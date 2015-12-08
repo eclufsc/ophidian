@@ -2,7 +2,8 @@
 
 ### how to open the project on Eclipse
 
-```mkdir ../openeda-build
+```bash
+mkdir ../openeda-build
 cd ../openeda-build
 mkdir debug
 cd debug
