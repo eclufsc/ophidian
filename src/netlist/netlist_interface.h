@@ -34,7 +34,7 @@ typedef std::size_t net_identifier;
 typedef std::size_t pin_identifier;
 
 enum class direction_enum  {
-	IN, OUT, INOUT
+	IN=0, OUT, INOUT
 };
 
 class netlist_interface {
@@ -47,11 +47,11 @@ public:
 	virtual pin_identifier insert_pad(std::string name, direction_enum direction) = 0;
 	virtual net_identifier insert_net(std::string name) = 0;
 
-	virtual bool erase_cell(cell_identifier cell) = 0;
-	virtual bool erase_cell(std::string name) = 0;
+	virtual void erase_cell(cell_identifier cell) = 0;
+	virtual void erase_cell(std::string name) = 0;
 
-	virtual bool erase_net(net_identifier net) = 0;
-	virtual bool erase_net(std::string name) = 0;
+	virtual void erase_net(net_identifier net) = 0;
+	virtual void erase_net(std::string name) = 0;
 
 	virtual void connect(net_identifier net, pin_identifier pin) = 0;
 	virtual void disconnect(net_identifier net, pin_identifier pin) = 0;
