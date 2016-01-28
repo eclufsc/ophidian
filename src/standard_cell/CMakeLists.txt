@@ -1,0 +1,5 @@
+find_package( Boost 1.59 )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (standard_cell standard_cells.cpp)
+target_include_directories ( standard_cell PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( standard_cell ${Boost_LIBRARIES} entity )
