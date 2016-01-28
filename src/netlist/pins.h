@@ -16,9 +16,9 @@
 namespace openeda {
 namespace netlist {
 
-class cells;
 class pins: entity::property {
 	std::vector<entity::entity> m_owners;
+	std::vector<entity::entity> m_nets;
 	std::vector<std::string> m_names;
 
 	std::vector<entity::entity> m_index2entity;
@@ -34,11 +34,15 @@ public:
 	entity::entity owner(entity::entity pin) const {
 		return m_owners[m_entity2index.at(pin)];
 	}
+	entity::entity net(entity::entity pin) const {
+			return m_nets[m_entity2index.at(pin)];
+		}
 	std::string name(entity::entity pin) const {
 		return m_names[m_entity2index.at(pin)];
 	}
 
 	void owner(entity::entity pin, entity::entity owner);
+	void net(entity::entity pin, entity::entity net);
 	void name(entity::entity pin, std::string name);
 
 };

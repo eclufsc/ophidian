@@ -16,7 +16,6 @@
 namespace openeda {
 namespace netlist {
 
-class pins;
 class cells: entity::property {
 	std::vector<std::string> m_names;
 	std::vector<entity::entity> m_standard_cells;
