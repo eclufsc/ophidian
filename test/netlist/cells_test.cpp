@@ -3,6 +3,7 @@
 #include <entity.h>
 #include <cells.h>
 #include <nets.h>
+#include <pins.h>
 
 TEST_CASE("cells/assign name","[netlist][cells]") {
 	openeda::entity::system system;

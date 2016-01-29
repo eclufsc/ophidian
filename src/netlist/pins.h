@@ -11,7 +11,6 @@
 #include <vector>
 #include <entity.h>
 #include <property.h>
-#include "cells.h"
 
 namespace openeda {
 namespace netlist {

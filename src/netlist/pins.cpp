@@ -19,8 +19,8 @@ pins::~pins() {
 
 void pins::create(entity::entity e) {
 	m_names.resize(m_names.size() + 1);
-	m_owners.resize(m_owners.size() + 1);
-	m_nets.resize(m_nets.size() + 1);
+	m_owners.push_back(entity::entity());
+	m_nets.push_back(entity::entity());
 	m_entity2index[e] = m_index2entity.size();
 	m_index2entity.push_back(e);
 }

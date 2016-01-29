@@ -11,7 +11,6 @@
 #include <vector>
 #include <property.h>
 #include <standard_cells.h>
-#include "pins.h"
 
 namespace openeda {
 namespace netlist {

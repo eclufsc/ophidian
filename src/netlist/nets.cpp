@@ -42,7 +42,7 @@ void nets::connect(entity::entity net, entity::entity pin) {
 }
 
 void nets::disconnect(entity::entity net, entity::entity pin) {
-	auto & pins_vector = m_pins[m_entity2index[net]];
+	auto & pins_vector = m_pins[m_entity2index.at(net)];
 	std::size_t i = 0;
 	while(i < pins_vector.size())
 	{
@@ -58,11 +58,11 @@ void nets::disconnect(entity::entity net, entity::entity pin) {
 }
 
 void nets::pins(entity::entity net, std::vector<entity::entity> pins) {
-	m_pins[m_entity2index[net]] = pins;
+	m_pins[m_entity2index.at(net)] = pins;
 }
 
 void nets::name(entity::entity net, std::string name) {
-	m_names[m_entity2index[net]] = name;
+	m_names[m_entity2index.at(net)] = name;
 }
 
 } /* namespace netlist */
