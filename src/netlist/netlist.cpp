@@ -12,12 +12,19 @@
 namespace openeda {
 namespace netlist {
 
+
 netlist::netlist(standard_cell::standard_cells * std_cells) :
 		m_std_cells(std_cells), m_cells(&m_cells_system), m_pins(
 				&m_pins_system), m_nets(&m_nets_system) {
 }
 
 netlist::~netlist() {
+}
+
+
+void netlist::register_cell_property(
+		entity::property* property) {
+	m_cells_system.register_property(property);
 }
 
 entity::entity netlist::cell_insert(std::string name, std::string type) {

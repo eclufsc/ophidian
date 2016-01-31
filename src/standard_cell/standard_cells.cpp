@@ -34,6 +34,11 @@ std::vector<std::string> standard_cells::names() const {
 	return names;
 }
 
+void standard_cells::register_property(
+		entity::property* property) {
+	m_system.register_property(property);
+}
+
 } /* namespace standard_cell */
 } /* namespace openeda */
 

@@ -25,6 +25,14 @@ public:
 	std::size_t size() const { return m_system.size(); }
 	bool empty() const { return m_system.empty(); }
 	std::vector<std::string> names() const;
+
+
+	void register_property(entity::property* property);
+	const entity::system & system() const {
+		return m_system;
+	}
+
+
 };
 
 } /* namespace standard_cell */
