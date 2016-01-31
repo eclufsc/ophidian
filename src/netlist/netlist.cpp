@@ -7,6 +7,7 @@
 
 #include <netlist.h>
 #include <algorithm>
+#include <iostream>
 
 namespace openeda {
 namespace netlist {
@@ -34,8 +35,8 @@ entity::entity netlist::cell_insert(std::string name, std::string type) {
 void netlist::cell_remove(entity::entity cell) {
 	m_name2cell.erase(m_cells.name(cell));
 	auto cell_pins = m_cells.pins(cell);
-	for(auto pin : cell_pins)
-		if( !(pin_net(pin) == entity::entity()) )
+	for (auto pin : cell_pins)
+		if (!(pin_net(pin) == entity::entity()))
 			disconnect(pin);
 	std::for_each(cell_pins.begin(), cell_pins.end(),
 			std::bind(&entity::system::destroy, &m_pins_system,
@@ -78,6 +79,81 @@ void netlist::connect(entity::entity net, entity::entity pin) {
 void netlist::disconnect(entity::entity pin) {
 	m_nets.disconnect(pin_net(pin), pin);
 	m_pins.net(pin, entity::entity());
+}
+
+entity::entity netlist::PI_insert(std::string name) {
+	auto result = m_name2pin.find(name);
+	if (result != m_name2pin.end())
+		return result->second;
+	entity::entity the_pin = m_pins_system.create();
+	m_name2pin[name] = the_pin;
+	m_pins.name(the_pin, name);
+	m_PI_mapping.insert(entity2index_map::value_type(the_pin, m_PI.size()));
+	m_PI.push_back(the_pin);
+	return the_pin;
+}
+
+void netlist::net_remove(entity::entity net) {
+	m_name2net.erase(m_nets.name(net));
+	auto net_pins = m_nets.pins(net);
+	for (auto pin : net_pins)
+		if (!(pin_net(pin) == entity::entity()))
+			disconnect(pin);
+	m_nets_system.destroy(net);
+}
+
+void netlist::PI_remove(entity::entity PI) {
+	std::size_t index = m_PI_mapping.left.at(PI);
+	std::size_t last_index = m_PI.size() - 1;
+	entity::entity last_entity = m_PI_mapping.right.at(last_index);
+	m_PI[index] = last_entity;
+	m_PI.pop_back();
+
+	auto current_it = m_PI_mapping.left.find(PI);
+	m_PI_mapping.left.erase(current_it);
+
+	if (!(pin_net(PI) == entity::entity()))
+		disconnect(PI);
+	m_pins_system.destroy(PI);
+
+	if (m_PI.size() > 1) {
+		current_it = m_PI_mapping.left.find(last_entity);
+		m_PI_mapping.left.erase(current_it);
+		m_PI_mapping.insert(entity2index_map::value_type(last_entity, index));
+	}
+}
+
+entity::entity netlist::PO_insert(std::string name) {
+	auto result = m_name2pin.find(name);
+	if (result != m_name2pin.end())
+		return result->second;
+	entity::entity the_pin = m_pins_system.create();
+	m_name2pin[name] = the_pin;
+	m_pins.name(the_pin, name);
+	m_PO_mapping.insert(entity2index_map::value_type(the_pin, m_PO.size()));
+	m_PO.push_back(the_pin);
+	return the_pin;
+}
+
+void netlist::PO_remove(entity::entity PO) {
+	std::size_t index = m_PO_mapping.left.at(PO);
+	std::size_t last_index = m_PO.size() - 1;
+	entity::entity last_entity = m_PO_mapping.right.at(last_index);
+	m_PO[index] = last_entity;
+	m_PO.pop_back();
+
+	auto current_it = m_PO_mapping.left.find(PO);
+	m_PO_mapping.left.erase(current_it);
+
+	if (!(pin_net(PO) == entity::entity()))
+		disconnect(PO);
+	m_pins_system.destroy(PO);
+
+	if (m_PO.size() > 1) {
+		current_it = m_PO_mapping.left.find(last_entity);
+		m_PO_mapping.left.erase(current_it);
+		m_PO_mapping.insert(entity2index_map::value_type(last_entity, index));
+	}
 }
 
 } /* namespace netlist */

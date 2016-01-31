@@ -34,10 +34,14 @@ public:
 		return m_owners[m_entity2index.at(pin)];
 	}
 	entity::entity net(entity::entity pin) const {
-			return m_nets[m_entity2index.at(pin)];
-		}
+		return m_nets[m_entity2index.at(pin)];
+	}
 	std::string name(entity::entity pin) const {
 		return m_names[m_entity2index.at(pin)];
+	}
+	std::pair<std::vector<std::string>::const_iterator,
+			std::vector<std::string>::const_iterator> names() const {
+		return std::make_pair(m_names.begin(), m_names.end());
 	}
 
 	void owner(entity::entity pin, entity::entity owner);

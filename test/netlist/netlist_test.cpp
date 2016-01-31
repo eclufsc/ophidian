@@ -169,10 +169,104 @@ TEST_CASE("netlist/remove cell and disconnect all pins before removing them","[n
 	auto inp1_pins = netlist.net_pins(inp1);
 	auto n1_pins = netlist.net_pins(n1);
 
-	REQUIRE( std::find(inp1_pins.begin(), inp1_pins.end(), u1a) == inp1_pins.end() );
-	REQUIRE( std::find(n1_pins.begin(), n1_pins.end(), u1o) == n1_pins.end() );
+	REQUIRE(
+			std::find(inp1_pins.begin(), inp1_pins.end(), u1a)
+					== inp1_pins.end());
+	REQUIRE(std::find(n1_pins.begin(), n1_pins.end(), u1o) == n1_pins.end());
 
-	REQUIRE( n1_pins.size() == 1 ); // u2:a
-	REQUIRE( inp1_pins.empty() );
+	REQUIRE(n1_pins.size() == 1); // u2:a
+	REQUIRE(inp1_pins.empty());
 
 }
+
+TEST_CASE("netlist/remove net", "[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+	auto u1 = netlist.cell_insert("u1", "INVX1");
+	auto u1a  = netlist.pin_insert(u1, "u1:a");
+	auto n1 = netlist.net_insert("u1");
+	auto pi = netlist.PI_insert("pi");
+
+	netlist.connect(n1, pi);
+	netlist.connect(n1, u1a);
+
+	REQUIRE_NOTHROW( netlist.net_remove(n1) );
+	REQUIRE( netlist.net_count() == 0 );
+	REQUIRE( netlist.pin_net(pi) == openeda::entity::entity() );
+	REQUIRE( netlist.pin_net(u1a) == openeda::entity::entity() );
+
+}
+
+TEST_CASE("netlist/insert PI","[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto inp1 = netlist.PI_insert("inp1");
+	REQUIRE(netlist.PI_count() == 1);
+	REQUIRE(netlist.pin_name(inp1) == "inp1");
+	REQUIRE(
+			std::find(netlist.PI_begin(), netlist.PI_end(), inp1)
+					!= netlist.PI_end());
+}
+
+TEST_CASE("netlist/remove PI","[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto inp1 = netlist.PI_insert("inp1");
+
+	netlist.PI_remove(inp1);
+
+	REQUIRE(netlist.PI_count() == 0);
+	REQUIRE_THROWS(netlist.pin_name(inp1));
+	REQUIRE(
+			std::find(netlist.PI_begin(), netlist.PI_end(), inp1)
+					== netlist.PI_end());
+}
+
+TEST_CASE("netlist/insert 2 PI and remove 1","[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto inp1 = netlist.PI_insert("inp1");
+	auto inp2 = netlist.PI_insert("inp2");
+
+	netlist.PI_remove(inp1);
+
+	REQUIRE(netlist.PI_count() == 1);
+	REQUIRE_THROWS(netlist.pin_name(inp1));
+	REQUIRE(
+			std::find(netlist.PI_begin(), netlist.PI_end(), inp1)
+					== netlist.PI_end());
+	REQUIRE(
+			std::find(netlist.PI_begin(), netlist.PI_end(), inp2)
+					!= netlist.PI_end());
+}
+
+
+TEST_CASE("netlist/insert PO","[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto out = netlist.PO_insert("out");
+
+	REQUIRE(netlist.PO_count() == 1);
+	REQUIRE(
+			std::find(netlist.PO_begin(), netlist.PO_end(), out)
+					!= netlist.PO_end());
+}
+
+
+TEST_CASE("netlist/remove PO","[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto out = netlist.PO_insert("out");
+
+	REQUIRE_NOTHROW( netlist.PO_remove(out) );
+	REQUIRE(netlist.PO_count() == 0);
+	REQUIRE(
+			std::find(netlist.PO_begin(), netlist.PO_end(), out)
+					== netlist.PO_end());
+}
+

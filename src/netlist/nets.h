@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <entity.h>
+#include <utility>
 
 namespace openeda {
 namespace netlist {
@@ -33,6 +34,9 @@ public:
 	}
 	std::vector<entity::entity> pins(entity::entity net) const {
 		return m_pins[m_entity2index.at(net)];
+	}
+	std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {
+		return std::make_pair(m_names.begin(), m_names.end());
 	}
 
 	void connect(entity::entity net, entity::entity pin);

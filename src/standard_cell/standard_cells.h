@@ -24,6 +24,7 @@ public:
 	std::string name(entity::entity cell) const { return m_mapping.right.at(cell); }
 	std::size_t size() const { return m_system.size(); }
 	bool empty() const { return m_system.empty(); }
+	std::vector<std::string> names() const;
 };
 
 } /* namespace standard_cell */
