@@ -45,6 +45,7 @@ std::vector<std::string> tokenize(std::string line) {
 }
 
 void read(std::istream & in, netlist* netlist) {
+	std::cout << "reading .v file..." << std::endl;
 	std::string line;
 	std::getline(in, line);
 	auto tokens = parser::tokenize(line);
@@ -90,7 +91,7 @@ void read(std::istream & in, netlist* netlist) {
 			netlist->connect(netlist->net_insert(tokens[i+1]),
 					netlist->pin_insert(netlist->cell_insert(cell_name, cell_type), cell_name+":"+tokens[i].substr(1)));
 	} while (tokens.size() != 1 || tokens[0] != "endmodule");
-
+	std::cout << "reading .v file DONE" << std::endl;
 }
 
 void write(std::ostream & out, standard_cell::standard_cells * std_cells,

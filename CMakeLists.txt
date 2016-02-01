@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8.12.2)
 project (openeda)
 
+
+ 
+ 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -23,3 +26,4 @@ endif()
 
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(apps)

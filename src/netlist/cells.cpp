@@ -21,13 +21,17 @@ void cells::destroy(entity::entity e) {
 	std::size_t to_destroy = m_entity2index[e];
 	std::size_t last = m_index2entity.size() - 1;
 	m_names[to_destroy] = m_names[last];
+	m_names.pop_back();
+
 	m_standard_cells[to_destroy] = m_standard_cells[last];
+	m_standard_cells.pop_back();
+
 	m_pins[to_destroy] = m_pins[last];
+	m_pins.pop_back();
+
 	m_index2entity[to_destroy] = m_index2entity[last];
 	m_entity2index[m_index2entity[to_destroy]] = to_destroy;
-	m_names.pop_back();
-	m_standard_cells.pop_back();
-	m_pins.pop_back();
+
 	m_index2entity.pop_back();
 	m_entity2index.erase(e);
 }

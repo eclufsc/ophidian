@@ -12,6 +12,8 @@ namespace placement {
 
 library::library(openeda::standard_cell::standard_cells * std_cells) {
 	std_cells->register_property(this);
+	for(auto c : std_cells->system())
+		create(c.second);
 }
 
 library::~library() {
@@ -37,5 +39,10 @@ void library::geometry(entity::entity e, multipolygon geometry) {
 	m_geometries[m_mapping.left.at(e)] = geometry;
 }
 
+void library::dist2microns(uint16_t dist) {
+	m_dist2microns = dist;
+}
+
 } /* namespace placement */
 } /* namespace openeda */
+

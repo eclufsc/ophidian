@@ -327,7 +327,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 
 void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 		library* lib) {
-
+	std::cout << "reading .lef file..." << std::endl;
 	std::vector<std::string> tokens(1);
 	while (!dot_lef.eof()) {
 		parser::get_next_token(dot_lef, tokens[0], parser::LEFCommentChar);
@@ -359,6 +359,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			assert(tokens.size() == 3);
 			assert(tokens[0] == "DATABASE");
 			assert(tokens[1] == "MICRONS");
+			lib->dist2microns(atoi(tokens[2].c_str()));
 			parser::get_next_n_tokens(dot_lef, tokens, 3,
 					parser::LEFCommentChar);
 			assert(tokens[0] == parser::LEFLineEndingChar);
@@ -379,6 +380,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			break;
 		}
 	}
+	std::cout << "reading .lef file DONE" << std::endl;
 //	dot_lef.close();
 
 }

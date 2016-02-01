@@ -19,6 +19,7 @@ class cells: entity::property {
 	std::vector<std::string> m_names;
 	std::vector<entity::entity> m_standard_cells;
 	std::vector<std::vector<entity::entity> > m_pins;
+
 	std::vector<entity::entity> m_index2entity;
 	std::unordered_map<entity::entity, std::size_t> m_entity2index;
 public:

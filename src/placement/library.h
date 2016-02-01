@@ -23,6 +23,8 @@ class library : public entity::property {
 	using multipolygon = geometry::multi_polygon<polygon>;
 	using entity2index_map = boost::bimap<entity::entity, std::size_t>;
 
+	uint16_t m_dist2microns;
+
 	std::vector< multipolygon > m_geometries;
 	entity2index_map m_mapping;
 
@@ -33,6 +35,10 @@ public:
 
 	void create(entity::entity e);
 	void destroy(entity::entity e);
+
+	uint16_t dist2microns() const { return m_dist2microns; }
+	void dist2microns(uint16_t dist);
+
 
 	multipolygon geometry(entity::entity e) const {
 		return m_geometries[m_mapping.left.at(e)];
