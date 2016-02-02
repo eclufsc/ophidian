@@ -35,6 +35,11 @@ public:
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry(entity::entity e) const {
 		return m_geometries[m_mapping.left.at(e)];
 	}
+
+	const std::vector<geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > & geometries() const {
+		return m_geometries;
+	}
+
 };
 
 } /* namespace placement */

@@ -251,13 +251,12 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 			get_next_n_tokens(is, tokens, 4, LEFCommentChar);
 			assert(tokens[1] == "BY");
 			assert(tokens[3] == LEFLineEndingChar);
-			std::vector<geometry::point<double> > points {
-				{ 0.0, 0.0 },
-				{ 0.0, atof(tokens[2].c_str()) },
-				{ atof(tokens[0].c_str()), atof(tokens[2].c_str()) },
-				{ atof(tokens[0].c_str()), 0.0 },
-				{ 0.0, 0.0 }
-			};
+			std::vector<geometry::point<double> > points { { 0.0, 0.0 }, { 0.0,
+					lib->dist2microns() * atof(tokens[2].c_str()) }, {
+					lib->dist2microns() * atof(tokens[0].c_str()),
+					lib->dist2microns() * atof(tokens[2].c_str()) }, {
+					lib->dist2microns() * atof(tokens[0].c_str()), 0.0 }, { 0.0,
+					0.0 } };
 			geometry::polygon<geometry::point<double> > current_polygon;
 			boost::geometry::append(current_polygon, points);
 			geometry.push_back(current_polygon);
@@ -292,16 +291,26 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 							get_next_n_tokens(is, tokens, 5, LEFCommentChar);
 
 							std::vector<geometry::point<double> > points { {
-									atof(tokens[0].c_str()), atof(
-											tokens[1].c_str()) },
-									{ atof(tokens[0].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[1].c_str()) }, { atof(
-											tokens[0].c_str()), atof(
-											tokens[1].c_str()) } };
+									lib->dist2microns()
+											* atof(tokens[0].c_str()),
+									lib->dist2microns()
+											* atof(tokens[1].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[0].c_str()),
+									lib->dist2microns()
+											* atof(tokens[3].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[2].c_str()),
+									lib->dist2microns()
+											* atof(tokens[3].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[2].c_str()),
+									lib->dist2microns()
+											* atof(tokens[1].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[0].c_str()),
+									lib->dist2microns()
+											*	atof(tokens[1].c_str()) } };
 							geometry::polygon<geometry::point<double> > current_polygon;
 							boost::geometry::append(current_polygon, points);
 							geometry.push_back(current_polygon);
