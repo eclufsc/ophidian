@@ -235,6 +235,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry;
 
 //	myMacro = locateOrCreateMacro(tokens[0]);
+	geometry::polygon<geometry::point<double> > bounding_rectangle;
 
 	get_next_token(is, tokens[0], LEFCommentChar);
 	while (tokens[0] != "END") {
@@ -252,12 +253,10 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 			assert(tokens[1] == "BY");
 			assert(tokens[3] == LEFLineEndingChar);
 			std::vector<geometry::point<double> > points { { 0.0, 0.0 }, { 0.0,
-					atof(tokens[2].c_str()) }, { atof(tokens[0].c_str()), atof(
-					tokens[2].c_str()) }, { atof(tokens[0].c_str()), 0.0 }, {
+					lib->dist2microns() * atof(tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
+					tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), 0.0 }, {
 					0.0, 0.0 } };
-			geometry::polygon<geometry::point<double> > current_polygon;
-			boost::geometry::append(current_polygon, points);
-			geometry.push_back(current_polygon);
+			boost::geometry::append(bounding_rectangle, points);
 //			myMacro->width = atof(tokens[0].c_str());
 //			myMacro->height = atof(tokens[2].c_str());
 		} else if (tokens[0] == "SITE")
@@ -290,14 +289,14 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 
 							std::vector<geometry::point<double> > points { {
 
-							atof(tokens[0].c_str()), atof(tokens[1].c_str()) },
-									{ atof(tokens[0].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[1].c_str()) }, { atof(
-											tokens[0].c_str()), atof(
+							lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(tokens[1].c_str()) },
+									{ lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
+											tokens[3].c_str()) }, { lib->dist2microns() * atof(
+											tokens[2].c_str()), lib->dist2microns() * atof(
+											tokens[3].c_str()) }, { lib->dist2microns() * atof(
+											tokens[2].c_str()), lib->dist2microns() * atof(
+											tokens[1].c_str()) }, { lib->dist2microns() * atof(
+											tokens[0].c_str()), lib->dist2microns() * atof(
 											tokens[1].c_str()) } };
 							geometry::polygon<geometry::point<double> > current_polygon;
 							boost::geometry::append(current_polygon, points);
@@ -315,6 +314,8 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 		get_next_token(is, tokens[0], LEFCommentChar);
 	}
 	get_next_token(is, tokens[0], LEFCommentChar);
+	if(geometry.empty())
+		geometry.push_back(bounding_rectangle);
 	lib->geometry(std_cell, geometry);
 //	assert(myMacro->name == tokens[0]);
 	return;
