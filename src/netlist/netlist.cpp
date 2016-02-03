@@ -27,6 +27,13 @@ void netlist::register_cell_property(
 	m_cells_system.register_property(property);
 }
 
+entity::entity netlist::cell_find(std::string name) {
+	auto result = m_name2cell.find(name);
+	if(result == m_name2cell.end())
+		return entity::entity{};
+	return result->second;
+}
+
 entity::entity netlist::cell_insert(std::string name, std::string type) {
 
 	auto result = m_name2cell.find(name);
@@ -165,4 +172,5 @@ void netlist::PO_remove(entity::entity PO) {
 
 } /* namespace netlist */
 } /* namespace openeda */
+
 

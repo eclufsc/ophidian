@@ -68,6 +68,8 @@ void read_init_def_components(std::istream& is, netlist::netlist* netlist,
 			parser::get_next_n_tokens(is, tokens, 2, parser::DEFCommentChar);
 			//assert(cell2id.find(tokens[0]) != cell2id.end());
 			cell = netlist->cell_insert(tokens[0], tokens[1]);
+//			cell = netlist->cell_find(tokens[0]);
+
 //			if (cell2id.find(tokens[0]) == cell2id.end()) {
 //				myCell = locateOrCreateCell(tokens[0]);
 //				myCell->type = macro2id[tokens[1]];
@@ -87,7 +89,6 @@ void read_init_def_components(std::istream& is, netlist::netlist* netlist,
 				get_next_n_tokens(is, tokens, 5, DEFCommentChar);
 				assert(tokens[0] == "(");
 				assert(tokens[3] == ")");
-
 				cells->position(cell,
 						{ atof(tokens[1].c_str()), atof(tokens[2].c_str()) });
 
@@ -182,7 +183,7 @@ void read_def_pins(std::istream& is) {
 void read_def_nets(std::istream& is) {
 //	net* myNet = NULL;
 //	pin* myPin = NULL;
-	std::vector < std::string > tokens(1);
+	std::vector<std::string> tokens(1);
 
 	get_next_n_tokens(is, tokens, 2, DEFCommentChar);
 	assert(tokens[1] == DEFLineEndingChar);

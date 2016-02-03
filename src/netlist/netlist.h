@@ -56,6 +56,7 @@ public:
 	}
 
 	// cell
+	entity::entity cell_find(std::string name);
 	entity::entity cell_insert(std::string name, std::string type);
 	void cell_remove(entity::entity cell);
 
