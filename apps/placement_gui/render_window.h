@@ -17,11 +17,15 @@ class render_window: public sf::RenderWindow {
 
 	application * m_app;
 
-	std::vector<GLdouble> m_vertex_array;
-	std::vector<GLdouble> m_color_array;
+	sf::VertexArray m_cells;
+	sf::VertexArray m_selected;
 	sf::View m_view;
-	std::size_t m_lines_to_draw;
 
+	std::unordered_map<openeda::entity::entity, std::pair<std::size_t, std::size_t> > m_entity2index;
+
+	void update_selected_vertex_array(
+			const std::set<openeda::entity::entity> &selected);
+	void update_cells_vertex_array(openeda::entity::entity cell);
 
 public:
 	render_window(application * app);
@@ -31,6 +35,7 @@ public:
 	void render();
 
 	void process_inputs();
+
 };
 
 #endif /* RENDER_WINDOW_H_ */
