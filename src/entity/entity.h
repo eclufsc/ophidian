@@ -58,7 +58,6 @@ namespace openeda {
 namespace entity{
 
 class system {
-protected:
 	using entity2index_map = typename boost::bimap< entity, std::size_t >;
 	entity2index_map m_entities;
 	uint32_t m_next;
@@ -77,6 +76,8 @@ public:
 	void register_property( property * p );
 
 	const entity2index_map::left_map & entities() const { return m_entities.left; }
+
+	std::size_t lookup(entity & e) const { return m_entities.left.at(e); }
 
 };
 

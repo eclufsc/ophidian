@@ -16,19 +16,21 @@
 namespace openeda {
 namespace netlist {
 
-class nets: public entity::system {
+class nets {
+	entity::system & m_system;
+
 	entity::vector_property<std::vector<entity::entity>> m_pins;
 	entity::vector_property<std::string> m_names;
 
 public:
-	nets();
+	nets(entity::system & system);
 	virtual ~nets();
 
 	std::string name(entity::entity net) const {
-		return m_names[m_entities.left.at(net)];
+		return m_names[m_system.lookup(net)];
 	}
 	std::vector<entity::entity> pins(entity::entity net) const {
-		return m_pins[m_entities.left.at(net)];
+		return m_pins[m_system.lookup(net)];
 	}
 	std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {
 		return std::make_pair(m_names.begin(), m_names.end());

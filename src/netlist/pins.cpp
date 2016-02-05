@@ -10,25 +10,25 @@
 namespace openeda {
 namespace netlist {
 
-pins::pins() {
-	register_property(&m_owners);
-	register_property(&m_nets);
-	register_property(&m_names);
+pins::pins(entity::system & system) : m_system(system) {
+	m_system.register_property(&m_owners);
+	m_system.register_property(&m_nets);
+	m_system.register_property(&m_names);
 }
 
 pins::~pins() {
 }
 
 void pins::owner(entity::entity pin, entity::entity owner) {
-	m_owners[m_entities.left.at(pin)] = owner;
+	m_owners[m_system.lookup(pin)] = owner;
 }
 
 void pins::net(entity::entity pin, entity::entity net) {
-	m_nets[m_entities.left.at(pin)] = net;
+	m_nets[m_system.lookup(pin)] = net;
 }
 
 void pins::name(entity::entity pin, std::string name) {
-	m_names[m_entities.left.at(pin)] = name;
+	m_names[m_system.lookup(pin)] = name;
 }
 
 } /* namespace netlist */

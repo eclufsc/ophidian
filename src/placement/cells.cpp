@@ -10,45 +10,21 @@
 namespace openeda {
 namespace placement {
 
-cells::cells(openeda::netlist::netlist * netlist) {
-	netlist->register_cell_property(this);
-	for (auto c : netlist->cell_system().entities())
-		create(c.first, 0);
+cells::cells(openeda::netlist::netlist * netlist) : m_system(netlist->cell_system()) {
+	netlist->register_cell_property(&m_positions);
+	netlist->register_cell_property(&m_geometries);
 }
 
 cells::~cells() {
 }
 
-void cells::create(entity::entity e, std::size_t index) {
-	m_mapping.insert(
-			boost::bimap<entity::entity, std::size_t>::value_type(e,
-					m_positions.size()));
-	geometry::point<double> point;
-	point.x(0.0); point.y(0.0);
-	m_positions.push_back(point);
-	m_geometries.resize(m_geometries.size() + 1);
+void cells::position(entity::entity cell, point position_point) {
+	m_positions[m_system.lookup(cell)] = position_point;
 }
 
-void cells::destroy(entity::entity e, std::size_t index) {
-	std::size_t to_destroy = m_mapping.left.at(e);
-	std::size_t last = m_geometries.size() - 1;
-	entity::entity last_entity = m_mapping.right.at(last);
-	m_geometries[to_destroy] = m_geometries[last];
-	m_positions[to_destroy] = m_positions[last];
-	m_geometries.pop_back();
-	m_positions.pop_back();
-	m_mapping.left.erase(e);
-	m_mapping.right.erase(last);
-	m_mapping.insert(boost::bimap<entity::entity, std::size_t>::value_type(last_entity, to_destroy));
-}
-
-void cells::position(entity::entity e, geometry::point<double> point) {
-	m_positions[m_mapping.left.at(e)] = point;
-}
-
-void cells::geometry(entity::entity e,
-		geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry) {
-	m_geometries[m_mapping.left.at(e)] = geometry;
+void cells::geometry(entity::entity cell,
+		multipolygon geometry) {
+	m_geometries[m_system.lookup(cell)] = geometry;
 }
 
 } /* namespace placement */

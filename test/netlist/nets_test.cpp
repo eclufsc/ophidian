@@ -7,9 +7,10 @@
 
 TEST_CASE("nets/name","[netlist][nets]") {
 
-	openeda::netlist::nets nets;
+	openeda::entity::system nets_system;
+	openeda::netlist::nets nets(nets_system);
 
-	auto n1 = nets.create();
+	auto n1 = nets_system.create();
 	nets.name(n1, "n1");
 
 	REQUIRE(nets.name(n1) == "n1");
@@ -18,11 +19,12 @@ TEST_CASE("nets/name","[netlist][nets]") {
 
 TEST_CASE("nets/assign pins","[netlist][nets]") {
 
-	openeda::netlist::nets nets;
+	openeda::entity::system nets_system;
+	openeda::netlist::nets nets(nets_system);
 
 	openeda::entity::system pin_sys;
 
-	auto n1 = nets.create();
+	auto n1 = nets_system.create();
 
 	std::vector<openeda::entity::entity> net_pins { pin_sys.create(),
 			pin_sys.create(), pin_sys.create() };
@@ -35,10 +37,11 @@ TEST_CASE("nets/assign pins","[netlist][nets]") {
 
 TEST_CASE("nets/connect pin","[netlist][nets]") {
 
-	openeda::netlist::nets nets;
+	openeda::entity::system nets_system;
+	openeda::netlist::nets nets(nets_system);
 	openeda::entity::system pin_sys;
 
-	auto n1 = nets.create();
+	auto n1 = nets_system.create();
 
 	auto connected = pin_sys.create();
 	auto unconnected = pin_sys.create();
@@ -58,10 +61,11 @@ TEST_CASE("nets/connect pin","[netlist][nets]") {
 
 TEST_CASE("nets/disconnect pin","[netlist][nets]") {
 
-	openeda::netlist::nets nets;
+	openeda::entity::system nets_system;
+	openeda::netlist::nets nets(nets_system);
 	openeda::entity::system pin_sys;
 
-	auto n1 = nets.create();
+	auto n1 = nets_system.create();
 
 	auto connected = pin_sys.create();
 	auto unconnected = pin_sys.create();

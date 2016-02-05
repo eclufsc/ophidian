@@ -15,22 +15,24 @@
 namespace openeda {
 namespace netlist {
 
-class cells: public entity::system {
+class cells {
+	entity::system & m_system;
+
 	entity::vector_property<std::string> m_names;
 	entity::vector_property<entity::entity> m_standard_cells;
 	entity::vector_property<std::vector<entity::entity> > m_pins;
 public:
-	cells();
+	cells(entity::system & system);
 	virtual ~cells();
 
 	std::string name(entity::entity cell) const {
-		return m_names[m_entities.left.at(cell)];
+		return m_names[m_system.lookup(cell)];
 	}
 	entity::entity standard_cell(entity::entity cell) const {
-		return m_standard_cells[m_entities.left.at(cell)];
+		return m_standard_cells[m_system.lookup(cell)];
 	}
 	std::vector<entity::entity> pins(entity::entity cell) const {
-		return m_pins[m_entities.left.at(cell)];
+		return m_pins[m_system.lookup(cell)];
 	}
 	void insert_pin(entity::entity cell, entity::entity pin);
 	void pins(entity::entity cell, std::vector<entity::entity> pins);

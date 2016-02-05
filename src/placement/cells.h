@@ -10,30 +10,34 @@
 
 
 #include <netlist.h>
-#include <property.h>
+#include <vector_property.h>
 #include "../geometry/geometry.h"
 #include <boost/bimap.hpp>
 
 namespace openeda {
 namespace placement {
 
-class cells : public entity::property {
-	std::vector<geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > m_geometries;
-	std::vector<geometry::point<double> > m_positions;
+class cells  {
+	using point = geometry::point<double>;
+	using polygon = geometry::polygon<point>;
+	using multipolygon = geometry::multi_polygon<polygon>;
 
-	boost::bimap<entity::entity, std::size_t> m_mapping;
+	const entity::system & m_system;
+
+	entity::vector_property<multipolygon> m_geometries;
+	entity::vector_property<point> m_positions;
+
 public:
 	cells(openeda::netlist::netlist * netlist);
 	virtual ~cells();
-	void create(entity::entity e, std::size_t index);
-	void destroy(entity::entity e, std::size_t index);
-	void position(entity::entity e, geometry::point<double>);
-	geometry::point<double> position(entity::entity e) const {
-		return m_positions[m_mapping.left.at(e)];
+
+	void position(entity::entity cell, point position_point);
+	point position(entity::entity cell) const {
+		return m_positions[m_system.lookup(cell)];
 	}
-	void geometry(entity::entity e, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry);
-	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry(entity::entity e) const {
-		return m_geometries[m_mapping.left.at(e)];
+	void geometry(entity::entity cell, multipolygon geometry);
+	multipolygon geometry(entity::entity cell) const {
+		return m_geometries[m_system.lookup(cell)];
 	}
 };
 

@@ -15,23 +15,25 @@
 namespace openeda {
 namespace netlist {
 
-class pins: public entity::system {
+class pins {
+	entity::system & m_system;
+
 	entity::vector_property<entity::entity> m_owners;
 	entity::vector_property<entity::entity> m_nets;
 	entity::vector_property<std::string> m_names;
 
 public:
-	pins();
+	pins(entity::system & system);
 	virtual ~pins();
 
 	entity::entity owner(entity::entity pin) const {
-		return m_owners[m_entities.left.at(pin)];
+		return m_owners[m_system.lookup(pin)];
 	}
 	entity::entity net(entity::entity pin) const {
-		return m_nets[m_entities.left.at(pin)];
+		return m_nets[m_system.lookup(pin)];
 	}
 	std::string name(entity::entity pin) const {
-		return m_names[m_entities.left.at(pin)];
+		return m_names[m_system.lookup(pin)];
 	}
 	std::pair<std::vector<std::string>::const_iterator,
 			std::vector<std::string>::const_iterator> names() const {

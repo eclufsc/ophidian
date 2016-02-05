@@ -24,6 +24,10 @@ class netlist {
 
 	std::string m_module_name;
 
+	entity::system m_cells_system;
+	entity::system m_pins_system;
+	entity::system m_nets_system;
+
 	cells m_cells;
 	pins m_pins;
 	nets m_nets;
@@ -57,7 +61,7 @@ public:
 	void cell_remove(entity::entity cell);
 
 	std::size_t cell_count() const {
-		return m_cells.size();
+		return m_cells_system.size();
 	}
 	std::string cell_name(entity::entity cell) const {
 		return m_cells.name(cell);
@@ -68,14 +72,14 @@ public:
 	entity::entity cell_std_cell(entity::entity cell) const {
 		return m_cells.standard_cell(cell);
 	}
-	const entity::system & cell_system() const {
-		return m_cells;
+	const entity::system & cell_system() {
+		return m_cells_system;
 	}
 
 	// pin
 	entity::entity pin_insert(entity::entity cell, std::string name);
 	std::size_t pin_count() const {
-		return m_pins.size();
+		return m_pins_system.size();
 	}
 	std::string pin_name(entity::entity pin) const {
 		return m_pins.name(pin);
@@ -83,7 +87,7 @@ public:
 	entity::entity pin_owner(entity::entity pin) const {
 		return m_pins.owner(pin);
 	}
-	;
+
 	entity::entity pin_net(entity::entity pin) const {
 		return m_pins.net(pin);
 	}
@@ -96,7 +100,7 @@ public:
 	entity::entity net_insert(std::string name);
 	void net_remove(entity::entity net);
 	std::size_t net_count() const {
-		return m_nets.size();
+		return m_nets_system.size();
 	}
 	std::string net_name(entity::entity net) const {
 		return m_nets.name(net);
