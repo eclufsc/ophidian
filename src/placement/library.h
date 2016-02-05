@@ -31,8 +31,8 @@ public:
 	library(openeda::standard_cell::standard_cells * std_cells);
 	virtual ~library();
 
-	void create(entity::entity e);
-	void destroy(entity::entity e);
+	void create(entity::entity e, std::size_t index);
+	void destroy(entity::entity e, std::size_t index);
 
 	multipolygon geometry(entity::entity e) const {
 		return m_geometries[m_mapping.left.at(e)];

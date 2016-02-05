@@ -25,8 +25,8 @@ class cells : public entity::property {
 public:
 	cells(openeda::netlist::netlist * netlist);
 	virtual ~cells();
-	void create(entity::entity e);
-	void destroy(entity::entity e);
+	void create(entity::entity e, std::size_t index);
+	void destroy(entity::entity e, std::size_t index);
 	void position(entity::entity e, geometry::point<double>);
 	geometry::point<double> position(entity::entity e) const {
 		return m_positions[m_mapping.left.at(e)];

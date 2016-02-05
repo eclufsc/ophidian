@@ -11,29 +11,24 @@
 #include <vector>
 #include <entity.h>
 #include <utility>
+#include <vector_property.h>
 
 namespace openeda {
 namespace netlist {
 
-class nets: entity::property {
-	std::vector<std::vector<entity::entity>> m_pins;
-	std::vector<std::string> m_names;
-
-	std::vector<entity::entity> m_index2entity;
-	std::unordered_map<entity::entity, std::size_t> m_entity2index;
+class nets: public entity::system {
+	entity::vector_property<std::vector<entity::entity>> m_pins;
+	entity::vector_property<std::string> m_names;
 
 public:
-	nets(entity::system * entity_system);
+	nets();
 	virtual ~nets();
 
-	void create(entity::entity e);
-	void destroy(entity::entity e);
-
 	std::string name(entity::entity net) const {
-		return m_names[m_entity2index.at(net)];
+		return m_names[m_entities.left.at(net)];
 	}
 	std::vector<entity::entity> pins(entity::entity net) const {
-		return m_pins[m_entity2index.at(net)];
+		return m_pins[m_entities.left.at(net)];
 	}
 	std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {
 		return std::make_pair(m_names.begin(), m_names.end());

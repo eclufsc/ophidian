@@ -12,14 +12,14 @@ namespace placement {
 
 cells::cells(openeda::netlist::netlist * netlist) {
 	netlist->register_cell_property(this);
-	for (auto c : netlist->cell_system())
-		create(c.second);
+	for (auto c : netlist->cell_system().entities())
+		create(c.first, 0);
 }
 
 cells::~cells() {
 }
 
-void cells::create(entity::entity e) {
+void cells::create(entity::entity e, std::size_t index) {
 	m_mapping.insert(
 			boost::bimap<entity::entity, std::size_t>::value_type(e,
 					m_positions.size()));
@@ -29,7 +29,7 @@ void cells::create(entity::entity e) {
 	m_geometries.resize(m_geometries.size() + 1);
 }
 
-void cells::destroy(entity::entity e) {
+void cells::destroy(entity::entity e, std::size_t index) {
 	std::size_t to_destroy = m_mapping.left.at(e);
 	std::size_t last = m_geometries.size() - 1;
 	entity::entity last_entity = m_mapping.right.at(last);

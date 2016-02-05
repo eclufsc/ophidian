@@ -17,12 +17,12 @@ library::library(openeda::standard_cell::standard_cells * std_cells) {
 library::~library() {
 }
 
-void library::create(entity::entity e) {
+void library::create(entity::entity e, std::size_t index) {
 	m_mapping.insert(entity2index_map::value_type(e, m_geometries.size()));
 	m_geometries.push_back(multipolygon());
 }
 
-void library::destroy(entity::entity e) {
+void library::destroy(entity::entity e, std::size_t index) {
 	std::size_t to_destroy = m_mapping.left.at(e);
 	std::size_t last = m_geometries.size()-1;
 	entity::entity last_entity = m_mapping.right.at(last);

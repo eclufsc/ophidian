@@ -36,7 +36,7 @@ TEST_CASE("netlist/cant insert cell twice","[netlist]") {
 	REQUIRE(netlist.cell_count() == 1);
 }
 
-TEST_CASE("netlist/remove cell","[netlist][netlist]") {
+TEST_CASE("netlist/remove cell","[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");

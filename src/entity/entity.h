@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <limits>
 #include <set>
+#include <vector>
+
+#include <boost/bimap.hpp>
 
 #include "property.h"
 
@@ -55,7 +58,9 @@ namespace openeda {
 namespace entity{
 
 class system {
-	std::unordered_map<uint32_t, entity> m_entities;
+protected:
+	using entity2index_map = typename boost::bimap< entity, std::size_t >;
+	entity2index_map m_entities;
 	uint32_t m_next;
 
 	std::set<property*> m_properties;
@@ -66,10 +71,12 @@ public:
 	void destroy( entity e );
 	std::size_t size() const { return m_entities.size(); }
 	bool empty() const { return m_entities.empty(); }
-	std::unordered_map<uint32_t, entity>::const_iterator begin() const { return m_entities.begin(); }
-	std::unordered_map<uint32_t, entity>::const_iterator end() const { return m_entities.end(); }
+	entity2index_map::left_const_iterator begin() const { return m_entities.left.begin(); }
+	entity2index_map::left_const_iterator end() const { return m_entities.left.end(); }
 
 	void register_property( property * p );
+
+	const entity2index_map::left_map & entities() const { return m_entities.left; }
 
 };
 

@@ -32,9 +32,9 @@ TEST_CASE("verilog/read","[verilog]") {
 	bool ok = true;
 	for (auto it = simple.cell_system().begin();
 			it != simple.cell_system().end(); ++it) {
-		std::string name = simple.cell_name(it->second);
-		std::string std_cell = std_cells.name(simple.cell_std_cell(it->second));
-		auto cell_pins = simple.cell_pins(it->second);
+		std::string name = simple.cell_name(it->first);
+		std::string std_cell = std_cells.name(simple.cell_std_cell(it->first));
+		auto cell_pins = simple.cell_pins(it->first);
 		if (name == "u1") {
 			REQUIRE(std_cell == "NAND2_X1");
 			REQUIRE(cell_pins.size() == 3);

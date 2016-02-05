@@ -10,34 +10,28 @@
 
 #include <vector>
 #include <entity.h>
-#include <property.h>
+#include <vector_property.h>
 
 namespace openeda {
 namespace netlist {
 
-class pins: entity::property {
-	std::vector<entity::entity> m_owners;
-	std::vector<entity::entity> m_nets;
-	std::vector<std::string> m_names;
-
-	std::vector<entity::entity> m_index2entity;
-	std::unordered_map<entity::entity, std::size_t> m_entity2index;
+class pins: public entity::system {
+	entity::vector_property<entity::entity> m_owners;
+	entity::vector_property<entity::entity> m_nets;
+	entity::vector_property<std::string> m_names;
 
 public:
-	pins(entity::system * entity_system);
+	pins();
 	virtual ~pins();
 
-	void create(entity::entity e);
-	void destroy(entity::entity e);
-
 	entity::entity owner(entity::entity pin) const {
-		return m_owners[m_entity2index.at(pin)];
+		return m_owners[m_entities.left.at(pin)];
 	}
 	entity::entity net(entity::entity pin) const {
-		return m_nets[m_entity2index.at(pin)];
+		return m_nets[m_entities.left.at(pin)];
 	}
 	std::string name(entity::entity pin) const {
-		return m_names[m_entity2index.at(pin)];
+		return m_names[m_entities.left.at(pin)];
 	}
 	std::pair<std::vector<std::string>::const_iterator,
 			std::vector<std::string>::const_iterator> names() const {

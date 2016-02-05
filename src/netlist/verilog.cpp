@@ -85,7 +85,6 @@ void read(std::istream & in, netlist* netlist) {
 			break;
 		std::string cell_type = tokens[0];
 		std::string cell_name = tokens[1];
-		std::vector<std::pair<std::string, std::string>> pin_net_pairs;
 		for(std::size_t i = 2; i < tokens.size()-1; i+=2)
 			netlist->connect(netlist->net_insert(tokens[i+1]),
 					netlist->pin_insert(netlist->cell_insert(cell_name, cell_type), cell_name+":"+tokens[i].substr(1)));
@@ -122,11 +121,11 @@ void write(std::ostream & out, standard_cell::standard_cells * std_cells,
 		out << "wire " << *it << ";" << std::endl;
 	out << std::endl;
 	out << "// Start cells" << std::endl;
-	for (auto cell : netlist->cell_system()) {
-		auto std_cell = netlist->cell_std_cell(cell.second);
+	for (auto cell : netlist->cell_system().entities()) {
+		auto std_cell = netlist->cell_std_cell(cell.first);
 		out << std_cells->name(std_cell) << " ";
-		out << netlist->cell_name(cell.second) << " ( ";
-		auto cell_pins = netlist->cell_pins(cell.second);
+		out << netlist->cell_name(cell.first) << " ( ";
+		auto cell_pins = netlist->cell_pins(cell.first);
 		bool first = true;
 		for (auto pin : cell_pins) {
 			auto net = netlist->pin_net(pin);

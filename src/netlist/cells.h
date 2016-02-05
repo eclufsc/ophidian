@@ -9,33 +9,28 @@
 #define SRC_NETLIST_CELLS_H_
 
 #include <vector>
-#include <property.h>
+#include <vector_property.h>
 #include <standard_cells.h>
 
 namespace openeda {
 namespace netlist {
 
-class cells: entity::property {
-	std::vector<std::string> m_names;
-	std::vector<entity::entity> m_standard_cells;
-	std::vector<std::vector<entity::entity> > m_pins;
-	std::vector<entity::entity> m_index2entity;
-	std::unordered_map<entity::entity, std::size_t> m_entity2index;
+class cells: public entity::system {
+	entity::vector_property<std::string> m_names;
+	entity::vector_property<entity::entity> m_standard_cells;
+	entity::vector_property<std::vector<entity::entity> > m_pins;
 public:
-	cells(entity::system * entity_system);
+	cells();
 	virtual ~cells();
 
-	void destroy(entity::entity e);
-	void create(entity::entity e);
-
 	std::string name(entity::entity cell) const {
-		return m_names[m_entity2index.at(cell)];
+		return m_names[m_entities.left.at(cell)];
 	}
 	entity::entity standard_cell(entity::entity cell) const {
-		return m_standard_cells[m_entity2index.at(cell)];
+		return m_standard_cells[m_entities.left.at(cell)];
 	}
 	std::vector<entity::entity> pins(entity::entity cell) const {
-		return m_pins[m_entity2index.at(cell)];
+		return m_pins[m_entities.left.at(cell)];
 	}
 	void insert_pin(entity::entity cell, entity::entity pin);
 	void pins(entity::entity cell, std::vector<entity::entity> pins);

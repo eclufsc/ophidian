@@ -65,9 +65,9 @@ TEST_CASE("placement/ lef library", "[placement]") {
 	openeda::placement::lef::read(buffer, &std_cells, &lib);
 
 	std::cout << "lef library" << std::endl;
-	for (auto c : std_cells.system()) {
-		std::cout << std_cells.name(c.second) << " "
-				<< boost::geometry::wkt(lib.geometry(c.second)) << std::endl;
+	for (auto c : std_cells.system().entities()) {
+		std::cout << std_cells.name(c.first) << " "
+				<< boost::geometry::wkt(lib.geometry(c.first)) << std::endl;
 	}
 
 }
