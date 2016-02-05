@@ -46,8 +46,8 @@ void get_next_n_tokens(std::istream &is, std::vector<std::string> &tokens,
 	} while (!is.eof() && count < numTokens);
 }
 
-void read_init_def_components(std::istream& is, netlist::netlist* netlist,
-		library * lib, cells* cells) {
+void read_init_def_components(std::istream &is, netlist::netlist* netlist,
+		placement* cells) {
 //	cell* myCell = NULL;
 	std::vector<std::string> tokens(1);
 
@@ -89,8 +89,8 @@ void read_init_def_components(std::istream& is, netlist::netlist* netlist,
 				get_next_n_tokens(is, tokens, 5, DEFCommentChar);
 				assert(tokens[0] == "(");
 				assert(tokens[3] == ")");
-				cells->position(cell,
-						{ atof(tokens[1].c_str()), atof(tokens[2].c_str()) });
+				cells->cell_position(cell,
+						{ std::stod(tokens[1]), std::stod(tokens[2]) });
 
 //				myCell->init_x_coord = atoi(tokens[1].c_str());
 //				myCell->init_y_coord = atoi(tokens[2].c_str());
@@ -242,8 +242,7 @@ void read_def_nets(std::istream& is) {
 
 }
 
-void read(std::istream& dot_def, netlist::netlist* netlist, library*lib,
-		cells * cells) {
+void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
 
 	std::cout << "reading .def file..." << std::endl;
 //	if (mode == INIT)
@@ -308,7 +307,7 @@ void read(std::istream& dot_def, netlist::netlist* netlist, library*lib,
 			assert(tokens[0] == "DISTANCE");
 			assert(tokens[1] == "MICRONS");
 			DEFdist2Microns = atoi(tokens[2].c_str());
-			assert(DEFdist2Microns <= lib->dist2microns());
+//			assert(DEFdist2Microns <= lib->dist2microns());
 //#ifdef DEBUG
 //			cout << "unit distance to microns: " << DEFdist2Microns << endl;
 //#endif
@@ -361,7 +360,7 @@ void read(std::istream& dot_def, netlist::netlist* netlist, library*lib,
 			// else we do not currently store properties
 		} else if (tokens[0] == "COMPONENTS") {
 //			if (mode == INIT)
-			parser::read_init_def_components(dot_def, netlist, lib, cells);
+			parser::read_init_def_components(dot_def, netlist, cells);
 //			else if (mode == FINAL)
 //				read_final_def_components(dot_def);
 		} else if (tokens[0] == "PINS"/* && mode == INIT*/) {

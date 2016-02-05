@@ -14,17 +14,16 @@
 render_window::render_window(application * app) :
 		m_app(app), sf::RenderWindow(sf::VideoMode(853.3344, 480), "OpenGL",
 				sf::Style::Default, sf::ContextSettings(0, 0, 0)), m_view(
-				sf::FloatRect(0, 0, 60800, 34200)) {
+				sf::FloatRect(0, 0, 60800, 34200)), m_state(new idle_state) {
 	m_view.setViewport(sf::FloatRect(0, 0, 1.0, 1.0));
 	m_view.setCenter(sf::Vector2f(0, 0));
-	create_vertex_array(app->placement_cells());
+	create_vertex_array();
 }
 
 render_window::~render_window() {
 }
 
-void render_window::create_vertex_array(
-		const openeda::placement::cells& placement_cells) {
+void render_window::create_vertex_array() {
 
 	static bool called;
 
@@ -37,7 +36,7 @@ void render_window::create_vertex_array(
 	std::uniform_int_distribution<uint8_t> distribution { 0, 255 };
 
 	for (auto e : m_app->netlist().cell_system()) {
-		auto geometry = m_app->placement_cells().geometry(e.second);
+		auto geometry = m_app->placement().cell_geometry(e.second);
 		m_entity2index[e.second] = std::make_pair(m_cells.getVertexCount(), 0);
 		std::size_t vertex_count = 0;
 		uint8_t blue = distribution(engine);
@@ -83,7 +82,7 @@ void render_window::update_selected_vertex_array(
 			<< std::endl;
 	m_selected.clear();
 	for (auto e : selected) {
-		auto geometry = m_app->placement_cells().geometry(e);
+		auto geometry = m_app->placement().cell_geometry(e);
 		auto & front = geometry.front();
 		m_selected.resize(front.outer().size());
 		for (std::size_t i = 0; i < m_selected.getVertexCount(); ++i) {
@@ -98,7 +97,7 @@ void render_window::update_selected_vertex_array(
 void render_window::update_cells_vertex_array(openeda::entity::entity cell) {
 
 	std::size_t current_index = m_entity2index[cell].first;
-	auto geometry = m_app->placement_cells().geometry(cell);
+	auto geometry = m_app->placement().cell_geometry(cell);
 	for (auto & polygon : geometry) {
 		for (std::size_t i = 0; i < 4; ++i) {
 			sf::Vertex & vertex = m_cells[current_index++];
@@ -115,6 +114,7 @@ void render_window::update_cells_vertex_array(openeda::entity::entity cell) {
 }
 
 void render_window::process_inputs() {
+
 	sf::Event event;
 
 	static sf::Vector2f offset;
@@ -124,7 +124,9 @@ void render_window::process_inputs() {
 			close();
 		else if (event.type == sf::Event::Resized) {
 			glViewport(0, 0, event.size.width, event.size.height);
-		} else if (event.type == sf::Event::KeyPressed) {
+		}
+
+		else if (event.type == sf::Event::KeyPressed) {
 			switch (event.key.code) {
 			case sf::Keyboard::Key::W:
 			case sf::Keyboard::Key::Up:
@@ -148,66 +150,139 @@ void render_window::process_inputs() {
 				m_view.zoom(1.0f / 1.1f);
 			else if (event.mouseWheel.delta < 0)
 				m_view.zoom(1.1f);
-		} else if (event.type == sf::Event::MouseButtonPressed) {
-			moved = false;
-			sf::Vector2i coord(event.mouseButton.x, event.mouseButton.y);
-			std::cout << "coord " << coord.x << ", " << coord.y << std::endl;
-
-			auto coord2 = mapPixelToCoords(coord, m_view);
-			coord2.y *= -1.0;
-			std::cout << "view coord " << coord2.x << ", " << coord2.y
-					<< std::endl;
-			m_app->click( { coord2.x, coord2.y });
-
-			std::set<openeda::entity::entity> selected =
-					m_app->selected_cells();
-
-			update_selected_vertex_array(selected);
-
-			if (!selected.empty()) {
-				auto cell_position = m_app->placement_cells().position(
-						*selected.begin());
-				offset.x = coord2.x - cell_position.x();
-				offset.y = coord2.y - cell_position.y();
-			}
-
-		} else if (event.type == sf::Event::MouseMoved) {
-
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-				moved = true;
-				auto selected = m_app->selected_cells();
-				for (auto c : selected) {
-					std::cout << "moving " << m_app->netlist().cell_name(c)
-							<< " to " << event.mouseMove.x << ", "
-							<< event.mouseMove.y << std::endl;
-
-					sf::Vector2f final_position = mapPixelToCoords(
-							{ event.mouseMove.x, event.mouseMove.y }, m_view);
-
-					final_position.y *= -1.f;
-
-					m_app->place_cell_and_update_index(c,
-							{ final_position.x - offset.x, final_position.y
-									- offset.y });
-					update_cells_vertex_array(c);
-				}
-			} else
-				moved = false;
-		} else if (event.type == sf::Event::MouseButtonReleased) {
-			sf::Vector2i coord(event.mouseButton.x, event.mouseButton.y);
-			std::cout << "coord " << coord.x << ", " << coord.y << std::endl;
-
-			auto coord2 = mapPixelToCoords(coord, m_view);
-			coord2.y *= -1.0;
-			std::cout << "view coord " << coord2.x << ", " << coord2.y
-					<< std::endl;
-
-			if (moved)
-				m_app->release_click( { coord2.x, coord2.y });
-			std::set<openeda::entity::entity> selected =
-					m_app->selected_cells();
-
-			update_selected_vertex_array(selected);
 		}
+		m_state->handle_input(event, this);
+
+//		else if (event.type == sf::Event::MouseButtonPressed) {
+//			moved = false;
+//			sf::Vector2i coord(event.mouseButton.x, event.mouseButton.y);
+//			std::cout << "coord " << coord.x << ", " << coord.y << std::endl;
+//
+//			auto coord2 = mapPixelToCoords(coord, m_view);
+//			coord2.y *= -1.0;
+//			std::cout << "view coord " << coord2.x << ", " << coord2.y
+//					<< std::endl;
+//			m_app->click( { coord2.x, coord2.y });
+//
+//			std::set<openeda::entity::entity> selected =
+//					m_app->selected_cells();
+//
+//			update_selected_vertex_array(selected);
+//
+//			if (!selected.empty()) {
+//				auto cell_position = m_app->placement().cell_position(
+//						*selected.begin());
+//				offset.x = coord2.x - cell_position.x();
+//				offset.y = coord2.y - cell_position.y();
+//			}
+//
+//		} else if (event.type == sf::Event::MouseMoved) {
+//
+//			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+//				moved = true;
+//				auto selected = m_app->selected_cells();
+//				for (auto c : selected) {
+//					std::cout << "moving " << m_app->netlist().cell_name(c)
+//							<< " to " << event.mouseMove.x << ", "
+//							<< event.mouseMove.y << std::endl;
+//
+//					sf::Vector2f final_position = mapPixelToCoords(
+//							{ event.mouseMove.x, event.mouseMove.y }, m_view);
+//
+//					final_position.y *= -1.f;
+//
+//					m_app->place_cell_and_update_index(c,
+//							{ final_position.x - offset.x, final_position.y
+//									- offset.y });
+//					update_cells_vertex_array(c);
+//				}
+//			} else
+//				moved = false;
+//		} else if (event.type == sf::Event::MouseButtonReleased) {
+//			sf::Vector2i coord(event.mouseButton.x, event.mouseButton.y);
+//			std::cout << "coord " << coord.x << ", " << coord.y << std::endl;
+//
+//			auto coord2 = mapPixelToCoords(coord, m_view);
+//			coord2.y *= -1.0;
+//			std::cout << "view coord " << coord2.x << ", " << coord2.y
+//					<< std::endl;
+//
+//			if (moved)
+//				m_app->release_click( { coord2.x, coord2.y });
+//			std::set<openeda::entity::entity> selected =
+//					m_app->selected_cells();
+//
+//			update_selected_vertex_array(selected);
+//		}
 	}
 }
+
+bool render_window::white_space(sf::Vector2f coord) const {
+
+	coord.y *= -1;
+	return !m_app->has_cell({coord.x,coord.y});
+
+}
+
+render_window::state * idle_state::handle_input(sf::Event & event, const render_window* window) {
+	render_window::state * next_state = this;
+	if (event.type == sf::Event::MouseButtonPressed) {
+		sf::Vector2i coord(event.mouseButton.x, event.mouseButton.y);
+		std::cout << "coord " << coord.x << ", " << coord.y << std::endl;
+
+		auto coord2 = window->mapPixelToCoords(coord, window->getView());
+
+		if (!window->white_space(coord2)) {
+			delete this;
+			next_state = new selected_state(coord2);
+		}
+
+	}
+	return next_state;
+}
+
+void idle_state::update(render_window* window) {
+}
+
+render_window::state * selected_state::handle_input(sf::Event & event, const render_window* window) {
+
+	if (event.type == sf::Event::MouseMoved) {
+	//
+	//			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+	//				moved = true;
+	//				auto selected = m_app->selected_cells();
+	//				for (auto c : selected) {
+	//					std::cout << "moving " << m_app->netlist().cell_name(c)
+	//							<< " to " << event.mouseMove.x << ", "
+	//							<< event.mouseMove.y << std::endl;
+	//
+	//					sf::Vector2f final_position = mapPixelToCoords(
+	//							{ event.mouseMove.x, event.mouseMove.y }, m_view);
+	//
+	//					final_position.y *= -1.f;
+	//
+	//					m_app->place_cell_and_update_index(c,
+	//							{ final_position.x - offset.x, final_position.y
+	//									- offset.y });
+	//					update_cells_vertex_array(c);
+	//				}
+	//			}
+	}
+
+
+}
+
+selected_state::selected_state(sf::Vector2f position) :
+		m_position(position) {
+}
+
+void selected_state::update(render_window* window) {
+}
+
+render_window::state * dragging_state::handle_input(sf::Event & event, const render_window* window) {
+}
+
+void dragging_state::update(render_window* window) {
+}
+
+

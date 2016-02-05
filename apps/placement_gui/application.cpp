@@ -20,8 +20,8 @@ namespace trans = bg::strategy::transform;
 
 application::application(std::string lef_file, std::string v_file,
 		std::string def_file) :
-		m_netlist(&m_std_cells), m_placement_library(&m_std_cells), m_placement_cells(
-				&m_netlist) {
+		m_netlist(&m_std_cells), m_placement_library(&m_std_cells), m_placement(
+				&m_netlist, &m_placement_library) {
 	std::ifstream dot_lef(lef_file.c_str(), std::ifstream::in);
 	std::ifstream dot_v(v_file.c_str(), std::ifstream::in);
 	std::ifstream dot_def(def_file.c_str(), std::ifstream::in);
@@ -32,14 +32,12 @@ application::application(std::string lef_file, std::string v_file,
 	dot_v.close();
 	openeda::placement::lef::read(dot_lef, &m_std_cells, &m_placement_library);
 	dot_lef.close();
-	openeda::placement::def::read(dot_def, &m_netlist, &m_placement_library,
-			&m_placement_cells);
+	openeda::placement::def::read(dot_def, &m_netlist, &m_placement);
 	dot_lef.close();
 
-	for (auto c : m_netlist.cell_system())
-	{
-		place_cell(c.second, m_placement_cells.position(c.second));
-		place_cell_and_update_index(c.second, m_placement_cells.position(c.second));
+	for (auto c : m_netlist.cell_system()) {
+		place_cell_and_update_index(c.second,
+				m_placement.cell_position(c.second));
 	}
 }
 
@@ -58,7 +56,7 @@ void application::click(point position) {
 		std::cout << position.x() << ", " << position.y() << " maps to cell "
 				<< m_netlist.cell_name(r.second) << std::endl;
 
-		auto geo = m_placement_cells.geometry(r.second);
+		auto geo = m_placement.cell_geometry(r.second);
 		std::cout << boost::geometry::wkt(geo) << std::endl;
 
 		m_selected_cells.insert(r.second);
@@ -70,7 +68,7 @@ void application::click(point position) {
 std::vector<rtree_node> application::create_rtree_nodes(
 		openeda::entity::entity cell) {
 
-	auto geometry = m_placement_cells.geometry(cell);
+	auto geometry = m_placement.cell_geometry(cell);
 	std::vector<rtree_node> nodes;
 	for (auto& poly : geometry) {
 		point ll { std::numeric_limits<double>::max(), std::numeric_limits<
@@ -90,35 +88,31 @@ std::vector<rtree_node> application::create_rtree_nodes(
 	return nodes;
 }
 
-void application::place_cell(openeda::entity::entity cell,
-		const point& position) {
-	// take the geometry from the library, translates and set to cell
-	auto geometry = m_placement_library.geometry(m_netlist.cell_std_cell(cell));
-	multi_polygon geo2;
-	trans::translate_transformer<double, 2, 2> translate(position.x(),
-			position.y());
-	bg::transform(geometry, geo2, translate);
-	bg::correct(geo2);
-	m_placement_cells.geometry(cell, geo2);
-	m_placement_cells.position(cell, position);
-}
-
 void application::release_click(point position) {
 	m_selected_cells.clear();
 }
 
-void application::place_cell_and_update_index(openeda::entity::entity cell, point position) {
+void application::place_cell_and_update_index(openeda::entity::entity cell,
+		point position) {
 	// remove from index
 	std::vector<rtree_node> nodes = create_rtree_nodes(cell);
 	m_position2cellentity.remove(nodes);
 
-
-	// take the geometry from the library, translates and set to cell
-	place_cell(cell, position);
+	m_placement.cell_position(cell, position);
 
 	// update index
 	nodes.clear();
 	nodes = create_rtree_nodes(cell);
 	m_position2cellentity.insert(nodes.begin(), nodes.end());
+
+}
+
+bool application::has_cell(point position) const {
+
+	std::vector<rtree_node> result;
+	m_position2cellentity.query(boost::geometry::index::contains(position),
+			std::back_inserter(result));
+
+	return !result.empty();
 
 }

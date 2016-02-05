@@ -8,8 +8,7 @@
 #ifndef APPS_PLACEMENT_GUI_APPLICATION_H_
 #define APPS_PLACEMENT_GUI_APPLICATION_H_
 
-#include "../placement/library.h"
-#include "../placement/cells.h"
+#include "../placement/placement.h"
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
@@ -38,14 +37,13 @@ class application {
 	openeda::standard_cell::standard_cells m_std_cells;
 	openeda::netlist::netlist m_netlist;
 	openeda::placement::library m_placement_library;
-	openeda::placement::cells m_placement_cells;
+	openeda::placement::placement m_placement;
 
 	std::set<openeda::entity::entity> m_selected_cells;
 
 	rtree m_position2cellentity;
 
 	std::vector<rtree_node> create_rtree_nodes(openeda::entity::entity cell);
-	void place_cell(openeda::entity::entity cell, const point& position); // will be replaced when placement interface gets done
 
 public:
 
@@ -55,8 +53,8 @@ public:
 	void click(point position);
 	void release_click(point position);
 
-	const openeda::placement::cells& placement_cells() const {
-		return m_placement_cells;
+	const openeda::placement::placement& placement() const {
+		return m_placement;
 	}
 
 	const openeda::netlist::netlist & netlist() const {
@@ -69,6 +67,7 @@ public:
 
 	void place_cell_and_update_index(openeda::entity::entity cell, point position);
 
+	bool has_cell(point position) const;
 };
 
 #endif /* APPS_PLACEMENT_GUI_APPLICATION_H_ */
