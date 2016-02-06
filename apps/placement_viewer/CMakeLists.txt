@@ -1,20 +1,18 @@
-cmake_minimum_required (VERSION 2.8.12.2)
-project(placement_viewer)
+cmake_minimum_required(VERSION 2.8.11)
 
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
+project(placement_viewer)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Include SFML headers
 include_directories(${SFML_INCLUDE_DIR})
 
-# Tell CMake to create the helloworld executable
-add_executable(placement_viewer main.cpp mainwindow.cpp open_circuit_dialog.cpp qsfmlcanvas.cpp mysfmlcanvas.cpp application.cpp )
+# Tell CMake to create the placement_viewer executable
+add_executable(placement_viewer WIN32 main.cpp mainwindow.cpp open_circuit_dialog.cpp application.cpp mysfmlcanvas.cpp qsfmlcanvas.cpp)
 
-# Use the Widgets module from Qt 5 and SFML Libraries
-target_link_libraries(placement_viewer Qt5::Widgets ${SFML_LIBRARIES} entity netlist standard_cell placement)
+# Use the Widgets module from Qt 5.
+target_link_libraries(placement_viewer Qt5::Widgets entity placement netlist standard_cell ${SFML_LIBRARIES})

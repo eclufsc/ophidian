@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <memory>
-#include <application.h>
+#include "application.h"
 
 #include "open_circuit_dialog.h"
 
