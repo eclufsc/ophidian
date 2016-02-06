@@ -33,26 +33,6 @@ application::application(const std::string v_file, const std::string lef_file, c
 application::~application() {
 }
 
-void application::click(point position) {
-
-    m_selected_cells.clear();
-
-    std::vector<rtree_node> result;
-    m_position2cellentity.query(boost::geometry::index::contains(position),
-                                std::back_inserter(result));
-
-    for (auto & r : result) {
-        std::cout << position.x() << ", " << position.y() << " maps to cell "
-                  << m_netlist.cell_name(r.second) << std::endl;
-
-        auto geo = m_placement.cell_geometry(r.second);
-        std::cout << boost::geometry::wkt(geo) << std::endl;
-
-        m_selected_cells.insert(r.second);
-
-    }
-
-}
 
 std::vector<rtree_node> application::create_rtree_nodes(
         openeda::entity::entity cell) {
@@ -77,9 +57,6 @@ std::vector<rtree_node> application::create_rtree_nodes(
     return nodes;
 }
 
-void application::release_click(point position) {
-    m_selected_cells.clear();
-}
 
 void application::place_cell_and_update_index(openeda::entity::entity cell,
                                               point position) {
@@ -96,12 +73,12 @@ void application::place_cell_and_update_index(openeda::entity::entity cell,
 
 }
 
-bool application::has_cell(point position) const {
-
+openeda::entity::entity application::get_cell(point position) const
+{
     std::vector<rtree_node> result;
     m_position2cellentity.query(boost::geometry::index::contains(position),
                                 std::back_inserter(result));
-
-    return !result.empty();
-
+    if(result.empty())
+        return openeda::entity::entity{};
+    return result.front().second;
 }

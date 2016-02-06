@@ -6,6 +6,7 @@
 mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
     QSFMLCanvas(parent),
     m_app(nullptr),
+    m_circuit(nullptr),
     m_image_size(0,-6121800.0, 9236280.0, 6121800.0), // superblue18 size
     m_view(sf::FloatRect(0,0,51599.25,34200.0)),
     m_minimap(m_image_size),
@@ -19,75 +20,9 @@ mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
 void mysfmlcanvas::app(application *app)
 {
     m_app = app;
-    create_vertex_array();
+    m_circuit.reset(new circuit(app));
 }
 
-
-void mysfmlcanvas::update_selected_vertex_array(const std::set<openeda::entity::entity> &selected)
-{
-    std::cout << "there are " << selected.size() << " cells selected "
-                << std::endl;
-        m_selected.clear();
-        for (auto e : selected) {
-            auto geometry = m_app->placement().cell_geometry(e);
-            auto & front = geometry.front();
-            m_selected.resize(front.outer().size());
-            for (std::size_t i = 0; i < m_selected.getVertexCount(); ++i) {
-                m_selected[i].position.x = front.outer()[i].x();
-                m_selected[i].position.y = -front.outer()[i].y();
-                m_selected[i].color = sf::Color::Magenta;
-            }
-        }
-}
-
-void mysfmlcanvas::update_cells_vertex_array(openeda::entity::entity cell)
-{
-    std::size_t current_index = m_entity2index[cell].first;
-        auto geometry = m_app->placement().cell_geometry(cell);
-        for (auto & polygon : geometry) {
-            for (std::size_t i = 0; i < 4; ++i) {
-                sf::Vertex & vertex = m_cells[current_index++];
-                vertex.position = sf::Vector2f {
-                        static_cast<float>(polygon.outer()[i].x()),
-                        static_cast<float>(-polygon.outer()[i].y()) };
-            }
-        }
-        assert(
-                current_index
-                        == m_entity2index[cell].first
-                                + m_entity2index[cell].second);
-}
-
-void mysfmlcanvas::create_vertex_array() {
-
-    m_cells.clear();
-    m_entity2index.clear();
-    std::default_random_engine engine;
-    std::uniform_int_distribution<uint8_t> distribution { 0, 255 };
-
-    for (auto e : m_app->netlist().cell_system()) {
-        auto geometry = m_app->placement().cell_geometry(e.second);
-        m_entity2index[e.second] = std::make_pair(m_cells.getVertexCount(), 0);
-        std::size_t vertex_count = 0;
-        uint8_t blue = distribution(engine);
-        bool macro = geometry.size() > 1;
-        for (auto & polygon : geometry) {
-            for (std::size_t i = 0; i < 4; ++i) {
-                sf::Vertex vertex;
-                vertex.position = sf::Vector2f {
-                        static_cast<float>(polygon.outer()[i].x()),
-                        static_cast<float>(-polygon.outer()[i].y()) };
-                vertex.color = sf::Color { 0, 0, blue };
-                if (macro)
-                    vertex.color = sf::Color { 100, 100, 100 };
-                m_cells.append(vertex);
-                ++vertex_count;
-            }
-        }
-        m_entity2index[e.second].second = vertex_count;
-    }
-
-}
 
 
 void mysfmlcanvas::OnInit()
@@ -105,15 +40,16 @@ void mysfmlcanvas::OnUpdate()
     setView(m_view);
 
 
-    draw(&m_cells[0], m_cells.getVertexCount(), sf::PrimitiveType::Quads);
-    draw(&m_selected[0], m_selected.getVertexCount(),
-            sf::PrimitiveType::LinesStrip);
+    if(m_circuit)
+        draw(*m_circuit);
+
     display();
 
 
     setView(m_minimap);
 
-    draw(&m_cells[0], m_cells.getVertexCount(), sf::PrimitiveType::Quads);
+    if(m_circuit)
+        draw(*m_circuit);
 
 
     sf::RectangleShape minimapBorder;
@@ -146,7 +82,7 @@ void mysfmlcanvas::wheelEvent(QWheelEvent *e)
         m_view.zoom(1.1f);
 
 
-//    update_view_position();
+    //    update_view_position();
 
     qDebug() << " view size " << m_view.getSize().x << " x " << m_view.getSize().y;
 }
@@ -193,18 +129,21 @@ void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
         break;
     }
 
-//    update_view_position();
+    //    update_view_position();
 
 }
 
 void mysfmlcanvas::mousePressEvent(QMouseEvent *e)
 {
+    m_holding_click = true;
     qDebug() << "mouse press " << e->pos();
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
     sf::Vector2f minimapCoord{mapPixelToCoords(pixelCoord, m_minimap)};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_view)};
 
     qDebug() << "view coord " << viewCoord.x << ", " << viewCoord.y;
+
+
 
     if(minimapCoord.x > m_minimap.getCenter().x-m_minimap.getSize().x/2 &&
             minimapCoord.x < m_minimap.getCenter().x+m_minimap.getSize().x/2)
@@ -215,9 +154,19 @@ void mysfmlcanvas::mousePressEvent(QMouseEvent *e)
 
             m_holding_inside_minimap = true;
             m_view.setCenter(minimapCoord);
-//            update_view_position();
+            //            update_view_position();
             qDebug() << "click inside minimap";
         }
+    }else
+    {
+
+        auto entity = m_app->get_cell({viewCoord.x, -viewCoord.y});
+        m_circuit->select_cell(entity);
+        if(!(entity == openeda::entity::entity{}))
+            qDebug() << "selected a cell";
+        else
+            qDebug() << "unselected a cell";
+
     }
 
 }
@@ -225,21 +174,33 @@ void mysfmlcanvas::mousePressEvent(QMouseEvent *e)
 void mysfmlcanvas::mouseMoveEvent(QMouseEvent *e)
 {
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
-    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_minimap)};
+    sf::Vector2f minimapCoord{mapPixelToCoords(pixelCoord, m_minimap)};
+    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_view)};
 
-    viewCoord.y = std::max(std::min(viewCoord.y, m_minimap.getCenter().y+m_minimap.getSize().y/2), m_minimap.getCenter().y-m_minimap.getSize().y/2);
-    viewCoord.x = std::max(std::min(viewCoord.x, m_minimap.getCenter().x+m_minimap.getSize().x/2), m_minimap.getCenter().x-m_minimap.getSize().x/2);
+    minimapCoord.y = std::max(std::min(minimapCoord.y, m_minimap.getCenter().y+m_minimap.getSize().y/2), m_minimap.getCenter().y-m_minimap.getSize().y/2);
+    minimapCoord.x = std::max(std::min(minimapCoord.x, m_minimap.getCenter().x+m_minimap.getSize().x/2), m_minimap.getCenter().x-m_minimap.getSize().x/2);
 
     if(m_holding_inside_minimap)
     {
         m_holding_inside_minimap = true;
-        m_view.setCenter(viewCoord);
-//        update_view_position();
+        m_view.setCenter(minimapCoord);
+        //        update_view_position();
         qDebug() << "click inside minimap";
+    } else if(m_holding_click)
+    {
+        if(!(m_circuit->selected_cell() == openeda::entity::entity{}))
+        {
+            qDebug() << "dragging selected cell";
+            m_app->place_cell_and_update_index(m_circuit->selected_cell(), {viewCoord.x, -viewCoord.y});
+            auto position = m_app->placement().cell_position(m_circuit->selected_cell());
+            qDebug() << " " << position.x() << ", " << position.y();
+            m_circuit->update_cell(m_circuit->selected_cell());
+        }
     }
 }
 
 void mysfmlcanvas::mouseReleaseEvent(QMouseEvent *e)
 {
+    m_holding_click = false;
     m_holding_inside_minimap = false;
 }

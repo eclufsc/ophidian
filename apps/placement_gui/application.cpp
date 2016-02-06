@@ -89,7 +89,7 @@ std::vector<rtree_node> application::create_rtree_nodes(
 }
 
 void application::release_click(point position) {
-	m_selected_cells.clear();
+    m_selected_cells.clear();
 }
 
 void application::place_cell_and_update_index(openeda::entity::entity cell,

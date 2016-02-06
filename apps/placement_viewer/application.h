@@ -32,8 +32,6 @@ class application
     openeda::placement::library m_library;
     openeda::placement::placement m_placement;
 
-    std::set<openeda::entity::entity> m_selected_cells;
-
     rtree m_position2cellentity;
 
     std::vector<rtree_node> create_rtree_nodes(openeda::entity::entity cell);
@@ -44,9 +42,6 @@ public:
 
     virtual ~application();
 
-    void click(point position);
-    void release_click(point position);
-
     const openeda::placement::placement& placement() const {
         return m_placement;
     }
@@ -55,13 +50,9 @@ public:
         return m_netlist;
     }
 
-    std::set<openeda::entity::entity> selected_cells() const {
-        return m_selected_cells;
-    }
-
     void place_cell_and_update_index(openeda::entity::entity cell, point position);
 
-    bool has_cell(point position) const;
+    openeda::entity::entity get_cell(point position) const;
 };
 
 #endif // APPLICATION_H

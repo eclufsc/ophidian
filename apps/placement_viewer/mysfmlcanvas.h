@@ -4,11 +4,14 @@
 #include "qsfmlcanvas.h"
 #include "application.h"
 
+#include "circuit.h"
+
 #include <unordered_map>
 
 class mysfmlcanvas : public QSFMLCanvas
 {
     application* m_app;
+    std::unique_ptr<circuit> m_circuit;
 
     sf::FloatRect m_image_size;
     sf::View m_view;
@@ -17,18 +20,8 @@ class mysfmlcanvas : public QSFMLCanvas
     uint8_t m_minimap_opacity;
     bool m_holding_inside_minimap;
 
-    ///////////////////
 
-    sf::VertexArray m_cells;
-    sf::VertexArray m_selected;
-
-    std::unordered_map<openeda::entity::entity,
-    std::pair<std::size_t, std::size_t> > m_entity2index;
-
-    void update_selected_vertex_array(
-            const std::set<openeda::entity::entity> &selected);
-    void update_cells_vertex_array(openeda::entity::entity cell);
-    void create_vertex_array();
+    bool m_holding_click;
 
 public:
     mysfmlcanvas(QWidget *parent = 0);
@@ -45,6 +38,7 @@ public:
     void mousePressEvent(QMouseEvent * e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent * e);
+
 
     void update_view_position();
 };

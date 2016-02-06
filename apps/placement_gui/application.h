@@ -50,8 +50,8 @@ public:
 	application(std::string lef_file, std::string v_file, std::string def_file);
 	virtual ~application();
 
-	void click(point position);
-	void release_click(point position);
+    void click(point position);
+    void release_click(point position);
 
 	const openeda::placement::placement& placement() const {
 		return m_placement;
