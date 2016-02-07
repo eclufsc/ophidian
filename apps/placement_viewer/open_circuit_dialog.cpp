@@ -41,7 +41,13 @@ void open_circuit_dialog::on_button_def_clicked()
 void open_circuit_dialog::accept()
 {
     QDialog::accept();
+    m_canvas->loading(true);
+    m_canvas->OnUpdate();
+
+    QCoreApplication::processEvents();
+
     m_app.reset(new application(ui->file_v->text().toStdString(), ui->file_lef->text().toStdString(), ui->file_def->text().toStdString()));
+    m_canvas->loading(false);
     m_canvas->app(m_app.get());
 }
 

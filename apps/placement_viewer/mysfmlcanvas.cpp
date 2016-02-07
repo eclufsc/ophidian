@@ -10,7 +10,8 @@ mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
     m_app(nullptr),
     m_circuit(nullptr),
     m_view(sf::FloatRect(0,0,51599.25,34200.0)),
-    m_state(new noninitialized)
+    m_state(new noninitialized),
+    m_last_state(nullptr)
 {
 }
 
@@ -105,6 +106,18 @@ void mysfmlcanvas::render_circuit()
 
     draw(fps);
 
+}
+
+void mysfmlcanvas::loading(bool set)
+{
+    if(set)
+    {
+        m_last_state = m_state;
+        m_state = new loading_state{};
+    } else {
+        delete m_state;
+        m_state = m_last_state;
+    }
 }
 
 void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
@@ -316,4 +329,23 @@ canvas_state *dragging::mouse_move(double x, double y)
 {
     m_canvas.drag_cell(m_cell, {x-m_xoffset, -y-m_yoffset});
     return this;
+}
+
+
+loading_state::loading_state()
+{
+    qDebug() <<"loading...";
+}
+
+void loading_state::render(mysfmlcanvas &canvas)
+{
+    canvas.clear(sf::Color::Black);
+
+    sf::Text pleaseload(sf::String{"Please, wait. Loading..."}, resources::font());
+    pleaseload.setColor(sf::Color::White);
+
+    pleaseload.setPosition((canvas.getSize().x-pleaseload.getLocalBounds().width)/2.f, (canvas.getSize().y-pleaseload.getLocalBounds().height)/2.f);
+    canvas.setView(canvas.getDefaultView());
+
+    canvas.draw(pleaseload);
 }

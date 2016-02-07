@@ -36,6 +36,7 @@ public:
 
     FPS m_fps;
     canvas_state *m_state;
+    canvas_state *m_last_state;
 
 public:
     mysfmlcanvas(QWidget *parent = 0);
@@ -64,6 +65,8 @@ public:
     void select(openeda::entity::entity  cell);
 
     void render_circuit();
+
+    void loading(bool set);
 
 };
 
@@ -120,6 +123,13 @@ public:
     dragging(mysfmlcanvas & canvas, openeda::entity::entity cell, double x, double y);
     virtual canvas_state* release();
     virtual canvas_state* mouse_move(double x, double y);
+};
+
+
+class loading_state : public canvas_state {
+public:
+    loading_state();
+    void render(mysfmlcanvas& canvas);
 };
 
 
