@@ -1,8 +1,7 @@
 #include "circuit.h"
 
 circuit::circuit(application *app) :
-    m_app(app),
-    m_selected_cell(openeda::entity::entity{})
+    m_app(app)
 {
     m_cells.clear();
     m_entity2index.clear();
@@ -69,7 +68,6 @@ void circuit::update_cell(openeda::entity::entity cell)
 
 void circuit::select_cell(openeda::entity::entity cell)
 {
-    m_selected_cell = cell;
     if(cell == openeda::entity::entity{})
         m_selected.clear();
     else

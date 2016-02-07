@@ -24,10 +24,12 @@ application::application(const std::string v_file, const std::string lef_file, c
     openeda::placement::def::read(dot_def, &m_netlist, &m_placement);
     dot_lef.close();
 
+    std::cout << "building RTree indexing..." << std::endl;
     for (auto c : m_netlist.cell_system()) {
         place_cell_and_update_index(c.second,
                                     m_placement.cell_position(c.second));
     }
+    std::cout << "building RTree indexing DONE" << std::endl;
 }
 
 application::~application() {

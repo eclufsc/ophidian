@@ -3,24 +3,23 @@
 #include <QDebug>
 #include <random>
 
+#include "resources.h"
+
 mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
     QSFMLCanvas(parent),
     m_app(nullptr),
     m_circuit(nullptr),
-    m_image_size(0,-6121800.0, 9236280.0, 6121800.0), // superblue18 size
     m_view(sf::FloatRect(0,0,51599.25,34200.0)),
-    m_minimap(m_image_size),
-    m_minimap_opacity(255),
-    m_holding_inside_minimap(false)
+    m_state(new noninitialized)
 {
-
-    m_minimap.setViewport(sf::FloatRect(0.85f, .02f, 0.14f, 0.15f));
 }
 
 void mysfmlcanvas::app(application *app)
 {
     m_app = app;
     m_circuit.reset(new circuit(app));
+    delete m_state;
+    m_state = new idle{*this};
 }
 
 
@@ -32,44 +31,10 @@ void mysfmlcanvas::OnInit()
 
 void mysfmlcanvas::OnUpdate()
 {
-    clear(sf::Color::White);
+    m_state = m_state->update();
+    m_state->render(*this);
 
-    setView(getDefaultView());
-
-
-    setView(m_view);
-
-
-    if(m_circuit)
-        draw(*m_circuit);
-
-    display();
-
-
-    setView(m_minimap);
-
-    if(m_circuit)
-        draw(*m_circuit);
-
-
-    sf::RectangleShape minimapBorder;
-    minimapBorder.setPosition(30.0,-m_image_size.height+30.f);
-    minimapBorder.setSize(sf::Vector2f{m_image_size.width-60.0f, m_image_size.height-60.0f});
-    minimapBorder.setFillColor(sf::Color::Transparent);
-    minimapBorder.setOutlineColor(sf::Color::Black);
-    minimapBorder.setOutlineThickness(30.0);
-    draw(minimapBorder);
-
-
-    sf::RectangleShape red_rectangle;
-    red_rectangle.setPosition(m_view.getCenter().x-m_view.getSize().x/2, m_view.getCenter().y-m_view.getSize().y/2);
-    red_rectangle.setSize(m_view.getSize());
-    red_rectangle.setOutlineColor(sf::Color::Red);
-    red_rectangle.setOutlineThickness(30.f);
-    red_rectangle.setFillColor(sf::Color::Transparent);
-    draw(red_rectangle);
-
-    setView(getDefaultView());
+    m_fps.update();
 
 }
 
@@ -83,7 +48,6 @@ void mysfmlcanvas::wheelEvent(QWheelEvent *e)
 
 
     //    update_view_position();
-
     qDebug() << " view size " << m_view.getSize().x << " x " << m_view.getSize().y;
 }
 
@@ -97,14 +61,50 @@ void mysfmlcanvas::resizeEvent(QResizeEvent *e)
 #include <QKeyEvent>
 void mysfmlcanvas::update_view_position()
 {
-    if(m_view.getSize().x > m_image_size.width && m_view.getSize().y > m_image_size.height)
-        m_view.setSize(m_image_size.width, m_image_size.height);
-    sf::Vector2f position(m_view.getCenter().x-m_view.getSize().x/2, m_view.getCenter().y-m_view.getSize().y/2);
-    position.x = std::min(std::max(m_image_size.left, position.x), m_image_size.width-m_view.getSize().x);
-    position.y = std::min(std::max(m_image_size.top, position.y), m_image_size.height-m_view.getSize().y);
-    position.x += m_view.getSize().x/2;
-    position.y += m_view.getSize().y/2;
-    m_view.setCenter(position);
+
+}
+
+void mysfmlcanvas::drag_cell(openeda::entity::entity cell, point position)
+{
+    m_app->place_cell_and_update_index(cell, position);
+    m_circuit->update_cell(cell);
+}
+
+openeda::entity::entity mysfmlcanvas::get_cell(point position)
+{
+    return m_app->get_cell(position);
+}
+
+point mysfmlcanvas::cell_position(openeda::entity::entity cell) const
+{
+    return m_app->placement().cell_position(cell);
+}
+
+void mysfmlcanvas::unselect()
+{
+    m_circuit->select_cell(openeda::entity::entity{});
+}
+
+void mysfmlcanvas::select(openeda::entity::entity cell)
+{
+    m_circuit->select_cell(cell);
+}
+
+void mysfmlcanvas::render_circuit()
+{
+    clear(sf::Color::White);
+    setView(m_view);
+    draw(*m_circuit);
+    setView(getDefaultView());
+
+    std::string fps_text{std::to_string(m_fps.getFPS())};
+    fps_text = "FPS: " + fps_text;
+    sf::Text fps{sf::String{fps_text.c_str()}, resources::font()};
+    fps.setColor(sf::Color::Red);
+    fps.setPosition(30.f,30.f);
+
+    draw(fps);
+
 }
 
 void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
@@ -135,72 +135,185 @@ void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
 
 void mysfmlcanvas::mousePressEvent(QMouseEvent *e)
 {
-    m_holding_click = true;
-    qDebug() << "mouse press " << e->pos();
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
-    sf::Vector2f minimapCoord{mapPixelToCoords(pixelCoord, m_minimap)};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_view)};
-
-    qDebug() << "view coord " << viewCoord.x << ", " << viewCoord.y;
-
-
-
-    if(minimapCoord.x > m_minimap.getCenter().x-m_minimap.getSize().x/2 &&
-            minimapCoord.x < m_minimap.getCenter().x+m_minimap.getSize().x/2)
-    {
-        if(minimapCoord.y > m_minimap.getCenter().y-m_minimap.getSize().y/2 &&
-                minimapCoord.y < m_minimap.getCenter().y+m_minimap.getSize().y/2)
-        {
-
-            m_holding_inside_minimap = true;
-            m_view.setCenter(minimapCoord);
-            //            update_view_position();
-            qDebug() << "click inside minimap";
-        }
-    }else
-    {
-
-        auto entity = m_app->get_cell({viewCoord.x, -viewCoord.y});
-        m_circuit->select_cell(entity);
-        if(!(entity == openeda::entity::entity{}))
-            qDebug() << "selected a cell";
-        else
-            qDebug() << "unselected a cell";
-
-    }
-
+    m_state = m_state->click(viewCoord.x, viewCoord.y);
 }
 
 void mysfmlcanvas::mouseMoveEvent(QMouseEvent *e)
 {
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
-    sf::Vector2f minimapCoord{mapPixelToCoords(pixelCoord, m_minimap)};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_view)};
-
-    minimapCoord.y = std::max(std::min(minimapCoord.y, m_minimap.getCenter().y+m_minimap.getSize().y/2), m_minimap.getCenter().y-m_minimap.getSize().y/2);
-    minimapCoord.x = std::max(std::min(minimapCoord.x, m_minimap.getCenter().x+m_minimap.getSize().x/2), m_minimap.getCenter().x-m_minimap.getSize().x/2);
-
-    if(m_holding_inside_minimap)
-    {
-        m_holding_inside_minimap = true;
-        m_view.setCenter(minimapCoord);
-        //        update_view_position();
-        qDebug() << "click inside minimap";
-    } else if(m_holding_click)
-    {
-        if(!(m_circuit->selected_cell() == openeda::entity::entity{}))
-        {
-            qDebug() << "dragging selected cell";
-            m_app->place_cell_and_update_index(m_circuit->selected_cell(), {viewCoord.x, -viewCoord.y});
-            auto position = m_app->placement().cell_position(m_circuit->selected_cell());
-            qDebug() << " " << position.x() << ", " << position.y();
-            m_circuit->update_cell(m_circuit->selected_cell());
-        }
-    }
+    m_state = m_state->mouse_move(viewCoord.x, viewCoord.y);
 }
 
 void mysfmlcanvas::mouseReleaseEvent(QMouseEvent *e)
 {
-    m_holding_click = false;
-    m_holding_inside_minimap = false;
+    m_state = m_state->release();
+}
+
+
+idle::idle(mysfmlcanvas & canvas) :
+    m_canvas(canvas)
+{
+    qDebug()<< "idle";
+
+    canvas.unselect();
+
+}
+
+canvas_state *idle::click(double x, double y)
+{
+    delete this;
+    return new clicking(m_canvas, x, y);
+}
+
+
+canvas_state *idle::update()
+{
+    return this;
+}
+
+clicking::clicking(mysfmlcanvas &canvas, double x, double y) :
+    m_canvas(canvas),
+    m_x(x),
+    m_y(y)
+{
+    qDebug()<< "clicking " << x << ", " << y;
+}
+
+
+canvas_state *clicking::update()
+{
+    openeda::entity::entity selected = m_canvas.get_cell({m_x, -m_y});
+    canvas_state * next = this;
+
+    if(selected == openeda::entity::entity{})
+    {
+        delete this;
+        next = new idle{m_canvas};
+    }
+    else
+    {
+        delete this;
+        auto position = m_canvas.cell_position(selected);
+        double offsetx{m_x - position.x()};
+        double offsety{-m_y - position.y()};
+        next = new selected_holding{m_canvas, selected, offsetx, offsety};
+    }
+
+    return next;
+}
+
+
+noninitialized::noninitialized()
+{
+    qDebug() <<"noninitialized";
+}
+
+
+void noninitialized::render(mysfmlcanvas &canvas)
+{
+    canvas.clear(sf::Color::Black);
+
+    sf::Text pleaseload(sf::String("Please, open a circuit (Ctrl+O)."), resources::font());
+    pleaseload.setColor(sf::Color::White);
+
+    pleaseload.setPosition((canvas.getSize().x-pleaseload.getLocalBounds().width)/2.f, (canvas.getSize().y-pleaseload.getLocalBounds().height)/2.f);
+    canvas.setView(canvas.getDefaultView());
+
+    canvas.draw(pleaseload);
+}
+
+
+canvas_state::~canvas_state()
+{
+
+}
+
+canvas_state *canvas_state::click(double x, double y)
+{
+    return this;
+}
+
+canvas_state *canvas_state::mouse_move(double x, double y)
+{
+    return this;
+}
+
+canvas_state *canvas_state::release()
+{
+    return this;
+}
+
+canvas_state *canvas_state::update()
+{
+    return this;
+}
+
+void canvas_state::render(mysfmlcanvas& canvas)
+{
+    canvas.render_circuit();
+}
+
+
+selected_holding::selected_holding(mysfmlcanvas &canvas, openeda::entity::entity cell, double x, double y):
+    m_canvas(canvas),
+    m_cell(cell),
+    m_xoffset(x),
+    m_yoffset(y)
+{
+    canvas.select(cell);
+    qDebug() << "selected_holding offset " << x << ", " << y;
+}
+
+canvas_state *selected_holding::mouse_move(double x, double y)
+{
+    delete this;
+    return new dragging{m_canvas, m_cell, m_xoffset, m_yoffset};
+}
+
+canvas_state *selected_holding::release()
+{
+    delete this;
+    return new selected{m_canvas, m_cell};
+}
+
+
+selected::selected(mysfmlcanvas &canvas, openeda::entity::entity cell) :
+    m_canvas(canvas),
+    m_cell(cell)
+{
+    qDebug() << "selected ";
+//    canvas.select(cell);
+}
+
+
+canvas_state *selected::click(double x, double y)
+{
+    delete this;
+    return new clicking{m_canvas, x, y};
+}
+
+
+dragging::dragging(mysfmlcanvas &canvas, openeda::entity::entity cell, double x, double y) :
+    m_canvas(canvas),
+    m_cell(cell),
+    m_xoffset(x),
+    m_yoffset(y)
+{
+    qDebug() << "dragging offset " << x << ", " << y;
+}
+
+
+canvas_state *dragging::release()
+{
+    delete this;
+    return new selected{m_canvas, m_cell};
+}
+
+canvas_state *dragging::mouse_move(double x, double y)
+{
+    m_canvas.drag_cell(m_cell, {x-m_xoffset, -y-m_yoffset});
+    return this;
 }

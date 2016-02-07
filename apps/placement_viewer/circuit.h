@@ -16,8 +16,6 @@ class circuit : public sf::Drawable, public sf::Transformable
     std::unordered_map<openeda::entity::entity,
     std::pair<std::size_t, std::size_t> > m_entity2index;
 
-    openeda::entity::entity m_selected_cell;
-
 public:
     circuit(application * app);
     ~circuit();
@@ -25,9 +23,6 @@ public:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void update_cell(openeda::entity::entity cell);
     void select_cell(openeda::entity::entity cell);
-    openeda::entity::entity selected_cell() const {
-        return m_selected_cell;
-    }
 };
 
 #endif // CIRCUIT_H
