@@ -28,6 +28,8 @@ class library {
 
 	entity::vector_property< multipolygon > m_geometries;
 
+    int32_t m_dist2microns;
+
 
 public:
 	library(openeda::standard_cell::standard_cells * std_cells);
@@ -38,6 +40,12 @@ public:
 	}
 
 	void geometry(entity::entity cell, multipolygon geometry);
+
+    int32_t dist2microns() const {
+        return m_dist2microns;
+    }
+
+    void dist2microns(int32_t dist);
 
 
 };

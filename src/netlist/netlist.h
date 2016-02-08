@@ -57,6 +57,7 @@ public:
 	}
 
 	// cell
+	entity::entity cell_find(std::string name);
 	entity::entity cell_insert(std::string name, std::string type);
 	void cell_remove(entity::entity cell);
 
@@ -72,7 +73,7 @@ public:
 	entity::entity cell_std_cell(entity::entity cell) const {
 		return m_cells.standard_cell(cell);
 	}
-	const entity::system & cell_system() {
+    const entity::system & cell_system() const {
 		return m_cells_system;
 	}
 

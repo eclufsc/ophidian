@@ -235,6 +235,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry;
 
 //	myMacro = locateOrCreateMacro(tokens[0]);
+	geometry::polygon<geometry::point<double> > bounding_rectangle;
 
 	get_next_token(is, tokens[0], LEFCommentChar);
 	while (tokens[0] != "END") {
@@ -251,16 +252,11 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 			get_next_n_tokens(is, tokens, 4, LEFCommentChar);
 			assert(tokens[1] == "BY");
 			assert(tokens[3] == LEFLineEndingChar);
-			std::vector<geometry::point<double> > points {
-				{ 0.0, 0.0 },
-				{ 0.0, atof(tokens[2].c_str()) },
-				{ atof(tokens[0].c_str()), atof(tokens[2].c_str()) },
-				{ atof(tokens[0].c_str()), 0.0 },
-				{ 0.0, 0.0 }
-			};
-			geometry::polygon<geometry::point<double> > current_polygon;
-			boost::geometry::append(current_polygon, points);
-			geometry.push_back(current_polygon);
+			std::vector<geometry::point<double> > points { { 0.0, 0.0 }, { 0.0,
+					lib->dist2microns() * atof(tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
+					tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), 0.0 }, {
+					0.0, 0.0 } };
+			boost::geometry::append(bounding_rectangle, points);
 //			myMacro->width = atof(tokens[0].c_str());
 //			myMacro->height = atof(tokens[2].c_str());
 		} else if (tokens[0] == "SITE")
@@ -292,15 +288,15 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 							get_next_n_tokens(is, tokens, 5, LEFCommentChar);
 
 							std::vector<geometry::point<double> > points { {
-									atof(tokens[0].c_str()), atof(
-											tokens[1].c_str()) },
-									{ atof(tokens[0].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[3].c_str()) }, { atof(
-											tokens[2].c_str()), atof(
-											tokens[1].c_str()) }, { atof(
-											tokens[0].c_str()), atof(
+
+							lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(tokens[1].c_str()) },
+									{ lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
+											tokens[3].c_str()) }, { lib->dist2microns() * atof(
+											tokens[2].c_str()), lib->dist2microns() * atof(
+											tokens[3].c_str()) }, { lib->dist2microns() * atof(
+											tokens[2].c_str()), lib->dist2microns() * atof(
+											tokens[1].c_str()) }, { lib->dist2microns() * atof(
+											tokens[0].c_str()), lib->dist2microns() * atof(
 											tokens[1].c_str()) } };
 							geometry::polygon<geometry::point<double> > current_polygon;
 							boost::geometry::append(current_polygon, points);
@@ -318,6 +314,8 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 		get_next_token(is, tokens[0], LEFCommentChar);
 	}
 	get_next_token(is, tokens[0], LEFCommentChar);
+	if(geometry.empty())
+		geometry.push_back(bounding_rectangle);
 	lib->geometry(std_cell, geometry);
 //	assert(myMacro->name == tokens[0]);
 	return;
@@ -327,7 +325,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 
 void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 		library* lib) {
-
+	std::cout << "reading .lef file..." << std::endl;
 	std::vector<std::string> tokens(1);
 	while (!dot_lef.eof()) {
 		parser::get_next_token(dot_lef, tokens[0], parser::LEFCommentChar);
@@ -359,6 +357,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			assert(tokens.size() == 3);
 			assert(tokens[0] == "DATABASE");
 			assert(tokens[1] == "MICRONS");
+            lib->dist2microns(std::atoi(tokens[2].c_str()));
 			parser::get_next_n_tokens(dot_lef, tokens, 3,
 					parser::LEFCommentChar);
 			assert(tokens[0] == parser::LEFLineEndingChar);
@@ -379,6 +378,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			break;
 		}
 	}
+	std::cout << "reading .lef file DONE" << std::endl;
 //	dot_lef.close();
 
 }

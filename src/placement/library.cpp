@@ -18,7 +18,12 @@ library::~library() {
 }
 
 void library::geometry(entity::entity cell, multipolygon geometry) {
-	m_geometries[m_system.lookup(cell)] = geometry;
+    m_geometries[m_system.lookup(cell)] = geometry;
+}
+
+void library::dist2microns(int32_t dist)
+{
+    m_dist2microns = dist;
 }
 
 } /* namespace placement */
