@@ -17,7 +17,7 @@ TEST_CASE("parser/tokenize", "[parser]") {
 TEST_CASE("verilog/read","[verilog]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist simple(&std_cells);
-	std::ifstream file("test/simple.v", std::ifstream::in);
+    std::ifstream file("benchmarks/simple/simple.v", std::ifstream::in);
 	REQUIRE(file.good());
 	openeda::netlist::verilog::read(file, &simple);
 

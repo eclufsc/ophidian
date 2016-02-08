@@ -45,6 +45,14 @@ void system::destroy(entity e) {
 
 void system::register_property(property* p) {
 	m_properties.insert(p);
+    for(auto it = m_entities.left.begin(); it != m_entities.left.end(); ++it)
+    {
+        entity e = it->first;
+        std::size_t index = it->second;
+        p->create(e, index);
+    }
+
+
 }
 
 } /* namespace entity */

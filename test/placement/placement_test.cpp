@@ -56,7 +56,7 @@ TEST_CASE("placement/ lef library", "[placement]") {
 	openeda::netlist::netlist netlist(&std_cells);
 	openeda::placement::library lib(&std_cells);
 
-	std::ifstream simple_lef("test/superblue16.lef", std::ifstream::in);
+    std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef", std::ifstream::in);
 	REQUIRE(simple_lef.good());
 	std::stringstream buffer;
 	buffer << simple_lef.rdbuf();
