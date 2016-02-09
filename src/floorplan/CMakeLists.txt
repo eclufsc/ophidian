@@ -1,0 +1,5 @@
+find_package( Boost 1.59 )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (floorplan rows.cpp sites.cpp sites.h)
+target_include_directories ( floorplan PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( floorplan ${Boost_LIBRARIES} placement )

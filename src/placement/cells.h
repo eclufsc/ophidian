@@ -31,7 +31,7 @@ public:
 	cells(openeda::netlist::netlist * netlist);
 	virtual ~cells();
 
-	void position(entity::entity cell, point position_point);
+	void position(entity::entity cell, point position);
 	point position(entity::entity cell) const {
 		return m_positions[m_system.lookup(cell)];
 	}

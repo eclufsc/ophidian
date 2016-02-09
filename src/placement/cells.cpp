@@ -18,8 +18,8 @@ cells::cells(openeda::netlist::netlist * netlist) : m_system(netlist->cell_syste
 cells::~cells() {
 }
 
-void cells::position(entity::entity cell, point position_point) {
-	m_positions[m_system.lookup(cell)] = position_point;
+void cells::position(entity::entity cell, point position) {
+	m_positions[m_system.lookup(cell)] = position;
 }
 
 void cells::geometry(entity::entity cell,
