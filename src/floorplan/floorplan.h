@@ -44,6 +44,10 @@ namespace openeda {
                 return m_sites.dimensions(site);
             }
 
+            const sites & sites_properties() const {
+                return m_sites;
+            }
+
             // rows
             entity::entity row_insert(entity::entity site, unsigned number_of_sites, point origin);
             void row_destroy(entity::entity row);
@@ -65,6 +69,10 @@ namespace openeda {
             }
 
             point row_dimensions(entity::entity row) const;
+
+            const rows & rows_properties() const {
+                return m_rows;
+            }
         };
     }
 }

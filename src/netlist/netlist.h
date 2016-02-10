@@ -77,6 +77,10 @@ public:
 		return m_cells_system;
 	}
 
+	const cells & cells_properties() const {
+		return m_cells;
+	}
+
 	// pin
 	entity::entity pin_insert(entity::entity cell, std::string name);
 	std::size_t pin_count() const {
@@ -97,6 +101,10 @@ public:
 		return m_pins.names();
 	}
 
+	const pins & pins_properties() const {
+		return m_pins;
+	}
+
 	// net
 	entity::entity net_insert(std::string name);
 	void net_remove(entity::entity net);
@@ -112,6 +120,10 @@ public:
 	std::pair<std::vector<std::string>::const_iterator,
 			std::vector<std::string>::const_iterator> net_names() const {
 		return m_nets.names();
+	}
+
+	const nets & nets_properties() const {
+		return m_nets;
 	}
 
 	void connect(entity::entity net, entity::entity pin);

@@ -40,6 +40,14 @@ public:
 		return std::make_pair(m_names.begin(), m_names.end());
 	}
 
+	std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > owners() const {
+		return std::make_pair(m_owners.begin(), m_owners.end());
+	}
+
+	std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > nets() const {
+		return std::make_pair(m_nets.begin(), m_nets.end());
+	}
+
 	void owner(entity::entity pin, entity::entity owner);
 	void net(entity::entity pin, entity::entity net);
 	void name(entity::entity pin, std::string name);

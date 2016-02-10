@@ -32,6 +32,10 @@ public:
 		return m_cells.position(cell);
 	}
 
+	const cells & cells_properties() const {
+		return m_cells;
+	}
+
 };
 
 } /* namespace placement */

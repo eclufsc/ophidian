@@ -30,6 +30,14 @@ namespace openeda {
                 return m_dimensions[m_system.lookup(site)];
             }
 
+            std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {
+                return std::make_pair(m_names.begin(), m_names.end());
+            }
+
+            std::pair< std::vector<point>::const_iterator, std::vector<point>::const_iterator > dimensions() const {
+                return std::make_pair(m_dimensions.begin(), m_dimensions.end());
+            }
+
             void name(entity::entity site, std::string name);
 
             void dimensions(entity::entity site, point dimensions);

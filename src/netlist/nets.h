@@ -36,6 +36,10 @@ public:
 		return std::make_pair(m_names.begin(), m_names.end());
 	}
 
+	std::pair< std::vector<std::vector<entity::entity>>::const_iterator, std::vector<std::vector<entity::entity>>::const_iterator > pins() const {
+		return std::make_pair(m_pins.begin(), m_pins.end());
+	}
+
 	void connect(entity::entity net, entity::entity pin);
 	void disconnect(entity::entity net, entity::entity pin);
 	void pins(entity::entity net, std::vector<entity::entity> pins);
