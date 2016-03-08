@@ -11,7 +11,7 @@ namespace openeda {
 namespace standard_cell {
 
 standard_cells::standard_cells() :
-				m_cells(m_cell_system), m_pins(m_pin_system) {
+						m_cells(m_cell_system), m_pins(m_pin_system) {
 
 }
 
@@ -31,6 +31,11 @@ entity::entity standard_cells::cell_create(std::string name) {
 
 void standard_cells::register_cell_property(entity::property* property) {
 	m_cell_system.register_property(property);
+}
+
+void standard_cells::register_pin_property(
+		entity::property* property) {
+	m_pin_system.register_property(property);
 }
 
 entity::entity standard_cells::pin_create(entity::entity cell,
@@ -65,4 +70,5 @@ entity::entity standard_cells::pad_create(std::string pin_name) {
 
 } /* namespace standard_cell */
 } /* namespace openeda */
+
 

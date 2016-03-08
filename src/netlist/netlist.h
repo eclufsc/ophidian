@@ -15,6 +15,8 @@
 #include "pins.h"
 #include "nets.h"
 
+#include  <iostream>
+
 namespace openeda {
 namespace netlist {
 
@@ -87,8 +89,13 @@ public:
 		auto owner = m_pins.owner(pin);
 		std::string the_name;
 		if (!(owner == entity::entity { }))
+		{
 			the_name = m_cells.name(owner) + ":";
-		the_name += m_std_cells->pin_name(m_pins.standard_cell_pin(pin));
+			std::string std_cell_pin_name = m_std_cells->pin_name(m_pins.standard_cell_pin(pin));
+			std_cell_pin_name = std_cell_pin_name.substr(std_cell_pin_name.find_last_of(':')+1);
+			the_name += std_cell_pin_name;
+		} else
+			the_name = m_std_cells->pin_name(m_pins.standard_cell_pin(pin));
 		return the_name;
 	}
 	entity::entity pin_owner(entity::entity pin) const {
@@ -100,6 +107,9 @@ public:
 	}
 	entity::entity pin_std_cell(entity::entity pin) const {
 		return m_pins.standard_cell_pin(pin);
+	}
+	entity::entity pin_by_name(std::string name) const {
+		return m_name2pin.at(name);
 	}
 	const entity::system & pin_system() const {
 		return m_pins_system;

@@ -29,10 +29,12 @@ class library {
 	using multipolygon = geometry::multi_polygon<polygon>;
 
 	const entity::system & m_cell_system;
+	const entity::system & m_pin_system;
+
 
 	entity::vector_property< multipolygon > m_cell_geometry;
 
-
+	entity::vector_property< point > m_pin_offset;
 
 
     int32_t m_dist2microns;
@@ -53,7 +55,10 @@ public:
     }
 
     // pins
-    entity::entity pin_create(entity::entity cell, std::string name);
+    void pin_offset(entity::entity pin, point offset);
+    point pin_offset(entity::entity pin) const {
+    	return m_pin_offset[m_pin_system.lookup(pin)];
+    }
 
     void dist2microns(int32_t dist);
 

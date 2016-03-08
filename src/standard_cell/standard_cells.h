@@ -30,6 +30,7 @@ public:
 	virtual ~standard_cells();
 
 	void register_cell_property(entity::property* property);
+	void register_pin_property(entity::property* property);
 
 	const entity::vector_property<std::string> & cell_names() const {
 		return m_cells.names();

@@ -22,7 +22,8 @@ void get_next_n_tokens(std::istream &is, std::vector<std::string> &tokens,
 
 void read_init_def_components(std::istream &is, netlist::netlist* netlist,
 		placement* cells);
-void read_def_pins(std::istream &is);
+void read_def_pins(std::istream &is, netlist::netlist* netlist,
+		placement* cells);
 void read_def_nets(std::istream &is);
 
 }
