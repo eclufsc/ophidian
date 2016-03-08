@@ -48,6 +48,7 @@ public:
 	virtual ~netlist();
 
 	void register_cell_property(entity::property * property);
+	void register_pin_property(entity::property * property);
 
 	void module_name(std::string name) {
 		m_module_name = name;
@@ -73,7 +74,7 @@ public:
 	entity::entity cell_std_cell(entity::entity cell) const {
 		return m_cells.standard_cell(cell);
 	}
-    const entity::system & cell_system() const {
+	const entity::system & cell_system() const {
 		return m_cells_system;
 	}
 
@@ -83,7 +84,12 @@ public:
 		return m_pins_system.size();
 	}
 	std::string pin_name(entity::entity pin) const {
-		return m_pins.name(pin);
+		auto owner = m_pins.owner(pin);
+		std::string the_name;
+		if (!(owner == entity::entity { }))
+			the_name = m_cells.name(owner) + ":";
+		the_name += m_std_cells->pin_name(m_pins.standard_cell_pin(pin));
+		return the_name;
 	}
 	entity::entity pin_owner(entity::entity pin) const {
 		return m_pins.owner(pin);
@@ -92,9 +98,11 @@ public:
 	entity::entity pin_net(entity::entity pin) const {
 		return m_pins.net(pin);
 	}
-	std::pair<std::vector<std::string>::const_iterator,
-			std::vector<std::string>::const_iterator> pin_names() const {
-		return m_pins.names();
+	entity::entity pin_std_cell(entity::entity pin) const {
+		return m_pins.standard_cell_pin(pin);
+	}
+	const entity::system & pin_system() const {
+		return m_pins_system;
 	}
 
 	// net
@@ -110,7 +118,7 @@ public:
 		return m_nets.pins(net);
 	}
 	std::pair<std::vector<std::string>::const_iterator,
-			std::vector<std::string>::const_iterator> net_names() const {
+	std::vector<std::string>::const_iterator> net_names() const {
 		return m_nets.names();
 	}
 

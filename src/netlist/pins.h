@@ -20,7 +20,7 @@ class pins {
 
 	entity::vector_property<entity::entity> m_owners;
 	entity::vector_property<entity::entity> m_nets;
-	entity::vector_property<std::string> m_names;
+	entity::vector_property<entity::entity> m_std_cell_pin;
 
 public:
 	pins(entity::system & system);
@@ -32,17 +32,13 @@ public:
 	entity::entity net(entity::entity pin) const {
 		return m_nets[m_system.lookup(pin)];
 	}
-	std::string name(entity::entity pin) const {
-		return m_names[m_system.lookup(pin)];
-	}
-	std::pair<std::vector<std::string>::const_iterator,
-			std::vector<std::string>::const_iterator> names() const {
-		return std::make_pair(m_names.begin(), m_names.end());
+	entity::entity standard_cell_pin(entity::entity pin) const {
+		return m_std_cell_pin[m_system.lookup(pin)];
 	}
 
 	void owner(entity::entity pin, entity::entity owner);
 	void net(entity::entity pin, entity::entity net);
-	void name(entity::entity pin, std::string name);
+	void standard_cell_pin(entity::entity pin, entity::entity std_cell_pin);
 
 };
 

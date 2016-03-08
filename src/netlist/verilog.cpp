@@ -88,7 +88,7 @@ void read(std::istream & in, netlist* netlist) {
 		std::string cell_name = tokens[1];
 		for(std::size_t i = 2; i < tokens.size()-1; i+=2)
 			netlist->connect(netlist->net_insert(tokens[i+1]),
-					netlist->pin_insert(netlist->cell_insert(cell_name, cell_type), cell_name+":"+tokens[i].substr(1)));
+					netlist->pin_insert(netlist->cell_insert(cell_name, cell_type), tokens[i].substr(1)));
 	} while (tokens.size() != 1 || tokens[0] != "endmodule");
 	std::cout << "reading .v file DONE" << std::endl;
 }
@@ -124,7 +124,7 @@ void write(std::ostream & out, standard_cell::standard_cells * std_cells,
 	out << "// Start cells" << std::endl;
 	for (auto cell : netlist->cell_system().entities()) {
 		auto std_cell = netlist->cell_std_cell(cell.first);
-		out << std_cells->name(std_cell) << " ";
+		out << std_cells->cell_name(std_cell) << " ";
 		out << netlist->cell_name(cell.first) << " ( ";
 		auto cell_pins = netlist->cell_pins(cell.first);
 		bool first = true;

@@ -19,6 +19,7 @@ class placement {
 	netlist::netlist * m_netlist;
 	library * m_library;
 	cells m_cells;
+	// pins
 public:
 	placement(netlist::netlist * netlist, library * lib);
 	virtual ~placement();

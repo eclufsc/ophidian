@@ -230,7 +230,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 	std::vector<std::string> tokens(1);
 
 	get_next_token(is, tokens[0], LEFCommentChar);
-	auto std_cell = std_cells->create(tokens[0]);
+	auto std_cell = std_cells->cell_create(tokens[0]);
 
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry;
 

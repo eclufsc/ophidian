@@ -18,15 +18,22 @@
 namespace openeda {
 namespace placement {
 
+class library_pins {
+
+};
+
 class library {
 
 	using point = geometry::point<double>;
 	using polygon = geometry::polygon<point>;
 	using multipolygon = geometry::multi_polygon<polygon>;
 
-	const entity::system & m_system;
+	const entity::system & m_cell_system;
 
-	entity::vector_property< multipolygon > m_geometries;
+	entity::vector_property< multipolygon > m_cell_geometry;
+
+
+
 
     int32_t m_dist2microns;
 
@@ -36,7 +43,7 @@ public:
 	virtual ~library();
 
 	multipolygon geometry(entity::entity cell) const {
-		return m_geometries[m_system.lookup(cell)];
+		return m_cell_geometry[m_cell_system.lookup(cell)];
 	}
 
 	void geometry(entity::entity cell, multipolygon geometry);
@@ -44,6 +51,9 @@ public:
     int32_t dist2microns() const {
         return m_dist2microns;
     }
+
+    // pins
+    entity::entity pin_create(entity::entity cell, std::string name);
 
     void dist2microns(int32_t dist);
 

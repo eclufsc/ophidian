@@ -10,33 +10,57 @@
 namespace openeda {
 namespace standard_cell {
 
+standard_cells::standard_cells() :
+				m_cells(m_cell_system), m_pins(m_pin_system) {
+
+}
+
 standard_cells::~standard_cells() {
 }
 
-entity::entity standard_cells::create(std::string name) {
-	auto result = m_mapping.left.find(name);
-	entity::entity e;
-	if (result != m_mapping.left.end())
-		e = result->second;
-	else {
-		e = m_system.create();
-		m_mapping.insert(
-				boost::bimaps::bimap<std::string, entity::entity>::value_type(
-						name, e));
-	}
-	return e;
+entity::entity standard_cells::cell_create(std::string name) {
+	auto result = m_name2cell.find(name);
+	if (result != m_name2cell.end())
+		return result->second;
+
+	auto id = m_cell_system.create();
+	m_name2cell[name] = id;
+	m_cells.name(id, name);
+	return id;
 }
 
-std::vector<std::string> standard_cells::names() const {
-	std::vector<std::string> names;
-	for (auto e : m_mapping)
-		names.push_back(e.left);
-	return names;
+void standard_cells::register_cell_property(entity::property* property) {
+	m_cell_system.register_property(property);
 }
 
-void standard_cells::register_property(
-		entity::property* property) {
-	m_system.register_property(property);
+entity::entity standard_cells::pin_create(entity::entity cell,
+		std::string name) {
+
+	const std::string std_cell_name = m_cells.name(cell);
+	std::string pin_name = std_cell_name + ":" + name;
+
+	auto result = m_name2pin.find(pin_name);
+	if (result != m_name2pin.end())
+		return result->second;
+
+	auto id = m_pin_system.create();
+	m_name2pin[pin_name] = id;
+	m_pins.name(id, name);
+	m_pins.owner(id, cell);
+	m_cells.insert_pin(cell, id);
+	return id;
+}
+
+entity::entity standard_cells::pad_create(std::string pin_name) {
+
+	auto result = m_name2pin.find(pin_name);
+	if (result != m_name2pin.end())
+		return result->second;
+
+	auto id = m_pin_system.create();
+	m_name2pin[pin_name] = id;
+	m_pins.name(id, pin_name);
+	return id;
 }
 
 } /* namespace standard_cell */

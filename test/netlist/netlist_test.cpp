@@ -1,8 +1,8 @@
 #include "../catch.hpp"
 
 #include <entity.h>
-#include <cells.h>
-#include <nets.h>
+#include "../netlist/cells.h"
+#include "../netlist/nets.h"
 #include <netlist.h>
 
 TEST_CASE("netlist/ empty","[netlist]") {
@@ -18,11 +18,11 @@ TEST_CASE("netlist/insert cell","[netlist]") {
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	REQUIRE(netlist.cell_count() == 1);
-	REQUIRE(std_cells.size() == 1);
+	REQUIRE(std_cells.cell_count() == 1);
 	REQUIRE(netlist.cell_name(u1) == "u1");
 	auto u2 = netlist.cell_insert("u2", "INVX1");
 	REQUIRE(netlist.cell_count() == 2);
-	REQUIRE(std_cells.size() == 1);
+	REQUIRE(std_cells.cell_count() == 1);
 	REQUIRE(netlist.cell_name(u2) == "u2");
 	REQUIRE(netlist.cell_name(u1) == "u1");
 }
@@ -61,8 +61,16 @@ TEST_CASE("netlist/insert pin to cell","[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
-	auto u1a = netlist.pin_insert(u1, "u1:a");
-	auto u1o = netlist.pin_insert(u1, "u1:o");
+	auto u1a = netlist.pin_insert(u1, "a");
+	auto u1o = netlist.pin_insert(u1, "o");
+
+	REQUIRE( netlist.pin_name(u1o) == "u1:o" );
+
+	auto INV_X1 = netlist.cell_std_cell(u1);
+	auto INV_X1_o = std_cells.pin_create(INV_X1, "o");
+
+	REQUIRE( netlist.pin_std_cell(u1o) == INV_X1_o );
+
 	REQUIRE(netlist.pin_count() == 2);
 	auto cell_pins = netlist.cell_pins(u1);
 	REQUIRE(cell_pins.size() == 2);
@@ -80,12 +88,12 @@ TEST_CASE("netlist/remove cell and owned pins","[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
-	auto u1a = netlist.pin_insert(u1, "u1:a");
-	auto u1o = netlist.pin_insert(u1, "u1:o");
+	auto u1a = netlist.pin_insert(u1, "a");
+	auto u1o = netlist.pin_insert(u1, "o");
 
 	auto u2 = netlist.cell_insert("u2", "INVX1");
-	auto u2a = netlist.pin_insert(u2, "u2:a");
-	auto u2o = netlist.pin_insert(u2, "u2:o");
+	auto u2a = netlist.pin_insert(u2, "a");
+	auto u2o = netlist.pin_insert(u2, "o");
 
 	netlist.cell_remove(u1);
 
@@ -120,7 +128,7 @@ TEST_CASE("netlist/connect","[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
-	auto u1a = netlist.pin_insert(u1, "u1:a");
+	auto u1a = netlist.pin_insert(u1, "a");
 	auto n1 = netlist.net_insert("n1");
 	auto n2 = netlist.net_insert("n2");
 	netlist.connect(n1, u1a);
@@ -136,7 +144,7 @@ TEST_CASE("netlist/disconnect","[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
-	auto u1a = netlist.pin_insert(u1, "u1:a");
+	auto u1a = netlist.pin_insert(u1, "a");
 	REQUIRE_THROWS(netlist.disconnect(u1a)); // cannot disconnect a disconnected pin
 	auto n1 = netlist.net_insert("n1");
 	netlist.connect(n1, u1a);
@@ -152,16 +160,16 @@ TEST_CASE("netlist/remove cell and disconnect all pins before removing them","[n
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto inp1 = netlist.net_insert("inp1");
-	auto u1a = netlist.pin_insert(u1, "u1:a");
+	auto u1a = netlist.pin_insert(u1, "a");
 	netlist.connect(inp1, u1a);
-	auto u1o = netlist.pin_insert(u1, "u1:o");
+	auto u1o = netlist.pin_insert(u1, "o");
 	auto n1 = netlist.net_insert("n1");
 	netlist.connect(n1, u1o);
 
 	auto u2 = netlist.cell_insert("u2", "INVX1");
-	auto u2a = netlist.pin_insert(u2, "u2:a");
+	auto u2a = netlist.pin_insert(u2, "a");
 	netlist.connect(n1, u2a);
-	auto u2o = netlist.pin_insert(u2, "u2:o");
+	auto u2o = netlist.pin_insert(u2, "o");
 	auto n2 = netlist.net_insert("n2");
 	netlist.connect(n2, u2o);
 	netlist.cell_remove(u1);
@@ -183,7 +191,7 @@ TEST_CASE("netlist/remove net", "[netlist]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
-	auto u1a  = netlist.pin_insert(u1, "u1:a");
+	auto u1a  = netlist.pin_insert(u1, "a");
 	auto n1 = netlist.net_insert("u1");
 	auto pi = netlist.PI_insert("pi");
 
@@ -202,6 +210,9 @@ TEST_CASE("netlist/insert PI","[netlist]") {
 	openeda::netlist::netlist netlist(&std_cells);
 
 	auto inp1 = netlist.PI_insert("inp1");
+
+
+	REQUIRE( std_cells.pin_name(netlist.pin_std_cell(inp1)) == "inp1" );
 	REQUIRE(netlist.PI_count() == 1);
 	REQUIRE(netlist.pin_name(inp1) == "inp1");
 	REQUIRE(

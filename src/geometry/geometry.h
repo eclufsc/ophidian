@@ -13,6 +13,8 @@
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 
+#include <cmath>
+
 namespace openeda {
 namespace geometry {
 template<class Coordinate_Type>
