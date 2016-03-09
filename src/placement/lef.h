@@ -26,6 +26,8 @@ void get_next_n_tokens(std::istream &is, std::vector<std::string> &tokens,
 void read_lef_macro_site(std::istream &is);
 void read_lef_site(std::istream &is);
 void read_lef_layer(std::istream &is);
+void read_lef_macro_pin(std::istream &is,  entity::entity cell, standard_cell::standard_cells * std_cells,
+		library* lib);
 void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 		library* lib);
 }

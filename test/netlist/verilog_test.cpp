@@ -54,6 +54,9 @@ TEST_CASE("verilog/read","[verilog]") {
 		}
 	}
 
+	REQUIRE( simple.pin_net(simple.pin_by_name("out")) == simple.net_by_name("out") );
+
+
 	std::cout << simple.module_name() << " pins (" << simple.pin_count() << ")"
 			<< std::endl;
 

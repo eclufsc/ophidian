@@ -60,14 +60,14 @@ void read(std::istream & in, netlist* netlist) {
 		std::getline(in, line);
 		tokens = parser::tokenize(line);
 		if (tokens.size() == 2 && tokens[0] == "input")
-			netlist->PI_insert(tokens[1]);
+			netlist->connect(netlist->net_insert(tokens[1]), netlist->PI_insert(tokens[1]));
 	} while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "POs");
 
 	do {
 		std::getline(in, line);
 		tokens = parser::tokenize(line);
 		if (tokens.size() == 2 && tokens[0] == "output")
-			netlist->PO_insert(tokens[1]);
+			netlist->connect(netlist->net_insert(tokens[1]), netlist->PO_insert(tokens[1]));
 	} while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "wires");
 
 	do {

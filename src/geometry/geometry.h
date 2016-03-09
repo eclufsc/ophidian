@@ -33,6 +33,12 @@ void translate(Geometry geometry, point<CoordinateType> point,
 //	boost::geometry::correct(result);
 }
 
+template<class CoordinateType>
+CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<CoordinateType> & p2)
+{
+	return std::abs(p2.y()-p1.y())+std::abs(p2.x()-p1.x());
+}
+
 }
 
 }

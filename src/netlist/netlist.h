@@ -131,6 +131,12 @@ public:
 	std::vector<std::string>::const_iterator> net_names() const {
 		return m_nets.names();
 	}
+	const entity::system & net_system() const {
+		return m_nets_system;
+	}
+	entity::entity net_by_name(std::string name) const {
+		return m_name2net.at(name);
+	}
 
 	void connect(entity::entity net, entity::entity pin);
 	void disconnect(entity::entity pin);

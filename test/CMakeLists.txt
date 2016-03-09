@@ -6,6 +6,7 @@ add_subdirectory (standard_cell)
 add_subdirectory (netlist)
 add_subdirectory (placement)
 add_subdirectory (geometry)
+add_subdirectory (regression)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
