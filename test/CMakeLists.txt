@@ -5,7 +5,9 @@ add_subdirectory (data_structures)
 add_subdirectory (standard_cell)
 add_subdirectory (netlist)
 add_subdirectory (placement)
-add_subdirectory(floorplan)
+add_subdirectory (geometry)
+add_subdirectory (regression)
+add_subdirectory (floorplan)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 

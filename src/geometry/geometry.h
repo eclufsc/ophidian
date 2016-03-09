@@ -13,6 +13,8 @@
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 
+#include <cmath>
+
 namespace openeda {
 namespace geometry {
 template<class Coordinate_Type>
@@ -29,6 +31,12 @@ void translate(Geometry geometry, point<CoordinateType> point,
 			2, 2> translate(point.x(), point.y());
 	boost::geometry::transform(geometry, result, translate);
 //	boost::geometry::correct(result);
+}
+
+template<class CoordinateType>
+CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<CoordinateType> & p2)
+{
+	return std::abs(p2.y()-p1.y())+std::abs(p2.x()-p1.x());
 }
 
 }

@@ -1,9 +1,9 @@
 #include "../catch.hpp"
 
 #include <entity.h>
-#include <cells.h>
-#include <pins.h>
-#include <nets.h>
+#include "../netlist/cells.h"
+#include "../netlist/nets.h"
+#include "../netlist/pins.h"
 
 TEST_CASE("nets/name","[netlist][nets]") {
 

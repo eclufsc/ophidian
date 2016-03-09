@@ -7,7 +7,6 @@
 
 #include <placement.h>
 
-
 namespace openeda {
 namespace placement {
 
@@ -27,5 +26,11 @@ void placement::cell_position(entity::entity cell,
 	m_cells.geometry(cell, translated);
 }
 
+void placement::pad_position(entity::entity pad,
+		geometry::point<double> position) {
+	m_library->pin_offset(m_netlist->pin_std_cell(pad), position);
+}
+
 } /* namespace placement */
 } /* namespace openeda */
+

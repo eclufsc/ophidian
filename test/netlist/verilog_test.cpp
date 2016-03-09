@@ -27,14 +27,13 @@ TEST_CASE("verilog/read","[verilog]") {
 	REQUIRE(simple.cell_count() == 6);
 	REQUIRE(simple.pin_count() == 19);
 	REQUIRE(simple.module_name() == "simple");
-	REQUIRE(std_cells.size() == 5);
+	REQUIRE(std_cells.cell_count() == 5);
 
 	bool ok = true;
-	for (auto it = simple.cell_system().begin();
-			it != simple.cell_system().end(); ++it) {
-		std::string name = simple.cell_name(it->first);
-		std::string std_cell = std_cells.name(simple.cell_std_cell(it->first));
-		auto cell_pins = simple.cell_pins(it->first);
+	for (auto cell : simple.cell_system()) {
+		std::string name = simple.cell_name(cell.second);
+		std::string std_cell = std_cells.cell_name(simple.cell_std_cell(cell.second));
+		auto cell_pins = simple.cell_pins(cell.second);
 		if (name == "u1") {
 			REQUIRE(std_cell == "NAND2_X1");
 			REQUIRE(cell_pins.size() == 3);
@@ -55,19 +54,29 @@ TEST_CASE("verilog/read","[verilog]") {
 		}
 	}
 
+	REQUIRE( simple.pin_net(simple.pin_by_name("out")) == simple.net_by_name("out") );
+
+
 	std::cout << simple.module_name() << " pins (" << simple.pin_count() << ")"
 			<< std::endl;
-	std::for_each(simple.pin_names().first, simple.pin_names().second,
-			[](std::string name) {
-				std::cout << name << std::endl;
-			});
 
-	std::cout << "std cell types (" << std_cells.size() << ")" << std::endl;
-	auto std_cell_names = std_cells.names();
+	for(auto p : simple.pin_system())
+	{
+		std::cout << simple.pin_name(p.second) << std::endl;
+	}
+
+	std::cout << "std cell types (" << std_cells.cell_count() << ")" << std::endl;
+	auto std_cell_names = std_cells.cell_names();
 	std::for_each(std_cell_names.begin(), std_cell_names.end(),
 			[](std::string name) {
 				std::cout << name << std::endl;
 			});
+
+	std::cout << "std cell pins (" << std_cells.pin_system().size() << ")" << std::endl;
+	for(auto std_cell_pin : std_cells.pin_system())
+	{
+		std::cout << std_cells.pin_name(std_cell_pin.second) << std::endl;
+	}
 
 }
 

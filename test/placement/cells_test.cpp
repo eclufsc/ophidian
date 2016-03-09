@@ -7,24 +7,30 @@
 #include <library.h>
 #include <lef.h>
 #include "../geometry/geometry.h"
-
+#include  "../placement/placement.h"
 
 TEST_CASE("placement cell info", "[placement]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
-	openeda::placement::library lib(&std_cells);
 
-	auto INV_X1 = std_cells.create("INV_X1");
-	auto u1 = netlist.cell_insert("u1", "INV_X1");
+	// create std cells
+	openeda::standard_cell::standard_cells std_cells;
+	auto INV_X1 = std_cells.cell_create("INV_X1");
+
+	// create dummy lib
+	openeda::placement::library lib(&std_cells);
 	std::vector<openeda::geometry::point<double> > points { { 0.0, 0.0 }, { 0.0,
 			200.0 }, { 800.0, 200.0 }, { 800.0, 0.0 }, { 0.0, 0.0 } };
 
 	openeda::geometry::polygon<openeda::geometry::point<double> > polygon;
 	boost::geometry::append(polygon, points);
 	openeda::geometry::multi_polygon<
-			openeda::geometry::polygon<openeda::geometry::point<double> > > multipolygon {
-			polygon };
+	openeda::geometry::polygon<openeda::geometry::point<double> > > multipolygon {
+		polygon };
 	lib.geometry(INV_X1, multipolygon);
+
+	// create netlist
+	openeda::netlist::netlist netlist(&std_cells);
+	auto u1 = netlist.cell_insert("u1", "INV_X1");
+
 	openeda::placement::cells cells(&netlist);
 	cells.position(u1, { 0.0, 0.0 });
 	cells.geometry(u1, lib.geometry(INV_X1));

@@ -13,7 +13,7 @@ namespace netlist {
 pins::pins(entity::system & system) : m_system(system) {
 	m_system.register_property(&m_owners);
 	m_system.register_property(&m_nets);
-	m_system.register_property(&m_names);
+	m_system.register_property(&m_std_cell_pin);
 }
 
 pins::~pins() {
@@ -27,8 +27,9 @@ void pins::net(entity::entity pin, entity::entity net) {
 	m_nets[m_system.lookup(pin)] = net;
 }
 
-void pins::name(entity::entity pin, std::string name) {
-	m_names[m_system.lookup(pin)] = name;
+void pins::standard_cell_pin(entity::entity pin,
+		entity::entity std_cell_pin) {
+	m_std_cell_pin[m_system.lookup(pin)] = std_cell_pin;
 }
 
 } /* namespace netlist */

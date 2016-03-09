@@ -15,9 +15,9 @@ using multi_polygon = openeda::geometry::multi_polygon<polygon>;
 TEST_CASE("placement library/set & get geometry", "[placement]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::placement::library lib(&std_cells);
-	auto INV_X1 = std_cells.create("INV_X1");
-	std::vector<point> points { { 0.0, 0.0 }, { 0.0, 200.0 }, { 800.0,
-			200.0 }, { 800.0, 0.0 }, { 0.0, 0.0 } };
+	auto INV_X1 = std_cells.cell_create("INV_X1");
+	std::vector<point> points { { 0.0, 0.0 }, { 0.0, 200.0 }, { 800.0, 200.0 },
+			{ 800.0, 0.0 }, { 0.0, 0.0 } };
 	polygon polygon;
 	boost::geometry::append(polygon, points);
 	multi_polygon multi;
@@ -28,7 +28,8 @@ TEST_CASE("placement/read lef", "[placement]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::placement::library lib(&std_cells);
 
-    std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef", std::ifstream::in);
+	std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef",
+			std::ifstream::in);
 	REQUIRE(simple_lef.good());
 	std::stringstream buffer;
 	buffer << simple_lef.rdbuf();
@@ -38,10 +39,10 @@ TEST_CASE("placement/read lef", "[placement]") {
 
 	REQUIRE(lib.dist2microns() == 2000);
 
-	std::cout << "lef library" << std::endl;
-	for (auto c : std_cells.system()) {
-		std::cout << std_cells.name(c.second) << " "
-				<< boost::geometry::wkt(lib.geometry(c.second)) << std::endl;
-	}
-
+//	std::cout << "lef library" << std::endl;
+//	for (auto c : std_cells.cell_system()) {
+//		std::cout << std_cells.cell_name(c.second) << " "
+//				<< boost::geometry::wkt(lib.geometry(c.second)) << std::endl;
+//	}
 }
+

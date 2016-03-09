@@ -166,11 +166,20 @@ void read_lef_macro_site(std::istream &is) {
 }
 
 // assumes the keyword PIN has already been read in
-void read_lef_macro_pin(std::istream &is) {
+void read_lef_macro_pin(std::istream &is, entity::entity cell,
+		standard_cell::standard_cells * std_cells, library* lib) {
 //	macro_pin myPin;
 	std::vector<std::string> tokens(1);
 	get_next_token(is, tokens[0], LEFCommentChar);
 	std::string pinName = tokens[0];
+
+	entity::entity pin = std_cells->pin_create(cell, pinName);
+
+	geometry::point<double> lower(std::numeric_limits<double>::max(),
+			std::numeric_limits<double>::max());
+	geometry::point<double> upper(std::numeric_limits<double>::lowest(),
+			std::numeric_limits<double>::lowest());
+
 	get_next_token(is, tokens[0], LEFCommentChar);
 	while (tokens[0] != "END") {
 		if (tokens[0] == "DIRECTION") {
@@ -188,14 +197,28 @@ void read_lef_macro_pin(std::istream &is) {
 				} else if (tokens[0] == "RECT") {
 					get_next_n_tokens(is, tokens, 2, LEFCommentChar);
 //					myPin.xLL = min(atof(tokens[0].c_str()), myPin.xLL);
+
+					lower.x(std::min(lower.x(), std::stod(tokens[0])));
+
 					if (tokens[1] == "ITERATE") {
 						get_next_n_tokens(is, tokens, 3, LEFCommentChar);
+
+						lower.y(std::min(lower.y(), std::stod(tokens[0])));
+						upper.x(std::max(upper.x(), std::stod(tokens[1])));
+						upper.y(std::max(upper.y(), std::stod(tokens[2])));
 //						myPin.yLL = min(atof(tokens[0].c_str()), myPin.yLL);
+
 //						myPin.xUR = max(atof(tokens[1].c_str()), myPin.xUR);
 //						myPin.yUR = max(atof(tokens[2].c_str()), myPin.yUR);
+
 					} else {
+						lower.y(std::min(lower.y(), std::stod(tokens[1])));
+
 //						myPin.yLL = min(atof(tokens[1].c_str()), myPin.yLL);
 						get_next_n_tokens(is, tokens, 2, LEFCommentChar);
+
+						upper.x(std::max(upper.x(), std::stod(tokens[0])));
+						upper.y(std::max(upper.y(), std::stod(tokens[1])));
 //						myPin.xUR = max(atof(tokens[0].c_str()), myPin.xUR);
 //						myPin.yUR = max(atof(tokens[1].c_str()), myPin.yUR);
 					}
@@ -207,6 +230,7 @@ void read_lef_macro_pin(std::istream &is) {
 				}
 				get_next_token(is, tokens[0], LEFCommentChar);
 			}
+			lib->pin_offset( pin, { 0.5 * (upper.x()+lower.x()) * static_cast<double>(lib->dist2microns()), 0.5 * (upper.y()+lower.y()) * static_cast<double>(lib->dist2microns()) } );
 		} else if (tokens[0] == "USE") {
 			while (tokens[0] != LEFLineEndingChar)
 				get_next_token(is, tokens[0], LEFCommentChar);
@@ -230,7 +254,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 	std::vector<std::string> tokens(1);
 
 	get_next_token(is, tokens[0], LEFCommentChar);
-	auto std_cell = std_cells->create(tokens[0]);
+	auto std_cell = std_cells->cell_create(tokens[0]);
 
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > geometry;
 
@@ -253,16 +277,18 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 			assert(tokens[1] == "BY");
 			assert(tokens[3] == LEFLineEndingChar);
 			std::vector<geometry::point<double> > points { { 0.0, 0.0 }, { 0.0,
-					lib->dist2microns() * atof(tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
-					tokens[2].c_str()) }, { lib->dist2microns() * atof(tokens[0].c_str()), 0.0 }, {
-					0.0, 0.0 } };
+					lib->dist2microns() * atof(tokens[2].c_str()) }, {
+					lib->dist2microns() * atof(tokens[0].c_str()),
+					lib->dist2microns() * atof(tokens[2].c_str()) }, {
+					lib->dist2microns() * atof(tokens[0].c_str()), 0.0 }, { 0.0,
+					0.0 } };
 			boost::geometry::append(bounding_rectangle, points);
 //			myMacro->width = atof(tokens[0].c_str());
 //			myMacro->height = atof(tokens[2].c_str());
 		} else if (tokens[0] == "SITE")
 			read_lef_macro_site(is);
 		else if (tokens[0] == "PIN")
-			read_lef_macro_pin(is);
+			read_lef_macro_pin(is, std_cell, std_cells, lib);
 		else if (tokens[0] == "SYMMETRY") {
 			// NOTE: this contest does not allow flipping/rotation
 			// even though symmetries are specified for a macro
@@ -289,15 +315,25 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 
 							std::vector<geometry::point<double> > points { {
 
-							lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(tokens[1].c_str()) },
-									{ lib->dist2microns() * atof(tokens[0].c_str()), lib->dist2microns() * atof(
-											tokens[3].c_str()) }, { lib->dist2microns() * atof(
-											tokens[2].c_str()), lib->dist2microns() * atof(
-											tokens[3].c_str()) }, { lib->dist2microns() * atof(
-											tokens[2].c_str()), lib->dist2microns() * atof(
-											tokens[1].c_str()) }, { lib->dist2microns() * atof(
-											tokens[0].c_str()), lib->dist2microns() * atof(
-											tokens[1].c_str()) } };
+							lib->dist2microns() * atof(tokens[0].c_str()),
+									lib->dist2microns()
+											* atof(tokens[1].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[0].c_str()),
+									lib->dist2microns()
+											* atof(tokens[3].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[2].c_str()),
+									lib->dist2microns()
+											* atof(tokens[3].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[2].c_str()),
+									lib->dist2microns()
+											* atof(tokens[1].c_str()) }, {
+									lib->dist2microns()
+											* atof(tokens[0].c_str()),
+									lib->dist2microns()
+											* atof(tokens[1].c_str()) } };
 							geometry::polygon<geometry::point<double> > current_polygon;
 							boost::geometry::append(current_polygon, points);
 							geometry.push_back(current_polygon);
@@ -314,7 +350,7 @@ void read_lef_macro(std::istream &is, standard_cell::standard_cells * std_cells,
 		get_next_token(is, tokens[0], LEFCommentChar);
 	}
 	get_next_token(is, tokens[0], LEFCommentChar);
-	if(geometry.empty())
+	if (geometry.empty())
 		geometry.push_back(bounding_rectangle);
 	lib->geometry(std_cell, geometry);
 //	assert(myMacro->name == tokens[0]);
@@ -357,7 +393,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			assert(tokens.size() == 3);
 			assert(tokens[0] == "DATABASE");
 			assert(tokens[1] == "MICRONS");
-            lib->dist2microns(std::atoi(tokens[2].c_str()));
+			lib->dist2microns(std::atoi(tokens[2].c_str()));
 			parser::get_next_n_tokens(dot_lef, tokens, 3,
 					parser::LEFCommentChar);
 			assert(tokens[0] == parser::LEFLineEndingChar);

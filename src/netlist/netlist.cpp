@@ -26,6 +26,11 @@ void netlist::register_cell_property(
 	m_cells_system.register_property(property);
 }
 
+void netlist::register_pin_property(
+		entity::property* property) {
+	m_pins_system.register_property(property);
+}
+
 entity::entity netlist::cell_find(std::string name) {
 	auto result = m_name2cell.find(name);
 	if(result == m_name2cell.end())
@@ -41,7 +46,7 @@ entity::entity netlist::cell_insert(std::string name, std::string type) {
 	entity::entity the_cell = m_cells_system.create();
 	m_name2cell[name] = the_cell;
 	m_cells.name(the_cell, name);
-	m_cells.standard_cell(the_cell, m_std_cells->create(type));
+	m_cells.standard_cell(the_cell, m_std_cells->cell_create(type));
 	return the_cell;
 }
 
@@ -58,13 +63,19 @@ void netlist::cell_remove(entity::entity cell) {
 }
 
 entity::entity netlist::pin_insert(entity::entity cell, std::string name) {
-	auto result = m_name2pin.find(name);
+	const std::string owner_name = m_cells.name(cell);
+	const std::string pin_name =  owner_name + ":" + name;
+
+	auto result = m_name2pin.find(pin_name);
 	if (result != m_name2pin.end())
 		return result->second;
+
 	entity::entity the_pin = m_pins_system.create();
-	m_name2pin[name] = the_pin;
+	m_name2pin[pin_name] = the_pin;
 	m_pins.owner(the_pin, cell);
-	m_pins.name(the_pin, name);
+
+	entity::entity std_cell_pin = m_std_cells->pin_create(m_cells.standard_cell(cell), name);
+	m_pins.standard_cell_pin(the_pin, std_cell_pin);
 	m_cells.insert_pin(cell, the_pin);
 	return the_pin;
 }
@@ -98,9 +109,11 @@ entity::entity netlist::PI_insert(std::string name) {
 	auto result = m_name2pin.find(name);
 	if (result != m_name2pin.end())
 		return result->second;
+
+
 	entity::entity the_pin = m_pins_system.create();
 	m_name2pin[name] = the_pin;
-	m_pins.name(the_pin, name);
+	m_pins.standard_cell_pin(the_pin, m_std_cells->pad_create(name));
 	m_PI_mapping.insert(entity2index_map::value_type(the_pin, m_PI.size()));
 	m_PI.push_back(the_pin);
 	return the_pin;
@@ -142,7 +155,7 @@ entity::entity netlist::PO_insert(std::string name) {
 		return result->second;
 	entity::entity the_pin = m_pins_system.create();
 	m_name2pin[name] = the_pin;
-	m_pins.name(the_pin, name);
+	m_pins.standard_cell_pin(the_pin, m_std_cells->pad_create(name));
 	m_PO_mapping.insert(entity2index_map::value_type(the_pin, m_PO.size()));
 	m_PO.push_back(the_pin);
 	return the_pin;

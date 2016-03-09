@@ -1,9 +1,9 @@
 #include "../catch.hpp"
 
 #include <entity.h>
-#include <cells.h>
-#include <nets.h>
-#include <pins.h>
+#include "../netlist/cells.h"
+#include "../netlist/nets.h"
+#include "../netlist/pins.h"
 
 TEST_CASE("cells/assign name","[netlist][cells]") {
 	openeda::entity::system cells_system;
@@ -17,7 +17,7 @@ TEST_CASE("cells/assign cell_type", "[netlist][cells]") {
 	openeda::entity::system cells_system;
 	openeda::netlist::cells cells(cells_system);
 	openeda::standard_cell::standard_cells std_cells;
-	auto NAND2_X2 = std_cells.create("NAND2_X2");
+	auto NAND2_X2 = std_cells.cell_create("NAND2_X2");
 	auto u1 = cells_system.create();
 	cells.standard_cell(u1, NAND2_X2);
 	REQUIRE(cells.standard_cell(u1) == NAND2_X2);

@@ -69,6 +69,7 @@ void mysfmlcanvas::drag_cell(openeda::entity::entity cell, point position)
 {
     m_app->place_cell_and_update_index(cell, position);
     m_circuit->update_cell(cell);
+    m_circuit->select_cell(cell);
 }
 
 openeda::entity::entity mysfmlcanvas::get_cell(point position)
