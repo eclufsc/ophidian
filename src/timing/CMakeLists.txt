@@ -1,0 +1,5 @@
+find_package( Boost 1.59 )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (timing rc_tree.cpp )
+target_include_directories ( timing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( timing ${Boost_LIBRARIES} emon )
