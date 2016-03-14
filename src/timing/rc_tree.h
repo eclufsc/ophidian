@@ -22,10 +22,13 @@ namespace timing {
 using namespace boost::units;
 
 class rc_tree {
-	lemon::ListGraph m_graph;
-	lemon::ListGraph::NodeMap<std::string> m_names;
-	lemon::ListGraph::NodeMap<quantity<si::capacitance> > m_capacitances;
-	lemon::ListGraph::EdgeMap<quantity<si::resistance> > m_resistances;
+public:
+	using graph_t =lemon::ListGraph;
+private:
+	graph_t m_graph;
+	graph_t::NodeMap<std::string> m_names;
+	graph_t::NodeMap<quantity<si::capacitance> > m_capacitances;
+	graph_t::EdgeMap<quantity<si::resistance> > m_resistances;
 	quantity<si::capacitance> m_lumped_capacitance;
 
 	std::unordered_map<std::string, lemon::ListGraph::Node> m_name2node;
@@ -42,8 +45,8 @@ public:
 
 	capacitor_id capacitor_insert(std::string name);
 
-	resistor_id resistor_insert(capacitor_id u,
-			capacitor_id v, quantity<si::resistance> res);
+	resistor_id resistor_insert(capacitor_id u, capacitor_id v,
+			quantity<si::resistance> res);
 
 	void capacitance(capacitor_id u, quantity<si::capacitance> cap);
 
@@ -58,8 +61,7 @@ public:
 		return m_resistances[uv];
 	}
 
-	resistor_it capacitor_resistors(
-			capacitor_id u) const {
+	resistor_it capacitor_resistors(capacitor_id u) const {
 		return resistor_it(m_graph, u);
 	}
 
@@ -71,6 +73,9 @@ public:
 		return lemon::INVALID;
 	}
 
+	graph_t & graph() {
+		return m_graph;
+	}
 
 };
 
