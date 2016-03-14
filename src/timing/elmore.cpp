@@ -25,7 +25,7 @@ elmore::elmore(rc_tree& tree, rc_tree::capacitor_id source) :
 	to_process.push_back(source);
 	while (!to_process.empty()) {
 		auto element = to_process.front();
-		to_process.pop_back();
+        to_process.pop_front();
 		m_order.push_back(element);
 		for (rc_tree::resistor_it it { tree.capacitor_resistors(element) };
 				it != rc_tree::invalid(); ++it) {

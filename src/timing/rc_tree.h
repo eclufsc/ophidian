@@ -25,6 +25,7 @@ class rc_tree {
 public:
 	using graph_t =lemon::ListGraph;
 private:
+public:
 	graph_t m_graph;
 	graph_t::NodeMap<std::string> m_names;
 	graph_t::NodeMap<quantity<si::capacitance> > m_capacitances;
@@ -44,6 +45,10 @@ public:
 	}
 
 	capacitor_id capacitor_insert(std::string name);
+
+    std::string capacitor_name(capacitor_id u) const {
+        return m_names[u];
+    }
 
 	resistor_id resistor_insert(capacitor_id u, capacitor_id v,
 			quantity<si::resistance> res);

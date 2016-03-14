@@ -24,6 +24,7 @@ lemon::ListGraph::Node rc_tree::capacitor_insert(std::string name) {
 	if (result != m_name2node.end())
 		return result->second;
 	auto node = m_graph.addNode();
+    m_names[node] = name;
 	m_name2node[name] = node;
 	m_capacitances[node] = 0.0*si::farad;
 	return node;
