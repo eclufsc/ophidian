@@ -11,7 +11,7 @@ add_subdirectory (placement)
 add_subdirectory (geometry)
 add_subdirectory (regression)
 add_subdirectory (floorplan)
-add_subdirectory(interconnection_estimation)
+add_subdirectory (interconnection_estimation)
 add_subdirectory (timing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )

@@ -71,6 +71,7 @@ namespace openeda {
     (d<=FLUTE_D ? flutes_LD(d, xs, ys, s) : flutes_MD(d, xs, ys, s, acc))
 
 #define ADIFF(x,y) ((x)>(y)?(x-y):(y-x))  // Absolute difference
+
     }
 }
 
