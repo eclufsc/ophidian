@@ -9,9 +9,9 @@
 #define SRC_NETLIST_NETS_H_
 
 #include <vector>
-#include <entity.h>
+#include "../entity/entity.h"
+#include "../entity/vector_property.h"
 #include <utility>
-#include <vector_property.h>
 
 namespace openeda {
 namespace netlist {

@@ -9,8 +9,8 @@
 #define SRC_NETLIST_PINS_H_
 
 #include <vector>
-#include <entity.h>
-#include <vector_property.h>
+#include "../entity/entity.h"
+#include "../entity/vector_property.h"
 
 namespace openeda {
 namespace netlist {

@@ -15,7 +15,7 @@ TEST_CASE("rc_tree/empty", "[timing][rc_tree]")
     quantity<capacitance> zero_farad(0.0 * farads);
 
     REQUIRE( (tree.lumped() == zero_farad) );
-
+    REQUIRE( tree.capacitor_count() == 0 );
 
 }
 
@@ -28,6 +28,7 @@ TEST_CASE("rc_tree/insert node", "[timing][rc_tree]")
 
     auto node = tree.capacitor_insert("u1");
     REQUIRE( tree.capacitance(node) == 0.0*farad );
+    REQUIRE( tree.capacitor_count() == 1 );
 }
 
 
