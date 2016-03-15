@@ -1,5 +1,0 @@
-find_package( Boost 1.59 )
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_library (interconnection_estimation interconnection_estimation.cpp hpwl_estimation.cpp hpwl_estimation.h flute.cpp flute.h stwl_estimation.cpp stwl_estimation.h)
-target_include_directories ( interconnection_estimation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries( interconnection_estimation ${Boost_LIBRARIES} netlist placement )

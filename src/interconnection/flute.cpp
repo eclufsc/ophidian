@@ -26,7 +26,7 @@ using std::pair;
 using std::make_pair;
 
 namespace openeda {
-    namespace interconnection_estimation {
+    namespace interconnection {
         int numgrp[10]={0,0,0,0,6,30,180,1260,10080,90720};
 
         typedef struct point {
@@ -688,6 +688,12 @@ namespace openeda {
 
         tree flute(int d, DTYPE x[], DTYPE y[], int acc)
         {
+            static bool LUTread;
+            if(!LUTread)
+            {
+                readLUT();
+                LUTread=true;
+            }
             unsigned allocateSize = MAXD;
             if (d > MAXD)
             {

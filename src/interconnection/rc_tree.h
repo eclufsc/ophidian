@@ -17,7 +17,7 @@
 #include <unordered_map>
 
 namespace openeda {
-namespace timing {
+namespace interconnection {
 
 using namespace boost::units;
 

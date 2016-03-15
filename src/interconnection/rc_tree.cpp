@@ -8,7 +8,7 @@
 #include "rc_tree.h"
 
 namespace openeda {
-namespace timing {
+namespace interconnection {
 
 rc_tree::rc_tree() :
 		m_names(m_graph), m_capacitances(m_graph), m_resistances(m_graph), m_lumped_capacitance(

@@ -1,0 +1,5 @@
+find_package( Boost 1.59 )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (interconnection flute.cpp hpwl.cpp stwl.cpp rc_tree.cpp )
+target_include_directories ( interconnection PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( interconnection ${Boost_LIBRARIES} )

@@ -20,7 +20,7 @@
 #define OPENEDA_FLUTE_H
 
 namespace openeda {
-    namespace interconnection_estimation {
+    namespace interconnection {
         typedef struct
         {
             unsigned x, y;   // starting point of the branch

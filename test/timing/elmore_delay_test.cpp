@@ -1,13 +1,13 @@
 #include "../catch.hpp"
 
-#include "../timing/rc_tree.h"
+#include "../interconnection/rc_tree.h"
 #include "../timing/elmore.h"
 
 #include <boost/units/systems/si/prefixes.hpp>
 
 TEST_CASE("elmore_delay/rc_tree with 1 node", "[timing][rc_tree][elmore]")
 {
-    openeda::timing::rc_tree tree;
+    openeda::interconnection::rc_tree tree;
     auto cap = tree.capacitor_insert("cap1");
     openeda::timing::elmore delay(tree, cap);
     REQUIRE( delay.get(cap) == boost::units::quantity<boost::units::si::time>(0.0*boost::units::si::seconds) );
@@ -16,7 +16,7 @@ TEST_CASE("elmore_delay/rc_tree with 1 node", "[timing][rc_tree][elmore]")
 TEST_CASE("elmore_delay/rc_tree with 2 node2", "[timing][rc_tree][elmore]")
 {
     using namespace boost::units;
-    openeda::timing::rc_tree tree;
+    openeda::interconnection::rc_tree tree;
     auto C0 = tree.capacitor_insert("C0");
     auto C1 = tree.capacitor_insert("C1");
     auto R1 = tree.resistor_insert(C0, C1, quantity<si::resistance>(0.223*si::kilo*si::ohms));
@@ -29,7 +29,7 @@ TEST_CASE("elmore_delay/rc_tree with 2 node2", "[timing][rc_tree][elmore]")
 TEST_CASE("elmore_delay/simulating tap node", "[timing][rc_tree][elmore]")
 {
     using namespace boost::units;
-    openeda::timing::rc_tree tree;
+    openeda::interconnection::rc_tree tree;
     /*
 
     R1       R2       R3 = 0ohms (virtual resistance)
@@ -60,7 +60,7 @@ z        z        z        z
     REQUIRE( delay.get(u1_a) == golden_delay );
 }
 
-#include "../interconnection_estimation/flute.h"
+#include "../interconnection/flute.h"
 #include "../geometry/geometry.h"
 #include "../timing/elmore.h"
 #include <boost/geometry/algorithms/equals.hpp>
@@ -100,20 +100,20 @@ TEST_CASE("rc_tree/generating tree from flute", "[timing][rc_tree][elmore][flute
         nodes.push_back({openeda::geometry::point<double>(X[i], Y[i]), names[i]});
     indexing.insert(nodes.begin(), nodes.end());
 
-    openeda::interconnection_estimation::readLUT();
-    auto tree = openeda::interconnection_estimation::flute(names.size(), X.data(), Y.data(), ACCURACY);
+    openeda::interconnection::readLUT();
+    auto tree = openeda::interconnection::flute(names.size(), X.data(), Y.data(), ACCURACY);
 
     std::size_t num_branches = 2*tree.deg-2;
 
-    openeda::timing::rc_tree rc_tree;
+    openeda::interconnection::rc_tree rc_tree;
 
 
     openeda::geometry::point<double> source_coord{static_cast<double>(X[0]), static_cast<double>(Y[0])};
 
-    openeda::timing::rc_tree::capacitor_id source;
+    openeda::interconnection::rc_tree::capacitor_id source;
 
 
-//    openeda::timing::rc_tree::graph_t::NodeMap<lemon::dim2::Point<double> > coords(rc_tree.graph());
+//    openeda::interconnection::rc_tree::graph_t::NodeMap<lemon::dim2::Point<double> > coords(rc_tree.graph());
 
     for(std::size_t i{0}; i < num_branches; ++i)
     {
