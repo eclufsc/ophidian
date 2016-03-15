@@ -9,3 +9,8 @@ cmake_install.cmake
 install_manifest.txt
 /Debug/
 /Release/
+/benchmarks/
+/PORT9.dat
+/POWV9.dat
+/benchmarks/
+/benchmarks
