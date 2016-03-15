@@ -4,7 +4,6 @@ set(SOURCE
 
 
 
-add_subdirectory (data_structures)
 add_subdirectory (standard_cell)
 add_subdirectory (netlist)
 add_subdirectory (placement)
