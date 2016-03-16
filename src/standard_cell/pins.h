@@ -8,8 +8,8 @@
 #ifndef SRC_STANDARD_CELL_PINS_H_
 #define SRC_STANDARD_CELL_PINS_H_
 
-#include "entity.h"
-#include "vector_property.h"
+#include "../entity/entity.h"
+#include "../entity/vector_property.h"
 
 namespace openeda {
 namespace standard_cell {

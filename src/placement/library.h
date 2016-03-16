@@ -8,12 +8,12 @@
 #ifndef SRC_PLACEMENT_LIBRARY_H_
 #define SRC_PLACEMENT_LIBRARY_H_
 
-#include <property.h>
+#include "../entity/property.h"
+#include "../entity/vector_property.h"
+#include "../standard_cell/standard_cells.h"
+#include "../geometry/geometry.h"
 #include <boost/bimap.hpp>
 #include <vector>
-#include <standard_cells.h>
-#include <vector_property.h>
-#include "../geometry/geometry.h"
 
 namespace openeda {
 namespace placement {

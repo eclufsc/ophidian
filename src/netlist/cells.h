@@ -9,8 +9,8 @@
 #define SRC_NETLIST_CELLS_H_
 
 #include <vector>
-#include <vector_property.h>
-#include <standard_cells.h>
+#include "../entity/vector_property.h"
+#include "../standard_cell/standard_cells.h"
 
 namespace openeda {
 namespace netlist {

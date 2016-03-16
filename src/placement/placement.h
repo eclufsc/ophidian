@@ -50,6 +50,16 @@ public:
 
 	void pad_position(entity::entity pad, geometry::point<double> position);
 
+
+	const netlist::netlist& netlist() const
+	{
+		return *m_netlist;
+	}
+
+	const library& lib() const {
+		return *m_library;
+	}
+
 };
 
 } /* namespace placement */

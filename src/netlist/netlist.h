@@ -8,8 +8,8 @@
 #ifndef SRC_NETLIST_NETLIST_H_
 #define SRC_NETLIST_NETLIST_H_
 
-#include <standard_cells.h>
-#include <entity.h>
+#include "../standard_cell/standard_cells.h"
+#include "../entity/entity.h"
 #include <boost/bimap.hpp>
 #include "cells.h"
 #include "pins.h"

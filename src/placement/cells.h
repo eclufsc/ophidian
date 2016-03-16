@@ -9,9 +9,9 @@
 #define SRC_PLACEMENT_CELLS_H_
 
 
-#include <netlist.h>
-#include <vector_property.h>
+#include "../netlist/netlist.h"
 #include "../geometry/geometry.h"
+#include "../entity/vector_property.h"
 #include <boost/bimap.hpp>
 
 namespace openeda {

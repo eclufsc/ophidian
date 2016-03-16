@@ -7,7 +7,12 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
-Debug
-Release
+/Debug/
+/Release/
+/benchmarks/
+/PORT9.dat
+/POWV9.dat
+/benchmarks/
+/benchmarks
 .project
 .cproject
