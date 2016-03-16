@@ -58,7 +58,7 @@ public:
 
 	void capacitance(capacitor_id u, quantity<si::capacitance> cap);
 
-	capacitor_id node_by_name(std::string name) const {
+	capacitor_id capacitor_by_name(std::string name) const {
 		return m_name2node.at(name);
 	}
 	quantity<si::capacitance> capacitance(capacitor_id u) const {
