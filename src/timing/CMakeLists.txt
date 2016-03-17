@@ -5,7 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/si2/lib/)  
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/si2/include )
-add_library (timing elmore.cpp liberty.cpp library.cpp )
+add_library (timing elmore.cpp liberty.cpp library.cpp library_timing_arcs.cpp )
 target_include_directories ( timing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 
 link_directories( 3rdparty/si2/lib/ )
