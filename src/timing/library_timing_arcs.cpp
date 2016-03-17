@@ -10,8 +10,7 @@
 namespace openeda {
 namespace timing {
 
-library_timing_arcs::library_timing_arcs(
-		standard_cell::standard_cells * std_cells) :
+library_timing_arcs::library_timing_arcs(standard_cell::standard_cells * std_cells) :
 		m_std_cells(*std_cells) {
 
 	m_system.register_property(&m_from);
@@ -27,11 +26,10 @@ library_timing_arcs::library_timing_arcs(
 library_timing_arcs::~library_timing_arcs() {
 }
 
-entity::entity library_timing_arcs::create(entity::entity from,
-		entity::entity to) {
+entity::entity library_timing_arcs::create(entity::entity from, entity::entity to) {
 	auto pair = std::make_pair(from, to);
 	auto result = m_pinpair2arc.find(pair);
-	if(result != m_pinpair2arc.end())
+	if (result != m_pinpair2arc.end())
 		return result->second;
 
 	entity::entity arc = m_system.create();
@@ -43,11 +41,9 @@ entity::entity library_timing_arcs::create(entity::entity from,
 	return arc;
 }
 
-entity::entity library_timing_arcs::get(entity::entity from,
-		entity::entity to) const {
+entity::entity library_timing_arcs::get(entity::entity from, entity::entity to) const {
 	return m_pinpair2arc.at(std::make_pair(from, to));
 }
-
 
 void library_timing_arcs::rise_delay(entity::entity arc, const LUT& lut) {
 	m_rise_delays[m_system.lookup(arc)] = lut;

@@ -43,11 +43,7 @@ TEST_CASE("lookup table/set column values", "[timing][lut]") {
 
 TEST_CASE("lookup table/interpolation", "[timing][lut]") {
 	using namespace boost::units;
-	openeda::timing::lookup_table<
-		quantity<si::capacitance>,
-		quantity<si::time>,
-		quantity<si::time>
-	> table(2, 2);
+	openeda::timing::lookup_table<quantity<si::capacitance>, quantity<si::time>, quantity<si::time> > table(2, 2);
 	table.row_value(0, quantity<si::capacitance>(0.0 * si::femto * si::farads));
 	table.row_value(1, quantity<si::capacitance>(6.0 * si::femto * si::farads));
 	table.column_value(0, quantity<si::time>(0.0 * si::pico * si::seconds));
@@ -60,13 +56,10 @@ TEST_CASE("lookup table/interpolation", "[timing][lut]") {
 
 	quantity<si::capacitance> row_value = table.row_value(1);
 	quantity<si::time> column_value = table.column_value(0);
-	REQUIRE( table.compute( row_value, column_value)  == table.at(1, 0) );
+	REQUIRE(table.compute(row_value, column_value) == table.at(1, 0));
 
-	auto result = table.compute( quantity<si::capacitance>(5.5 * si::femto * si::farads), quantity<si::time>(4.7 * si::pico * si::seconds) );
-	REQUIRE( (result-quantity<si::time>(1.38684e-11* si::seconds)) <= quantity<si::time>(1e-4 * si::pico * si::seconds) );
-
+	auto result = table.compute(quantity<si::capacitance>(5.5 * si::femto * si::farads), quantity<si::time>(4.7 * si::pico * si::seconds));
+	REQUIRE((result - quantity<si::time>(1.38684e-11 * si::seconds)) <= quantity<si::time>(1e-4 * si::pico * si::seconds));
 
 }
-
-
 

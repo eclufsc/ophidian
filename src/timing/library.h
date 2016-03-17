@@ -21,18 +21,15 @@ namespace timing {
 
 class library {
 	openeda::standard_cell::standard_cells & m_std_cells;
-	entity::vector_property<
-			boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
+	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
 	library_timing_arcs m_tarcs;
 
 public:
 	library(openeda::standard_cell::standard_cells * std_cells);
 	virtual ~library();
-	void pin_capacitance(entity::entity pin,
-			boost::units::quantity<boost::units::si::capacitance> capacitance);
-	boost::units::quantity<boost::units::si::capacitance> pin_capacitance(
-			entity::entity pin) const {
+	void pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance);
+	boost::units::quantity<boost::units::si::capacitance> pin_capacitance(entity::entity pin) const {
 		return m_pin_capacitance[m_std_cells.pin_system().lookup(pin)];
 	}
 	openeda::standard_cell::standard_cells & std_cells() {
@@ -51,11 +48,9 @@ public:
 		return m_tarcs.create(from, to);
 	}
 
-	const std::vector<entity::entity>& pin_timing_arcs(
-			entity::entity pin) const {
+	const std::vector<entity::entity>& pin_timing_arcs(entity::entity pin) const {
 		return m_tarcs.pin_timing_arcs(pin);
 	}
-
 
 	void timing_arc_rise_slew(entity::entity arc, const library_timing_arcs::LUT & lut);
 	void timing_arc_fall_slew(entity::entity arc, const library_timing_arcs::LUT & lut);
