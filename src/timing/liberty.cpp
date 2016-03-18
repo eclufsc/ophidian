@@ -31,7 +31,7 @@ std::vector<double> split_string_into_values(const std::string &the_string) {
 	return values;
 }
 
-void read_LUT(si2drGroupIdT group, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit, library_timing_arcs::LUT*& lut) {
+void read_LUT(si2drGroupIdT group, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit, library::LUT*& lut) {
 
 	si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
 	si2drAttrIdT attr;
@@ -67,7 +67,7 @@ void read_LUT(si2drGroupIdT group, boost::units::quantity<boost::units::si::time
 				} else if (name == "values") {
 
 					if (!lut)
-						lut = new library_timing_arcs::LUT(std::max(static_cast<std::size_t>(1), loadValues.size()), std::max(static_cast<std::size_t>(1), slewValues.size()));
+						lut = new library::LUT(std::max(static_cast<std::size_t>(1), loadValues.size()), std::max(static_cast<std::size_t>(1), slewValues.size()));
 					assert(i < lut->row_count());
 					assert(lut);
 					for (std::size_t j = 0; j < values_vector.size(); ++j)
@@ -96,7 +96,7 @@ void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost
 			//	            __read_constraint(group, timing_info.fallConstraint);
 		} else {
 
-			library_timing_arcs::LUT * lut { nullptr };
+			library::LUT * lut { nullptr };
 			read_LUT(group, time_unit, capacitive_load_unit, lut);
 			assert(lut);
 			if (group_type == "cell_fall") {
@@ -164,7 +164,7 @@ void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, b
 	std::string pin_name { si2drIterNextName(current_cell_group_names, &err) };
 	si2drIterQuit(current_cell_group_names, &err);
 
-	auto pin_entity = library.std_cells().pin_create(cell_entity, pin_name);
+	auto pin_entity = library.pin_create(cell_entity, pin_name);
 
 	si2drAttrsIdT attrs = si2drGroupGetAttrs(pin, &err);
 	si2drAttrIdT attr;
@@ -216,7 +216,7 @@ void read_cell(si2drGroupIdT cell, timing::library& library, boost::units::quant
 
 	si2drIterQuit(cell_names, &err);
 
-	auto cell_entity = library.std_cells().cell_create(name);
+	auto cell_entity = library.cell_create(name);
 
 	si2drGroupsIdT groups = si2drGroupGetGroups(cell, &err);
 	si2drGroupIdT current_cell_group;

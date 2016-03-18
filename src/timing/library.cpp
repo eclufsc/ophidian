@@ -10,40 +10,46 @@
 namespace openeda {
 namespace timing {
 
-library::library(openeda::standard_cell::standard_cells * std_cells):
-				m_std_cells(*std_cells),
-				m_tarcs(std_cells)
-{
+library::library(library_timing_arcs * tarcs, openeda::standard_cell::standard_cells * std_cells) :
+		m_std_cells(*std_cells), m_tarcs(*tarcs) {
 	std_cells->register_pin_property(&m_pin_capacitance);
+	m_tarcs.register_property(&m_rise_delays);
+	m_tarcs.register_property(&m_rise_slews);
+	m_tarcs.register_property(&m_fall_delays);
+	m_tarcs.register_property(&m_fall_slews);
 }
 
 library::~library() {
 }
 
-void library::pin_capacitance(entity::entity pin,
-		boost::units::quantity<boost::units::si::capacitance> capacitance) {
+void library::pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance) {
 	m_pin_capacitance[m_std_cells.pin_system().lookup(pin)] = capacitance;
 }
 
-void library::timing_arc_rise_slew(entity::entity arc,
-		const library_timing_arcs::LUT& lut) {
-	m_tarcs.rise_slew(arc, lut);
+void library::timing_arc_rise_slew(entity::entity arc, const LUT& lut) {
+	m_rise_slews[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_fall_slew(entity::entity arc,
-		const library_timing_arcs::LUT& lut) {
-	m_tarcs.fall_slew(arc, lut);
+void library::timing_arc_fall_slew(entity::entity arc, const LUT& lut) {
+	m_fall_slews[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_rise_delay(entity::entity arc,
-		const library_timing_arcs::LUT& lut) {
-	m_tarcs.rise_delay(arc, lut);
+void library::timing_arc_rise_delay(entity::entity arc, const LUT& lut) {
+	m_rise_delays[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_fall_delay(entity::entity arc,
-		const library_timing_arcs::LUT& lut) {
-	m_tarcs.fall_delay(arc, lut);
+void library::timing_arc_fall_delay(entity::entity arc, const LUT& lut) {
+	m_fall_delays[m_tarcs.system().lookup(arc)] = lut;
+}
+
+entity::entity library::cell_create(std::string name) {
+	return m_std_cells.cell_create(name);
+}
+
+entity::entity library::pin_create(entity::entity cell, std::string name) {
+	return m_std_cells.pin_create(cell, name);
 }
 
 } /* namespace timing */
 } /* namespace openeda */
+

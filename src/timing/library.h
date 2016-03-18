@@ -20,13 +20,21 @@ namespace openeda {
 namespace timing {
 
 class library {
+public:
+	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
+private:
 	openeda::standard_cell::standard_cells & m_std_cells;
+	library_timing_arcs & m_tarcs;
+
+	entity::vector_property<LUT> m_rise_delays;
+	entity::vector_property<LUT> m_fall_delays;
+	entity::vector_property<LUT> m_rise_slews;
+	entity::vector_property<LUT> m_fall_slews;
+
 	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
-	library_timing_arcs m_tarcs;
-
 public:
-	library(openeda::standard_cell::standard_cells * std_cells);
+	library(library_timing_arcs * tarcs, openeda::standard_cell::standard_cells * std_cells);
 	virtual ~library();
 	void pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance);
 	boost::units::quantity<boost::units::si::capacitance> pin_capacitance(entity::entity pin) const {
@@ -52,26 +60,30 @@ public:
 		return m_tarcs.pin_timing_arcs(pin);
 	}
 
-	void timing_arc_rise_slew(entity::entity arc, const library_timing_arcs::LUT & lut);
-	void timing_arc_fall_slew(entity::entity arc, const library_timing_arcs::LUT & lut);
-	void timing_arc_rise_delay(entity::entity arc, const library_timing_arcs::LUT & lut);
-	void timing_arc_fall_delay(entity::entity arc, const library_timing_arcs::LUT & lut);
+	void timing_arc_rise_slew(entity::entity arc, const LUT & lut);
+	void timing_arc_fall_slew(entity::entity arc, const LUT & lut);
+	void timing_arc_rise_delay(entity::entity arc, const LUT & lut);
+	void timing_arc_fall_delay(entity::entity arc, const LUT & lut);
 
-	const library_timing_arcs::LUT & timing_arc_rise_slew(entity::entity arc) const {
-		return m_tarcs.rise_slew(arc);
+	const LUT & timing_arc_rise_slew(entity::entity arc) const {
+		return m_rise_slews[m_tarcs.system().lookup(arc)];
 	}
-	const library_timing_arcs::LUT & timing_arc_fall_slew(entity::entity arc) const {
-		return m_tarcs.fall_slew(arc);
+	const LUT & timing_arc_fall_slew(entity::entity arc) const {
+		return m_fall_slews[m_tarcs.system().lookup(arc)];
 	}
-	const library_timing_arcs::LUT & timing_arc_rise_delay(entity::entity arc) const {
-		return m_tarcs.rise_delay(arc);
+	const LUT & timing_arc_rise_delay(entity::entity arc) const {
+		return m_rise_delays[m_tarcs.system().lookup(arc)];
 	}
-	const library_timing_arcs::LUT & timing_arc_fall_delay(entity::entity arc) const {
-		return m_tarcs.fall_delay(arc);
+	const LUT & timing_arc_fall_delay(entity::entity arc) const {
+		return m_fall_delays[m_tarcs.system().lookup(arc)];
 	}
 	entity::entity timing_arc(entity::entity from, entity::entity to) const {
 		return m_tarcs.get(from, to);
 	}
+
+
+	entity::entity cell_create(std::string name);
+	entity::entity pin_create(entity::entity cell, std::string name);
 };
 
 } /* namespace timing */

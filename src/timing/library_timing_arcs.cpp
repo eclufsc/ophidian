@@ -15,11 +15,6 @@ library_timing_arcs::library_timing_arcs(standard_cell::standard_cells * std_cel
 
 	m_system.register_property(&m_from);
 	m_system.register_property(&m_to);
-	m_system.register_property(&m_rise_delays);
-	m_system.register_property(&m_fall_delays);
-	m_system.register_property(&m_rise_slews);
-	m_system.register_property(&m_fall_slews);
-
 	m_std_cells.register_pin_property(&m_pin_timing_arcs);
 }
 
@@ -45,20 +40,8 @@ entity::entity library_timing_arcs::get(entity::entity from, entity::entity to) 
 	return m_pinpair2arc.at(std::make_pair(from, to));
 }
 
-void library_timing_arcs::rise_delay(entity::entity arc, const LUT& lut) {
-	m_rise_delays[m_system.lookup(arc)] = lut;
-}
-
-void library_timing_arcs::fall_delay(entity::entity arc, const LUT& lut) {
-	m_fall_delays[m_system.lookup(arc)] = lut;
-}
-
-void library_timing_arcs::rise_slew(entity::entity arc, const LUT& lut) {
-	m_rise_slews[m_system.lookup(arc)] = lut;
-}
-
-void library_timing_arcs::fall_slew(entity::entity arc, const LUT& lut) {
-	m_fall_slews[m_system.lookup(arc)] = lut;
+void library_timing_arcs::register_property(entity::property* property) {
+	m_system.register_property(property);
 }
 
 } /* namespace timing */

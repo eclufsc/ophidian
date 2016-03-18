@@ -32,7 +32,6 @@ struct pair_hash {
 
 class library_timing_arcs {
 public:
-	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
 private:
 	standard_cell::standard_cells & m_std_cells;
 
@@ -40,10 +39,6 @@ private:
 	entity::vector_property<entity::entity> m_from;
 	entity::vector_property<entity::entity> m_to;
 
-	entity::vector_property<LUT> m_rise_delays;
-	entity::vector_property<LUT> m_fall_delays;
-	entity::vector_property<LUT> m_rise_slews;
-	entity::vector_property<LUT> m_fall_slews;
 
 	//	// std_cell properties
 		entity::vector_property< std::vector<entity::entity> > m_pin_timing_arcs;
@@ -71,29 +66,11 @@ public:
 		return m_system;
 	}
 
-	void rise_delay(entity::entity arc, const LUT & lut);
-	const LUT & rise_delay(entity::entity arc) const {
-		return m_rise_delays[m_system.lookup(arc)];
-	}
-
-	void fall_delay(entity::entity arc, const LUT & lut);
-	const LUT & fall_delay(entity::entity arc) const {
-		return m_fall_delays[m_system.lookup(arc)];
-	}
-
-	void rise_slew(entity::entity arc, const LUT & lut);
-	const LUT & rise_slew(entity::entity arc) const {
-		return m_rise_slews[m_system.lookup(arc)];
-	}
-
-	void fall_slew(entity::entity arc, const LUT & lut);
-	const LUT & fall_slew(entity::entity arc) const {
-		return m_fall_slews[m_system.lookup(arc)];
-	}
-
 	const std::vector<entity::entity> & pin_timing_arcs(entity::entity pin) const {
 		return m_pin_timing_arcs[m_std_cells.pin_system().lookup(pin)];
 	}
+
+	void register_property(entity::property* property);
 
 };
 

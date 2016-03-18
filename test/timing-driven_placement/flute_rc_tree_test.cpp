@@ -7,7 +7,8 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::netlist::netlist netlist{&std_cells};
-	openeda::timing::library timing_library{&std_cells};
+	openeda::timing::library_timing_arcs tarcs{&std_cells};
+	openeda::timing::library timing_library{&tarcs, &std_cells};
 
 	auto n1 = netlist.net_insert("n1");
 	auto u1 = netlist.cell_insert("u1", "INV_X1");
