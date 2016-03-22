@@ -76,6 +76,8 @@ public:
 	entity::entity cell_std_cell(entity::entity cell) const {
 		return m_cells.standard_cell(cell);
 	}
+	bool cell_std_cell(entity::entity cell, std::string type);
+	bool cell_std_cell(entity::entity cell, entity::entity std_cell);
 	const entity::system & cell_system() const {
 		return m_cells_system;
 	}

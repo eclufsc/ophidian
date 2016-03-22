@@ -281,3 +281,69 @@ TEST_CASE("netlist/remove PO","[netlist]") {
 					== netlist.PO_end());
 }
 
+TEST_CASE("netlist/change cell type", "[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto nand1 = std_cells.cell_create("NAND1");
+	auto nand1_a = std_cells.pin_create(nand1, "a");
+	auto nand1_b = std_cells.pin_create(nand1, "b");
+	auto nand1_o = std_cells.pin_create(nand1, "o");
+
+	auto nand2 = std_cells.cell_create("NAND2");
+	auto nand2_a = std_cells.pin_create(nand2, "a");
+	auto nand2_b = std_cells.pin_create(nand2, "b");
+	auto nand2_o = std_cells.pin_create(nand2, "o");
+
+	auto u1 = netlist.cell_insert("u1", "NAND1");
+	netlist.pin_insert(u1, "a");
+	netlist.pin_insert(u1, "b");
+	netlist.pin_insert(u1, "o");
+
+	auto u1_std_cell = netlist.cell_std_cell(u1);
+	auto u1_std_cell_pins = std_cells.cell_pins(u1_std_cell);
+	REQUIRE(u1_std_cell_pins[0] == nand1_a);
+	REQUIRE(u1_std_cell_pins[1] == nand1_b);
+	REQUIRE(u1_std_cell_pins[2] == nand1_o);
+
+	REQUIRE(netlist.cell_std_cell(u1, "NAND2"));
+
+	u1_std_cell = netlist.cell_std_cell(u1);
+	u1_std_cell_pins = std_cells.cell_pins(u1_std_cell);
+	REQUIRE(u1_std_cell_pins[0] == nand2_a);
+	REQUIRE(u1_std_cell_pins[1] == nand2_b);
+	REQUIRE(u1_std_cell_pins[2] == nand2_o);
+}
+
+TEST_CASE("netlist/try changing cell to invalid type", "[netlist]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+
+	auto nand1 = std_cells.cell_create("NAND1");
+	auto nand1_a = std_cells.pin_create(nand1, "a");
+	auto nand1_b = std_cells.pin_create(nand1, "b");
+	auto nand1_o = std_cells.pin_create(nand1, "o");
+
+	auto inv1 = std_cells.cell_create("INV1");
+	auto inv1_a = std_cells.pin_create(inv1, "a");
+	auto inv1_z = std_cells.pin_create(inv1, "z");
+
+	auto u1 = netlist.cell_insert("u1", "NAND1");
+	netlist.pin_insert(u1, "a");
+	netlist.pin_insert(u1, "b");
+	netlist.pin_insert(u1, "o");
+
+	auto u1_std_cell = netlist.cell_std_cell(u1);
+	auto u1_std_cell_pins = std_cells.cell_pins(u1_std_cell);
+	REQUIRE(u1_std_cell_pins[0] == nand1_a);
+	REQUIRE(u1_std_cell_pins[1] == nand1_b);
+	REQUIRE(u1_std_cell_pins[2] == nand1_o);
+
+	REQUIRE(!netlist.cell_std_cell(u1, "INV1"));
+
+	u1_std_cell = netlist.cell_std_cell(u1);
+	u1_std_cell_pins = std_cells.cell_pins(u1_std_cell);
+	REQUIRE(u1_std_cell_pins[0] == nand1_a);
+	REQUIRE(u1_std_cell_pins[1] == nand1_b);
+	REQUIRE(u1_std_cell_pins[2] == nand1_o);
+}
