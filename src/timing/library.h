@@ -19,6 +19,10 @@
 namespace openeda {
 namespace timing {
 
+enum class unateness {
+	NEGATIVE_UNATE, POSITIVE_UNATE, NON_UNATE
+};
+
 class library {
 public:
 	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
@@ -30,7 +34,7 @@ private:
 	entity::vector_property<LUT> m_fall_delays;
 	entity::vector_property<LUT> m_rise_slews;
 	entity::vector_property<LUT> m_fall_slews;
-
+	entity::vector_property<unateness> m_timing_senses;
 	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
 public:
@@ -79,6 +83,12 @@ public:
 	}
 	entity::entity timing_arc(entity::entity from, entity::entity to) const {
 		return m_tarcs.get(from, to);
+	}
+
+
+	void timing_arc_timing_sense(entity::entity arc, unateness timing_sense);
+	unateness timing_arc_timing_sense(entity::entity arc) const {
+		return m_timing_senses[m_tarcs.system().lookup(arc)];
 	}
 
 

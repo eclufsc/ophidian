@@ -14,6 +14,7 @@ pins::pins(entity::system & system) :
 	m_system(system){
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_owners);
+	m_system.register_property(&m_directions);
 }
 
 pins::~pins() {
@@ -27,5 +28,10 @@ void pins::owner(entity::entity pin, entity::entity cell) {
 	m_owners[m_system.lookup(pin)] = cell;
 }
 
+void pins::direction(entity::entity pin, pin_directions direction) {
+	m_directions[m_system.lookup(pin)] = direction;
+}
+
 } /* namespace standard_cell */
 } /* namespace openeda */
+

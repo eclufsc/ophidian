@@ -79,6 +79,12 @@ void read_LUT(si2drGroupIdT group, boost::units::quantity<boost::units::si::time
 			si2drIterQuit(values, &err);
 		}
 	}
+
+	for (std::size_t i = 0; i < loadValues.size(); ++i)
+		lut->row_value(i, loadValues[i]);
+	for (std::size_t i = 0; i < slewValues.size(); ++i)
+		lut->column_value(i, slewValues[i]);
+
 	assert(lut);
 	si2drIterQuit(attrs, &err);
 }
@@ -127,9 +133,9 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
 
 	while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
 		std::string attr_name { si2drAttrGetName(attr, &err) };
-		if (attr_name == "timing_sense")
+		if (attr_name == "timing_sense") {
 			timing_sense = si2drSimpleAttrGetStringValue(attr, &err);
-		else if (attr_name == "timing_type")
+		} else if (attr_name == "timing_type")
 			timing_type = si2drSimpleAttrGetStringValue(attr, &err);
 		else if (attr_name == "related_pin") {
 			related_pin = si2drSimpleAttrGetStringValue(attr, &err);
@@ -138,7 +144,12 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
 	}
 	si2drIterQuit(attrs, &err);
 	auto arc = library.timing_arc_create(from, pin_entity);
-
+	if (timing_sense == "negative_unate")
+		library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
+	else if (timing_sense == "positive_unate")
+		library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
+	else if (timing_sense == "non_unate")
+		library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
 	//	timing_info.timingSense = timing_sense;
 	//	timing_info.timing_type = Liberty_Timing_Type::Combinational;
 	//	if(timing_type == "setup_rising")
@@ -163,7 +174,7 @@ void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, b
 	si2drNamesIdT current_cell_group_names = si2drGroupGetNames(pin, &err);
 	std::string pin_name { si2drIterNextName(current_cell_group_names, &err) };
 	si2drIterQuit(current_cell_group_names, &err);
-
+	si2StringT direction;
 	auto pin_entity = library.pin_create(cell_entity, pin_name);
 
 	si2drAttrsIdT attrs = si2drGroupGetAttrs(pin, &err);
@@ -171,16 +182,21 @@ void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, b
 
 	while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
 		std::string attr_name { si2drAttrGetName(attr, &err) };
-		//		if (attr_name == "direction")
-		//			direction = si2drSimpleAttrGetStringValue(attr, &err);
+		if (attr_name == "direction")
+			direction = si2drSimpleAttrGetStringValue(attr, &err);
 		//		else if (attr_name == "max_capacitance")
 		//			max_capacitance = si2drSimpleAttrGetFloat64Value(attr, &err);
-		if (attr_name == "capacitance")
+		else if (attr_name == "capacitance")
 			library.pin_capacitance(pin_entity, si2drSimpleAttrGetFloat64Value(attr, &err) * capacitive_load_unit);
 		//		else if (attr_name == "clock")
 		//			is_clock = si2drSimpleAttrGetBooleanValue(attr, &err);
 	}
 	si2drIterQuit(attrs, &err);
+
+	if (std::string(direction) == "input")
+		library.std_cells().pin_direction(pin_entity, standard_cell::pin_directions::INPUT);
+	else if (std::string(direction) == "output")
+		library.std_cells().pin_direction(pin_entity, standard_cell::pin_directions::OUTPUT);
 
 	//    std::cout << "    direction: " << direction << std::endl;
 	//    std::cout << "    max_capacitance: " << max_capacitance << std::endl;

@@ -93,7 +93,7 @@ public:
 
 		// loads -- rows
 		for (size_t i = 0; i < m_row_values.size() - 1; i++) {
-			if (rv > m_row_values[i] && rv < m_row_values[i + 1]) {
+			if (rv >= m_row_values[i] && rv <= m_row_values[i + 1]) {
 				row1 = i;
 				row2 = i + 1;
 				y1 = m_row_values[row1];
