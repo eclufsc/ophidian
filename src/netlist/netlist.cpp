@@ -73,6 +73,7 @@ entity::entity netlist::pin_insert(entity::entity cell, std::string name) {
 	entity::entity the_pin = m_pins_system.create();
 	m_name2pin[pin_name] = the_pin;
 	m_pins.owner(the_pin, cell);
+	m_pins.name(the_pin, name);
 
 	entity::entity std_cell_pin = m_std_cells->pin_create(m_cells.standard_cell(cell), name);
 	m_pins.standard_cell_pin(the_pin, std_cell_pin);
@@ -182,27 +183,27 @@ void netlist::PO_remove(entity::entity PO) {
 	}
 }
 
-	bool netlist::cell_std_cell(entity::entity cell, std::string type) {
-		auto new_std_cell = m_std_cells->cell_create(type);
+bool netlist::cell_std_cell(entity::entity cell, std::string type) {
+	auto new_std_cell = m_std_cells->cell_create(type);
 
-		return cell_std_cell(cell, new_std_cell);
+	return cell_std_cell(cell, new_std_cell);
+}
+
+bool netlist::cell_std_cell(entity::entity cell, entity::entity std_cell) {
+	auto current_std_cell = m_cells.standard_cell(cell);
+
+	auto current_std_cell_pins = m_std_cells->cell_pins(current_std_cell);
+	auto new_std_cell_pins = m_std_cells->cell_pins(std_cell);
+	if (new_std_cell_pins.size() != current_std_cell_pins.size()) {
+		return false;
 	}
-
-	bool netlist::cell_std_cell(entity::entity cell, entity::entity std_cell) {
-		auto current_std_cell = m_cells.standard_cell(cell);
-
-		auto current_std_cell_pins = m_std_cells->cell_pins(current_std_cell);
-		auto new_std_cell_pins = m_std_cells->cell_pins(std_cell);
-		if (new_std_cell_pins.size() != current_std_cell_pins.size()) {
-			return false;
-		}
-		m_cells.standard_cell(cell, std_cell);
-		auto cell_pins = m_cells.pins(cell);
-		for (size_t pin_id = 0; pin_id < cell_pins.size(); pin_id++) {
-			m_pins.standard_cell_pin(cell_pins.at(pin_id), new_std_cell_pins.at(pin_id));
-		}
-		return true;
+	m_cells.standard_cell(cell, std_cell);
+	for (auto pin : m_cells.pins(cell)) {
+		entity::entity std_cell_pin = m_std_cells->pin_create(std_cell, m_pins.name(pin));
+		m_pins.standard_cell_pin(pin, std_cell_pin);
 	}
+	return true;
+}
 } /* namespace netlist */
 } /* namespace openeda */
 

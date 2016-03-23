@@ -18,6 +18,7 @@ namespace netlist {
 class pins {
 	entity::system & m_system;
 
+	entity::vector_property<std::string> m_names;
 	entity::vector_property<entity::entity> m_owners;
 	entity::vector_property<entity::entity> m_nets;
 	entity::vector_property<entity::entity> m_std_cell_pin;
@@ -26,6 +27,9 @@ public:
 	pins(entity::system & system);
 	virtual ~pins();
 
+	std::string name(entity::entity pin) const {
+		return m_names[m_system.lookup(pin)];
+	}
 	entity::entity owner(entity::entity pin) const {
 		return m_owners[m_system.lookup(pin)];
 	}
@@ -44,6 +48,7 @@ public:
 		return std::make_pair(m_nets.begin(), m_nets.end());
 	}
 
+	void name(entity::entity pin, std::string name);
 	void owner(entity::entity pin, entity::entity owner);
 	void net(entity::entity pin, entity::entity net);
 	void standard_cell_pin(entity::entity pin, entity::entity std_cell_pin);
