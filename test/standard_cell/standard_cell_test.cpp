@@ -94,3 +94,20 @@ TEST_CASE("standard cells/add pin twice", "[standard_cell]")
 	REQUIRE( INV_X1_a2 == INV_X1_a );
 	REQUIRE( std_cells.cell_pins(INV_X1).size() == 1 );
 }
+
+
+
+TEST_CASE("standard cells/pin direction", "[standard_cell]")
+{
+	standard_cells std_cells;
+	auto INV_X1 = std_cells.cell_create("INV_X1");
+	auto INV_X1_a = std_cells.pin_create(INV_X1, "a");
+	auto INV_X1_o = std_cells.pin_create(INV_X1, "o");
+	REQUIRE( std_cells.pin_direction(INV_X1_a) == openeda::standard_cell::pin_directions::NOT_ASSIGNED );
+	std_cells.pin_direction(INV_X1_a, openeda::standard_cell::pin_directions::INPUT);
+	std_cells.pin_direction(INV_X1_o, openeda::standard_cell::pin_directions::OUTPUT);
+	REQUIRE( std_cells.pin_direction(INV_X1_a) == openeda::standard_cell::pin_directions::INPUT );
+	REQUIRE( std_cells.pin_direction(INV_X1_o) == openeda::standard_cell::pin_directions::OUTPUT );
+	REQUIRE( std_cells.pin_direction(INV_X1_a) != openeda::standard_cell::pin_directions::NOT_ASSIGNED );
+	REQUIRE( std_cells.pin_direction(INV_X1_o) != openeda::standard_cell::pin_directions::NOT_ASSIGNED );
+}

@@ -14,11 +14,17 @@
 namespace openeda {
 namespace standard_cell {
 
+
+enum class pin_directions {
+		NOT_ASSIGNED, INPUT, OUTPUT
+	};
+
 class pins {
 	entity::system & m_system;
 
 	entity::vector_property< std::string > m_names;
 	entity::vector_property< entity::entity > m_owners;
+	entity::vector_property< pin_directions > m_directions;
 
 public:
 	pins(entity::system & system);
@@ -31,6 +37,11 @@ public:
 	void owner(entity::entity pin, entity::entity cell);
 	entity::entity owner(entity::entity pin) const {
 		return m_owners[m_system.lookup(pin)];
+	}
+
+	void direction(entity::entity pin, pin_directions dir);
+	pin_directions direction(entity::entity pin) const {
+		return m_directions[m_system.lookup(pin)];
 	}
 
 };

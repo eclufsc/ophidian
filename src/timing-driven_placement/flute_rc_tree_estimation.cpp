@@ -33,8 +33,9 @@ typedef boost::geometry::index::rtree<rtree_node,
 
 }
 
-void flute_rc_tree(const placement::placement& placement,
-		const entity::entity net, interconnection::rc_tree& rc_tree) {
+
+std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement,
+		const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library) {
 
 	auto net_pins = placement.netlist().net_pins(net);
 
@@ -59,6 +60,8 @@ void flute_rc_tree(const placement::placement& placement,
 		nodes.push_back( { geometry::point<double>(X[i], Y[i]), net_pins[i] });
 	indexing.insert(nodes.begin(), nodes.end());
 
+	std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
+
 	for (std::size_t i { 0 }; i < num_branches; ++i) {
 		std::size_t n { static_cast<std::size_t>(tree.branch[i].n) };
 		if (n == i)
@@ -73,6 +76,7 @@ void flute_rc_tree(const placement::placement& placement,
 		double length = openeda::geometry::manhattan_distance(from, to);
 		length /= static_cast<double>(placement.lib().dist2microns());
 
+		std::cout << "lenght " << length << std::endl;
 		// Capacitor U
 		lemon::ListGraph::Node cap_from = rc_tree.capacitor_insert(
 				"C_" + std::to_string(i));
@@ -103,17 +107,19 @@ void flute_rc_tree(const placement::placement& placement,
 				&& boost::geometry::equals(from, nearest.front().first);
 
 		if (from_is_tap) {
-			entity::entity pin;
-			if (from_is_tap)
-				pin = nearest.front().second;
+			entity::entity pin{nearest.front().second};
 			auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
-			rc_tree.capacitance(tap_cap,
-					quantity<si::capacitance>(4.0 * si::femto * si::farads)); // tap pin capacitance
+
+			tap_mapping[pin] = tap_cap;
+
+			auto pin_cap = library.pin_capacitance( placement.netlist().pin_std_cell(pin) );
+			rc_tree.capacitance(tap_cap, pin_cap); // tap pin capacitance
 			if (from_is_tap)
 				rc_tree.resistor_insert(cap_from, tap_cap,
 						quantity<si::resistance>(0.0 * si::ohms));
 		}
 	}
+	return tap_mapping;
 }
 
 } /* namespace timingdriven_placement */

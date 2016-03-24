@@ -15,6 +15,7 @@
 namespace openeda {
 namespace standard_cell {
 
+
 class standard_cells {
 
 	entity::system m_cell_system;
@@ -68,6 +69,12 @@ public:
 	const entity::system & pin_system() const {
 		return m_pin_system;
 	}
+	pin_directions pin_direction(entity::entity pin) const {
+		return m_pins.direction(pin);
+	}
+
+	void pin_direction(entity::entity pin, pin_directions direction);
+
 
 	entity::entity pad_create(std::string name);
 

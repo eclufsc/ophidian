@@ -1,5 +1,5 @@
 find_package( Boost 1.59 )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_library ( timing-driven_placement flute_rc_tree_estimation.cpp )
+add_library ( timing-driven_placement flute_rc_tree_estimation.cpp sta_flute_net_calculator.cpp )
 target_include_directories ( timing-driven_placement PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries( timing-driven_placement ${Boost_LIBRARIES} )

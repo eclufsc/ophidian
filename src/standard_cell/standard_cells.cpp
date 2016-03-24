@@ -68,7 +68,10 @@ entity::entity standard_cells::pad_create(std::string pin_name) {
 	return id;
 }
 
+void standard_cells::pin_direction(entity::entity pin, pin_directions direction) {
+	m_pins.direction(pin, direction);
+}
+
 } /* namespace standard_cell */
 } /* namespace openeda */
-
 
