@@ -13,35 +13,53 @@
 #include "graph_arcs_timing.h"
 #include "library.h"
 
+#include "sta_arc_calculator.h"
+#include "graph.h"
+
 namespace openeda {
 namespace timing {
 
-class sta_timing_arc_calculator {
+class sta_timing_arc_calculator: public sta_arc_calculator {
+	const graph & m_graph;
 	const library & m_library;
-	const lemon::ListDigraph & m_graph;
-	const graph_nodes_timing& m_nodes_timing;
-	graph_arcs_timing & m_arcs_rise;
-	graph_arcs_timing & m_arcs_fall;
-	lemon::ListDigraph::ArcMap<entity::entity> m_tarcs;
+
+	const graph_nodes_timing & m_nodes_timing;
+	graph_arcs_timing & m_arcs;
+
+	std::deque<lemon::ListDigraph::Arc> m_to_process;
 
 public:
-	sta_timing_arc_calculator(const library & lib, const lemon::ListDigraph & graph, const graph_nodes_timing& nodes_timing, graph_arcs_timing & arcs_rise, graph_arcs_timing & arcs_fall);
+	sta_timing_arc_calculator(const graph& graph, const library & lib, const graph_nodes_timing& nodes_timing, graph_arcs_timing & arcs);
 	virtual ~sta_timing_arc_calculator();
 
-	void timing_arc(lemon::ListDigraph::Arc arc, entity::entity timing_arc);
+	void push(lemon::ListDigraph::Arc arc) {
+		m_to_process.push_back(arc);
+	}
 
-	template<class T>
-	void update(T begin, T end) {
-		for (T it(begin); it != end; ++it) {
-			lemon::ListDigraph::Arc arc = static_cast<lemon::ListDigraph::Arc>(*it);
-			const boost::units::quantity<boost::units::si::capacitance> target_load(m_nodes_timing.load(m_graph.target(arc)));
-			const boost::units::quantity<boost::units::si::time> source_slew(m_nodes_timing.slew(m_graph.source(arc)));
-			const entity::entity tarc = m_tarcs[arc];
-			m_arcs_rise.delay(arc, m_library.timing_arc_rise_delay(tarc).compute(target_load, source_slew));
-			m_arcs_fall.delay(arc, m_library.timing_arc_fall_delay(tarc).compute(target_load, source_slew));
-			m_arcs_rise.slew(arc, m_library.timing_arc_rise_slew(tarc).compute(target_load, source_slew));
-			m_arcs_fall.slew(arc, m_library.timing_arc_fall_slew(tarc).compute(target_load, source_slew));
+	void update(sta_timing_point_calculator & tpoints) {
+		// PARALEL >>>>
+		for (lemon::ListDigraph::Arc arc : m_to_process) {
+			const boost::units::quantity<boost::units::si::capacitance> target_load(m_nodes_timing.load(m_graph.edge_target(arc)));
+			const boost::units::quantity<boost::units::si::time> source_slew(m_nodes_timing.slew(m_graph.edge_source(arc)));
+			const entity::entity tarc = m_graph.edge_timing_arc(arc);
+			switch (m_arcs.transition(arc)) {
+			case edge::RISE:
+				m_arcs.delay(arc, m_library.timing_arc_rise_delay(tarc).compute(target_load, source_slew));
+				m_arcs.slew(arc, m_library.timing_arc_rise_slew(tarc).compute(target_load, source_slew));
+			case edge::FALL:
+				m_arcs.slew(arc, m_library.timing_arc_fall_slew(tarc).compute(target_load, source_slew));
+				m_arcs.delay(arc, m_library.timing_arc_fall_delay(tarc).compute(target_load, source_slew));
+			default:
+				break;
+			}
 		}
+		// <<<<
+		// CRITICAL >>>>
+		for (lemon::ListDigraph::Arc arc : m_to_process) {
+			tpoints.push(m_graph.edge_target(arc));
+		}
+		// <<<<
+		m_to_process.clear();
 	}
 };
 

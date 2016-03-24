@@ -18,7 +18,7 @@ namespace openeda {
 namespace timingdriven_placement {
 
 std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement,
-		const entity::entity net, interconnection::rc_tree& rc_tree, timing::library & library);
+		const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library);
 
 } /* namespace timingdriven_placement */
 } /* namespace openeda */

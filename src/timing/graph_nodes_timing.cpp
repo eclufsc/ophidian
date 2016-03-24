@@ -10,17 +10,12 @@
 namespace openeda {
 namespace timing {
 
-graph_nodes_timing::graph_nodes_timing(lemon::ListDigraph & graph) :
-	m_arrivals(graph),
-	m_slews(graph),
-	m_requireds(graph),
-	m_loads(graph)
-{
+graph_nodes_timing::graph_nodes_timing(const lemon::ListDigraph & graph) :
+		m_arrivals(graph), m_slews(graph), m_requireds(graph), m_loads(graph) {
 
 }
 
 graph_nodes_timing::~graph_nodes_timing() {
-	// TODO Auto-generated destructor stub
 }
 
 void graph_nodes_timing::arrival(lemon::ListDigraph::Node node, boost::units::quantity<boost::units::si::time> arrival) {

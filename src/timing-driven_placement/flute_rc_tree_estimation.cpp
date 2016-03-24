@@ -35,7 +35,7 @@ typedef boost::geometry::index::rtree<rtree_node,
 
 
 std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement,
-		const entity::entity net, interconnection::rc_tree& rc_tree, timing::library & library) {
+		const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library) {
 
 	auto net_pins = placement.netlist().net_pins(net);
 
@@ -76,6 +76,7 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
 		double length = openeda::geometry::manhattan_distance(from, to);
 		length /= static_cast<double>(placement.lib().dist2microns());
 
+		std::cout << "lenght " << length << std::endl;
 		// Capacitor U
 		lemon::ListGraph::Node cap_from = rc_tree.capacitor_insert(
 				"C_" + std::to_string(i));

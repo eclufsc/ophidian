@@ -6,10 +6,8 @@
 TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 {
 	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist{&std_cells};
-	openeda::timing::library_timing_arcs tarcs{&std_cells};
-	openeda::timing::library timing_library{&tarcs, &std_cells};
 
+	openeda::netlist::netlist netlist{&std_cells};
 	auto n1 = netlist.net_insert("n1");
 	auto u1 = netlist.cell_insert("u1", "INV_X1");
 	auto u2 = netlist.cell_insert("u2", "INV_X1");
@@ -19,6 +17,12 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 	auto u2a = netlist.pin_insert(u2, "a");
 	auto u3a = netlist.pin_insert(u3, "a");
 	auto u4a = netlist.pin_insert(u4, "a");
+
+	openeda::timing::library_timing_arcs tarcs{&std_cells};
+	openeda::timing::library timing_library{&tarcs, &std_cells};
+
+
+
 	netlist.connect(n1, u1o);
 	netlist.connect(n1, u2a);
 	netlist.connect(n1, u3a);

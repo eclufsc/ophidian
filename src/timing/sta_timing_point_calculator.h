@@ -10,17 +10,25 @@
 
 #include "graph_nodes_timing.h"
 #include "graph_arcs_timing.h"
+#include "sta_arc_calculator.h"
+#include "graph.h"
 
 namespace openeda {
 namespace timing {
 
+class sta_arc_calculator;
 class sta_timing_point_calculator {
+	const graph & m_graph;
+	const graph_arcs_timing & m_arcs_timing;
+	graph_nodes_timing & m_nodes_timing;
+	std::deque<lemon::ListDigraph::Node> m_to_process;
 public:
-	sta_timing_point_calculator();
+	sta_timing_point_calculator(const graph & graph, const graph_arcs_timing & m_arcs_timing, graph_nodes_timing & m_nodes_timing);
 	virtual ~sta_timing_point_calculator();
 
-
-	void update( const lemon::ListDigraph & graph, const graph_arcs_timing & arcs_timing, graph_nodes_timing & nodes_timing, lemon::ListDigraph::Node node );
+	bool empty();
+	virtual void push(lemon::ListDigraph::Node node);
+	virtual void process_queue(lemon::ListDigraph::ArcMap< sta_arc_calculator * > & tarcs);
 };
 
 } /* namespace timing */

@@ -10,15 +10,16 @@
 
 #include <lemon/list_graph.h>
 #include <boost/units/systems/si.hpp>
-
+#include "transition.h"
 namespace openeda {
 namespace timing {
 
 class graph_arcs_timing {
+	lemon::ListDigraph::ArcMap<edge> m_transitions;
 	lemon::ListDigraph::ArcMap<boost::units::quantity<boost::units::si::time> > m_delays;
 	lemon::ListDigraph::ArcMap<boost::units::quantity<boost::units::si::time> > m_slews;
 public:
-	graph_arcs_timing(lemon::ListDigraph & graph);
+	graph_arcs_timing(const lemon::ListDigraph & graph);
 	virtual ~graph_arcs_timing();
 	void delay(lemon::ListDigraph::Arc, const boost::units::quantity<boost::units::si::time> delay);
 	const boost::units::quantity<boost::units::si::time> delay(lemon::ListDigraph::Arc arc) const {
@@ -27,6 +28,11 @@ public:
 	void slew(lemon::ListDigraph::Arc, const boost::units::quantity<boost::units::si::time> delay);
 	const boost::units::quantity<boost::units::si::time> slew(lemon::ListDigraph::Arc arc) const {
 		return m_slews[arc];
+	}
+
+	void transition(lemon::ListDigraph::Arc arc, edge trans);
+	const edge transition(lemon::ListDigraph::Arc arc) const {
+		return m_transitions[arc];
 	}
 };
 

@@ -10,6 +10,7 @@
 
 #include <lemon/list_graph.h>
 #include <boost/units/systems/si.hpp>
+#include "../entity/entity.h"
 
 namespace openeda {
 namespace timing {
@@ -20,7 +21,7 @@ class graph_nodes_timing {
 	lemon::ListDigraph::NodeMap<boost::units::quantity<boost::units::si::time> > m_requireds;
 	lemon::ListDigraph::NodeMap<boost::units::quantity<boost::units::si::capacitance> > m_loads;
 public:
-	graph_nodes_timing(lemon::ListDigraph & graph);
+	graph_nodes_timing(const lemon::ListDigraph & graph);
 	virtual ~graph_nodes_timing();
 
 	void arrival(lemon::ListDigraph::Node node, boost::units::quantity<boost::units::si::time> arrival);
