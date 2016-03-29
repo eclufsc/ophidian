@@ -1,9 +1,8 @@
 #include "../catch.hpp"
 
-TEST_CASE("simple design constraint","[timing][design_constrints]")
+
+TEST_CASE("default design constraint","[timing][design_constrints]")
 {
-
-
 
 
 

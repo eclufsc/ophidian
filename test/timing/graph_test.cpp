@@ -136,7 +136,4 @@ TEST_CASE("graph/construct from netlist", "[timing][graph]") {
 
 	REQUIRE((graph.edges_count() == graph_GOLDEN.edges_count()));
 	REQUIRE((graph.nodes_count() == graph_GOLDEN.nodes_count()));
-
-
-
 }

@@ -11,7 +11,7 @@ namespace openeda {
 namespace timing {
 
 static_timing_analysis::static_timing_analysis(const graph & graph, const library & lib, sta_net_calculator * net_calculator) :
-				m_graph(graph), m_library(lib), m_nodes(graph.G()), m_arcs(graph.G()), m_interconnection_estimator(net_calculator), m_timing_arc_calculator(lib), m_arcs_calculators(m_graph.G()) {
+                m_graph(graph), m_library(lib), m_nodes(graph.G()), m_arcs(graph.G()), m_interconnection_estimator(net_calculator), m_timing_arc_calculator(lib), m_timing_point_calculator(graph), m_arcs_calculators(m_graph.G()) {
 
 	for (lemon::ListDigraph::ArcIt it(graph.G()); it != lemon::INVALID; ++it) {
 		timing::graph::node source { graph.edge_source(static_cast<timing::graph::edge>(it)) };
@@ -35,6 +35,7 @@ void static_timing_analysis::make_dirty(entity::entity net) {
 }
 
 void static_timing_analysis::run() {
+    m_timing_point_calculator.reset_counter();
 	m_interconnection_estimator->update_dirty_nets(m_library, m_nodes, m_arcs);
 
 

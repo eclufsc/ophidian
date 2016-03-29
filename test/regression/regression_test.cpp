@@ -86,24 +86,34 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 		placement::lef::read(dot_lef, &std_cells, &library);
 		netlist::verilog::read(dot_v, &netlist);
 
+//        for(auto pin : netlist.pin_system())
+//        {
+//            std::cout << pin.first.id() << " = " << netlist.pin_name(pin.first) << std::endl;
+//        }
+
+
 		timing::library_timing_arcs timing_arcs { &std_cells };
 		timing::library timing_lib { &timing_arcs, &std_cells };
 		timing::liberty::read("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + "_Late.lib", timing_lib);
 
-		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("inp1")), standard_cell::pin_directions::OUTPUT);
-		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("inp2")), standard_cell::pin_directions::OUTPUT);
-		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("iccad_clk")), standard_cell::pin_directions::OUTPUT);
-		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("out")), standard_cell::pin_directions::INPUT);
+
 
 
 
 		timing::graph graph;
 
 		timing::simple_design_constraint dc;
+
+        for(auto driver : dc.dc().input_drivers)
+            std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
+
+        std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(dc.dc().clock.port_name)), standard_cell::pin_directions::OUTPUT);
+
 		for(auto out_load : dc.dc().output_loads)
 		{
 			auto PO_pin = netlist.pin_by_name(out_load.port_name);
 			auto PO_std_cell_pin = netlist.pin_std_cell(PO_pin);
+            std_cells.pin_direction(netlist.pin_std_cell(PO_pin), standard_cell::pin_directions::INPUT);
 			timing_lib.pin_capacitance(PO_std_cell_pin, boost::units::quantity<boost::units::si::capacitance>(out_load.pin_load*boost::units::si::femto*boost::units::si::farads));
 		}
 		timing::graph_builder::build(netlist, timing_lib, dc.dc(), graph);
@@ -116,15 +126,15 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 
 
 
-		for(auto pin : netlist.pin_system())
-		{
-			std::cout << netlist.pin_name(pin.first) << " ";
-			std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
-			std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
-			std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
-			std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
-			std::cout << std::endl;
-		}
+//		for(auto pin : netlist.pin_system())
+//		{
+//			std::cout << netlist.pin_name(pin.first) << " ";
+//			std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
+//			std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
+//			std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
+//			std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
+//			std::cout << std::endl;
+//		}
 
 
 

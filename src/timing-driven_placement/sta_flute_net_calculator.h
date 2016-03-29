@@ -30,6 +30,7 @@ class sta_flute_net_calculator: public timing::sta_net_calculator {
 	const timing::graph & m_graph;
 
 	const placement::placement & m_placement; // to get pin positions
+    flute_rc_tree_creator m_flute;
 
 	// dirty nets
 	std::unordered_set<entity::entity> m_dirty;

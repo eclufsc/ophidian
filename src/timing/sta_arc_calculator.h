@@ -26,6 +26,7 @@ public:
 	virtual ~sta_arc_calculator() {
 	}
 	virtual void push(lemon::ListDigraph::Arc arc) {
+        assert(std::find( m_to_process.begin(), m_to_process.end(), arc) == m_to_process.end());
 		m_to_process.push_back(arc);
 	}
 	virtual void update(const graph& m_graph, const graph_nodes_timing& nodes_timing, sta_timing_point_calculator & tpoints, graph_arcs_timing & m_arcs);

@@ -34,8 +34,8 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 			case standard_cell::pin_directions::INPUT:
 				break;
 			case standard_cell::pin_directions::OUTPUT:
+            default:
 				source = pin;
-			default:
 				break;
 			}
 		}
@@ -119,21 +119,21 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 		}
 	}
 
-	for (lemon::ListDigraph::ArcIt it(graph.G()); it != lemon::INVALID; ++it) {
-		auto source_node = graph.edge_source(it);
-		auto target_node = graph.edge_target(it);
-		auto source_pin = graph.pin(source_node);
-		auto target_pin = graph.pin(target_node);
-		std::string source_type = "r";
-		std::string target_type = "r";
-		if (graph.node_edge(source_node) == edges::FALL)
-			source_type = "f";
-		if (graph.node_edge(target_node) == edges::FALL)
-			target_type = "f";
-		std::cout << netlist.pin_name(source_pin) << " " << source_type <<
-		" -> " << netlist.pin_name(target_pin) << " " << target_type << std::endl;
+//	for (lemon::ListDigraph::ArcIt it(graph.G()); it != lemon::INVALID; ++it) {
+//		auto source_node = graph.edge_source(it);
+//		auto target_node = graph.edge_target(it);
+//		auto source_pin = graph.pin(source_node);
+//		auto target_pin = graph.pin(target_node);
+//		std::string source_type = "r";
+//		std::string target_type = "r";
+//		if (graph.node_edge(source_node) == edges::FALL)
+//			source_type = "f";
+//		if (graph.node_edge(target_node) == edges::FALL)
+//			target_type = "f";
+//		std::cout << netlist.pin_name(source_pin) << " " << source_type <<
+//		" -> " << netlist.pin_name(target_pin) << " " << target_type << std::endl;
 
-	}
+//	}
 
 }
 

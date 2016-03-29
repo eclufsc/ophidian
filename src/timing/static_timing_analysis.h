@@ -43,10 +43,12 @@ public:
 	void run();
 
 	boost::units::quantity<boost::units::si::time> rise_arrival(entity::entity pin) const {
+        assert(m_graph.node_edge(m_graph.rise_node(pin)) == edges::RISE);
 		return m_nodes.arrival(m_graph.rise_node(pin));
 	}
 
 	boost::units::quantity<boost::units::si::time> fall_arrival(entity::entity pin) const {
+        assert(m_graph.node_edge(m_graph.fall_node(pin)) == edges::FALL);
 		return m_nodes.arrival(m_graph.fall_node(pin));
 	}
 

@@ -72,31 +72,18 @@ void sta_flute_net_calculator::set_delays(timing::graph_nodes_timing& nodes_timi
 
 void sta_flute_net_calculator::update_dirty_nets(const timing::library& m_library, timing::graph_nodes_timing& m_nodes, timing::graph_arcs_timing& m_arcs) {
 	for (auto net : m_dirty) {
-
-		std::cout << "updating dirty net " << m_placement.netlist().net_name(net) << std::endl;
 		interconnection::rc_tree tree;
-		auto tap_map = flute_rc_tree(m_placement, net, tree, m_library);
+        auto tap_map = m_flute.create_tree(m_placement, net, tree, m_library);
 		std::size_t net_index = m_placement.netlist().net_system().lookup(net);
-
 		std::pair<std::size_t, std::size_t> rise_edges { m_net_rise_edges[net_index] };
 		lemon::ListDigraph::Node source_rise_node { m_graph.edge_source(m_net2arc[rise_edges.first]) };
-		std::pair<std::size_t, std::size_t> fall_edges { m_net_rise_edges[net_index] };
+        std::pair<std::size_t, std::size_t> fall_edges { m_net_fall_edges[net_index] };
 		lemon::ListDigraph::Node source_fall_node { m_graph.edge_source(m_net2arc[fall_edges.first]) };
-
-
-			for(auto tap : tap_map)
-				std::cout << "tap " << m_placement.netlist().pin_name(tap.first) << std::endl;
-
 		entity::entity source_pin { m_graph.pin(source_rise_node) };
-
-		std::cout << "source pin " << m_placement.netlist().pin_name(source_pin) << std::endl;
-
 		timing::elmore delay(tree, tap_map.at(source_pin));
 		timing::elmore_second_moment second(tree, delay);
-
-		set_delays(m_nodes, m_arcs, source_rise_node, tree, delay, second, tap_map, rise_edges.first, rise_edges.first + rise_edges.second - 1);
-		set_delays(m_nodes, m_arcs, source_fall_node, tree, delay, second, tap_map, fall_edges.first, fall_edges.first + fall_edges.second - 1);
-
+        set_delays(m_nodes, m_arcs, source_rise_node, tree, delay, second, tap_map, rise_edges.first, rise_edges.first + rise_edges.second -1);
+        set_delays(m_nodes, m_arcs, source_fall_node, tree, delay, second, tap_map, fall_edges.first, fall_edges.first + fall_edges.second -1);
 	}
 	m_dirty.clear();
 }

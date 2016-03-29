@@ -32,19 +32,21 @@ public:
 			const boost::units::quantity<boost::units::si::capacitance> target_load(nodes_timing.load(g.edge_target(arc)));
 			const boost::units::quantity<boost::units::si::time> source_slew(nodes_timing.slew(g.edge_source(arc)));
 			const entity::entity tarc = g.edge_entity(arc);
-
-			std::cout << "tarc " << tarc.id() << " slew " << source_slew << " load " << target_load << std::endl;
-
-			switch (m_arcs.transition(arc)) {
-			case edges::RISE:
-				m_arcs.delay(arc, m_library.timing_arc_rise_delay(tarc).compute(target_load, source_slew));
-				m_arcs.slew(arc, m_library.timing_arc_rise_slew(tarc).compute(target_load, source_slew));
+            boost::units::quantity<boost::units::si::time> delay, slew;
+            switch (g.node_edge( g.edge_target(arc) )) {
+            case edges::RISE:
+                delay = m_library.timing_arc_rise_delay(tarc).compute(target_load, source_slew);
+                slew = m_library.timing_arc_rise_slew(tarc).compute(target_load, source_slew);
+                break;
 			case edges::FALL:
-				m_arcs.slew(arc, m_library.timing_arc_fall_slew(tarc).compute(target_load, source_slew));
-				m_arcs.delay(arc, m_library.timing_arc_fall_delay(tarc).compute(target_load, source_slew));
+                delay = m_library.timing_arc_fall_delay(tarc).compute(target_load, source_slew);
+                slew = m_library.timing_arc_fall_slew(tarc).compute(target_load, source_slew);
+                break;
 			default:
 				break;
 			}
+            m_arcs.slew(arc, slew);
+            m_arcs.delay(arc, delay);
 		}
 		// <<<<
 		// CRITICAL >>>>

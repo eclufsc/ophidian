@@ -15,7 +15,6 @@ namespace openeda {
 namespace timing {
 
 class graph_arcs_timing {
-	lemon::ListDigraph::ArcMap<edges> m_transitions;
 	lemon::ListDigraph::ArcMap<boost::units::quantity<boost::units::si::time> > m_delays;
 	lemon::ListDigraph::ArcMap<boost::units::quantity<boost::units::si::time> > m_slews;
 public:
@@ -28,11 +27,6 @@ public:
 	void slew(lemon::ListDigraph::Arc, const boost::units::quantity<boost::units::si::time> delay);
 	const boost::units::quantity<boost::units::si::time> slew(lemon::ListDigraph::Arc arc) const {
 		return m_slews[arc];
-	}
-
-	void transition(lemon::ListDigraph::Arc arc, edges trans);
-	const edges transition(lemon::ListDigraph::Arc arc) const {
-		return m_transitions[arc];
 	}
 };
 

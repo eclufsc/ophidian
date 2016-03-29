@@ -19,10 +19,14 @@ namespace timing {
 
 class sta_arc_calculator;
 class sta_timing_point_calculator {
+    const graph & m_graph;
 	std::deque<lemon::ListDigraph::Node> m_to_process;
+    lemon::ListDigraph::NodeMap<std::size_t> m_counter;
 public:
-	sta_timing_point_calculator();
+    sta_timing_point_calculator(const graph & g);
 	virtual ~sta_timing_point_calculator();
+
+    void reset_counter();
 
 	bool empty();
 	virtual void push(lemon::ListDigraph::Node node);
