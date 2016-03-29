@@ -65,7 +65,9 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 
 #include "../timing/static_timing_analysis.h"
 #include "../timing/liberty.h"
-#include "../timing/graph.h"
+#include "../timing/graph_builder.h"
+#include "../timing-driven_placement/sta_flute_net_calculator.h"
+#include "../timing/simple_design_constraint.h"
 TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 	using namespace openeda;
 	std::vector<std::string> circuits { "simple" };
@@ -83,9 +85,48 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 		placement::def::read(dot_def, &netlist, &placement);
 		placement::lef::read(dot_lef, &std_cells, &library);
 		netlist::verilog::read(dot_v, &netlist);
+
 		timing::library_timing_arcs timing_arcs { &std_cells };
 		timing::library timing_lib { &timing_arcs, &std_cells };
 		timing::liberty::read("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + "_Late.lib", timing_lib);
+
+		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("inp1")), standard_cell::pin_directions::OUTPUT);
+		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("inp2")), standard_cell::pin_directions::OUTPUT);
+		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("iccad_clk")), standard_cell::pin_directions::OUTPUT);
+		std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name("out")), standard_cell::pin_directions::INPUT);
+
+
+
+		timing::graph graph;
+
+		timing::simple_design_constraint dc;
+		for(auto out_load : dc.dc().output_loads)
+		{
+			auto PO_pin = netlist.pin_by_name(out_load.port_name);
+			auto PO_std_cell_pin = netlist.pin_std_cell(PO_pin);
+			timing_lib.pin_capacitance(PO_std_cell_pin, boost::units::quantity<boost::units::si::capacitance>(out_load.pin_load*boost::units::si::femto*boost::units::si::farads));
+		}
+		timing::graph_builder::build(netlist, timing_lib, dc.dc(), graph);
+		timingdriven_placement::sta_flute_net_calculator flute(graph, placement, netlist);
+		timing::static_timing_analysis STA(graph, timing_lib, &flute);
+		for(auto net : netlist.net_system())
+			STA.make_dirty(net.first);
+		STA.set_constraints(netlist, dc.dc());
+		STA.run();
+
+
+
+		for(auto pin : netlist.pin_system())
+		{
+			std::cout << netlist.pin_name(pin.first) << " ";
+			std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
+			std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
+			std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
+			std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
+			std::cout << std::endl;
+		}
+
+
 
 	}
 }

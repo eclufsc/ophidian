@@ -10,9 +10,15 @@
 
 #include <lemon/list_graph.h>
 #include "../entity/entity.h"
+#include "transition.h"
 
 namespace openeda {
 namespace timing {
+
+enum class  edge_types {
+	TIMING_ARC, NET
+};
+
 
 class graph {
 public:
@@ -22,13 +28,16 @@ public:
 private:
 	graph_t m_graph;
 
-	std::unordered_map<entity::entity, node> m_rise_nodes;
-	std::unordered_map<entity::entity, node> m_fall_nodes;
-
 	lemon::ListDigraph::NodeMap< entity::entity > m_pins;
-	lemon::ListDigraph::ArcMap< entity::entity > m_tarcs;
+	lemon::ListDigraph::NodeMap< edges > m_node_edges;
+	lemon::ListDigraph::ArcMap< edge_types > m_arc_types;
+	lemon::ListDigraph::ArcMap< entity::entity > m_arcs;
 
-	node node_create(entity::entity pin, std::unordered_map<entity::entity, node>& map);
+
+	std::unordered_map< entity::entity, node > m_rise_nodes;
+	std::unordered_map< entity::entity, node > m_fall_nodes;
+
+	node node_create(entity::entity pin, edges node_edge, std::unordered_map< entity::entity, node > & map);
 
 
 public:
@@ -57,9 +66,15 @@ public:
 		return m_fall_nodes.at(pin);
 	}
 
-	edge edge_create(node u, node v, entity::entity tarc = entity::entity{});
-	entity::entity edge_timing_arc(edge e) const{
-		return m_tarcs[e];
+	void node_edge(node u, edges e);
+	edges node_edge(node u) const {
+		return m_node_edges[u];
+	}
+
+
+	edge edge_create(node u, node v, edge_types type, entity::entity entity);
+	entity::entity edge_entity(edge e) const{
+		return m_arcs[e];
 	}
 
 	entity::entity pin(node u) const {
@@ -76,6 +91,12 @@ public:
 	node edge_target(edge e)  const {
 		return m_graph.target(e);
 	}
+	edge_types edge_type(edge e) const {
+		return m_arc_types[e];
+	}
+
+	void edge_source(edge e, node u);
+
 
 };
 

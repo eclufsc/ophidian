@@ -82,7 +82,7 @@ public:
 		return lemon::INVALID;
 	}
 
-	graph_t & graph() {
+	const graph_t & graph() const {
 		return m_graph;
 	}
 

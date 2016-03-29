@@ -27,7 +27,7 @@ void graph_arcs_timing::slew(lemon::ListDigraph::Arc arc, const quantity<si::tim
 	m_slews[arc] = delay;
 }
 
-void graph_arcs_timing::transition(lemon::ListDigraph::Arc arc, edge trans) {
+void graph_arcs_timing::transition(lemon::ListDigraph::Arc arc, edges trans) {
 	m_transitions[arc] = trans;
 }
 

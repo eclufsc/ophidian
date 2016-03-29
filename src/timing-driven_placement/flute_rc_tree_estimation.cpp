@@ -27,17 +27,15 @@ public:
 	}
 };
 
-typedef boost::geometry::index::rtree<rtree_node,
-		boost::geometry::index::rstar<16>,
-		boost::geometry::index::indexable<rtree_node>, rtree_node_comparator> rtree;
+typedef boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>, boost::geometry::index::indexable<rtree_node>, rtree_node_comparator> rtree;
 
 }
 
-
-std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement,
-		const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library) {
+std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement, const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library) {
 
 	auto net_pins = placement.netlist().net_pins(net);
+
+
 
 	std::vector<unsigned> X(net_pins.size());
 	std::vector<unsigned> Y(net_pins.size());
@@ -49,8 +47,7 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
 		Y.push_back(static_cast<unsigned>(position.y()));
 	}
 
-	auto tree = openeda::interconnection::flute(net_pins.size(), X.data(),
-			Y.data(), ACCURACY);
+	auto tree = openeda::interconnection::flute(net_pins.size(), X.data(), Y.data(), ACCURACY);
 	std::size_t num_branches = 2 * tree.deg - 2;
 
 	flute_rc_tree_rtree::rtree indexing;
@@ -67,56 +64,45 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
 		if (n == i)
 			continue;
 
-		openeda::geometry::point<double> from {
-				static_cast<double>(tree.branch[i].x),
-				static_cast<double>(tree.branch[i].y) };
-		openeda::geometry::point<double> to {
-				static_cast<double>(tree.branch[n].x),
-				static_cast<double>(tree.branch[n].y) };
+		openeda::geometry::point<double> from { static_cast<double>(tree.branch[i].x), static_cast<double>(tree.branch[i].y) };
+		openeda::geometry::point<double> to { static_cast<double>(tree.branch[n].x), static_cast<double>(tree.branch[n].y) };
 		double length = openeda::geometry::manhattan_distance(from, to);
 		length /= static_cast<double>(placement.lib().dist2microns());
 
-		std::cout << "lenght " << length << std::endl;
+		std::cout << "length " << length << std::endl;
 		// Capacitor U
-		lemon::ListGraph::Node cap_from = rc_tree.capacitor_insert(
-				"C_" + std::to_string(i));
+		lemon::ListGraph::Node cap_from = rc_tree.capacitor_insert("C_" + std::to_string(i));
 		//		        if(boost::geometry::equals(from, source_coord))
 		//		            source = cap_from;
-		rc_tree.capacitance(cap_from,
-				quantity<si::capacitance>(
-						(length / 2.0) * 0.20 * si::femto * si::farads));
+		rc_tree.capacitance(cap_from, quantity<si::capacitance>((length / 2.0) * 0.20 * si::femto * si::farads));
 
 		// Capacitor V
-		lemon::ListGraph::Node cap_to = rc_tree.capacitor_insert(
-				"C_" + std::to_string(n));
+		lemon::ListGraph::Node cap_to = rc_tree.capacitor_insert("C_" + std::to_string(n));
 		//		        if(boost::geometry::equals(to, source_coord))
 		//		            source = cap_to;
-		rc_tree.capacitance(cap_to,
-				quantity<si::capacitance>(
-						(length / 2.0) * 0.20 * si::femto * si::farads));
+		rc_tree.capacitance(cap_to, quantity<si::capacitance>((length / 2.0) * 0.20 * si::femto * si::farads));
 
 		// Resistor
-		auto res = rc_tree.resistor_insert(cap_from, cap_to,
-				quantity<si::resistance>(length * 0.440 * si::kilo * si::ohms));
+		auto res = rc_tree.resistor_insert(cap_from, cap_to, quantity<si::resistance>(length * 0.440 * si::kilo * si::ohms));
 
 		std::vector<flute_rc_tree_rtree::rtree_node> nearest;
-		indexing.query(boost::geometry::index::nearest(from, 1),
-				std::back_inserter(nearest));
+		indexing.query(boost::geometry::index::nearest(from, 1), std::back_inserter(nearest));
 
-		bool from_is_tap = !nearest.empty()
-				&& boost::geometry::equals(from, nearest.front().first);
+		bool from_is_tap = !nearest.empty() && boost::geometry::equals(from, nearest.front().first);
 
 		if (from_is_tap) {
-			entity::entity pin{nearest.front().second};
+			entity::entity pin { nearest.front().second };
+
+			std::cout << "tap name " << placement.netlist().pin_name(pin) << std::endl;
+
 			auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
 
 			tap_mapping[pin] = tap_cap;
 
-			auto pin_cap = library.pin_capacitance( placement.netlist().pin_std_cell(pin) );
+			auto pin_cap = library.pin_capacitance(placement.netlist().pin_std_cell(pin));
 			rc_tree.capacitance(tap_cap, pin_cap); // tap pin capacitance
 			if (from_is_tap)
-				rc_tree.resistor_insert(cap_from, tap_cap,
-						quantity<si::resistance>(0.0 * si::ohms));
+				rc_tree.resistor_insert(cap_from, tap_cap, quantity<si::resistance>(0.0 * si::ohms));
 		}
 	}
 	return tap_mapping;

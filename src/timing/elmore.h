@@ -14,8 +14,8 @@ namespace openeda {
 namespace timing {
 
 class elmore {
-    
-    interconnection::rc_tree& m_tree;
+
+	interconnection::rc_tree& m_tree;
 	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_delay;
 	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::capacitance > > m_downstream_capacitance;
 	lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > m_pred;
@@ -27,8 +27,15 @@ public:
 
 	void update();
 
-	boost::units::quantity<boost::units::si::time> get(interconnection::rc_tree::capacitor_id capacitor) const {
+	boost::units::quantity<boost::units::si::time> at(interconnection::rc_tree::capacitor_id capacitor) const {
 		return m_elmore_delay[capacitor];
+	}
+
+	const lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > & pred() const {
+		return m_pred;
+	}
+	const std::vector< interconnection::rc_tree::capacitor_id > & order() const {
+		return m_order;
 	}
 };
 

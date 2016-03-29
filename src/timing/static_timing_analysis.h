@@ -12,30 +12,51 @@
 #include "sta_timing_arc_calculator.h"
 #include "sta_timing_point_calculator.h"
 #include "graph.h"
+#include "design_constraints.h"
+#include "../netlist/netlist.h"
 
 namespace openeda {
 namespace timing {
 
 class static_timing_analysis {
-	const timing::graph & m_graph;
+	const graph & m_graph;
+	const library & m_library;
 
 	graph_nodes_timing m_nodes;
 	graph_arcs_timing m_arcs;
+	sta_net_calculator * m_interconnection_estimator;
 
-	sta_net_calculator * m_net_calculator;
+	sta_arc_calculator m_net_arc_calculator;
 	sta_timing_arc_calculator m_timing_arc_calculator;
 	sta_timing_point_calculator m_timing_point_calculator;
 
-	lemon::ListDigraph::ArcMap< sta_arc_calculator * > m_arcs_calculators;
+	lemon::ListDigraph::ArcMap<sta_arc_calculator *> m_arcs_calculators;
 
 public:
-	static_timing_analysis(const timing::graph & graph, const library & lib);
+	static_timing_analysis(const graph & graph, const library & lib, sta_net_calculator * net_calculator);
 	virtual ~static_timing_analysis();
-	void net_calculator(sta_net_calculator * net_calculator);
-	void arc_calculator(lemon::ListDigraph::Arc arc, sta_arc_calculator * arc_calculator);
 
 	void make_dirty(entity::entity net);
+
+	void set_constraints(const netlist::netlist & netlist, const design_constraints & dc);
+
 	void run();
+
+	boost::units::quantity<boost::units::si::time> rise_arrival(entity::entity pin) const {
+		return m_nodes.arrival(m_graph.rise_node(pin));
+	}
+
+	boost::units::quantity<boost::units::si::time> fall_arrival(entity::entity pin) const {
+		return m_nodes.arrival(m_graph.fall_node(pin));
+	}
+
+	boost::units::quantity<boost::units::si::time> rise_slew(entity::entity pin) const {
+		return m_nodes.slew(m_graph.rise_node(pin));
+	}
+
+	boost::units::quantity<boost::units::si::time> fall_slew(entity::entity pin) const {
+		return m_nodes.slew(m_graph.fall_node(pin));
+	}
 };
 
 } /* namespace timing */

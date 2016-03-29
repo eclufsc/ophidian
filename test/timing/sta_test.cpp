@@ -37,10 +37,10 @@ TEST_CASE("sta/timing arcs timing", "[timing][sta]") {
 	timing::graph_arcs_timing arcs(graph);
 	arcs.delay(arc, quantity<si::time>(10.0 * si::seconds));
 	arcs.slew(arc, quantity<si::time>(12.0 * si::seconds));
-	arcs.transition(arc, timing::edge::FALL);
+	arcs.transition(arc, timing::edges::FALL);
 
 	REQUIRE(arcs.delay(arc) == quantity<si::time>(10.0 * si::seconds));
 	REQUIRE(arcs.slew(arc) == quantity<si::time>(12.0 * si::seconds));
-	REQUIRE(arcs.transition(arc) == timing::edge::FALL);
+	REQUIRE(arcs.transition(arc) == timing::edges::FALL);
 
 }

@@ -10,7 +10,7 @@ TEST_CASE("elmore_delay/rc_tree with 1 node", "[timing][rc_tree][elmore]")
     openeda::interconnection::rc_tree tree;
     auto cap = tree.capacitor_insert("cap1");
     openeda::timing::elmore delay(tree, cap);
-    REQUIRE( delay.get(cap) == boost::units::quantity<boost::units::si::time>(0.0*boost::units::si::seconds) );
+    REQUIRE( delay.at(cap) == boost::units::quantity<boost::units::si::time>(0.0*boost::units::si::seconds) );
 }
 
 TEST_CASE("elmore_delay/rc_tree with 2 node2", "[timing][rc_tree][elmore]")
@@ -23,7 +23,7 @@ TEST_CASE("elmore_delay/rc_tree with 2 node2", "[timing][rc_tree][elmore]")
     tree.capacitance(C0, quantity<si::capacitance>(1.1*si::femto*si::farads));
     tree.capacitance(C1, quantity<si::capacitance>(2.2*si::femto*si::farads));
     openeda::timing::elmore delay(tree, C0);
-    REQUIRE( delay.get(C1) == quantity<si::time>((0.223*2.2)*si::pico*si::seconds) );
+    REQUIRE( delay.at(C1) == quantity<si::time>((0.223*2.2)*si::pico*si::seconds) );
 }
 
 TEST_CASE("elmore_delay/simulating tap node", "[timing][rc_tree][elmore]")
@@ -57,5 +57,5 @@ z        z        z        z
 
     openeda::timing::elmore delay(tree, C0);
     quantity<si::time> golden_delay{tree.resistance(R2)*(tree.capacitance(u1_a_tap)+tree.capacitance(u1_a))+tree.resistance(R1)*(tree.capacitance(u1_a_tap)+tree.capacitance(u1_a)+tree.capacitance(C1))};
-    REQUIRE( delay.get(u1_a) == golden_delay );
+    REQUIRE( delay.at(u1_a) == golden_delay );
 }

@@ -20,33 +20,26 @@ namespace openeda {
 namespace timing {
 
 class sta_timing_arc_calculator: public sta_arc_calculator {
-	const graph & m_graph;
 	const library & m_library;
 
-	const graph_nodes_timing & m_nodes_timing;
-	graph_arcs_timing & m_arcs;
-
-	std::deque<lemon::ListDigraph::Arc> m_to_process;
-
 public:
-	sta_timing_arc_calculator(const graph& graph, const library & lib, const graph_nodes_timing& nodes_timing, graph_arcs_timing & arcs);
+	sta_timing_arc_calculator(const library & lib);
 	virtual ~sta_timing_arc_calculator();
 
-	void push(lemon::ListDigraph::Arc arc) {
-		m_to_process.push_back(arc);
-	}
-
-	void update(sta_timing_point_calculator & tpoints) {
+	void update(const graph& g, const graph_nodes_timing& nodes_timing, sta_timing_point_calculator & tpoints, graph_arcs_timing & m_arcs) {
 		// PARALEL >>>>
 		for (lemon::ListDigraph::Arc arc : m_to_process) {
-			const boost::units::quantity<boost::units::si::capacitance> target_load(m_nodes_timing.load(m_graph.edge_target(arc)));
-			const boost::units::quantity<boost::units::si::time> source_slew(m_nodes_timing.slew(m_graph.edge_source(arc)));
-			const entity::entity tarc = m_graph.edge_timing_arc(arc);
+			const boost::units::quantity<boost::units::si::capacitance> target_load(nodes_timing.load(g.edge_target(arc)));
+			const boost::units::quantity<boost::units::si::time> source_slew(nodes_timing.slew(g.edge_source(arc)));
+			const entity::entity tarc = g.edge_entity(arc);
+
+			std::cout << "tarc " << tarc.id() << " slew " << source_slew << " load " << target_load << std::endl;
+
 			switch (m_arcs.transition(arc)) {
-			case edge::RISE:
+			case edges::RISE:
 				m_arcs.delay(arc, m_library.timing_arc_rise_delay(tarc).compute(target_load, source_slew));
 				m_arcs.slew(arc, m_library.timing_arc_rise_slew(tarc).compute(target_load, source_slew));
-			case edge::FALL:
+			case edges::FALL:
 				m_arcs.slew(arc, m_library.timing_arc_fall_slew(tarc).compute(target_load, source_slew));
 				m_arcs.delay(arc, m_library.timing_arc_fall_delay(tarc).compute(target_load, source_slew));
 			default:
@@ -56,7 +49,7 @@ public:
 		// <<<<
 		// CRITICAL >>>>
 		for (lemon::ListDigraph::Arc arc : m_to_process) {
-			tpoints.push(m_graph.edge_target(arc));
+			tpoints.push(g.edge_target(arc));
 		}
 		// <<<<
 		m_to_process.clear();

@@ -54,9 +54,6 @@ void elmore::update() {
 			m_downstream_capacitance[m_pred[*it].first] += m_downstream_capacitance[*it];
 	}
 
-	for (auto c : m_order)
-		std::cout << "cap " << m_tree.capacitor_name(c) << " cap " << m_tree.capacitance(c) << " downstream " << m_downstream_capacitance[c] << std::endl;
-
 	m_elmore_delay[m_source] = 0.0 * si::seconds;
 	for (auto c : m_order) {
 		if (m_pred[c].first != lemon::INVALID)

@@ -3,6 +3,8 @@
 #include "../timing-driven_placement/flute_rc_tree_estimation.h"
 #include <boost/units/systems/si/prefixes.hpp>
 
+#include <lemon/dfs.h>
+
 TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 {
 	openeda::standard_cell::standard_cells std_cells;
@@ -20,8 +22,6 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 
 	openeda::timing::library_timing_arcs tarcs{&std_cells};
 	openeda::timing::library timing_library{&tarcs, &std_cells};
-
-
 
 	netlist.connect(n1, u1o);
 	netlist.connect(n1, u2a);
@@ -41,6 +41,8 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 
 	openeda::interconnection::rc_tree rc_tree;
 	auto tap_mapping = openeda::timingdriven_placement::flute_rc_tree(placement, net, rc_tree, timing_library);
+
+	REQUIRE( rc_tree.graph() );
 
 	REQUIRE( rc_tree.capacitor_count() == 10 );
 	REQUIRE( rc_tree.capacitance(tap_mapping.at(u2a)) == timing_library.pin_capacitance( netlist.pin_std_cell(u2a) ) );
