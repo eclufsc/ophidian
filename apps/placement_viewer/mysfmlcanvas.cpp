@@ -1,4 +1,5 @@
 #include "mysfmlcanvas.h"
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <random>
@@ -90,6 +91,7 @@ void mysfmlcanvas::unselect()
 void mysfmlcanvas::select(openeda::entity::entity cell)
 {
     m_circuit->select_cell(cell);
+    m_main_window->select_cell(cell);
 }
 
 void mysfmlcanvas::render_circuit()
@@ -119,6 +121,29 @@ void mysfmlcanvas::loading(bool set)
         delete m_state;
         m_state = m_last_state;
     }
+}
+
+void mysfmlcanvas::main_window(MainWindow *main_window)
+{
+    m_main_window = main_window;
+}
+
+void mysfmlcanvas::update_cell(openeda::entity::entity cell)
+{
+    m_circuit->update_cell(cell);
+    m_circuit->select_cell(cell);
+}
+
+void mysfmlcanvas::load_circuit()
+{
+    loading(true);
+    OnUpdate();
+
+    QCoreApplication::processEvents();
+
+    loading(false);
+
+    m_main_window->load_circuit();
 }
 
 void mysfmlcanvas::keyPressEvent(QKeyEvent *e)

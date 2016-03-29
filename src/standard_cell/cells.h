@@ -17,7 +17,7 @@ namespace standard_cell {
 class cells {
 	entity::system & m_system;
 	entity::vector_property<std::string> m_names;
-	entity::vector_property<std::vector<entity::entity> > m_pins;
+    entity::vector_property<std::vector<entity::entity> > m_pins;
 public:
 	cells(entity::system & system);
 	virtual ~cells();
@@ -32,7 +32,7 @@ public:
 	}
 	void name(entity::entity e, std::string name);
 	void insert_pin(entity::entity cell, entity::entity pin);
-	void pins(entity::entity cell, std::vector<entity::entity> pins);
+    void pins(entity::entity cell, std::vector<entity::entity> pins);
 };
 
 } /* namespace standard_cell */

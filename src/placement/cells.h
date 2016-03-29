@@ -24,7 +24,7 @@ class cells  {
 
 	const entity::system & m_system;
 
-	entity::vector_property<multipolygon> m_geometries;
+    entity::vector_property<multipolygon> m_geometries;
 	entity::vector_property<point> m_positions;
 
 public:
@@ -39,13 +39,13 @@ public:
 		return std::make_pair(m_positions.begin(), m_positions.end());
 	}
 
-	void geometry(entity::entity cell, multipolygon geometry);
-	multipolygon geometry(entity::entity cell) const {
-		return m_geometries[m_system.lookup(cell)];
-	}
-	std::pair< std::vector<multipolygon>::const_iterator, std::vector<multipolygon>::const_iterator > geometries() const {
-		return std::make_pair(m_geometries.begin(), m_geometries.end());
-	}
+    void geometry(entity::entity cell, multipolygon geometry);
+    multipolygon geometry(entity::entity cell) const {
+        return m_geometries[m_system.lookup(cell)];
+    }
+    std::pair< std::vector<multipolygon>::const_iterator, std::vector<multipolygon>::const_iterator > geometries() const {
+        return std::make_pair(m_geometries.begin(), m_geometries.end());
+    }
 };
 
 } /* namespace placement */

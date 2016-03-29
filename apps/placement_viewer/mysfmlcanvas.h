@@ -1,6 +1,8 @@
 #ifndef MYSFMLCANVAS_H
 #define MYSFMLCANVAS_H
 
+#include <QCoreApplication>
+
 #include "qsfmlcanvas.h"
 #include "application.h"
 
@@ -10,7 +12,7 @@
 
 #include "fps.h"
 
-
+class MainWindow;
 class mysfmlcanvas;
 class canvas_state {
 public:
@@ -37,6 +39,8 @@ public:
     FPS m_fps;
     canvas_state *m_state;
     canvas_state *m_last_state;
+
+    MainWindow * m_main_window;
 
 public:
     mysfmlcanvas(QWidget *parent = 0);
@@ -67,6 +71,12 @@ public:
     void render_circuit();
 
     void loading(bool set);
+
+    void main_window(MainWindow * main_window);
+
+    void update_cell(openeda::entity::entity cell);
+
+    void load_circuit();
 
 };
 

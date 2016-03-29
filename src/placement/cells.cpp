@@ -11,8 +11,8 @@ namespace openeda {
 namespace placement {
 
 cells::cells(openeda::netlist::netlist * netlist) : m_system(netlist->cell_system()) {
-	netlist->register_cell_property(&m_positions);
-	netlist->register_cell_property(&m_geometries);
+    netlist->register_cell_property(&m_positions);
+    netlist->register_cell_property(&m_geometries);
 }
 
 cells::~cells() {
@@ -23,8 +23,8 @@ void cells::position(entity::entity cell, point position) {
 }
 
 void cells::geometry(entity::entity cell,
-		multipolygon geometry) {
-	m_geometries[m_system.lookup(cell)] = geometry;
+        multipolygon geometry) {
+    m_geometries[m_system.lookup(cell)] = geometry;
 }
 
 } /* namespace placement */

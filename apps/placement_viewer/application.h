@@ -50,9 +50,15 @@ public:
         return m_netlist;
     }
 
+    const openeda::standard_cell::standard_cells & std_cells() const {
+        return m_std_cells;
+    }
+
     void place_cell_and_update_index(openeda::entity::entity cell, point position);
 
     openeda::entity::entity get_cell(point position) const;
+
+    bool cell_std_cell(openeda::entity::entity cell, std::string std_cell_name);
 };
 
 #endif // APPLICATION_H

@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
+#include <QMessageBox>
+
 #include <memory>
+
 #include "application.h"
 
 #include "open_circuit_dialog.h"
@@ -23,8 +27,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void select_cell(openeda::entity::entity cell);
+
+    void load_circuit();
+
 private slots:
-    void on_actionOpen_Circuit_triggered();
+    void on_actionOpen_Circuit_triggered();    
+
+    void on_combo_box_cell_type_activated(const QString &current_text);
 
 private:
     Ui::MainWindow *ui;

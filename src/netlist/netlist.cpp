@@ -31,7 +31,7 @@ void netlist::register_pin_property(
 	m_pins_system.register_property(property);
 }
 
-entity::entity netlist::cell_find(std::string name) {
+entity::entity netlist::cell_find(std::string name) const {
 	auto result = m_name2cell.find(name);
 	if(result == m_name2cell.end())
 		return entity::entity{};

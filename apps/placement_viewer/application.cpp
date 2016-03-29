@@ -42,17 +42,8 @@ std::vector<rtree_node> application::create_rtree_nodes(
     auto geometry = m_placement.cell_geometry(cell);
     std::vector<rtree_node> nodes;
     for (auto& poly : geometry) {
-        point ll { std::numeric_limits<double>::max(), std::numeric_limits<
-                    double>::max() };
-        point ur { std::numeric_limits<double>::min(), std::numeric_limits<
-                    double>::min() };
-        for (auto& p : poly.outer()) {
-            ll.x(std::min(ll.x(), p.x()));
-            ll.y(std::min(ll.y(), p.y()));
-            ur.x(std::max(ur.x(), p.x()));
-            ur.y(std::max(ur.y(), p.y()));
-        }
-        box cellbox(ll, ur);
+        box cellbox;
+        boost::geometry::envelope(poly, cellbox);
         rtree_node cell_node(cellbox, cell);
         nodes.push_back(cell_node);
     }
@@ -64,7 +55,9 @@ void application::place_cell_and_update_index(openeda::entity::entity cell,
                                               point position) {
     // remove from index
     std::vector<rtree_node> nodes = create_rtree_nodes(cell);
-    m_position2cellentity.remove(nodes);
+    if (!m_position2cellentity.empty()) {
+        m_position2cellentity.remove(nodes);
+    }
 
     m_placement.cell_position(cell, position);
 
@@ -83,4 +76,16 @@ openeda::entity::entity application::get_cell(point position) const
     if(result.empty())
         return openeda::entity::entity{};
     return result.front().second;
+}
+
+bool application::cell_std_cell(openeda::entity::entity cell, std::string std_cell_name)
+{
+    auto old_rtree_nodes = create_rtree_nodes(cell);
+    bool result = m_netlist.cell_std_cell(cell, std_cell_name);
+    if (result) {
+        m_position2cellentity.remove(old_rtree_nodes);
+        auto new_rtree_nodes = create_rtree_nodes(cell);
+        m_position2cellentity.insert(new_rtree_nodes.begin(), new_rtree_nodes.end());
+    }
+    return result;
 }
