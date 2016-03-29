@@ -51,6 +51,7 @@ public:
 
 	void register_cell_property(entity::property * property);
 	void register_pin_property(entity::property * property);
+	void register_net_property(entity::property * property);
 
 	void module_name(std::string name) {
 		m_module_name = name;

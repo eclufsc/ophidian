@@ -12,7 +12,6 @@
 namespace openeda {
 namespace netlist {
 
-
 netlist::netlist(standard_cell::standard_cells * std_cells) :
 		m_std_cells(std_cells), m_cells(m_cells_system), m_pins(m_pins_system), m_nets(m_nets_system) {
 }
@@ -20,21 +19,22 @@ netlist::netlist(standard_cell::standard_cells * std_cells) :
 netlist::~netlist() {
 }
 
-
-void netlist::register_cell_property(
-		entity::property* property) {
+void netlist::register_cell_property(entity::property* property) {
 	m_cells_system.register_property(property);
 }
 
-void netlist::register_pin_property(
-		entity::property* property) {
+void netlist::register_pin_property(entity::property* property) {
 	m_pins_system.register_property(property);
+}
+
+void netlist::register_net_property(entity::property* property) {
+	m_nets_system.register_property(property);
 }
 
 entity::entity netlist::cell_find(std::string name) const {
 	auto result = m_name2cell.find(name);
-	if(result == m_name2cell.end())
-		return entity::entity{};
+	if (result == m_name2cell.end())
+		return entity::entity { };
 	return result->second;
 }
 
@@ -56,15 +56,13 @@ void netlist::cell_remove(entity::entity cell) {
 	for (auto pin : cell_pins)
 		if (!(pin_net(pin) == entity::entity()))
 			disconnect(pin);
-	std::for_each(cell_pins.begin(), cell_pins.end(),
-			std::bind(&entity::system::destroy, &m_pins_system,
-					std::placeholders::_1));
+	std::for_each(cell_pins.begin(), cell_pins.end(), std::bind(&entity::system::destroy, &m_pins_system, std::placeholders::_1));
 	m_cells_system.destroy(cell);
 }
 
 entity::entity netlist::pin_insert(entity::entity cell, std::string name) {
 	const std::string owner_name = m_cells.name(cell);
-	const std::string pin_name =  owner_name + ":" + name;
+	const std::string pin_name = owner_name + ":" + name;
 
 	auto result = m_name2pin.find(pin_name);
 	if (result != m_name2pin.end())
@@ -110,7 +108,6 @@ entity::entity netlist::PI_insert(std::string name) {
 	auto result = m_name2pin.find(name);
 	if (result != m_name2pin.end())
 		return result->second;
-
 
 	entity::entity the_pin = m_pins_system.create();
 	m_name2pin[name] = the_pin;
@@ -206,5 +203,4 @@ bool netlist::cell_std_cell(entity::entity cell, entity::entity std_cell) {
 }
 } /* namespace netlist */
 } /* namespace openeda */
-
 

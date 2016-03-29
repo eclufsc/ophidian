@@ -10,11 +10,15 @@
 
 #include "../interconnection/rc_tree.h"
 #include "../placement/placement.h"
+#include "../timing/library.h"
+
+#include <unordered_map>
 
 namespace openeda {
 namespace timingdriven_placement {
 
-void flute_rc_tree(const placement::placement& placement, const entity::entity net, interconnection::rc_tree& tree);
+std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree(const placement::placement& placement,
+		const entity::entity net, interconnection::rc_tree& rc_tree, const timing::library & library);
 
 } /* namespace timingdriven_placement */
 } /* namespace openeda */
