@@ -65,11 +65,20 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 
 #include "../timing/static_timing_analysis.h"
 #include "../timing/liberty.h"
-#include "../timing/graph.h"
+#include "../timing/graph_builder.h"
+#include "../timing-driven_placement/sta_flute_net_calculator.h"
+#include "../timing/simple_design_constraint.h"
+
+
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <omp.h>
+
 TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 	using namespace openeda;
-	std::vector<std::string> circuits { "simple" };
+    std::vector<std::string> circuits { "simple", "superblue16" };
 	for (std::size_t i { 0 }; i < circuits.size(); ++i) {
+
 		std::ifstream dot_def("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".def", std::ifstream::in);
 		std::ifstream dot_lef("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".lef", std::ifstream::in);
 		std::ifstream dot_v("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".v", std::ifstream::in);
@@ -83,9 +92,61 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 		placement::def::read(dot_def, &netlist, &placement);
 		placement::lef::read(dot_lef, &std_cells, &library);
 		netlist::verilog::read(dot_v, &netlist);
+
+//        for(auto pin : netlist.pin_system())
+//        {
+//            std::cout << pin.first.id() << " = " << netlist.pin_name(pin.first) << std::endl;
+//        }
+
+
 		timing::library_timing_arcs timing_arcs { &std_cells };
 		timing::library timing_lib { &timing_arcs, &std_cells };
 		timing::liberty::read("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + "_Late.lib", timing_lib);
+
+
+        std::cout << "Running STA for " << circuits.at(i) << " ..." << std::endl;
+		timing::graph graph;
+        timing::default_design_constraints default_dc(netlist);
+        timing::design_constraints dc( default_dc.dc() );
+
+        for(auto driver : dc.input_drivers)
+            std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
+
+        std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
+
+        for(auto out_load : dc.output_loads)
+		{
+			auto PO_pin = netlist.pin_by_name(out_load.port_name);
+			auto PO_std_cell_pin = netlist.pin_std_cell(PO_pin);
+            std_cells.pin_direction(netlist.pin_std_cell(PO_pin), standard_cell::pin_directions::INPUT);
+			timing_lib.pin_capacitance(PO_std_cell_pin, boost::units::quantity<boost::units::si::capacitance>(out_load.pin_load*boost::units::si::femto*boost::units::si::farads));
+		}
+        timing::graph_builder::build(netlist, timing_lib, dc, graph);
+		timingdriven_placement::sta_flute_net_calculator flute(graph, placement, netlist);
+		timing::static_timing_analysis STA(graph, timing_lib, &flute);
+		for(auto net : netlist.net_system())
+			STA.make_dirty(net.first);
+        STA.set_constraints(netlist, dc);
+        omp_set_num_threads(8);
+        boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
+		STA.run();
+        boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
+        boost::posix_time::time_duration msdiff = mst2 - mst1;
+        std::cout << "STA DONE in " << msdiff.total_milliseconds()/1000.0 << " seconds" << std::endl;
+
+
+
+//		for(auto pin : netlist.pin_system())
+//		{
+//			std::cout << netlist.pin_name(pin.first) << " ";
+//			std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
+//			std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
+//			std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
+//			std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
+//			std::cout << std::endl;
+//		}
+
+
 
 	}
 }

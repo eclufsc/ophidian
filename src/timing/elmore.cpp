@@ -31,8 +31,6 @@ elmore::elmore(rc_tree& tree, rc_tree::capacitor_id source) :
 			auto other = tree.other_capacitor(static_cast<rc_tree::resistor_id>(it), element);
 			if (reached.insert(other).second) {
 				m_pred[other] = std::make_pair(element, static_cast<rc_tree::resistor_id>(it));
-				std::cout << tree.capacitor_name(other) << " pred = " << tree.capacitor_name(element) << std::endl;
-
 				to_process.push_back(other);
 			}
 		}
@@ -53,10 +51,6 @@ void elmore::update() {
 		if (m_pred[*it].first != lemon::INVALID)
 			m_downstream_capacitance[m_pred[*it].first] += m_downstream_capacitance[*it];
 	}
-
-	for (auto c : m_order)
-		std::cout << "cap " << m_tree.capacitor_name(c) << " cap " << m_tree.capacitance(c) << " downstream " << m_downstream_capacitance[c] << std::endl;
-
 	m_elmore_delay[m_source] = 0.0 * si::seconds;
 	for (auto c : m_order) {
 		if (m_pred[c].first != lemon::INVALID)

@@ -11,7 +11,7 @@
 namespace openeda {
 namespace timing {
 
-enum class edge {
+enum class edges {
 	RISE, FALL
 };
 

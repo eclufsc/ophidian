@@ -6,5 +6,6 @@ set(SOURCE
    ${CMAKE_CURRENT_SOURCE_DIR}/library_timing_arc_test.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/sta_test.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/graph_test.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/design_constraints_test.cpp
    PARENT_SCOPE
 )
