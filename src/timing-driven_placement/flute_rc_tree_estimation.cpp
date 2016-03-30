@@ -61,6 +61,19 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
     params dummy{0.0*si::ohms, 0.0*si::farads};
     params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
 
+    if(net_pins.size() == 1)
+    {
+        auto pin_u = net_pins[0];
+        auto u_position = placement.pin_position(pin_u);
+        auto u = rc_tree.capacitor_insert("C0");
+        auto tap_u = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_u));
+        tap_mapping[pin_u] = tap_u;
+        auto pin_cap_u = library.pin_capacitance(placement.netlist().pin_std_cell(pin_u));
+        rc_tree.capacitance(tap_u, pin_cap_u);
+        rc_tree.resistor_insert(u, tap_u, quantity<si::resistance>(0.0 * si::ohms));
+        return tap_mapping;
+    }
+
 
     if(net_pins.size() == 2)
     {
