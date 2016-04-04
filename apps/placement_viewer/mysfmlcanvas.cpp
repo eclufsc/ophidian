@@ -146,6 +146,103 @@ void mysfmlcanvas::load_circuit()
     m_main_window->load_circuit();
 }
 
+sf::Color hsv(int hue, float sat, float val)
+{
+    hue %= 360;
+    while(hue<0) hue += 360;
+
+    if(sat<0.f) sat = 0.f;
+    if(sat>1.f) sat = 1.f;
+
+    if(val<0.f) val = 0.f;
+    if(val>1.f) val = 1.f;
+
+    int h = hue/60;
+    float f = float(hue)/60-h;
+    float p = val*(1.f-sat);
+    float q = val*(1.f-sat*f);
+    float t = val*(1.f-sat*(1-f));
+
+    switch(h)
+    {
+    default:
+    case 0:
+    case 6: return sf::Color(val*255, t*255, p*255);
+    case 1: return sf::Color(q*255, val*255, p*255);
+    case 2: return sf::Color(p*255, val*255, t*255);
+    case 3: return sf::Color(p*255, q*255, val*255);
+    case 4: return sf::Color(t*255, p*255, val*255);
+    case 5: return sf::Color(val*255, p*255, q*255);
+    }
+}
+
+void mysfmlcanvas::run_sta()
+{
+    loading(true);
+    OnUpdate();
+    QCoreApplication::processEvents();
+
+
+
+    m_app->run_sta();
+
+
+
+    std::map< openeda::entity::entity, boost::units::quantity<boost::units::si::time> > worst_slacks;
+
+
+    boost::units::quantity<boost::units::si::time> maximum_value(0.0 * boost::units::si::second);
+    boost::units::quantity<boost::units::si::time> minimum_value(std::numeric_limits<double>::max() * boost::units::si::second);
+
+    for(auto cell : m_app->netlist().cell_system())
+    {
+        auto cell_pin = m_app->netlist().cell_pins(cell.first);
+        boost::units::quantity<boost::units::si::time> worst_slack(std::numeric_limits<double>::max() * boost::units::si::second);
+        for(auto pin : cell_pin)
+        {
+            worst_slack = std::min(worst_slack, m_app->fall_slack(pin));
+            worst_slack = std::min(worst_slack,  m_app->rise_slack(pin));
+        }
+        maximum_value = std::max(maximum_value, worst_slack);
+        minimum_value = std::min(minimum_value, worst_slack);
+
+        worst_slacks[cell.first] = worst_slack;
+    }
+
+
+    for(auto cell : m_app->netlist().cell_system())
+    {
+
+
+        boost::units::quantity<boost::units::si::time> value = worst_slacks[cell.first] - minimum_value;
+
+        sf::Color color;
+
+
+        if(worst_slacks[cell.first] < boost::units::quantity<boost::units::si::time>(0.0*boost::units::si::second))
+        {
+            double position = value/(-minimum_value);
+            position = std::max(0.0, std::min(1.0, position));
+            color = hsv(position*60, 0.8, 1.0);
+        } else
+        {
+            value -=  - minimum_value;
+            double position = value / maximum_value;
+            position = std::max(0.0, std::min(1.0, position));
+            color = hsv(240.0+(position)*70.0, 0.8, 1.0);
+
+        }
+        m_circuit->paint_cell(cell.first, color);
+    }
+    loading(false);
+
+
+    auto cp = m_app->critical_path();
+    m_circuit->critical_path(cp);
+
+}
+
+
 void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
@@ -324,7 +421,7 @@ selected::selected(mysfmlcanvas &canvas, openeda::entity::entity cell) :
     m_cell(cell)
 {
     qDebug() << "selected ";
-//    canvas.select(cell);
+    //    canvas.select(cell);
 }
 
 

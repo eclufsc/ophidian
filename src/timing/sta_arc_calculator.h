@@ -14,31 +14,44 @@
 #include "library.h"
 #include "graph_arcs_timing.h"
 #include "graph_nodes_timing.h"
+#include <unordered_set>
 
 namespace openeda {
 namespace timing {
 
 class sta_timing_point_calculator;
-class sta_arc_calculator {
+class sta_timing_edge_calculator {
 protected:
-	std::deque<lemon::ListDigraph::Arc> m_to_process;
 public:
-	virtual ~sta_arc_calculator() {
-	}
-	virtual void push(lemon::ListDigraph::Arc arc) {
-        assert(std::find( m_to_process.begin(), m_to_process.end(), arc) == m_to_process.end());
-		m_to_process.push_back(arc);
-	}
-	virtual void update(const graph& m_graph, const graph_nodes_timing& nodes_timing, sta_timing_point_calculator & tpoints, graph_arcs_timing & m_arcs);
+    virtual ~sta_timing_edge_calculator() {}
+    virtual void update(const graph & g, const graph::edge arc, const graph_nodes_timing & nodes, graph_arcs_timing & arcs) = 0;
 };
 
-class sta_net_calculator {
+
+class sta_timing_arc_edge_calculator : public sta_timing_edge_calculator {
+    const library & m_lib;
 public:
-	virtual ~sta_net_calculator() {
-	}
-	virtual void make_dirty(entity::entity net) = 0;
-	virtual void update_dirty_nets(const library& library, graph_nodes_timing& nodes, graph_arcs_timing& arcs) = 0;
+    sta_timing_arc_edge_calculator(const library & lib);
+    void update(const graph & g, const graph::edge arc, const graph_nodes_timing & nodes, graph_arcs_timing & arcs);
 };
+
+
+class sta_timing_net_edge_calculator : public sta_timing_edge_calculator {
+    lemon::ListDigraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_delay;
+    lemon::ListDigraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_slew;
+public:
+    sta_timing_net_edge_calculator(const graph & g);
+    void elmore_delay(lemon::ListDigraph::Node node, boost::units::quantity<boost::units::si::time> delay);
+    void elmore_slew( lemon::ListDigraph::Node node, boost::units::quantity<boost::units::si::time > slew);
+    void update(const graph & g, const graph::edge arc, const graph_nodes_timing & nodes, graph_arcs_timing & arcs);
+};
+
+class sta_interconnection_estimator {
+public:
+    virtual void update_net(timing::sta_timing_net_edge_calculator * tnet, entity::entity net, timing::graph_nodes_timing &nodes_timing) = 0;
+};
+
+
 
 } /* namespace timing */
 } /* namespace openeda */

@@ -36,6 +36,8 @@ private slots:
 
     void on_combo_box_cell_type_activated(const QString &current_text);
 
+    void on_button_sta_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

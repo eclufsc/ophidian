@@ -38,13 +38,22 @@ void open_circuit_dialog::on_button_def_clicked()
         ui->file_def->setText(def_file);
 }
 
+void open_circuit_dialog::on_button_lib_clicked()
+{
+    auto lib_file = QFileDialog::getOpenFileName(this, tr("Open Liberty File..."), "", tr("Liberty Format (*.lib)"));
+    if(!lib_file.isEmpty())
+        ui->file_lib->setText(lib_file);
+}
+
 void open_circuit_dialog::accept()
 {
-    m_app.reset(new application(ui->file_v->text().toStdString(), ui->file_lef->text().toStdString(), ui->file_def->text().toStdString()));
+    m_app.reset(new application(ui->file_v->text().toStdString(), ui->file_lef->text().toStdString(), ui->file_def->text().toStdString(), ui->file_lib->text().toStdString()));
 
     QDialog::accept();
-    m_canvas->load_circuit();
     m_canvas->app(m_app.get());
+
+    m_canvas->load_circuit();
+
 }
 
 void open_circuit_dialog::reject()

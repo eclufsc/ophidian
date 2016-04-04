@@ -688,12 +688,6 @@ namespace openeda {
 
         tree flute(int d, DTYPE x[], DTYPE y[], int acc)
         {
-            static bool LUTread;
-            if(!LUTread)
-            {
-                readLUT();
-                LUTread=true;
-            }
             unsigned allocateSize = MAXD;
             if (d > MAXD)
             {

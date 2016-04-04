@@ -26,6 +26,8 @@ private slots:
 
     void on_button_def_clicked();
 
+    void on_button_lib_clicked();
+
 
     void accept();
     void reject();

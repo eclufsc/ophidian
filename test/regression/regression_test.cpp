@@ -77,8 +77,11 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 	using namespace openeda;
     std::vector<std::string> circuits { "simple", "superblue16" };
+//        std::vector<std::string> circuits { "simple" };
 	for (std::size_t i { 0 }; i < circuits.size(); ++i) {
 
+        std::cout << "reading inputs..." << std::endl;
+        boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
 		std::ifstream dot_def("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".def", std::ifstream::in);
 		std::ifstream dot_lef("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".lef", std::ifstream::in);
 		std::ifstream dot_v("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + ".v", std::ifstream::in);
@@ -102,9 +105,13 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 		timing::library_timing_arcs timing_arcs { &std_cells };
 		timing::library timing_lib { &timing_arcs, &std_cells };
 		timing::liberty::read("benchmarks/" + circuits.at(i) + "/" + circuits.at(i) + "_Late.lib", timing_lib);
+        boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
+        boost::posix_time::time_duration msdiff = mst2 - mst1;
+        std::cout << "inputs read in " << msdiff.total_milliseconds()/1000.0 << " seconds" << std::endl;
 
 
-        std::cout << "Running STA for " << circuits.at(i) << " ..." << std::endl;
+        std::cout << "Building graph..." << std::endl;
+        mst1 = boost::posix_time::microsec_clock::local_time();
 		timing::graph graph;
         timing::default_design_constraints default_dc(netlist);
         timing::design_constraints dc( default_dc.dc() );
@@ -122,29 +129,37 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
 			timing_lib.pin_capacitance(PO_std_cell_pin, boost::units::quantity<boost::units::si::capacitance>(out_load.pin_load*boost::units::si::femto*boost::units::si::farads));
 		}
         timing::graph_builder::build(netlist, timing_lib, dc, graph);
-		timingdriven_placement::sta_flute_net_calculator flute(graph, placement, netlist);
+        mst2 = boost::posix_time::microsec_clock::local_time();
+        msdiff = mst2 - mst1;
+        std::cout << "Building graph DONE in " << msdiff.total_milliseconds()/1000.0 << " seconds" << std::endl;
+
+        std::cout << "running STA... " << std::endl;
+        timingdriven_placement::sta_flute_net_calculator flute(graph, placement, timing_lib, netlist);
 		timing::static_timing_analysis STA(graph, timing_lib, &flute);
 		for(auto net : netlist.net_system())
 			STA.make_dirty(net.first);
         STA.set_constraints(netlist, dc);
         omp_set_num_threads(8);
-        boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
+        mst1 = boost::posix_time::microsec_clock::local_time();
 		STA.run();
-        boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
-        boost::posix_time::time_duration msdiff = mst2 - mst1;
+        mst2 = boost::posix_time::microsec_clock::local_time();
+        msdiff = mst2 - mst1;
         std::cout << "STA DONE in " << msdiff.total_milliseconds()/1000.0 << " seconds" << std::endl;
 
 
 
-//		for(auto pin : netlist.pin_system())
-//		{
-//			std::cout << netlist.pin_name(pin.first) << " ";
-//			std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
-//			std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
-//			std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
-//			std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
-//			std::cout << std::endl;
-//		}
+
+//        for(auto pin : netlist.pin_system())
+//        {
+//            std::cout << netlist.pin_name(pin.first) << " ";
+//            std::cout << "at r " << STA.rise_arrival(pin.first) << " ";
+//            std::cout << "at f " << STA.fall_arrival(pin.first) << " ";
+//            std::cout << "slew r " << STA.rise_slew(pin.first) << " ";
+//            std::cout << "slew f " << STA.fall_slew(pin.first) << " ";
+//            std::cout << "slack r " << STA.rise_slack(pin.first) << " ";
+//            std::cout << "slack f " << STA.fall_slack(pin.first) << " ";
+//            std::cout << std::endl;
+//        }
 
 
 

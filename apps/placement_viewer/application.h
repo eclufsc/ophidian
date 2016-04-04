@@ -8,6 +8,11 @@
 
 #include <utility>
 
+#include "../timing/library.h"
+#include "../timing/graph.h"
+#include "../timing/static_timing_analysis.h"
+#include "../timing-driven_placement/sta_flute_net_calculator.h"
+
 using point = openeda::geometry::point<double>;
 using polygon = openeda::geometry::polygon<point>;
 using multi_polygon = openeda::geometry::multi_polygon<polygon>;
@@ -31,13 +36,18 @@ class application
     openeda::netlist::netlist m_netlist;
     openeda::placement::library m_library;
     openeda::placement::placement m_placement;
+    openeda::timing::library_timing_arcs m_timing_arcs;
+    openeda::timing::library m_timing_library;
+    openeda::timing::graph m_graph;
+    std::unique_ptr<openeda::timingdriven_placement::sta_flute_net_calculator> m_flute;
+    std::unique_ptr<openeda::timing::static_timing_analysis> m_sta;
 
     rtree m_position2cellentity;
 
     std::vector<rtree_node> create_rtree_nodes(openeda::entity::entity cell);
 
 public:
-    application(const std::string v_file, const std::string lef_file, const std::string def_file);
+    application(const std::string v_file, const std::string lef_file, const std::string def_file, const std::string lib_file);
 
 
     virtual ~application();
@@ -59,6 +69,20 @@ public:
     openeda::entity::entity get_cell(point position) const;
 
     bool cell_std_cell(openeda::entity::entity cell, std::string std_cell_name);
+
+
+    boost::units::quantity< boost::units::si::time > cell_worst_slack(openeda::entity::entity cell) const;
+
+    void run_sta();
+
+    boost::units::quantity< boost::units::si::time > rise_arrival(openeda::entity::entity pin) const;
+    boost::units::quantity< boost::units::si::time > fall_arrival(openeda::entity::entity pin) const;
+
+
+    boost::units::quantity< boost::units::si::time > rise_slack(openeda::entity::entity pin) const;
+    boost::units::quantity< boost::units::si::time > fall_slack(openeda::entity::entity pin) const;
+
+    std::vector< openeda::entity::entity > critical_path() const;
 };
 
 #endif // APPLICATION_H

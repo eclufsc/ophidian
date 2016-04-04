@@ -78,6 +78,9 @@ public:
 
     void load_circuit();
 
+    void run_sta();
+
+
 };
 
 class noninitialized : public canvas_state {

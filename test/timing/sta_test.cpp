@@ -4,9 +4,6 @@
 #include <lemon/list_graph.h>
 #include "../timing/graph_arcs_timing.h"
 #include "../timing/graph_nodes_timing.h"
-#include "../timing/sta_timing_point_calculator.h"
-#include "../timing/sta_timing_arc_calculator.h"
-
 #include <boost/units/systems/si/prefixes.hpp>
 
 TEST_CASE("sta/timing points timing","[timing][sta]") {

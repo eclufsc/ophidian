@@ -23,6 +23,15 @@ void MainWindow::select_cell(openeda::entity::entity cell)
     openeda::entity::entity cell_std_cell = m_app->netlist().cell_std_cell(cell);
     std::string std_cell_name = m_app->std_cells().cell_name(cell_std_cell);
     ui->combo_box_cell_type->setCurrentText(QString::fromStdString(std_cell_name));
+
+    auto position = m_app->placement().cell_position(cell);
+    ui->label_X->setText(QString::number(position.x()));
+    ui->label_Y->setText(QString::number(position.y()));
+
+    boost::units::quantity< boost::units::si::time >  worst_slack = m_app->cell_worst_slack(cell);
+    ui->label_worst_slack->setText(QString::number(worst_slack.value()));
+
+
 }
 
 void MainWindow::load_circuit()
@@ -54,4 +63,9 @@ void MainWindow::on_combo_box_cell_type_activated(const QString &current_text)
         ui->canvas->update_cell(cell);
     }
 
+}
+
+void MainWindow::on_button_sta_clicked()
+{
+    ui->canvas->run_sta();
 }

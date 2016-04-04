@@ -17,7 +17,7 @@
 namespace openeda {
 namespace timing {
 
-class sta_arc_calculator;
+class sta_timing_edge_calculator;
 class sta_timing_point_calculator {
     const graph & m_graph;
 	std::deque<lemon::ListDigraph::Node> m_to_process;
@@ -30,7 +30,7 @@ public:
 
 	bool empty();
 	virtual void push(lemon::ListDigraph::Node node);
-	virtual void process_queue(const graph & m_graph, const graph_arcs_timing & m_arcs_timing, graph_nodes_timing & m_nodes_timing, lemon::ListDigraph::ArcMap< sta_arc_calculator * > & tarcs);
+	virtual void process_queue(const graph & m_graph, const graph_arcs_timing & m_arcs_timing, graph_nodes_timing & m_nodes_timing, lemon::ListDigraph::ArcMap< sta_timing_edge_calculator * > & tarcs);
 };
 } /* namespace timing */
 } /* namespace openeda */

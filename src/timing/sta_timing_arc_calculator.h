@@ -19,7 +19,7 @@
 namespace openeda {
 namespace timing {
 
-class sta_timing_arc_calculator: public sta_arc_calculator {
+class sta_timing_arc_calculator: public sta_timing_edge_calculator {
     const library & m_library;
 
 public:

@@ -34,6 +34,7 @@ typedef boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<
 
 flute_rc_tree_creator::flute_rc_tree_creator()
 {
+    interconnection::readLUT();
     m_params.capacitance_per_micron = quantity<si::capacitance>(0.16 * si::femto * si::farads);
     m_params.resistance_per_micron = quantity<si::resistance>(2.535 * si::ohms);
 }
