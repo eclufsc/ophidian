@@ -87,7 +87,7 @@ void circuit::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     }
 }
 
-void circuit::update_cell(openeda::entity::entity cell) {
+void circuit::update_cell(ophidian::entity::entity cell) {
     std::size_t current_index = m_entity2index[cell].first;
     auto geometry = m_app->placement().cell_geometry(cell);
     for (auto & polygon : geometry) {
@@ -104,9 +104,9 @@ void circuit::update_cell(openeda::entity::entity cell) {
                 + m_entity2index[cell].second);
 }
 
-void circuit::select_cell(openeda::entity::entity cell) {
+void circuit::select_cell(ophidian::entity::entity cell) {
     m_selected.clear();
-    if(!(cell == openeda::entity::entity { })) {
+    if(!(cell == ophidian::entity::entity { })) {
         auto geometry = m_app->placement().cell_geometry(cell);
         sf::Vertex prev;
         prev.position.x = geometry.front().outer()[0].x();
@@ -126,7 +126,7 @@ void circuit::select_cell(openeda::entity::entity cell) {
         // edges
         auto cell_pins = m_app->netlist().cell_pins(cell);
 
-        std::unordered_set<openeda::entity::entity> nets_to_draw;
+        std::unordered_set<ophidian::entity::entity> nets_to_draw;
         for (auto pin1 : cell_pins) {
             auto net = m_app->netlist().pin_net(pin1);
             nets_to_draw.insert(net);
@@ -135,17 +135,17 @@ void circuit::select_cell(openeda::entity::entity cell) {
         for(auto net : nets_to_draw)
         {
             auto net_pins = m_app->netlist().net_pins(net);
-            openeda::entity::entity source;
+            ophidian::entity::entity source;
             for(auto pin : net_pins)
             {
-                if(m_app->std_cells().pin_direction(m_app->netlist().pin_std_cell(pin)) == openeda::standard_cell::pin_directions::OUTPUT)
+                if(m_app->std_cells().pin_direction(m_app->netlist().pin_std_cell(pin)) == ophidian::standard_cell::pin_directions::OUTPUT)
                 {
                     source = pin;
                     break;
                 }
             }
 
-            if(!(source == openeda::entity::entity{}))
+            if(!(source == ophidian::entity::entity{}))
             {
 
                 sf::Vertex p1, p2;
@@ -170,14 +170,14 @@ void circuit::select_cell(openeda::entity::entity cell) {
     }
 }
 
-void circuit::paint_cell(openeda::entity::entity cell, sf::Color color)
+void circuit::paint_cell(ophidian::entity::entity cell, sf::Color color)
 {
     auto index = m_entity2index[cell];
     for(std::size_t i = index.first; i < index.first + index.second; ++i)
         m_cells[i].color = color;
 }
 
-void circuit::critical_path(const std::vector<openeda::entity::entity> &cp)
+void circuit::critical_path(const std::vector<ophidian::entity::entity> &cp)
 {
     m_cp.clear();
     for(auto pin : cp)

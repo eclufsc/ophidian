@@ -1,14 +1,33 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
+
 #include "../catch.hpp"
 
 #include <standard_cells.h>
 #include "../standard_cell/cells.h"
 #include "../standard_cell/pins.h"
 
-using namespace openeda::standard_cell;
+using namespace ophidian::standard_cell;
 
 TEST_CASE("standard cells/cells", "[standard_cells][cells]")
 {
-	openeda::entity::system cells_system;
+	ophidian::entity::system cells_system;
 	cells cells(cells_system);
 	auto cell = cells_system.create();
 	cells.name(cell, "the cell");
@@ -18,8 +37,8 @@ TEST_CASE("standard cells/cells", "[standard_cells][cells]")
 
 TEST_CASE("standard cells/pins", "[standard_cells][pins]")
 {
-	openeda::entity::system cells_system;
-	openeda::entity::system pins_system;
+	ophidian::entity::system cells_system;
+	ophidian::entity::system pins_system;
 	cells std_cells(cells_system);
 	pins std_cells_pins(pins_system);
 	auto INV_X1 = cells_system.create();
@@ -103,11 +122,11 @@ TEST_CASE("standard cells/pin direction", "[standard_cell]")
 	auto INV_X1 = std_cells.cell_create("INV_X1");
 	auto INV_X1_a = std_cells.pin_create(INV_X1, "a");
 	auto INV_X1_o = std_cells.pin_create(INV_X1, "o");
-	REQUIRE( std_cells.pin_direction(INV_X1_a) == openeda::standard_cell::pin_directions::NOT_ASSIGNED );
-	std_cells.pin_direction(INV_X1_a, openeda::standard_cell::pin_directions::INPUT);
-	std_cells.pin_direction(INV_X1_o, openeda::standard_cell::pin_directions::OUTPUT);
-	REQUIRE( std_cells.pin_direction(INV_X1_a) == openeda::standard_cell::pin_directions::INPUT );
-	REQUIRE( std_cells.pin_direction(INV_X1_o) == openeda::standard_cell::pin_directions::OUTPUT );
-	REQUIRE( std_cells.pin_direction(INV_X1_a) != openeda::standard_cell::pin_directions::NOT_ASSIGNED );
-	REQUIRE( std_cells.pin_direction(INV_X1_o) != openeda::standard_cell::pin_directions::NOT_ASSIGNED );
+	REQUIRE( std_cells.pin_direction(INV_X1_a) == ophidian::standard_cell::pin_directions::NOT_ASSIGNED );
+	std_cells.pin_direction(INV_X1_a, ophidian::standard_cell::pin_directions::INPUT);
+	std_cells.pin_direction(INV_X1_o, ophidian::standard_cell::pin_directions::OUTPUT);
+	REQUIRE( std_cells.pin_direction(INV_X1_a) == ophidian::standard_cell::pin_directions::INPUT );
+	REQUIRE( std_cells.pin_direction(INV_X1_o) == ophidian::standard_cell::pin_directions::OUTPUT );
+	REQUIRE( std_cells.pin_direction(INV_X1_a) != ophidian::standard_cell::pin_directions::NOT_ASSIGNED );
+	REQUIRE( std_cells.pin_direction(INV_X1_o) != ophidian::standard_cell::pin_directions::NOT_ASSIGNED );
 }

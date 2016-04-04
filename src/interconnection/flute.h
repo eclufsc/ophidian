@@ -19,7 +19,7 @@
 
 #define OPENEDA_FLUTE_H
 
-namespace openeda {
+namespace ophidian {
     namespace interconnection {
         typedef struct
         {

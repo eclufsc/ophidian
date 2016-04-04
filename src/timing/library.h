@@ -1,9 +1,20 @@
 /*
- * library.h
  *
- *  Created on: Mar 16, 2016
- *      Author: csguth
- */
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
 
 #ifndef SRC_TIMING_LIBRARY_H_
 #define SRC_TIMING_LIBRARY_H_
@@ -16,7 +27,7 @@
 
 #include "library_timing_arcs.h"
 
-namespace openeda {
+namespace ophidian {
 namespace timing {
 
 enum class unateness {
@@ -27,7 +38,7 @@ class library {
 public:
 	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
 private:
-	openeda::standard_cell::standard_cells & m_std_cells;
+	ophidian::standard_cell::standard_cells & m_std_cells;
 	library_timing_arcs & m_tarcs;
 
 	entity::vector_property<LUT> m_rise_delays;
@@ -38,13 +49,13 @@ private:
 	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
 public:
-	library(library_timing_arcs * tarcs, openeda::standard_cell::standard_cells * std_cells);
+	library(library_timing_arcs * tarcs, ophidian::standard_cell::standard_cells * std_cells);
 	virtual ~library();
 	void pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance);
 	boost::units::quantity<boost::units::si::capacitance> pin_capacitance(entity::entity pin) const {
 		return m_pin_capacitance[m_std_cells.pin_system().lookup(pin)];
 	}
-	openeda::standard_cell::standard_cells & std_cells() {
+	ophidian::standard_cell::standard_cells & std_cells() {
 		return m_std_cells;
 	}
 

@@ -1,9 +1,20 @@
 /*
- * sta_flute_net_calculator.h
  *
- *  Created on: Mar 23, 2016
- *      Author: csguth
- */
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
 
 #ifndef SRC_TIMING_DRIVEN_PLACEMENT_STA_FLUTE_NET_CALCULATOR_H_
 #define SRC_TIMING_DRIVEN_PLACEMENT_STA_FLUTE_NET_CALCULATOR_H_
@@ -23,7 +34,7 @@
 #include "../timing/graph.h"
 #include "../timing/design_constraints.h"
 
-namespace openeda {
+namespace ophidian {
 namespace timingdriven_placement {
 
 class sta_flute_net_calculator: public timing::sta_interconnection_estimator {

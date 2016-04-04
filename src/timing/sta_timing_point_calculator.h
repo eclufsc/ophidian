@@ -14,7 +14,7 @@
 #include "graph_nodes_timing.h"
 #include "graph_arcs_timing.h"
 
-namespace openeda {
+namespace ophidian {
 namespace timing {
 
 class sta_timing_edge_calculator;

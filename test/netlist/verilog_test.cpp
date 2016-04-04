@@ -1,3 +1,21 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
 #include "../catch.hpp"
 
 #include <netlist.h>
@@ -10,16 +28,16 @@ TEST_CASE("parser/tokenize", "[parser]") {
 	const std::vector<std::string> golden { "this", "is", "a", "sample",
 			"string", ".ab", "a", "b", "c" };
 	const std::vector<std::string> tokens =
-			openeda::netlist::verilog::parser::tokenize(str);
+			ophidian::netlist::verilog::parser::tokenize(str);
 	REQUIRE(tokens == golden);
 }
 
 TEST_CASE("verilog/read","[verilog]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist simple(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist simple(&std_cells);
     std::ifstream file("benchmarks/simple/simple.v", std::ifstream::in);
 	REQUIRE(file.good());
-	openeda::netlist::verilog::read(file, &simple);
+	ophidian::netlist::verilog::read(file, &simple);
 
 	REQUIRE(simple.PI_count() == 3);
 	REQUIRE(simple.PO_count() == 1);

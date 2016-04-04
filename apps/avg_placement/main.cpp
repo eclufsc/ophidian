@@ -7,7 +7,7 @@
 #include "../placement/lef.h"
 #include "../netlist/verilog.h"
 
-double measure_HPWL(openeda::netlist::netlist& netlist, openeda::placement::placement &placement, openeda::placement::library &library) {
+double measure_HPWL(ophidian::netlist::netlist& netlist, ophidian::placement::placement &placement, ophidian::placement::library &library) {
 	double HPWL = 0.0;
 	for(auto net : netlist.net_system())
 	{
@@ -23,9 +23,9 @@ double measure_HPWL(openeda::netlist::netlist& netlist, openeda::placement::plac
 			X.push_back(pos.x());
 			Y.push_back(pos.y());
 		}
-		openeda::geometry::point<double> lower{*std::min_element(X.begin(), X.end()), *std::min_element(Y.begin(), Y.end())};
-		openeda::geometry::point<double> upper{*std::max_element(X.begin(), X.end()), *std::max_element(Y.begin(), Y.end())};
-		double local_HPWL = openeda::geometry::manhattan_distance(lower, upper);
+		ophidian::geometry::point<double> lower{*std::min_element(X.begin(), X.end()), *std::min_element(Y.begin(), Y.end())};
+		ophidian::geometry::point<double> upper{*std::max_element(X.begin(), X.end()), *std::max_element(Y.begin(), Y.end())};
+		double local_HPWL = ophidian::geometry::manhattan_distance(lower, upper);
 		HPWL += local_HPWL;
 	}
 	HPWL /= static_cast<double>(library.dist2microns());
@@ -42,10 +42,10 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	openeda::standard_cell::standard_cells std_cell;
-	openeda::netlist::netlist netlist { &std_cell };
-	openeda::placement::library library { &std_cell };
-	openeda::placement::placement placement { &netlist, &library };
+	ophidian::standard_cell::standard_cells std_cell;
+	ophidian::netlist::netlist netlist { &std_cell };
+	ophidian::placement::library library { &std_cell };
+	ophidian::placement::placement placement { &netlist, &library };
 
 	std::ifstream dot_v { argv[1], std::ifstream::in };
 	std::ifstream dot_def { argv[2], std::ifstream::in };
@@ -66,9 +66,9 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	openeda::netlist::verilog::read(dot_v, &netlist);
-	openeda::placement::def::read(dot_def, &netlist, &placement);
-	openeda::placement::lef::read(dot_lef, &std_cell, &library);
+	ophidian::netlist::verilog::read(dot_v, &netlist);
+	ophidian::placement::def::read(dot_def, &netlist, &placement);
+	ophidian::placement::lef::read(dot_lef, &std_cell, &library);
 
 	double HPWL{measure_HPWL(netlist, placement, library)};
 	std::cout << "HPWL before: " << HPWL << std::endl;
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 	{
 		auto cell_pins = netlist.cell_pins(cell.second);
 
-		openeda::geometry::point<double> avg{0.0, 0.0};
+		ophidian::geometry::point<double> avg{0.0, 0.0};
 		std::size_t count{0};
 		for(auto pin : cell_pins)
 		{

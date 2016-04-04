@@ -1,3 +1,21 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
 #include "../catch.hpp"
 
 #include <entity.h>
@@ -6,17 +24,17 @@
 #include "../netlist/pins.h"
 
 TEST_CASE("cells/assign name","[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
 	auto u1 = cells_system.create();
 	cells.name(u1, "u1");
 	REQUIRE(cells.name(u1) == "u1");
 }
 
 TEST_CASE("cells/assign cell_type", "[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
-	openeda::standard_cell::standard_cells std_cells;
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
+	ophidian::standard_cell::standard_cells std_cells;
 	auto NAND2_X2 = std_cells.cell_create("NAND2_X2");
 	auto u1 = cells_system.create();
 	cells.standard_cell(u1, NAND2_X2);
@@ -24,10 +42,10 @@ TEST_CASE("cells/assign cell_type", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/insert pin", "[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
-	openeda::entity::system pins_system;
-	openeda::netlist::pins pins(pins_system);
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
+	ophidian::entity::system pins_system;
+	ophidian::netlist::pins pins(pins_system);
 	auto u1 = cells_system.create();
 	auto u1a = pins_system.create();
 	cells.insert_pin(u1, u1a);
@@ -37,24 +55,24 @@ TEST_CASE("cells/insert pin", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/assign pins", "[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
-	openeda::entity::system pins_system;
-	openeda::netlist::pins pins(pins_system);
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
+	ophidian::entity::system pins_system;
+	ophidian::netlist::pins pins(pins_system);
 	auto u1 = cells_system.create();
-	std::vector<openeda::entity::entity> cell_pins { pins_system.create(),
+	std::vector<ophidian::entity::entity> cell_pins { pins_system.create(),
 			pins_system.create(), pins_system.create() };
 	cells.pins(u1, cell_pins);
 	REQUIRE(cell_pins == cells.pins(u1));
 }
 
 TEST_CASE("cells/find interconnections of a cell", "[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
-	openeda::entity::system pins_system;
-	openeda::netlist::pins pins(pins_system);
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
+	ophidian::entity::system pins_system;
+	ophidian::netlist::pins pins(pins_system);
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
 
 	auto u1 = cells_system.create();
 	auto u1o = pins_system.create();
@@ -71,12 +89,12 @@ TEST_CASE("cells/find interconnections of a cell", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/check cells connected to an interconnection", "[netlist][cells]") {
-	openeda::entity::system cells_system;
-	openeda::netlist::cells cells(cells_system);
-	openeda::entity::system pins_system;
-	openeda::netlist::pins pins(pins_system);
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
+	ophidian::entity::system cells_system;
+	ophidian::netlist::cells cells(cells_system);
+	ophidian::entity::system pins_system;
+	ophidian::netlist::pins pins(pins_system);
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
 
 	auto u1 = cells_system.create();
 	auto u1o = pins_system.create();
@@ -99,7 +117,7 @@ TEST_CASE("cells/check cells connected to an interconnection", "[netlist][cells]
 	pins.net(u2a, n1); nets.connect(n1, u2a);
 
 	auto interconnection_pins = nets.pins(n1);
-	std::vector<openeda::entity::entity> pins_owners;
+	std::vector<ophidian::entity::entity> pins_owners;
 	for( auto p : interconnection_pins )
 		pins_owners.push_back(pins.owner(p));
 

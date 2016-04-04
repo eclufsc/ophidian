@@ -8,7 +8,7 @@
 #ifndef SRC_TIMING_TRANSITION_H_
 #define SRC_TIMING_TRANSITION_H_
 
-namespace openeda {
+namespace ophidian {
 namespace timing {
 
 enum class edges {

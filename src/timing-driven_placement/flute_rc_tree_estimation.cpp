@@ -1,9 +1,20 @@
 /*
- * flute_rc_tree_estimation.cpp
  *
- *  Created on: Mar 15, 2016
- *      Author: csguth
- */
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
 
 #include "flute_rc_tree_estimation.h"
 #include "../interconnection/flute.h"
@@ -13,13 +24,13 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
-namespace openeda {
+namespace ophidian {
 namespace timingdriven_placement {
 
 using namespace boost::units;
 
 namespace flute_rc_tree_rtree {
-typedef std::pair<openeda::geometry::point<double>, entity::entity> rtree_node;
+typedef std::pair<ophidian::geometry::point<double>, entity::entity> rtree_node;
 class rtree_node_comparator {
 public:
     bool operator()(const rtree_node & node1, const rtree_node & node2) const {
@@ -84,7 +95,7 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
         auto v_position = placement.pin_position(pin_v);
         auto u = rc_tree.capacitor_insert("C0");
         auto v = rc_tree.capacitor_insert("C1");
-        double length = openeda::geometry::manhattan_distance(u_position, v_position);
+        double length = ophidian::geometry::manhattan_distance(u_position, v_position);
         length /= static_cast<double>(placement.lib().dist2microns());
         rc_tree.capacitance(u, quantity<si::capacitance>((length / 2.0) * param.capacitance_per_micron));
         rc_tree.capacitance(v, quantity<si::capacitance>((length / 2.0) * param.capacitance_per_micron));
@@ -117,7 +128,7 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
         Y.push_back(static_cast<unsigned>(position.y()));
     }
 
-    auto tree = openeda::interconnection::flute(net_pins.size(), X.data(), Y.data(), ACCURACY);
+    auto tree = ophidian::interconnection::flute(net_pins.size(), X.data(), Y.data(), ACCURACY);
     std::size_t num_branches = 2 * tree.deg - 2;
 
     flute_rc_tree_rtree::rtree indexing;
@@ -133,9 +144,9 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
         if (n == i)
             continue;
 
-        openeda::geometry::point<double> from { static_cast<double>(tree.branch[i].x), static_cast<double>(tree.branch[i].y) };
-        openeda::geometry::point<double> to { static_cast<double>(tree.branch[n].x), static_cast<double>(tree.branch[n].y) };
-        double length = openeda::geometry::manhattan_distance(from, to);
+        ophidian::geometry::point<double> from { static_cast<double>(tree.branch[i].x), static_cast<double>(tree.branch[i].y) };
+        ophidian::geometry::point<double> to { static_cast<double>(tree.branch[n].x), static_cast<double>(tree.branch[n].y) };
+        double length = ophidian::geometry::manhattan_distance(from, to);
         length /= static_cast<double>(placement.lib().dist2microns());
 
         // Capacitor U

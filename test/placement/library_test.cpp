@@ -1,3 +1,22 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
+
 #include "../catch.hpp"
 
 #include <library.h>
@@ -8,13 +27,13 @@
 #include <boost/geometry/algorithms/equals.hpp>
 #include "../geometry/geometry.h"
 
-using point = openeda::geometry::point<double>;
-using polygon = openeda::geometry::polygon<point>;
-using multi_polygon = openeda::geometry::multi_polygon<polygon>;
+using point = ophidian::geometry::point<double>;
+using polygon = ophidian::geometry::polygon<point>;
+using multi_polygon = ophidian::geometry::multi_polygon<polygon>;
 
 TEST_CASE("placement library/set & get geometry", "[placement]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::placement::library lib(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::placement::library lib(&std_cells);
 	auto INV_X1 = std_cells.cell_create("INV_X1");
 	std::vector<point> points { { 0.0, 0.0 }, { 0.0, 200.0 }, { 800.0, 200.0 },
 			{ 800.0, 0.0 }, { 0.0, 0.0 } };
@@ -25,8 +44,8 @@ TEST_CASE("placement library/set & get geometry", "[placement]") {
 }
 
 TEST_CASE("placement/read lef", "[placement]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::placement::library lib(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::placement::library lib(&std_cells);
 
 	std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef",
 			std::ifstream::in);
@@ -35,7 +54,7 @@ TEST_CASE("placement/read lef", "[placement]") {
 	buffer << simple_lef.rdbuf();
 	simple_lef.close();
 	std::cout << "reading lef..." << std::endl;
-	openeda::placement::lef::read(buffer, &std_cells, &lib);
+	ophidian::placement::lef::read(buffer, &std_cells, &lib);
 
 	REQUIRE(lib.dist2microns() == 2000);
 

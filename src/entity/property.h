@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 
-namespace openeda {
+namespace ophidian {
 namespace entity {
 
 class entity;

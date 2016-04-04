@@ -1,3 +1,21 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
 #include "../catch.hpp"
 
 #include <entity.h>
@@ -7,8 +25,8 @@
 
 TEST_CASE("nets/name","[netlist][nets]") {
 
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
 
 	auto n1 = nets_system.create();
 	nets.name(n1, "n1");
@@ -19,14 +37,14 @@ TEST_CASE("nets/name","[netlist][nets]") {
 
 TEST_CASE("nets/assign pins","[netlist][nets]") {
 
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
 
-	openeda::entity::system pin_sys;
+	ophidian::entity::system pin_sys;
 
 	auto n1 = nets_system.create();
 
-	std::vector<openeda::entity::entity> net_pins { pin_sys.create(),
+	std::vector<ophidian::entity::entity> net_pins { pin_sys.create(),
 			pin_sys.create(), pin_sys.create() };
 
 	nets.pins(n1, net_pins);
@@ -37,9 +55,9 @@ TEST_CASE("nets/assign pins","[netlist][nets]") {
 
 TEST_CASE("nets/connect pin","[netlist][nets]") {
 
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
-	openeda::entity::system pin_sys;
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
+	ophidian::entity::system pin_sys;
 
 	auto n1 = nets_system.create();
 
@@ -61,9 +79,9 @@ TEST_CASE("nets/connect pin","[netlist][nets]") {
 
 TEST_CASE("nets/disconnect pin","[netlist][nets]") {
 
-	openeda::entity::system nets_system;
-	openeda::netlist::nets nets(nets_system);
-	openeda::entity::system pin_sys;
+	ophidian::entity::system nets_system;
+	ophidian::netlist::nets nets(nets_system);
+	ophidian::entity::system pin_sys;
 
 	auto n1 = nets_system.create();
 

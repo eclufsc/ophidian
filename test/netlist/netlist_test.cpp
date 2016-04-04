@@ -1,3 +1,21 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
 #include "../catch.hpp"
 
 #include <entity.h>
@@ -6,16 +24,16 @@
 #include <netlist.h>
 
 TEST_CASE("netlist/ empty","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist empty(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist empty(&std_cells);
 	REQUIRE(empty.cell_count() == 0);
 	REQUIRE(empty.net_count() == 0);
 	REQUIRE(empty.pin_count() == 0);
 }
 
 TEST_CASE("netlist/insert cell","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	REQUIRE(netlist.cell_count() == 1);
 	REQUIRE(std_cells.cell_count() == 1);
@@ -28,8 +46,8 @@ TEST_CASE("netlist/insert cell","[netlist]") {
 }
 
 TEST_CASE("netlist/cant insert cell twice","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u12 = netlist.cell_insert("u1", "INVX1");
 	REQUIRE(u1 == u12);
@@ -37,8 +55,8 @@ TEST_CASE("netlist/cant insert cell twice","[netlist]") {
 }
 
 TEST_CASE("netlist/remove cell","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u2 = netlist.cell_insert("u2", "INVX1");
 	REQUIRE_NOTHROW(netlist.cell_remove(u1));
@@ -48,8 +66,8 @@ TEST_CASE("netlist/remove cell","[netlist]") {
 }
 
 TEST_CASE("netlist/insert cell after removing","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u2 = netlist.cell_insert("u2", "INVX1");
 	netlist.cell_remove(u1);
@@ -58,8 +76,8 @@ TEST_CASE("netlist/insert cell after removing","[netlist]") {
 }
 
 TEST_CASE("netlist/insert pin to cell","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u1a = netlist.pin_insert(u1, "a");
 	auto u1o = netlist.pin_insert(u1, "o");
@@ -85,8 +103,8 @@ TEST_CASE("netlist/insert pin to cell","[netlist]") {
 }
 
 TEST_CASE("netlist/remove cell and owned pins","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u1a = netlist.pin_insert(u1, "a");
 	auto u1o = netlist.pin_insert(u1, "o");
@@ -106,8 +124,8 @@ TEST_CASE("netlist/remove cell and owned pins","[netlist]") {
 }
 
 TEST_CASE("netlist/insert net","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto n1 = netlist.net_insert("n1");
 	REQUIRE(netlist.net_count() == 1);
 	REQUIRE(netlist.net_name(n1) == "n1");
@@ -115,8 +133,8 @@ TEST_CASE("netlist/insert net","[netlist]") {
 }
 
 TEST_CASE("netlist/ cannot insert net twice","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto n1 = netlist.net_insert("n1");
 	auto n12 = netlist.net_insert("n1");
 	REQUIRE(netlist.net_count() == 1);
@@ -125,8 +143,8 @@ TEST_CASE("netlist/ cannot insert net twice","[netlist]") {
 }
 
 TEST_CASE("netlist/connect","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u1a = netlist.pin_insert(u1, "a");
 	auto n1 = netlist.net_insert("n1");
@@ -141,8 +159,8 @@ TEST_CASE("netlist/connect","[netlist]") {
 }
 
 TEST_CASE("netlist/disconnect","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u1a = netlist.pin_insert(u1, "a");
 	REQUIRE_THROWS(netlist.disconnect(u1a)); // cannot disconnect a disconnected pin
@@ -156,8 +174,8 @@ TEST_CASE("netlist/disconnect","[netlist]") {
 }
 
 TEST_CASE("netlist/remove cell and disconnect all pins before removing them","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto inp1 = netlist.net_insert("inp1");
 	auto u1a = netlist.pin_insert(u1, "a");
@@ -188,8 +206,8 @@ TEST_CASE("netlist/remove cell and disconnect all pins before removing them","[n
 }
 
 TEST_CASE("netlist/remove net", "[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u1a  = netlist.pin_insert(u1, "a");
 	auto n1 = netlist.net_insert("u1");
@@ -200,14 +218,14 @@ TEST_CASE("netlist/remove net", "[netlist]") {
 
 	REQUIRE_NOTHROW( netlist.net_remove(n1) );
 	REQUIRE( netlist.net_count() == 0 );
-	REQUIRE( netlist.pin_net(pi) == openeda::entity::entity() );
-	REQUIRE( netlist.pin_net(u1a) == openeda::entity::entity() );
+	REQUIRE( netlist.pin_net(pi) == ophidian::entity::entity() );
+	REQUIRE( netlist.pin_net(u1a) == ophidian::entity::entity() );
 
 }
 
 TEST_CASE("netlist/insert PI","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto inp1 = netlist.PI_insert("inp1");
 
@@ -221,8 +239,8 @@ TEST_CASE("netlist/insert PI","[netlist]") {
 }
 
 TEST_CASE("netlist/remove PI","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto inp1 = netlist.PI_insert("inp1");
 
@@ -236,8 +254,8 @@ TEST_CASE("netlist/remove PI","[netlist]") {
 }
 
 TEST_CASE("netlist/insert 2 PI and remove 1","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto inp1 = netlist.PI_insert("inp1");
 	auto inp2 = netlist.PI_insert("inp2");
@@ -256,8 +274,8 @@ TEST_CASE("netlist/insert 2 PI and remove 1","[netlist]") {
 
 
 TEST_CASE("netlist/insert PO","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto out = netlist.PO_insert("out");
 
@@ -269,8 +287,8 @@ TEST_CASE("netlist/insert PO","[netlist]") {
 
 
 TEST_CASE("netlist/remove PO","[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto out = netlist.PO_insert("out");
 
@@ -282,8 +300,8 @@ TEST_CASE("netlist/remove PO","[netlist]") {
 }
 
 TEST_CASE("netlist/change cell type", "[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto nand1 = std_cells.cell_create("NAND1");
 	auto nand1_a = std_cells.pin_create(nand1, "a");
@@ -314,8 +332,8 @@ TEST_CASE("netlist/change cell type", "[netlist]") {
 }
 
 TEST_CASE("netlist/change cell type without defining all pins", "[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto nand1 = std_cells.cell_create("NAND1");
 	auto nand1_a = std_cells.pin_create(nand1, "a");
@@ -343,8 +361,8 @@ TEST_CASE("netlist/change cell type without defining all pins", "[netlist]") {
 }
 
 TEST_CASE("netlist/try changing cell to invalid type", "[netlist]") {
-	openeda::standard_cell::standard_cells std_cells;
-	openeda::netlist::netlist netlist(&std_cells);
+	ophidian::standard_cell::standard_cells std_cells;
+	ophidian::netlist::netlist netlist(&std_cells);
 
 	auto nand1 = std_cells.cell_create("NAND1");
 	auto nand1_a = std_cells.pin_create(nand1, "a");

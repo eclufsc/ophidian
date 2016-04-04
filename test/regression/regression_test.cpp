@@ -1,3 +1,21 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
 #include "../catch.hpp"
 
 #include "../geometry/geometry.h"
@@ -11,7 +29,7 @@
 #include <iostream>
 #include <sstream>
 
-double measure_HPWL(openeda::netlist::netlist& netlist, openeda::placement::placement &placement, openeda::placement::library &library) {
+double measure_HPWL(ophidian::netlist::netlist& netlist, ophidian::placement::placement &placement, ophidian::placement::library &library) {
 	double HPWL = 0.0;
 	for (auto net : netlist.net_system()) {
 		auto net_pins = netlist.net_pins(net.second);
@@ -26,9 +44,9 @@ double measure_HPWL(openeda::netlist::netlist& netlist, openeda::placement::plac
 			X.push_back(pos.x());
 			Y.push_back(pos.y());
 		}
-		openeda::geometry::point<double> lower { *std::min_element(X.begin(), X.end()), *std::min_element(Y.begin(), Y.end()) };
-		openeda::geometry::point<double> upper { *std::max_element(X.begin(), X.end()), *std::max_element(Y.begin(), Y.end()) };
-		double local_HPWL = openeda::geometry::manhattan_distance(lower, upper);
+		ophidian::geometry::point<double> lower { *std::min_element(X.begin(), X.end()), *std::min_element(Y.begin(), Y.end()) };
+		ophidian::geometry::point<double> upper { *std::max_element(X.begin(), X.end()), *std::max_element(Y.begin(), Y.end()) };
+		double local_HPWL = ophidian::geometry::manhattan_distance(lower, upper);
 		HPWL += local_HPWL;
 	}
 	HPWL /= static_cast<double>(library.dist2microns());
@@ -45,13 +63,13 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 		REQUIRE(dot_def.good());
 		REQUIRE(dot_lef.good());
 		REQUIRE(dot_v.good());
-		openeda::standard_cell::standard_cells std_cells;
-		openeda::netlist::netlist netlist(&std_cells);
-		openeda::placement::library library(&std_cells);
-		openeda::placement::placement placement(&netlist, &library);
-		openeda::placement::def::read(dot_def, &netlist, &placement);
-		openeda::placement::lef::read(dot_lef, &std_cells, &library);
-		openeda::netlist::verilog::read(dot_v, &netlist);
+		ophidian::standard_cell::standard_cells std_cells;
+		ophidian::netlist::netlist netlist(&std_cells);
+		ophidian::placement::library library(&std_cells);
+		ophidian::placement::placement placement(&netlist, &library);
+		ophidian::placement::def::read(dot_def, &netlist, &placement);
+		ophidian::placement::lef::read(dot_lef, &std_cells, &library);
+		ophidian::netlist::verilog::read(dot_v, &netlist);
 		double HPWL = measure_HPWL(netlist, placement, library);
 		std::stringstream ss;
 		ss.precision(5);

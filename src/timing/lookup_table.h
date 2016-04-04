@@ -13,7 +13,7 @@
 #include <boost/units/systems/si/prefixes.hpp>
 #include <iostream>
 
-namespace openeda {
+namespace ophidian {
 namespace timing {
 
 template<class RowType, class ColumnType, class ValueType>

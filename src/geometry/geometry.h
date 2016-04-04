@@ -15,7 +15,7 @@
 
 #include <cmath>
 
-namespace openeda {
+namespace ophidian {
 namespace geometry {
 template<class Coordinate_Type>
 using point = typename boost::geometry::model::d2::point_xy<Coordinate_Type>;

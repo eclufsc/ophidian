@@ -30,42 +30,42 @@ application::application(const std::string v_file, const std::string lef_file, c
 
 
     std::cout << "reading inputs..." << std::endl;
-    openeda::netlist::verilog::read(dot_v, &m_netlist);
+    ophidian::netlist::verilog::read(dot_v, &m_netlist);
     dot_v.close();
-    openeda::placement::lef::read(dot_lef, &m_std_cells, &m_library);
+    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library);
     dot_lef.close();
-    openeda::placement::def::read(dot_def, &m_netlist, &m_placement);
+    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement);
     dot_lef.close();
-    openeda::timing::liberty::read(lib_file, m_timing_library);
+    ophidian::timing::liberty::read(lib_file, m_timing_library);
 
 
     std::cout << "setting design constraints..." << std::endl;
-    openeda::timing::default_design_constraints default_dc(m_netlist);
-    openeda::timing::design_constraints dc(default_dc.dc());
+    ophidian::timing::default_design_constraints default_dc(m_netlist);
+    ophidian::timing::design_constraints dc(default_dc.dc());
     for(auto driver : dc.input_drivers)
-        m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(driver.port_name)), openeda::standard_cell::pin_directions::OUTPUT);
+        m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(driver.port_name)), ophidian::standard_cell::pin_directions::OUTPUT);
 
-    m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(dc.clock.port_name)), openeda::standard_cell::pin_directions::OUTPUT);
+    m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(dc.clock.port_name)), ophidian::standard_cell::pin_directions::OUTPUT);
 
     for(auto out_load : dc.output_loads)
     {
         auto PO_pin = m_netlist.pin_by_name(out_load.port_name);
         auto PO_std_cell_pin = m_netlist.pin_std_cell(PO_pin);
-        m_std_cells.pin_direction(m_netlist.pin_std_cell(PO_pin), openeda::standard_cell::pin_directions::INPUT);
+        m_std_cells.pin_direction(m_netlist.pin_std_cell(PO_pin), ophidian::standard_cell::pin_directions::INPUT);
         m_timing_library.pin_capacitance(PO_std_cell_pin, boost::units::quantity<boost::units::si::capacitance>(out_load.pin_load*boost::units::si::femto*boost::units::si::farads));
     }
 
 
     std::cout << "building graph..." << std::endl;
-    openeda::timing::graph_builder::build(m_netlist, m_timing_library, dc, m_graph);
+    ophidian::timing::graph_builder::build(m_netlist, m_timing_library, dc, m_graph);
 
 
     std::cout << "initializing routing estimator & timing analysis " << std::endl;
-    m_flute.reset(new openeda::timingdriven_placement::sta_flute_net_calculator(m_graph, m_placement, m_timing_library, m_netlist));
-    m_sta.reset(new openeda::timing::static_timing_analysis(m_graph, m_timing_library, m_flute.get()));
+    m_flute.reset(new ophidian::timingdriven_placement::sta_flute_net_calculator(m_graph, m_placement, m_timing_library, m_netlist));
+    m_sta.reset(new ophidian::timing::static_timing_analysis(m_graph, m_timing_library, m_flute.get()));
 
 
-    openeda::timing::static_timing_analysis * sta = m_sta.get();
+    ophidian::timing::static_timing_analysis * sta = m_sta.get();
     for(auto net : m_netlist.net_system())
         sta->make_dirty(net.first);
     sta->set_constraints( m_netlist, dc );
@@ -85,7 +85,7 @@ application::~application() {
 
 
 std::vector<rtree_node> application::create_rtree_nodes(
-        openeda::entity::entity cell) {
+        ophidian::entity::entity cell) {
 
     auto geometry = m_placement.cell_geometry(cell);
     std::vector<rtree_node> nodes;
@@ -99,7 +99,7 @@ std::vector<rtree_node> application::create_rtree_nodes(
 }
 
 
-void application::place_cell_and_update_index(openeda::entity::entity cell,
+void application::place_cell_and_update_index(ophidian::entity::entity cell,
                                               point position) {
     // remove from index
     std::vector<rtree_node> nodes = create_rtree_nodes(cell);
@@ -124,17 +124,17 @@ void application::place_cell_and_update_index(openeda::entity::entity cell,
 
 }
 
-openeda::entity::entity application::get_cell(point position) const
+ophidian::entity::entity application::get_cell(point position) const
 {
     std::vector<rtree_node> result;
     m_position2cellentity.query(boost::geometry::index::contains(position),
                                 std::back_inserter(result));
     if(result.empty())
-        return openeda::entity::entity{};
+        return ophidian::entity::entity{};
     return result.front().second;
 }
 
-bool application::cell_std_cell(openeda::entity::entity cell, std::string std_cell_name)
+bool application::cell_std_cell(ophidian::entity::entity cell, std::string std_cell_name)
 {
     auto old_rtree_nodes = create_rtree_nodes(cell);
     bool result = m_netlist.cell_std_cell(cell, std_cell_name);
@@ -146,7 +146,7 @@ bool application::cell_std_cell(openeda::entity::entity cell, std::string std_ce
     return result;
 }
 
-boost::units::quantity<boost::units::si::time> application::cell_worst_slack(openeda::entity::entity cell) const
+boost::units::quantity<boost::units::si::time> application::cell_worst_slack(ophidian::entity::entity cell) const
 {
     boost::units::quantity<boost::units::si::time> worst( std::numeric_limits<double>::max() * boost::units::si::second );
     auto cell_pins = m_netlist.cell_pins(cell);
@@ -167,28 +167,28 @@ void application::run_sta()
 
 }
 
-boost::units::quantity<boost::units::si::time> application::rise_arrival(openeda::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::rise_arrival(ophidian::entity::entity pin) const
 {
     return m_sta->rise_arrival(pin);
 }
 
-boost::units::quantity<boost::units::si::time> application::fall_arrival(openeda::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::fall_arrival(ophidian::entity::entity pin) const
 {
     return  m_sta->fall_arrival(pin);
 }
 
-boost::units::quantity<boost::units::si::time> application::fall_slack(openeda::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::fall_slack(ophidian::entity::entity pin) const
 {
     return m_sta->fall_slack(pin);
 }
 
-std::vector<openeda::entity::entity> application::critical_path() const
+std::vector<ophidian::entity::entity> application::critical_path() const
 {
     return m_sta->critical_path();
 
 }
 
-boost::units::quantity<boost::units::si::time> application::rise_slack(openeda::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::rise_slack(ophidian::entity::entity pin) const
 {
     return m_sta->rise_slack(pin);
 }

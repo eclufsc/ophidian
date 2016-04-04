@@ -25,7 +25,7 @@ using std::min;
 using std::pair;
 using std::make_pair;
 
-namespace openeda {
+namespace ophidian {
     namespace interconnection {
         int numgrp[10]={0,0,0,0,6,30,180,1260,10080,90720};
 

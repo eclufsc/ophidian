@@ -66,29 +66,29 @@ void mysfmlcanvas::update_view_position()
 
 }
 
-void mysfmlcanvas::drag_cell(openeda::entity::entity cell, point position)
+void mysfmlcanvas::drag_cell(ophidian::entity::entity cell, point position)
 {
     m_app->place_cell_and_update_index(cell, position);
     m_circuit->update_cell(cell);
     m_circuit->select_cell(cell);
 }
 
-openeda::entity::entity mysfmlcanvas::get_cell(point position)
+ophidian::entity::entity mysfmlcanvas::get_cell(point position)
 {
     return m_app->get_cell(position);
 }
 
-point mysfmlcanvas::cell_position(openeda::entity::entity cell) const
+point mysfmlcanvas::cell_position(ophidian::entity::entity cell) const
 {
     return m_app->placement().cell_position(cell);
 }
 
 void mysfmlcanvas::unselect()
 {
-    m_circuit->select_cell(openeda::entity::entity{});
+    m_circuit->select_cell(ophidian::entity::entity{});
 }
 
-void mysfmlcanvas::select(openeda::entity::entity cell)
+void mysfmlcanvas::select(ophidian::entity::entity cell)
 {
     m_circuit->select_cell(cell);
     m_main_window->select_cell(cell);
@@ -128,7 +128,7 @@ void mysfmlcanvas::main_window(MainWindow *main_window)
     m_main_window = main_window;
 }
 
-void mysfmlcanvas::update_cell(openeda::entity::entity cell)
+void mysfmlcanvas::update_cell(ophidian::entity::entity cell)
 {
     m_circuit->update_cell(cell);
     m_circuit->select_cell(cell);
@@ -188,7 +188,7 @@ void mysfmlcanvas::run_sta()
 
 
 
-    std::map< openeda::entity::entity, boost::units::quantity<boost::units::si::time> > worst_slacks;
+    std::map< ophidian::entity::entity, boost::units::quantity<boost::units::si::time> > worst_slacks;
 
 
     boost::units::quantity<boost::units::si::time> maximum_value(0.0 * boost::units::si::second);
@@ -321,10 +321,10 @@ clicking::clicking(mysfmlcanvas &canvas, double x, double y) :
 
 canvas_state *clicking::update()
 {
-    openeda::entity::entity selected = m_canvas.get_cell({m_x, -m_y});
+    ophidian::entity::entity selected = m_canvas.get_cell({m_x, -m_y});
     canvas_state * next = this;
 
-    if(selected == openeda::entity::entity{})
+    if(selected == ophidian::entity::entity{})
     {
         delete this;
         next = new idle{m_canvas};
@@ -393,7 +393,7 @@ void canvas_state::render(mysfmlcanvas& canvas)
 }
 
 
-selected_holding::selected_holding(mysfmlcanvas &canvas, openeda::entity::entity cell, double x, double y):
+selected_holding::selected_holding(mysfmlcanvas &canvas, ophidian::entity::entity cell, double x, double y):
     m_canvas(canvas),
     m_cell(cell),
     m_xoffset(x),
@@ -416,7 +416,7 @@ canvas_state *selected_holding::release()
 }
 
 
-selected::selected(mysfmlcanvas &canvas, openeda::entity::entity cell) :
+selected::selected(mysfmlcanvas &canvas, ophidian::entity::entity cell) :
     m_canvas(canvas),
     m_cell(cell)
 {
@@ -432,7 +432,7 @@ canvas_state *selected::click(double x, double y)
 }
 
 
-dragging::dragging(mysfmlcanvas &canvas, openeda::entity::entity cell, double x, double y) :
+dragging::dragging(mysfmlcanvas &canvas, ophidian::entity::entity cell, double x, double y) :
     m_canvas(canvas),
     m_cell(cell),
     m_xoffset(x),

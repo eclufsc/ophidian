@@ -1,3 +1,22 @@
+/*
+ *
+ * This file is part of Ophidian.
+ * Ophidian is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Ophidian is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Ophidian.  If not, see <http://www.gnu.org/licenses/>.
+ *
+*/
+
+
 #include "../catch.hpp"
 
 #include <boost/units/systems/si.hpp>
@@ -8,7 +27,7 @@
 
 TEST_CASE("lookup table/create with size", "[timing][lut]") {
 
-	openeda::timing::lookup_table<double, double, double> table(1, 1);
+	ophidian::timing::lookup_table<double, double, double> table(1, 1);
 
 	REQUIRE(table.row_count() == 1);
 	REQUIRE(table.column_count() == 1);
@@ -19,7 +38,7 @@ TEST_CASE("lookup table/create with size", "[timing][lut]") {
 }
 
 TEST_CASE("lookup table/set", "[timing][lut]") {
-	openeda::timing::lookup_table<double, double, double> table(1, 2);
+	ophidian::timing::lookup_table<double, double, double> table(1, 2);
 	table.at(0, 0, 1.0);
 	table.at(0, 1, 2.0);
 
@@ -28,13 +47,13 @@ TEST_CASE("lookup table/set", "[timing][lut]") {
 }
 
 TEST_CASE("lookup table/set row values", "[timing][lut]") {
-	openeda::timing::lookup_table<double, double, double> table(1, 2);
+	ophidian::timing::lookup_table<double, double, double> table(1, 2);
 	table.row_value(0, 10.0);
 	REQUIRE(table.row_value(0) == 10.0);
 }
 
 TEST_CASE("lookup table/set column values", "[timing][lut]") {
-	openeda::timing::lookup_table<double, double, double> table(1, 2);
+	ophidian::timing::lookup_table<double, double, double> table(1, 2);
 	table.column_value(0, 10.0);
 	table.column_value(1, 30.0);
 	REQUIRE(table.column_value(0) == 10.0);
@@ -43,7 +62,7 @@ TEST_CASE("lookup table/set column values", "[timing][lut]") {
 
 TEST_CASE("lookup table/interpolation", "[timing][lut]") {
 	using namespace boost::units;
-	openeda::timing::lookup_table<quantity<si::capacitance>, quantity<si::time>, quantity<si::time> > table(2, 2);
+	ophidian::timing::lookup_table<quantity<si::capacitance>, quantity<si::time>, quantity<si::time> > table(2, 2);
 	table.row_value(0, quantity<si::capacitance>(0.0 * si::femto * si::farads));
 	table.row_value(1, quantity<si::capacitance>(6.0 * si::femto * si::farads));
 	table.column_value(0, quantity<si::time>(0.0 * si::pico * si::seconds));
