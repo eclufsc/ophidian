@@ -64,5 +64,5 @@ void graph::edge_source(edge e, node u) {
 
 }
 /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

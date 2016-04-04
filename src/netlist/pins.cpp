@@ -48,5 +48,5 @@ void pins::standard_cell_pin(entity::entity pin,
 	m_std_cell_pin[m_system.lookup(pin)] = std_cell_pin;
 }
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 

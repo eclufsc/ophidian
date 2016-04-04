@@ -86,6 +86,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_LIBRARY_TIMING_ARCS_H_ */

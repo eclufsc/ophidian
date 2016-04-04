@@ -68,4 +68,4 @@ simple_design_constraint::~simple_design_constraint() {
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */

@@ -67,5 +67,5 @@ void system::register_property(property* p) {
 }
 
 } /* namespace entity */
-} /* namespace openeda */
+} /* namespace ophidian */
 

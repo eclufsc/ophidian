@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_ROWS_H
-#define OPENEDA_ROWS_H
+#ifndef ophidian_ROWS_H
+#define ophidian_ROWS_H
 
 #include <vector_property.h>
 #include "entity.h"
@@ -71,4 +71,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_ROWS_H
+#endif //ophidian_ROWS_H

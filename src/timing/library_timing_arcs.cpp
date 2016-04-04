@@ -56,5 +56,5 @@ void library_timing_arcs::register_property(entity::property* property) {
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

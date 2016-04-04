@@ -67,5 +67,5 @@ void library::timing_arc_timing_sense(entity::entity arc, unateness timing_sense
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

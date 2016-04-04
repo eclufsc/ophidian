@@ -26,7 +26,7 @@
 
 TEST_CASE("sta/timing points timing","[timing][sta]") {
 
-	using namespace openeda;
+	using namespace ophidian;
 	using namespace boost::units;
 	lemon::ListDigraph graph;
 	lemon::ListDigraph::Node node { graph.addNode() };
@@ -44,7 +44,7 @@ TEST_CASE("sta/timing points timing","[timing][sta]") {
 
 }
 TEST_CASE("sta/timing arcs timing", "[timing][sta]") {
-	using namespace openeda;
+	using namespace ophidian;
 	using namespace boost::units;
 	lemon::ListDigraph graph;
 	lemon::ListDigraph::Arc arc { graph.addArc(graph.addNode(), graph.addNode()) };

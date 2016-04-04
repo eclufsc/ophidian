@@ -70,4 +70,4 @@ void elmore::update() {
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */

@@ -58,6 +58,6 @@ public:
 };
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_NETLIST_NETS_H_ */

@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_SITES_H
-#define OPENEDA_SITES_H
+#ifndef ophidian_SITES_H
+#define ophidian_SITES_H
 
 #include <vector_property.h>
 #include "entity.h"
@@ -61,4 +61,4 @@ namespace ophidian {
 
 
 
-#endif //OPENEDA_SITES_H
+#endif //ophidian_SITES_H

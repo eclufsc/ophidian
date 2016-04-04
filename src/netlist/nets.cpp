@@ -58,4 +58,4 @@ void nets::name(entity::entity net, std::string name) {
 }
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */

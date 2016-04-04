@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_STWL_ESTIMATION_H
-#define OPENEDA_STWL_ESTIMATION_H
+#ifndef ophidian_STWL_ESTIMATION_H
+#define ophidian_STWL_ESTIMATION_H
 
 #include "../geometry/geometry.h"
 
@@ -28,4 +28,4 @@ double stwl(const std::vector<geometry::point<double> >&points);
 }
 
 
-#endif //OPENEDA_STWL_ESTIMATION_H
+#endif //ophidian_STWL_ESTIMATION_H

@@ -94,6 +94,6 @@ public:
 };
 
 } /* namespace standard_cell */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_STANDARD_CELL_STANDARD_CELLS_H_ */

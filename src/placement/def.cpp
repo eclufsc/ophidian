@@ -430,5 +430,5 @@ void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
 
 }
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 

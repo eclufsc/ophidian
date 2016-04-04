@@ -48,6 +48,6 @@ void cells::standard_cell(entity::entity cell,
 }
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 

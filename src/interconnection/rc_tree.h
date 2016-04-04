@@ -100,6 +100,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_RC_TREE_H_ */

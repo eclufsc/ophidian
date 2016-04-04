@@ -182,5 +182,5 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
 }
 
 } /* namespace timingdriven_placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 

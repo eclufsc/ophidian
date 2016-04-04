@@ -44,5 +44,5 @@ void pins::direction(entity::entity pin, pin_directions direction) {
 }
 
 } /* namespace standard_cell */
-} /* namespace openeda */
+} /* namespace ophidian */
 

@@ -177,5 +177,5 @@ void static_timing_analysis::set_constraints(const netlist::netlist & netlist, c
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

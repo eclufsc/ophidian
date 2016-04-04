@@ -56,5 +56,5 @@ void rc_tree::capacitance(lemon::ListGraph::Node u,
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

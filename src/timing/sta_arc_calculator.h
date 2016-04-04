@@ -65,6 +65,6 @@ public:
 
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_STA_ARC_CALCULATOR_H_ */

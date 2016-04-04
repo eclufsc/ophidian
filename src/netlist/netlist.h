@@ -196,6 +196,6 @@ public:
 };
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_NETLIST_NETLIST_H_ */

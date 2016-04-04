@@ -43,6 +43,6 @@ void read(std::istream& input, netlist::netlist* netlist, placement * cells);
 
 }
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_PLACEMENT_DEF_H_ */

@@ -93,7 +93,7 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 #include <omp.h>
 
 TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
-	using namespace openeda;
+    using namespace ophidian;
     std::vector<std::string> circuits { "simple", "superblue16" };
 //        std::vector<std::string> circuits { "simple" };
 	for (std::size_t i { 0 }; i < circuits.size(); ++i) {

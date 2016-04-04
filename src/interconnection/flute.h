@@ -2,7 +2,7 @@
 // Created by renan on 3/10/16.
 //
 
-#ifndef OPENEDA_FLUTE_H
+#ifndef ophidian_FLUTE_H
 
 #define POWVFILE "POWV9.dat"    // LUT for POWV (Wirelength Vector)
 #define PORTFILE "PORT9.dat"    // LUT for PORT (Routing Tree)
@@ -17,7 +17,7 @@
 #define DTYPE unsigned
 #endif
 
-#define OPENEDA_FLUTE_H
+#define ophidian_FLUTE_H
 
 namespace ophidian {
     namespace interconnection {
@@ -76,4 +76,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_FLUTE_H
+#endif //ophidian_FLUTE_H

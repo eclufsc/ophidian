@@ -67,6 +67,6 @@ public:
 };
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_NETLIST_PINS_H_ */

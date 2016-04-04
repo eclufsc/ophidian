@@ -30,6 +30,6 @@ void read(std::string filename, timing::library& library);
 
 } /* namespace liberty */
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_LIBERTY_H_ */

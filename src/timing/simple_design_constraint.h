@@ -35,6 +35,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_SIMPLE_DESIGN_CONSTRAINT_H_ */

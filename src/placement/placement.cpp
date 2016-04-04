@@ -39,5 +39,5 @@ void placement::pad_position(entity::entity pad,
 }
 
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 

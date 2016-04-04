@@ -76,4 +76,4 @@ elmore_second_moment::~elmore_second_moment() {
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */

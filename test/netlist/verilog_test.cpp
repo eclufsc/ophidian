@@ -99,8 +99,8 @@ TEST_CASE("verilog/read","[verilog]") {
 }
 
 //TEST_CASE("verilog/read suplerblue16","[verilog][slow]") {
-//	openeda::standard_cell::standard_cells std_cells;
-//	openeda::netlist::netlist superblue16(&std_cells);
+//	ophidian::standard_cell::standard_cells std_cells;
+//	ophidian::netlist::netlist superblue16(&std_cells);
 //	std::ifstream file("test/superblue16.v", std::ifstream::in);
 //	REQUIRE(file.good());
 //	std::stringstream buffer;
@@ -108,7 +108,7 @@ TEST_CASE("verilog/read","[verilog]") {
 //	file.close();
 //	time_t begin, end;
 //	time(&begin);
-//	openeda::netlist::verilog::read(buffer, &superblue16);
+//	ophidian::netlist::verilog::read(buffer, &superblue16);
 //	time(&end);
 //	std::cout << "time to read \"test/superblue16.v\" = "
 //			<< difftime(end, begin) << " seconds" << std::endl;

@@ -213,5 +213,5 @@ bool netlist::cell_std_cell(entity::entity cell, entity::entity std_cell) {
 	return true;
 }
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 

@@ -37,6 +37,6 @@ void write(std::ostream & out, standard_cell::standard_cells * std_cells,
 }
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_NETLIST_VERILOG_H_ */

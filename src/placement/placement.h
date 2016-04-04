@@ -78,6 +78,6 @@ public:
 };
 
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_PLACEMENT_PLACEMENT_H_ */

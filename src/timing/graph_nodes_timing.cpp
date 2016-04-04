@@ -46,5 +46,5 @@ void graph_nodes_timing::load(lemon::ListDigraph::Node node, boost::units::quant
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

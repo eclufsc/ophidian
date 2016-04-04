@@ -43,6 +43,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_ELMORE_SECOND_MOMENT_H_ */

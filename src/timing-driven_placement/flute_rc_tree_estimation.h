@@ -50,7 +50,7 @@ class flute_rc_tree_creator {
 };
 
 } /* namespace timingdriven_placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_DRIVEN_PLACEMENT_FLUTE_RC_TREE_ESTIMATION_H_ */
 

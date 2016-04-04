@@ -93,6 +93,6 @@ public:
 };
 
 } /* namespace entity */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_ENTITY_ENTITY_H_ */

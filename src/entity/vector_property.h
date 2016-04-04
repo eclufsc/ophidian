@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_VECTOR_PROPERTY_H
-#define OPENEDA_VECTOR_PROPERTY_H
+#ifndef ophidian_VECTOR_PROPERTY_H
+#define ophidian_VECTOR_PROPERTY_H
 
 #include <vector>
 
@@ -62,4 +62,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_VECTOR_PROPERTY_H
+#endif //ophidian_VECTOR_PROPERTY_H

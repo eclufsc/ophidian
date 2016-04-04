@@ -66,6 +66,6 @@ public:
 };
 
 } /* namespace netlist */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_NETLIST_CELLS_H_ */

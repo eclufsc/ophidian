@@ -39,4 +39,4 @@ void cells::geometry(entity::entity cell,
 }
 
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */

@@ -43,4 +43,4 @@ void cells::pins(entity::entity cell, std::vector<entity::entity> pins) {
 }
 
 } /* namespace standard_cell */
-} /* namespace openeda */
+} /* namespace ophidian */

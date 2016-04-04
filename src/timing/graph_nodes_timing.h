@@ -55,6 +55,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_GRAPH_NODES_TIMING_H_ */

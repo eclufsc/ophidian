@@ -40,5 +40,5 @@ void graph_arcs_timing::slew(lemon::ListDigraph::Arc arc, const quantity<si::tim
 
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

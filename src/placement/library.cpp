@@ -44,5 +44,5 @@ void library::pin_offset(entity::entity pin, point offset) {
 
 
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 

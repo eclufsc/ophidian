@@ -76,6 +76,6 @@ public:
 };
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_TIMING_DESIGN_CONSTRAINTS_H_ */

@@ -177,5 +177,5 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 
 }
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

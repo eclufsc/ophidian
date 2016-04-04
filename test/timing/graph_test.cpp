@@ -23,14 +23,14 @@
 
 TEST_CASE("timing graph/", "[timing][graph]") {
 
-	using namespace openeda;
+	using namespace ophidian;
 	timing::graph g;
 	REQUIRE(g.nodes_count() == 0);
 	REQUIRE(g.edges_count() == 0);
 }
 
 TEST_CASE("timing graph/add rise node", "[timing][graph]") {
-	using namespace openeda;
+	using namespace ophidian;
 	timing::graph g;
 	entity::entity pin { 0 };
 	timing::graph::node node = g.rise_node_create(pin);
@@ -41,7 +41,7 @@ TEST_CASE("timing graph/add rise node", "[timing][graph]") {
 }
 
 TEST_CASE("timing graph/add fall node", "[timing][graph]") {
-	using namespace openeda;
+	using namespace ophidian;
 	timing::graph g;
 	entity::entity pin { 0 };
 	timing::graph::node node = g.fall_node_create(pin);
@@ -51,7 +51,7 @@ TEST_CASE("timing graph/add fall node", "[timing][graph]") {
 }
 
 TEST_CASE("timing graph/add edge", "[timing][graph]") {
-	using namespace openeda;
+	using namespace ophidian;
 	timing::graph g;
 	entity::entity i { 0 };
 	entity::entity j { 1 };
@@ -68,7 +68,7 @@ TEST_CASE("timing graph/add edge", "[timing][graph]") {
 }
 
 TEST_CASE("timing graph/out edges", "[timing][graph]") {
-	using namespace openeda;
+	using namespace ophidian;
 	timing::graph g;
 	entity::entity i { 0 };
 	entity::entity j { 1 };
@@ -106,7 +106,7 @@ struct transitions {
 }
 
 TEST_CASE("graph/construct from netlist", "[timing][graph]") {
-	using namespace openeda;
+	using namespace ophidian;
 
 	standard_cell::standard_cells std_cells;
 	netlist::netlist netlist { &std_cells };

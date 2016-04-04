@@ -58,6 +58,6 @@ public:
 };
 
 } /* namespace standard_cell */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_STANDARD_CELL_PINS_H_ */

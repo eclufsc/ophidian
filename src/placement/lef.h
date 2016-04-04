@@ -48,6 +48,6 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 
 }
 } /* namespace placement */
-} /* namespace openeda */
+} /* namespace ophidian */
 
 #endif /* SRC_PLACEMENT_LEF_H_ */

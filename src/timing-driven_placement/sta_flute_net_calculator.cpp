@@ -87,4 +87,4 @@ void sta_flute_net_calculator::update_net(timing::sta_timing_net_edge_calculator
 
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */

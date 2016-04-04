@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_HPWL_ESTIMATION_H
-#define OPENEDA_HPWL_ESTIMATION_H
+#ifndef ophidian_HPWL_ESTIMATION_H
+#define ophidian_HPWL_ESTIMATION_H
 
 #include "../geometry/geometry.h"
 
@@ -28,4 +28,4 @@ double hpwl(const std::vector<geometry::point<double> > & points);
 }
 
 
-#endif //OPENEDA_HPWL_ESTIMATION_H
+#endif //ophidian_HPWL_ESTIMATION_H

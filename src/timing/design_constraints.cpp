@@ -66,5 +66,5 @@ default_design_constraints::default_design_constraints(const netlist::netlist &n
 }
 
 } /* namespace timing */
-} /* namespace openeda */
+} /* namespace ophidian */
 

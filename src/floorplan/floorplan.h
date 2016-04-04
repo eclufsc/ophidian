@@ -16,8 +16,8 @@
  *
 */
 
-#ifndef OPENEDA_FLOORPLAN_H
-#define OPENEDA_FLOORPLAN_H
+#ifndef ophidian_FLOORPLAN_H
+#define ophidian_FLOORPLAN_H
 
 #include <entity.h>
 #include "rows.h"
@@ -93,4 +93,4 @@ namespace ophidian {
 
 
 
-#endif //OPENEDA_FLOORPLAN_H
+#endif //ophidian_FLOORPLAN_H
