@@ -1,4 +1,4 @@
-# openeda
+# Ophidian
 
 ### how to open the project on Eclipse
 
