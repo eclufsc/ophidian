@@ -92,5 +92,18 @@ TEST_CASE("generic sta", "[timing][generic_sta]")
 
     sta.run(timing::ceff{});
 
+    for(auto pin : netlist.pin_system())
+    {
+        std::cout << netlist.pin_name(pin.first) << " ";
+        std::cout << "at r " << sta.rise_arrival(pin.first) << " ";
+        std::cout << "at f " << sta.fall_arrival(pin.first) << " ";
+        std::cout << "slew r " << sta.rise_slew(pin.first) << " ";
+        std::cout << "slew f " << sta.fall_slew(pin.first) << " ";
+        std::cout << "slack r " << sta.rise_slack(pin.first) << " ";
+        std::cout << "slack f " << sta.fall_slack(pin.first) << " ";
+        std::cout << std::endl;
+    }
+
+
 
 }

@@ -127,7 +127,7 @@ public:
         delays[source] = SlewType(0.0*boost::units::si::seconds);
         while (error > m_precision) {
             current_ceff = ceff[source];
-            std::cout << "iteration #" << iteration++ << " ceff " << current_ceff << std::endl;
+//            std::cout << "iteration #" << iteration++ << " ceff " << current_ceff << std::endl;
             slews[source] = slew_calculator(current_ceff);
             for(std::size_t i = 1; i < order.size(); ++i)
             {

@@ -28,7 +28,8 @@ generic_sta::generic_sta(const ophidian::netlist::netlist &netlist, const ophidi
     m_rc_trees(rc_trees),
     m_nodes(graph.G()),
     m_arcs(graph.G()),
-    m_sorted_nodes(m_graph.nodes_count())
+    m_sorted_nodes(m_graph.nodes_count()),
+    m_sorted_driver_nodes(m_graph.nodes_count())
 {
 
     using GraphType = lemon::ListDigraph;
@@ -38,22 +39,59 @@ generic_sta::generic_sta(const ophidian::netlist::netlist &netlist, const ophidi
 
 
     std::vector<GraphType::Node> sorted_nodes(graph.nodes_count());
+
+    GraphType::NodeMap<int> level(graph.G());
+
     for(GraphType::NodeIt it(graph.G()); it != lemon::INVALID; ++it)
+    {
+        level[it] = std::numeric_limits<int>::max();
         m_sorted_nodes[ order[it] ] = it;
+        m_sorted_driver_nodes[ order[it] ] = it;
+        if(lemon::countInArcs(graph.G(), it) == 0)
+            level[it] = 0;
+    }
+
+    int num_levels = 0;
+    for(auto node : m_sorted_nodes)
+    {
+        if(lemon::countInArcs(graph.G(), node) > 0)
+        {
+            int max_level = std::numeric_limits<int>::min();
+            for(GraphType::InArcIt arc(graph.G(), node); arc != lemon::INVALID; ++arc)
+                max_level = std::max(max_level, level[graph.edge_source(arc)]);
+            level[node] = max_level + 1;
+            num_levels = std::max(num_levels, max_level+1);
+        }
+    }
+
+    m_levels.resize(num_levels);
+
+    for(auto node : m_sorted_nodes)
+        m_levels[level[node]].push_back(node);
+
+    auto beg = std::remove_if(m_levels.begin(), m_levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
+        return vec.empty();
+    });
+    m_levels.erase(beg, m_levels.end());
+
 
     auto begin = std::remove_if(
-                m_sorted_nodes.begin(),
-                m_sorted_nodes.end(),
+                m_sorted_driver_nodes.begin(),
+                m_sorted_driver_nodes.end(),
                 [this](GraphType::Node node)->bool {
             return m_library.pin_direction(m_netlist.pin_std_cell(m_graph.pin(node))) != standard_cell::pin_directions::OUTPUT;
 });
-    m_sorted_nodes.erase(begin, m_sorted_nodes.end());
 
+    m_sorted_driver_nodes.erase(begin, m_sorted_driver_nodes.end());
 #ifndef NDEBUG
-    std::for_each(m_sorted_nodes.begin(), m_sorted_nodes.end(), [this](GraphType::Node node){
+    std::for_each(m_sorted_driver_nodes.begin(), m_sorted_driver_nodes.end(), [this](GraphType::Node node){
         assert(m_library.pin_direction(m_netlist.pin_std_cell(m_graph.pin(node))) == standard_cell::pin_directions::OUTPUT);
     });
+    std::for_each(m_levels.begin(), m_levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
+        assert(!vec.empty());
+    });
 #endif
+
 
 }
 
@@ -84,6 +122,7 @@ void generic_sta::set_constraints(const design_constraints &dc)
     }
 
 }
+
 
 }
 }
