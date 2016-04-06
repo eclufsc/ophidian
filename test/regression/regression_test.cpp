@@ -138,7 +138,6 @@ TEST_CASE("regression/ simple flute STA", "[regression][sta][flute]") {
             std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
 
         std_cells.pin_direction(netlist.pin_std_cell(netlist.pin_by_name(dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
-
         for(auto out_load : dc.output_loads)
 		{
 			auto PO_pin = netlist.pin_by_name(out_load.port_name);

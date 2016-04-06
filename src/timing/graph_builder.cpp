@@ -41,6 +41,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         net_pins = netlist.net_pins(net.first);
         entity::entity source;
         for (auto pin : net_pins) {
+            std::string pin_name = netlist.pin_name(pin);
             standard_cell::pin_directions direction = lib.pin_direction(netlist.pin_std_cell(pin));
             switch (direction) {
             case standard_cell::pin_directions::INPUT:

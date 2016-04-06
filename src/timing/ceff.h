@@ -135,8 +135,11 @@ public:
                 auto parent = tree.graph().oppositeNode(order[i], pred[order[i]]);
                 auto resistance_with_parent = tree.resistance(pred[order[i]]);
 
-                double x = resistance_with_parent*ceff[current]/slews[parent];
-                slews[current] = slews[parent]/ (1-x*(1-std::exp(-1/x)));
+                slews[current] = slews[parent];
+                if(slews[parent] > 0.0*boost::units::si::seconds){
+                    double x = resistance_with_parent*ceff[current]/slews[parent];
+                    slews[current] = slews[parent]/ (1-x*(1-std::exp(-1/x)));
+                }
                 delays[current] = delays[parent] + resistance_with_parent*ceff[current];
             }
             for(auto node : order)
@@ -150,8 +153,9 @@ public:
                     auto resistance_with_parent = tree.resistance(pred[current]);
                     double x = 2.0 * resistance_with_parent  * ceff[current] / slews[parent];
                     double y = 1.0 - std::exp(-1.0/x);
-                    double shielding_factor = 1 - x * y;
+                    double shielding_factor = (slews[parent] > 0.0*boost::units::si::seconds?1.0 - x * y:1.0);
                     ceff[parent] += shielding_factor*ceff[current];
+
                 }
             }
             error = boost::units::abs(current_ceff-ceff[source])/std::max(current_ceff, ceff[source]);

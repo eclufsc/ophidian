@@ -48,6 +48,8 @@ public:
 	using resistor_id = lemon::ListGraph::Edge;
 	using resistor_it = lemon::ListGraph::IncEdgeIt;
 	rc_tree();
+    rc_tree(const rc_tree& other);
+    rc_tree&  operator=(const rc_tree& other);
 	virtual ~rc_tree();
 
 	quantity<si::capacitance> lumped() const {
