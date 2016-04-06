@@ -70,7 +70,7 @@ public:
     }
 
     template <class SlewCalculator>
-    CapacitanceType simulate(const SlewCalculator & slew_calculator, const SlewType input_slew, const interconnection::rc_tree & tree,  const interconnection::rc_tree::capacitor_id source)
+    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::rc_tree & tree,  const interconnection::rc_tree::capacitor_id source)
     {
         if(!m_slews)
             m_slews = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
@@ -119,14 +119,16 @@ public:
             ceff[parent] += ceff[current];
         }
 
-        CapacitanceType current_ceff = ceff[source];
-        SlewType source_slew = slew_calculator(input_slew, current_ceff);
-        std::size_t iteration = 0;
-        double error = 1.0;
-        do {
 
-            slews[source] = source_slew;
-            std::cout << "iteration #" << iteration++ << " source slew " << source_slew << " ceff " << current_ceff << std::endl;
+        double error = 1.0;
+        std::size_t iteration = 0;
+
+        CapacitanceType current_ceff;
+        delays[source] = SlewType(0.0*boost::units::si::seconds);
+        while (error > m_precision) {
+            current_ceff = ceff[source];
+            std::cout << "iteration #" << iteration++ << " ceff " << current_ceff << std::endl;
+            slews[source] = slew_calculator(current_ceff);
             for(std::size_t i = 1; i < order.size(); ++i)
             {
                 auto current = order[i];
@@ -153,9 +155,7 @@ public:
                 }
             }
             error = boost::units::abs(current_ceff-ceff[source])/std::max(current_ceff, ceff[source]);
-            current_ceff = ceff[source];
-            source_slew = slew_calculator(input_slew, current_ceff);
-        } while(error > m_precision); // 0.0001% of precision
+        }
         return current_ceff;
     }
 };

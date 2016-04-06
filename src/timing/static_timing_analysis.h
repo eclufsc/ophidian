@@ -35,7 +35,6 @@ class static_timing_analysis {
 	graph_nodes_timing m_nodes;
 	graph_arcs_timing m_arcs;
 
-
     sta_interconnection_estimator * m_interconnection_estimator;
     sta_timing_arc_edge_calculator m_tarcs;
     sta_timing_net_edge_calculator m_tnets;

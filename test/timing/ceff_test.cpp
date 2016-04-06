@@ -32,6 +32,8 @@
 
 
 #include "../timing/ceff.h"
+#include "../timing/elmore.h"
+#include "../timing/elmore_second_moment.h"
 
 using namespace ophidian;
 using namespace boost::units;
@@ -40,7 +42,8 @@ using namespace boost::units::si;
 struct simple_driver_model {
     timing::library & lib;
     entity::entity tarc;
-    quantity<si::time> operator()(const quantity<si::time> slew, const quantity<capacitance> load) const {
+    const quantity<si::time> slew;
+    quantity<si::time> operator()(const quantity<capacitance> load) const {
         return lib.timing_arc_rise_slew(tarc).compute(load, slew);
     }
 };
@@ -96,9 +99,9 @@ z        z        z        z
 
     auto tarc = lib.timing_arc(std_cell.pin_create(std_cell.cell_create("INV_X1"), "a"), std_cell.pin_create(std_cell.cell_create("INV_X1"), "o"));
 
-    simple_driver_model s_calculator{lib, tarc};
+    simple_driver_model s_calculator{lib, tarc, input_slew};
     timing::ceff calculator;
-    auto ceff = calculator.simulate(s_calculator, input_slew, tree, c0);
+    auto ceff = calculator.simulate(s_calculator, tree, c0);
 
     REQUIRE( ceff < tree.lumped() );
     std::cout << "rc network lumped capacitance " << tree.lumped() << " effective capacitance " << ceff << std::endl;
@@ -106,7 +109,19 @@ z        z        z        z
     std::cout << "delay to tap node " << tree.capacitor_name(u2_a) << " = " << calculator.delays()[u2_a] << std::endl;
     std::cout << "slew to tap node " << tree.capacitor_name(u1_a) << " = " << calculator.slews()[u1_a] << std::endl;
     std::cout << "slew to tap node " << tree.capacitor_name(u2_a) << " = " << calculator.slews()[u2_a] << std::endl;
+
+    timing::elmore elmore(tree, c0);
+    elmore.update();
+
+    timing::elmore_second_moment beta(tree, elmore);
+    auto step_slew_u1_a = boost::units::sqrt( (beta.at(u1_a)+beta.at(u1_a)) - boost::units::pow<2>(elmore.at(u1_a)));
+    auto step_slew_u2_a = boost::units::sqrt( (beta.at(u2_a)+beta.at(u2_a)) - boost::units::pow<2>(elmore.at(u2_a)));
+
+
+    std::cout << "elmore delay to tap node " << tree.capacitor_name(u1_a) << " = " << elmore.at(u1_a) << std::endl;
+    std::cout << "elmore to tap node " << tree.capacitor_name(u2_a) << " = " << elmore.at(u2_a) << std::endl;
+    std::cout << "slew to tap node " << tree.capacitor_name(u1_a) << " = " << sqrt( pow<2>(s_calculator(tree.lumped())) + pow<2>(step_slew_u1_a) ) << std::endl;
+    std::cout << "slew to tap node " << tree.capacitor_name(u1_a) << " = " << sqrt( pow<2>(s_calculator(tree.lumped())) + pow<2>(step_slew_u2_a) ) << std::endl;
+
 }
-
-
 
