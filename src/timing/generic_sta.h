@@ -167,6 +167,10 @@ public:
 
         using namespace boost::units;
         using namespace boost::units::si;
+
+        m_nodes.arrival( m_graph.rise_node(m_netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
+        m_nodes.arrival( m_graph.fall_node(m_netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
+
         for(auto & i : dc.input_delays)
         {
             auto pin = m_netlist.pin_by_name(i.port_name);
@@ -184,7 +188,11 @@ public:
 
         for(lemon::ListDigraph::NodeIt node(m_graph.G()); node != lemon::INVALID; ++node)
         {
-            if(lemon::countOutArcs(m_graph.G(), node) == 0)
+
+
+            if(m_library.pin_clock_input(m_graph.pin(node)))
+                m_nodes.required( node, std::numeric_limits<quantity<si::time> >::infinity() );
+            else if(lemon::countOutArcs(m_graph.G(), node) == 0 )
                 m_nodes.required( node, quantity<si::time>(dc.clock.period * pico* seconds) );
         }
 
@@ -231,6 +239,7 @@ public:
                 if(lemon::countInArcs(m_graph.G(), node) != 0)
                 {
                     auto pin = m_graph.pin(node);
+                    std::cout << "processing pin " << m_netlist.pin_name(pin) << std::endl;
                     auto net = m_netlist.pin_net(pin);
                     auto tree = m_rc_trees[m_netlist.net_system().lookup(net)];
                     lemon::ListGraph::NodeMap< SlewType > slews(tree.graph());
@@ -281,6 +290,9 @@ public:
                     {
                         auto arc_target = m_graph.edge_target(arc);
                         auto target_pin = m_graph.pin(arc_target);
+
+                        std::cout << "    setting to " << m_netlist.pin_name(target_pin) << " " << (m_graph.node_edge(arc_target)==edges::RISE?"RISE":"FALL") << " the arrival and slew " << std::endl;
+
                         auto target_capacitor = tree.capacitor_by_name(m_netlist.pin_name(target_pin));
                         m_nodes.slew(arc_target, m_arcs.slew(arc));
                         m_nodes.arrival(arc_target, m_nodes.arrival(node) + m_arcs.delay(arc));
@@ -296,11 +308,12 @@ public:
             auto node = *node_it;
             if(lemon::countOutArcs(m_graph.G(), node) > 0)
             {
-                SlewType required = std::numeric_limits<SlewType>::max();
+                SlewType required = std::numeric_limits<SlewType>::infinity();
                 for(lemon::ListDigraph::OutArcIt arc(m_graph.G(), node); arc != lemon::INVALID; ++arc)
                     required = std::min(required, m_nodes.required(m_graph.edge_target(arc))-m_arcs.delay(arc));
                 m_nodes.required(node, required);
             }
+            std::cout << m_netlist.pin_name( m_graph.pin(node) ) << " " << (m_graph.node_edge(node)==edges::RISE?"RISE":"FALL") << " required = " << m_nodes.required(node) << std::endl;
         }
     }
 

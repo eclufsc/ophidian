@@ -154,32 +154,41 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
         }
     }
     si2drIterQuit(attrs, &err);
-    if(timing_type != "setup_rising" && timing_type != "hold_rising")
-    {
-        auto arc = library.timing_arc_create(from, pin_entity);
-        if (timing_sense == "negative_unate")
-            library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
-        else if (timing_sense == "positive_unate")
-            library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
-        else if (timing_sense == "non_unate")
-            library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
-        //	timing_info.timingSense = timing_sense;
-        //	timing_info.timing_type = Liberty_Timing_Type::Combinational;
-        //	if(timing_type == "setup_rising")
-        //		timing_info.timing_type = Liberty_Timing_Type::Setup_Rising;
-        //	else if(timing_type == "hold_rising")
-        //		timing_info.timing_type = Liberty_Timing_Type::Hold_Rising;
-        //	timing_info.fromPin = related_pin;
-        //	timing_info.fallConstraint = std::numeric_limits<double>::max();
-        //	timing_info.riseConstraint = std::numeric_limits<double>::max();
 
-        //    std::cout << "    timing arc (" << timing_sense << ")" << std::endl;
-        //    std::cout << "      related pin: " << related_pin << std::endl;
-        //    std::cout << "      timing sense: " << timing_sense << std::endl;
-        //    std::cout << "      timing type: " << timing_type << std::endl;
+    timing_arc_types type = timing_arc_types::COMBINATIONAL;
+    if(timing_type=="setup_rising")
+        type = timing_arc_types::SETUP_RISING;
+    else if(timing_type=="hold_rising")
+        type = timing_arc_types::HOLD_RISING;
+    else if(timing_type=="rising_edge")
+        type = timing_arc_types::RISING_EDGE;
 
-        read_LUTs(timing, arc, library, time_unit, capacitive_load_unit);
-    }
+    auto arc = library.timing_arc_create(from, pin_entity);
+
+    library.timing_arc_timing_type(arc, type);
+
+    if (timing_sense == "negative_unate")
+        library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
+    else if (timing_sense == "positive_unate")
+        library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
+    else if (timing_sense == "non_unate")
+        library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
+    //	timing_info.timingSense = timing_sense;
+    //	timing_info.timing_type = Liberty_Timing_Type::Combinational;
+    //	if(timing_type == "setup_rising")
+    //		timing_info.timing_type = Liberty_Timing_Type::Setup_Rising;
+    //	else if(timing_type == "hold_rising")
+    //		timing_info.timing_type = Liberty_Timing_Type::Hold_Rising;
+    //	timing_info.fromPin = related_pin;
+    //	timing_info.fallConstraint = std::numeric_limits<double>::max();
+    //	timing_info.riseConstraint = std::numeric_limits<double>::max();
+
+    //    std::cout << "    timing arc (" << timing_sense << ")" << std::endl;
+    //    std::cout << "      related pin: " << related_pin << std::endl;
+    //    std::cout << "      timing sense: " << timing_sense << std::endl;
+    //    std::cout << "      timing type: " << timing_type << std::endl;
+
+    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit);
 
 }
 
@@ -202,7 +211,8 @@ void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, b
         //			max_capacitance = si2drSimpleAttrGetFloat64Value(attr, &err);
         else if (attr_name == "capacitance")
             library.pin_capacitance(pin_entity, si2drSimpleAttrGetFloat64Value(attr, &err) * capacitive_load_unit);
-        //		else if (attr_name == "clock")
+        else if (attr_name == "clock")
+            library.pin_clock_input(pin_entity, true);
         //			is_clock = si2drSimpleAttrGetBooleanValue(attr, &err);
     }
     si2drIterQuit(attrs, &err);
@@ -253,7 +263,9 @@ void read_cell(si2drGroupIdT cell, timing::library& library, boost::units::quant
 
     while (!si2drObjectIsNull((current_cell_group = si2drIterNextGroup(groups, &err)), &err)) {
         std::string current_cell_group_type { si2drGroupGetGroupType(current_cell_group, &err) };
-        if (current_cell_group_type == "pin") {
+        if(current_cell_group_type == "ff")
+            library.cell_sequential(cell_entity, true);
+        else if (current_cell_group_type == "pin") {
             read_pin(cell_entity, current_cell_group, library, time_unit, capacitive_load_unit);
         }
     }

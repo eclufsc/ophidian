@@ -37,7 +37,12 @@ entity::entity standard_cells::cell_create(std::string name) {
 	auto id = m_cell_system.create();
 	m_name2cell[name] = id;
 	m_cells.name(id, name);
-	return id;
+    return id;
+}
+
+void standard_cells::cell_sequential(entity::entity cell, bool sequential)
+{
+    m_cells.sequential(cell, sequential);
 }
 
 void standard_cells::register_cell_property(entity::property* property) {
@@ -64,7 +69,12 @@ entity::entity standard_cells::pin_create(entity::entity cell,
 	m_pins.name(id, name);
 	m_pins.owner(id, cell);
 	m_cells.insert_pin(cell, id);
-	return id;
+    return id;
+}
+
+void standard_cells::pin_clock_input(entity::entity pin, bool clock_input)
+{
+    m_pins.clock_input(pin, clock_input);
 }
 
 entity::entity standard_cells::pad_create(std::string pin_name) {

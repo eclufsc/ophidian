@@ -34,19 +34,12 @@
 
 using namespace ophidian;
 
-TEST_CASE("generic sta", "[timing][generic_sta]")
-{
-    omp_set_num_threads(8);
-
+void run(std::string benchmark) {
     standard_cell::standard_cells std_cells;
     netlist::netlist netlist{&std_cells};
 
     timing::library_timing_arcs tarcs{&std_cells};
     timing::library lib(&tarcs, &std_cells);
-
-    std::string benchmark = "superblue16";
-
-
     std::ifstream dot_v("benchmarks/"+benchmark+"/"+benchmark+".v", std::ifstream::in);
     REQUIRE(dot_v.good());
     netlist::verilog::read(dot_v, &netlist);
@@ -113,7 +106,7 @@ TEST_CASE("generic sta", "[timing][generic_sta]")
     sta.run();
 
     using TimingType = boost::units::quantity< boost::units::si::time > ;
-    TimingType WNS = std::numeric_limits<TimingType>::max();
+    TimingType WNS = std::numeric_limits<TimingType>::infinity();
     TimingType TNS;
     for(auto PO = netlist.PO_begin(); PO != netlist.PO_end(); ++PO)
     {
@@ -124,18 +117,27 @@ TEST_CASE("generic sta", "[timing][generic_sta]")
     std::cout << "WNS " << WNS << std::endl;
     std::cout << "TNS " << TNS << std::endl;
 
-//    for(auto pin : netlist.pin_system())
-//    {
-//        std::cout << netlist.pin_name(pin.first) << " ";
-//        std::cout << "at r " << sta.rise_arrival(pin.first) << " ";
-//        std::cout << "at f " << sta.fall_arrival(pin.first) << " ";
-//        std::cout << "slew r " << sta.rise_slew(pin.first) << " ";
-//        std::cout << "slew f " << sta.fall_slew(pin.first) << " ";
-//        std::cout << "slack r " << sta.rise_slack(pin.first) << " ";
-//        std::cout << "slack f " << sta.fall_slack(pin.first) << " ";
-//        std::cout << std::endl;
-//    }
+    for(auto pin : netlist.pin_system())
+    {
+        std::cout << netlist.pin_name(pin.first) << " ";
+        std::cout << "at r " << sta.rise_arrival(pin.first) << " ";
+        std::cout << "at f " << sta.fall_arrival(pin.first) << " ";
+        std::cout << "slew r " << sta.rise_slew(pin.first) << " ";
+        std::cout << "slew f " << sta.fall_slew(pin.first) << " ";
+        std::cout << "slack r " << sta.rise_slack(pin.first) << " ";
+        std::cout << "slack f " << sta.fall_slack(pin.first) << " ";
+        std::cout << std::endl;
+    }
+}
 
+TEST_CASE("generic sta simple", "[timing][generic_sta][simple]")
+{
+    omp_set_num_threads(8);
+    run("simple");
+}
 
-
+TEST_CASE("generic sta superblue16", "[timing][generic_sta][superblue16]")
+{
+    omp_set_num_threads(8);
+    run("superblue16");
 }

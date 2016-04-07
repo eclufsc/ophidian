@@ -61,6 +61,11 @@ public:
 		return m_cell_system;
 	}
 
+    void  cell_sequential(entity::entity cell, bool sequential);
+    bool cell_sequential(entity::entity cell) const {
+        return m_cells.sequential(cell);
+    }
+
 	entity::entity pin_create(entity::entity cell, std::string name);
 	entity::entity pin_owner(entity::entity pin) const
 	{
@@ -84,6 +89,11 @@ public:
 		return m_pins.direction(pin);
 	}
 
+    bool pin_clock_input(entity::entity pin) const {
+        return m_pins.clock_input(pin);
+    }
+
+    void pin_clock_input(entity::entity pin, bool clock_input);
 	void pin_direction(entity::entity pin, pin_directions direction);
 
 

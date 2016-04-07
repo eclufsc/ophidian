@@ -27,6 +27,7 @@
 namespace ophidian {
 namespace timing {
 
+
 // Only for pairs of std::hash-able types for simplicity.
 // You can of course template this struct to allow other hash functions
 struct pair_hash {
@@ -49,7 +50,6 @@ private:
 	entity::system m_system;
 	entity::vector_property<entity::entity> m_from;
 	entity::vector_property<entity::entity> m_to;
-
 
 	//	// std_cell properties
 		entity::vector_property< std::vector<entity::entity> > m_pin_timing_arcs;

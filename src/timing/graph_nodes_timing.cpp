@@ -22,7 +22,7 @@ namespace ophidian {
 namespace timing {
 
 graph_nodes_timing::graph_nodes_timing(const lemon::ListDigraph & graph) :
-		m_arrivals(graph), m_slews(graph), m_requireds(graph), m_loads(graph) {
+        m_arrivals(graph), m_slews(graph), m_requireds(graph), m_loads(graph) {
 
 }
 

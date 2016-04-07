@@ -34,6 +34,10 @@ enum class unateness {
 	NEGATIVE_UNATE, POSITIVE_UNATE, NON_UNATE
 };
 
+enum class timing_arc_types {
+    COMBINATIONAL, RISING_EDGE, HOLD_RISING, SETUP_RISING
+};
+
 class library {
 public:
 	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
@@ -46,6 +50,7 @@ private:
 	entity::vector_property<LUT> m_rise_slews;
 	entity::vector_property<LUT> m_fall_slews;
 	entity::vector_property<unateness> m_timing_senses;
+    entity::vector_property<timing_arc_types> m_timing_types;
 	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
 public:
@@ -106,9 +111,21 @@ public:
 		return m_timing_senses[m_tarcs.system().lookup(arc)];
 	}
 
+    void timing_arc_timing_type(entity::entity arc, timing_arc_types type);
+    timing_arc_types timing_arc_timing_type(entity::entity arc) const {
+        return m_timing_types[m_tarcs.system().lookup(arc)];
+    }
+
 
 	entity::entity cell_create(std::string name);
 	entity::entity pin_create(entity::entity cell, std::string name);
+
+    void cell_sequential(entity::entity cell, bool sequential);
+    void pin_clock_input(entity::entity pin, bool clock_input);
+
+    bool pin_clock_input(entity::entity pin) const {
+        return m_std_cells.pin_clock_input(pin);
+    }
 };
 
 } /* namespace timing */

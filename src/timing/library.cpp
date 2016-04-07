@@ -29,6 +29,7 @@ library::library(library_timing_arcs * tarcs, ophidian::standard_cell::standard_
 	m_tarcs.register_property(&m_fall_delays);
 	m_tarcs.register_property(&m_fall_slews);
 	m_tarcs.register_property(&m_timing_senses);
+    m_tarcs.register_property(&m_timing_types);
 }
 
 library::~library() {
@@ -59,11 +60,26 @@ entity::entity library::cell_create(std::string name) {
 }
 
 entity::entity library::pin_create(entity::entity cell, std::string name) {
-	return m_std_cells.pin_create(cell, name);
+    return m_std_cells.pin_create(cell, name);
+}
+
+void library::cell_sequential(entity::entity cell, bool sequential)
+{
+    m_std_cells.cell_sequential(cell, sequential);
+}
+
+void library::pin_clock_input(entity::entity pin, bool clock_input)
+{
+    m_std_cells.pin_clock_input(pin, clock_input);
 }
 
 void library::timing_arc_timing_sense(entity::entity arc, unateness timing_sense) {
-	m_timing_senses[m_tarcs.system().lookup(arc)] = timing_sense;
+    m_timing_senses[m_tarcs.system().lookup(arc)] = timing_sense;
+}
+
+void library::timing_arc_timing_type(entity::entity arc, timing_arc_types type)
+{
+    m_timing_types[m_tarcs.system().lookup(arc)] = type;
 }
 
 } /* namespace timing */

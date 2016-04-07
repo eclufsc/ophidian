@@ -25,6 +25,7 @@ cells::cells(entity::system& system) :
 		m_system(system) {
 	system.register_property(&m_names);
 	system.register_property(&m_pins);
+    system.register_property(&m_sequential);
 }
 
 cells::~cells() {
@@ -39,7 +40,12 @@ void cells::insert_pin(entity::entity cell, entity::entity pin) {
 }
 
 void cells::pins(entity::entity cell, std::vector<entity::entity> pins) {
-	m_pins[m_system.lookup(cell)] = pins;
+    m_pins[m_system.lookup(cell)] = pins;
+}
+
+void cells::sequential(entity::entity cell, bool sequential)
+{
+    m_sequential[m_system.lookup(cell)] = sequential;
 }
 
 } /* namespace standard_cell */

@@ -36,6 +36,7 @@ class pins {
 	entity::vector_property< std::string > m_names;
 	entity::vector_property< entity::entity > m_owners;
 	entity::vector_property< pin_directions > m_directions;
+    entity::vector_property< bool > m_clock_input;
 
 public:
 	pins(entity::system & system);
@@ -54,6 +55,12 @@ public:
 	pin_directions direction(entity::entity pin) const {
 		return m_directions[m_system.lookup(pin)];
 	}
+
+
+    void clock_input(entity::entity pin, bool clock);
+    bool clock_input(entity::entity pin) const {
+        return m_clock_input[m_system.lookup(pin)];
+    }
 
 };
 

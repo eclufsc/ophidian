@@ -26,6 +26,7 @@ pins::pins(entity::system & system) :
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_owners);
 	m_system.register_property(&m_directions);
+    m_system.register_property(&m_clock_input);
 }
 
 pins::~pins() {
@@ -40,7 +41,12 @@ void pins::owner(entity::entity pin, entity::entity cell) {
 }
 
 void pins::direction(entity::entity pin, pin_directions direction) {
-	m_directions[m_system.lookup(pin)] = direction;
+    m_directions[m_system.lookup(pin)] = direction;
+}
+
+void pins::clock_input(entity::entity pin, bool clock)
+{
+    m_clock_input[m_system.lookup(pin)] = clock;
 }
 
 } /* namespace standard_cell */

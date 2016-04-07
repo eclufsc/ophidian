@@ -87,7 +87,7 @@ void static_timing_analysis::run() {
     for(auto node_it = m_topological_sorted_nodes.rbegin(); node_it != m_topological_sorted_nodes.rend(); ++node_it)
     {
         auto node = *node_it;
-        boost::units::quantity<boost::units::si::time> required(std::numeric_limits<double>::max() * boost::units::si::second);
+        boost::units::quantity<boost::units::si::time> required = std::numeric_limits<boost::units::quantity<boost::units::si::time> >::infinity();
         if( lemon::countOutArcs(m_graph.G(), node) >= 1 )
         {
             for(lemon::ListDigraph::OutArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
@@ -126,7 +126,7 @@ std::vector<entity::entity> static_timing_analysis::critical_path() const
     {
         cp.push_back(m_graph.pin(worst_node));
 
-        boost::units::quantity< boost::units::si::time > worst_slack(std::numeric_limits<double>::max()*boost::units::si::seconds);
+        boost::units::quantity<boost::units::si::time> worst_slack = std::numeric_limits<boost::units::quantity<boost::units::si::time> >::infinity();
         lemon::ListDigraph::Node worst_input;
         bool first = true;
         for(lemon::ListDigraph::InArcIt arc(m_graph.G(), worst_node); arc != lemon::INVALID; ++arc)

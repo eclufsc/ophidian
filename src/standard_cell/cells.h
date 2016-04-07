@@ -29,6 +29,7 @@ class cells {
 	entity::system & m_system;
 	entity::vector_property<std::string> m_names;
     entity::vector_property<std::vector<entity::entity> > m_pins;
+    entity::vector_property<bool> m_sequential;
 public:
 	cells(entity::system & system);
 	virtual ~cells();
@@ -41,9 +42,13 @@ public:
 	const std::vector<entity::entity> & pins(entity::entity cell) const {
 		return m_pins[m_system.lookup(cell)];
 	}
+    bool sequential(entity::entity cell) const {
+        return m_sequential[m_system.lookup(cell)];
+    }
 	void name(entity::entity e, std::string name);
 	void insert_pin(entity::entity cell, entity::entity pin);
     void pins(entity::entity cell, std::vector<entity::entity> pins);
+    void sequential(entity::entity cell, bool sequential);
 };
 
 } /* namespace standard_cell */

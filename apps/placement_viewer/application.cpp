@@ -148,7 +148,7 @@ bool application::cell_std_cell(ophidian::entity::entity cell, std::string std_c
 
 boost::units::quantity<boost::units::si::time> application::cell_worst_slack(ophidian::entity::entity cell) const
 {
-    boost::units::quantity<boost::units::si::time> worst( std::numeric_limits<double>::max() * boost::units::si::second );
+    boost::units::quantity<boost::units::si::time> worst = std::numeric_limits<boost::units::quantity<boost::units::si::time> >::infinity();
     auto cell_pins = m_netlist.cell_pins(cell);
     for(auto pin : cell_pins)
     {

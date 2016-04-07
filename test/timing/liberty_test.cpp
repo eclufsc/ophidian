@@ -117,3 +117,21 @@ TEST_CASE("liberty/pin direction", "[timing][liberty]") {
 
 }
 
+TEST_CASE("liberty/flop", "[timing][liberty]") {
+    ophidian::standard_cell::standard_cells std_cells;
+    auto DFF_X80 = std_cells.cell_create("DFF_X80");
+    auto DFF_X80ck = std_cells.pin_create(DFF_X80, "ck");
+    auto DFF_X80d = std_cells.pin_create(DFF_X80, "d");
+    auto DFF_X80q = std_cells.pin_create(DFF_X80, "q");
+    ophidian::timing::library_timing_arcs tarcs { &std_cells };
+    ophidian::timing::library lib { &tarcs, &std_cells };
+    ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    REQUIRE( std_cells.pin_direction(DFF_X80ck) == ophidian::standard_cell::pin_directions::INPUT );
+    REQUIRE( std_cells.pin_direction(DFF_X80d) == ophidian::standard_cell::pin_directions::INPUT );
+    REQUIRE( std_cells.pin_direction(DFF_X80q) == ophidian::standard_cell::pin_directions::OUTPUT );
+    REQUIRE( std_cells.cell_sequential(DFF_X80) );
+    REQUIRE( !std_cells.pin_clock_input(DFF_X80d) );
+    REQUIRE( !std_cells.pin_clock_input(DFF_X80q) );
+    REQUIRE( std_cells.pin_clock_input(DFF_X80ck) );
+}
+
