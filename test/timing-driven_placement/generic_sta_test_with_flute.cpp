@@ -28,29 +28,39 @@
 #include "../placement/lef.h"
 #include "../placement/def.h"
 
+#include <boost/units/systems/si.hpp>
+#include <boost/units/limits.hpp>
+
+
 using namespace ophidian;
 
 TEST_CASE("generic sta", "[timing][generic_sta]")
 {
+    omp_set_num_threads(8);
+
     standard_cell::standard_cells std_cells;
     netlist::netlist netlist{&std_cells};
 
     timing::library_timing_arcs tarcs{&std_cells};
     timing::library lib(&tarcs, &std_cells);
-    std::ifstream dot_v("benchmarks/simple/simple.v", std::ifstream::in);
+
+    std::string benchmark = "superblue16";
+
+
+    std::ifstream dot_v("benchmarks/"+benchmark+"/"+benchmark+".v", std::ifstream::in);
     REQUIRE(dot_v.good());
     netlist::verilog::read(dot_v, &netlist);
-    timing::liberty::read("benchmarks/simple/simple_Late.lib", lib);
+    timing::liberty::read("benchmarks/"+benchmark+"/"+benchmark+"_Late.lib", lib);
     placement::library placement_lib{&std_cells};
     placement::placement placement{&netlist, &placement_lib};
 
-    std::ifstream dot_def("benchmarks/simple/simple.def", std::ifstream::in);
+    std::ifstream dot_def("benchmarks/"+benchmark+"/"+benchmark+".def", std::ifstream::in);
     REQUIRE(dot_def.good());
 
     placement::def::read(dot_def, &netlist, &placement);
 
 
-    std::ifstream dot_lef("benchmarks/simple/simple.lef", std::ifstream::in);
+    std::ifstream dot_lef("benchmarks/"+benchmark+"/"+benchmark+".lef", std::ifstream::in);
     REQUIRE(dot_lef.good());
 
     placement::lef::read(dot_lef, &std_cells, &placement_lib);
@@ -77,32 +87,54 @@ TEST_CASE("generic sta", "[timing][generic_sta]")
     }
 
 
-    timing::generic_sta sta(netlist, lib, graph, rc_trees);
+    std::cout << "creating STA" << std::endl;
+    timing::generic_sta<timing::ceff> sta(netlist, lib, graph, rc_trees);
     sta.set_constraints(dc.dc());
 
+    std::cout << "creating RC_trees" << std::endl;
     timingdriven_placement::flute_rc_tree_creator flute;
-    for(auto net_it : netlist.net_system())
+
+    std::vector<entity::entity> nets(netlist.net_system().size());
+    nets.resize(0);
+    for(auto net : netlist.net_system())
+        nets.push_back(net.first);
+
+    std::size_t i;
+#pragma omp parallel for shared(nets) private(i)
+    for(i = 0; i < nets.size(); ++i)
     {
-        auto net = net_it.first;
+        auto net = nets[i];
         auto & rc_tree = rc_trees[netlist.net_system().lookup(net)];
         flute.create_tree(placement, net, rc_tree, lib);
     }
+#pragma omp barrier
 
+    std::cout << "running STA" << std::endl;
+    sta.run();
 
-
-    sta.run(timing::ceff{});
-
-    for(auto pin : netlist.pin_system())
+    using TimingType = boost::units::quantity< boost::units::si::time > ;
+    TimingType WNS = std::numeric_limits<TimingType>::max();
+    TimingType TNS;
+    for(auto PO = netlist.PO_begin(); PO != netlist.PO_end(); ++PO)
     {
-        std::cout << netlist.pin_name(pin.first) << " ";
-        std::cout << "at r " << sta.rise_arrival(pin.first) << " ";
-        std::cout << "at f " << sta.fall_arrival(pin.first) << " ";
-        std::cout << "slew r " << sta.rise_slew(pin.first) << " ";
-        std::cout << "slew f " << sta.fall_slew(pin.first) << " ";
-        std::cout << "slack r " << sta.rise_slack(pin.first) << " ";
-        std::cout << "slack f " << sta.fall_slack(pin.first) << " ";
-        std::cout << std::endl;
+        WNS = std::min( WNS, std::min(sta.rise_slack(*PO), sta.fall_slack(*PO)));
+        TNS += std::min(0.0*boost::units::si::seconds, std::min( WNS, std::min(sta.rise_slack(*PO), sta.fall_slack(*PO))));
     }
+
+    std::cout << "WNS " << WNS << std::endl;
+    std::cout << "TNS " << TNS << std::endl;
+
+//    for(auto pin : netlist.pin_system())
+//    {
+//        std::cout << netlist.pin_name(pin.first) << " ";
+//        std::cout << "at r " << sta.rise_arrival(pin.first) << " ";
+//        std::cout << "at f " << sta.fall_arrival(pin.first) << " ";
+//        std::cout << "slew r " << sta.rise_slew(pin.first) << " ";
+//        std::cout << "slew f " << sta.fall_slew(pin.first) << " ";
+//        std::cout << "slack r " << sta.rise_slack(pin.first) << " ";
+//        std::cout << "slack f " << sta.fall_slack(pin.first) << " ";
+//        std::cout << std::endl;
+//    }
 
 
 
