@@ -41,7 +41,7 @@
 namespace ophidian {
 namespace timing {
 
-template <class WireDelayModel>
+template <class WireDelayModel, class MergeStrategy>
 class generic_sta
 {
     const netlist::netlist & m_netlist;
@@ -60,8 +60,10 @@ class generic_sta
     std::vector< std::vector<lemon::ListDigraph::Node> > m_levels;
     std::vector<lemon::ListDigraph::Node> m_sorted_driver_nodes;
 
+    MergeStrategy m_merge;
+
     SlewType compute_slew(lemon::ListDigraph::Node node, CapacitanceType load) const {
-        SlewType worst_slew = std::numeric_limits<SlewType>::lowest();
+        SlewType worst_slew = MergeStrategy::best();
         if(lemon::countInArcs(m_graph.G(), node) == 0) // PI without driver
             return m_nodes.slew(node);
         switch(m_graph.node_edge(node))
@@ -70,14 +72,14 @@ class generic_sta
             for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
             {
                 auto tarc = m_graph.edge_entity(it) ;
-                worst_slew = std::max(worst_slew, m_library.timing_arc_rise_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
+                worst_slew = m_merge(worst_slew, m_library.timing_arc_rise_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
             }
             break;
         case edges::FALL:
             for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
             {
                 auto tarc = m_graph.edge_entity(it) ;
-                worst_slew = std::max(worst_slew, m_library.timing_arc_fall_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
+                worst_slew = m_merge(worst_slew, m_library.timing_arc_fall_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
             }
             break;
         }
@@ -191,9 +193,9 @@ public:
 
 
             if(m_library.pin_clock_input(m_graph.pin(node)))
-                m_nodes.required( node, std::numeric_limits<quantity<si::time> >::infinity() );
+                m_nodes.required( node, MergeStrategy::worst() );
             else if(lemon::countOutArcs(m_graph.G(), node) == 0 )
-                m_nodes.required( node, quantity<si::time>(dc.clock.period * pico* seconds) );
+                m_nodes.required( node, m_merge(quantity<si::time>(0.0*seconds), quantity<si::time>(dc.clock.period * pico* seconds)) );
         }
 
     }
@@ -220,12 +222,12 @@ public:
     SlewType rise_slack(const entity::entity pin) const
     {
         auto node = m_graph.rise_node(pin);
-        return m_nodes.required(node)-m_nodes.arrival(node);
+        return MergeStrategy::slack_signal()*(m_nodes.required(node)-m_nodes.arrival(node));
     }
     SlewType fall_slack(const entity::entity pin) const
     {
         auto node = m_graph.fall_node(pin);
-        return m_nodes.required(node)-m_nodes.arrival(node);
+        return MergeStrategy::slack_signal()*(m_nodes.required(node)-m_nodes.arrival(node));
     }
 
     void run() {
@@ -256,7 +258,7 @@ public:
                     m_nodes.load(node, load);
                     m_nodes.slew(node, slews[source_capacitor]);
 
-                    SlewType worst_arrival = std::numeric_limits<SlewType>::lowest();
+                    SlewType worst_arrival = MergeStrategy::best();
                     switch(m_graph.node_edge(node))
                     {
                     case edges::RISE:
@@ -268,7 +270,7 @@ public:
                             auto arc_slew = m_library.timing_arc_rise_slew(tarc).compute(load, m_nodes.slew(edge_source));
                             m_arcs.delay(it, arc_delay);
                             m_arcs.slew(it, arc_slew);
-                            worst_arrival = std::max(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
+                            worst_arrival = m_merge(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
                         }
                         break;
                     case edges::FALL:
@@ -280,7 +282,7 @@ public:
                             auto arc_slew = m_library.timing_arc_fall_slew(tarc).compute(load, m_nodes.slew(edge_source));
                             m_arcs.delay(it, arc_delay);
                             m_arcs.slew(it, arc_slew);
-                            worst_arrival = std::max(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
+                            worst_arrival = m_merge(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
                         }
                         break;
                     }
@@ -294,6 +296,7 @@ public:
                         std::cout << "    setting to " << m_netlist.pin_name(target_pin) << " " << (m_graph.node_edge(arc_target)==edges::RISE?"RISE":"FALL") << " the arrival and slew " << std::endl;
 
                         auto target_capacitor = tree.capacitor_by_name(m_netlist.pin_name(target_pin));
+                        m_arcs.slew(arc, slews[target_capacitor]);
                         m_nodes.slew(arc_target, m_arcs.slew(arc));
                         m_nodes.arrival(arc_target, m_nodes.arrival(node) + m_arcs.delay(arc));
                     }
@@ -308,9 +311,9 @@ public:
             auto node = *node_it;
             if(lemon::countOutArcs(m_graph.G(), node) > 0)
             {
-                SlewType required = std::numeric_limits<SlewType>::infinity();
+                SlewType required = MergeStrategy::worst();
                 for(lemon::ListDigraph::OutArcIt arc(m_graph.G(), node); arc != lemon::INVALID; ++arc)
-                    required = std::min(required, m_nodes.required(m_graph.edge_target(arc))-m_arcs.delay(arc));
+                    required = m_merge.inverted(required, m_nodes.required(m_graph.edge_target(arc))-m_arcs.delay(arc));
                 m_nodes.required(node, required);
             }
             std::cout << m_netlist.pin_name( m_graph.pin(node) ) << " " << (m_graph.node_edge(node)==edges::RISE?"RISE":"FALL") << " required = " << m_nodes.required(node) << std::endl;
