@@ -33,11 +33,68 @@
 #include <boost/units/cmath.hpp>
 
 #include "../interconnection/rc_tree.h"
+#include "elmore.h"
+#include "elmore_second_moment.h"
 
 namespace ophidian {
 namespace timing {
 
-class ceff
+
+class lumped_capacitance_wire_model {
+    using CapacitanceType = boost::units::quantity < boost::units::si::capacitance >;
+    using SlewType = boost::units::quantity < boost::units::si::time >;
+    lemon::ListGraph::NodeMap< SlewType > * m_slews;
+    lemon::ListGraph::NodeMap< SlewType > * m_delays;
+    lemon::ListGraph::NodeMap< CapacitanceType > * m_ceff;
+    bool m_slews_owner;
+    bool m_delays_owner;
+    bool m_ceff_owner;
+public:
+    lumped_capacitance_wire_model();
+    virtual ~lumped_capacitance_wire_model();
+    void slew_map(lemon::ListGraph::NodeMap< SlewType >& sm);
+    void delay_map(lemon::ListGraph::NodeMap< SlewType >& dm);
+    void ceff_map(lemon::ListGraph::NodeMap<CapacitanceType> &cm);
+    const lemon::ListGraph::NodeMap< SlewType >& slews() const {
+        return *m_slews;
+    }
+    const lemon::ListGraph::NodeMap< SlewType >& delays() const {
+        return *m_delays;
+    }
+    const lemon::ListGraph::NodeMap< CapacitanceType >& ceffs() const {
+        return *m_ceff;
+    }
+    template <class SlewCalculator>
+    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::rc_tree & tree,  const interconnection::rc_tree::capacitor_id source)
+    {
+        if(!m_slews)
+            m_slews = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+        if(!m_delays)
+            m_delays = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+        if(!m_ceff)
+            m_ceff = new lemon::ListGraph::NodeMap< CapacitanceType >(tree.graph());
+
+        lemon::ListGraph::NodeMap< SlewType > & slews = *m_slews;
+        lemon::ListGraph::NodeMap< SlewType > & delays = *m_delays;
+        lemon::ListGraph::NodeMap< CapacitanceType > & ceff = *m_ceff;
+
+        elmore delay(tree, source);
+        elmore_second_moment second_moment(tree, delay);
+        auto source_slew = slew_calculator(tree.lumped());
+
+        for(lemon::ListGraph::NodeIt node(tree.graph()); node != lemon::INVALID; ++node)
+        {
+            delays[node] = delay.at(node);
+            auto step_slew = boost::units::sqrt( second_moment.at(node)*2.0 - boost::units::pow<2>(delay.at(node)) );
+            slews[node] = boost::units::sqrt(boost::units::pow<2>(source_slew) + boost::units::pow<2>(step_slew));
+        }
+
+        return tree.lumped();
+    }
+};
+
+
+class effective_capacitance_wire_model
 {
     using CapacitanceType = boost::units::quantity < boost::units::si::capacitance >;
     using SlewType = boost::units::quantity < boost::units::si::time >;
@@ -51,8 +108,8 @@ class ceff
     bool m_delays_owner;
     bool m_ceff_owner;
 public:
-    ceff();
-    virtual ~ceff();
+    effective_capacitance_wire_model();
+    virtual ~effective_capacitance_wire_model();
     void precision(double epsilon);
 
     void slew_map(lemon::ListGraph::NodeMap< SlewType >& sm);

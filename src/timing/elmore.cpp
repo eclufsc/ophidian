@@ -26,7 +26,7 @@ namespace timing {
 using rc_tree = interconnection::rc_tree;
 using namespace boost::units;
 
-elmore::elmore(rc_tree& tree, rc_tree::capacitor_id source) :
+elmore::elmore(const rc_tree& tree, rc_tree::capacitor_id source) :
 		m_tree(tree), m_elmore_delay(tree.graph()), m_downstream_capacitance(tree.graph()), m_pred(tree.graph()), m_source(source) {
 
 	std::deque<rc_tree::capacitor_id> to_process;

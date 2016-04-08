@@ -30,6 +30,10 @@ namespace ophidian {
             std::vector<T> m_values;
 
         public:
+            vector_property(){
+
+            }
+
             void destroy(entity & e, std::size_t index) {
                 std::size_t last_index = m_values.size() - 1;
                 m_values[index] = m_values[last_index];

@@ -100,17 +100,74 @@ void read_LUT(si2drGroupIdT group, boost::units::quantity<boost::units::si::time
     si2drIterQuit(attrs, &err);
 }
 
-void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit) {
+void read_constraint(si2drGroupIdT group, library::TestLUT*& test_LUT, boost::units::quantity<boost::units::si::time> time_unit)
+{
+    si2drNamesIdT group_names{si2drGroupGetNames(group, &err)};
+    std::string group_name{si2drIterNextName(group_names, &err)};
+    si2drIterQuit(group_names, &err);
+
+    assert(group_name == "scalar");
+
+    si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
+    si2drAttrIdT attr;
+    double constraint;
+    while( !si2drObjectIsNull((attr=si2drIterNextAttr(attrs,&err)),&err) )
+    {
+        std::string name{si2drAttrGetName(attr, &err)};
+        //        std::cout << "        " << name << " ( ";
+        assert(name=="values");
+
+        si2drValuesIdT values = si2drComplexAttrGetValues(attr, &err);
+
+        si2drValueTypeT type;
+        si2drInt32T     int_val;
+        si2drFloat64T   double_val;
+        si2drStringT    string_val;
+        si2drBooleanT   bool_val;
+        si2drExprT      *expr;
+
+        si2drIterNextComplexValue(values,
+                                  &type,
+                                  &int_val,
+                                  &double_val,
+                                  &string_val,
+                                  &bool_val,
+                                  &expr,
+                                  &err);
+        //        constraint = std::stod(string_val) * time_unit_;
+        test_LUT = new library::TestLUT(1,1);
+        constraint = std::stod(string_val);
+        test_LUT->at(0,0) = constraint * time_unit;
+        si2drIterQuit(values, &err);
+        //        std::cout << constraint << " );" << std::endl;
+    }
+    si2drIterQuit(attrs, &err);
+}
+
+void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit, bool setup, bool hold) {
 
     si2drGroupsIdT groups = si2drGroupGetGroups(timing, &err);
     si2drGroupIdT group;
 
     while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
         std::string group_type { si2drGroupGetGroupType(group, &err) };
+        library::TestLUT * test_lut { nullptr };
         if (group_type == "rise_constraint") {
-            //	            __read_constraint(group, timing_info.riseConstraint);
+            {
+                read_constraint(group, test_lut, time_unit);
+                if(hold)
+                    library.hold_rise_create(arc, *test_lut);
+                else if(setup)
+                    library.setup_rise_create(arc, *test_lut);
+            }
         } else if (group_type == "fall_constraint") {
-            //	            __read_constraint(group, timing_info.fallConstraint);
+            {
+                read_constraint(group, test_lut, time_unit);
+                if(hold)
+                    library.hold_fall_create(arc, *test_lut);
+                else if(setup)
+                    library.setup_fall_create(arc, *test_lut);
+            }
         } else {
 
             library::LUT * lut { nullptr };
@@ -128,6 +185,7 @@ void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost
                 assert(false);
             delete lut;
         }
+        delete test_lut;
     }
     si2drIterQuit(groups, &err);
 
@@ -155,11 +213,20 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
     }
     si2drIterQuit(attrs, &err);
 
+    bool setup = false;
+    bool hold = false;
+
     timing_arc_types type = timing_arc_types::COMBINATIONAL;
     if(timing_type=="setup_rising")
-        type = timing_arc_types::SETUP_RISING;
+    {
+        type = timing_arc_types::SEQUENTIAL;
+        setup = true;
+    }
     else if(timing_type=="hold_rising")
-        type = timing_arc_types::HOLD_RISING;
+    {
+        type = timing_arc_types::SEQUENTIAL;
+        hold = true;
+    }
     else if(timing_type=="rising_edge")
         type = timing_arc_types::RISING_EDGE;
 
@@ -188,7 +255,7 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
     //    std::cout << "      timing sense: " << timing_sense << std::endl;
     //    std::cout << "      timing type: " << timing_type << std::endl;
 
-    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit);
+    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit, setup, hold);
 
 }
 

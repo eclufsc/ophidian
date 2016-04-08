@@ -100,7 +100,7 @@ z        z        z        z
     auto tarc = lib.timing_arc(std_cell.pin_create(std_cell.cell_create("INV_X1"), "a"), std_cell.pin_create(std_cell.cell_create("INV_X1"), "o"));
 
     simple_driver_model s_calculator{lib, tarc, input_slew};
-    timing::ceff calculator;
+    timing::effective_capacitance_wire_model calculator;
     auto ceff = calculator.simulate(s_calculator, tree, c0);
 
     REQUIRE( ceff < tree.lumped() );

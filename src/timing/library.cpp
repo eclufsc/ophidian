@@ -30,13 +30,42 @@ library::library(library_timing_arcs * tarcs, ophidian::standard_cell::standard_
 	m_tarcs.register_property(&m_fall_slews);
 	m_tarcs.register_property(&m_timing_senses);
     m_tarcs.register_property(&m_timing_types);
+    m_tarcs.register_property(&m_arc2setup_rise);
+    m_tarcs.register_property(&m_arc2hold_rise);
+    m_tarcs.register_property(&m_arc2setup_fall);
+    m_tarcs.register_property(&m_arc2hold_fall);
 }
 
 library::~library() {
 }
 
 void library::pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance) {
-	m_pin_capacitance[m_std_cells.pin_system().lookup(pin)] = capacitance;
+    m_pin_capacitance[m_std_cells.pin_system().lookup(pin)] = capacitance;
+}
+
+void library::hold_rise_create(entity::entity arc, const library::TestLUT &lut)
+{
+    m_arc2hold_rise[ m_tarcs.system().lookup(arc) ] = m_tests.size();
+    m_tests.push_back(lut);
+}
+
+void library::setup_rise_create(entity::entity arc, const library::TestLUT &lut)
+{
+    m_arc2setup_rise[ m_tarcs.system().lookup(arc) ] = m_tests.size();
+    m_tests.push_back(lut);
+}
+
+
+void library::hold_fall_create(entity::entity arc, const library::TestLUT &lut)
+{
+    m_arc2hold_fall[ m_tarcs.system().lookup(arc) ] = m_tests.size();
+    m_tests.push_back(lut);
+}
+
+void library::setup_fall_create(entity::entity arc, const library::TestLUT &lut)
+{
+    m_arc2setup_fall[ m_tarcs.system().lookup(arc) ] = m_tests.size();
+    m_tests.push_back(lut);
 }
 
 void library::timing_arc_rise_slew(entity::entity arc, const LUT& lut) {

@@ -55,7 +55,7 @@ private:
 		entity::vector_property< std::vector<entity::entity> > m_pin_timing_arcs;
 
 
-		std::unordered_map< std::pair< entity::entity, entity::entity >, entity::entity,pair_hash > m_pinpair2arc;
+        std::unordered_map< std::pair< entity::entity, entity::entity >, entity::entity,pair_hash > m_pinpair2arc;
 public:
 	library_timing_arcs(standard_cell::standard_cells * std_cells);
 	virtual ~library_timing_arcs();

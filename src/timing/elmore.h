@@ -26,14 +26,14 @@ namespace timing {
 
 class elmore {
 
-	interconnection::rc_tree& m_tree;
+    const interconnection::rc_tree& m_tree;
 	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_delay;
 	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::capacitance > > m_downstream_capacitance;
 	lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > m_pred;
 	std::vector< interconnection::rc_tree::capacitor_id > m_order;
 	interconnection::rc_tree::capacitor_id m_source;
 public:
-	elmore(interconnection::rc_tree& tree, interconnection::rc_tree::capacitor_id source);
+    elmore(const interconnection::rc_tree& tree, interconnection::rc_tree::capacitor_id source);
 	virtual ~elmore();
 
 	void update();

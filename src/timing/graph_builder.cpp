@@ -94,31 +94,43 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
             arcs = lib.pin_timing_arcs(from_std_cell);
             for(auto arc : arcs)
             {
-                if(lib.timing_arc_timing_type(arc) == timing_arc_types::HOLD_RISING ||
-                        lib.timing_arc_timing_type(arc) == timing_arc_types::SETUP_RISING) continue;
-                auto result = output_pins.find(lib.timing_arc_to(arc));
-                if(result == output_pins.end()) continue;
-                auto to = result->second;
-                switch (lib.timing_arc_timing_sense(arc)) {
-                case unateness::POSITIVE_UNATE:
-                    graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
-                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
-                        graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
-                    break;
-                case unateness::NON_UNATE:
-                    graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
-                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
-                        graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
-                    graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
-                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
-                        graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
-                    break;
-                case unateness::NEGATIVE_UNATE:
-                default:
-                    graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
-                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
-                        graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
-                    break;
+                if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL)
+                {
+                    auto to = from;
+                    auto result = std::find_if(input_pins.begin(), input_pins.end(), [netlist, lib, arc](entity::entity pin)->bool{
+                        return netlist.pin_std_cell(pin) == lib.timing_arc_from(arc);
+                    });
+                    if(result == input_pins.end()) continue;
+                    from = *result;
+                    graph.test_insert(graph.rise_node(from), graph.rise_node(to), arc);
+                    graph.test_insert(graph.fall_node(from), graph.fall_node(to), arc);
+                }
+                else
+                {
+                    auto result = output_pins.find(lib.timing_arc_to(arc));
+                    if(result == output_pins.end()) continue;
+                    auto to = result->second;
+                    switch (lib.timing_arc_timing_sense(arc)) {
+                    case unateness::POSITIVE_UNATE:
+                        graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                        if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                            graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                        break;
+                    case unateness::NON_UNATE:
+                        graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                        if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                            graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                        graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                        if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                            graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                        break;
+                    case unateness::NEGATIVE_UNATE:
+                    default:
+                        graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                        if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                            graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                        break;
+                    }
                 }
             }
         }

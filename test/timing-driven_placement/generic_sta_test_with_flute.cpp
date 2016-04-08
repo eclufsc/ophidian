@@ -31,6 +31,7 @@
 #include <boost/units/systems/si.hpp>
 #include <boost/units/limits.hpp>
 #include <boost/units/io.hpp>
+#include <boost/units/systems/si/prefixes.hpp>
 
 using namespace ophidian;
 
@@ -138,29 +139,36 @@ struct pessimistic {
 
 TEST_CASE("simple generic sta", "[timing-driven_placement][generic_sta][flute][simple]")
 {
+    using namespace boost::units;
+    using namespace boost::units::si;
     simple_moc simple;
+
     timing::graph_and_topology topology{simple.graph, simple.netlist, simple.lib_late};
+
     timing::timing_data late{simple.lib_late, simple.graph};
     timing::timing_data early{simple.lib_early, simple.graph};
+    timing::test_calculator test{topology, early, late, quantity<si::time>(simple.dc.dc().clock.period*pico*seconds)};
 
-    using LateSTA = timing::generic_sta<timing::ceff, pessimistic>;
-    using EarlySTA = timing::generic_sta<timing::ceff, optimistic>;
+//    using LateSTA = timing::generic_sta<timing::effective_capacitance_wire_model, pessimistic>;
+//    using EarlySTA = timing::generic_sta<timing::effective_capacitance_wire_model, optimistic>;
+
+    using LateSTA = timing::generic_sta<timing::lumped_capacitance_wire_model, pessimistic>;
+    using EarlySTA = timing::generic_sta<timing::lumped_capacitance_wire_model, optimistic>;
 
     LateSTA late_sta(late, topology, simple.rc_trees_late); EarlySTA early_sta(early, topology, simple.rc_trees_early);
     late_sta.set_constraints(simple.dc.dc()); early_sta.set_constraints(simple.dc.dc());
     late_sta.update_ats(); early_sta.update_ats();
+    test.compute_tests();
     late_sta.update_rts(); early_sta.update_rts();
 
 
-    using namespace boost::units;
-    using namespace boost::units::si;
     using boost::units::engineering_prefix;
 
+    std::cout << boost::units::engineering_prefix;
     for(auto pin : simple.netlist.pin_system())
     {
         std::cout << "Timing Info. of Pin `" << simple.netlist.pin_name(pin.first) << "`" << std::endl;
         std::cout << "  LATE " << std::endl;
-        std::cout << boost::units::engineering_prefix;
         std::cout << "     at R / F " << late_sta.rise_arrival(pin.first) << " / " << late_sta.fall_arrival(pin.first) << std::endl;
         std::cout << "     sw R / F " << late_sta.rise_slew(pin.first) << " / " << late_sta.fall_slew(pin.first) << std::endl;
         std::cout << "     sl R / F " << late_sta.rise_slack(pin.first) << " / " << late_sta.fall_slack(pin.first) << std::endl;
@@ -169,7 +177,6 @@ TEST_CASE("simple generic sta", "[timing-driven_placement][generic_sta][flute][s
         std::cout << "     at R / F " << early_sta.rise_arrival(pin.first) << " / " << early_sta.fall_arrival(pin.first) << std::endl;
         std::cout << "     sw R / F " << early_sta.rise_slew(pin.first) << " / " << early_sta.fall_slew(pin.first) << std::endl;
         std::cout << "     sl R / F " << early_sta.rise_slack(pin.first) << " / " << early_sta.fall_slack(pin.first) << std::endl;
-
     }
 
 

@@ -26,6 +26,7 @@
 #include <boost/units/io.hpp>
 
 #include "library_timing_arcs.h"
+#include <boost/optional.hpp>
 
 namespace ophidian {
 namespace timing {
@@ -35,12 +36,16 @@ enum class unateness {
 };
 
 enum class timing_arc_types {
-    COMBINATIONAL, RISING_EDGE, HOLD_RISING, SETUP_RISING
+    COMBINATIONAL, SEQUENTIAL, RISING_EDGE
 };
 
 class library {
 public:
-	using LUT = lookup_table<boost::units::quantity<boost::units::si::capacitance>, boost::units::quantity<boost::units::si::time>, boost::units::quantity<boost::units::si::time>>;
+    using CapacitanceType = boost::units::quantity<boost::units::si::capacitance>;
+    using SlewType = boost::units::quantity<boost::units::si::time>;
+    using LUT = lookup_table<CapacitanceType, SlewType, SlewType>;
+    using TestLUT = lookup_table<SlewType, SlewType, SlewType>;
+
 private:
 	ophidian::standard_cell::standard_cells & m_std_cells;
 	library_timing_arcs & m_tarcs;
@@ -51,12 +56,50 @@ private:
 	entity::vector_property<LUT> m_fall_slews;
 	entity::vector_property<unateness> m_timing_senses;
     entity::vector_property<timing_arc_types> m_timing_types;
+
+
+    entity::vector_property<boost::optional<std::size_t> > m_arc2setup_rise;
+    entity::vector_property<boost::optional<std::size_t> > m_arc2setup_fall;
+    entity::vector_property<boost::optional<std::size_t> > m_arc2hold_rise;
+    entity::vector_property<boost::optional<std::size_t> > m_arc2hold_fall;
+    std::vector<TestLUT> m_tests;
+
 	entity::vector_property<boost::units::quantity<boost::units::si::capacitance> > m_pin_capacitance;
 
 public:
 	library(library_timing_arcs * tarcs, ophidian::standard_cell::standard_cells * std_cells);
 	virtual ~library();
 	void pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance);
+
+
+    void setup_rise_create(entity::entity arc, const TestLUT & lut);
+    void hold_rise_create(entity::entity arc, const TestLUT & lut);
+
+    const TestLUT& setup_rise(entity::entity arc) const {
+        assert(m_arc2setup_rise[m_tarcs.system().lookup(arc)]);
+        return m_tests[*m_arc2setup_rise[m_tarcs.system().lookup(arc)]];
+    }
+
+    const TestLUT& hold_rise(entity::entity arc) const {
+        assert(m_arc2hold_rise[m_tarcs.system().lookup(arc)]);
+        return m_tests[*m_arc2hold_rise[m_tarcs.system().lookup(arc)]];
+    }
+
+
+    void setup_fall_create(entity::entity arc, const TestLUT & lut);
+    void hold_fall_create(entity::entity arc, const TestLUT & lut);
+
+    const TestLUT& setup_fall(entity::entity arc) const {
+        assert(m_arc2setup_fall[m_tarcs.system().lookup(arc)]);
+        return m_tests[*m_arc2setup_fall[m_tarcs.system().lookup(arc)]];
+    }
+
+    const TestLUT& hold_fall(entity::entity arc) const {
+        assert(m_arc2hold_fall[m_tarcs.system().lookup(arc)]);
+        return m_tests[*m_arc2hold_fall[m_tarcs.system().lookup(arc)]];
+    }
+
+
 	boost::units::quantity<boost::units::si::capacitance> pin_capacitance(entity::entity pin) const {
 		return m_pin_capacitance[m_std_cells.pin_system().lookup(pin)];
 	}

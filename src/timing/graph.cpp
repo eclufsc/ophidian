@@ -31,6 +31,11 @@ graph::graph() :
 graph::~graph() {
 }
 
+void graph::test_insert(node ck, node d, entity::entity tarc)
+{
+    m_tests.push_back(test{ck, d, tarc});
+}
+
 graph::node graph::node_create(entity::entity pin, edges node_edge, std::unordered_map< entity::entity, node > & map) {
 	auto new_node = m_graph.addNode();
 	if(map.find(pin) == map.end())

@@ -135,3 +135,29 @@ TEST_CASE("liberty/flop", "[timing][liberty]") {
     REQUIRE( std_cells.pin_clock_input(DFF_X80ck) );
 }
 
+
+TEST_CASE("liberty/setup", "[timing][liberty]") {
+    ophidian::standard_cell::standard_cells std_cells;
+    auto DFF_X80 = std_cells.cell_create("DFF_X80");
+    auto DFF_X80ck = std_cells.pin_create(DFF_X80, "ck");
+    auto DFF_X80d = std_cells.pin_create(DFF_X80, "d");
+    auto DFF_X80q = std_cells.pin_create(DFF_X80, "q");
+    ophidian::timing::library_timing_arcs tarcs { &std_cells };
+    ophidian::timing::library lib { &tarcs, &std_cells };
+    ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+
+
+
+    using namespace boost::units;
+    using namespace boost::units::si;
+
+
+
+    REQUIRE_NOTHROW( lib.setup_rise(lib.timing_arc(DFF_X80ck, DFF_X80d)).compute(0.0*seconds, 0.0*seconds) == quantity<si::time>(1.5*pico*seconds) );
+    REQUIRE_NOTHROW( lib.setup_fall(lib.timing_arc(DFF_X80ck, DFF_X80d)).compute(0.0*seconds, 0.0*seconds) == quantity<si::time>(2.5*pico*seconds) );
+//    REQUIRE_THROWS( lib.setup_fall(lib.timing_arc(DFF_X80ck, DFF_X80q)) );
+
+
+}
+
+

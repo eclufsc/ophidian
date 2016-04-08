@@ -65,77 +65,20 @@ struct graph_and_topology {
     std::vector<lemon::ListDigraph::Node> sorted;
     std::vector< std::vector<lemon::ListDigraph::Node> > levels;
     std::vector<lemon::ListDigraph::Node> sorted_drivers;
-    graph_and_topology(const graph & G, const netlist::netlist & netlist, const library & lib) :
-        g(G),
-        netlist(netlist),
-        sorted(g.nodes_count()),
-        sorted_drivers(g.nodes_count()){
+    graph_and_topology(const graph & G, const netlist::netlist & netlist, const library & lib);
 
-        using GraphType = lemon::ListDigraph;
-
-        GraphType::NodeMap<int> order(g.G());
-        lemon::topologicalSort(g.G(), order);
+};
 
 
-        std::vector<GraphType::Node> sorted_nodes(g.nodes_count());
+struct test_calculator {
 
-        GraphType::NodeMap<int> level(g.G());
+    const graph_and_topology & topology;
+    timing_data & early;
+    timing_data & late;
+    boost::units::quantity< boost::units::si::time > clock_period;
 
-        for(GraphType::NodeIt it(g.G()); it != lemon::INVALID; ++it)
-        {
-            level[it] = std::numeric_limits<int>::max();
-            sorted[ order[it] ] = it;
-            sorted_drivers[ order[it] ] = it;
-            if(lemon::countInArcs(g.G(), it) == 0)
-                level[it] = 0;
-        }
+    void compute_tests();
 
-        int num_levels = 0;
-        for(auto node : sorted)
-        {
-            if(lemon::countInArcs(g.G(), node) > 0)
-            {
-                int max_level = std::numeric_limits<int>::min();
-                for(GraphType::InArcIt arc(g.G(), node); arc != lemon::INVALID; ++arc)
-                    max_level = std::max(max_level, level[g.edge_source(arc)]);
-                level[node] = max_level + 1;
-                num_levels = std::max(num_levels, max_level+1);
-            }
-        }
-
-        levels.resize(num_levels+1);
-
-        for(auto node : sorted)
-        {
-            if(lib.pin_direction(netlist.pin_std_cell(g.pin(node))) == standard_cell::pin_directions::OUTPUT)
-                levels[level[node]].push_back(node);
-        }
-
-        auto beg = std::remove_if(levels.begin(), levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
-                return vec.empty();
-    });
-        levels.erase(beg, levels.end());
-
-
-        auto begin = std::remove_if(
-                    sorted_drivers.begin(),
-                    sorted_drivers.end(),
-                    [this, lib, netlist](GraphType::Node node)->bool {
-                return lib.pin_direction(netlist.pin_std_cell(g.pin(node))) != standard_cell::pin_directions::OUTPUT;
-    });
-
-        sorted_drivers.erase(begin, sorted_drivers.end());
-#ifndef NDEBUG
-        std::for_each(sorted_drivers.begin(), sorted_drivers.end(), [this, lib, netlist](GraphType::Node node){
-            assert(lib.pin_direction(netlist.pin_std_cell(g.pin(node))) == standard_cell::pin_directions::OUTPUT);
-        });
-        std::for_each(levels.begin(), levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
-            assert(!vec.empty());
-        });
-#endif
-
-
-    }
 
 };
 

@@ -21,7 +21,7 @@
 namespace ophidian {
 namespace timing {
 
-ceff::ceff():
+effective_capacitance_wire_model::effective_capacitance_wire_model():
     m_precision(1e-6),
     m_slews(nullptr),
     m_delays(nullptr),
@@ -32,31 +32,67 @@ ceff::ceff():
 
 }
 
-ceff::~ceff()
+effective_capacitance_wire_model::~effective_capacitance_wire_model()
 {
     if(m_ceff_owner && m_ceff) delete m_ceff;
     if(m_delays_owner && m_delays) delete m_delays;
     if(m_slews_owner && m_slews) delete m_slews;
 }
 
-void ceff::precision(double epsilon)
+void effective_capacitance_wire_model::precision(double epsilon)
 {
     m_precision = epsilon;
 }
 
-void ceff::slew_map(lemon::ListGraph::NodeMap<ceff::SlewType> &sm)
+void effective_capacitance_wire_model::slew_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::SlewType> &sm)
 {
     m_slews_owner = false;
     m_slews = &sm;
 }
 
-void ceff::delay_map(lemon::ListGraph::NodeMap<ceff::SlewType> &dm)
+void effective_capacitance_wire_model::delay_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::SlewType> &dm)
 {
     m_delays_owner = false;
     m_delays = &dm;
 }
 
-void ceff::ceff_map(lemon::ListGraph::NodeMap<ceff::CapacitanceType> &cm)
+void effective_capacitance_wire_model::ceff_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::CapacitanceType> &cm)
+{
+    m_ceff_owner = false;
+    m_ceff = &cm;
+}
+
+lumped_capacitance_wire_model::lumped_capacitance_wire_model():
+    m_slews(nullptr),
+    m_delays(nullptr),
+    m_ceff(nullptr),
+    m_slews_owner(true),
+    m_delays_owner(true),
+    m_ceff_owner(true)
+{
+
+}
+
+lumped_capacitance_wire_model::~lumped_capacitance_wire_model()
+{
+    if(m_ceff_owner && m_ceff) delete m_ceff;
+    if(m_delays_owner && m_delays) delete m_delays;
+    if(m_slews_owner && m_slews) delete m_slews;
+}
+
+void lumped_capacitance_wire_model::slew_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::SlewType> &sm)
+{
+    m_slews_owner = false;
+    m_slews = &sm;
+}
+
+void lumped_capacitance_wire_model::delay_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::SlewType> &dm)
+{
+    m_delays_owner = false;
+    m_delays = &dm;
+}
+
+void lumped_capacitance_wire_model::ceff_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::CapacitanceType> &cm)
 {
     m_ceff_owner = false;
     m_ceff = &cm;
