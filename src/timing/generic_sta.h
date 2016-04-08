@@ -41,45 +41,135 @@
 namespace ophidian {
 namespace timing {
 
+
+struct timing_data {
+    const library & lib;
+    graph_nodes_timing nodes;
+    graph_arcs_timing arcs;
+
+
+    timing_data(library & lib, const graph& g):
+        lib(lib),
+        nodes(g.G()),
+        arcs(g.G())
+    {
+
+    }
+
+};
+
+
+struct graph_and_topology {
+    const graph & g;
+    const netlist::netlist & netlist;
+    std::vector<lemon::ListDigraph::Node> sorted;
+    std::vector< std::vector<lemon::ListDigraph::Node> > levels;
+    std::vector<lemon::ListDigraph::Node> sorted_drivers;
+    graph_and_topology(const graph & G, const netlist::netlist & netlist, const library & lib) :
+        g(G),
+        netlist(netlist),
+        sorted(g.nodes_count()),
+        sorted_drivers(g.nodes_count()){
+
+        using GraphType = lemon::ListDigraph;
+
+        GraphType::NodeMap<int> order(g.G());
+        lemon::topologicalSort(g.G(), order);
+
+
+        std::vector<GraphType::Node> sorted_nodes(g.nodes_count());
+
+        GraphType::NodeMap<int> level(g.G());
+
+        for(GraphType::NodeIt it(g.G()); it != lemon::INVALID; ++it)
+        {
+            level[it] = std::numeric_limits<int>::max();
+            sorted[ order[it] ] = it;
+            sorted_drivers[ order[it] ] = it;
+            if(lemon::countInArcs(g.G(), it) == 0)
+                level[it] = 0;
+        }
+
+        int num_levels = 0;
+        for(auto node : sorted)
+        {
+            if(lemon::countInArcs(g.G(), node) > 0)
+            {
+                int max_level = std::numeric_limits<int>::min();
+                for(GraphType::InArcIt arc(g.G(), node); arc != lemon::INVALID; ++arc)
+                    max_level = std::max(max_level, level[g.edge_source(arc)]);
+                level[node] = max_level + 1;
+                num_levels = std::max(num_levels, max_level+1);
+            }
+        }
+
+        levels.resize(num_levels+1);
+
+        for(auto node : sorted)
+        {
+            if(lib.pin_direction(netlist.pin_std_cell(g.pin(node))) == standard_cell::pin_directions::OUTPUT)
+                levels[level[node]].push_back(node);
+        }
+
+        auto beg = std::remove_if(levels.begin(), levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
+                return vec.empty();
+    });
+        levels.erase(beg, levels.end());
+
+
+        auto begin = std::remove_if(
+                    sorted_drivers.begin(),
+                    sorted_drivers.end(),
+                    [this, lib, netlist](GraphType::Node node)->bool {
+                return lib.pin_direction(netlist.pin_std_cell(g.pin(node))) != standard_cell::pin_directions::OUTPUT;
+    });
+
+        sorted_drivers.erase(begin, sorted_drivers.end());
+#ifndef NDEBUG
+        std::for_each(sorted_drivers.begin(), sorted_drivers.end(), [this, lib, netlist](GraphType::Node node){
+            assert(lib.pin_direction(netlist.pin_std_cell(g.pin(node))) == standard_cell::pin_directions::OUTPUT);
+        });
+        std::for_each(levels.begin(), levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
+            assert(!vec.empty());
+        });
+#endif
+
+
+    }
+
+};
+
 template <class WireDelayModel, class MergeStrategy>
 class generic_sta
 {
-    const netlist::netlist & m_netlist;
-    const timing::library & m_library;
-    const timing::graph & m_graph;
-    const entity::vector_property< interconnection::rc_tree > & m_rc_trees;
-
     using SlewType = boost::units::quantity< boost::units::si::time >;
     using CapacitanceType = boost::units::quantity< boost::units::si::capacitance >;
 
 
-    graph_nodes_timing m_nodes;
-    graph_arcs_timing m_arcs;
 
-    std::vector<lemon::ListDigraph::Node> m_sorted_nodes;
-    std::vector< std::vector<lemon::ListDigraph::Node> > m_levels;
-    std::vector<lemon::ListDigraph::Node> m_sorted_driver_nodes;
-
+    timing_data & m_timing;
+    graph_and_topology & m_topology;
+    const entity::vector_property< interconnection::rc_tree > & m_rc_trees;
     MergeStrategy m_merge;
 
     SlewType compute_slew(lemon::ListDigraph::Node node, CapacitanceType load) const {
         SlewType worst_slew = MergeStrategy::best();
-        if(lemon::countInArcs(m_graph.G(), node) == 0) // PI without driver
-            return m_nodes.slew(node);
-        switch(m_graph.node_edge(node))
+        if(lemon::countInArcs(m_topology.g.G(), node) == 0) // PI without driver
+            return m_timing.nodes.slew(node);
+        switch(m_topology.g.node_edge(node))
         {
         case edges::RISE:
-            for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
+            for(lemon::ListDigraph::InArcIt it(m_topology.g.G(), node); it != lemon::INVALID; ++it)
             {
-                auto tarc = m_graph.edge_entity(it) ;
-                worst_slew = m_merge(worst_slew, m_library.timing_arc_rise_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
+                auto tarc = m_topology.g.edge_entity(it) ;
+                worst_slew = m_merge(worst_slew, m_timing.lib.timing_arc_rise_slew(tarc).compute(load, m_timing.nodes.slew(m_topology.g.edge_source(it))));
             }
             break;
         case edges::FALL:
-            for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
+            for(lemon::ListDigraph::InArcIt it(m_topology.g.G(), node); it != lemon::INVALID; ++it)
             {
-                auto tarc = m_graph.edge_entity(it) ;
-                worst_slew = m_merge(worst_slew, m_library.timing_arc_fall_slew(tarc).compute(load, m_nodes.slew(m_graph.edge_source(it))));
+                auto tarc = m_topology.g.edge_entity(it) ;
+                worst_slew = m_merge(worst_slew, m_timing.lib.timing_arc_fall_slew(tarc).compute(load, m_timing.nodes.slew(m_topology.g.edge_source(it))));
             }
             break;
         }
@@ -87,79 +177,13 @@ class generic_sta
     }
 
 public:
-    generic_sta(const netlist::netlist & netlist, const timing::library & library, const timing::graph & graph, const entity::vector_property< interconnection::rc_tree > & rc_trees) :
-        m_netlist(netlist),
-        m_library(library),
-        m_graph(graph),
-        m_rc_trees(rc_trees),
-        m_nodes(graph.G()),
-        m_arcs(graph.G()),
-        m_sorted_nodes(m_graph.nodes_count()),
-        m_sorted_driver_nodes(m_graph.nodes_count())
+    generic_sta( timing_data & timing, graph_and_topology & topology, const entity::vector_property< interconnection::rc_tree > & rc_trees) :
+        m_timing(timing),
+        m_topology(topology),
+        m_rc_trees(rc_trees)
     {
 
-        using GraphType = lemon::ListDigraph;
 
-        GraphType::NodeMap<int> order(graph.G());
-        lemon::topologicalSort(graph.G(), order);
-
-
-        std::vector<GraphType::Node> sorted_nodes(graph.nodes_count());
-
-        GraphType::NodeMap<int> level(graph.G());
-
-        for(GraphType::NodeIt it(graph.G()); it != lemon::INVALID; ++it)
-        {
-            level[it] = std::numeric_limits<int>::max();
-            m_sorted_nodes[ order[it] ] = it;
-            m_sorted_driver_nodes[ order[it] ] = it;
-            if(lemon::countInArcs(graph.G(), it) == 0)
-                level[it] = 0;
-        }
-
-        int num_levels = 0;
-        for(auto node : m_sorted_nodes)
-        {
-            if(lemon::countInArcs(graph.G(), node) > 0)
-            {
-                int max_level = std::numeric_limits<int>::min();
-                for(GraphType::InArcIt arc(graph.G(), node); arc != lemon::INVALID; ++arc)
-                    max_level = std::max(max_level, level[graph.edge_source(arc)]);
-                level[node] = max_level + 1;
-                num_levels = std::max(num_levels, max_level+1);
-            }
-        }
-
-        m_levels.resize(num_levels+1);
-
-        for(auto node : m_sorted_nodes)
-        {
-            if(m_library.pin_direction(m_netlist.pin_std_cell(m_graph.pin(node))) == standard_cell::pin_directions::OUTPUT)
-                m_levels[level[node]].push_back(node);
-        }
-
-        auto beg = std::remove_if(m_levels.begin(), m_levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
-            return vec.empty();
-        });
-        m_levels.erase(beg, m_levels.end());
-
-
-        auto begin = std::remove_if(
-                    m_sorted_driver_nodes.begin(),
-                    m_sorted_driver_nodes.end(),
-                    [this](GraphType::Node node)->bool {
-                return m_library.pin_direction(m_netlist.pin_std_cell(m_graph.pin(node))) != standard_cell::pin_directions::OUTPUT;
-    });
-
-        m_sorted_driver_nodes.erase(begin, m_sorted_driver_nodes.end());
-    #ifndef NDEBUG
-        std::for_each(m_sorted_driver_nodes.begin(), m_sorted_driver_nodes.end(), [this](GraphType::Node node){
-            assert(m_library.pin_direction(m_netlist.pin_std_cell(m_graph.pin(node))) == standard_cell::pin_directions::OUTPUT);
-        });
-        std::for_each(m_levels.begin(), m_levels.end(), [this](std::vector<lemon::ListDigraph::Node> & vec)->bool{
-            assert(!vec.empty());
-        });
-    #endif
 
 
     }
@@ -170,32 +194,32 @@ public:
         using namespace boost::units;
         using namespace boost::units::si;
 
-        m_nodes.arrival( m_graph.rise_node(m_netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
-        m_nodes.arrival( m_graph.fall_node(m_netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
+        m_timing.nodes.arrival( m_topology.g.rise_node(m_topology.netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
+        m_timing.nodes.arrival( m_topology.g.fall_node(m_topology.netlist.pin_by_name(dc.clock.port_name)), 0.0*seconds );
 
         for(auto & i : dc.input_delays)
         {
-            auto pin = m_netlist.pin_by_name(i.port_name);
-            m_nodes.arrival( m_graph.rise_node(pin), quantity<si::time>(i.delay*pico*seconds) );
-            m_nodes.arrival( m_graph.fall_node(pin), quantity<si::time>(i.delay*pico*seconds) );
+            auto pin = m_topology.netlist.pin_by_name(i.port_name);
+            m_timing.nodes.arrival( m_topology.g.rise_node(pin), quantity<si::time>(i.delay*pico*seconds) );
+            m_timing.nodes.arrival( m_topology.g.fall_node(pin), quantity<si::time>(i.delay*pico*seconds) );
         }
 
         for(auto & i : dc.input_drivers)
         {
-            auto pin = m_netlist.pin_by_name(i.port_name);
-            m_nodes.slew( m_graph.rise_node(pin), quantity<si::time>(i.slew_rise*pico*seconds) );
-            m_nodes.slew( m_graph.fall_node(pin), quantity<si::time>(i.slew_fall*pico*seconds) );
+            auto pin = m_topology.netlist.pin_by_name(i.port_name);
+            m_timing.nodes.slew( m_topology.g.rise_node(pin), quantity<si::time>(i.slew_rise*pico*seconds) );
+            m_timing.nodes.slew( m_topology.g.fall_node(pin), quantity<si::time>(i.slew_fall*pico*seconds) );
         }
 
 
-        for(lemon::ListDigraph::NodeIt node(m_graph.G()); node != lemon::INVALID; ++node)
+        for(lemon::ListDigraph::NodeIt node(m_topology.g.G()); node != lemon::INVALID; ++node)
         {
 
 
-            if(m_library.pin_clock_input(m_graph.pin(node)))
-                m_nodes.required( node, MergeStrategy::worst() );
-            else if(lemon::countOutArcs(m_graph.G(), node) == 0 )
-                m_nodes.required( node, m_merge(quantity<si::time>(0.0*seconds), quantity<si::time>(dc.clock.period * pico* seconds)) );
+            if(m_timing.lib.pin_clock_input(m_topology.g.pin(node)))
+                m_timing.nodes.required( node, MergeStrategy::worst() );
+            else if(lemon::countOutArcs(m_topology.g.G(), node) == 0 )
+                m_timing.nodes.required( node, m_merge(quantity<si::time>(0.0*seconds), quantity<si::time>(dc.clock.period * pico* seconds)) );
         }
 
     }
@@ -203,120 +227,117 @@ public:
 
     SlewType rise_arrival(const entity::entity pin) const
     {
-        return m_nodes.arrival(m_graph.rise_node(pin));
+        return m_timing.nodes.arrival(m_topology.g.rise_node(pin));
     }
     SlewType fall_arrival(const entity::entity pin) const
     {
-        return m_nodes.arrival(m_graph.fall_node(pin));
+        return m_timing.nodes.arrival(m_topology.g.fall_node(pin));
     }
 
     SlewType rise_slew(const entity::entity pin) const
     {
-        return m_nodes.slew(m_graph.rise_node(pin));
+        return m_timing.nodes.slew(m_topology.g.rise_node(pin));
     }
     SlewType fall_slew(const entity::entity pin) const
     {
-        return m_nodes.slew(m_graph.fall_node(pin));
+        return m_timing.nodes.slew(m_topology.g.fall_node(pin));
     }
 
     SlewType rise_slack(const entity::entity pin) const
     {
-        auto node = m_graph.rise_node(pin);
-        return MergeStrategy::slack_signal()*(m_nodes.required(node)-m_nodes.arrival(node));
+        auto node = m_topology.g.rise_node(pin);
+        return MergeStrategy::slack_signal()*(m_timing.nodes.required(node)-m_timing.nodes.arrival(node));
     }
     SlewType fall_slack(const entity::entity pin) const
     {
-        auto node = m_graph.fall_node(pin);
-        return MergeStrategy::slack_signal()*(m_nodes.required(node)-m_nodes.arrival(node));
+        auto node = m_topology.g.fall_node(pin);
+        return MergeStrategy::slack_signal()*(m_timing.nodes.required(node)-m_timing.nodes.arrival(node));
     }
 
-    void run() {
+    void update_ats() {
         {
-        for(auto & level : m_levels)
-        {
-            std::size_t i;
-            for(i = 0; i < level.size(); ++i) // paralell
+            for(auto & level : m_topology.levels)
             {
-                auto node = level[i];
-                if(lemon::countInArcs(m_graph.G(), node) != 0)
+                std::size_t i;
+                for(i = 0; i < level.size(); ++i) // paralell
                 {
-                    auto pin = m_graph.pin(node);
-                    std::cout << "processing pin " << m_netlist.pin_name(pin) << std::endl;
-                    auto net = m_netlist.pin_net(pin);
-                    auto tree = m_rc_trees[m_netlist.net_system().lookup(net)];
-                    lemon::ListGraph::NodeMap< SlewType > slews(tree.graph());
-                    lemon::ListGraph::NodeMap< SlewType > delays(tree.graph());
-                    lemon::ListGraph::NodeMap< CapacitanceType > ceffs(tree.graph());
-                    WireDelayModel calculator;
-                    calculator.delay_map(delays);
-                    calculator.slew_map(slews);
-                    calculator.ceff_map(ceffs);
-                    std::function<SlewType(CapacitanceType)> s_calculator = std::bind(&generic_sta::compute_slew, this, node, std::placeholders::_1);
-                    auto source_capacitor = tree.capacitor_by_name(m_netlist.pin_name(pin));
-                    CapacitanceType load = calculator.simulate(s_calculator, tree, source_capacitor);
-
-                    m_nodes.load(node, load);
-                    m_nodes.slew(node, slews[source_capacitor]);
-
-                    SlewType worst_arrival = MergeStrategy::best();
-                    switch(m_graph.node_edge(node))
+                    auto node = level[i];
+                    if(lemon::countInArcs(m_topology.g.G(), node) != 0)
                     {
-                    case edges::RISE:
-                        for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
+                        auto pin = m_topology.g.pin(node);
+                        auto net = m_topology.netlist.pin_net(pin);
+                        auto tree = m_rc_trees[m_topology.netlist.net_system().lookup(net)];
+                        lemon::ListGraph::NodeMap< SlewType > slews(tree.graph());
+                        lemon::ListGraph::NodeMap< SlewType > delays(tree.graph());
+                        lemon::ListGraph::NodeMap< CapacitanceType > ceffs(tree.graph());
+                        WireDelayModel calculator;
+                        calculator.delay_map(delays);
+                        calculator.slew_map(slews);
+                        calculator.ceff_map(ceffs);
+                        std::function<SlewType(CapacitanceType)> s_calculator = std::bind(&generic_sta::compute_slew, this, node, std::placeholders::_1);
+                        auto source_capacitor = tree.capacitor_by_name(m_topology.netlist.pin_name(pin));
+                        CapacitanceType load = calculator.simulate(s_calculator, tree, source_capacitor);
+
+                        m_timing.nodes.load(node, load);
+                        m_timing.nodes.slew(node, slews[source_capacitor]);
+
+                        SlewType worst_arrival = MergeStrategy::best();
+                        switch(m_topology.g.node_edge(node))
                         {
-                            auto tarc = m_graph.edge_entity(it) ;
-                            auto edge_source = m_graph.edge_source(it);
-                            auto arc_delay = m_library.timing_arc_rise_delay(tarc).compute(load, m_nodes.slew(edge_source));
-                            auto arc_slew = m_library.timing_arc_rise_slew(tarc).compute(load, m_nodes.slew(edge_source));
-                            m_arcs.delay(it, arc_delay);
-                            m_arcs.slew(it, arc_slew);
-                            worst_arrival = m_merge(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
+                        case edges::RISE:
+                            for(lemon::ListDigraph::InArcIt it(m_topology.g.G(), node); it != lemon::INVALID; ++it)
+                            {
+                                auto tarc = m_topology.g.edge_entity(it) ;
+                                auto edge_source = m_topology.g.edge_source(it);
+                                auto arc_delay = m_timing.lib.timing_arc_rise_delay(tarc).compute(load, m_timing.nodes.slew(edge_source));
+                                auto arc_slew = m_timing.lib.timing_arc_rise_slew(tarc).compute(load, m_timing.nodes.slew(edge_source));
+                                m_timing.arcs.delay(it, arc_delay);
+                                m_timing.arcs.slew(it, arc_slew);
+                                worst_arrival = m_merge(worst_arrival, m_timing.nodes.arrival(edge_source) + arc_delay);
+                            }
+                            break;
+                        case edges::FALL:
+                            for(lemon::ListDigraph::InArcIt it(m_topology.g.G(), node); it != lemon::INVALID; ++it)
+                            {
+                                auto tarc = m_topology.g.edge_entity(it) ;
+                                auto edge_source = m_topology.g.edge_source(it);
+                                auto arc_delay = m_timing.lib.timing_arc_fall_delay(tarc).compute(load, m_timing.nodes.slew(edge_source));
+                                auto arc_slew = m_timing.lib.timing_arc_fall_slew(tarc).compute(load, m_timing.nodes.slew(edge_source));
+                                m_timing.arcs.delay(it, arc_delay);
+                                m_timing.arcs.slew(it, arc_slew);
+                                worst_arrival = m_merge(worst_arrival, m_timing.nodes.arrival(edge_source) + arc_delay);
+                            }
+                            break;
                         }
-                        break;
-                    case edges::FALL:
-                        for(lemon::ListDigraph::InArcIt it(m_graph.G(), node); it != lemon::INVALID; ++it)
+                        m_timing.nodes.arrival(node, worst_arrival);
+
+                        for(lemon::ListDigraph::OutArcIt arc(m_topology.g.G(), node); arc != lemon::INVALID; ++arc)
                         {
-                            auto tarc = m_graph.edge_entity(it) ;
-                            auto edge_source = m_graph.edge_source(it);
-                            auto arc_delay = m_library.timing_arc_fall_delay(tarc).compute(load, m_nodes.slew(edge_source));
-                            auto arc_slew = m_library.timing_arc_fall_slew(tarc).compute(load, m_nodes.slew(edge_source));
-                            m_arcs.delay(it, arc_delay);
-                            m_arcs.slew(it, arc_slew);
-                            worst_arrival = m_merge(worst_arrival, m_nodes.arrival(edge_source) + arc_delay);
+                            auto arc_target = m_topology.g.edge_target(arc);
+                            auto target_pin = m_topology.g.pin(arc_target);
+                            auto target_capacitor = tree.capacitor_by_name(m_topology.netlist.pin_name(target_pin));
+                            m_timing.arcs.slew(arc, slews[target_capacitor]);
+                            m_timing.nodes.slew(arc_target, m_timing.arcs.slew(arc));
+                            m_timing.nodes.arrival(arc_target, m_timing.nodes.arrival(node) + m_timing.arcs.delay(arc));
                         }
-                        break;
-                    }
-                    m_nodes.arrival(node, worst_arrival);
-
-                    for(lemon::ListDigraph::OutArcIt arc(m_graph.G(), node); arc != lemon::INVALID; ++arc)
-                    {
-                        auto arc_target = m_graph.edge_target(arc);
-                        auto target_pin = m_graph.pin(arc_target);
-
-                        std::cout << "    setting to " << m_netlist.pin_name(target_pin) << " " << (m_graph.node_edge(arc_target)==edges::RISE?"RISE":"FALL") << " the arrival and slew " << std::endl;
-
-                        auto target_capacitor = tree.capacitor_by_name(m_netlist.pin_name(target_pin));
-                        m_arcs.slew(arc, slews[target_capacitor]);
-                        m_nodes.slew(arc_target, m_arcs.slew(arc));
-                        m_nodes.arrival(arc_target, m_nodes.arrival(node) + m_arcs.delay(arc));
                     }
                 }
             }
-        }
 
         }
+    }
 
-        for(auto node_it = m_sorted_nodes.rbegin(); node_it != m_sorted_nodes.rend(); ++node_it)
+    void update_rts() {
+        for(auto node_it = m_topology.sorted.rbegin(); node_it != m_topology.sorted.rend(); ++node_it)
         {
             auto node = *node_it;
-            if(lemon::countOutArcs(m_graph.G(), node) > 0)
+            if(lemon::countOutArcs(m_topology.g.G(), node) > 0)
             {
                 SlewType required = MergeStrategy::worst();
-                for(lemon::ListDigraph::OutArcIt arc(m_graph.G(), node); arc != lemon::INVALID; ++arc)
-                    required = m_merge.inverted(required, m_nodes.required(m_graph.edge_target(arc))-m_arcs.delay(arc));
-                m_nodes.required(node, required);
+                for(lemon::ListDigraph::OutArcIt arc(m_topology.g.G(), node); arc != lemon::INVALID; ++arc)
+                    required = m_merge.inverted(required, m_timing.nodes.required(m_topology.g.edge_target(arc))-m_timing.arcs.delay(arc));
+                m_timing.nodes.required(node, required);
             }
-            std::cout << m_netlist.pin_name( m_graph.pin(node) ) << " " << (m_graph.node_edge(node)==edges::RISE?"RISE":"FALL") << " required = " << m_nodes.required(node) << std::endl;
         }
     }
 

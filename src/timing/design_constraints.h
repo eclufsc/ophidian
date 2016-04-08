@@ -69,6 +69,7 @@ struct design_constraints {
 class default_design_constraints {
     design_constraints m_dc;
 public:
+    default_design_constraints(){}
     default_design_constraints(const netlist::netlist & netlist);
     const design_constraints dc() const {
         return m_dc;
