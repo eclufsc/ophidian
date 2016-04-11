@@ -31,10 +31,12 @@ struct transitions {
 
 void graph_builder::build(const netlist::netlist & netlist, library & lib, const timing::design_constraints & dc, graph& graph) {
 
+    std::cout << "  graph_builder::build(): creating two nodes for each pin" << std::endl << std::flush;
     // create a node for each pin
     for (auto pin : netlist.pin_system())
         util::transitions<graph::node> node { graph.rise_node_create(pin.first), graph.fall_node_create(pin.first) };
 
+    std::cout << "  graph_builder::build(): creating net edges" << std::endl << std::flush;
     // create net edges
     std::vector< entity::entity > net_pins;
     for (auto net : netlist.net_system()) {
@@ -63,14 +65,29 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 
     // create timing arc edges
 
-
+    std::cout << "  graph_builder::build(): creating timing arc edges" << std::endl << std::flush;
     std::vector< entity::entity > input_pins;
     std::unordered_map< entity::entity, entity::entity > output_pins;
     std::vector< entity::entity > arcs;
+    std::size_t current_cell{0};
+
+    std::vector<double> percentages {
+        0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0
+    };
     for (auto cell : netlist.cell_system()) {
+        ++current_cell;
+
+        for(auto p : percentages)
+        {
+            if(static_cast<std::size_t>(p*netlist.cell_system().size()) == current_cell)
+                std::cout << "       graph_builder::build(): ["<<100*p<<"%]" << std::endl << std::flush;
+        }
         auto cell_pins = netlist.cell_pins(cell.first);
+//        std::cout << "  graph_builder::build(): creating timing arcs for cell " << netlist.cell_name(cell.first) << std::endl << std::endl << std::flush;
         input_pins.resize(0);
         output_pins.clear();
+
+        entity::entity data_pin, clk_pin;
 
         for(auto pin : cell_pins)
         {
@@ -79,6 +96,12 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
             {
             case standard_cell::pin_directions::INPUT:
                 input_pins.push_back(pin);
+
+                if(lib.pin_clock_input(netlist.pin_std_cell(pin)))
+                    clk_pin = pin;
+                else if(lib.cell_sequential(netlist.cell_std_cell(netlist.pin_owner(pin))))
+                    data_pin = pin;
+
                 break;
             case standard_cell::pin_directions::OUTPUT:
                 output_pins[ netlist.pin_std_cell(pin) ] = pin;
@@ -86,24 +109,22 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
             default:
                 break;
             }
+
+
         }
 
+        bool test_created = false;
         for (auto from : input_pins) {
 
             entity::entity from_std_cell = netlist.pin_std_cell(from);
             arcs = lib.pin_timing_arcs(from_std_cell);
             for(auto arc : arcs)
             {
-                if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL)
+                if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL && !test_created)
                 {
-                    auto to = from;
-                    auto result = std::find_if(input_pins.begin(), input_pins.end(), [netlist, lib, arc](entity::entity pin)->bool{
-                        return netlist.pin_std_cell(pin) == lib.timing_arc_from(arc);
-                    });
-                    if(result == input_pins.end()) continue;
-                    from = *result;
-                    graph.test_insert(graph.rise_node(from), graph.rise_node(to), arc);
-                    graph.test_insert(graph.fall_node(from), graph.fall_node(to), arc);
+                    graph.test_insert(graph.rise_node(clk_pin), graph.rise_node(data_pin), arc);
+                    graph.test_insert(graph.fall_node(clk_pin), graph.fall_node(data_pin), arc);
+                    test_created = true;
                 }
                 else
                 {
@@ -136,6 +157,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         }
     }
 
+    std::cout << "  graph_builder::build(): creating input drivers edges" << std::endl << std::endl << std::flush;
     std::vector<lemon::ListDigraph::Arc> out_rise_arcs, out_fall_arcs;
     for (std::size_t i = 0; i < dc.input_drivers.size(); ++i) {
         out_rise_arcs.resize(0);

@@ -157,9 +157,7 @@ public:
 
         for(lemon::ListDigraph::NodeIt node(m_topology.g.G()); node != lemon::INVALID; ++node)
         {
-
-
-            if(m_timing.lib.pin_clock_input(m_topology.g.pin(node)))
+            if(m_timing.lib.pin_clock_input(m_topology.netlist.pin_std_cell(m_topology.g.pin(node))))
                 m_timing.nodes.required( node, MergeStrategy::worst() );
             else if(lemon::countOutArcs(m_topology.g.G(), node) == 0 )
                 m_timing.nodes.required( node, m_merge(quantity<si::time>(0.0*seconds), quantity<si::time>(dc.clock.period * pico* seconds)) );
@@ -260,6 +258,7 @@ public:
                             auto target_pin = m_topology.g.pin(arc_target);
                             auto target_capacitor = tree.capacitor_by_name(m_topology.netlist.pin_name(target_pin));
                             m_timing.arcs.slew(arc, slews[target_capacitor]);
+                            m_timing.arcs.delay(arc, delays[target_capacitor]);
                             m_timing.nodes.slew(arc_target, m_timing.arcs.slew(arc));
                             m_timing.nodes.arrival(arc_target, m_timing.nodes.arrival(node) + m_timing.arcs.delay(arc));
                         }

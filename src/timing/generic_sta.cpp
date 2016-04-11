@@ -21,23 +21,16 @@
 namespace ophidian {
 namespace timing {
 
-void test_calculator::compute_tests()
+void test_calculator:: compute_tests()
 {
     auto tests = topology.g.tests();
     std::size_t i;
-
     using DelayType = boost::units::quantity< boost::units::si::time >;
-
-
     for(i = 0; i < tests.size(); ++i) // parallel
     {
         const test & t = tests[i];
-
         auto pin_ck = topology.g.pin(t.ck);
         auto pin_d = topology.g.pin(t.d);
-
-        std::cout << "computing test from " << topology.netlist.pin_name(pin_ck) << " to " << topology.netlist.pin_name(pin_d) << " " << (topology.g.node_edge(t.d)==edges::RISE?"RISE":"FALL") << std::endl;
-
         DelayType setup, hold;
         switch(topology.g.node_edge(t.d))
         {
@@ -50,18 +43,11 @@ void test_calculator::compute_tests()
             hold = early.lib.hold_fall(t.tarc).compute(late.nodes.slew(t.ck), early.nodes.slew(t.d));
             break;
         }
-
-
         const DelayType e_ck = early.nodes.arrival(topology.g.rise_node(pin_ck));
         const DelayType l_ck = late.nodes.arrival(topology.g.rise_node(pin_ck));
-
-        std::cout << "  setup " << setup << " hold " << hold << std::endl;
-
-
         late.nodes.required(t.d, e_ck-setup+clock_period);
         early.nodes.required(t.d, l_ck+hold);
 
-        std::cout << "  required LATE " << e_ck-setup+clock_period <<  " EARLY " << l_ck+hold << std::endl;
     }
 }
 

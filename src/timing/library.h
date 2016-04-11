@@ -163,7 +163,13 @@ public:
 	entity::entity cell_create(std::string name);
 	entity::entity pin_create(entity::entity cell, std::string name);
 
+
     void cell_sequential(entity::entity cell, bool sequential);
+
+    bool cell_sequential(entity::entity cell) const
+     {
+        return m_std_cells.cell_sequential(cell);
+    }
     void pin_clock_input(entity::entity pin, bool clock_input);
 
     bool pin_clock_input(entity::entity pin) const {

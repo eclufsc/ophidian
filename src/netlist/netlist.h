@@ -71,6 +71,10 @@ public:
 		return m_module_name;
 	}
 
+    const standard_cell::standard_cells & std_cells() const {
+        return *m_std_cells;
+    }
+
 	// cell
     entity::entity cell_find(std::string name) const;
 	entity::entity cell_insert(std::string name, std::string type);

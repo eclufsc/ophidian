@@ -137,7 +137,7 @@ void read_constraint(si2drGroupIdT group, library::TestLUT*& test_LUT, boost::un
         //        constraint = std::stod(string_val) * time_unit_;
         test_LUT = new library::TestLUT(1,1);
         constraint = std::stod(string_val);
-        test_LUT->at(0,0) = constraint * time_unit;
+        test_LUT->at(0,0, constraint * time_unit);
         si2drIterQuit(values, &err);
         //        std::cout << constraint << " );" << std::endl;
     }
@@ -279,7 +279,10 @@ void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, b
         else if (attr_name == "capacitance")
             library.pin_capacitance(pin_entity, si2drSimpleAttrGetFloat64Value(attr, &err) * capacitive_load_unit);
         else if (attr_name == "clock")
+        {
             library.pin_clock_input(pin_entity, true);
+            library.cell_sequential(cell_entity, true);
+        }
         //			is_clock = si2drSimpleAttrGetBooleanValue(attr, &err);
     }
     si2drIterQuit(attrs, &err);

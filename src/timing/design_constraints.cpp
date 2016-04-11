@@ -25,7 +25,7 @@ default_design_constraints::default_design_constraints(const netlist::netlist &n
 {
     m_dc.clock.name = "mclk";
     m_dc.clock.port_name = "iccad_clk";
-    m_dc.clock.period = 50.0;
+    m_dc.clock.period = 80.0;
 
     for(auto PI(netlist.PI_begin()); PI != netlist.PI_end(); ++PI)
     {
