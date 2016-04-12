@@ -4,6 +4,12 @@ Ophidian
 
 Ophidian is a multi-platform library for ease the teaching and research on physical design topics.
 
+
+Code Your Own Timing-Driven Placement Algorithm With the Brand-New TDP Module
+-------------------------
+[Example Code](https://github.com/eclufsc/ophidian/blob/master/apps/tdp/main.cpp)
+
+
 Eclipse user attention
 -------------------------
 
