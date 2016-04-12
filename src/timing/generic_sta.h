@@ -35,11 +35,52 @@
 
 #include <omp.h>
 
-#ifndef GENERIC_STA_H
-#define GENERIC_STA_H
+#ifndef OPHIDIAN_TIMING_GENERIC_STA_H
+#define OPHIDIAN_TIMING_GENERIC_STA_H
 
 namespace ophidian {
 namespace timing {
+
+struct optimistic {
+    using TimingType = boost::units::quantity< boost::units::si::time >;
+
+    TimingType operator()(const TimingType &a, const TimingType &b) const {
+        return std::min(a, b);
+    }
+    TimingType inverted(const TimingType &a, const TimingType &b) const {
+        return std::max(a, b);
+    }
+    static double slack_signal() {
+        return -1.0;
+    }
+    static TimingType best() {
+        return std::numeric_limits<TimingType >::infinity();
+    }
+    static TimingType worst() {
+        return -std::numeric_limits<TimingType >::infinity();
+    }
+};
+
+
+struct pessimistic {
+    using TimingType = boost::units::quantity< boost::units::si::time >;
+
+    TimingType operator()(const TimingType &a, const TimingType &b) const {
+        return std::max(a, b);
+    }
+    TimingType inverted(const TimingType &a, const TimingType &b) const {
+        return std::min(a, b);
+    }
+    static double slack_signal() {
+        return 1.0;
+    }
+    static TimingType best() {
+        return -std::numeric_limits<TimingType >::infinity();
+    }
+    static TimingType worst() {
+        return std::numeric_limits<TimingType >::infinity();
+    }
+};
 
 
 struct timing_data {
@@ -290,5 +331,5 @@ public:
 }
 
 
-#endif // GENERIC_STA_H
+#endif // OPHIDIAN_TIMING_GENERIC_STA_H
 

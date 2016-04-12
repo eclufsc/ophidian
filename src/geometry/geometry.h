@@ -12,6 +12,9 @@
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
+#include <boost/geometry/algorithms/equals.hpp>
+
+#include <boost/geometry/io/wkt/wkt.hpp>
 
 #include <cmath>
 
@@ -39,8 +42,11 @@ CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<
 	return std::abs(p2.y()-p1.y())+std::abs(p2.x()-p1.x());
 }
 
-}
 
+using boost::geometry::equals;
+using boost::geometry::wkt;
+
+}
 }
 
 #endif //OPENEDA_POINT_H

@@ -21,6 +21,10 @@
 namespace ophidian {
 namespace timing {
 
+endpoints::endpoints() {
+
+}
+
 endpoints::endpoints(const netlist::netlist & netlist) : m_entities(netlist.PO_count())
 {
     m_entities.resize(0);

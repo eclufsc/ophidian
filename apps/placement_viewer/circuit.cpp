@@ -77,6 +77,8 @@ circuit::~circuit() {
 void circuit::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(&m_cells[0], m_cells.getVertexCount(), sf::PrimitiveType::Quads,
             states);
+
+
     target.draw(&m_selected[0], m_selected.getVertexCount(),
             sf::PrimitiveType::Lines);
 

@@ -30,6 +30,9 @@
 #include "../timing/graph_builder.h"
 #include "../timing-driven_placement/flute_rc_tree_estimation.h"
 
+
+#include "../timing/generic_sta.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -94,46 +97,7 @@ using namespace ophidian;
 using namespace boost::units;
 using namespace boost::units::si;
 
-struct optimistic {
-    using TimingType = boost::units::quantity< boost::units::si::time >;
 
-    TimingType operator()(const TimingType &a, const TimingType &b) const {
-        return std::min(a, b);
-    }
-    TimingType inverted(const TimingType &a, const TimingType &b) const {
-        return std::max(a, b);
-    }
-    static double slack_signal() {
-        return -1.0;
-    }
-    static TimingType best() {
-        return std::numeric_limits<TimingType >::infinity();
-    }
-    static TimingType worst() {
-        return -std::numeric_limits<TimingType >::infinity();
-    }
-};
-
-
-struct pessimistic {
-    using TimingType = boost::units::quantity< boost::units::si::time >;
-
-    TimingType operator()(const TimingType &a, const TimingType &b) const {
-        return std::max(a, b);
-    }
-    TimingType inverted(const TimingType &a, const TimingType &b) const {
-        return std::min(a, b);
-    }
-    static double slack_signal() {
-        return 1.0;
-    }
-    static TimingType best() {
-        return -std::numeric_limits<TimingType >::infinity();
-    }
-    static TimingType worst() {
-        return std::numeric_limits<TimingType >::infinity();
-    }
-};
 
 namespace moc {
 struct golden {
@@ -272,8 +236,8 @@ TEST_CASE("regression/iccad 2015 sta", "[regression][sta][flute]") {
         timing::timing_data late{moc.lib_late, moc.graph};
         timing::timing_data early{moc.lib_early, moc.graph};
         timing::test_calculator test{topology, early, late, quantity<si::time>(moc.dc.clock.period*pico*seconds)};
-        using LateSTA = timing::generic_sta<timing::lumped_capacitance_wire_model, pessimistic>;
-        using EarlySTA = timing::generic_sta<timing::lumped_capacitance_wire_model, optimistic>;
+        using LateSTA = timing::generic_sta<timing::lumped_capacitance_wire_model, timing::pessimistic>;
+        using EarlySTA = timing::generic_sta<timing::lumped_capacitance_wire_model, timing::optimistic>;
 
         LateSTA late_sta(late, topology, moc.rc_trees_late); EarlySTA early_sta(early, topology, moc.rc_trees_early);
         late_sta.set_constraints(moc.dc); early_sta.set_constraints(moc.dc);

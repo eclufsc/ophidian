@@ -30,6 +30,7 @@ class endpoints
     std::vector< entity::entity > m_entities;
 
 public:
+    endpoints();
     endpoints(const netlist::netlist & netlist);
     virtual ~endpoints();
 
