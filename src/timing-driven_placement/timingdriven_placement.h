@@ -29,6 +29,21 @@
 namespace ophidian {
 namespace timingdriven_placement {
 
+template <class IteratorType>
+struct bounds {
+    const IteratorType m_begin;
+    const IteratorType m_end;
+
+    const IteratorType begin() const {
+        return m_begin;
+    }
+
+    const IteratorType end() const {
+        return m_end;
+    }
+};
+
+
 using Cell = entity::entity;
 using Pin = entity::entity;
 using StandardCellPin = entity::entity;
@@ -38,12 +53,18 @@ using Point = geometry::point<double>;
 using Geometry = geometry::multi_polygon< geometry::polygon<Point> >;
 using TimeType = boost::units::quantity< boost::units::si::time > ;
 using CapacitanceType = boost::units::quantity< boost::units::si::capacitance > ;
+using NetIterator = entity::bimap_iterator_adapter;
+using CellIterator = entity::bimap_iterator_adapter;
+using PinIterator = entity::bimap_iterator_adapter;
+
 
 struct cells_geometries {
     std::vector<Cell> cells;
     std::vector<Geometry> geometries;
     cells_geometries(std::size_t size) : cells(size), geometries(size) {cells.resize(0); geometries.resize(0);}
 };
+
+
 
 class timingdriven_placement
 {
@@ -105,7 +126,47 @@ public:
         return m_netlist.cell_find(name);
     }
 
-    //! Generates a `cells_geometries` object cointaining a vector containing the cell entities and a vector containing the cells geometries
+    //! Finds a Net by its name
+    /*!
+      \param name the name of the net
+      \return Net entity representing the Net you are looking for, an exception is thrown if there is no net called `name`
+    */
+    Net find_net(std::string name) const {
+        return m_netlist.net_by_name(name);
+    }
+    std::string net_name(Net n) const {
+        return m_netlist.net_name(n);
+    }
+    std::string pin_name(Pin pin) const {
+        return m_netlist.pin_name(pin);
+    }
+
+    bounds<NetIterator> nets() const {
+        return {m_netlist.net_system().begin(), m_netlist.net_system().end()};
+    }
+
+    bounds<PinIterator> pins() const {
+        return {m_netlist.pin_system().begin(), m_netlist.pin_system().end()};
+    }
+
+    bounds<CellIterator> cells() const {
+        return {m_netlist.cell_system().begin(), m_netlist.cell_system().end()};
+    }
+
+    std::vector<Pin> net_pins(Net net) const {
+        return m_netlist.net_pins(net);
+    }
+
+    Net pin_net(Pin pin) const {
+        return m_netlist.pin_net(pin);
+    }
+
+
+
+
+
+
+    //! Generates a `cells_geometries` object cointaining a vector of cell entities and a vector of cell geometries
     //! Both vectors have the same size
     /*!
       \return The geometries for all cells in the netlist
@@ -121,6 +182,10 @@ public:
     }
 
     void place_cell(Cell cell, Point destination);
+
+
+
+
     void update_timing();
 
 
