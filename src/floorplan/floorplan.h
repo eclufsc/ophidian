@@ -24,7 +24,12 @@
 #include "sites.h"
 
 namespace ophidian {
+    /// Namespace describing floorplan entities and basic floorplan interface.
     namespace floorplan {
+        /// Floorplan class.
+        /**
+         * This class provides the basic floorplan interface, such as site and rows insertion, site and rows properties and circuit dimensions.
+         */
         class floorplan {
             using point = geometry::point<double>;
 
@@ -37,53 +42,140 @@ namespace ophidian {
             point m_chip_boundaries;
 
         public:
+            /// Constructor.
+            /**
+             * Creates a circuit floorplan with given chip boundaries.
+             * The chip boundaries are represented by a point, where the x coordinate represents the width, while the y coordinate represents the height.
+             * \param chip_boundaries The chip boundaries for the floorplan
+             */
             floorplan(point chip_boundaries);
 
+            /// Chip boundaries getter.
+            /**
+             * Returns the boundaries of the chip.
+             * \return Point describing the chip boundaries.
+             */
             point chip_boundaries() const {
                 return m_chip_boundaries;
             }
 
             // sites
+            /// Inserts a new site.
+            /**
+             * Inserts a new site in the floorplan. A site has a name and dimensions associated to it.
+             * \param name Name of the site, used to identify it.
+             * \param dimensions Point describing the site dimensions.
+             * \return The created site.
+             */
             entity::entity site_insert(std::string name, point dimensions);
+            /// Destroys a site.
+            /**
+             * Destroys an existing site.
+             * \param site Site to be destroyed.
+             */
             void site_destroy(entity::entity site);
 
+            /// Returns the number of sites.
+            /**
+             * Returns the number of sites created in the sites system.
+             * \return Number of sites.
+             */
             std::size_t site_count() const {
                 return m_sites_system.size();
             }
 
+            /// Site name getter.
+            /**
+             * Returns the name of a site.
+             * \param site Site entity to get the name.
+             * \return Name of the site.
+             */
             std::string site_name(entity::entity site) const {
                 return m_sites.name(site);
             }
+            /// Site dimensions getter.
+            /**
+             * Returns the dimensions of a site.
+             * \param site Site entity to get the dimensions.
+             * \return Point describing the site dimensions.
+             */
             point site_dimensions(entity::entity site) const {
                 return m_sites.dimensions(site);
             }
-
+            /// Sites properties getter.
+            /**
+             * Returns the object describing sites properties.
+             * \return A constant reference to the object describing sites properties.
+             */
             const sites & sites_properties() const {
                 return m_sites;
             }
 
             // rows
+            /// Inserts a new row.
+            /**
+             * Inserts a new row in the floorplan. A row has a site, number of sites and origin.
+             * \param site Entity of the site of this row.
+             * \param number_of_sites Number of sites which the row consists of.
+             * \param origin Point describing the row origin.
+             * \return The created row.
+             */
             entity::entity row_insert(entity::entity site, unsigned number_of_sites, point origin);
+            /// Destroys a row.
+            /**
+             * Destroys an existing row.
+             * \param row Row to be destroyed.
+             */
             void row_destroy(entity::entity row);
 
+            /// Returns the number of rows.
+            /**
+             * Returns the number of rows created in the rows system.
+             * \return Number of rows.
+             */
             std::size_t row_count() const {
                 return m_rows_system.size();
             }
 
+            /// Row site getter.
+            /**
+             * Returns the site of a row.
+             * \param row Row entity to get the site.
+             * \return Entity representing the site of the row.
+             */
             entity::entity row_site(entity::entity row) const {
                 return m_rows.site(row);
             }
-
+            /// Row number of sites getter.
+            /**
+             * Returns the number of sites of a row.
+             * \param row Row entity to get the number of sites.
+             * \return Number of sites in that row.
+             */
             unsigned row_number_of_sites(entity::entity row) const {
                 return m_rows.number_of_sites(row);
             }
-
+            /// Row origin getter.
+            /**
+             * Returns the origin of a row.
+             * \param row Row entity to get the origin.
+             * \return Point describing the origin of that row.
+             */
             point row_origin(entity::entity row) const {
                 return m_rows.origin(row);
             }
-
+            /// Row dimensions getter.
+            /**
+             * Returns the dimensions of a row, calculated using the number of sites and site dimensions in that row.
+             * \param row Row entity to gets the dimensions.
+             * \return Point describing the dimensions of that row.
+             */
             point row_dimensions(entity::entity row) const;
-
+            /// Rows properties getter.
+            /**
+             * Returns the object describing rows properties.
+             * \return A constant reference to the object describing rows properties.
+             */
             const rows & rows_properties() const {
                 return m_rows;
             }
