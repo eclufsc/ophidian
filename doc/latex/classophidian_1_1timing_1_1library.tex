@@ -1,0 +1,137 @@
+\hypertarget{classophidian_1_1timing_1_1library}{\section{ophidian\-:\-:timing\-:\-:library Class Reference}
+\label{classophidian_1_1timing_1_1library}\index{ophidian\-::timing\-::library@{ophidian\-::timing\-::library}}
+}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a5d7d09d93a28917cf3467cf0310f0d13}{using {\bfseries Capacitance\-Type} = boost\-::units\-::quantity$<$ boost\-::units\-::si\-::capacitance $>$}\label{classophidian_1_1timing_1_1library_a5d7d09d93a28917cf3467cf0310f0d13}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a4a2470c263f4abaa7bcb9d305568a4ca}{using {\bfseries Slew\-Type} = boost\-::units\-::quantity$<$ boost\-::units\-::si\-::time $>$}\label{classophidian_1_1timing_1_1library_a4a2470c263f4abaa7bcb9d305568a4ca}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ac707d167a8df758c8edf1465f2b4c334}{using {\bfseries L\-U\-T} = \hyperlink{classophidian_1_1timing_1_1lookup__table}{lookup\-\_\-table}$<$ Capacitance\-Type, Slew\-Type, Slew\-Type $>$}\label{classophidian_1_1timing_1_1library_ac707d167a8df758c8edf1465f2b4c334}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a0713b88f915bd0ee8776e69325564cba}{using {\bfseries Test\-L\-U\-T} = \hyperlink{classophidian_1_1timing_1_1lookup__table}{lookup\-\_\-table}$<$ Slew\-Type, Slew\-Type, Slew\-Type $>$}\label{classophidian_1_1timing_1_1library_a0713b88f915bd0ee8776e69325564cba}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ad3636ead6a7f5f606a30ed6aaef8b583}{{\bfseries library} (\hyperlink{classophidian_1_1timing_1_1library__timing__arcs}{library\-\_\-timing\-\_\-arcs} $\ast$tarcs, \hyperlink{classophidian_1_1standard__cell_1_1standard__cells}{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells} $\ast$std\-\_\-cells)}\label{classophidian_1_1timing_1_1library_ad3636ead6a7f5f606a30ed6aaef8b583}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ac24f818be2f0703c5d30e5efb828de5a}{void {\bfseries pin\-\_\-capacitance} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin, boost\-::units\-::quantity$<$ boost\-::units\-::si\-::capacitance $>$ capacitance)}\label{classophidian_1_1timing_1_1library_ac24f818be2f0703c5d30e5efb828de5a}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a054b6ca87043b352b3b25a47647d5562}{void {\bfseries setup\-\_\-rise\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_a054b6ca87043b352b3b25a47647d5562}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_affd690e12f7ef0ac193dba55fa95c113}{void {\bfseries hold\-\_\-rise\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_affd690e12f7ef0ac193dba55fa95c113}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a4c131116aa7d7cf83b2eb45b14130246}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \& {\bfseries setup\-\_\-rise} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a4c131116aa7d7cf83b2eb45b14130246}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a1e0fc898d5613e5373ce17f295eedeef}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \& {\bfseries hold\-\_\-rise} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a1e0fc898d5613e5373ce17f295eedeef}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a2f1566a609778f58ac45a2d2ad6d8715}{void {\bfseries setup\-\_\-fall\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_a2f1566a609778f58ac45a2d2ad6d8715}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a1dcdd86bf4493227660694c93b625437}{void {\bfseries hold\-\_\-fall\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_a1dcdd86bf4493227660694c93b625437}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a310b30a45dbbc4df6c2add6096fd1864}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \& {\bfseries setup\-\_\-fall} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a310b30a45dbbc4df6c2add6096fd1864}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_adacc6ed2658a61e6ddea0bfd5bfdc388}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{Test\-L\-U\-T} \& {\bfseries hold\-\_\-fall} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_adacc6ed2658a61e6ddea0bfd5bfdc388}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a646949c4832f6468123351064b255bbd}{boost\-::units\-::quantity\\*
+$<$ boost\-::units\-::si\-::capacitance $>$ {\bfseries pin\-\_\-capacitance} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const }\label{classophidian_1_1timing_1_1library_a646949c4832f6468123351064b255bbd}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ad7f737ee38aaf8310ea436c167d52ca9}{\hyperlink{classophidian_1_1standard__cell_1_1standard__cells}{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells} \& {\bfseries std\-\_\-cells} ()}\label{classophidian_1_1timing_1_1library_ad7f737ee38aaf8310ea436c167d52ca9}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a1378e88837646fc95954fc860608b709}{standard\-\_\-cell\-::pin\-\_\-directions {\bfseries pin\-\_\-direction} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const }\label{classophidian_1_1timing_1_1library_a1378e88837646fc95954fc860608b709}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ae671422e89e271f857012123acf757cc}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries timing\-\_\-arc\-\_\-from} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_ae671422e89e271f857012123acf757cc}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_acdc8cb23ea2f9f32be62adb73e59c420}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries timing\-\_\-arc\-\_\-to} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_acdc8cb23ea2f9f32be62adb73e59c420}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a76b538dd83fedd09e7ccbe797b6f5cfb}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries timing\-\_\-arc\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} from, \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} to)}\label{classophidian_1_1timing_1_1library_a76b538dd83fedd09e7ccbe797b6f5cfb}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_af77429734bed6603e0ffb0b79998804f}{const std\-::vector\\*
+$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$ \& {\bfseries pin\-\_\-timing\-\_\-arcs} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const }\label{classophidian_1_1timing_1_1library_af77429734bed6603e0ffb0b79998804f}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_af3a4a326eb98e7598bfb7a4ac567a840}{void {\bfseries timing\-\_\-arc\-\_\-rise\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_af3a4a326eb98e7598bfb7a4ac567a840}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a411500b8bed7c261feb2c8d4aeeebe39}{void {\bfseries timing\-\_\-arc\-\_\-fall\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_a411500b8bed7c261feb2c8d4aeeebe39}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_ae4a077e43bf2391385d03571e9d52f9f}{void {\bfseries timing\-\_\-arc\-\_\-rise\-\_\-delay} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_ae4a077e43bf2391385d03571e9d52f9f}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a766d088c33a877fa3ff00b2c11dbabe7}{void {\bfseries timing\-\_\-arc\-\_\-fall\-\_\-delay} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \&lut)}\label{classophidian_1_1timing_1_1library_a766d088c33a877fa3ff00b2c11dbabe7}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a7c0f3b88c543bd05c399abe6b929020b}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \& {\bfseries timing\-\_\-arc\-\_\-rise\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a7c0f3b88c543bd05c399abe6b929020b}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a58e0b141a9bfb0b89c305ae9386b76e1}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \& {\bfseries timing\-\_\-arc\-\_\-fall\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a58e0b141a9bfb0b89c305ae9386b76e1}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a9556fe013e754587c64a2db7029b9045}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \& {\bfseries timing\-\_\-arc\-\_\-rise\-\_\-delay} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a9556fe013e754587c64a2db7029b9045}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a3c7c5398f6f59c33b76d0ee8a44c6b24}{const \hyperlink{classophidian_1_1timing_1_1lookup__table}{L\-U\-T} \& {\bfseries timing\-\_\-arc\-\_\-fall\-\_\-delay} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_a3c7c5398f6f59c33b76d0ee8a44c6b24}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a19559d496b31f3dd25c715fca18c6cad}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries timing\-\_\-arc} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} from, \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} to) const }\label{classophidian_1_1timing_1_1library_a19559d496b31f3dd25c715fca18c6cad}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a65991807e093557aaebf333b875c3c95}{void {\bfseries timing\-\_\-arc\-\_\-timing\-\_\-sense} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, unateness timing\-\_\-sense)}\label{classophidian_1_1timing_1_1library_a65991807e093557aaebf333b875c3c95}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_af5cfd33ac27510a81a125683c1e98c48}{unateness {\bfseries timing\-\_\-arc\-\_\-timing\-\_\-sense} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_af5cfd33ac27510a81a125683c1e98c48}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_aa0e62d446a2ef93a6f74e40555455591}{void {\bfseries timing\-\_\-arc\-\_\-timing\-\_\-type} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc, timing\-\_\-arc\-\_\-types type)}\label{classophidian_1_1timing_1_1library_aa0e62d446a2ef93a6f74e40555455591}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_af7a8a5036ec2b1a5f6fafb9b5ebeba02}{timing\-\_\-arc\-\_\-types {\bfseries timing\-\_\-arc\-\_\-timing\-\_\-type} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} arc) const }\label{classophidian_1_1timing_1_1library_af7a8a5036ec2b1a5f6fafb9b5ebeba02}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_aa4e5a595f44abd517b2345c2bf9df5b5}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries cell\-\_\-create} (std\-::string name)}\label{classophidian_1_1timing_1_1library_aa4e5a595f44abd517b2345c2bf9df5b5}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a0a980f67c4360ca8aa9bf13055fb90b2}{\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} {\bfseries pin\-\_\-create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, std\-::string name)}\label{classophidian_1_1timing_1_1library_a0a980f67c4360ca8aa9bf13055fb90b2}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a6e03381495e1e32c755008b599d958f9}{void {\bfseries cell\-\_\-sequential} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, bool sequential)}\label{classophidian_1_1timing_1_1library_a6e03381495e1e32c755008b599d958f9}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_a6f7ffe00a84533941b821962b518e6bb}{bool {\bfseries cell\-\_\-sequential} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell) const }\label{classophidian_1_1timing_1_1library_a6f7ffe00a84533941b821962b518e6bb}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_af22828047fda8cd05b0409d0b1bba055}{void {\bfseries pin\-\_\-clock\-\_\-input} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin, bool clock\-\_\-input)}\label{classophidian_1_1timing_1_1library_af22828047fda8cd05b0409d0b1bba055}
+
+\item 
+\hypertarget{classophidian_1_1timing_1_1library_aefbce0ea37e99aaf16808b6420b77764}{bool {\bfseries pin\-\_\-clock\-\_\-input} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const }\label{classophidian_1_1timing_1_1library_aefbce0ea37e99aaf16808b6420b77764}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/timing/library.\-h\item 
+/home/renan/workspace/openeda/src/timing/library.\-cpp\end{DoxyCompactItemize}

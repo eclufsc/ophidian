@@ -1,0 +1,277 @@
+\hypertarget{classophidian_1_1floorplan_1_1floorplan}{\section{ophidian\-:\-:floorplan\-:\-:floorplan Class Reference}
+\label{classophidian_1_1floorplan_1_1floorplan}\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}}
+}
+
+
+Floorplan class.  
+
+
+
+
+{\ttfamily \#include $<$floorplan.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1floorplan_1_1floorplan_add37c6dba7efa30a5876c86724eb500d}{floorplan} (point \hyperlink{classophidian_1_1floorplan_1_1floorplan_a382fe697a6d6166b0cfb945de1f8ff70}{chip\-\_\-boundaries})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1floorplan_a382fe697a6d6166b0cfb945de1f8ff70}{chip\-\_\-boundaries} () const 
+\begin{DoxyCompactList}\small\item\em Chip boundaries getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1floorplan_1_1floorplan_ab463b231083c84ac04ba4812308d7fb0}{site\-\_\-insert} (std\-::string name, point dimensions)
+\begin{DoxyCompactList}\small\item\em Inserts a new site. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1floorplan_ad42b426f1cba815bf35d99d6dde69a64}{site\-\_\-destroy} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site)
+\begin{DoxyCompactList}\small\item\em Destroys a site. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1floorplan_1_1floorplan_a4c802b4b7d01d32124c08441a252a595}{site\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of sites. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1floorplan_1_1floorplan_a4fc7ee4e1596bb5a868bea820afb6d06}{site\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site) const 
+\begin{DoxyCompactList}\small\item\em Site name getter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1floorplan_a199f97cd289ec302d5a32b08852343b9}{site\-\_\-dimensions} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site) const 
+\begin{DoxyCompactList}\small\item\em Site dimensions getter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1floorplan_1_1sites}{sites} \& \hyperlink{classophidian_1_1floorplan_1_1floorplan_a8cdc6ae613d2eb53eff766539bfa2d3d}{sites\-\_\-properties} () const 
+\begin{DoxyCompactList}\small\item\em Sites properties getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1floorplan_1_1floorplan_a0e3e2e2e49b037387506f32736c46958}{row\-\_\-insert} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site, unsigned number\-\_\-of\-\_\-sites, point origin)
+\begin{DoxyCompactList}\small\item\em Inserts a new row. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1floorplan_a9f480d05677541d567260d67289eb6b3}{row\-\_\-destroy} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row)
+\begin{DoxyCompactList}\small\item\em Destroys a row. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1floorplan_1_1floorplan_a885d82c7486f55f0954503e29b30302a}{row\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of rows. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1floorplan_1_1floorplan_aaefd3a9811ccf325870a770f6fcf567b}{row\-\_\-site} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Row site getter. \end{DoxyCompactList}\item 
+unsigned \hyperlink{classophidian_1_1floorplan_1_1floorplan_ad3061c1c80f5767a35f40f8abc120f5a}{row\-\_\-number\-\_\-of\-\_\-sites} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Row number of sites getter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1floorplan_acd1a51329315d13aa2137757f6249546}{row\-\_\-origin} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Row origin getter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1floorplan_a77a8ac7e9f4bf139179466e6ff320047}{row\-\_\-dimensions} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Row dimensions getter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1floorplan_1_1rows}{rows} \& \hyperlink{classophidian_1_1floorplan_1_1floorplan_a7afdd1bd041f85a4e404e6524bdfcc13}{rows\-\_\-properties} () const 
+\begin{DoxyCompactList}\small\item\em Rows properties getter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides the basic floorplan interface, such as site and rows insertion, site and rows properties and circuit dimensions. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_add37c6dba7efa30a5876c86724eb500d}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!floorplan@{floorplan}}
+\index{floorplan@{floorplan}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{floorplan}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::floorplan\-::floorplan\-::floorplan (
+\begin{DoxyParamCaption}
+\item[{point}]{chip\-\_\-boundaries}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1floorplan_add37c6dba7efa30a5876c86724eb500d}
+Creates a circuit floorplan with given chip boundaries. The chip boundaries are represented by a point, where the x coordinate represents the width, while the y coordinate represents the height. 
+\begin{DoxyParams}{Parameters}
+{\em chip\-\_\-boundaries} & The chip boundaries for the floorplan \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a382fe697a6d6166b0cfb945de1f8ff70}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!chip\-\_\-boundaries@{chip\-\_\-boundaries}}
+\index{chip\-\_\-boundaries@{chip\-\_\-boundaries}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{chip\-\_\-boundaries}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::floorplan\-::floorplan\-::chip\-\_\-boundaries (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a382fe697a6d6166b0cfb945de1f8ff70}
+Returns the boundaries of the chip. \begin{DoxyReturn}{Returns}
+Point describing the chip boundaries. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a885d82c7486f55f0954503e29b30302a}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-count@{row\-\_\-count}}
+\index{row\-\_\-count@{row\-\_\-count}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::floorplan\-::floorplan\-::row\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a885d82c7486f55f0954503e29b30302a}
+Returns the number of rows created in the rows system. \begin{DoxyReturn}{Returns}
+Number of rows. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a9f480d05677541d567260d67289eb6b3}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-destroy@{row\-\_\-destroy}}
+\index{row\-\_\-destroy@{row\-\_\-destroy}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::floorplan\-::row\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1floorplan_a9f480d05677541d567260d67289eb6b3}
+Destroys an existing row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row to be destroyed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a77a8ac7e9f4bf139179466e6ff320047}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-dimensions@{row\-\_\-dimensions}}
+\index{row\-\_\-dimensions@{row\-\_\-dimensions}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-dimensions}]{\setlength{\rightskip}{0pt plus 5cm}floorplan\-::point ophidian\-::floorplan\-::floorplan\-::row\-\_\-dimensions (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const}}\label{classophidian_1_1floorplan_1_1floorplan_a77a8ac7e9f4bf139179466e6ff320047}
+Returns the dimensions of a row, calculated using the number of sites and site dimensions in that row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to gets the dimensions. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the dimensions of that row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a0e3e2e2e49b037387506f32736c46958}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-insert@{row\-\_\-insert}}
+\index{row\-\_\-insert@{row\-\_\-insert}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::floorplan\-::floorplan\-::row\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site, }
+\item[{unsigned}]{number\-\_\-of\-\_\-sites, }
+\item[{floorplan\-::point}]{origin}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1floorplan_a0e3e2e2e49b037387506f32736c46958}
+Inserts a new row in the floorplan. A row has a site, number of sites and origin. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Entity of the site of this row. \\
+\hline
+{\em number\-\_\-of\-\_\-sites} & Number of sites which the row consists of. \\
+\hline
+{\em origin} & Point describing the row origin. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_ad3061c1c80f5767a35f40f8abc120f5a}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-number\-\_\-of\-\_\-sites@{row\-\_\-number\-\_\-of\-\_\-sites}}
+\index{row\-\_\-number\-\_\-of\-\_\-sites@{row\-\_\-number\-\_\-of\-\_\-sites}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-number\-\_\-of\-\_\-sites}]{\setlength{\rightskip}{0pt plus 5cm}unsigned ophidian\-::floorplan\-::floorplan\-::row\-\_\-number\-\_\-of\-\_\-sites (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_ad3061c1c80f5767a35f40f8abc120f5a}
+Returns the number of sites of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the number of sites. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of sites in that row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_acd1a51329315d13aa2137757f6249546}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-origin@{row\-\_\-origin}}
+\index{row\-\_\-origin@{row\-\_\-origin}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-origin}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::floorplan\-::floorplan\-::row\-\_\-origin (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_acd1a51329315d13aa2137757f6249546}
+Returns the origin of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the origin. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the origin of that row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_aaefd3a9811ccf325870a770f6fcf567b}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!row\-\_\-site@{row\-\_\-site}}
+\index{row\-\_\-site@{row\-\_\-site}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{row\-\_\-site}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::floorplan\-::floorplan\-::row\-\_\-site (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_aaefd3a9811ccf325870a770f6fcf567b}
+Returns the site of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the site. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity representing the site of the row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a7afdd1bd041f85a4e404e6524bdfcc13}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!rows\-\_\-properties@{rows\-\_\-properties}}
+\index{rows\-\_\-properties@{rows\-\_\-properties}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{rows\-\_\-properties}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf rows}\& ophidian\-::floorplan\-::floorplan\-::rows\-\_\-properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a7afdd1bd041f85a4e404e6524bdfcc13}
+Returns the object describing rows properties. \begin{DoxyReturn}{Returns}
+A constant reference to the object describing rows properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a4c802b4b7d01d32124c08441a252a595}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!site\-\_\-count@{site\-\_\-count}}
+\index{site\-\_\-count@{site\-\_\-count}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{site\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::floorplan\-::floorplan\-::site\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a4c802b4b7d01d32124c08441a252a595}
+Returns the number of sites created in the sites system. \begin{DoxyReturn}{Returns}
+Number of sites. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_ad42b426f1cba815bf35d99d6dde69a64}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!site\-\_\-destroy@{site\-\_\-destroy}}
+\index{site\-\_\-destroy@{site\-\_\-destroy}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{site\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::floorplan\-::site\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1floorplan_ad42b426f1cba815bf35d99d6dde69a64}
+Destroys an existing site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site to be destroyed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a199f97cd289ec302d5a32b08852343b9}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!site\-\_\-dimensions@{site\-\_\-dimensions}}
+\index{site\-\_\-dimensions@{site\-\_\-dimensions}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{site\-\_\-dimensions}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::floorplan\-::floorplan\-::site\-\_\-dimensions (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a199f97cd289ec302d5a32b08852343b9}
+Returns the dimensions of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to get the dimensions. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the site dimensions. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_ab463b231083c84ac04ba4812308d7fb0}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!site\-\_\-insert@{site\-\_\-insert}}
+\index{site\-\_\-insert@{site\-\_\-insert}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{site\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::floorplan\-::floorplan\-::site\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name, }
+\item[{floorplan\-::point}]{dimensions}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1floorplan_ab463b231083c84ac04ba4812308d7fb0}
+Inserts a new site in the floorplan. A site has a name and dimensions associated to it. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the site, used to identify it. \\
+\hline
+{\em dimensions} & Point describing the site dimensions. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created site. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a4fc7ee4e1596bb5a868bea820afb6d06}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!site\-\_\-name@{site\-\_\-name}}
+\index{site\-\_\-name@{site\-\_\-name}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{site\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::floorplan\-::floorplan\-::site\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a4fc7ee4e1596bb5a868bea820afb6d06}
+Returns the name of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the site. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1floorplan_a8cdc6ae613d2eb53eff766539bfa2d3d}{\index{ophidian\-::floorplan\-::floorplan@{ophidian\-::floorplan\-::floorplan}!sites\-\_\-properties@{sites\-\_\-properties}}
+\index{sites\-\_\-properties@{sites\-\_\-properties}!ophidian::floorplan::floorplan@{ophidian\-::floorplan\-::floorplan}}
+\subsubsection[{sites\-\_\-properties}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf sites}\& ophidian\-::floorplan\-::floorplan\-::sites\-\_\-properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1floorplan_a8cdc6ae613d2eb53eff766539bfa2d3d}
+Returns the object describing sites properties. \begin{DoxyReturn}{Returns}
+A constant reference to the object describing sites properties. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/floorplan/floorplan.\-h\item 
+/home/renan/workspace/openeda/src/floorplan/floorplan.\-cpp\end{DoxyCompactItemize}

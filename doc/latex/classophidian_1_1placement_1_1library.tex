@@ -1,0 +1,138 @@
+\hypertarget{classophidian_1_1placement_1_1library}{\section{ophidian\-:\-:placement\-:\-:library Class Reference}
+\label{classophidian_1_1placement_1_1library}\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}}
+}
+
+
+Placement library class.  
+
+
+
+
+{\ttfamily \#include $<$library.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1placement_1_1library_a33f89c4a0aa6a5f27a0f7b6b1021bac5}{library} (\hyperlink{classophidian_1_1standard__cell_1_1standard__cells}{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells} $\ast$std\-\_\-cells)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+multipolygon \hyperlink{classophidian_1_1placement_1_1library_afc2a71a35aa645d13c4e55884a46b219}{geometry} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell) const 
+\begin{DoxyCompactList}\small\item\em Cell geometry getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1placement_1_1library_af050cbfc19f4e4294b8a21a01f0c8b9d}{geometry} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, multipolygon geometry)
+\begin{DoxyCompactList}\small\item\em Cell geometry setter. \end{DoxyCompactList}\item 
+int32\-\_\-t \hyperlink{classophidian_1_1placement_1_1library_a418ab862570f88891352d4025b4d90b5}{dist2microns} () const 
+\begin{DoxyCompactList}\small\item\em Distance unit to microns ratio getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1placement_1_1library_ad602d111fb0bb7e7108feb682268a183}{pin\-\_\-offset} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin, point offset)
+\begin{DoxyCompactList}\small\item\em Pin offset setter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1placement_1_1library_a1c26ff5bc43f9659b015c77a44f1e6e6}{pin\-\_\-offset} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const 
+\begin{DoxyCompactList}\small\item\em Pin offset getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1placement_1_1library_aa421a90150a98aa9bfb26ceca82a89a1}{dist2microns} (int32\-\_\-t dist)
+\begin{DoxyCompactList}\small\item\em Distance unit to microns ratio setter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides the interface to placement library properties, such as cell geometries and pin offsets. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1placement_1_1library_a33f89c4a0aa6a5f27a0f7b6b1021bac5}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!library@{library}}
+\index{library@{library}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{library}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::placement\-::library\-::library (
+\begin{DoxyParamCaption}
+\item[{{\bf ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells} $\ast$}]{std\-\_\-cells}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1library_a33f89c4a0aa6a5f27a0f7b6b1021bac5}
+Placement library constructor. Register the cell geometries and pin offsets properties. 
+\begin{DoxyParams}{Parameters}
+{\em std\-\_\-cells} & Standard cell library. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1placement_1_1library_a418ab862570f88891352d4025b4d90b5}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!dist2microns@{dist2microns}}
+\index{dist2microns@{dist2microns}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{dist2microns}]{\setlength{\rightskip}{0pt plus 5cm}int32\-\_\-t ophidian\-::placement\-::library\-::dist2microns (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1library_a418ab862570f88891352d4025b4d90b5}
+Returns the number of microns in a distance unit of the library. \begin{DoxyReturn}{Returns}
+Number of microns in a distance unit. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1library_aa421a90150a98aa9bfb26ceca82a89a1}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!dist2microns@{dist2microns}}
+\index{dist2microns@{dist2microns}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{dist2microns}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::placement\-::library\-::dist2microns (
+\begin{DoxyParamCaption}
+\item[{int32\-\_\-t}]{dist}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1library_aa421a90150a98aa9bfb26ceca82a89a1}
+Sets the number of microns in a distance unit of the library. 
+\begin{DoxyParams}{Parameters}
+{\em dist} & Number of microns in a distance unit. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1placement_1_1library_afc2a71a35aa645d13c4e55884a46b219}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!geometry@{geometry}}
+\index{geometry@{geometry}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{geometry}]{\setlength{\rightskip}{0pt plus 5cm}multipolygon ophidian\-::placement\-::library\-::geometry (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1library_afc2a71a35aa645d13c4e55884a46b219}
+Returns the geometry of a cell as a multi polygon. Each polygon in the multi polygon represents a rectangle of the cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the geometry. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Multi polygon representing the cell geometry. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1library_af050cbfc19f4e4294b8a21a01f0c8b9d}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!geometry@{geometry}}
+\index{geometry@{geometry}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{geometry}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::placement\-::library\-::geometry (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell, }
+\item[{multipolygon}]{geometry}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1library_af050cbfc19f4e4294b8a21a01f0c8b9d}
+Sets the geometry of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to set the geometry. \\
+\hline
+{\em geometry} & Multi polygon representing the cell geometry. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1placement_1_1library_ad602d111fb0bb7e7108feb682268a183}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!pin\-\_\-offset@{pin\-\_\-offset}}
+\index{pin\-\_\-offset@{pin\-\_\-offset}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{pin\-\_\-offset}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::placement\-::library\-::pin\-\_\-offset (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin, }
+\item[{point}]{offset}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1library_ad602d111fb0bb7e7108feb682268a183}
+Sets the offset of a pin with relation to its owner cell. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to set the offset. \\
+\hline
+{\em offset} & Point describing the pin offset. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1placement_1_1library_a1c26ff5bc43f9659b015c77a44f1e6e6}{\index{ophidian\-::placement\-::library@{ophidian\-::placement\-::library}!pin\-\_\-offset@{pin\-\_\-offset}}
+\index{pin\-\_\-offset@{pin\-\_\-offset}!ophidian::placement::library@{ophidian\-::placement\-::library}}
+\subsubsection[{pin\-\_\-offset}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::placement\-::library\-::pin\-\_\-offset (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1library_a1c26ff5bc43f9659b015c77a44f1e6e6}
+Returns the offset of a pin with relation to its owner cell. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the offset. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the pin offset. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/placement/library.\-h\item 
+/home/renan/workspace/openeda/src/placement/library.\-cpp\end{DoxyCompactItemize}

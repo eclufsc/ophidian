@@ -1,0 +1,191 @@
+\hypertarget{classophidian_1_1floorplan_1_1rows}{\section{ophidian\-:\-:floorplan\-:\-:rows Class Reference}
+\label{classophidian_1_1floorplan_1_1rows}\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}}
+}
+
+
+Rows class.  
+
+
+
+
+{\ttfamily \#include $<$rows.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1floorplan_1_1rows_a615ba2d1e4ca91c9faf91e9f2d53efed}{rows} (\hyperlink{classophidian_1_1entity_1_1system}{entity\-::system} \&system)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1floorplan_1_1rows_ad752fabe326be190ca1db1c6f3041a05}{site} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Site getter. \end{DoxyCompactList}\item 
+unsigned \hyperlink{classophidian_1_1floorplan_1_1rows_a4f502b7792681191ab717db70370622e}{number\-\_\-of\-\_\-sites} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Number of sites getter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1rows_a7dd1c9c3743ca06933fa6fc120e65d57}{origin} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row) const 
+\begin{DoxyCompactList}\small\item\em Row origin getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector\\*
+$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator, std\-::vector\\*
+$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1floorplan_1_1rows_a259f8f0511ad0e1c139b97a418aca957}{sites} () const 
+\begin{DoxyCompactList}\small\item\em Sites iterator getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector\\*
+$<$ unsigned $>$\-::const\-\_\-iterator, \\*
+std\-::vector$<$ unsigned $>$\\*
+\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1floorplan_1_1rows_ad9da40317e6b4eaada1893b925bca1f4}{number\-\_\-of\-\_\-sites} () const 
+\begin{DoxyCompactList}\small\item\em Number of sites iterator getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector$<$ point $>$\\*
+\-::const\-\_\-iterator, std\-::vector\\*
+$<$ point $>$\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1floorplan_1_1rows_a37a388de47fe14525780086d17e3bcfb}{origins} () const 
+\begin{DoxyCompactList}\small\item\em Origins iterator getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1rows_ac4ea14b0ce48d27aca9b8522bb501b14}{site} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row, \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site)
+\begin{DoxyCompactList}\small\item\em Site setter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1rows_a590b0a0b337edaa5d52d2ad272cd6736}{number\-\_\-of\-\_\-sites} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row, unsigned number\-\_\-of\-\_\-sites)
+\begin{DoxyCompactList}\small\item\em Number of sites setter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1rows_a497e85a03604c2c3fb1f44fdbeafa260}{origin} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} row, point origin)
+\begin{DoxyCompactList}\small\item\em Origin setter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class describes the properties of rows initialized by the floorplan module. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a615ba2d1e4ca91c9faf91e9f2d53efed}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!rows@{rows}}
+\index{rows@{rows}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{rows}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::floorplan\-::rows\-::rows (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::system} \&}]{system}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1rows_a615ba2d1e4ca91c9faf91e9f2d53efed}
+Rows object constructor. Register the rows properties to the rows system. 
+\begin{DoxyParams}{Parameters}
+{\em system} & Rows entity system. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a4f502b7792681191ab717db70370622e}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}}
+\index{number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{number\-\_\-of\-\_\-sites}]{\setlength{\rightskip}{0pt plus 5cm}unsigned ophidian\-::floorplan\-::rows\-::number\-\_\-of\-\_\-sites (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_a4f502b7792681191ab717db70370622e}
+Returns the number of sites in a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the number of sites. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of sites of the row. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1rows_ad9da40317e6b4eaada1893b925bca1f4}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}}
+\index{number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{number\-\_\-of\-\_\-sites}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<$unsigned$>$\-::const\-\_\-iterator, std\-::vector$<$unsigned$>$\-::const\-\_\-iterator $>$ ophidian\-::floorplan\-::rows\-::number\-\_\-of\-\_\-sites (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_ad9da40317e6b4eaada1893b925bca1f4}
+Returns the begin and end iterator of the row number of sites property. \begin{DoxyReturn}{Returns}
+Pair with constant iterators pointing the the beginning and end of the number of sites property. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a590b0a0b337edaa5d52d2ad272cd6736}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}}
+\index{number\-\_\-of\-\_\-sites@{number\-\_\-of\-\_\-sites}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{number\-\_\-of\-\_\-sites}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::rows\-::number\-\_\-of\-\_\-sites (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row, }
+\item[{unsigned}]{number\-\_\-of\-\_\-sites}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1rows_a590b0a0b337edaa5d52d2ad272cd6736}
+Sets the number of sites of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to set the number of sites. \\
+\hline
+{\em number\-\_\-of\-\_\-sites} & Number of sites to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a7dd1c9c3743ca06933fa6fc120e65d57}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!origin@{origin}}
+\index{origin@{origin}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{origin}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::floorplan\-::rows\-::origin (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_a7dd1c9c3743ca06933fa6fc120e65d57}
+Returns the origin of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the origin. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the row origin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a497e85a03604c2c3fb1f44fdbeafa260}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!origin@{origin}}
+\index{origin@{origin}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{origin}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::rows\-::origin (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row, }
+\item[{rows\-::point}]{origin}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1rows_a497e85a03604c2c3fb1f44fdbeafa260}
+Sets the origin of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to set the origin. \\
+\hline
+{\em origin} & Origin to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a37a388de47fe14525780086d17e3bcfb}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!origins@{origins}}
+\index{origins@{origins}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{origins}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<$point$>$\-::const\-\_\-iterator, std\-::vector$<$point$>$\-::const\-\_\-iterator $>$ ophidian\-::floorplan\-::rows\-::origins (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_a37a388de47fe14525780086d17e3bcfb}
+Returns the begin and end iterator of the row origins property. \begin{DoxyReturn}{Returns}
+Pair with constant iterators pointing the the beginning and end of the origins property. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1rows_ad752fabe326be190ca1db1c6f3041a05}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!site@{site}}
+\index{site@{site}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{site}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::floorplan\-::rows\-::site (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_ad752fabe326be190ca1db1c6f3041a05}
+Returns the site composing a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to get the site. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Site entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1rows_ac4ea14b0ce48d27aca9b8522bb501b14}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!site@{site}}
+\index{site@{site}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{site}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::rows\-::site (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{row, }
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1rows_ac4ea14b0ce48d27aca9b8522bb501b14}
+Sets the site of a row. 
+\begin{DoxyParams}{Parameters}
+{\em row} & Row entity to set the site. \\
+\hline
+{\em site} & Site entity to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1rows_a259f8f0511ad0e1c139b97a418aca957}{\index{ophidian\-::floorplan\-::rows@{ophidian\-::floorplan\-::rows}!sites@{sites}}
+\index{sites@{sites}!ophidian::floorplan::rows@{ophidian\-::floorplan\-::rows}}
+\subsubsection[{sites}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator, std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator $>$ ophidian\-::floorplan\-::rows\-::sites (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1rows_a259f8f0511ad0e1c139b97a418aca957}
+Returns the begin and end iterator of the row sites property. \begin{DoxyReturn}{Returns}
+Pair with constant iterators pointing the the beginning and end of the sites property. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/floorplan/rows.\-h\item 
+/home/renan/workspace/openeda/src/floorplan/rows.\-cpp\end{DoxyCompactItemize}
