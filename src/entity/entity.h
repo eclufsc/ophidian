@@ -37,7 +37,7 @@ namespace entity {
 		 * This class describes an entity from an entity system, which can have properties associated to it.
 		 */
 class entity {
-	uint32_t m_id;
+    uint32_t m_id;
 public:
 
 	/// Constructor.
@@ -82,21 +82,62 @@ public:
 // custom specialization of std::hash can be injected in namespace std
 namespace std
 {
-    template<> struct hash<ophidian::entity::entity>
+template<> struct hash<ophidian::entity::entity>
+{
+    typedef ophidian::entity::entity argument_type;
+    typedef std::size_t result_type;
+    result_type operator()(argument_type const& s) const
     {
-        typedef ophidian::entity::entity argument_type;
-        typedef std::size_t result_type;
-        result_type operator()(argument_type const& s) const
-        {
-            result_type const h1 ( std::hash<std::uint32_t>()(s.id()) );
-            return h1;
-        }
-    };
+        result_type const h1 ( std::hash<std::uint32_t>()(s.id()) );
+        return h1;
+    }
+};
 }
 
 
 namespace ophidian {
 namespace entity{
+
+	using entity2index_map = typename boost::bimap< entity, std::size_t >;
+	using entity2index_map_iterator = typename entity2index_map::left_const_iterator;
+
+	class bimap_iterator_adapter {
+		entity2index_map_iterator m_it;
+	public:
+		bimap_iterator_adapter(entity2index_map_iterator it) :
+				m_it(it){
+
+		}
+		bimap_iterator_adapter(const bimap_iterator_adapter & o) :
+				m_it(o.m_it){
+
+		}
+		bimap_iterator_adapter& operator=(const bimap_iterator_adapter & o) {
+			m_it = o.m_it;
+			return *this;
+		}
+		virtual ~bimap_iterator_adapter()
+		{
+		}
+		bimap_iterator_adapter operator++(int) {
+			m_it++;
+		}
+		bimap_iterator_adapter operator--(int) {
+			m_it--;
+		}
+		bimap_iterator_adapter& operator++() {
+			++m_it;
+		}
+		bimap_iterator_adapter& operator--() {
+			--m_it;
+		}
+		bool operator!=(const bimap_iterator_adapter & other) const {
+			return m_it != other.m_it;
+		}
+		entity operator*() {
+			return m_it->first;
+		}
+	};
 
 	/// System class.
 	/*
@@ -107,8 +148,7 @@ class system {
 	entity2index_map m_entities;
 	uint32_t m_next;
 
-	std::set<property*> m_properties;
-
+    std::set<property*> m_properties;
 public:
 	/// Constructor.
 	/**
@@ -178,6 +218,7 @@ public:
 	std::size_t lookup(entity & e) const { return m_entities.left.at(e); }
 
 };
+
 
 } /* namespace entity */
 } /* namespace ophidian */
