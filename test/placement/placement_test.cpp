@@ -46,10 +46,54 @@ TEST_CASE("placement/place cell", "[placement]") {
 
 	placement.cell_position(u1, { 100.0, 200.0 });
 
+	REQUIRE(placement.cell_position(u1).x() == 100.0);
+	REQUIRE(placement.cell_position(u1).y() == 200.0);
+
 	REQUIRE(placement.pin_position(u1a).x() == 101.0);
 	REQUIRE(placement.pin_position(u1a).y() == 202.0);
 
 	REQUIRE(placement.pin_position(u1o).x() == 103.0);
 	REQUIRE(placement.pin_position(u1o).y() == 204.0);
 
+}
+
+TEST_CASE("placement/trying to move fixed cell", "[placement]") {
+	openeda::standard_cell::standard_cells std_cells;
+	openeda::netlist::netlist netlist(&std_cells);
+	openeda::placement::library lib { &std_cells };
+	openeda::placement::placement placement { &netlist, &lib };
+
+	auto INV_X1 = std_cells.cell_create("INV_X1");
+	auto INV_X1a = std_cells.pin_create(INV_X1, "a");
+	auto INV_X1o = std_cells.pin_create(INV_X1, "o");
+
+	lib.pin_offset(INV_X1a, { 1.0, 2.0 });
+	lib.pin_offset(INV_X1o, { 3.0, 4.0 });
+
+	auto u1 = netlist.cell_insert("u1", "INV_X1");
+	auto u1a = netlist.pin_insert(u1, "a");
+	auto u1o = netlist.pin_insert(u1, "o");
+
+	placement.cell_position(u1, { 100.0, 200.0 });
+
+	REQUIRE(placement.cell_position(u1).x() == 100.0);
+	REQUIRE(placement.cell_position(u1).y() == 200.0);
+
+	REQUIRE(placement.pin_position(u1a).x() == 101.0);
+	REQUIRE(placement.pin_position(u1a).y() == 202.0);
+
+	REQUIRE(placement.pin_position(u1o).x() == 103.0);
+	REQUIRE(placement.pin_position(u1o).y() == 204.0);
+
+	placement.cell_fixed(u1, true);
+	placement.cell_position(u1, {300.0, 400.0});
+
+	REQUIRE(placement.cell_position(u1).x() == 100.0);
+	REQUIRE(placement.cell_position(u1).y() == 200.0);
+
+	REQUIRE(placement.pin_position(u1a).x() == 101.0);
+	REQUIRE(placement.pin_position(u1a).y() == 202.0);
+
+	REQUIRE(placement.pin_position(u1o).x() == 103.0);
+	REQUIRE(placement.pin_position(u1o).y() == 204.0);
 }

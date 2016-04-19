@@ -57,7 +57,7 @@ namespace openeda {
                 return free_space;
             }
 
-            void bin_movable_utilization(entity::entity bin, double movable_utilization);
+            void add_movable_utilization(entity::entity bin, double movable_utilization);
 
             const bins & bins_properties() const {
                 return m_bins;
@@ -67,7 +67,7 @@ namespace openeda {
                 return m_bins_system;
             }
 
-            entity::entity intersecting_bins(box region, std::vector<entity::entity> & bins);
+            void intersecting_bins(box region, std::vector<entity::entity> & bins);
         };
     }
 }

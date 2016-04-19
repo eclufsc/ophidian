@@ -85,12 +85,14 @@ void read_init_def_components(std::istream &is, netlist::netlist* netlist,
 			get_next_token(is, tokens[0], DEFCommentChar);
 
 			if (tokens[0] == "PLACED" || tokens[0] == "FIXED") {
+				bool fixed = tokens[0] == "FIXED";
 				//				myCell->isFixed = (tokens[0] == "FIXED");
 				get_next_n_tokens(is, tokens, 5, DEFCommentChar);
 				assert(tokens[0] == "(");
 				assert(tokens[3] == ")");
 				cells->cell_position(cell,
 						{ std::stod(tokens[1]), std::stod(tokens[2]) });
+				cells->cell_fixed(cell, fixed);
 
 				//				myCell->init_x_coord = atoi(tokens[1].c_str());
 				//				myCell->init_y_coord = atoi(tokens[2].c_str());

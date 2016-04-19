@@ -56,7 +56,7 @@ namespace openeda {
                     multi_polygon intersection;
                     boost::geometry::intersection(bin_boundaries, *cell_geometry_it, intersection);
                     double intersection_area = boost::geometry::area(intersection);
-                    m_density.bin_movable_utilization(bin, intersection_area);
+                    m_density.add_movable_utilization(bin, intersection_area);
                 }
 
             }

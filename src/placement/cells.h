@@ -26,6 +26,7 @@ class cells  {
 
 	entity::vector_property<multipolygon> m_geometries;
 	entity::vector_property<point> m_positions;
+	entity::vector_property<bool> m_fixed;
 
 public:
 	cells(openeda::netlist::netlist * netlist);
@@ -45,6 +46,11 @@ public:
 	}
 	std::pair< std::vector<multipolygon>::const_iterator, std::vector<multipolygon>::const_iterator > geometries() const {
 		return std::make_pair(m_geometries.begin(), m_geometries.end());
+	}
+
+	void fixed(entity::entity cell, bool fixed);
+	bool fixed(entity::entity cell) const {
+		return m_fixed[m_system.lookup(cell)];
 	}
 };
 

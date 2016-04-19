@@ -27,4 +27,7 @@ TEST_CASE("def read", "[def]") {
 	REQUIRE( boost::geometry::equals( position, golden ) );
 	REQUIRE( boost::geometry::equals( pad_position, golden_pad_position ) );
 
+	auto fixed_cell = netlist.cell_find("A1_B1_C3_D3_E18_F6_G6_o680467");
+	REQUIRE(cells.cell_fixed(fixed_cell));
+
 }

@@ -18,7 +18,7 @@ namespace openeda {
             m_bins_rtree.insert(std::make_pair(bin_box, bin));
         }
 
-        entity::entity density_map::intersecting_bins(density_map::box region, std::vector<entity::entity> &bins) {
+        void density_map::intersecting_bins(density_map::box region, std::vector<entity::entity> &bins) {
             std::vector<rtree_node> intersecting_nodes;
             m_bins_rtree.query(boost::geometry::index::intersects(region), intersecting_nodes);
             bins.reserve(intersecting_nodes.size());
@@ -27,8 +27,9 @@ namespace openeda {
             }
         }
 
-        void density_map::bin_movable_utilization(entity::entity bin, double movable_utilization) {
-            m_bins.movable_utilization(bin, movable_utilization);
+        void density_map::add_movable_utilization(entity::entity bin, double movable_utilization) {
+            auto current_movable_utilization = m_bins.movable_utilization(bin);
+            m_bins.movable_utilization(bin, current_movable_utilization + movable_utilization);
         }
     }
 }

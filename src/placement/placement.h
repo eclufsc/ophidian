@@ -31,10 +31,13 @@ public:
 	geometry::point<double> cell_position(entity::entity cell) const {
 		return m_cells.position(cell);
 	}
+	void cell_fixed(entity::entity cell, bool fixed);
+	bool cell_fixed(entity::entity cell) const {
+		return m_cells.fixed(cell);
+	}
 
 
 	geometry::point<double> pin_position(entity::entity pin) const {
-
 		entity::entity owner = m_netlist->pin_owner(pin);
 		entity::entity std_cell_pin = m_netlist->pin_std_cell(pin);
 
