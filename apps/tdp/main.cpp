@@ -43,18 +43,13 @@ int main(int argc, char **argv) {
     std::cout << "WNS Late: " << tdp.late_wns() << std::endl;
 
     // places cell `u1` at (1000,1500)
-    tdp.place_cell(tdp.find_cell("u1"), timingdriven_placement::Point(1000,1500));
-
-    // gets all cells and geometries
-    auto cells_geometries = tdp.cells_geometries();
-    auto & cells = cells_geometries.cells;
-    auto & geometries = cells_geometries.geometries;
+    tdp.place_cell(tdp.cell_find("u1"), timingdriven_placement::Point(1000,1500));
 
     // iterates over each cell and prints its name and geometry in WKT format
-    for(std::size_t i{0}; i < cells.size(); ++i)
+    for(auto cell : tdp.cells())
     {
-        std::cout << tdp.cell_name(cells[i]);
-        std::cout << "\t" << geometry::wkt(geometries[i]) << std::endl;
+        std::cout << tdp.cell_name(cell);
+        std::cout << "\t" << geometry::wkt(tdp.cell_geometry(cell)) << std::endl;
     }
 
     // calls STA

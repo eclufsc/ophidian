@@ -16,78 +16,130 @@
  *
 */
 
-#ifndef SRC_TIMING_STATIC_TIMING_ANALYSIS_H_
-#define SRC_TIMING_STATIC_TIMING_ANALYSIS_H_
+#ifndef OPHIDIAN_TIMING_STATIC_TIMING_ANALYSIS_H
+#define OPHIDIAN_TIMING_STATIC_TIMING_ANALYSIS_H
 
-#include "graph.h"
-#include "design_constraints.h"
-#include "../netlist/netlist.h"
+#include "generic_sta.h"
+#include "endpoints.h"
 
-#include "sta_arc_calculator.h"
 
 namespace ophidian {
 namespace timing {
 
-class static_timing_analysis {
-	const graph & m_graph;
-	const library & m_library;
 
-	graph_nodes_timing m_nodes;
-	graph_arcs_timing m_arcs;
+using TimeType = boost::units::quantity< boost::units::si::time > ;
+using Cell = entity::entity;
+using Net = entity::entity;
+using Pin = entity::entity;
 
-    sta_interconnection_estimator * m_interconnection_estimator;
-    sta_timing_arc_edge_calculator m_tarcs;
-    sta_timing_net_edge_calculator m_tnets;
 
-    lemon::ListDigraph::ArcMap<sta_timing_edge_calculator *> m_arcs_calculators;
 
-    std::vector< lemon::ListDigraph::Node > m_topological_sorted_nodes;
-    std::deque< entity::entity > m_dirty_nets;
+class static_timing_analysis
+{
+    const timing::graph * m_timing_graph;
+    const entity::vector_property< interconnection::rc_tree > * m_rc_trees;
+    const library * m_late_lib;
+    const library * m_early_lib;
+    const netlist::netlist * m_netlist;
+    design_constraints m_dc;
 
-    std::unordered_set< entity::entity > m_dirty;
 
+    // lazy pointers
+    std::unique_ptr<timing_data> m_late;
+    std::unique_ptr<timing_data> m_early;
+    std::unique_ptr<graph_and_topology> m_topology;
+    std::unique_ptr<generic_sta<effective_capacitance_wire_model, pessimistic> > m_late_sta;
+    std::unique_ptr<generic_sta<effective_capacitance_wire_model, optimistic> > m_early_sta;
+    std::unique_ptr<test_calculator> m_test;
+    endpoints m_endpoints;
+    TimeType m_lwns;
+    TimeType m_ewns;
+    TimeType m_ltns;
+    TimeType m_etns;
+
+    void init_timing_data();
+    void propagate_ats();
+    void propagate_rts();
+    void update_wns_and_tns();
+    bool has_timing_data() const {
+        assert(m_rc_trees);
+        assert(m_timing_graph);
+        assert(m_late_lib && m_early_lib);
+        assert(m_netlist);
+        return m_late_sta && m_early_sta;
+    }
 public:
-    static_timing_analysis(const graph & g, const library & lib, sta_interconnection_estimator * interconnection_estimator);
-	virtual ~static_timing_analysis();
+    static_timing_analysis();
+    void graph(const timing::graph& g);
+    void rc_trees(const entity::vector_property< interconnection::rc_tree > & trees);
+    void late_lib(const library& lib);
+    void early_lib(const library& lib);
+    void netlist(const netlist::netlist & netlist);
+    void set_constraints(const design_constraints & dc);
 
-	void make_dirty(entity::entity net);
+    void update_timing();
 
-	void set_constraints(const netlist::netlist & netlist, const design_constraints & dc);
 
-	void run();
-
-    boost::units::quantity<boost::units::si::time> rise_slack(entity::entity pin) const {
-        assert(m_graph.node_edge(m_graph.rise_node(pin)) == edges::RISE);
-        return m_nodes.required(m_graph.rise_node(pin)) - m_nodes.arrival(m_graph.rise_node(pin));
+    TimeType late_wns() const {
+        return m_lwns;
+    }
+    TimeType early_wns() const{
+        return m_ewns;
+    }
+    TimeType late_tns() const {
+        return m_ltns;
+    }
+    TimeType early_tns() const{
+        return m_etns;
     }
 
-    boost::units::quantity<boost::units::si::time> fall_slack(entity::entity pin) const {
-        assert(m_graph.node_edge(m_graph.fall_node(pin)) == edges::FALL);
-        return m_nodes.required(m_graph.fall_node(pin)) - m_nodes.arrival(m_graph.fall_node(pin));
+    TimeType early_rise_slack(Pin p) const {
+        return m_early_sta->rise_slack(p);
+    }
+    TimeType early_fall_slack(Pin p) const {
+        return m_early_sta->fall_slack(p);
+    }
+    TimeType late_rise_slack(Pin p) const {
+        return m_late_sta->rise_slack(p);
+    }
+    TimeType late_fall_slack(Pin p) const {
+        return m_late_sta->rise_slack(p);
     }
 
-	boost::units::quantity<boost::units::si::time> rise_arrival(entity::entity pin) const {
-        assert(m_graph.node_edge(m_graph.rise_node(pin)) == edges::RISE);
-		return m_nodes.arrival(m_graph.rise_node(pin));
-	}
+    TimeType early_rise_arrival(Pin p) const {
+        return m_early_sta->rise_arrival(p);
+    }
+    TimeType early_fall_arrival(Pin p) const {
+        return m_early_sta->fall_arrival(p);
+    }
+    TimeType late_rise_arrival(Pin p) const {
+        return m_late_sta->rise_arrival(p);
+    }
+    TimeType late_fall_arrival(Pin p) const {
+        return m_late_sta->rise_arrival(p);
+    }
 
-	boost::units::quantity<boost::units::si::time> fall_arrival(entity::entity pin) const {
-        assert(m_graph.node_edge(m_graph.fall_node(pin)) == edges::FALL);
-		return m_nodes.arrival(m_graph.fall_node(pin));
-	}
+    TimeType early_rise_slew(Pin p) const {
+        return m_early_sta->rise_slew(p);
+    }
+    TimeType early_fall_slew(Pin p) const {
+        return m_early_sta->fall_slew(p);
+    }
+    TimeType late_rise_slew(Pin p) const {
+        return m_late_sta->rise_slew(p);
+    }
+    TimeType late_fall_slew(Pin p) const {
+        return m_late_sta->rise_slew(p);
+    }
 
-	boost::units::quantity<boost::units::si::time> rise_slew(entity::entity pin) const {
-		return m_nodes.slew(m_graph.rise_node(pin));
-	}
+    const endpoints & timing_endpoints() const {
+        return m_endpoints;
+    }
 
-	boost::units::quantity<boost::units::si::time> fall_slew(entity::entity pin) const {
-		return m_nodes.slew(m_graph.fall_node(pin));
-	}
-
-    std::vector< entity::entity > critical_path() const;
 };
 
-} /* namespace timing */
-} /* namespace ophidian */
+}
+}
 
-#endif /* SRC_TIMING_STATIC_TIMING_ANALYSIS_H_ */
+
+#endif // OPHIDIAN_TIMING_STATIC_TIMING_ANALYSIS_H

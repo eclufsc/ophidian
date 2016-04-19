@@ -25,6 +25,7 @@
 #include "../timing/endpoints.h"
 #include "flute_rc_tree_estimation.h"
 
+#include "../timing/static_timing_analysis.h"
 
 namespace ophidian {
 namespace timingdriven_placement {
@@ -51,7 +52,6 @@ using StandardCell = entity::entity;
 using Net = entity::entity;
 using Point = geometry::point<double>;
 using Geometry = geometry::multi_polygon< geometry::polygon<Point> >;
-using TimeType = boost::units::quantity< boost::units::si::time > ;
 using CapacitanceType = boost::units::quantity< boost::units::si::capacitance > ;
 using NetIterator = entity::bimap_iterator_adapter;
 using CellIterator = entity::bimap_iterator_adapter;
@@ -72,38 +72,22 @@ class timingdriven_placement
 
     standard_cell::standard_cells m_std_cells;
     netlist::netlist m_netlist{&m_std_cells};
-    timing::library_timing_arcs m_tarcs{&m_std_cells};
-    timing::library m_lib_late{&m_tarcs, &m_std_cells};
-    timing::library m_lib_early{&m_tarcs, &m_std_cells};
     placement::library m_placement_lib{&m_std_cells};
     placement::placement m_placement{&m_netlist, &m_placement_lib};
-
-    timing::graph m_timing_graph;
     entity::vector_property< interconnection::rc_tree > m_rc_trees;
     timing::design_constraints m_dc;
     flute_rc_tree_creator m_flute;
-
-
-    // lazy pointers
-    std::unique_ptr<timing::timing_data> m_late;
-    std::unique_ptr<timing::timing_data> m_early;
-    std::unique_ptr<timing::graph_and_topology> m_topology;
-    std::unique_ptr<timing::generic_sta<timing::effective_capacitance_wire_model, timing::pessimistic> > m_late_sta;
-    std::unique_ptr<timing::generic_sta<timing::effective_capacitance_wire_model, timing::optimistic> > m_early_sta;
-    std::unique_ptr<timing::test_calculator> m_test;
-    timing::endpoints m_endpoints;
-
-    TimeType m_lwns;
-    TimeType m_ewns;
-    TimeType m_ltns;
-    TimeType m_etns;
-
     std::set<Net> m_dirty_nets;
 
-
-    void init_timing_data();
-
-
+    // timing info is initialized in a lazy fashion >>
+    const std::string & m_dot_lib_late;
+    const std::string & m_dot_lib_early;
+    timing::graph m_timing_graph;
+    std::unique_ptr<timing::library_timing_arcs> m_tarcs;
+    std::unique_ptr<timing::library> m_lib_late;
+    std::unique_ptr<timing::library> m_lib_early;
+    std::unique_ptr<timing::static_timing_analysis> m_sta;
+    // <<
 
     void make_cell_nets_dirty(Cell cell);
     void update_dirty_rc_trees();
@@ -111,123 +95,166 @@ public:
     timingdriven_placement(const std::string & dot_verilog_file, const std::string & dot_def_file, const std::string & dot_lef_file, const std::string & dot_lib_late, const std::string & dot_lib_early, double clock_in_picosseconds);
     virtual ~timingdriven_placement();
 
-    Point cell_position(Cell cell) const {
-        return m_placement.cell_position(cell);
-    }
-    Geometry cell_geometry(Cell cell) const {
-        return m_placement.cell_geometry(cell);
-    }
 
+
+    // NETLIST
+    //    cell
     //! Finds a Cell by its name
     /*!
-      \return Cell entity representing the Cell you are looking for
     */
-    Cell find_cell(std::string name) const {
+    Cell cell_find(std::string name) const {
         return m_netlist.cell_find(name);
     }
 
+    //! Gets the name of a cell
+    /*!
+    */
+    std::string cell_name(Cell c) const {
+        return m_netlist.cell_name(c);
+    }
+
+    //! Gets the cells
+    /*!
+      \return bounds<CellIterator> of Netlist's Cell Entity System
+    */
+    bounds<CellIterator> cells() const {
+        return {m_netlist.cell_system().begin(), m_netlist.cell_system().end()};
+    }
+
+    //   net
     //! Finds a Net by its name
     /*!
       \param name the name of the net
       \return Net entity representing the Net you are looking for, an exception is thrown if there is no net called `name`
     */
-    Net find_net(std::string name) const {
+    Net net_find(std::string name) const {
         return m_netlist.net_by_name(name);
     }
+
+    //! Gets the name of a net
+    /*!
+    */
     std::string net_name(Net n) const {
         return m_netlist.net_name(n);
     }
-    std::string pin_name(Pin pin) const {
-        return m_netlist.pin_name(pin);
-    }
 
-    bounds<NetIterator> nets() const {
-        return {m_netlist.net_system().begin(), m_netlist.net_system().end()};
-    }
-
-    bounds<PinIterator> pins() const {
-        return {m_netlist.pin_system().begin(), m_netlist.pin_system().end()};
-    }
-
-    bounds<CellIterator> cells() const {
-        return {m_netlist.cell_system().begin(), m_netlist.cell_system().end()};
-    }
-
+    //! Gets the pin of a net
+    /*!
+    */
     std::vector<Pin> net_pins(Net net) const {
         return m_netlist.net_pins(net);
     }
 
+    //! Gets the nets
+    /*!
+      \return bounds<NetIterator> of Netlist's Net Entity System
+    */
+    bounds<NetIterator> nets() const {
+        return {m_netlist.net_system().begin(), m_netlist.net_system().end()};
+    }
+
+    //   pin
+    //! Gets the name of a pin
+    /*!
+    */
+    std::string pin_name(Pin pin) const {
+        return m_netlist.pin_name(pin);
+    }
+
+    //! Gets the net of a pin
+    /*!
+    */
     Net pin_net(Pin pin) const {
         return m_netlist.pin_net(pin);
     }
 
-
-
-
-
-
-    //! Generates a `cells_geometries` object cointaining a vector of cell entities and a vector of cell geometries
-    //! Both vectors have the same size
+    //! Gets the pins
     /*!
-      \return The geometries for all cells in the netlist
+      \return bounds<PinIterator> of Netlist's Pin Entity System
     */
-    ophidian::timingdriven_placement::cells_geometries cells_geometries() const {
-        ophidian::timingdriven_placement::cells_geometries geometries(m_netlist.cell_count());
-        for(auto cell : m_netlist.cell_system())
-        {
-            geometries.cells.push_back(cell.first);
-            geometries.geometries.push_back(m_placement.cell_geometry(cell.first));
-        }
-        return geometries;
+    bounds<PinIterator> pins() const {
+        return {m_netlist.pin_system().begin(), m_netlist.pin_system().end()};
     }
 
+
+    // PLACEMENT
+    //! Places a cell in a position
+    /*!
+    */
     void place_cell(Cell cell, Point destination);
+    //! Gets the cell's position
+    /*!
+    */
+    Point cell_position(Cell cell) const {
+        return m_placement.cell_position(cell);
+    }
+    //! Gets the cell's geometry
+    /*!
+       \param the cell to retrieve the geometry
+       \return the cell geometry, translated to the cell position
+    */
+    Geometry cell_geometry(Cell cell) const {
+        return m_placement.cell_geometry(cell);
+    }
 
 
 
-
+    // TIMING
+    //! Updates the timing information
+    /*!
+    */
     void update_timing();
 
-
-    TimeType late_wns() const {
-        return m_lwns;
+    timing::TimeType late_wns() const {
+        return m_sta->late_wns();
     }
-    TimeType early_wns() const{
-        return m_ewns;
+    timing::TimeType early_wns() const{
+        return m_sta->early_wns();
     }
-    TimeType late_tns() const {
-        return m_ltns;
+    timing::TimeType late_tns() const {
+        return m_sta->late_tns();
     }
-    TimeType early_tns() const{
-        return m_etns;
+    timing::TimeType early_tns() const{
+        return m_sta->early_tns();
     }
-
-    TimeType early_rise_slack(Pin p) const {
-        return m_early_sta->rise_slack(p);
+    timing::TimeType early_rise_slack(Pin p) const {
+        return m_sta->early_rise_slack(p);
     }
-    TimeType early_fall_slack(Pin p) const {
-        return m_early_sta->fall_slack(p);
+    timing::TimeType early_fall_slack(Pin p) const {
+        return m_sta->early_fall_slack(p);
     }
-    TimeType late_rise_slack(Pin p) const {
-        return m_late_sta->rise_slack(p);
+    timing::TimeType late_rise_slack(Pin p) const {
+        return m_sta->late_rise_slack(p);
     }
-    TimeType late_fall_slack(Pin p) const {
-        return m_late_sta->fall_slack(p);
+    timing::TimeType late_fall_slack(Pin p) const {
+        return m_sta->late_fall_slack(p);
     }
-
-    const timing::endpoints & timing_endpoints() const;
-
-    void propagate_rts();
-
-    std::string cell_name(Cell c) const {
-        return m_netlist.cell_name(c);
+    timing::TimeType early_rise_arrival(Pin p) const {
+        return m_sta->early_rise_arrival(p);
     }
-
-private:
-    void propagate_ats();
-    void update_wns_and_tns();
-    bool has_timing_data() const {
-        return m_late_sta && m_early_sta;
+    timing::TimeType early_fall_arrival(Pin p) const {
+        return m_sta->early_fall_arrival(p);
+    }
+    timing::TimeType late_rise_arrival(Pin p) const {
+        return m_sta->late_rise_arrival(p);
+    }
+    timing::TimeType late_fall_arrival(Pin p) const {
+        return m_sta->late_fall_arrival(p);
+    }
+    timing::TimeType early_rise_slew(Pin p) const {
+        return m_sta->early_rise_slew(p);
+    }
+    timing::TimeType early_fall_slew(Pin p) const {
+        return m_sta->early_fall_slew(p);
+    }
+    timing::TimeType late_rise_slew(Pin p) const {
+        return m_sta->late_rise_slew(p);
+    }
+    timing::TimeType late_fall_slew(Pin p) const {
+        return m_sta->late_fall_slew(p);
+    }
+    const timing::endpoints & timing_endpoints() const {
+        return m_sta->timing_endpoints();
     }
 };
 
