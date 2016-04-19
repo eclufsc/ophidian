@@ -1,0 +1,75 @@
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree}{\section{ophidian\-:\-:interconnection\-:\-:rc\-\_\-tree Class Reference}
+\label{classophidian_1_1interconnection_1_1rc__tree}\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a3150567e8388e615a01021accf9544a2}{using {\bfseries graph\-\_\-t} = lemon\-::\-List\-Graph}\label{classophidian_1_1interconnection_1_1rc__tree_a3150567e8388e615a01021accf9544a2}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a924f23b7ccb8c4fcc9a0782efd0fd96b}{using {\bfseries capacitor\-\_\-id} = lemon\-::\-List\-Graph\-::\-Node}\label{classophidian_1_1interconnection_1_1rc__tree_a924f23b7ccb8c4fcc9a0782efd0fd96b}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a6f88448d10474e21d5c341f598154b0a}{using {\bfseries resistor\-\_\-id} = lemon\-::\-List\-Graph\-::\-Edge}\label{classophidian_1_1interconnection_1_1rc__tree_a6f88448d10474e21d5c341f598154b0a}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_abd7eab88b02ff1c1f70e2f6f6fe495b7}{using {\bfseries resistor\-\_\-it} = lemon\-::\-List\-Graph\-::\-Inc\-Edge\-It}\label{classophidian_1_1interconnection_1_1rc__tree_abd7eab88b02ff1c1f70e2f6f6fe495b7}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}{{\bfseries rc\-\_\-tree} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)}\label{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}{\hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \& {\bfseries operator=} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)}\label{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}{quantity$<$ si\-::capacitance $>$ {\bfseries lumped} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}{capacitor\-\_\-id {\bfseries capacitor\-\_\-insert} (std\-::string name)}\label{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}{std\-::string {\bfseries capacitor\-\_\-name} (capacitor\-\_\-id u) const }\label{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}{std\-::size\-\_\-t {\bfseries capacitor\-\_\-count} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a9d9fa55505a49e5adc7847f485711987}{resistor\-\_\-id {\bfseries resistor\-\_\-insert} (capacitor\-\_\-id u, capacitor\-\_\-id v, quantity$<$ si\-::resistance $>$ res)}\label{classophidian_1_1interconnection_1_1rc__tree_a9d9fa55505a49e5adc7847f485711987}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a4db2106df9ff03422a9efa996d9dabfe}{void {\bfseries capacitance} (capacitor\-\_\-id u, quantity$<$ si\-::capacitance $>$ cap)}\label{classophidian_1_1interconnection_1_1rc__tree_a4db2106df9ff03422a9efa996d9dabfe}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a27d52641b61ecb5722f5c9f7e183f674}{capacitor\-\_\-id {\bfseries capacitor\-\_\-by\-\_\-name} (std\-::string name) const }\label{classophidian_1_1interconnection_1_1rc__tree_a27d52641b61ecb5722f5c9f7e183f674}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a4b3aad5a72af43566289e6de214ace50}{quantity$<$ si\-::capacitance $>$ {\bfseries capacitance} (capacitor\-\_\-id u) const }\label{classophidian_1_1interconnection_1_1rc__tree_a4b3aad5a72af43566289e6de214ace50}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a15276013af4bb7283f62656531ffecfb}{quantity$<$ si\-::resistance $>$ {\bfseries resistance} (resistor\-\_\-id uv) const }\label{classophidian_1_1interconnection_1_1rc__tree_a15276013af4bb7283f62656531ffecfb}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a1c296a5067234cb99ce6a8ca1f085c75}{resistor\-\_\-it {\bfseries capacitor\-\_\-resistors} (capacitor\-\_\-id u) const }\label{classophidian_1_1interconnection_1_1rc__tree_a1c296a5067234cb99ce6a8ca1f085c75}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a612ffed536ea1fbaf6e7574f4e0a6531}{capacitor\-\_\-id {\bfseries other\-\_\-capacitor} (resistor\-\_\-id res, capacitor\-\_\-id cap) const }\label{classophidian_1_1interconnection_1_1rc__tree_a612ffed536ea1fbaf6e7574f4e0a6531}
+
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a52102a355b292bca74f6494663c477e8}{const graph\-\_\-t \& {\bfseries graph} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a52102a355b292bca74f6494663c477e8}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_aa4187806724136382911946a0112ccf4}{static resistor\-\_\-it {\bfseries invalid} ()}\label{classophidian_1_1interconnection_1_1rc__tree_aa4187806724136382911946a0112ccf4}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/interconnection/rc\-\_\-tree.\-h\item 
+/home/renan/workspace/openeda/src/interconnection/rc\-\_\-tree.\-cpp\end{DoxyCompactItemize}

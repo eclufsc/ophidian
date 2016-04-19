@@ -1,0 +1,142 @@
+\hypertarget{classophidian_1_1floorplan_1_1sites}{\section{ophidian\-:\-:floorplan\-:\-:sites Class Reference}
+\label{classophidian_1_1floorplan_1_1sites}\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}}
+}
+
+
+Sites class.  
+
+
+
+
+{\ttfamily \#include $<$sites.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1floorplan_1_1sites_a448e8d956831330bad88f3bc41ad3897}{sites} (\hyperlink{classophidian_1_1entity_1_1system}{entity\-::system} \&system)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1floorplan_1_1sites_aedaadf66a689a9542f3c33da9f76cfd4}{name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site) const 
+\begin{DoxyCompactList}\small\item\em Name getter. \end{DoxyCompactList}\item 
+point \hyperlink{classophidian_1_1floorplan_1_1sites_addce4102309e4f3f07e9869ced4bfbc6}{dimensions} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site) const 
+\begin{DoxyCompactList}\small\item\em Dimensions getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector\\*
+$<$ std\-::string $>$\\*
+\-::const\-\_\-iterator, std\-::vector\\*
+$<$ std\-::string $>$\\*
+\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1floorplan_1_1sites_abcd874e49de890637581e8b192274b5e}{names} () const 
+\begin{DoxyCompactList}\small\item\em Name iterator getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector$<$ point $>$\\*
+\-::const\-\_\-iterator, std\-::vector\\*
+$<$ point $>$\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1floorplan_1_1sites_a2cdf9c4052e6ffe35f55e258e18686ce}{dimensions} () const 
+\begin{DoxyCompactList}\small\item\em Dimensions iterator getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1sites_a13693fdb90abc0521bd7c2ef73ef97b7}{name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site, std\-::string name)
+\begin{DoxyCompactList}\small\item\em Name setter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1floorplan_1_1sites_a48fe05718d1b079ab2da16c5a4290e2c}{dimensions} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} site, point dimensions)
+\begin{DoxyCompactList}\small\item\em Dimensions setter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class describes the properties of sites initialized by the floorplan module. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1sites_a448e8d956831330bad88f3bc41ad3897}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!sites@{sites}}
+\index{sites@{sites}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{sites}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::floorplan\-::sites\-::sites (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::system} \&}]{system}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1sites_a448e8d956831330bad88f3bc41ad3897}
+Sites object constructor. Register the sites properties to the sites system. 
+\begin{DoxyParams}{Parameters}
+{\em system} & Sites entity system. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1floorplan_1_1sites_addce4102309e4f3f07e9869ced4bfbc6}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!dimensions@{dimensions}}
+\index{dimensions@{dimensions}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{dimensions}]{\setlength{\rightskip}{0pt plus 5cm}point ophidian\-::floorplan\-::sites\-::dimensions (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1sites_addce4102309e4f3f07e9869ced4bfbc6}
+Returns the dimensions of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to get the dimensions. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the site dimensions. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1sites_a2cdf9c4052e6ffe35f55e258e18686ce}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!dimensions@{dimensions}}
+\index{dimensions@{dimensions}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{dimensions}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<$point$>$\-::const\-\_\-iterator, std\-::vector$<$point$>$\-::const\-\_\-iterator $>$ ophidian\-::floorplan\-::sites\-::dimensions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1sites_a2cdf9c4052e6ffe35f55e258e18686ce}
+Returns the begin and end iterator of the site dimensions property. \begin{DoxyReturn}{Returns}
+Pair with constant iterators pointing the the beginning and end of the dimensions property. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1sites_a48fe05718d1b079ab2da16c5a4290e2c}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!dimensions@{dimensions}}
+\index{dimensions@{dimensions}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{dimensions}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::sites\-::dimensions (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site, }
+\item[{sites\-::point}]{dimensions}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1sites_a48fe05718d1b079ab2da16c5a4290e2c}
+Sets the dimensions of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to set the dimensions. \\
+\hline
+{\em name} & Desired dimensions to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1sites_aedaadf66a689a9542f3c33da9f76cfd4}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!name@{name}}
+\index{name@{name}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::floorplan\-::sites\-::name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1sites_aedaadf66a689a9542f3c33da9f76cfd4}
+Returns the name of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Site name. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1floorplan_1_1sites_a13693fdb90abc0521bd7c2ef73ef97b7}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!name@{name}}
+\index{name@{name}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{name}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::floorplan\-::sites\-::name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{site, }
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1floorplan_1_1sites_a13693fdb90abc0521bd7c2ef73ef97b7}
+Sets the name of a site. 
+\begin{DoxyParams}{Parameters}
+{\em site} & Site entity to set the name. \\
+\hline
+{\em name} & Desired name to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1floorplan_1_1sites_abcd874e49de890637581e8b192274b5e}{\index{ophidian\-::floorplan\-::sites@{ophidian\-::floorplan\-::sites}!names@{names}}
+\index{names@{names}!ophidian::floorplan::sites@{ophidian\-::floorplan\-::sites}}
+\subsubsection[{names}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<$std\-::string$>$\-::const\-\_\-iterator, std\-::vector$<$std\-::string$>$\-::const\-\_\-iterator $>$ ophidian\-::floorplan\-::sites\-::names (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1floorplan_1_1sites_abcd874e49de890637581e8b192274b5e}
+Returns the begin and end iterator of the site names property. \begin{DoxyReturn}{Returns}
+Pair with constant iterators pointing the the beginning and end of the names property. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/floorplan/sites.\-h\item 
+/home/renan/workspace/openeda/src/floorplan/sites.\-cpp\end{DoxyCompactItemize}

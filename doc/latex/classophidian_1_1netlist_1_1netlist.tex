@@ -1,0 +1,727 @@
+\hypertarget{classophidian_1_1netlist_1_1netlist}{\section{ophidian\-:\-:netlist\-:\-:netlist Class Reference}
+\label{classophidian_1_1netlist_1_1netlist}\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}}
+}
+
+
+Netlist class.  
+
+
+
+
+{\ttfamily \#include $<$netlist.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1netlist_1_1netlist_aaed1b2653302d1ff92ec1c06f27c3f62}{netlist} (\hyperlink{classophidian_1_1standard__cell_1_1standard__cells}{standard\-\_\-cell\-::standard\-\_\-cells} $\ast$\hyperlink{classophidian_1_1netlist_1_1netlist_a61ec8a8325b9f5d7a476b95cdb2f96c1}{std\-\_\-cells})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_a9750a992e2d181741a3a94d91296e704}{register\-\_\-cell\-\_\-property} (\hyperlink{classophidian_1_1entity_1_1property}{entity\-::property} $\ast$property)
+\begin{DoxyCompactList}\small\item\em Registers cell property. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_a49ba5eac946171b23f3d001a65023b4f}{register\-\_\-pin\-\_\-property} (\hyperlink{classophidian_1_1entity_1_1property}{entity\-::property} $\ast$property)
+\begin{DoxyCompactList}\small\item\em Registers pin property. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_aa77943063c4e053486169bfc61bc900e}{register\-\_\-net\-\_\-property} (\hyperlink{classophidian_1_1entity_1_1property}{entity\-::property} $\ast$property)
+\begin{DoxyCompactList}\small\item\em Registers net property. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1netlist_1_1netlist_a2a425d6fe6441f49f1ca232511c31cbd}{void {\bfseries module\-\_\-name} (std\-::string name)}\label{classophidian_1_1netlist_1_1netlist_a2a425d6fe6441f49f1ca232511c31cbd}
+
+\item 
+\hypertarget{classophidian_1_1netlist_1_1netlist_abba837e971c71ddff96b387faf94b5ea}{std\-::string {\bfseries module\-\_\-name} () const }\label{classophidian_1_1netlist_1_1netlist_abba837e971c71ddff96b387faf94b5ea}
+
+\item 
+const \\*
+\hyperlink{classophidian_1_1standard__cell_1_1standard__cells}{standard\-\_\-cell\-::standard\-\_\-cells} \& \hyperlink{classophidian_1_1netlist_1_1netlist_a61ec8a8325b9f5d7a476b95cdb2f96c1}{std\-\_\-cells} () const 
+\begin{DoxyCompactList}\small\item\em Standard cells getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_ac548c13bd3dd3bc244f994a8fa89705e}{cell\-\_\-find} (std\-::string name) const 
+\begin{DoxyCompactList}\small\item\em Finds cell. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a232badb209a281fadfaa95e551649423}{cell\-\_\-insert} (std\-::string name, std\-::string type)
+\begin{DoxyCompactList}\small\item\em Inserts a new cell. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_a5d4eb18a9ba1b37fd0aa537a3ffdefc7}{cell\-\_\-remove} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell)
+\begin{DoxyCompactList}\small\item\em Removes a cell. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1netlist_1_1netlist_a5835db533e539df0a67385015bec7349}{cell\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of cells. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1netlist_1_1netlist_a4350770de004129ea4abc09e201deeba}{cell\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell) const 
+\begin{DoxyCompactList}\small\item\em Cell name getter. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$ \hyperlink{classophidian_1_1netlist_1_1netlist_addef5a455c87dbcb26b55a3e624c964e}{cell\-\_\-pins} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell) const 
+\begin{DoxyCompactList}\small\item\em Cell pins getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_ae2da9561b53fae34c02ac37929e3bc0f}{cell\-\_\-std\-\_\-cell} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell) const 
+\begin{DoxyCompactList}\small\item\em Cell type getter. \end{DoxyCompactList}\item 
+bool \hyperlink{classophidian_1_1netlist_1_1netlist_aecf16e06c5b2410a57e3808eafdd9a90}{cell\-\_\-std\-\_\-cell} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, std\-::string type)
+\begin{DoxyCompactList}\small\item\em Cell type setter. \end{DoxyCompactList}\item 
+bool \hyperlink{classophidian_1_1netlist_1_1netlist_ab79b0117e84d8dd70178fa29072b51c3}{cell\-\_\-std\-\_\-cell} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} std\-\_\-cell)
+\begin{DoxyCompactList}\small\item\em Cell type setter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1entity_1_1system}{entity\-::system} \& \hyperlink{classophidian_1_1netlist_1_1netlist_adc43e9a4f5c5a4c25188a0c8a107422f}{cell\-\_\-system} () const 
+\begin{DoxyCompactList}\small\item\em Cell system getter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1netlist_1_1cells}{cells} \& \hyperlink{classophidian_1_1netlist_1_1netlist_a0e57e192f8dcae8f15531f609274d3e5}{cells\-\_\-properties} () const 
+\begin{DoxyCompactList}\small\item\em Cell properties getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a9469d7b2f01b912edf7e5efd91527503}{pin\-\_\-insert} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} cell, std\-::string name)
+\begin{DoxyCompactList}\small\item\em Inserts a new pin. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1netlist_1_1netlist_ad7ca89ecd797580236cbf4203c0298b7}{pin\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of pins. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1netlist_1_1netlist_a7e687a8525c7f16aad405f7fee0f8e8c}{pin\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const 
+\begin{DoxyCompactList}\small\item\em Pin name getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a7918cede2eea6fa451a93f41012f2152}{pin\-\_\-owner} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const 
+\begin{DoxyCompactList}\small\item\em Pin owner getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_aec916ca58338566b7d544dc3c63e27db}{pin\-\_\-net} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const 
+\begin{DoxyCompactList}\small\item\em Pin net getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_afeb649d84db0d66c6eda3de31050c15a}{pin\-\_\-std\-\_\-cell} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin) const 
+\begin{DoxyCompactList}\small\item\em Pin type getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a14efd19c1da2be8f8f05f32ea24d8a61}{pin\-\_\-by\-\_\-name} (std\-::string name) const 
+\begin{DoxyCompactList}\small\item\em Finds pin. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1entity_1_1system}{entity\-::system} \& \hyperlink{classophidian_1_1netlist_1_1netlist_a095b98b11c484e944f8be336aca54013}{pin\-\_\-system} () const 
+\begin{DoxyCompactList}\small\item\em Pin system getter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1netlist_1_1pins}{pins} \& \hyperlink{classophidian_1_1netlist_1_1netlist_af7026a773f912f287495378871c98f92}{pins\-\_\-properties} () const 
+\begin{DoxyCompactList}\small\item\em Pin properties getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a95f8833cc5be77bf9baf1232af8fe210}{net\-\_\-insert} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Inserts a new net. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_ad56401b6b778bd36cb06ce251b530203}{net\-\_\-remove} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} net)
+\begin{DoxyCompactList}\small\item\em Removes a net. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1netlist_1_1netlist_a30f3c26fbf0bd3ca1686aa0bc6f72314}{net\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of nets. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1netlist_1_1netlist_a404d23a09954f6f9980b3488fa9a08b6}{net\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} net) const 
+\begin{DoxyCompactList}\small\item\em Net name getter. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$ \hyperlink{classophidian_1_1netlist_1_1netlist_ac40def6c00adecd32c514b4c53d36e4a}{net\-\_\-pins} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} net) const 
+\begin{DoxyCompactList}\small\item\em Net pins getter. \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector\\*
+$<$ std\-::string $>$\\*
+\-::const\-\_\-iterator, std\-::vector\\*
+$<$ std\-::string $>$\\*
+\-::const\-\_\-iterator $>$ \hyperlink{classophidian_1_1netlist_1_1netlist_a3aad34720cad4872b7a0d2df5575689f}{net\-\_\-names} () const 
+\begin{DoxyCompactList}\small\item\em Net names iterator. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1entity_1_1system}{entity\-::system} \& \hyperlink{classophidian_1_1netlist_1_1netlist_ab60dc6b6e588ce1f73e09c2e99085b46}{net\-\_\-system} () const 
+\begin{DoxyCompactList}\small\item\em Net system getter. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a3544a02afaf5cc68dc5fe56c57ebd47e}{net\-\_\-by\-\_\-name} (std\-::string name) const 
+\begin{DoxyCompactList}\small\item\em Finds net. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1netlist_1_1nets}{nets} \& \hyperlink{classophidian_1_1netlist_1_1netlist_ae643902ea56d79268ae044a5f732c7fb}{nets\-\_\-properties} () const 
+\begin{DoxyCompactList}\small\item\em Net properties getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_a733426ecede07f3d7b6d64b63c151a6e}{connect} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} net, \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin)
+\begin{DoxyCompactList}\small\item\em Connects a pin to a net. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_aa9e942e86e09f158dd3aa59dfc5e72ec}{disconnect} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} pin)
+\begin{DoxyCompactList}\small\item\em Disconnects a pin from its net. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a2e6159790e5a61545e3a99083d715b0b}{P\-I\-\_\-insert} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Inserts a new primary input. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_a0357ec14b61d4a28bc76a637d12a26c1}{P\-I\-\_\-remove} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} P\-I)
+\begin{DoxyCompactList}\small\item\em Removes a primary input. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1netlist_1_1netlist_a4b3b3780c9aa759e4838faa0465e12dc}{P\-I\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of primary inputs. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator \hyperlink{classophidian_1_1netlist_1_1netlist_a9a5231c1f4ade9ecec2faae521c5c570}{P\-I\-\_\-begin} () const 
+\begin{DoxyCompactList}\small\item\em Primary input begin iterator. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator \hyperlink{classophidian_1_1netlist_1_1netlist_a4bbbb7fa49c1cdbd6d35613733154937}{P\-I\-\_\-end} () const 
+\begin{DoxyCompactList}\small\item\em Primary input end iterator. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} \hyperlink{classophidian_1_1netlist_1_1netlist_a1bfc2d689c0d62cd4678b730b7ec0b9a}{P\-O\-\_\-insert} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Inserts a new primary output. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1netlist_1_1netlist_aece3c1b22962d5a182c47c4d715f6ad7}{P\-O\-\_\-remove} (\hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} P\-O)
+\begin{DoxyCompactList}\small\item\em Removes a primary output. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1netlist_1_1netlist_a560619b3deea1b719a9280b0021144b1}{P\-O\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of primary outputs. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator \hyperlink{classophidian_1_1netlist_1_1netlist_a8df1e9e6e2e4c3d07a9911366bde579f}{P\-O\-\_\-begin} () const 
+\begin{DoxyCompactList}\small\item\em Primary output begin iterator. \end{DoxyCompactList}\item 
+std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{entity\-::entity} $>$\\*
+\-::const\-\_\-iterator \hyperlink{classophidian_1_1netlist_1_1netlist_af9cee6dedd3f826b7bfd1b0e3d35a3fb}{P\-O\-\_\-end} () const 
+\begin{DoxyCompactList}\small\item\em Primary output end iterator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides the basic netlist interface, such as cells, pins and nets manipulation. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aaed1b2653302d1ff92ec1c06f27c3f62}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!netlist@{netlist}}
+\index{netlist@{netlist}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{netlist}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::netlist\-::netlist\-::netlist (
+\begin{DoxyParamCaption}
+\item[{{\bf standard\-\_\-cell\-::standard\-\_\-cells} $\ast$}]{std\-\_\-cells}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_aaed1b2653302d1ff92ec1c06f27c3f62}
+Netlist constructor. Creates the entity systems for cells, pins and nets. 
+\begin{DoxyParams}{Parameters}
+{\em std\-\_\-cells} & Standard cells object. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a5835db533e539df0a67385015bec7349}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-count@{cell\-\_\-count}}
+\index{cell\-\_\-count@{cell\-\_\-count}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::netlist\-::netlist\-::cell\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a5835db533e539df0a67385015bec7349}
+Returns the number of cells created in the cells system. \begin{DoxyReturn}{Returns}
+Number of cells. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ac548c13bd3dd3bc244f994a8fa89705e}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-find@{cell\-\_\-find}}
+\index{cell\-\_\-find@{cell\-\_\-find}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-find}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::cell\-\_\-find (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+) const}}\label{classophidian_1_1netlist_1_1netlist_ac548c13bd3dd3bc244f994a8fa89705e}
+Finds a cell by its name. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Cell name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity representing the found cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a232badb209a281fadfaa95e551649423}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-insert@{cell\-\_\-insert}}
+\index{cell\-\_\-insert@{cell\-\_\-insert}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::cell\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name, }
+\item[{std\-::string}]{type}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a232badb209a281fadfaa95e551649423}
+Inserts a new cell in the netlist. A cell has a name and type associated to it. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the cell, used to identify it. \\
+\hline
+{\em type} & Standard cell type of the cell. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a4350770de004129ea4abc09e201deeba}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-name@{cell\-\_\-name}}
+\index{cell\-\_\-name@{cell\-\_\-name}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::netlist\-::netlist\-::cell\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a4350770de004129ea4abc09e201deeba}
+Returns the name of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_addef5a455c87dbcb26b55a3e624c964e}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-pins@{cell\-\_\-pins}}
+\index{cell\-\_\-pins@{cell\-\_\-pins}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-pins}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$ ophidian\-::netlist\-::netlist\-::cell\-\_\-pins (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_addef5a455c87dbcb26b55a3e624c964e}
+Returns the pins of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the pins. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Vector containing all pins of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a5d4eb18a9ba1b37fd0aa537a3ffdefc7}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-remove@{cell\-\_\-remove}}
+\index{cell\-\_\-remove@{cell\-\_\-remove}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-remove}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::cell\-\_\-remove (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a5d4eb18a9ba1b37fd0aa537a3ffdefc7}
+Removes an existing cell from the netlist. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to be removed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ae2da9561b53fae34c02ac37929e3bc0f}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}}
+\index{cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-std\-\_\-cell}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::cell\-\_\-std\-\_\-cell (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_ae2da9561b53fae34c02ac37929e3bc0f}
+Returns the standard cell type of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the type. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity representing the standard cell type of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aecf16e06c5b2410a57e3808eafdd9a90}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}}
+\index{cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-std\-\_\-cell}]{\setlength{\rightskip}{0pt plus 5cm}bool ophidian\-::netlist\-::netlist\-::cell\-\_\-std\-\_\-cell (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell, }
+\item[{std\-::string}]{type}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_aecf16e06c5b2410a57e3808eafdd9a90}
+Sets the standard cell type of a cell. The number of pins of the current cell type and the new one must match. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to set the type. \\
+\hline
+{\em type} & Name of the type to set for the cell. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool variable describing if it was possible to set the type of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ab79b0117e84d8dd70178fa29072b51c3}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}}
+\index{cell\-\_\-std\-\_\-cell@{cell\-\_\-std\-\_\-cell}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-std\-\_\-cell}]{\setlength{\rightskip}{0pt plus 5cm}bool ophidian\-::netlist\-::netlist\-::cell\-\_\-std\-\_\-cell (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell, }
+\item[{{\bf entity\-::entity}}]{std\-\_\-cell}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_ab79b0117e84d8dd70178fa29072b51c3}
+Sets the standard cell type of a cell. The number of pins of the current cell type and the new one must match. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to set the type. \\
+\hline
+{\em type} & Entity of the type to set for the cell. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool variable describing if it was possible to set the type of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_adc43e9a4f5c5a4c25188a0c8a107422f}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cell\-\_\-system@{cell\-\_\-system}}
+\index{cell\-\_\-system@{cell\-\_\-system}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cell\-\_\-system}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-::system}\& ophidian\-::netlist\-::netlist\-::cell\-\_\-system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_adc43e9a4f5c5a4c25188a0c8a107422f}
+Returns the cells entity system. \begin{DoxyReturn}{Returns}
+Constant reference to the cells entity system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a0e57e192f8dcae8f15531f609274d3e5}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!cells\-\_\-properties@{cells\-\_\-properties}}
+\index{cells\-\_\-properties@{cells\-\_\-properties}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{cells\-\_\-properties}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf cells}\& ophidian\-::netlist\-::netlist\-::cells\-\_\-properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a0e57e192f8dcae8f15531f609274d3e5}
+Returns the cells properties object. \begin{DoxyReturn}{Returns}
+Constant reference to the object containing the cells properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a733426ecede07f3d7b6d64b63c151a6e}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!connect@{connect}}
+\index{connect@{connect}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{connect}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::connect (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{net, }
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a733426ecede07f3d7b6d64b63c151a6e}
+Connects a pin to a net. This method changes the pins property of the net to contain the new pin and the net property of the pin. 
+\begin{DoxyParams}{Parameters}
+{\em net} & Net to be connnected. \\
+\hline
+{\em pin} & Pin to be connected. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aa9e942e86e09f158dd3aa59dfc5e72ec}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{disconnect}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::disconnect (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_aa9e942e86e09f158dd3aa59dfc5e72ec}
+Disconnects a pin from its net. This method removes the pin from the net pins property and leaves the pin without a net. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to be disconnected. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a3544a02afaf5cc68dc5fe56c57ebd47e}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-by\-\_\-name@{net\-\_\-by\-\_\-name}}
+\index{net\-\_\-by\-\_\-name@{net\-\_\-by\-\_\-name}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-by\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::net\-\_\-by\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a3544a02afaf5cc68dc5fe56c57ebd47e}
+Finds a net by its name. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Net name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity representing the found net. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a30f3c26fbf0bd3ca1686aa0bc6f72314}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-count@{net\-\_\-count}}
+\index{net\-\_\-count@{net\-\_\-count}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::netlist\-::netlist\-::net\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a30f3c26fbf0bd3ca1686aa0bc6f72314}
+Returns the number of nets created in the pins system. \begin{DoxyReturn}{Returns}
+Number of pins. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a95f8833cc5be77bf9baf1232af8fe210}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-insert@{net\-\_\-insert}}
+\index{net\-\_\-insert@{net\-\_\-insert}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::net\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a95f8833cc5be77bf9baf1232af8fe210}
+Inserts a new net in the netlist. A net has a name associated to it. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the net, used to identify it. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created net. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a404d23a09954f6f9980b3488fa9a08b6}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-name@{net\-\_\-name}}
+\index{net\-\_\-name@{net\-\_\-name}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::netlist\-::netlist\-::net\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{net}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a404d23a09954f6f9980b3488fa9a08b6}
+Returns the name of a net. 
+\begin{DoxyParams}{Parameters}
+{\em net} & Net to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the net. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a3aad34720cad4872b7a0d2df5575689f}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-names@{net\-\_\-names}}
+\index{net\-\_\-names@{net\-\_\-names}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$std\-::vector$<$std\-::string$>$\-::const\-\_\-iterator, std\-::vector$<$std\-::string$>$\-::const\-\_\-iterator$>$ ophidian\-::netlist\-::netlist\-::net\-\_\-names (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a3aad34720cad4872b7a0d2df5575689f}
+Returns the beginning and end iterators of the net names property. \begin{DoxyReturn}{Returns}
+Pair of iterators pointing to the begin and end of the net names property. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ac40def6c00adecd32c514b4c53d36e4a}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-pins@{net\-\_\-pins}}
+\index{net\-\_\-pins@{net\-\_\-pins}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-pins}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$ ophidian\-::netlist\-::netlist\-::net\-\_\-pins (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{net}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_ac40def6c00adecd32c514b4c53d36e4a}
+Returns the pins of a net. 
+\begin{DoxyParams}{Parameters}
+{\em net} & Net to get the pins. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Vector containing all pins of the net. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ad56401b6b778bd36cb06ce251b530203}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-remove@{net\-\_\-remove}}
+\index{net\-\_\-remove@{net\-\_\-remove}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-remove}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::net\-\_\-remove (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{net}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_ad56401b6b778bd36cb06ce251b530203}
+Removes an existing net from the netlist. 
+\begin{DoxyParams}{Parameters}
+{\em net} & Net to be removed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ab60dc6b6e588ce1f73e09c2e99085b46}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!net\-\_\-system@{net\-\_\-system}}
+\index{net\-\_\-system@{net\-\_\-system}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{net\-\_\-system}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-::system}\& ophidian\-::netlist\-::netlist\-::net\-\_\-system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_ab60dc6b6e588ce1f73e09c2e99085b46}
+Returns the nets entity system. \begin{DoxyReturn}{Returns}
+Constant reference to the nets entity system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ae643902ea56d79268ae044a5f732c7fb}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!nets\-\_\-properties@{nets\-\_\-properties}}
+\index{nets\-\_\-properties@{nets\-\_\-properties}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{nets\-\_\-properties}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf nets}\& ophidian\-::netlist\-::netlist\-::nets\-\_\-properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_ae643902ea56d79268ae044a5f732c7fb}
+Returns the nets properties object. \begin{DoxyReturn}{Returns}
+Constant reference to the object containing the nets properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a9a5231c1f4ade9ecec2faae521c5c570}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-I\-\_\-begin@{P\-I\-\_\-begin}}
+\index{P\-I\-\_\-begin@{P\-I\-\_\-begin}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-I\-\_\-begin}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator ophidian\-::netlist\-::netlist\-::\-P\-I\-\_\-begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a9a5231c1f4ade9ecec2faae521c5c570}
+Returns an iterator pointing to the beginning of the primary inputs in the netlist. \begin{DoxyReturn}{Returns}
+Constant iterator pointing to the beginning of the primary inputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a4b3b3780c9aa759e4838faa0465e12dc}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-I\-\_\-count@{P\-I\-\_\-count}}
+\index{P\-I\-\_\-count@{P\-I\-\_\-count}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-I\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::netlist\-::netlist\-::\-P\-I\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a4b3b3780c9aa759e4838faa0465e12dc}
+Returns the number of primary inputs created in the netlist. \begin{DoxyReturn}{Returns}
+Number of primary inputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a4bbbb7fa49c1cdbd6d35613733154937}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-I\-\_\-end@{P\-I\-\_\-end}}
+\index{P\-I\-\_\-end@{P\-I\-\_\-end}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-I\-\_\-end}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator ophidian\-::netlist\-::netlist\-::\-P\-I\-\_\-end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a4bbbb7fa49c1cdbd6d35613733154937}
+Returns an iterator pointing to the end of the primary inputs in the netlist. \begin{DoxyReturn}{Returns}
+Constant iterator pointing to the end of the primary inputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a2e6159790e5a61545e3a99083d715b0b}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-I\-\_\-insert@{P\-I\-\_\-insert}}
+\index{P\-I\-\_\-insert@{P\-I\-\_\-insert}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-I\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::\-P\-I\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a2e6159790e5a61545e3a99083d715b0b}
+Inserts a new primary input in the netlist. A primary input is a pin without an owner. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the primary input, used to identify it. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created primary input. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a0357ec14b61d4a28bc76a637d12a26c1}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-I\-\_\-remove@{P\-I\-\_\-remove}}
+\index{P\-I\-\_\-remove@{P\-I\-\_\-remove}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-I\-\_\-remove}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::\-P\-I\-\_\-remove (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{P\-I}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a0357ec14b61d4a28bc76a637d12a26c1}
+Removes an existing primary input from the netlist. 
+\begin{DoxyParams}{Parameters}
+{\em P\-I} & Primary input to be removed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a14efd19c1da2be8f8f05f32ea24d8a61}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-by\-\_\-name@{pin\-\_\-by\-\_\-name}}
+\index{pin\-\_\-by\-\_\-name@{pin\-\_\-by\-\_\-name}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-by\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::pin\-\_\-by\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a14efd19c1da2be8f8f05f32ea24d8a61}
+Finds a pin by its name. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Pin name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity representing the found pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_ad7ca89ecd797580236cbf4203c0298b7}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-count@{pin\-\_\-count}}
+\index{pin\-\_\-count@{pin\-\_\-count}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::netlist\-::netlist\-::pin\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_ad7ca89ecd797580236cbf4203c0298b7}
+Returns the number of pins created in the pins system. \begin{DoxyReturn}{Returns}
+Number of pins. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a9469d7b2f01b912edf7e5efd91527503}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-insert@{pin\-\_\-insert}}
+\index{pin\-\_\-insert@{pin\-\_\-insert}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::pin\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{cell, }
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a9469d7b2f01b912edf7e5efd91527503}
+Inserts a new pin in the netlist. A pin has a name and owner associated to it. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell owner of the pin. \\
+\hline
+{\em name} & Name of the pin, used to identify it. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a7e687a8525c7f16aad405f7fee0f8e8c}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-name@{pin\-\_\-name}}
+\index{pin\-\_\-name@{pin\-\_\-name}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::netlist\-::netlist\-::pin\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a7e687a8525c7f16aad405f7fee0f8e8c}
+Returns the name of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aec916ca58338566b7d544dc3c63e27db}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-net@{pin\-\_\-net}}
+\index{pin\-\_\-net@{pin\-\_\-net}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-net}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::pin\-\_\-net (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_aec916ca58338566b7d544dc3c63e27db}
+Returns the net of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the net. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity describing the net of the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a7918cede2eea6fa451a93f41012f2152}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-owner@{pin\-\_\-owner}}
+\index{pin\-\_\-owner@{pin\-\_\-owner}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-owner}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::pin\-\_\-owner (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a7918cede2eea6fa451a93f41012f2152}
+Returns the owner of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the owner. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity describing the cell owning the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_afeb649d84db0d66c6eda3de31050c15a}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-std\-\_\-cell@{pin\-\_\-std\-\_\-cell}}
+\index{pin\-\_\-std\-\_\-cell@{pin\-\_\-std\-\_\-cell}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-std\-\_\-cell}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::pin\-\_\-std\-\_\-cell (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_afeb649d84db0d66c6eda3de31050c15a}
+Returns the standard cell type of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the type. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity describing the standard cell type of a pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a095b98b11c484e944f8be336aca54013}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pin\-\_\-system@{pin\-\_\-system}}
+\index{pin\-\_\-system@{pin\-\_\-system}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pin\-\_\-system}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-::system}\& ophidian\-::netlist\-::netlist\-::pin\-\_\-system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a095b98b11c484e944f8be336aca54013}
+Returns the pins entity system. \begin{DoxyReturn}{Returns}
+Constant reference to the pins entity system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_af7026a773f912f287495378871c98f92}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!pins\-\_\-properties@{pins\-\_\-properties}}
+\index{pins\-\_\-properties@{pins\-\_\-properties}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{pins\-\_\-properties}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf pins}\& ophidian\-::netlist\-::netlist\-::pins\-\_\-properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_af7026a773f912f287495378871c98f92}
+Returns the pins properties object. \begin{DoxyReturn}{Returns}
+Constant reference to the object containing the pins properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a8df1e9e6e2e4c3d07a9911366bde579f}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-O\-\_\-begin@{P\-O\-\_\-begin}}
+\index{P\-O\-\_\-begin@{P\-O\-\_\-begin}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-O\-\_\-begin}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator ophidian\-::netlist\-::netlist\-::\-P\-O\-\_\-begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a8df1e9e6e2e4c3d07a9911366bde579f}
+Returns an iterator pointing to the beginning of the primary outputs in the netlist. \begin{DoxyReturn}{Returns}
+Constant iterator pointing to the beginning of the primary outputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a560619b3deea1b719a9280b0021144b1}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-O\-\_\-count@{P\-O\-\_\-count}}
+\index{P\-O\-\_\-count@{P\-O\-\_\-count}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-O\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::netlist\-::netlist\-::\-P\-O\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a560619b3deea1b719a9280b0021144b1}
+Returns the number of primary outputs created in the netlist. \begin{DoxyReturn}{Returns}
+Number of primary outputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_af9cee6dedd3f826b7bfd1b0e3d35a3fb}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-O\-\_\-end@{P\-O\-\_\-end}}
+\index{P\-O\-\_\-end@{P\-O\-\_\-end}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-O\-\_\-end}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<${\bf entity\-::entity}$>$\-::const\-\_\-iterator ophidian\-::netlist\-::netlist\-::\-P\-O\-\_\-end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_af9cee6dedd3f826b7bfd1b0e3d35a3fb}
+Returns an iterator pointing to the end of the primary outputs in the netlist. \begin{DoxyReturn}{Returns}
+Constant iterator pointing to the end of the primary outputs. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a1bfc2d689c0d62cd4678b730b7ec0b9a}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-O\-\_\-insert@{P\-O\-\_\-insert}}
+\index{P\-O\-\_\-insert@{P\-O\-\_\-insert}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-O\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity\-::entity} ophidian\-::netlist\-::netlist\-::\-P\-O\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a1bfc2d689c0d62cd4678b730b7ec0b9a}
+Inserts a new primary output in the netlist. A primary input is a pin without an owner. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the primary output, used to identify it. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created primary output. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aece3c1b22962d5a182c47c4d715f6ad7}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!P\-O\-\_\-remove@{P\-O\-\_\-remove}}
+\index{P\-O\-\_\-remove@{P\-O\-\_\-remove}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{P\-O\-\_\-remove}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::\-P\-O\-\_\-remove (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::entity}}]{P\-O}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_aece3c1b22962d5a182c47c4d715f6ad7}
+Removes an existing primary output from the netlist. 
+\begin{DoxyParams}{Parameters}
+{\em P\-O} & Primary output to be removed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a9750a992e2d181741a3a94d91296e704}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!register\-\_\-cell\-\_\-property@{register\-\_\-cell\-\_\-property}}
+\index{register\-\_\-cell\-\_\-property@{register\-\_\-cell\-\_\-property}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{register\-\_\-cell\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::register\-\_\-cell\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::property} $\ast$}]{property}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a9750a992e2d181741a3a94d91296e704}
+Registers a property to the cells entity system. 
+\begin{DoxyParams}{Parameters}
+{\em property} & Property to be registered. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_aa77943063c4e053486169bfc61bc900e}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!register\-\_\-net\-\_\-property@{register\-\_\-net\-\_\-property}}
+\index{register\-\_\-net\-\_\-property@{register\-\_\-net\-\_\-property}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{register\-\_\-net\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::register\-\_\-net\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::property} $\ast$}]{property}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_aa77943063c4e053486169bfc61bc900e}
+Registers a property to the nets entity system. 
+\begin{DoxyParams}{Parameters}
+{\em property} & Property to be registered. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a49ba5eac946171b23f3d001a65023b4f}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!register\-\_\-pin\-\_\-property@{register\-\_\-pin\-\_\-property}}
+\index{register\-\_\-pin\-\_\-property@{register\-\_\-pin\-\_\-property}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{register\-\_\-pin\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::netlist\-::netlist\-::register\-\_\-pin\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-::property} $\ast$}]{property}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1netlist_1_1netlist_a49ba5eac946171b23f3d001a65023b4f}
+Registers a property to the pins entity system. 
+\begin{DoxyParams}{Parameters}
+{\em property} & Property to be registered. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1netlist_1_1netlist_a61ec8a8325b9f5d7a476b95cdb2f96c1}{\index{ophidian\-::netlist\-::netlist@{ophidian\-::netlist\-::netlist}!std\-\_\-cells@{std\-\_\-cells}}
+\index{std\-\_\-cells@{std\-\_\-cells}!ophidian::netlist::netlist@{ophidian\-::netlist\-::netlist}}
+\subsubsection[{std\-\_\-cells}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf standard\-\_\-cell\-::standard\-\_\-cells}\& ophidian\-::netlist\-::netlist\-::std\-\_\-cells (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1netlist_1_1netlist_a61ec8a8325b9f5d7a476b95cdb2f96c1}
+Returns the standard cells object. \begin{DoxyReturn}{Returns}
+Constant reference to the standard cells object. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/renan/workspace/openeda/src/netlist/netlist.\-h\item 
+/home/renan/workspace/openeda/src/netlist/netlist.\-cpp\end{DoxyCompactItemize}

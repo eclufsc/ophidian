@@ -28,6 +28,7 @@
 #include <unordered_map>
 
 namespace ophidian {
+	/// Namespace describing interconnection estimation functions.
 namespace interconnection {
 
 using namespace boost::units;
