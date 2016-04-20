@@ -113,6 +113,14 @@ public:
         return m_netlist.cell_name(c);
     }
 
+    std::size_t cell_lookup(Cell c) const {
+        return m_netlist.cell_system().lookup(c);
+    }
+
+    std::vector<Pin> cell_pins(Cell c) const {
+        return m_netlist.cell_pins(c);
+    }
+
     //! Gets the cells
     /*!
       \return bounds<CellIterator> of Netlist's Cell Entity System
@@ -145,6 +153,12 @@ public:
         return m_netlist.net_pins(net);
     }
 
+    std::size_t net_lookup(Net net) const {
+        return m_netlist.net_system().lookup(net);
+    }
+
+    void net_register_property(entity::property & p);
+
     //! Gets the nets
     /*!
       \return bounds<NetIterator> of Netlist's Net Entity System
@@ -166,6 +180,14 @@ public:
     */
     Net pin_net(Pin pin) const {
         return m_netlist.pin_net(pin);
+    }
+
+    std::size_t pin_lookup(Pin pin) const {
+        return m_netlist.pin_system().lookup(pin);
+    }
+
+    Cell pin_owner(Pin pin) const {
+        return m_netlist.pin_owner(pin);
     }
 
     //! Gets the pins
@@ -195,6 +217,10 @@ public:
     */
     Geometry cell_geometry(Cell cell) const {
         return m_placement.cell_geometry(cell);
+    }
+
+    Point pin_position(Pin pin) const {
+        return m_placement.pin_position(pin);
     }
 
 

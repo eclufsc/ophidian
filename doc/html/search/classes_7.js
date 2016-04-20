@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['optimistic',['optimistic',['../structophidian_1_1timing_1_1optimistic.html',1,'ophidian::timing']]]
+  ['netlist',['netlist',['../classophidian_1_1netlist_1_1netlist.html',1,'ophidian::netlist']]],
+  ['nets',['nets',['../classophidian_1_1netlist_1_1nets.html',1,'ophidian::netlist']]]
 ];

@@ -96,54 +96,87 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a78b20f32e89fdaa5c07c368962891ecc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78b20f32e89fdaa5c07c368962891ecc"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>static_timing_analysis</b> (const <a class="el" href="classophidian_1_1timing_1_1graph.html">graph</a> &amp;g, const <a class="el" href="classophidian_1_1timing_1_1library.html">library</a> &amp;lib, <a class="el" href="classophidian_1_1timing_1_1sta__interconnection__estimator.html">sta_interconnection_estimator</a> *interconnection_estimator)</td></tr>
-<tr class="separator:a78b20f32e89fdaa5c07c368962891ecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79be31aec074017707a897401501ce16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79be31aec074017707a897401501ce16"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>make_dirty</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net)</td></tr>
-<tr class="separator:a79be31aec074017707a897401501ce16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39f48b6359c5147a2d47af9d59dc3ef3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a39f48b6359c5147a2d47af9d59dc3ef3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_constraints</b> (const <a class="el" href="classophidian_1_1netlist_1_1netlist.html">netlist::netlist</a> &amp;netlist, const <a class="el" href="structophidian_1_1timing_1_1design__constraints.html">design_constraints</a> &amp;dc)</td></tr>
-<tr class="separator:a39f48b6359c5147a2d47af9d59dc3ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92b02756ab118f0d12e935bae4d63e58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92b02756ab118f0d12e935bae4d63e58"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> ()</td></tr>
-<tr class="separator:a92b02756ab118f0d12e935bae4d63e58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2f3b64e15f77f8732fc73ccf496a8a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af2f3b64e15f77f8732fc73ccf496a8a9"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:af2f3b64e15f77f8732fc73ccf496a8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88ea07d77802e1c5293d17072092f7ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88ea07d77802e1c5293d17072092f7ab"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:a88ea07d77802e1c5293d17072092f7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34e95a03213b46d693d4b81e01ea027f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34e95a03213b46d693d4b81e01ea027f"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:a34e95a03213b46d693d4b81e01ea027f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3676fa08af16bda89f50f87722831686"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3676fa08af16bda89f50f87722831686"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:a3676fa08af16bda89f50f87722831686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8d770580fd0b1f44033f69e09104f30"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8d770580fd0b1f44033f69e09104f30"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:af8d770580fd0b1f44033f69e09104f30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a620ad4f9d3a607ce75edca47b7ea956b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a620ad4f9d3a607ce75edca47b7ea956b"></a>
-boost::units::quantity<br class="typebreak"/>
-&lt; boost::units::si::time &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin) const </td></tr>
-<tr class="separator:a620ad4f9d3a607ce75edca47b7ea956b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6418e56da1d5cf82326a56ca8d071e9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6418e56da1d5cf82326a56ca8d071e9f"></a>
-std::vector&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>critical_path</b> () const </td></tr>
-<tr class="separator:a6418e56da1d5cf82326a56ca8d071e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ec4043e2d269b5a8c637d09464a3454"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ec4043e2d269b5a8c637d09464a3454"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>graph</b> (const <a class="el" href="classophidian_1_1timing_1_1graph.html">timing::graph</a> &amp;g)</td></tr>
+<tr class="separator:a1ec4043e2d269b5a8c637d09464a3454"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a445b401a59c35ab8df965a63de5067fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a445b401a59c35ab8df965a63de5067fe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>rc_trees</b> (const <a class="el" href="classophidian_1_1entity_1_1vector__property.html">entity::vector_property</a>&lt; <a class="el" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &gt; &amp;trees)</td></tr>
+<tr class="separator:a445b401a59c35ab8df965a63de5067fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d883dfeb217ef975052f4f106d253b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d883dfeb217ef975052f4f106d253b3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>late_lib</b> (const <a class="el" href="classophidian_1_1timing_1_1library.html">library</a> &amp;lib)</td></tr>
+<tr class="separator:a2d883dfeb217ef975052f4f106d253b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab575b843a38a4d8e019ddaf746b4f050"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab575b843a38a4d8e019ddaf746b4f050"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>early_lib</b> (const <a class="el" href="classophidian_1_1timing_1_1library.html">library</a> &amp;lib)</td></tr>
+<tr class="separator:ab575b843a38a4d8e019ddaf746b4f050"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85ed618eaa5f2860648e4d4f4e2cf8e2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a85ed618eaa5f2860648e4d4f4e2cf8e2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>netlist</b> (const <a class="el" href="classophidian_1_1netlist_1_1netlist.html">netlist::netlist</a> &amp;netlist)</td></tr>
+<tr class="separator:a85ed618eaa5f2860648e4d4f4e2cf8e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac257e0b49a43754f85d44e83ffb8a468"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac257e0b49a43754f85d44e83ffb8a468"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_constraints</b> (const <a class="el" href="structophidian_1_1timing_1_1design__constraints.html">design_constraints</a> &amp;dc)</td></tr>
+<tr class="separator:ac257e0b49a43754f85d44e83ffb8a468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57c03d8d7d741ac2e7cc52c359418038"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57c03d8d7d741ac2e7cc52c359418038"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>update_timing</b> ()</td></tr>
+<tr class="separator:a57c03d8d7d741ac2e7cc52c359418038"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75b5325160dd5f9957c2d23794a82ea9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a75b5325160dd5f9957c2d23794a82ea9"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_wns</b> () const </td></tr>
+<tr class="separator:a75b5325160dd5f9957c2d23794a82ea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa60ff7912d23c265bc1d680c13a7fb7c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa60ff7912d23c265bc1d680c13a7fb7c"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_wns</b> () const </td></tr>
+<tr class="separator:aa60ff7912d23c265bc1d680c13a7fb7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7332752308d08e3bfed7261759c9343a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7332752308d08e3bfed7261759c9343a"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_tns</b> () const </td></tr>
+<tr class="separator:a7332752308d08e3bfed7261759c9343a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a187b3b022072d233eb796219b4f125a1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a187b3b022072d233eb796219b4f125a1"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_tns</b> () const </td></tr>
+<tr class="separator:a187b3b022072d233eb796219b4f125a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3484bce86ef88fe153587fcd518be099"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3484bce86ef88fe153587fcd518be099"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a3484bce86ef88fe153587fcd518be099"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebb36df7ea3147c0c3728f0195a00f23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebb36df7ea3147c0c3728f0195a00f23"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:aebb36df7ea3147c0c3728f0195a00f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6263432253884a629692951efec37e23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6263432253884a629692951efec37e23"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a6263432253884a629692951efec37e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc8a75f52c90e7474432c7aa48e93c64"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc8a75f52c90e7474432c7aa48e93c64"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:abc8a75f52c90e7474432c7aa48e93c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a574e05e8ba14dca800ea8f3dad25b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a574e05e8ba14dca800ea8f3dad25b6"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a7a574e05e8ba14dca800ea8f3dad25b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91b79cd8bbc79cafec357943d9df1464"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91b79cd8bbc79cafec357943d9df1464"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a91b79cd8bbc79cafec357943d9df1464"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60ba9d3d191b2848dc10b09922cba3fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60ba9d3d191b2848dc10b09922cba3fa"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a60ba9d3d191b2848dc10b09922cba3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c7f984d4fb6eb3815e5c7fa1d8f62d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c7f984d4fb6eb3815e5c7fa1d8f62d2"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a7c7f984d4fb6eb3815e5c7fa1d8f62d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a274a0a9c32844ac58dd6c351803e7dcb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a274a0a9c32844ac58dd6c351803e7dcb"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a274a0a9c32844ac58dd6c351803e7dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7865a454c88143a4d2c5eb70f5363dac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7865a454c88143a4d2c5eb70f5363dac"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a7865a454c88143a4d2c5eb70f5363dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad5216c335999dee985a8d8048b557a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aad5216c335999dee985a8d8048b557a5"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:aad5216c335999dee985a8d8048b557a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c9b7ea2e367a8557f8e77410a4c0bf3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c9b7ea2e367a8557f8e77410a4c0bf3"></a>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+<tr class="separator:a4c9b7ea2e367a8557f8e77410a4c0bf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac03ee85b1021876ad1b8ba8f4a0bf64d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac03ee85b1021876ad1b8ba8f4a0bf64d"></a>
+const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">endpoints</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>timing_endpoints</b> () const </td></tr>
+<tr class="separator:ac03ee85b1021876ad1b8ba8f4a0bf64d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/renan/workspace/openeda/src/timing/<a class="el" href="static__timing__analysis_8h_source.html">static_timing_analysis.h</a></li>
-<li>/home/renan/workspace/openeda/src/timing/static_timing_analysis.cpp</li>
+<li>/home/csguth/workspace/openeda/src/timing/<a class="el" href="static__timing__analysis_8h_source.html">static_timing_analysis.h</a></li>
+<li>/home/csguth/workspace/openeda/src/timing/static_timing_analysis.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 14:27:01 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

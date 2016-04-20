@@ -103,7 +103,7 @@ public:
         return m_late_sta->rise_slack(p);
     }
     TimeType late_fall_slack(Pin p) const {
-        return m_late_sta->rise_slack(p);
+        return m_late_sta->fall_slack(p);
     }
 
     TimeType early_rise_arrival(Pin p) const {
@@ -116,7 +116,7 @@ public:
         return m_late_sta->rise_arrival(p);
     }
     TimeType late_fall_arrival(Pin p) const {
-        return m_late_sta->rise_arrival(p);
+        return m_late_sta->fall_arrival(p);
     }
 
     TimeType early_rise_slew(Pin p) const {
@@ -129,7 +129,7 @@ public:
         return m_late_sta->rise_slew(p);
     }
     TimeType late_fall_slew(Pin p) const {
-        return m_late_sta->rise_slew(p);
+        return m_late_sta->fall_slew(p);
     }
 
     const endpoints & timing_endpoints() const {

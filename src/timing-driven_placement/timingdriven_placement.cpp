@@ -82,6 +82,11 @@ timingdriven_placement::~timingdriven_placement()
 
 }
 
+void timingdriven_placement::net_register_property(entity::property &p)
+{
+    m_netlist.register_net_property(&p);
+}
+
 void timingdriven_placement::place_cell(Cell cell, Point destination)
 {
     if(!geometry::equals(destination, m_placement.cell_position(cell)))
