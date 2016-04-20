@@ -18,6 +18,8 @@
 
 #include "rc_tree.h"
 
+#include <deque>
+
 namespace ophidian {
 namespace interconnection {
 
@@ -60,6 +62,62 @@ rc_tree &rc_tree::operator=(const rc_tree &other)
 rc_tree::~rc_tree() {
 }
 
+packed_rc_tree rc_tree::pack(capacitor_id source)
+{
+    packed_rc_tree result(capacitor_count());
+
+    enum status {
+        OPEN, TOUCHED, CLOSED
+    };
+
+    graph_t::NodeMap<resistor_id> pred(m_graph);
+    graph_t::NodeMap<std::size_t> order(m_graph);
+    std::vector<capacitor_id> reverse_order(capacitor_count());
+    graph_t::NodeMap<status> stat(m_graph, OPEN);
+    std::deque<capacitor_id> ready;
+    ready.push_back(source);
+    std::size_t current_order{0};
+    while(!ready.empty())
+    {
+        auto cap = ready.front();
+        ready.pop_front();
+        stat[cap] = CLOSED;
+        reverse_order[current_order] = cap;
+        order[cap] = current_order++;
+        for(graph_t::OutArcIt it(m_graph, cap); it != lemon::INVALID; ++it)
+        {
+            capacitor_id target = m_graph.target(it);
+            switch(stat[target])
+            {
+            case OPEN:
+                pred[target] = it;
+                stat[target] = TOUCHED;
+                ready.push_back(target);
+                break;
+            case TOUCHED:
+            case CLOSED:
+                break;
+            }
+        }
+    }
+
+
+    result.pred(0, std::numeric_limits<std::size_t>::max());
+    for(current_order = 0; current_order < reverse_order.size(); ++current_order)
+    {
+        auto current_capacitor = reverse_order[current_order];
+        result.capacitance(current_order, capacitance(current_capacitor));
+        if(current_order > 0)
+        {
+            auto parent = m_graph.oppositeNode(current_capacitor, pred[current_capacitor]);
+            result.resistance(current_order, resistance(pred[current_capacitor]));
+            result.pred(current_order, order[parent]);
+        }
+    }
+
+    return result;
+}
+
 lemon::ListGraph::Node rc_tree::capacitor_insert(std::string name) {
     auto result = m_name2node.find(name);
     if (result != m_name2node.end())
@@ -83,6 +141,34 @@ void rc_tree::capacitance(lemon::ListGraph::Node u,
     m_lumped_capacitance -= m_capacitances[u];
     m_capacitances[u] = cap;
     m_lumped_capacitance += m_capacitances[u];
+}
+
+packed_rc_tree::packed_rc_tree(std::size_t node_count) :
+    m_pred(node_count, -1),
+    m_resistances(node_count),
+    m_capacitances(node_count)
+{
+
+}
+
+packed_rc_tree::~packed_rc_tree()
+{
+
+}
+
+void packed_rc_tree::pred(std::size_t i, std::size_t pred)
+{
+    m_pred[i] = pred;
+}
+
+void packed_rc_tree::capacitance(std::size_t i, quantity<si::capacitance> cap)
+{
+    m_capacitances[i] = cap;
+}
+
+void packed_rc_tree::resistance(std::size_t i, quantity<si::resistance> res)
+{
+    m_resistances[i] = res;
 }
 
 } /* namespace timing */

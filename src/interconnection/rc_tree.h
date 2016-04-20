@@ -33,6 +33,30 @@ namespace interconnection {
 
 using namespace boost::units;
 
+class packed_rc_tree {
+    std::vector< std::size_t > m_pred;
+    std::vector< quantity<si::resistance> > m_resistances;
+    std::vector< quantity<si::capacitance> > m_capacitances;
+public:
+    packed_rc_tree(std::size_t node_count);
+    virtual ~packed_rc_tree();
+    void pred(std::size_t i, std::size_t pred);
+    void capacitance(std::size_t i, quantity<si::capacitance> cap);
+    void resistance(std::size_t i, quantity<si::resistance> res);
+    std::size_t node_count() const {
+        return m_pred.size();
+    }
+    std::size_t pred(std::size_t i) const {
+        return m_pred[i];
+    }
+    quantity<si::resistance> resistance(std::size_t i) const {
+        return m_resistances[i];
+    }
+    quantity<si::capacitance> capacitance(std::size_t i) const {
+        return m_capacitances[i];
+    }
+};
+
 class rc_tree {
 public:
 	using graph_t =lemon::ListGraph;
@@ -100,7 +124,11 @@ public:
 		return m_graph;
 	}
 
+    packed_rc_tree pack(capacitor_id source);
+
 };
+
+
 
 } /* namespace timing */
 } /* namespace ophidian */
