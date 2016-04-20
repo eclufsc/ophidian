@@ -111,5 +111,23 @@ TEST_CASE("rc_tree/get opposite capacitor of a resistor", "[timing][rc_tree]")
 
 
 
+TEST_CASE("rc_tree/pack test", "[timing][rc_tree]")
+{
+    ophidian::interconnection::rc_tree tree;
+    using namespace boost::units;
+    using namespace boost::units::si;
+    auto u1o = tree.capacitor_insert("u1:o");
+    auto in1 = tree.capacitor_insert("in1");
+    auto res = tree.resistor_insert(u1o, in1, quantity<resistance>(1.1*kilo*ohms));
+    auto packed = tree.pack(u1o);
+    REQUIRE( packed.node_count() == 2);
+    REQUIRE( packed.pred(0) == std::numeric_limits<std::size_t>::max());
+    REQUIRE( packed.pred(1) == 0);
+    REQUIRE( packed.resistance(1) == quantity<resistance>(1.1*kilo*ohms));
+
+}
+
+
+
 
 
