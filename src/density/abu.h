@@ -16,24 +16,19 @@ namespace openeda {
 
             density_map m_density;
 
-            floorplan::floorplan & m_floorplan;
-            placement::placement & m_placement;
-
             point m_bin_dimensions;
 
-            void build_density_map();
-
-            double measure_abu_for_range(double range, std::vector<double> & utilizations);
+            double measure_abu_for_range(double range, std::vector<double> & utilizations, double target_utilization);
         public:
 
-            abu(floorplan::floorplan & floorplan, placement::placement & placement, point bin_dimensions)
-                    : m_floorplan(floorplan), m_placement(placement), m_bin_dimensions(bin_dimensions) {
+            abu(floorplan::floorplan * floorplan, placement::placement * placement, point bin_dimensions)
+                    : m_density(floorplan, placement), m_bin_dimensions(bin_dimensions) {
 
             }
 
             ~abu() { }
 
-            double measure_abu(double target_utilization, std::vector<double> abu_ranges, std::vector<double> abu_weights);
+            double measure_abu(double target_utilization, std::vector<double> abu_ranges = {0.02, 0.05, 0.1, 0.2}, std::vector<double> abu_weights = {10, 4, 2, 1}, double bin_area_threshold = 0.2, double free_space_threshold = 0.2);
         };
     }
 }

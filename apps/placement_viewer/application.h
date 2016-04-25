@@ -31,6 +31,7 @@ class application
     openeda::netlist::netlist m_netlist;
     openeda::placement::library m_library;
     openeda::placement::placement m_placement;
+    openeda::floorplan::floorplan m_floorplan;
 
     rtree m_position2cellentity;
 

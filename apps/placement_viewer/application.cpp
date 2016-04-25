@@ -19,9 +19,9 @@ application::application(const std::string v_file, const std::string lef_file, c
 
     openeda::netlist::verilog::read(dot_v, &m_netlist);
     dot_v.close();
-    openeda::placement::lef::read(dot_lef, &m_std_cells, &m_library);
+    openeda::placement::lef::read(dot_lef, &m_std_cells, &m_library, &m_floorplan);
     dot_lef.close();
-    openeda::placement::def::read(dot_def, &m_netlist, &m_placement);
+    openeda::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan);
     dot_lef.close();
 
     std::cout << "building RTree indexing..." << std::endl;

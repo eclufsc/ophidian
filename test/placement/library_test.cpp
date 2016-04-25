@@ -27,6 +27,7 @@ TEST_CASE("placement library/set & get geometry", "[placement]") {
 TEST_CASE("placement/read lef", "[placement]") {
 	openeda::standard_cell::standard_cells std_cells;
 	openeda::placement::library lib(&std_cells);
+	openeda::floorplan::floorplan floorplan;
 
 	std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef",
 			std::ifstream::in);
@@ -35,7 +36,7 @@ TEST_CASE("placement/read lef", "[placement]") {
 	buffer << simple_lef.rdbuf();
 	simple_lef.close();
 	std::cout << "reading lef..." << std::endl;
-	openeda::placement::lef::read(buffer, &std_cells, &lib);
+	openeda::placement::lef::read(buffer, &std_cells, &lib, &floorplan);
 
 	REQUIRE(lib.dist2microns() == 2000);
 

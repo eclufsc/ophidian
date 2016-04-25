@@ -50,8 +50,9 @@ TEST_CASE("regression/hpwl simple", "[regression][hpwl]") {
 		openeda::netlist::netlist netlist(&std_cells);
 		openeda::placement::library library(&std_cells);
 		openeda::placement::placement placement(&netlist, &library);
-		openeda::placement::def::read(dot_def, &netlist, &placement);
-		openeda::placement::lef::read(dot_lef, &std_cells, &library);
+		openeda::floorplan::floorplan floorplan;
+		openeda::placement::def::read(dot_def, &netlist, &placement, &floorplan);
+		openeda::placement::lef::read(dot_lef, &std_cells, &library, &floorplan);
 		openeda::netlist::verilog::read(dot_v, &netlist);
 		double HPWL = measure_HPWL(netlist, placement, library);
 		std::stringstream ss;

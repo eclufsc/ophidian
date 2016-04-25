@@ -53,6 +53,11 @@ public:
 
 	void pad_position(entity::entity pad, geometry::point<double> position);
 
+	const netlist::netlist& netlist() const
+	{
+		return *m_netlist;
+	}
+
 };
 
 } /* namespace placement */

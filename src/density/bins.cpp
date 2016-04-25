@@ -23,5 +23,9 @@ namespace openeda {
         void bins::fixed_utilization(entity::entity bin, double fixed_utilization) {
             m_fixed_utilization[m_system.lookup(bin)] = fixed_utilization;
         }
+
+        void bins::free_space(entity::entity bin, double free_space) {
+            m_free_space[m_system.lookup(bin)] = free_space;
+        }
     }
 }

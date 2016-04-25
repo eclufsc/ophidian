@@ -14,7 +14,8 @@ TEST_CASE("def read", "[def]") {
 	openeda::netlist::netlist netlist(&std_cells);
 	openeda::placement::library lib(&std_cells);
 	openeda::placement::placement cells(&netlist, &lib);
-	openeda::placement::def::read(superblue16_def, &netlist, &cells);
+	openeda::floorplan::floorplan floorplan;
+	openeda::placement::def::read(superblue16_def, &netlist, &cells, &floorplan);
 
 	auto position = cells.cell_position(netlist.cell_insert("o641083", "INV_Z4"));
 	auto golden = openeda::geometry::point<double> { 7214680.0, 1402200.0 };
@@ -26,8 +27,5 @@ TEST_CASE("def read", "[def]") {
 
 	REQUIRE( boost::geometry::equals( position, golden ) );
 	REQUIRE( boost::geometry::equals( pad_position, golden_pad_position ) );
-
-	auto fixed_cell = netlist.cell_find("A1_B1_C3_D3_E18_F6_G6_o680467");
-	REQUIRE(cells.cell_fixed(fixed_cell));
 
 }

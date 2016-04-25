@@ -21,13 +21,16 @@ namespace openeda {
             entity::vector_property<point> m_dimensions;
             entity::vector_property<double> m_movable_utilization;
             entity::vector_property<double> m_fixed_utilization;
+            entity::vector_property<double> m_free_space;
 
         public:
 
-            bins(entity::system & system) : m_system(m_system) {
+            bins(entity::system & system) : m_system(system) {
                 m_system.register_property(&m_positions);
                 m_system.register_property(&m_dimensions);
                 m_system.register_property(&m_movable_utilization);
+                m_system.register_property(&m_fixed_utilization);
+                m_system.register_property(&m_free_space);
             }
 
             virtual ~bins() { }
@@ -48,6 +51,10 @@ namespace openeda {
                 return m_fixed_utilization[m_system.lookup(bin)];
             }
 
+            double free_space(entity::entity bin) {
+                return m_free_space[m_system.lookup(bin)];
+            }
+
             std::pair< std::vector<point>::const_iterator, std::vector<point>::const_iterator > positions() const {
                 return std::make_pair(m_positions.begin(), m_positions.end());
             }
@@ -64,6 +71,10 @@ namespace openeda {
                 return std::make_pair(m_fixed_utilization.begin(), m_fixed_utilization.end());
             }
 
+            std::pair< std::vector<double>::const_iterator, std::vector<double>::const_iterator > free_spaces() const {
+                return std::make_pair(m_free_space.begin(), m_free_space.end());
+            }
+
             void position(entity::entity bin, point position);
 
             void dimension(entity::entity bin, point dimension);
@@ -71,6 +82,8 @@ namespace openeda {
             void movable_utilization(entity::entity bin, double movable_utilization);
 
             void fixed_utilization(entity::entity bin, double fixed_utilization);
+
+            void free_space(entity::entity bin, double free_space);
         };
     }
 }

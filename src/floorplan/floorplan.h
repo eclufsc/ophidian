@@ -20,14 +20,22 @@ namespace openeda {
             sites m_sites;
             rows m_rows;
 
+            point m_chip_origin;
             point m_chip_boundaries;
 
-        public:
-            floorplan(point chip_boundaries);
+            std::unordered_map<std::string, entity::entity> m_name2site;
 
+        public:
+            floorplan();
+
+            point chip_origin() const {
+                return m_chip_origin;
+            }
+            void chip_origin(point chip_origin);
             point chip_boundaries() const {
                 return m_chip_boundaries;
             }
+            void chip_boundaries(point chip_boundaries);
 
             // sites
             entity::entity site_insert(std::string name, point dimensions);
@@ -49,6 +57,7 @@ namespace openeda {
             }
 
             // rows
+            entity::entity row_insert(std::string site, unsigned number_of_sites, point origin);
             entity::entity row_insert(entity::entity site, unsigned number_of_sites, point origin);
             void row_destroy(entity::entity row);
 
@@ -69,6 +78,10 @@ namespace openeda {
             }
 
             point row_dimensions(entity::entity row) const;
+
+            const entity::system & rows_system() const {
+                return m_rows_system;
+            };
 
             const rows & rows_properties() const {
                 return m_rows;

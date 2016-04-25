@@ -8,7 +8,8 @@
 
 TEST_CASE("floorplan/ empty","[floorplan]") {
     openeda::geometry::point<double> chip_boundaries(1000, 1000);
-    openeda::floorplan::floorplan floorplan(chip_boundaries);
+    openeda::floorplan::floorplan floorplan;
+    floorplan.chip_boundaries(chip_boundaries);
 
     REQUIRE(floorplan.site_count() == 0);
     REQUIRE(floorplan.row_count() == 0);
@@ -16,8 +17,7 @@ TEST_CASE("floorplan/ empty","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ insert site","[floorplan]") {
-    openeda::geometry::point<double> chip_boundaries(1000, 1000);
-    openeda::floorplan::floorplan floorplan(chip_boundaries);
+    openeda::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     openeda::geometry::point<double> site_dimensions(10, 100);
@@ -29,8 +29,7 @@ TEST_CASE("floorplan/ insert site","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ insert row","[floorplan]") {
-    openeda::geometry::point<double> chip_boundaries(1000, 1000);
-    openeda::floorplan::floorplan floorplan(chip_boundaries);
+    openeda::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     openeda::geometry::point<double> site_dimensions(10, 100);
@@ -50,8 +49,7 @@ TEST_CASE("floorplan/ insert row","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ destroy site","[floorplan]") {
-    openeda::geometry::point<double> chip_boundaries(1000, 1000);
-    openeda::floorplan::floorplan floorplan(chip_boundaries);
+    openeda::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     openeda::geometry::point<double> site_dimensions(10, 100);
@@ -65,8 +63,7 @@ TEST_CASE("floorplan/ destroy site","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ destroy row","[floorplan]") {
-    openeda::geometry::point<double> chip_boundaries(1000, 1000);
-    openeda::floorplan::floorplan floorplan(chip_boundaries);
+    openeda::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     openeda::geometry::point<double> site_dimensions(10, 100);

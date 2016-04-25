@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
 	openeda::netlist::netlist netlist { &std_cell };
 	openeda::placement::library library { &std_cell };
 	openeda::placement::placement placement { &netlist, &library };
+	openeda::floorplan::floorplan floorplan;
 
 	std::ifstream dot_v { argv[1], std::ifstream::in };
 	std::ifstream dot_def { argv[2], std::ifstream::in };
@@ -67,8 +68,8 @@ int main(int argc, char **argv) {
 	}
 
 	openeda::netlist::verilog::read(dot_v, &netlist);
-	openeda::placement::def::read(dot_def, &netlist, &placement);
-	openeda::placement::lef::read(dot_lef, &std_cell, &library);
+	openeda::placement::def::read(dot_def, &netlist, &placement, &floorplan);
+	openeda::placement::lef::read(dot_lef, &std_cell, &library, &floorplan);
 
 	double HPWL{measure_HPWL(netlist, placement, library)};
 	std::cout << "HPWL before: " << HPWL << std::endl;

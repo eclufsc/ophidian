@@ -15,7 +15,8 @@ TEST_CASE("lef read", "[lef]") {
 	openeda::netlist::netlist netlist(&std_cells);
 	openeda::placement::library lib(&std_cells);
 	openeda::placement::placement cells(&netlist, &lib);
-	openeda::placement::lef::read(superblue16_lef, &std_cells, &lib);
+	openeda::floorplan::floorplan floorplan;
+	openeda::placement::lef::read(superblue16_lef, &std_cells, &lib, &floorplan);
 
 	auto NOR3_X4 = std_cells.cell_create("NOR3_X4");
 
