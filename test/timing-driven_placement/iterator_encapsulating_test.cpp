@@ -23,7 +23,7 @@ using namespace boost::units;
 using namespace boost::units::si;
 
 
-TEST_CASE("iterate over nets", "[tdp][iterator]")
+TEST_CASE("iterate over nets", "[tdp][iterator][run]")
 {
 
     timingdriven_placement::timingdriven_placement tdp("benchmarks/simple/simple.v", "benchmarks/simple/simple.def", "benchmarks/simple/simple.lef", "benchmarks/simple/simple_Late.lib", "benchmarks/simple/simple_Early.lib", 80);
@@ -40,7 +40,9 @@ TEST_CASE("iterate over nets", "[tdp][iterator]")
     for(timingdriven_placement::Net net : tdp.nets())
         std::cout << "  " << tdp.net_name(net) << std::endl;
 
+}
 
-
-
+TEST_CASE("DONT RUN", "[tdp][iterator][dontrun]")
+{
+    REQUIRE(false);
 }

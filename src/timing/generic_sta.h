@@ -89,7 +89,7 @@ struct timing_data {
     graph_arcs_timing arcs;
 
 
-    timing_data(library & lib, const graph& g):
+    timing_data(const library & lib, const graph& g):
         lib(lib),
         nodes(g.G()),
         arcs(g.G())
