@@ -74,6 +74,10 @@ public:
 	geometry::point<double> cell_position(entity::entity cell) const {
 		return m_cells.position(cell);
 	}
+	void cell_fixed(entity::entity cell, bool fixed);
+	bool cell_fixed(entity::entity cell) const {
+		return m_cells.fixed(cell);
+	}
 
 	/// Pin position getter.
 	/**
@@ -82,7 +86,6 @@ public:
 	 * \return Point describing the pin position.
 	 */
 	geometry::point<double> pin_position(entity::entity pin) const {
-
 		entity::entity owner = m_netlist->pin_owner(pin);
 		entity::entity std_cell_pin = m_netlist->pin_std_cell(pin);
 
@@ -104,6 +107,7 @@ public:
 	 */
 	void pad_position(entity::entity pad, geometry::point<double> position);
 
+
 	/// Netlist getter.
 	/**
 	 * Returns the netlist used in the placement construction.
@@ -122,7 +126,6 @@ public:
 	const library& lib() const {
 		return *m_library;
 	}
-
 };
 
 } /* namespace placement */

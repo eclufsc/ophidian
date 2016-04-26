@@ -96,12 +96,14 @@ void read_init_def_components(std::istream &is, netlist::netlist* netlist,
 			get_next_token(is, tokens[0], DEFCommentChar);
 
 			if (tokens[0] == "PLACED" || tokens[0] == "FIXED") {
+				bool fixed = tokens[0] == "FIXED";
 				//				myCell->isFixed = (tokens[0] == "FIXED");
 				get_next_n_tokens(is, tokens, 5, DEFCommentChar);
 				assert(tokens[0] == "(");
 				assert(tokens[3] == ")");
 				cells->cell_position(cell,
 						{ std::stod(tokens[1]), std::stod(tokens[2]) });
+				cells->cell_fixed(cell, fixed);
 
 				//				myCell->init_x_coord = atoi(tokens[1].c_str());
 				//				myCell->init_y_coord = atoi(tokens[2].c_str());
@@ -281,7 +283,7 @@ void read_def_nets(std::istream& is) {
 
 }
 
-void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
+void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells, floorplan::floorplan * floorplan) {
 
 	std::cout << "reading .def file..." << std::endl;
 	//	if (mode == INIT)
@@ -356,13 +358,15 @@ void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
 			assert(tokens.size() == 8);
 			assert(tokens[0] == "(" && tokens[3] == ")");
 			assert(tokens[4] == "(" && tokens[7] == ")");
-			//			lx = atof(tokens[1].c_str());
-			//			by = atof(tokens[2].c_str());
-			//			rx = atof(tokens[5].c_str());
-			//			ty = atof(tokens[6].c_str());
+			geometry::point<double> chip_origin(atof(tokens[1].c_str()), atof(tokens[2].c_str()));
+			floorplan->chip_origin(chip_origin);
+			geometry::point<double> chip_boundaries(atof(tokens[5].c_str()), atof(tokens[6].c_str()));
+			floorplan->chip_boundaries(chip_boundaries);
 		} else if (tokens[0] == "ROW"/* && mode == INIT*/) {
 			parser::get_next_n_tokens(dot_def, tokens, 5,
 					parser::DEFCommentChar);
+			std::string row_site = tokens[1];
+			geometry::point<double> row_origin(atof(tokens[2].c_str()), atof(tokens[3].c_str()));
 			//			row* myRow = locateOrCreateRow(tokens[0]);
 			//			myRow->name = tokens[0];
 			//			myRow->site = site2id[tokens[1]];
@@ -376,6 +380,7 @@ void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
 			if (tokens[0] == "DO") {
 				parser::get_next_n_tokens(dot_def, tokens, 3,
 						parser::DEFCommentChar);
+				unsigned number_of_sites = atoi(tokens[0].c_str());
 				assert(tokens[1] == "BY");
 				//				myRow->numSites = max(atoi(tokens[0].c_str()),
 				//						atoi(tokens[2].c_str()));
@@ -395,7 +400,9 @@ void read(std::istream& dot_def, netlist::netlist* netlist, placement * cells) {
 					//											* LEFdist2Microns);
 					//					assert(myRow->stepY == 0);
 				}
+				floorplan->row_insert(row_site, number_of_sites, row_origin);
 			}
+
 			// else we do not currently store properties
 		} else if (tokens[0] == "COMPONENTS") {
 			//			if (mode == INIT)

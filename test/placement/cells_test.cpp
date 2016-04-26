@@ -53,8 +53,10 @@ TEST_CASE("placement cell info", "[placement]") {
 	ophidian::placement::cells cells(&netlist);
 	cells.position(u1, { 0.0, 0.0 });
 	cells.geometry(u1, lib.geometry(INV_X1));
+	cells.fixed(u1, false);
 	REQUIRE(
 			boost::geometry::equals(cells.position(u1),
 					ophidian::geometry::point<double>(0.0, 0.0)));
 	REQUIRE(boost::geometry::equals(cells.geometry(u1), lib.geometry(INV_X1)));
+	REQUIRE(cells.fixed(u1) == false);
 }

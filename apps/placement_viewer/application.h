@@ -12,6 +12,7 @@
 #include "../timing/graph.h"
 #include "../timing/static_timing_analysis.h"
 #include "../timing-driven_placement/sta_flute_net_calculator.h"
+#include "../../src/floorplan/floorplan.h"
 
 using point = ophidian::geometry::point<double>;
 using polygon = ophidian::geometry::polygon<point>;
@@ -36,6 +37,7 @@ class application
     ophidian::netlist::netlist m_netlist;
     ophidian::placement::library m_library;
     ophidian::placement::placement m_placement;
+    ophidian::floorplan::floorplan m_floorplan;
     ophidian::timing::library_timing_arcs m_timing_arcs;
     ophidian::timing::library m_timing_library;
     ophidian::timing::graph m_graph;

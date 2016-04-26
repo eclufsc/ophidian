@@ -33,7 +33,8 @@ TEST_CASE("lef read", "[lef]") {
 	ophidian::netlist::netlist netlist(&std_cells);
 	ophidian::placement::library lib(&std_cells);
 	ophidian::placement::placement cells(&netlist, &lib);
-	ophidian::placement::lef::read(superblue16_lef, &std_cells, &lib);
+	ophidian::floorplan::floorplan floorplan;
+	ophidian::placement::lef::read(superblue16_lef, &std_cells, &lib, &floorplan);
 
 	auto NOR3_X4 = std_cells.cell_create("NOR3_X4");
 

@@ -46,6 +46,7 @@ TEST_CASE("placement library/set & get geometry", "[placement]") {
 TEST_CASE("placement/read lef", "[placement]") {
 	ophidian::standard_cell::standard_cells std_cells;
 	ophidian::placement::library lib(&std_cells);
+	ophidian::floorplan::floorplan floorplan;
 
 	std::ifstream simple_lef("benchmarks/superblue16/superblue16.lef",
 			std::ifstream::in);
@@ -54,7 +55,7 @@ TEST_CASE("placement/read lef", "[placement]") {
 	buffer << simple_lef.rdbuf();
 	simple_lef.close();
 	std::cout << "reading lef..." << std::endl;
-	ophidian::placement::lef::read(buffer, &std_cells, &lib);
+	ophidian::placement::lef::read(buffer, &std_cells, &lib, &floorplan);
 
 	REQUIRE(lib.dist2microns() == 2000);
 

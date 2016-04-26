@@ -21,9 +21,10 @@
 namespace ophidian {
 namespace placement {
 
-cells::cells(ophidian::netlist::netlist * netlist) : m_system(netlist->cell_system()) {
-    netlist->register_cell_property(&m_positions);
-    netlist->register_cell_property(&m_geometries);
+cells::cells(netlist::netlist * netlist) : m_system(netlist->cell_system()), m_fixed(false) {
+	netlist->register_cell_property(&m_positions);
+	netlist->register_cell_property(&m_geometries);
+	netlist->register_cell_property(&m_fixed);
 }
 
 cells::~cells() {
@@ -38,5 +39,8 @@ void cells::geometry(entity::entity cell,
     m_geometries[m_system.lookup(cell)] = geometry;
 }
 
+void cells::fixed(entity::entity cell, bool fixed) {
+	m_fixed[m_system.lookup(cell)] = fixed;
+}
 } /* namespace placement */
 } /* namespace ophidian */

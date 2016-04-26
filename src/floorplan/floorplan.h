@@ -39,18 +39,19 @@ namespace ophidian {
             sites m_sites;
             rows m_rows;
 
+            point m_chip_origin;
             point m_chip_boundaries;
 
-        public:
-            /// Constructor.
-            /**
-             * Creates a circuit floorplan with given chip boundaries.
-             * The chip boundaries are represented by a point, where the x coordinate represents the width, while the y coordinate represents the height.
-             * \param chip_boundaries The chip boundaries for the floorplan
-             */
-            floorplan(point chip_boundaries);
+            std::unordered_map<std::string, entity::entity> m_name2site;
 
-            /// Chip boundaries getter.
+        public:
+            floorplan();
+
+            point chip_origin() const {
+                return m_chip_origin;
+            }
+            void chip_origin(point chip_origin);
+/// Chip boundaries getter.
             /**
              * Returns the boundaries of the chip.
              * \return Point describing the chip boundaries.
@@ -58,6 +59,7 @@ namespace ophidian {
             point chip_boundaries() const {
                 return m_chip_boundaries;
             }
+            void chip_boundaries(point chip_boundaries);
 
             // sites
             /// Inserts a new site.
@@ -121,6 +123,8 @@ namespace ophidian {
              * \return The created row.
              */
             entity::entity row_insert(entity::entity site, unsigned number_of_sites, point origin);
+            entity::entity row_insert(std::string site, unsigned number_of_sites, point origin);
+
             /// Destroys a row.
             /**
              * Destroys an existing row.
@@ -179,6 +183,10 @@ namespace ophidian {
             const rows & rows_properties() const {
                 return m_rows;
             }
+
+            const entity::system & rows_system() const {
+                return m_rows_system;
+            };
         };
     }
 }

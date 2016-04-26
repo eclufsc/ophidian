@@ -22,7 +22,8 @@
 
 TEST_CASE("floorplan/ empty","[floorplan]") {
     ophidian::geometry::point<double> chip_boundaries(1000, 1000);
-    ophidian::floorplan::floorplan floorplan(chip_boundaries);
+    ophidian::floorplan::floorplan floorplan;
+    floorplan.chip_boundaries(chip_boundaries);
 
     REQUIRE(floorplan.site_count() == 0);
     REQUIRE(floorplan.row_count() == 0);
@@ -30,8 +31,7 @@ TEST_CASE("floorplan/ empty","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ insert site","[floorplan]") {
-    ophidian::geometry::point<double> chip_boundaries(1000, 1000);
-    ophidian::floorplan::floorplan floorplan(chip_boundaries);
+    ophidian::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     ophidian::geometry::point<double> site_dimensions(10, 100);
@@ -43,8 +43,7 @@ TEST_CASE("floorplan/ insert site","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ insert row","[floorplan]") {
-    ophidian::geometry::point<double> chip_boundaries(1000, 1000);
-    ophidian::floorplan::floorplan floorplan(chip_boundaries);
+    ophidian::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     ophidian::geometry::point<double> site_dimensions(10, 100);
@@ -64,8 +63,7 @@ TEST_CASE("floorplan/ insert row","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ destroy site","[floorplan]") {
-    ophidian::geometry::point<double> chip_boundaries(1000, 1000);
-    ophidian::floorplan::floorplan floorplan(chip_boundaries);
+    ophidian::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     ophidian::geometry::point<double> site_dimensions(10, 100);
@@ -79,8 +77,7 @@ TEST_CASE("floorplan/ destroy site","[floorplan]") {
 }
 
 TEST_CASE("floorplan/ destroy row","[floorplan]") {
-    ophidian::geometry::point<double> chip_boundaries(1000, 1000);
-    ophidian::floorplan::floorplan floorplan(chip_boundaries);
+    ophidian::floorplan::floorplan floorplan;
 
     std::string site_name = "core";
     ophidian::geometry::point<double> site_dimensions(10, 100);

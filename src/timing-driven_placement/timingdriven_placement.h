@@ -22,6 +22,7 @@
 #include "../timing/generic_sta.h"
 #include "../timing/ceff.h"
 #include "../placement/placement.h"
+#include "floorplan.h"
 #include "../timing/endpoints.h"
 #include "flute_rc_tree_estimation.h"
 
@@ -75,6 +76,7 @@ class timingdriven_placement
     timing::library_timing_arcs m_tarcs{&m_std_cells};
     timing::library m_lib_late{&m_tarcs, &m_std_cells};
     timing::library m_lib_early{&m_tarcs, &m_std_cells};
+    floorplan::floorplan m_floorplan;
     placement::library m_placement_lib{&m_std_cells};
     placement::placement m_placement{&m_netlist, &m_placement_lib};
 

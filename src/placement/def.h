@@ -21,6 +21,7 @@
 
 #include <istream>
 #include "placement.h"
+#include "floorplan.h"
 
 namespace ophidian {
 namespace placement {
@@ -39,7 +40,7 @@ void read_def_nets(std::istream &is);
 
 }
 
-void read(std::istream& input, netlist::netlist* netlist, placement * cells);
+void read(std::istream& input, netlist::netlist* netlist, placement * cells, floorplan::floorplan * floorplan);
 
 }
 } /* namespace placement */

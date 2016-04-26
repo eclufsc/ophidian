@@ -32,7 +32,8 @@ TEST_CASE("def read", "[def]") {
 	ophidian::netlist::netlist netlist(&std_cells);
 	ophidian::placement::library lib(&std_cells);
 	ophidian::placement::placement cells(&netlist, &lib);
-	ophidian::placement::def::read(superblue16_def, &netlist, &cells);
+	ophidian::floorplan::floorplan floorplan;
+	ophidian::placement::def::read(superblue16_def, &netlist, &cells, &floorplan);
 
 	auto position = cells.cell_position(netlist.cell_insert("o641083", "INV_Z4"));
 	auto golden = ophidian::geometry::point<double> { 7214680.0, 1402200.0 };

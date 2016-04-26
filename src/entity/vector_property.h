@@ -39,11 +39,15 @@ namespace ophidian {
             /**
              * Default constructor. Creates an empty vector property.
              */
-            vector_property(){
+            vector_property() {
 
             }
 
-            /// Destroys the property of an entity.
+            vector_property(T default_value) : m_values(default_value) {
+
+            }
+
+/// Destroys the property of an entity.
             /**
              * Implements the destroy method from property. Moves the last property in the vector to the position of the destroyed entity.
              * \param e Entity that was destroyed
@@ -111,6 +115,14 @@ namespace ophidian {
             std::vector<bool> m_values;
 
         public:
+            vector_property() {
+
+            }
+
+            vector_property(bool default_value) : m_values(default_value) {
+
+            }
+
             void destroy(entity & e, std::size_t index) {
                 std::size_t last_index = m_values.size() - 1;
                 m_values[index] = m_values[last_index];

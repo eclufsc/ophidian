@@ -30,7 +30,13 @@ placement::~placement() {
 
 void placement::cell_position(entity::entity cell,
 		geometry::point<double> position) {
-	m_cells.position(cell, position);
+	if (!cell_fixed(cell)) {
+		m_cells.position(cell, position);
+		auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
+		geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
+		geometry::translate(lib_geometry, position, translated);
+		m_cells.geometry(cell, translated);
+	}
 }
 
 void placement::pad_position(entity::entity pad,
@@ -38,6 +44,9 @@ void placement::pad_position(entity::entity pad,
 	m_library->pin_offset(m_netlist->pin_std_cell(pad), position);
 }
 
+	void placement::cell_fixed(entity::entity cell, bool fixed) {
+		m_cells.fixed(cell, fixed);
+	}
 } /* namespace placement */
 } /* namespace ophidian */
 
