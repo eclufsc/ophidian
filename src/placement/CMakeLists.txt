@@ -1,3 +1,5 @@
+add_subdirectory(legalization)
+
 find_package( Boost 1.59 )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 add_library (placement library.cpp cells.cpp lef.cpp def.cpp placement.cpp )

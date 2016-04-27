@@ -1,0 +1,5 @@
+find_package( Boost 1.59 )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (abacus )
+target_include_directories ( abacus PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( abacus ${Boost_LIBRARIES} )
