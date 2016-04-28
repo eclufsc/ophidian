@@ -22,24 +22,33 @@ namespace ophidian {
 namespace placement {
 
 library::library(ophidian::standard_cell::standard_cells * std_cells) :
-		m_cell_system(std_cells->cell_system()), m_pin_system(
-				std_cells->pin_system()) {
-	std_cells->register_cell_property(&m_cell_geometry);
-	std_cells->register_pin_property(&m_pin_offset);
+    m_std_cells(*std_cells) {
+    std_cells->register_cell_property(&m_cell_geometry);
+    std_cells->register_pin_property(&m_pin_offset);
 }
 
 library::~library() {
 }
 
 void library::geometry(entity::entity cell, multipolygon geometry) {
-	m_cell_geometry[m_cell_system.lookup(cell)] = geometry;
+    m_cell_geometry[m_std_cells.cell_system().lookup(cell)] = geometry;
+}
+
+entity::entity library::cell_create(std::string name)
+{
+    return m_std_cells.cell_create(name);
 }
 
 void library::dist2microns(int32_t dist) {
-	m_dist2microns = dist;
+    m_dist2microns = dist;
 }
 void library::pin_offset(entity::entity pin, point offset) {
-	m_pin_offset[m_pin_system.lookup(pin)] = offset;
+    m_pin_offset[m_std_cells.pin_system().lookup(pin)] = offset;
+}
+
+entity::entity library::pin_create(entity::entity cell, std::string name)
+{
+    return m_std_cells.pin_create(cell, name);
 }
 
 

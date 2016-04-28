@@ -32,6 +32,7 @@ struct spef_tree {
 
 class spef
 {
+public:
     std::vector<spef_tree> m_trees;
 
     void tokenize(const std::string & line, std::vector<std::string> & tokens);
@@ -44,7 +45,6 @@ class spef
     void read_res(std::istream &in, std::vector<std::string> & tokens, spef_tree & current_tree);
 
     bool is_source(const std::vector<std::string> & tokens) const;
-public:
     spef();
 
     void read(const std::string & in);

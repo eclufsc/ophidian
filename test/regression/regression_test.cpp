@@ -79,7 +79,10 @@ TEST_CASE("regression/hpwl", "[regression][hpwl]") {
         ophidian::placement::library library(&std_cells);
         ophidian::placement::placement placement(&netlist, &library);
         ophidian::placement::def::read(dot_def, &netlist, &placement);
-        ophidian::placement::lef::read(dot_lef, &std_cells, &library);
+
+        // READ LEF
+
+
         ophidian::netlist::verilog::read(dot_v, &netlist);
         double HPWL = measure_HPWL(netlist, placement, library);
         std::stringstream ss;
@@ -137,7 +140,9 @@ struct circuit {
         std::ifstream dot_def("benchmarks/"+name+"/"+name+".def", std::ifstream::in);
         placement::def::read(dot_def, &netlist, &placement);
         std::ifstream dot_lef("benchmarks/"+name+"/"+name+".lef", std::ifstream::in);
-        placement::lef::read(dot_lef, &std_cells, &placement_lib);
+
+
+//        placement::lef::read(dot_lef, &std_cells, &placement_lib); TODO READ LEF
         dc = timing::default_design_constraints{netlist}.dc();
         dc.clock.period = clk;
         for(auto driver : dc.input_drivers)

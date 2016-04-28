@@ -26,6 +26,8 @@
 #include <boost/bimap.hpp>
 #include <vector>
 
+#include "lef.h"
+
 namespace ophidian {
 namespace placement {
 
@@ -43,17 +45,11 @@ class library {
 	using polygon = geometry::polygon<point>;
 	using multipolygon = geometry::multi_polygon<polygon>;
 
-	const entity::system & m_cell_system;
-	const entity::system & m_pin_system;
-
-
+    ophidian::standard_cell::standard_cells & m_std_cells;
 	entity::vector_property< multipolygon > m_cell_geometry;
-
 	entity::vector_property< point > m_pin_offset;
 
-
     int32_t m_dist2microns;
-
 
 public:
 	/// Constructor.
@@ -71,7 +67,7 @@ public:
 	 * \return Multi polygon representing the cell geometry.
 	 */
 	multipolygon geometry(entity::entity cell) const {
-		return m_cell_geometry[m_cell_system.lookup(cell)];
+        return m_cell_geometry[m_std_cells.cell_system().lookup(cell)];
 	}
 	/// Cell geometry setter.
 	/**
@@ -80,6 +76,9 @@ public:
 	 * \param geometry Multi polygon representing the cell geometry.
 	 */
 	void geometry(entity::entity cell, multipolygon geometry);
+
+
+    entity::entity cell_create(std::string name);
 
 	/// Distance unit to microns ratio getter.
 	/**
@@ -105,8 +104,10 @@ public:
 	 * \return Point describing the pin offset.
 	 */
     point pin_offset(entity::entity pin) const {
-    	return m_pin_offset[m_pin_system.lookup(pin)];
+        return m_pin_offset[m_std_cells.pin_system().lookup(pin)];
     }
+
+    entity::entity pin_create(entity::entity cell, std::string name);
 
 	/// Distance unit to microns ratio setter.
 	/**
@@ -114,7 +115,6 @@ public:
 	 * \param dist Number of microns in a distance unit.
 	 */
     void dist2microns(int32_t dist);
-
 
 };
 

@@ -16,6 +16,7 @@
 
 #include <boost/geometry/io/wkt/wkt.hpp>
 
+#include <limits>
 #include <cmath>
 
 namespace ophidian {
@@ -26,6 +27,8 @@ template<class Point_Type>
 using polygon = typename boost::geometry::model::polygon<Point_Type>;
 template<class Polygon_Type>
 using multi_polygon = typename boost::geometry::model::multi_polygon<Polygon_Type>;
+template<class Point_Type>
+using box = typename boost::geometry::model::box<Point_Type>;
 
 template<class Geometry, class CoordinateType>
 void translate(Geometry geometry, point<CoordinateType> point,
@@ -45,6 +48,10 @@ CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<
 
 using boost::geometry::equals;
 using boost::geometry::wkt;
+
+using boost::geometry::correct;
+using boost::geometry::append;
+using boost::geometry::envelope;
 
 }
 }
