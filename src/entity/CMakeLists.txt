@@ -1,5 +1,5 @@
 find_package( Boost 1.59 )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_library (entity entity.cpp vector_property.h)
+add_library (entity entity.cpp vector_property.h property.h)
 target_include_directories (entity PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries( entity ${Boost_LIBRARIES} )
