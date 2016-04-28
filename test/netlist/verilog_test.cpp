@@ -37,7 +37,7 @@ TEST_CASE("parser/tokenize", "[parser]") {
 TEST_CASE("verilog/read","[verilog]") {
 	ophidian::standard_cell::standard_cells std_cells;
 	ophidian::netlist::netlist simple(&std_cells);
-    std::ifstream file("benchmarks/simple/simple.v", std::ifstream::in);
+    std::ifstream file("input_files/simple.v", std::ifstream::in);
 	REQUIRE(file.good());
 	ophidian::netlist::verilog::read(file, &simple);
 
@@ -100,21 +100,3 @@ TEST_CASE("verilog/read","[verilog]") {
 
 }
 
-//TEST_CASE("verilog/read suplerblue16","[verilog][slow]") {
-//	ophidian::standard_cell::standard_cells std_cells;
-//	ophidian::netlist::netlist superblue16(&std_cells);
-//	std::ifstream file("test/superblue16.v", std::ifstream::in);
-//	REQUIRE(file.good());
-//	std::stringstream buffer;
-//	buffer << file.rdbuf();
-//	file.close();
-//	time_t begin, end;
-//	time(&begin);
-//	ophidian::netlist::verilog::read(buffer, &superblue16);
-//	time(&end);
-//	std::cout << "time to read \"test/superblue16.v\" = "
-//			<< difftime(end, begin) << " seconds" << std::endl;
-////	REQUIRE(superblue16.cell_count() == 981559);
-//	REQUIRE(superblue16.net_count() == 999902);
-//
-//}

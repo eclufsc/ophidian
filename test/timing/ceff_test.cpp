@@ -96,7 +96,7 @@ z        z        z        z
     standard_cell::standard_cells std_cell;
     timing::library_timing_arcs tarcs{&std_cell};
     timing::library lib{&tarcs, &std_cell};
-    timing::liberty::read("benchmarks/superblue16/superblue16_Late.lib", lib);
+    timing::liberty::read("input_files/superblue16_Early.lib", lib);
 
 
     auto tarc = lib.timing_arc(std_cell.pin_create(std_cell.cell_create("INV_X1"), "a"), std_cell.pin_create(std_cell.cell_create("INV_X1"), "o"));

@@ -32,6 +32,8 @@ endif()
 
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 
+
+
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 #Find any version 2.X of SFML
@@ -42,3 +44,8 @@ find_package(SFML 2 REQUIRED system window graphics network audio)
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(apps)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+${CMAKE_SOURCE_DIR}/3rdparty
+${CMAKE_BINARY_DIR}/3rdparty)
+

@@ -28,7 +28,7 @@ under the License.
 
 TEST_CASE("def read", "[def]") {
 
-    std::ifstream superblue16_def("benchmarks/superblue16/superblue16.def", std::ifstream::in);
+    std::ifstream superblue16_def("input_files/superblue16.def", std::ifstream::in);
 	REQUIRE( superblue16_def.good() );
 	ophidian::standard_cell::standard_cells std_cells;
 	ophidian::netlist::netlist netlist(&std_cells);

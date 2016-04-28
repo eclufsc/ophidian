@@ -20,3 +20,10 @@ add_executable( run_tests ${SOURCE} ${HEADERS} )
 
 target_link_libraries ( run_tests LINK_PUBLIC entity standard_cell netlist placement floorplan interconnection timing timing-driven_placement density legalization emon )
 
+
+add_custom_command(
+    TARGET run_tests POST_BUILD
+    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_CURRENT_BINARY_DIR}/input_files
+    COMMAND ln -sf ${THIRD_PARTY_PATH} ${CMAKE_CURRENT_BINARY_DIR}
+
+)

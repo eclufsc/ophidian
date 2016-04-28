@@ -41,7 +41,7 @@ bool pin_comparison(const lef_parser::pin & a, const lef_parser::pin & b)
 
 TEST_CASE("Cadence LEF parser","[lef][cadence]")
 {
-    ophidian::placement::lef_parser parser("benchmarks/superblue18/superblue18.lef");
+    ophidian::placement::lef_parser parser("input_files/superblue18.lef");
 
 
     lef_parser::site core;
@@ -140,7 +140,7 @@ TEST_CASE("lef 2 library", "[lef][cadence]")
 {
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::placement::library library{&std_cells};
-    ophidian::placement::lef2library({"benchmarks/superblue18/superblue18.lef"}, library);
+    ophidian::placement::lef2library({"input_files/superblue18.lef"}, library);
     ophidian::geometry::point<double> golden_offset(0.5*(1.040+1.495)*library.dist2microns(), 0.5*(0.150+1.255)*library.dist2microns());
     auto offset = library.pin_offset(library.pin_create(library.cell_create("INV_Y3"), "o"));
     REQUIRE( ophidian::geometry::equals(offset, golden_offset) );

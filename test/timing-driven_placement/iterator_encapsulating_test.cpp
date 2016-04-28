@@ -28,7 +28,7 @@ using namespace boost::units::si;
 TEST_CASE("iterate over nets", "[tdp][iterator][run]")
 {
 
-    timingdriven_placement::timingdriven_placement tdp("benchmarks/simple/simple.v", "benchmarks/simple/simple.def", "benchmarks/simple/simple.lef", "benchmarks/simple/simple_Late.lib", "benchmarks/simple/simple_Early.lib", 80);
+    timingdriven_placement::timingdriven_placement tdp("input_files/simple.v", "input_files/simple.def", "input_files/simple.lef", "input_files/simple_Late.lib", "input_files/simple_Early.lib", 80);
 
     std::cout << "circuit cells" << std::endl;
     for(timingdriven_placement::Cell cell : tdp.cells())

@@ -28,7 +28,7 @@ TEST_CASE("liberty/pin capacitance", "[timing][liberty]") {
 	ophidian::standard_cell::standard_cells std_cells;
 	ophidian::timing::library_timing_arcs tarcs { &std_cells };
 	ophidian::timing::library lib { &tarcs, &std_cells };
-	ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
 	REQUIRE(lib.pin_capacitance(std_cells.pin_create(std_cells.cell_create("NOR2_X4"), "b")) == boost::units::quantity<boost::units::si::capacitance>(3 * boost::units::si::femto * boost::units::si::farads));
 	REQUIRE(lib.pin_capacitance(std_cells.pin_create(std_cells.cell_create("NOR2_X4"), "o")) == boost::units::quantity<boost::units::si::capacitance>(0.0 * boost::units::si::femto * boost::units::si::farads));
 }
@@ -43,7 +43,7 @@ TEST_CASE("liberty/timing arcs", "[timing][liberty]") {
 
 	ophidian::timing::library_timing_arcs tarcs { &std_cells };
 	ophidian::timing::library lib { &tarcs, &std_cells };
-	ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
 
 	auto o_timing_arcs = lib.pin_timing_arcs(NOR2_X4o);
 
@@ -81,7 +81,7 @@ TEST_CASE("liberty/lut", "[timing][liberty]") {
 	auto NOR2_X4o = std_cells.pin_create(NOR2_X4, "o");
 	ophidian::timing::library_timing_arcs tarcs { &std_cells };
 	ophidian::timing::library lib { &tarcs, &std_cells };
-	ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
 	auto arc = lib.timing_arc(NOR2_X4a, NOR2_X4o);
 	const ophidian::timing::library::LUT & fall_delay = lib.timing_arc_fall_delay(arc);
 	REQUIRE( (fall_delay.row_count() == 7) );
@@ -99,7 +99,7 @@ TEST_CASE("liberty/timing sense", "[timing][liberty]") {
 	auto NOR2_X4o = std_cells.pin_create(NOR2_X4, "o");
 	ophidian::timing::library_timing_arcs tarcs { &std_cells };
 	ophidian::timing::library lib { &tarcs, &std_cells };
-	ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
 	auto arc = lib.timing_arc(NOR2_X4a, NOR2_X4o);
 	REQUIRE( lib.timing_arc_timing_sense(arc) == ophidian::timing::unateness::NEGATIVE_UNATE );
 }
@@ -112,7 +112,7 @@ TEST_CASE("liberty/pin direction", "[timing][liberty]") {
 	auto NOR2_X4o = std_cells.pin_create(NOR2_X4, "o");
 	ophidian::timing::library_timing_arcs tarcs { &std_cells };
 	ophidian::timing::library lib { &tarcs, &std_cells };
-	ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
 	REQUIRE( std_cells.pin_direction(NOR2_X4a) == ophidian::standard_cell::pin_directions::INPUT );
 	REQUIRE( std_cells.pin_direction(NOR2_X4b) == ophidian::standard_cell::pin_directions::INPUT );
 	REQUIRE( std_cells.pin_direction(NOR2_X4o) == ophidian::standard_cell::pin_directions::OUTPUT );
@@ -127,7 +127,7 @@ TEST_CASE("liberty/flop", "[timing][liberty]") {
     auto DFF_X80q = std_cells.pin_create(DFF_X80, "q");
     ophidian::timing::library_timing_arcs tarcs { &std_cells };
     ophidian::timing::library lib { &tarcs, &std_cells };
-    ophidian::timing::liberty::read("benchmarks/superblue16/superblue16_Early.lib", lib);
+    ophidian::timing::liberty::read("input_files/superblue16_Early.lib", lib);
     REQUIRE( std_cells.pin_direction(DFF_X80ck) == ophidian::standard_cell::pin_directions::INPUT );
     REQUIRE( std_cells.pin_direction(DFF_X80d) == ophidian::standard_cell::pin_directions::INPUT );
     REQUIRE( std_cells.pin_direction(DFF_X80q) == ophidian::standard_cell::pin_directions::OUTPUT );
@@ -146,7 +146,7 @@ TEST_CASE("liberty/setup", "[timing][liberty]") {
     auto DFF_X80q = std_cells.pin_create(DFF_X80, "q");
     ophidian::timing::library_timing_arcs tarcs { &std_cells };
     ophidian::timing::library lib { &tarcs, &std_cells };
-    ophidian::timing::liberty::read("benchmarks/simple/simple_Late.lib", lib);
+    ophidian::timing::liberty::read("input_files/simple_Late.lib", lib);
 
 
 
