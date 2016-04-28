@@ -2,6 +2,7 @@ set(SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.cpp
 )
 
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
 
 
 add_subdirectory (standard_cell)

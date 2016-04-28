@@ -77,12 +77,17 @@ TEST_CASE("regression/hpwl", "[regression][hpwl]") {
         REQUIRE(dot_lef.good());
         REQUIRE(dot_v.good());
         ophidian::standard_cell::standard_cells std_cells;
+
+        ophidian::floorplan::floorplan fplan;
+
         ophidian::netlist::netlist netlist(&std_cells);
         ophidian::placement::library library(&std_cells);
         ophidian::placement::placement placement(&netlist, &library);
-        ophidian::floorplan::floorplan floorplan;
-        ophidian::placement::def::read(dot_def, &netlist, &placement, &floorplan);
-        ophidian::placement::lef::read(dot_lef, &std_cells, &library, &floorplan);
+        ophidian::placement::def::read(dot_def, &netlist, &placement, &fplan);
+
+        // READ LEF
+
+
         ophidian::netlist::verilog::read(dot_v, &netlist);
         double HPWL = measure_HPWL(netlist, placement, library);
         std::stringstream ss;
@@ -141,7 +146,9 @@ struct circuit {
         std::ifstream dot_def("benchmarks/"+name+"/"+name+".def", std::ifstream::in);
         placement::def::read(dot_def, &netlist, &placement, &floorplan);
         std::ifstream dot_lef("benchmarks/"+name+"/"+name+".lef", std::ifstream::in);
-        placement::lef::read(dot_lef, &std_cells, &placement_lib, &floorplan);
+
+
+//        placement::lef::read(dot_lef, &std_cells, &placement_lib); TODO READ LEF
         dc = timing::default_design_constraints{netlist}.dc();
         dc.clock.period = clk;
         for(auto driver : dc.input_drivers)
@@ -277,5 +284,8 @@ TEST_CASE("regression/iccad 2015 sta", "[regression][sta][flute]") {
         }
     }
     }
+
+
+
 
 }

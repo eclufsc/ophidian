@@ -43,8 +43,3 @@ TEST_CASE("iterate over nets", "[tdp][iterator][run]")
         std::cout << "  " << tdp.net_name(net) << std::endl;
 
 }
-
-TEST_CASE("DONT RUN", "[tdp][iterator][dontrun]")
-{
-    REQUIRE(false);
-}

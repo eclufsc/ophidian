@@ -23,7 +23,7 @@ under the License.
 
 #include <istream>
 #include "placement.h"
-#include "floorplan.h"
+#include "../floorplan/floorplan.h"
 
 namespace ophidian {
 namespace placement {

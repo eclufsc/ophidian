@@ -26,17 +26,15 @@ under the License.
 #include "abu.h"
 #include "def.h"
 
-TEST_CASE("density/ abu of superblue18","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue18/superblue18.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue18","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue18/superblue18.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -51,17 +49,15 @@ TEST_CASE("density/ abu of superblue18","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue16","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue16/superblue16.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue16","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue16/superblue16.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -76,17 +72,15 @@ TEST_CASE("density/ abu of superblue16","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue4","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue4/superblue4.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue4","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue4/superblue4.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -101,17 +95,15 @@ TEST_CASE("density/ abu of superblue4","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue10","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue10/superblue10.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue10","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue10/superblue10.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -126,17 +118,15 @@ TEST_CASE("density/ abu of superblue10","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue7","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue7/superblue7.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue7","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue7/superblue7.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -151,17 +141,15 @@ TEST_CASE("density/ abu of superblue7","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue1","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue1/superblue1.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue1","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue1/superblue1.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -176,17 +164,15 @@ TEST_CASE("density/ abu of superblue1","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue3","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue3/superblue3.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue3","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue3/superblue3.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();
@@ -201,17 +187,15 @@ TEST_CASE("density/ abu of superblue3","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue5","[density][abu]") {
-    std::ifstream lef("benchmarks/superblue5/superblue5.lef", std::ifstream::in);
+TEST_CASE("density/ abu of superblue5","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue5/superblue5.def", std::ifstream::in);
-    REQUIRE(lef.good());
     REQUIRE( def.good() );
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
     ophidian::placement::library lib(&std_cells);
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    // TODO READ LEF
     ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
     auto row_it = floorplan.rows_system().begin();

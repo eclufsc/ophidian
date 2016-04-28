@@ -63,12 +63,12 @@ timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_f
     m_dot_lib_late(dot_lib_late),
     m_dot_lib_early(dot_lib_early)
 {
+    floorplan::floorplan fplan;
     std::ifstream dot_v(dot_verilog_file, std::ifstream::in);
     netlist::verilog::read(dot_v, &m_netlist);
     std::ifstream dot_def(dot_def_file, std::ifstream::in);
-    placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan);
-    std::ifstream dot_lef(dot_lef_file, std::ifstream::in);
-    placement::lef::read(dot_lef, &m_std_cells, &m_placement_lib, &m_floorplan);
+    placement::def::read(dot_def, &m_netlist, &m_placement, &fplan);
+    // TODO READ LEF
     m_dc = timing::default_design_constraints{m_netlist}.dc();
     m_dc.clock.period = clock_in_picosseconds;
     for(auto driver : m_dc.input_drivers)

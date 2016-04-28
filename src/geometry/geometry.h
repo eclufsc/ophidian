@@ -32,6 +32,7 @@ under the License.
 
 #include <boost/geometry/io/wkt/wkt.hpp>
 
+#include <limits>
 #include <cmath>
 
 namespace ophidian {
@@ -63,6 +64,10 @@ CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<
 
 using boost::geometry::equals;
 using boost::geometry::wkt;
+
+using boost::geometry::correct;
+using boost::geometry::append;
+using boost::geometry::envelope;
 
 }
 }
