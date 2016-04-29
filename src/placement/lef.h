@@ -38,7 +38,7 @@ void get_next_n_tokens(std::istream &is, std::vector<std::string> &tokens,
 		const unsigned numTokens, const char* beginComment);
 
 void read_lef_macro_site(std::istream &is);
-void read_lef_site(std::istream &is, floorplan::floorplan * floorplan);
+void read_lef_site(std::istream &is, floorplan::floorplan * floorplan, library* lib);
 void read_lef_layer(std::istream &is);
 void read_lef_macro_pin(std::istream &is,  entity::entity cell, standard_cell::standard_cells * std_cells,
 		library* lib);

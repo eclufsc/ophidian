@@ -26,7 +26,7 @@ under the License.
 #include "abu.h"
 #include "def.h"
 
-TEST_CASE("density/ abu of superblue18","[density][abu]") {
+TEST_CASE("density/ abu of superblue18","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue18/superblue18.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue18/superblue18.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -51,7 +51,7 @@ TEST_CASE("density/ abu of superblue18","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue16","[density][abu]") {
+TEST_CASE("density/ abu of superblue16","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue16/superblue16.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue16/superblue16.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -76,7 +76,7 @@ TEST_CASE("density/ abu of superblue16","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue4","[density][abu]") {
+TEST_CASE("density/ abu of superblue4","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue4/superblue4.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue4/superblue4.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -101,7 +101,7 @@ TEST_CASE("density/ abu of superblue4","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue10","[density][abu]") {
+TEST_CASE("density/ abu of superblue10","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue10/superblue10.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue10/superblue10.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -126,7 +126,7 @@ TEST_CASE("density/ abu of superblue10","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue7","[density][abu]") {
+TEST_CASE("density/ abu of superblue7","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue7/superblue7.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue7/superblue7.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -151,7 +151,7 @@ TEST_CASE("density/ abu of superblue7","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue1","[density][abu]") {
+TEST_CASE("density/ abu of superblue1","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue1/superblue1.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue1/superblue1.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -176,7 +176,7 @@ TEST_CASE("density/ abu of superblue1","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue3","[density][abu]") {
+TEST_CASE("density/ abu of superblue3","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue3/superblue3.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue3/superblue3.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -201,7 +201,7 @@ TEST_CASE("density/ abu of superblue3","[density][abu]") {
     REQUIRE(measured_abu == Approx(golden_abu));
 }
 
-TEST_CASE("density/ abu of superblue5","[density][abu]") {
+TEST_CASE("density/ abu of superblue5","[regression][density][abu]") {
     std::ifstream lef("benchmarks/superblue5/superblue5.lef", std::ifstream::in);
     std::ifstream def("benchmarks/superblue5/superblue5.def", std::ifstream::in);
     REQUIRE(lef.good());
@@ -222,6 +222,31 @@ TEST_CASE("density/ abu of superblue5","[density][abu]") {
     double target_utilization = 0.85;
     double measured_abu = abu.measure_abu(target_utilization);
     double golden_abu = 0.0208419;
+
+    REQUIRE(measured_abu == Approx(golden_abu));
+}
+
+TEST_CASE("density/ abu of b19","[density][abu]") {
+    std::ifstream lef("benchmarks/b19/techlib.lef", std::ifstream::in);
+    std::ifstream def("benchmarks/b19/b19.def", std::ifstream::in);
+    REQUIRE(lef.good());
+    REQUIRE( def.good() );
+    ophidian::standard_cell::standard_cells std_cells;
+    ophidian::netlist::netlist netlist(&std_cells);
+    ophidian::placement::library lib(&std_cells);
+    ophidian::placement::placement cells(&netlist, &lib);
+    ophidian::floorplan::floorplan floorplan;
+    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
+    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+
+    auto row_it = floorplan.rows_system().begin();
+    double row_height = floorplan.row_dimensions(row_it->first).y();
+    unsigned number_of_rows_in_each_bin = 9;
+
+    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
+    double target_utilization = 0.76;
+    double measured_abu = abu.measure_abu(target_utilization);
+    double golden_abu = 0.0259217;
 
     REQUIRE(measured_abu == Approx(golden_abu));
 }

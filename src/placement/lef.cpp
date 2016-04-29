@@ -65,7 +65,7 @@ void get_next_n_tokens(std::istream &is, std::vector<std::string> &tokens,
 	} while (!is.eof() && count < numTokens);
 }
 
-void read_lef_site(std::istream &is, floorplan::floorplan * floorplan) {
+void read_lef_site(std::istream &is, floorplan::floorplan * floorplan, library* lib) {
 	std::vector<std::string> tokens(1);
 
 	get_next_token(is, tokens[0], LEFCommentChar);
@@ -78,7 +78,7 @@ void read_lef_site(std::istream &is, floorplan::floorplan * floorplan) {
 			get_next_n_tokens(is, tokens, 4, LEFCommentChar);
 //      mySite->width  = atof(tokens[0].c_str());
 //      mySite->height = atof(tokens[2].c_str());
-			geometry::point<double> site_dimensions(atof(tokens[0].c_str()) * 2000, atof(tokens[2].c_str()) * 2000);
+			geometry::point<double> site_dimensions(atof(tokens[0].c_str()) * lib->dist2microns(), atof(tokens[2].c_str()) * lib->dist2microns());
 			floorplan->site_insert(site_name, site_dimensions);
 		} else if (tokens[0] == "CLASS") {
 			get_next_n_tokens(is, tokens, 2, LEFCommentChar);
@@ -419,7 +419,7 @@ void read(std::istream& dot_lef, standard_cell::standard_cells* std_cells,
 			parser::get_next_token(dot_lef, tokens[0],
 					parser::LEFLineEndingChar);
 		} else if (tokens[0] == "SITE")
-			parser::read_lef_site(dot_lef, floorplan);
+			parser::read_lef_site(dot_lef, floorplan, lib);
 		else if (tokens[0] == "LAYER")
 			parser::read_lef_layer(dot_lef);
 		else if (tokens[0] == "MACRO")

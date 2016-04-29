@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPHIDIAN_CELLS_H
-#define OPHIDIAN_CELLS_H
+#ifndef OPHIDIAN_ABACUS_CELLS_H
+#define OPHIDIAN_ABACUS_CELLS_H
 
 #include <vector_property.h>
 #include "entity.h"
@@ -68,4 +68,4 @@ namespace ophidian {
 }
 
 
-#endif //OPHIDIAN_CELLS_H
+#endif //OPHIDIAN_ABACUS_CELLS_H

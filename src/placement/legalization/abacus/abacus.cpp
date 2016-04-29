@@ -38,6 +38,7 @@ namespace ophidian {
                     for (std::size_t sorted_cell_id = 0; sorted_cell_id < sorted_cells.size(); sorted_cell_id++) {
                         auto cell = sorted_cells.at(sorted_cell_id);
                         point cell_position = m_placement->cell_position(cell);
+                        point cell_dimensions = m_placement->cell_dimensions(cell);
 
                         auto abacus_cell = m_cells_system.create();
                         m_cells.netlist_cell(abacus_cell, cell);
@@ -56,9 +57,62 @@ namespace ophidian {
                                 point target_position(cell_position.x(), trial_y);
                                 m_cells.position(abacus_cell, target_position);
                                 entity::entity trial_row = m_subrows.find_subrow(target_position);
-                                // insert cell in row
-                                // update best cost
+                                if (m_abacus_subrows.insert_cell(trial_row, abacus_cell, cell_dimensions.x())) {
+                                    place_row(trial_row);
+                                    auto last_cell = m_abacus_subrows.cells(trial_row).back();
+                                    point last_cell_position = m_cells.position(last_cell);
+                                    double cost = std::abs(last_cell_position.x() - cell_position.x()) + std::abs(last_cell_position.y() - cell_position.y());
+                                    if (cost < best_cost) {
+                                        best_cost = cost;
+                                        best_y = trial_y;
+                                    }
+                                    m_abacus_subrows.remove_last_cell(trial_row);
+                                }
                             }
+                        }
+                    }
+                }
+
+                void abacus::place_row(entity::entity subrow) {
+                    std::list<cluster> clusters;
+                    auto cells = m_abacus_subrows.cells(subrow);
+                    for (auto cell : cells) {
+                        double cell_begin = m_cells.position(cell).x();
+                        double cell_width = m_placement->cell_dimensions(m_cells.netlist_cell(cell)).x();
+                        auto cluster_it = clusters.end();
+                        if (!clusters.empty()) {
+                            cluster_it--;
+                        }
+                        if (clusters.empty() || cluster_it->m_begin + cluster_it->m_size <= cell_begin) {
+                            cluster new_cluster(cell_begin);
+                            new_cluster.insert_cell(m_cells.order_id(cell), cell_begin, cell_width, m_cells.weight(cell));
+                            cluster_it = clusters.insert(clusters.end(), new_cluster);
+                        } else {
+                            cluster_it->insert_cell(m_cells.order_id(cell), cell_begin, cell_width, m_cells.weight(cell));
+                            collapse(clusters, cluster_it, m_subrows.begin(subrow), m_subrows.end(subrow));
+                        }
+                    }
+                }
+
+                void abacus::collapse(std::list<cluster> &clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max) {
+                    bool collapsed = false;
+                    while (!collapsed) {
+                        double optimal_x = cluster_it->m_displacement / cluster_it->m_weight;
+                        optimal_x = std::min(std::max(optimal_x, x_min), x_max);
+
+                        cluster_it->m_begin = optimal_x;
+                        if (cluster_it != clusters.begin()) {
+                            auto previous_cluster = cluster_it;
+                            previous_cluster--;
+                            if (previous_cluster->m_begin + previous_cluster->m_size >= cluster_it->m_begin) {
+                                previous_cluster->insert_cluster(*cluster_it);
+                                clusters.erase(cluster_it);
+                                cluster_it = previous_cluster;
+                            } else {
+                                collapsed = true;
+                            }
+                        } else {
+                            collapsed = true;
                         }
                     }
                 }

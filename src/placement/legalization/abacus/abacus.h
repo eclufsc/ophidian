@@ -23,6 +23,7 @@ under the License.
 
 #include <legalization.h>
 #include "cells.h"
+#include "subrows.h"
 
 namespace ophidian {
     namespace placement {
@@ -42,12 +43,45 @@ namespace ophidian {
                     }
                 };
 
+                struct cluster {
+                    double m_begin;
+                    unsigned m_last_order_id;
+                    double m_size;
+                    double m_displacement;
+                    double m_weight;
+
+                    cluster(double begin)
+                            : m_begin(begin), m_last_order_id(0), m_size(0), m_displacement(0), m_weight(0) {
+
+                    }
+
+                    void insert_cell(unsigned order_id, double x, double width, double weight) {
+                        m_last_order_id = order_id;
+                        m_displacement += weight*(x - m_size);
+                        m_size += width;
+                        m_weight += weight;
+                    }
+
+                    void insert_cluster(cluster & cluster) {
+                        m_last_order_id = cluster.m_last_order_id;
+                        m_displacement += cluster.m_displacement - (cluster.m_weight - m_size);
+                        m_size += cluster.m_size;
+                        m_weight += cluster.m_weight;
+                    }
+                };
+
                 class abacus : public legalization {
                     entity::system m_cells_system;
                     cells m_cells;
+
+                    subrows m_abacus_subrows;
+
+                    void place_row(entity::entity subrow);
+
+                    void collapse(std::list<cluster> & clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max);
                 public:
                     abacus(floorplan::floorplan *floorplan, placement *placement)
-                            : legalization(floorplan, placement), m_cells(m_cells_system) { }
+                            : legalization(floorplan, placement), m_cells(m_cells_system), m_abacus_subrows(m_subrows_system) { }
 
                     void legalize_placement();
                 };
