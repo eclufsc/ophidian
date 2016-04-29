@@ -121,7 +121,7 @@ public:
         return m_netlist.cell_system().lookup(c);
     }
 
-    std::vector<Pin> cell_pins(Cell c) const {
+    const std::vector<Pin> & cell_pins(Cell c) const {
         return m_netlist.cell_pins(c);
     }
 
@@ -153,7 +153,7 @@ public:
     //! Gets the pin of a net
     /*!
     */
-    std::vector<Pin> net_pins(Net net) const {
+    const std::vector<Pin> & net_pins(Net net) const {
         return m_netlist.net_pins(net);
     }
 

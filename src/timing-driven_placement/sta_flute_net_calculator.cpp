@@ -34,11 +34,11 @@ sta_flute_net_calculator::sta_flute_net_calculator(const timing::graph & graph, 
     m_timing_lib(timing_lib) {
     netlist.register_net_property(&m_net_sources);
 
-    std::vector< entity::entity >net_pins;
+
     for(auto net_it : netlist.net_system())
     {
         entity::entity net = net_it.first;
-        net_pins = netlist.net_pins(net);
+        auto net_pins = netlist.net_pins(net);
         bool source_found = false;
         for(auto pin : net_pins)
         {

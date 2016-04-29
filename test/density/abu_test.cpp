@@ -19,12 +19,10 @@ under the License.
  */
 
 #include "../catch.hpp"
+#include "../parsing/def.h"
 #include <iostream>
 #include <fstream>
-#include <lef.h>
-
 #include "abu.h"
-#include "def.h"
 
 TEST_CASE("density/ abu of superblue18","[density][abu][regression]") {
     std::ifstream def("benchmarks/superblue18/superblue18.def", std::ifstream::in);
@@ -35,7 +33,7 @@ TEST_CASE("density/ abu of superblue18","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -58,8 +56,7 @@ TEST_CASE("density/ abu of superblue16","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
+    // TODO READ DEF
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
     unsigned number_of_rows_in_each_bin = 9;
@@ -81,7 +78,7 @@ TEST_CASE("density/ abu of superblue4","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -104,7 +101,7 @@ TEST_CASE("density/ abu of superblue10","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -127,7 +124,7 @@ TEST_CASE("density/ abu of superblue7","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -150,7 +147,7 @@ TEST_CASE("density/ abu of superblue1","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -173,7 +170,7 @@ TEST_CASE("density/ abu of superblue3","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
@@ -196,7 +193,7 @@ TEST_CASE("density/ abu of superblue5","[density][abu][regression]") {
     ophidian::placement::placement cells(&netlist, &lib);
     ophidian::floorplan::floorplan floorplan;
     // TODO READ LEF
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+    // TODO READ DEF
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();

@@ -26,7 +26,6 @@ under the License.
 #include <standard_cells.h>
 #include <boost/geometry.hpp>
 #include <library.h>
-#include <lef.h>
 #include "../geometry/geometry.h"
 #include  "../placement/placement.h"
 

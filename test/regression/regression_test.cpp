@@ -22,8 +22,6 @@ under the License.
 
 #include "../geometry/geometry.h"
 #include "../netlist/verilog.h"
-#include "../placement/def.h"
-#include "../placement/lef.h"
 #include "../placement/placement.h"
 
 #include "../timing/endpoints.h"
@@ -66,6 +64,8 @@ double measure_HPWL(ophidian::netlist::netlist& netlist, ophidian::placement::pl
     return HPWL;
 }
 
+
+#include "../floorplan/floorplan.h"
 TEST_CASE("regression/hpwl", "[regression][hpwl]") {
     std::vector<std::string> circuits { "simple", "superblue16" };
     std::vector<double> golden_HPWL { 36.4645, 9.08702e+07 };
@@ -83,8 +83,7 @@ TEST_CASE("regression/hpwl", "[regression][hpwl]") {
         ophidian::netlist::netlist netlist(&std_cells);
         ophidian::placement::library library(&std_cells);
         ophidian::placement::placement placement(&netlist, &library);
-        ophidian::placement::def::read(dot_def, &netlist, &placement, &fplan);
-
+        // READ DEF
         // READ LEF
 
 
@@ -144,7 +143,7 @@ struct circuit {
         timing::liberty::read("benchmarks/"+name+"/"+name+"_Early.lib", lib_early);
         }
         std::ifstream dot_def("benchmarks/"+name+"/"+name+".def", std::ifstream::in);
-        placement::def::read(dot_def, &netlist, &placement, &floorplan);
+//        placement::def::read(dot_def, &netlist, &placement, &floorplan); TODO READ DEF
         std::ifstream dot_lef("benchmarks/"+name+"/"+name+".lef", std::ifstream::in);
 
 

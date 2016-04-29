@@ -2,8 +2,7 @@
 
 #include <fstream>
 
-#include "../../src/placement/lef.h"
-#include "../../src/placement/def.h"
+
 #include "../../src/netlist/verilog.h"
 #include "../../src/timing/liberty.h"
 
@@ -34,7 +33,7 @@ application::application(const std::string v_file, const std::string lef_file, c
     dot_v.close();
 //    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library); TODO READ LEF
     dot_lef.close();
-    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan);
+//    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan); TODO READ DEF
     dot_def.close();
     ophidian::timing::liberty::read(lib_file, m_timing_library);
 

@@ -152,7 +152,7 @@ public:
 	 * \param cell Cell to get the pins.
 	 * \return Vector containing all pins of the cell.
 	 */
-	std::vector<entity::entity> cell_pins(entity::entity cell) const {
+    const std::vector<entity::entity> & cell_pins(entity::entity cell) const {
 		return m_cells.pins(cell);
 	}
 	/// Cell type getter.
@@ -323,7 +323,7 @@ public:
 	 * \param net Net to get the pins.
 	 * \return Vector containing all pins of the net.
 	 */
-	std::vector<entity::entity> net_pins(entity::entity net) const {
+    const std::vector<entity::entity> & net_pins(entity::entity net) const {
 		return m_nets.pins(net);
 	}
 	/// Net names iterator.

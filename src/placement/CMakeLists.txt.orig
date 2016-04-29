@@ -1,0 +1,29 @@
+add_subdirectory(legalization)
+
+find_package( Boost 1.59 )
+<<<<<<< HEAD
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+add_library (placement library.cpp cells.cpp lef.cpp def.cpp placement.cpp )
+target_include_directories ( placement PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries( placement ${Boost_LIBRARIES} entity standard_cell netlist floorplan )
+=======
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} ${THIRD_PARTY_PATH})
+
+set(PLACEMENT_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/library.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cells.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/lef.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/def.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/placement.cpp
+)
+
+add_subdirectory(lef)
+
+add_library (placement ${PLACEMENT_SOURCE} )
+
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
+target_include_directories ( placement PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${THIRD_PARTY_PATH})
+
+
+target_link_libraries( placement ${Boost_LIBRARIES} entity standard_cell netlist LEF )
+>>>>>>> lef

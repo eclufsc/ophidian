@@ -19,32 +19,31 @@ under the License.
  */
 
 #include "../catch.hpp"
-#include "../placement/lef.h"
+#include "../parsing/lef.h"
 
-using namespace ophidian::placement;
-bool compare(const lef_parser::site & a, const lef_parser::site & b)
+using namespace ophidian;
+bool compare(const parsing::lef::site & a, const parsing::lef::site & b)
 {
     return a.name == b.name && a.class_ == b.class_ && a.symmetry == b.symmetry && Approx(a.x)==b.x && Approx(a.y)==b.y;
 }
 
-bool compare(const lef_parser::layer & a, const lef_parser::layer & b)
+bool compare(const parsing::lef::layer & a, const parsing::lef::layer & b)
 {
     return a.name == b.name && a.type == b.type && a.direction == b.direction && Approx(a.pitch) == b.pitch && Approx(a.width) == b.width;
 }
 
 #include <algorithm>
 
-bool pin_comparison(const lef_parser::pin & a, const lef_parser::pin & b)
+bool pin_comparison(const parsing::lef::pin & a, const parsing::lef::pin & b)
 {
     return a.name == b.name;
 }
 
 TEST_CASE("Cadence LEF parser","[lef][cadence]")
 {
-    ophidian::placement::lef_parser parser("input_files/superblue18.lef");
+    parsing::lef parser("input_files/superblue18.lef");
 
-
-    lef_parser::site core;
+    parsing::lef::site core;
     core.name = "core";
     core.class_ = "CORE";
     core.x = 0.19;
@@ -53,18 +52,18 @@ TEST_CASE("Cadence LEF parser","[lef][cadence]")
     REQUIRE( parser.sites().size() == 1 );
     REQUIRE( compare(parser.sites().front(), core) );
 
-    std::vector<lef_parser::layer> layers{
-        {"metal1", "ROUTING", lef_parser::layer::HORIZONTAL, 0.19, 0.065},
-        {"metal2", "ROUTING", lef_parser::layer::VERTICAL, 0.19, 0.07},
-        {"metal3", "ROUTING", lef_parser::layer::HORIZONTAL, 0.19, 0.07},
-        {"metal4", "ROUTING", lef_parser::layer::VERTICAL, 0.285, 0.14}
+    std::vector<parsing::lef::layer> layers{
+        {"metal1", "ROUTING", parsing::lef::layer::HORIZONTAL, 0.19, 0.065},
+        {"metal2", "ROUTING", parsing::lef::layer::VERTICAL, 0.19, 0.07},
+        {"metal3", "ROUTING", parsing::lef::layer::HORIZONTAL, 0.19, 0.07},
+        {"metal4", "ROUTING", parsing::lef::layer::VERTICAL, 0.285, 0.14}
     };
 
     REQUIRE( parser.layers().size() == layers.size() );
 
     for(auto & golden_layer : layers)
     {
-        REQUIRE( std::find_if(parser.layers().begin(), parser.layers().end(), [golden_layer](const lef_parser::layer & layer)->bool{
+        REQUIRE( std::find_if(parser.layers().begin(), parser.layers().end(), [golden_layer](const parsing::lef::layer & layer)->bool{
             return compare(golden_layer, layer);
         }) != parser.layers().end());
     }
@@ -72,11 +71,11 @@ TEST_CASE("Cadence LEF parser","[lef][cadence]")
     REQUIRE( parser.macros().size() == 278 );
 
 
-    const lef_parser::macro & m = *std::find_if(parser.macros().begin(), parser.macros().end(), [](const lef_parser::macro & m)->bool{
+    const parsing::lef::macro & m = *std::find_if(parser.macros().begin(), parser.macros().end(), [](const parsing::lef::macro & m)->bool{
         return m.name == "NAND3_X2";
     });
 
-    lef_parser::macro golden;
+    parsing::lef::macro golden;
     golden.name = "NAND3_X2";
     golden.class_ = "CORE";
     golden.foreign.name = "NAND3_X2";
@@ -86,14 +85,14 @@ TEST_CASE("Cadence LEF parser","[lef][cadence]")
     golden.size.y = 1.71;
     golden.site = "core";
 
-    lef_parser::pin goldeno;
+    parsing::lef::pin goldeno;
     goldeno.name = "o";
-    goldeno.direction = lef_parser::pin::OUTPUT;
-    lef_parser::port goldenoport;
+    goldeno.direction = parsing::lef::pin::OUTPUT;
+    parsing::lef::port goldenoport;
     goldenoport.layers.push_back("metal1");
-    lef_parser::rect goldenoport_rect1{0.975, 0.805, 1.17, 1.26};
-    lef_parser::rect goldenoport_rect2{0.975, 0.805, 2.21, 0.87};
-    lef_parser::rect goldenoport_rect3{2.035, 0.090, 2.23, 1.26};
+    parsing::lef::rect goldenoport_rect1{0.975, 0.805, 1.17, 1.26};
+    parsing::lef::rect goldenoport_rect2{0.975, 0.805, 2.21, 0.87};
+    parsing::lef::rect goldenoport_rect3{2.035, 0.090, 2.23, 1.26};
     goldenoport.rects.push_back(goldenoport_rect1);
     goldenoport.rects.push_back(goldenoport_rect2);
     goldenoport.rects.push_back(goldenoport_rect3);
@@ -101,32 +100,32 @@ TEST_CASE("Cadence LEF parser","[lef][cadence]")
     golden.pins.push_back(goldeno);
 
 
-    lef_parser::pin goldena;
-    goldena.direction = lef_parser::pin::INPUT;
-    lef_parser::port goldenaport;
+    parsing::lef::pin goldena;
+    goldena.direction = parsing::lef::pin::INPUT;
+    parsing::lef::port goldenaport;
     goldenaport.layers.push_back("metal1");
-    lef_parser::rect goldenaport_rect1{0.090, 0.630, 0.61, 0.76};
+    parsing::lef::rect goldenaport_rect1{0.090, 0.630, 0.61, 0.76};
     goldenaport.rects.push_back(goldenaport_rect1);
     goldena.ports.push_back(goldenaport);
     golden.pins.push_back(goldena);
 
 
-    lef_parser::pin goldenb;
+    parsing::lef::pin goldenb;
     goldenb.name = "b";
-    goldenb.direction = lef_parser::pin::INPUT;
-    lef_parser::port goldenbport;
+    goldenb.direction = parsing::lef::pin::INPUT;
+    parsing::lef::port goldenbport;
     goldenbport.layers.push_back("metal1");
-    lef_parser::rect goldenbport_rect1{0.820, 0.090, 1.34, 0.74};
+    parsing::lef::rect goldenbport_rect1{0.820, 0.090, 1.34, 0.74};
     goldenbport.rects.push_back(goldenbport_rect1);
     goldenb.ports.push_back(goldenbport);
     golden.pins.push_back(goldenb);
 
-    lef_parser::pin goldenc;
+    parsing::lef::pin goldenc;
     goldenc.name = "c";
-    goldenc.direction = lef_parser::pin::INPUT;
-    lef_parser::port goldencport;
+    goldenc.direction = parsing::lef::pin::INPUT;
+    parsing::lef::port goldencport;
     goldencport.layers.push_back("metal1");
-    lef_parser::rect goldencport_rect1{1.490, 0.090, 1.815, 0.74};
+    parsing::lef::rect goldencport_rect1{1.490, 0.090, 1.815, 0.74};
     goldencport.rects.push_back(goldencport_rect1);
     goldenc.ports.push_back(goldencport);
     golden.pins.push_back(goldenc);
@@ -135,7 +134,7 @@ TEST_CASE("Cadence LEF parser","[lef][cadence]")
 
 }
 
-#include "../placement/lef/lef2library.h"
+#include "../placement/lef2library.h"
 TEST_CASE("lef 2 library", "[lef][cadence]")
 {
     ophidian::standard_cell::standard_cells std_cells;

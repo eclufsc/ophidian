@@ -81,6 +81,8 @@ public:
 		return m_cells.fixed(cell);
 	}
 
+    entity::entity cell_create(std::string name, std::string type);
+
 	/// Pin position getter.
 	/**
 	 * Returns the position of a pin, calculated from the cell position and the pin offset.

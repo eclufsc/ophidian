@@ -44,7 +44,7 @@ public:
 	entity::entity standard_cell(entity::entity cell) const {
 		return m_standard_cells[m_system.lookup(cell)];
 	}
-	std::vector<entity::entity> pins(entity::entity cell) const {
+    const std::vector<entity::entity> & pins(entity::entity cell) const {
 		return m_pins[m_system.lookup(cell)];
 	}
 

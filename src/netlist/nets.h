@@ -42,7 +42,7 @@ public:
 	std::string name(entity::entity net) const {
 		return m_names[m_system.lookup(net)];
 	}
-	std::vector<entity::entity> pins(entity::entity net) const {
+    const std::vector<entity::entity> & pins(entity::entity net) const {
 		return m_pins[m_system.lookup(net)];
 	}
 	std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {

@@ -21,11 +21,15 @@ under the License.
 #include "timingdriven_placement.h"
 
 #include "../netlist/verilog.h"
-#include "../placement/def.h"
-#include "../placement/lef.h"
+#include "../parsing/def.h"
+#include "../parsing/lef.h"
 #include "../timing/liberty.h"
 #include "../timing/design_constraints.h"
 #include "../timing/graph_builder.h"
+
+
+#include "../placement/def2placement.h"
+#include "../placement/lef2library.h"
 
 #include "wns.h"
 
@@ -63,12 +67,30 @@ timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_f
     m_dot_lib_late(dot_lib_late),
     m_dot_lib_early(dot_lib_early)
 {
+
     floorplan::floorplan fplan;
     std::ifstream dot_v(dot_verilog_file, std::ifstream::in);
+
+
     netlist::verilog::read(dot_v, &m_netlist);
-    std::ifstream dot_def(dot_def_file, std::ifstream::in);
-    placement::def::read(dot_def, &m_netlist, &m_placement, &fplan);
-    // TODO READ LEF
+
+    parsing::lef * lef{nullptr};
+    parsing::def * def{nullptr};
+
+
+
+#pragma omp single nowait
+{
+#pragma omp task shared(lef, dot_lef_file)
+    lef = new parsing::lef(dot_lef_file);
+#pragma omp task shared(def, dot_def_file)
+    def = new parsing::def(dot_def_file);
+}
+#pragma omp taskwait
+    placement::lef2library(*lef, m_placement_lib);
+    placement::def2placement(*def, m_placement);
+    delete lef, def;
+
     m_dc = timing::default_design_constraints{m_netlist}.dc();
     m_dc.clock.period = clock_in_picosseconds;
     for(auto driver : m_dc.input_drivers)

@@ -28,8 +28,6 @@ under the License.
 #include <boost/bimap.hpp>
 #include <vector>
 
-#include "lef.h"
-
 namespace ophidian {
 namespace placement {
 
