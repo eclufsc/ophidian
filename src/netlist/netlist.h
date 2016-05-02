@@ -63,12 +63,18 @@ class netlist {
 	std::unordered_map<std::string, entity::entity> m_name2net;
 
 public:
+
+    void cell_preallocate(std::size_t qnt);
+    void pin_preallocate(std::size_t qnt);
+    void net_preallocate(std::size_t qnt);
+
 	/// Constructor.
 	/**
 	 * Netlist constructor. Creates the entity systems for cells, pins and nets.
 	 * \param std_cells Standard cells object.
 	 */
 	netlist(standard_cell::standard_cells * std_cells);
+
 	virtual ~netlist();
 
 	/// Registers cell property.
@@ -294,6 +300,14 @@ public:
      * \return The created net.
      */
 	entity::entity net_insert(std::string name);
+    /// Inserts a new net.
+    /**
+     * Inserts a new net in the netlist. A net has a name associated to it.
+     * \param name Name of the net, used to identify it.
+     * \param pin_count Number of pins the net will connect
+     * \return The created net.
+     */
+    entity::entity net_insert(std::string name, std::size_t pin_count);
 	/// Removes a net.
 	/**
 	 * Removes an existing net from the netlist.

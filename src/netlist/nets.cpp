@@ -56,8 +56,14 @@ void nets::pins(entity::entity net, std::vector<entity::entity> pins) {
 }
 
 void nets::name(entity::entity net, std::string name) {
-	m_names[m_system.lookup(net)] = name;
+    m_names[m_system.lookup(net)] = name;
 }
+
+void nets::preallocate_pins(entity::entity net, std::size_t pin_count)
+{
+    m_pins[m_system.lookup(net)].reserve(pin_count);
+}
+
 
 } /* namespace netlist */
 } /* namespace ophidian */

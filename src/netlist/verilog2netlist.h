@@ -18,27 +18,19 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef SRC_NETLIST_VERILOG_H_
-#define SRC_NETLIST_VERILOG_H_
 
+#ifndef OPHIDIAN_NETLIST_VERILOG2NETLIST_H
+#define OPHIDIAN_NETLIST_VERILOG2NETLIST_H
+
+#include "../parsing/verilog.h"
 #include "netlist.h"
-#include <fstream>
 
 namespace ophidian {
 namespace netlist {
 
-namespace verilog {
-namespace parser {
-bool is_special_char(char c);
-std::vector<std::string> tokenize(std::string line);
+void verilog2netlist(const parsing::verilog & verilog, netlist& netlist);
+
+}
 }
 
-void read(std::istream & in, netlist* netlist);
-void write(std::ostream & out, standard_cell::standard_cells * std_cells,
-		netlist* netlist);
-}
-
-} /* namespace netlist */
-} /* namespace ophidian */
-
-#endif /* SRC_NETLIST_VERILOG_H_ */
+#endif // OPHIDIAN_NETLIST_VERILOG2NETLIST_H

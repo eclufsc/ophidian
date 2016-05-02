@@ -49,6 +49,8 @@ public:
 	 * \param index The index of the created entity
 	 */
 	virtual void create( entity & e, std::size_t index) = 0;
+
+    virtual void preallocate(std::size_t qnt) = 0;
 };
 
 } /* namespace entity */

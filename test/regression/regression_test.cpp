@@ -21,7 +21,6 @@ under the License.
 #include "../catch.hpp"
 
 #include "../geometry/geometry.h"
-#include "../netlist/verilog.h"
 #include "../placement/placement.h"
 
 #include "../timing/endpoints.h"
@@ -85,9 +84,7 @@ TEST_CASE("regression/hpwl", "[regression][hpwl]") {
         ophidian::placement::placement placement(&netlist, &library);
         // READ DEF
         // READ LEF
-
-
-        ophidian::netlist::verilog::read(dot_v, &netlist);
+        // READ V
         double HPWL = measure_HPWL(netlist, placement, library);
         std::stringstream ss;
         ss.precision(5);
@@ -132,8 +129,7 @@ struct circuit {
 
     circuit(const std::string & name, double clk)
     {
-        std::ifstream dot_v("benchmarks/"+name+"/"+name+".v", std::ifstream::in);
-        netlist::verilog::read(dot_v, &netlist);
+//        std::ifstream dot_v("benchmarks/"+name+"/"+name+".v", std::ifstream::in); TODO READ V
 #pragma omp critical
         {
         timing::liberty::read("benchmarks/"+name+"/"+name+"_Late.lib", lib_late);

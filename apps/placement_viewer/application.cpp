@@ -3,13 +3,15 @@
 #include <fstream>
 
 
-#include "../../src/netlist/verilog.h"
 #include "../../src/timing/liberty.h"
 
 #include "../../src/timing/graph_builder.h"
 
 #include "../../src/standard_cell/standard_cells.h"
 
+#include "../../src/parsing/def.h"
+#include "../../src/parsing/lef.h"
+#include "../../src/parsing/verilog.h"
 
 #include <omp.h>
 
@@ -22,24 +24,13 @@ application::application(const std::string v_file, const std::string lef_file, c
 
 
 {
-    std::ifstream dot_lef(lef_file.c_str(), std::ifstream::in);
-    std::ifstream dot_v(v_file.c_str(), std::ifstream::in);
-    std::ifstream dot_def(def_file.c_str(), std::ifstream::in);
-    if (!dot_def.good() || !dot_v.good() || !dot_def.good())
-        throw std::runtime_error("Error reading the files");
 
 
     std::cout << "reading inputs..." << std::endl;
-    ophidian::netlist::verilog::read(dot_v, &m_netlist);
-    dot_v.close();
-
-
 
 
 //    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library); TODO READ LEF
-    dot_lef.close();
 //    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan); TODO READ DEF
-    dot_def.close();
     ophidian::timing::liberty::read(lib_file, m_timing_library);
 
 

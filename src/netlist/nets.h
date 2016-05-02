@@ -57,6 +57,9 @@ public:
 	void disconnect(entity::entity net, entity::entity pin);
 	void pins(entity::entity net, std::vector<entity::entity> pins);
 	void name(entity::entity net, std::string name);
+
+
+    void preallocate_pins(entity::entity net, std::size_t pin_count);
 };
 
 } /* namespace netlist */

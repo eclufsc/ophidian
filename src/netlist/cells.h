@@ -65,6 +65,9 @@ public:
 	void name(entity::entity cell, std::string name);
 	void standard_cell(entity::entity cell, entity::entity std_cell);
 
+
+    void pins_preallocate(entity::entity cell, std::size_t pin_count);
+
 };
 
 } /* namespace netlist */

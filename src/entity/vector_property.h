@@ -110,6 +110,10 @@ namespace ophidian {
             typename std::vector<T>::const_iterator end() const {
                 return m_values.end();
             }
+
+            void preallocate(std::size_t qnt) {
+                m_values.reserve(std::max(m_values.capacity(), qnt));
+            }
         };
 
         template <>
@@ -151,6 +155,10 @@ namespace ophidian {
 
             std::vector<bool>::const_iterator end() const {
                 return m_values.end();
+            }
+
+            void preallocate(std::size_t qnt) {
+                m_values.reserve(std::max(m_values.capacity(), qnt));
             }
         };
     }

@@ -25,6 +25,21 @@ under the License.
 namespace ophidian {
 namespace netlist {
 
+void netlist::pin_preallocate(std::size_t qnt)
+{
+    m_pins_system.preallocate(qnt);
+}
+
+void netlist::net_preallocate(std::size_t qnt)
+{
+    m_pins_system.preallocate(qnt);
+}
+
+void netlist::cell_preallocate(std::size_t qnt)
+{
+    m_pins_system.preallocate(qnt);
+}
+
 netlist::netlist(standard_cell::standard_cells * std_cells) :
 		m_std_cells(std_cells), m_cells(m_cells_system), m_pins(m_pins_system), m_nets(m_nets_system) {
 }
@@ -59,8 +74,10 @@ entity::entity netlist::cell_insert(std::string name, std::string type) {
 	entity::entity the_cell = m_cells_system.create();
 	m_name2cell[name] = the_cell;
 	m_cells.name(the_cell, name);
-	m_cells.standard_cell(the_cell, m_std_cells->cell_create(type));
-	return the_cell;
+    auto std_cell = m_std_cells->cell_create(type);
+    m_cells.standard_cell(the_cell, std_cell);
+    m_cells.pins_preallocate(the_cell, m_std_cells->cell_pins(std_cell).size());
+    return the_cell;
 }
 
 void netlist::cell_remove(entity::entity cell) {
@@ -99,7 +116,15 @@ entity::entity netlist::net_insert(std::string name) {
 	entity::entity the_net = m_nets_system.create();
 	m_name2net[name] = the_net;
 	m_nets.name(the_net, name);
-	return the_net;
+    return the_net;
+}
+
+entity::entity netlist::net_insert(std::string name, std::size_t pin_count)
+{
+    auto the_net = net_insert(name);
+    m_nets.preallocate_pins(the_net, pin_count);
+    return the_net;
+
 }
 
 void netlist::connect(entity::entity net, entity::entity pin) {

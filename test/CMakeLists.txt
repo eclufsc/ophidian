@@ -15,7 +15,8 @@ add_subdirectory (floorplan)
 add_subdirectory (interconnection)
 add_subdirectory (timing)
 add_subdirectory (timing-driven_placement)
-add_subdirectory(density)
+add_subdirectory (density)
+add_subdirectory (parsing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
