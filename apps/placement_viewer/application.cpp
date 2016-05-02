@@ -10,6 +10,7 @@
 
 #include "../../src/standard_cell/standard_cells.h"
 
+
 #include <omp.h>
 
 application::application(const std::string v_file, const std::string lef_file, const std::string def_file, const std::string lib_file):
@@ -31,6 +32,10 @@ application::application(const std::string v_file, const std::string lef_file, c
     std::cout << "reading inputs..." << std::endl;
     ophidian::netlist::verilog::read(dot_v, &m_netlist);
     dot_v.close();
+
+
+
+
 //    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library); TODO READ LEF
     dot_lef.close();
 //    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan); TODO READ DEF

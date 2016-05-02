@@ -30,6 +30,7 @@ under the License.
 
 #include "../placement/def2placement.h"
 #include "../placement/lef2library.h"
+#include "../floorplan/lefdef2floorplan.h"
 
 #include "wns.h"
 
@@ -89,6 +90,7 @@ timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_f
 #pragma omp taskwait
     placement::lef2library(*lef, m_placement_lib);
     placement::def2placement(*def, m_placement);
+    floorplan::lefdef2floorplan(*lef, *def, m_floorplan);
     delete lef, def;
 
     m_dc = timing::default_design_constraints{m_netlist}.dc();

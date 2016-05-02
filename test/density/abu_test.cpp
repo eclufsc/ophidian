@@ -25,6 +25,7 @@ under the License.
 
 #include "../placement/def2placement.h"
 #include "../placement/lef2library.h"
+#include "../floorplan/lefdef2floorplan.h"
 
 #include "abu.h"
 
@@ -54,6 +55,7 @@ bool run_circuit(const std::string & ckt_name, const double target_utilization, 
 
     placement::lef2library(*lef, lib);
     placement::def2placement(*def, cells);
+    floorplan::lefdef2floorplan(*lef, *def, floorplan);
 
     auto row_it = floorplan.rows_system().begin();
     double row_height = floorplan.row_dimensions(row_it->first).y();
