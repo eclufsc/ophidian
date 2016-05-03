@@ -114,6 +114,14 @@ namespace ophidian {
             void preallocate(std::size_t qnt) {
                 m_values.reserve(std::max(m_values.capacity(), qnt));
             }
+
+            T* data() {
+                return m_values.data();
+            }
+
+            const T* data() const {
+                return m_values.data();
+            }
         };
 
         template <>
@@ -160,6 +168,8 @@ namespace ophidian {
             void preallocate(std::size_t qnt) {
                 m_values.reserve(std::max(m_values.capacity(), qnt));
             }
+
+
         };
     }
 }
