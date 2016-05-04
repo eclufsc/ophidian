@@ -14,11 +14,12 @@ add_subdirectory (floorplan)
 add_subdirectory (interconnection)
 add_subdirectory (timing)
 add_subdirectory (timing-driven_placement)
-add_subdirectory(density)
+add_subdirectory (density)
+add_subdirectory (routing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
-target_link_libraries ( run_tests LINK_PUBLIC entity standard_cell netlist placement floorplan interconnection timing timing-driven_placement density legalization emon )
+target_link_libraries ( run_tests LINK_PUBLIC entity standard_cell netlist placement floorplan interconnection timing timing-driven_placement density legalization routing emon )
 
 
 add_custom_command(

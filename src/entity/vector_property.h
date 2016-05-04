@@ -36,6 +36,11 @@ namespace ophidian {
         class vector_property : public property {
             std::vector<T> m_values;
 
+            void _m_range_check(size_t index) const {
+                if(index >= m_values.size())
+                    throw std::out_of_range("vector::_M_range_check");
+            }
+
         public:
             /// Constructor.
             /**
@@ -93,6 +98,28 @@ namespace ophidian {
                 return m_values[entity_index];
             }
 
+            /// Property getter with range check
+            /**
+             * Returns the property value for an entity after checking the range.
+             * \param entity_index The index of the entity to get the property.
+             * \return A reference to the property of that entity.
+             */
+            T & at(std::size_t entity_index) {
+                _m_range_check(entity_index);
+                return m_values[entity_index];
+            }
+
+            /// Constant property getter with range check
+            /**
+             * Returns the property value for an entity after checking the range. Necessary when there is only a constant reference to the properties.
+             * \param entity_index The index of the entity to get the property.
+             * \return A constant reference to the property of that entity.
+             */
+            const T & at(std::size_t entity_index) const {
+                _m_range_check(entity_index);
+                return m_values[entity_index];
+            }
+
             /// Begin iterator
             /**
              * Returns an iterator pointing to the beginning of the vector of properties.
@@ -116,6 +143,11 @@ namespace ophidian {
         class vector_property<bool> : public property {
             std::vector<bool> m_values;
 
+            void _m_range_check(size_t index) const {
+                if(index >= m_values.size())
+                    throw std::out_of_range("vector::_M_range_check");
+            }
+
         public:
             vector_property() {
 
@@ -137,11 +169,21 @@ namespace ophidian {
 
             }
 
+            bool operator[](std::size_t entity_index) const {
+                return m_values[entity_index];
+            }
+
             std::vector<bool>::reference operator[](std::size_t entity_index) {
                 return m_values[entity_index];
             }
 
-            bool operator[](std::size_t entity_index) const {
+            bool at(std::size_t entity_index) const {
+                _m_range_check(entity_index);
+                return m_values[entity_index];
+            }
+
+            std::vector<bool>::reference at(std::size_t entity_index) {
+                _m_range_check(entity_index);
                 return m_values[entity_index];
             }
 
