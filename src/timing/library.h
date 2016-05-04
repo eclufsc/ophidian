@@ -109,6 +109,10 @@ public:
 		return m_std_cells;
 	}
 
+    void pin_direction(entity::entity pin, standard_cell::pin_directions direction) {
+        return m_std_cells.pin_direction(pin, direction);
+    }
+
 	standard_cell::pin_directions pin_direction(entity::entity pin) const {
 		return m_std_cells.pin_direction(pin);
 	}

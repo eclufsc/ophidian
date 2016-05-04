@@ -40,9 +40,8 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 
     std::cout << "  graph_builder::build(): creating net edges" << std::endl << std::flush;
     // create net edges
-    std::vector< entity::entity > net_pins;
     for (auto net : netlist.net_system()) {
-        net_pins = netlist.net_pins(net.first);
+        auto net_pins = netlist.net_pins(net.first);
         entity::entity source;
         for (auto pin : net_pins) {
             std::string pin_name = netlist.pin_name(pin);
@@ -70,7 +69,6 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
     std::cout << "  graph_builder::build(): creating timing arc edges" << std::endl << std::flush;
     std::vector< entity::entity > input_pins;
     std::unordered_map< entity::entity, entity::entity > output_pins;
-    std::vector< entity::entity > arcs;
     std::size_t current_cell{0};
 
     std::vector<double> percentages {
@@ -119,7 +117,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         for (auto from : input_pins) {
 
             entity::entity from_std_cell = netlist.pin_std_cell(from);
-            arcs = lib.pin_timing_arcs(from_std_cell);
+            auto arcs = lib.pin_timing_arcs(from_std_cell);
             for(auto arc : arcs)
             {
                 if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL && !test_created)
@@ -180,7 +178,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         for (auto arc : out_fall_arcs)
             graph.edge_source(arc, new_fall_node);
 
-        arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
+        auto arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
         for (auto arc : arcs) {
             switch (lib.timing_arc_timing_sense(arc)) {
             case unateness::POSITIVE_UNATE:

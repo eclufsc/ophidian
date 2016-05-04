@@ -21,6 +21,8 @@ under the License.
 #ifndef OPHIDIAN_TIMING_DRIVEN_PLACEMENT_TIMING_DRIVEN_PLACEMENT_H
 #define OPHIDIAN_TIMING_DRIVEN_PLACEMENT_TIMING_DRIVEN_PLACEMENT_H
 
+
+
 #include "../timing/generic_sta.h"
 #include "../timing/ceff.h"
 #include "../placement/placement.h"
@@ -121,7 +123,7 @@ public:
         return m_netlist.cell_system().lookup(c);
     }
 
-    std::vector<Pin> cell_pins(Cell c) const {
+    const std::vector<Pin> & cell_pins(Cell c) const {
         return m_netlist.cell_pins(c);
     }
 
@@ -153,7 +155,7 @@ public:
     //! Gets the pin of a net
     /*!
     */
-    std::vector<Pin> net_pins(Net net) const {
+    const std::vector<Pin> & net_pins(Net net) const {
         return m_netlist.net_pins(net);
     }
 

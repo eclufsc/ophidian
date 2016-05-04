@@ -152,6 +152,7 @@ class system {
 
     std::set<property*> m_properties;
 public:
+    void preallocate(std::size_t qnt);
 	/// Constructor.
 	/**
 	 * Creates an empty system.

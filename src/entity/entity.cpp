@@ -28,6 +28,12 @@ entity::entity(uint32_t id) :
 
 }
 
+void system::preallocate(std::size_t qnt)
+{
+    for(auto property : m_properties)
+        property->preallocate(qnt);
+}
+
 system::system() :
 		m_next(0) {
 }

@@ -42,7 +42,7 @@ public:
 	std::string name(entity::entity net) const {
 		return m_names[m_system.lookup(net)];
 	}
-	std::vector<entity::entity> pins(entity::entity net) const {
+    const std::vector<entity::entity> & pins(entity::entity net) const {
 		return m_pins[m_system.lookup(net)];
 	}
 	std::pair< std::vector<std::string>::const_iterator, std::vector<std::string>::const_iterator > names() const {
@@ -57,6 +57,9 @@ public:
 	void disconnect(entity::entity net, entity::entity pin);
 	void pins(entity::entity net, std::vector<entity::entity> pins);
 	void name(entity::entity net, std::string name);
+
+
+    void preallocate_pins(entity::entity net, std::size_t pin_count);
 };
 
 } /* namespace netlist */

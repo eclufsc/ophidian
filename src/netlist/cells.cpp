@@ -46,7 +46,12 @@ void cells::name(entity::entity cell, std::string name) {
 
 void cells::standard_cell(entity::entity cell,
 		entity::entity std_cell) {
-	m_standard_cells[m_system.lookup(cell)] = std_cell;
+    m_standard_cells[m_system.lookup(cell)] = std_cell;
+}
+
+void cells::pins_preallocate(entity::entity cell, std::size_t pin_count)
+{
+    m_pins[m_system.lookup(cell)].reserve(pin_count);
 }
 
 } /* namespace netlist */

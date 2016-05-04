@@ -1,3 +1,4 @@
+add_subdirectory (parsing)
 add_subdirectory (interconnection)
 add_subdirectory (standard_cell)
 add_subdirectory (entity)

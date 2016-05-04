@@ -44,7 +44,7 @@ public:
 	entity::entity standard_cell(entity::entity cell) const {
 		return m_standard_cells[m_system.lookup(cell)];
 	}
-	std::vector<entity::entity> pins(entity::entity cell) const {
+    const std::vector<entity::entity> & pins(entity::entity cell) const {
 		return m_pins[m_system.lookup(cell)];
 	}
 
@@ -64,6 +64,9 @@ public:
 	void pins(entity::entity cell, std::vector<entity::entity> pins);
 	void name(entity::entity cell, std::string name);
 	void standard_cell(entity::entity cell, entity::entity std_cell);
+
+
+    void pins_preallocate(entity::entity cell, std::size_t pin_count);
 
 };
 

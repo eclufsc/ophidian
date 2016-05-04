@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(placement_viewer)
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets)

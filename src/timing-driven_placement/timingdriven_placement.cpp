@@ -20,14 +20,28 @@ under the License.
 
 #include "timingdriven_placement.h"
 
-#include "../netlist/verilog.h"
-#include "../placement/def.h"
-#include "../placement/lef.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+
+
+#include "../parsing/def.h"
+#include "../parsing/lef.h"
+#include "../parsing/verilog.h"
+
 #include "../timing/liberty.h"
 #include "../timing/design_constraints.h"
 #include "../timing/graph_builder.h"
 
+
+
+#include "../netlist/verilog2netlist.h"
+#include "../placement/def2placement.h"
+#include "../placement/lef2library.h"
+#include "../floorplan/lefdef2floorplan.h"
+
 #include "wns.h"
+
+
 
 namespace ophidian {
 namespace timingdriven_placement {
@@ -63,17 +77,79 @@ timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_f
     m_dot_lib_late(dot_lib_late),
     m_dot_lib_early(dot_lib_early)
 {
-    floorplan::floorplan fplan;
-    std::ifstream dot_v(dot_verilog_file, std::ifstream::in);
-    netlist::verilog::read(dot_v, &m_netlist);
-    std::ifstream dot_def(dot_def_file, std::ifstream::in);
-    placement::def::read(dot_def, &m_netlist, &m_placement, &fplan);
-    // TODO READ LEF
+
+    std::unique_ptr<parsing::lef> lef;
+    std::unique_ptr<parsing::def> def;
+    std::unique_ptr<parsing::verilog> v;
+
+    boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
+
+
+#pragma omp parallel
+    {
+#pragma omp single
+        {
+#pragma omp task shared(v, dot_verilog_file)
+            {
+                std::cout << "reading verilog on thread #" << omp_get_thread_num() << std::endl;
+                v.reset(new parsing::verilog(dot_verilog_file));
+                std::cout << "reading verilog on thread #" << omp_get_thread_num() << "DONE" << std::endl;
+            }
+#pragma omp task shared(def, dot_def_file)
+            {
+                std::cout << "reading def on thread #" << omp_get_thread_num() << std::endl;
+                def.reset(new parsing::def(dot_def_file));
+                std::cout << "reading def on thread #" << omp_get_thread_num() << "DONE" << std::endl;
+            }
+#pragma omp task shared(lef, dot_lef_file)
+            {
+                std::cout << "reading lef on thread #" << omp_get_thread_num() << std::endl;
+                lef.reset(new parsing::lef(dot_lef_file));
+
+                std::cout << "reading lef on thread #" << omp_get_thread_num() << "DONE" << std::endl;
+            }
+#pragma omp taskwait
+        }
+    }
+
+    boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
+    boost::posix_time::time_duration msdiff = mst2 - mst1;
+    std::cout << "parsing (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
+    mst1 = boost::posix_time::microsec_clock::local_time();
+    placement::lef2library(*lef, m_placement_lib);
+    mst2 = boost::posix_time::microsec_clock::local_time();
+    msdiff = mst2 - mst1;
+    std::cout << "lef lib creation (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
+    mst1 = boost::posix_time::microsec_clock::local_time();
+    netlist::verilog2netlist(*v, m_netlist);
+    mst2 = boost::posix_time::microsec_clock::local_time();
+    msdiff = mst2 - mst1;
+    std::cout << "netlist creation (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
+    mst1 = boost::posix_time::microsec_clock::local_time();
+    placement::def2placement(*def, m_placement);
+    mst2 = boost::posix_time::microsec_clock::local_time();
+    msdiff = mst2 - mst1;
+    std::cout << "cells placement (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
+    mst1 = boost::posix_time::microsec_clock::local_time();
+    floorplan::lefdef2floorplan(*lef, *def, m_floorplan);
+    mst2 = boost::posix_time::microsec_clock::local_time();
+    msdiff = mst2 - mst1;
+    std::cout << "floorplan info (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
+    mst1 = boost::posix_time::microsec_clock::local_time();
     m_dc = timing::default_design_constraints{m_netlist}.dc();
     m_dc.clock.period = clock_in_picosseconds;
     for(auto driver : m_dc.input_drivers)
         m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
     m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(m_dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
+    mst2 = boost::posix_time::microsec_clock::local_time();
+    msdiff = mst2 - mst1;
+    std::cout << "design constraints (" << msdiff.total_milliseconds() << " ms)" << std::endl;
+
     m_netlist.register_net_property(&m_rc_trees);
     for(auto cell : cells())
         make_cell_nets_dirty(cell);
@@ -105,11 +181,11 @@ void timingdriven_placement::update_timing()
         m_tarcs.reset(new timing::library_timing_arcs{&m_std_cells});
         m_lib_late.reset(new timing::library{m_tarcs.get(), &m_std_cells});
         m_lib_early.reset(new timing::library{m_tarcs.get(), &m_std_cells});
-    #pragma omp critical
+#pragma omp critical
         {
             timing::liberty::read(m_dot_lib_late, *m_lib_late);
         }
-    #pragma omp critical
+#pragma omp critical
         {
             timing::liberty::read(m_dot_lib_early, *m_lib_early);
         }

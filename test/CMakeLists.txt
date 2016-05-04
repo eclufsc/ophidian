@@ -3,6 +3,7 @@ set(SOURCE
 )
 
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/)
 
 
 add_subdirectory (standard_cell)
@@ -20,7 +21,7 @@ add_subdirectory (routing)
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
 target_link_libraries ( run_tests LINK_PUBLIC entity standard_cell netlist placement floorplan interconnection timing timing-driven_placement density legalization routing emon )
-
+add_subdirectory (parsing)
 
 add_custom_command(
     TARGET run_tests POST_BUILD
