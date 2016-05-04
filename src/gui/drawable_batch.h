@@ -19,6 +19,7 @@ public:
     drawable_batch(sf::PrimitiveType primitive) :
         m_primitive(primitive){
         m_system.register_property(&m_vertices);
+        m_vertices.preallocate(10000000);
     }
 
     entity::entity create() {
