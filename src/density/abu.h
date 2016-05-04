@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_ABU_H
-#define OPENEDA_ABU_H
+#ifndef ophidian_ABU_H
+#define ophidian_ABU_H
 
 #include "density_map.h"
 #include "placement.h"
@@ -51,4 +51,4 @@ namespace ophidian {
 
 
 
-#endif //OPENEDA_ABU_H
+#endif //ophidian_ABU_H

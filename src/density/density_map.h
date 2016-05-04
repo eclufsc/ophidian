@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_DENSITY_H
-#define OPENEDA_DENSITY_H
+#ifndef ophidian_DENSITY_H
+#define ophidian_DENSITY_H
 
 #include <boost/geometry/index/rtree.hpp>
 #include "bins.h"
@@ -113,4 +113,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_DENSITY_H
+#endif //ophidian_DENSITY_H

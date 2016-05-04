@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_BINS_H
-#define OPENEDA_BINS_H
+#ifndef ophidian_BINS_H
+#define ophidian_BINS_H
 
 #include <vector_property.h>
 #include "entity.h"
@@ -105,4 +105,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_BINS_H
+#endif //ophidian_BINS_H
