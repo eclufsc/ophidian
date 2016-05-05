@@ -35,8 +35,8 @@ canvas::~canvas()
 
 void canvas::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-    target.draw(m_lines, states);
     target.draw(m_quads, states);
+    target.draw(m_lines, states);
 }
 
 line canvas::line_create(const geometry::point<double> &p1, const geometry::point<double> &p2)
