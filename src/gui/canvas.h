@@ -45,7 +45,6 @@ public:
     virtual ~canvas();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-
     line line_create(const geometry::point<double> & p1, const geometry::point<double> & p2);
     void destroy(line the_line);
     void transform(line the_line, const sf::Transform & transformation);

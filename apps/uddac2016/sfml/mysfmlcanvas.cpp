@@ -36,75 +36,7 @@ mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
     m_opensans.loadFromFile("/usr/share/fonts/truetype/open-sans-elementary/OpenSans-Regular.ttf");
     omp_set_num_threads(omp_get_max_threads());
     m_camera_view.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
-    //    auto quad = m_canvas.quad_create(geometry::point<double>(0.0, 0.0),
-    //                         geometry::point<double>(0.0, 100.0),
-    //                         geometry::point<double>(200.0, 100.0),
-    //                         geometry::point<double>(200.0, 0.0));
-    //    m_canvas.paint(quad, sf::Color::Green);
 
-    std::unique_ptr<parsing::def> def;
-    std::unique_ptr<parsing::lef> lef;
-#pragma omp single nowait
-    {
-#pragma omp task shared(def)
-        def.reset(new parsing::def("./benchmarks/superblue10/superblue10.def"));
-#pragma omp task shared(lef)
-        lef.reset(new parsing::lef("./benchmarks/superblue10/superblue10.lef"));
-    }
-#pragma omp taskwait
-
-    standard_cell::standard_cells std_cells;
-    netlist::netlist netlist(&std_cells);
-    placement::library lib(&std_cells);
-    placement::placement placement(&netlist, &lib);
-
-    floorplan::floorplan fplan;
-
-#pragma omp single nowait
-    {
-#pragma omp task shared(lef, def, placement, lib)
-        {
-            placement::def2placement(*def, placement);
-            placement::lef2library(*lef, lib);
-        }
-#pragma omp task shared(lef, def, fplan)
-        floorplan::lefdef2floorplan(*lef, *def, fplan);
-    }
-#pragma omp taskwait
-
-    std::normal_distribution<double> blue_distribution(125.0, 24.0);
-    std::default_random_engine engine;
-
-    sf::Transform mirror;
-    mirror.scale(1.0, -1.0);
-
-    for(auto cell : netlist.cell_system())
-    {
-        auto geo = placement.cell_geometry(cell.first);
-        for(auto & poly : geo)
-        {
-
-            auto quad = m_canvas.quad_create(poly.outer()[0], poly.outer()[1], poly.outer()[2], poly.outer()[3]);
-            // mirroring y axis.
-            m_canvas.transform(quad, mirror);
-            // painting random blue
-            double blue_tone{std::max(0.0, std::min(255.0, blue_distribution(engine)))};
-            m_canvas.paint(quad, sf::Color(0,0,static_cast<sf::Uint8>(blue_tone)));
-        }
-    }
-    m_camera_view.setSize(fplan.chip_boundaries().x()-fplan.chip_origin().x(), fplan.chip_boundaries().y()-fplan.chip_origin().y());
-    m_camera_view.setCenter(fplan.chip_origin().x()+m_camera_view.getSize().x/2, -(fplan.chip_origin().y()+m_camera_view.getSize().y/2));
-
-
-    auto line1 = m_canvas.line_create(fplan.chip_origin(), {fplan.chip_origin().x(), fplan.chip_boundaries().y()});
-    auto line2 = m_canvas.line_create({fplan.chip_origin().x(), fplan.chip_boundaries().y()}, fplan.chip_boundaries());
-    auto line3 = m_canvas.line_create(fplan.chip_boundaries(), {fplan.chip_boundaries().x(), fplan.chip_origin().y()});
-    auto line4 = m_canvas.line_create({fplan.chip_boundaries().x(), fplan.chip_origin().y()}, fplan.chip_origin());
-
-    m_canvas.transform(line1, mirror);
-    m_canvas.transform(line2, mirror);
-    m_canvas.transform(line3, mirror);
-    m_canvas.transform(line4, mirror);
 }
 
 void mysfmlcanvas::resizeEvent(QResizeEvent *e)
@@ -170,6 +102,27 @@ void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
         m_camera_view.move(sf::Vector2f(-m_camera_view.getSize().x*.1, 0.0f));
         break;
     }
+}
+
+void mysfmlcanvas::center_view_on(const ophidian::geometry::point<double> &p1)
+{
+    m_camera_view.setCenter(sf::Vector2f(p1.x(), p1.y()));
+}
+
+void mysfmlcanvas::view_size(const ophidian::geometry::point<double> &size)
+{
+    m_camera_view.setSize(sf::Vector2f(size.x(), size.y()));
+}
+
+gui::line mysfmlcanvas::line_create(const ophidian::geometry::point<double> &p1, const ophidian::geometry::point<double> &p2)
+{
+    return m_canvas.line_create(p1, p2);
+}
+
+
+gui::quad mysfmlcanvas::quad_create(const ophidian::geometry::point<double> &p1, const ophidian::geometry::point<double> &p2, const ophidian::geometry::point<double> &p3, const ophidian::geometry::point<double> &p4)
+{
+   return m_canvas.quad_create(p1, p2, p3, p4);
 }
 
 }

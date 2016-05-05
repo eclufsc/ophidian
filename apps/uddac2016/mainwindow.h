@@ -2,6 +2,7 @@
 #define OPHIDIAN_APPS_UDDAC2016_MAINWINDOW_H
 
 #include <QMainWindow>
+#include "controller.h"
 
 namespace uddac2016 {
 
@@ -13,9 +14,14 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    controller m_controller;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+private slots:
+
 
 private:
     Ui::MainWindow *ui;
