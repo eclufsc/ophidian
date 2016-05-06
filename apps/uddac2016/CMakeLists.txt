@@ -24,6 +24,7 @@ set(SOURCES
     main.cpp
     controller.cpp
     canvas_controller.cpp
+    canvas_state.cpp
     random_purple_cell_painter.cpp
     application.cpp
     mainwindow.cpp

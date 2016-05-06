@@ -32,6 +32,13 @@ bool application::read_lefdef(const std::string &LEF, const std::string &DEF)
     return true;
 }
 
+bool application::read_def(const std::string &DEF)
+{
+    parsing::def def(DEF);
+    placement::def2placement(def, m_placement);
+    return true;
+}
+
 std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > application::cells_geometries() const
 {
     std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries;

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMessageBox>
 
+#include <QFileDialog>
+
 namespace uddac2016 {
 
 MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
@@ -13,6 +15,9 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QMenu * file = this->addMenu("File");
     QAction * action = file->addAction("Open LEF/DEF...");
     connect(action, SIGNAL(triggered()), this, SLOT(action_open_LEFDEF_triggered()));
+
+    QAction * read_sol = file->addAction("Open placement solution (.DEF)...");
+    connect(read_sol, SIGNAL(triggered()), this, SLOT(action_open_placement_solution_triggered()));
 
 
     QAction * exit = file->addAction("Exit");
@@ -35,6 +40,13 @@ void MainWindowMenuBar::action_open_LEFDEF_triggered()
     connect(&dialog, SIGNAL(accepted(QString, QString)), this, SLOT(LEFDEF_accept(QString, QString)));
     connect(&dialog, SIGNAL(rejected()), this, SLOT(LEFDEF_reject()));
     dialog.exec();
+}
+
+void MainWindowMenuBar::action_open_placement_solution_triggered()
+{
+    auto text = QFileDialog::getOpenFileName(this, tr("Open DEF File..."), "", tr("Design Exchange Format (*.def)"));
+    if(!text.isEmpty())
+        m_ctrl->read_def(text.toStdString());
 }
 
 void MainWindowMenuBar::LEFDEF_accept(QString LEF, QString DEF)

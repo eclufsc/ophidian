@@ -20,6 +20,7 @@ public:
 
 public slots:
     void action_open_LEFDEF_triggered();
+    void action_open_placement_solution_triggered();
     void LEFDEF_accept(QString LEF, QString DEF);
     void LEFDEF_reject();
 };

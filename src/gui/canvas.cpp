@@ -87,6 +87,25 @@ void canvas::paint(quad the_quad, sf::Color color)
     m_quads.paint(the_quad.entity, color);
 }
 
+void canvas::quad_update(quad the_quad, const geometry::point<double> &p1, const geometry::point<double> &p2, const geometry::point<double> &p3, const geometry::point<double> &p4)
+{
+    m_quads.set_point(the_quad.entity, 0, p1);
+    m_quads.set_point(the_quad.entity, 1, p2);
+    m_quads.set_point(the_quad.entity, 2, p3);
+    m_quads.set_point(the_quad.entity, 3, p4);
+}
+
+void canvas::quads_animate(batch_animation * animation)
+{
+    m_quads.animate(animation);
+}
+
+void canvas::update()
+{
+    m_quads.update();
+    m_lines.update();
+}
+
 
 }
 }

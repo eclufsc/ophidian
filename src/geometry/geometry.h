@@ -55,6 +55,15 @@ void translate(Geometry geometry, point<CoordinateType> point,
 //	boost::geometry::correct(result);
 }
 
+template<class Geometry, class CoordinateType>
+void scale(Geometry geometry, point<CoordinateType> point,
+                Geometry & result) {
+        boost::geometry::strategy::transform::scale_transformer<CoordinateType,
+                        2, 2> translate(point.x(), point.y());
+        boost::geometry::transform(geometry, result, translate);
+//	boost::geometry::correct(result);
+}
+
 template<class CoordinateType>
 CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<CoordinateType> & p2)
 {
@@ -68,6 +77,7 @@ using boost::geometry::wkt;
 using boost::geometry::correct;
 using boost::geometry::append;
 using boost::geometry::envelope;
+
 
 }
 }

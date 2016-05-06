@@ -15,12 +15,17 @@ class controller
 {
     MainWindow & m_mainwindow;
     application m_app;
-    std::unique_ptr<canvas_controller> m_canvas_controller; // lazy init
+    canvas_controller * m_canvas_controller; // lazy init
 public:
     controller(MainWindow & mainwindow);
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
-    void init_canvas_controller(mysfmlcanvas *canvas);
+    void read_def(const std::string & DEF);
+    void init_canvas_controller(canvas_controller *canvas);
+
+    std::string cell_name(const ophidian::entity::entity & cell);
+    void quads_animate(ophidian::gui::batch_animation * animation);
 };
+
 
 }
 

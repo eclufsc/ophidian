@@ -14,9 +14,16 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="mysfmlcanvas" name="Canvas" native="true"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_animate">
+      <property name="text">
+       <string>Animate</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

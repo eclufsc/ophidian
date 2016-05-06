@@ -55,6 +55,15 @@ public:
     void transform(quad the_quad, const sf::Transform & transformation);
     void paint(quad the_quad, sf::Color color);
 
+    void quad_update(quad the_quad, const geometry::point<double> & p1, const geometry::point<double> & p2, const geometry::point<double> & p3, const geometry::point<double> & p4);
+    void quads_animate(batch_animation *animation);
+
+    void update();
+
+    drawable_batch<4>& quads() {
+        return m_quads;
+    }
+
 
 
 };

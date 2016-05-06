@@ -34,9 +34,37 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
     return false;
 }
 
-void controller::init_canvas_controller(mysfmlcanvas * canvas)
+void controller::read_def(const std::string &DEF)
 {
-    m_canvas_controller.reset(new canvas_controller(canvas));
+    m_app.read_def(DEF);
+    std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
+    ophidian::gui::drawable_batch<4> destination_quads = m_canvas_controller->quads();
+    m_canvas_controller->update_quads(destination_quads, geometries);
+    ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas_controller->quads(), 30);
+    for(int i = 0; i < m_canvas_controller->quads().vertex_count(); ++i)
+    {
+        (*animation)[i].position.x =  m_canvas_controller->quads()[i].position.x-destination_quads[i].position.x;
+        (*animation)[i].position.y = m_canvas_controller->quads()[i].position.y-destination_quads[i].position.y;
+    }
+    m_canvas_controller->animate_quads(animation);
 }
+
+void controller::init_canvas_controller(canvas_controller *canvas)
+{
+    m_canvas_controller = canvas;
+    canvas->main_controller(this);
+}
+
+std::string controller::cell_name(const entity::entity &cell)
+{
+    return m_app.cell_name(cell);
+}
+
+void controller::quads_animate(gui::batch_animation *animation)
+{
+    m_canvas_controller->animate_quads(animation);
+}
+
+
 
 }

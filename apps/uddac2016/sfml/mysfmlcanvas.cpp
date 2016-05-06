@@ -4,25 +4,13 @@
 #include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "../parsing/def.h"
-#include "../parsing/lef.h"
-
-#include "../netlist/netlist.h"
-
-#include "../placement/placement.h"
-#include "../placement/def2placement.h"
-#include "../placement/lef2library.h"
-
-#include "../floorplan/floorplan.h"
-#include "../floorplan/lefdef2floorplan.h"
-
 #include <QKeyEvent>
 #include <QWheelEvent>
 
 #include <omp.h>
 #include <memory>
 
-
+#include "../geometry/geometry.h"
 
 #include <QResizeEvent>
 
@@ -30,6 +18,7 @@ namespace uddac2016 {
 using namespace ophidian;
 
 mysfmlcanvas::mysfmlcanvas(QWidget *parent) :
+    m_controller(this),
     QSFMLCanvas(parent),
     m_camera_view(sf::FloatRect(0,0,51599.25,34200.0))
 {
@@ -48,6 +37,11 @@ mysfmlcanvas::~mysfmlcanvas()
 {
 }
 
+canvas_controller *mysfmlcanvas::controller()
+{
+    return &m_controller;
+}
+
 
 void mysfmlcanvas::OnInit()
 {
@@ -56,6 +50,7 @@ void mysfmlcanvas::OnInit()
 
 void mysfmlcanvas::OnUpdate()
 {
+    m_canvas.update();
     static boost::posix_time::ptime last;
     boost::posix_time::ptime current = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration diff = current - last;
@@ -104,6 +99,25 @@ void mysfmlcanvas::keyPressEvent(QKeyEvent *e)
     }
 }
 
+void mysfmlcanvas::mousePressEvent(QMouseEvent *e)
+{
+    sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
+    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_camera_view)};
+    m_controller.mouse_press(geometry::point<double>(viewCoord.x, viewCoord.y));
+}
+
+void mysfmlcanvas::mouseMoveEvent(QMouseEvent *e)
+{
+    sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
+    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, m_camera_view)};
+    m_controller.mouse_move(geometry::point<double>(viewCoord.x, viewCoord.y));
+}
+
+void mysfmlcanvas::mouseReleaseEvent(QMouseEvent *e)
+{
+    m_controller.mouse_release();
+}
+
 void mysfmlcanvas::center_view_on(const ophidian::geometry::point<double> &p1)
 {
     m_camera_view.setCenter(sf::Vector2f(p1.x(), p1.y()));
@@ -122,7 +136,19 @@ gui::line mysfmlcanvas::line_create(const ophidian::geometry::point<double> &p1,
 
 gui::quad mysfmlcanvas::quad_create(const ophidian::geometry::point<double> &p1, const ophidian::geometry::point<double> &p2, const ophidian::geometry::point<double> &p3, const ophidian::geometry::point<double> &p4)
 {
-   return m_canvas.quad_create(p1, p2, p3, p4);
+    return m_canvas.quad_create(p1, p2, p3, p4);
 }
+
+void mysfmlcanvas::quads_animate(gui::batch_animation *animation)
+{
+    m_canvas.quads_animate(animation);
+
+}
+
+ophidian::gui::drawable_batch<4> &mysfmlcanvas::quads()
+{
+    return m_canvas.quads();
+}
+
 
 }
