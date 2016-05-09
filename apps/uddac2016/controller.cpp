@@ -43,8 +43,8 @@ void controller::read_def(const std::string &DEF)
     ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas_controller->quads(), 30);
     for(int i = 0; i < m_canvas_controller->quads().vertex_count(); ++i)
     {
-        (*animation)[i].position.x =  m_canvas_controller->quads()[i].position.x-destination_quads[i].position.x;
-        (*animation)[i].position.y = m_canvas_controller->quads()[i].position.y-destination_quads[i].position.y;
+        (*animation)[i].position.x =  destination_quads[i].position.x-m_canvas_controller->quads()[i].position.x;
+        (*animation)[i].position.y = destination_quads[i].position.y-m_canvas_controller->quads()[i].position.y;
     }
     m_canvas_controller->animate_quads(animation);
 }

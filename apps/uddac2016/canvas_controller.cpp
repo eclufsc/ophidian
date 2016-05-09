@@ -49,14 +49,14 @@ void canvas_controller::update_quads(ophidian::gui::drawable_batch<4> &quads, co
     for(auto & entity_pair : geometries)
     {
         std::vector<gui::quad>& entity_quads = m_entity2quads[entity_pair.first];
-        std::size_t quad_id{0};
-        for(auto & geometry : entity_pair.second)
-        {
-            m_canvas->quad_update(entity_quads[quad_id], geometry.outer()[0], geometry.outer()[1], geometry.outer()[2], geometry.outer()[3]);
-            ++quad_id;
-        }
         for(auto & quad : entity_quads)
-            m_canvas->transform(quad, mirror);
+        {
+            quads.set_point(quad.entity, 0, entity_pair.second.front().outer()[0]);
+            quads.set_point(quad.entity, 1, entity_pair.second.front().outer()[1]);
+            quads.set_point(quad.entity, 2, entity_pair.second.front().outer()[2]);
+            quads.set_point(quad.entity, 3, entity_pair.second.front().outer()[3]);
+            quads.transform(quad.entity, mirror);
+        }
     }
 }
 
