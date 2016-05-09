@@ -42,6 +42,11 @@ canvas_controller *mysfmlcanvas::controller()
     return &m_controller;
 }
 
+gui::canvas *mysfmlcanvas::canvas()
+{
+    return &m_canvas;
+}
+
 
 void mysfmlcanvas::OnInit()
 {

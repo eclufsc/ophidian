@@ -27,6 +27,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
     {
         std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
         m_canvas_controller->create_quads(geometries);
+        m_canvas_controller->create_index(geometries);
         random_purple_cell_painter painter;
         m_canvas_controller->paint_quads(painter);
         return true;
@@ -34,9 +35,8 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
     return false;
 }
 
-void controller::read_def(const std::string &DEF)
+void controller::animate_solution()
 {
-    m_app.read_def(DEF);
     std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
     ophidian::gui::drawable_batch<4> destination_quads = m_canvas_controller->quads();
     m_canvas_controller->update_quads(destination_quads, geometries);
@@ -47,6 +47,13 @@ void controller::read_def(const std::string &DEF)
         (*animation)[i].position.y = destination_quads[i].position.y-m_canvas_controller->quads()[i].position.y;
     }
     m_canvas_controller->animate_quads(animation);
+    m_canvas_controller->create_index(geometries);
+}
+
+void controller::read_def(const std::string &DEF)
+{
+    m_app.read_def(DEF);
+    animate_solution();
 }
 
 void controller::init_canvas_controller(canvas_controller *canvas)
@@ -55,14 +62,21 @@ void controller::init_canvas_controller(canvas_controller *canvas)
     canvas->main_controller(this);
 }
 
-std::string controller::cell_name(const entity::entity &cell)
-{
-    return m_app.cell_name(cell);
-}
 
 void controller::quads_animate(gui::batch_animation *animation)
 {
     m_canvas_controller->animate_quads(animation);
+}
+
+void controller::run_SA(const std::string & verilog_file)
+{
+    m_app.run_SA(verilog_file);
+    animate_solution();
+}
+
+void controller::place_cell(const entity::entity &cell, const ophidian::geometry::point<double> &p)
+{
+    m_app.cell_position(cell, p);
 }
 
 

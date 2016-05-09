@@ -34,7 +34,31 @@ struct line {
 
 struct quad {
     entity::entity entity;
+
+    bool operator==(const quad & o) const {
+        return entity == o.entity;
+    }
 };
+
+}}
+namespace std
+{
+template<> struct hash<ophidian::gui::quad>
+{
+    typedef ophidian::gui::quad argument_type;
+    typedef std::size_t result_type;
+    result_type operator()(argument_type const& s) const
+    {
+        hash<ophidian::entity::entity> hash1;
+        return hash1(s.entity);
+    }
+};
+}
+
+
+namespace ophidian {
+namespace gui {
+
 
 class canvas : public sf::Drawable
 {
@@ -57,6 +81,9 @@ public:
 
     void quad_update(quad the_quad, const geometry::point<double> & p1, const geometry::point<double> & p2, const geometry::point<double> & p3, const geometry::point<double> & p4);
     void quads_animate(batch_animation *animation);
+    const std::array<sf::Vertex, 4> & quad_points(quad the_quad) const {
+        return m_quads.points(the_quad.entity);
+    }
 
     void update();
 

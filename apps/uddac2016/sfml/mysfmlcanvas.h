@@ -4,7 +4,9 @@
 #include "qsfmlcanvas.h"
 
 #include "../gui/canvas.h"
+#include "../gui/spatial_index.h"
 #include "../canvas_controller.h"
+
 
 namespace uddac2016 {
 
@@ -21,6 +23,8 @@ public:
 
     canvas_controller * controller();
 
+    ophidian::gui::canvas * canvas();
+
     void OnInit();
     void OnUpdate();
     void wheelEvent(QWheelEvent * e);
@@ -35,7 +39,12 @@ public:
 
     ophidian::gui::line line_create(const ophidian::geometry::point<double> & p1, const ophidian::geometry::point<double> & p2);
     ophidian::gui::quad quad_create(const ophidian::geometry::point<double> & p1, const ophidian::geometry::point<double> & p2, const ophidian::geometry::point<double> & p3, const ophidian::geometry::point<double> & p4);
+
     ophidian::gui::drawable_batch<4> & quads();
+
+    const std::array<sf::Vertex, 4> & quad_points(ophidian::gui::quad the_quad) const {
+        return m_canvas.quad_points(the_quad);
+    }
 
     void quads_animate(ophidian::gui::batch_animation *animation);
 

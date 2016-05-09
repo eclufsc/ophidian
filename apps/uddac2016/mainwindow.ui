@@ -19,9 +19,9 @@
      <widget class="mysfmlcanvas" name="Canvas" native="true"/>
     </item>
     <item>
-     <widget class="QPushButton" name="button_animate">
+     <widget class="QPushButton" name="button">
       <property name="text">
-       <string>Animate</string>
+       <string>Run SA</string>
       </property>
      </widget>
     </item>

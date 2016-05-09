@@ -1,8 +1,8 @@
 #ifndef CANVAS_STATE_H
 #define CANVAS_STATE_H
 
+#include "../gui/canvas.h"
 #include "../geometry/geometry.h"
-
 namespace uddac2016 {
 
 
@@ -28,8 +28,10 @@ public:
 };
 
 class dragging_state : public canvas_state {
+    ophidian::geometry::point<double> m_initial;
+    ophidian::gui::quad m_selected;
 public:
-    dragging_state(canvas_controller *controller);
+    dragging_state(canvas_controller *controller,  ophidian::gui::quad selected, const ophidian::geometry::point<double> &p);
     void mouse_press(const ophidian::geometry::point<double> &p);
     void mouse_release();
     void mouse_move(const ophidian::geometry::point<double> &p);

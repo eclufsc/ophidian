@@ -5,6 +5,8 @@
 #include <QDialog>
 #include <QMessageBox>
 
+#include <QFileDialog>
+
 namespace uddac2016 {
 
 MainWindow::MainWindow(QWidget *parent):
@@ -20,6 +22,13 @@ MainWindow::MainWindow(QWidget *parent):
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::on_button_clicked()
+{
+    auto text = QFileDialog::getOpenFileName(this, tr("Open Verilog File..."), "", tr("Verilog (*.v)"));
+    if(!text.isEmpty())
+        m_controller.run_SA(text.toStdString());
 }
 
 

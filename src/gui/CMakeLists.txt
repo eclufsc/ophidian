@@ -6,6 +6,6 @@ find_package(SFML 2 REQUIRED system window graphics network audio)
 
 include_directories(${SFML_INCLUDE_DIR})
 
-add_library (gui  canvas.cpp drawable_batch.h)
+add_library (gui  canvas.cpp spatial_index.cpp drawable_batch.h)
 target_include_directories (gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries( gui ${Boost_LIBRARIES} )

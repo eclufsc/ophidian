@@ -22,8 +22,25 @@ public:
     void read_def(const std::string & DEF);
     void init_canvas_controller(canvas_controller *canvas);
 
-    std::string cell_name(const ophidian::entity::entity & cell);
+
+    void place_cell(const ophidian::entity::entity & cell, const ophidian::geometry::point<double> & p);
     void quads_animate(ophidian::gui::batch_animation * animation);
+
+    std::string cell_name(const ophidian::entity::entity & cell) const {
+        return m_app.cell_name(cell);
+    }
+
+    ophidian::geometry::point<double> cell_position(const ophidian::entity::entity & cell) const {
+        return m_app.cell_position(cell);
+    }
+
+    ophidian::geometry::multi_polygon< ophidian::geometry::polygon< ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity::entity & cell) const {
+        return m_app.cell_geometry(cell);
+    }
+
+
+    void run_SA(const std::string &verilog_file);
+    void animate_solution();
 };
 
 
