@@ -27,7 +27,7 @@ under the License.
 
 TEST_CASE("nets/name","[netlist][nets]") {
 
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
 
 	auto n1 = nets_system.create();
@@ -39,14 +39,14 @@ TEST_CASE("nets/name","[netlist][nets]") {
 
 TEST_CASE("nets/assign pins","[netlist][nets]") {
 
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
 
-	ophidian::entity::system pin_sys;
+    ophidian::entity_system::entity_system pin_sys;
 
 	auto n1 = nets_system.create();
 
-	std::vector<ophidian::entity::entity> net_pins { pin_sys.create(),
+    std::vector<ophidian::entity_system::entity> net_pins { pin_sys.create(),
 			pin_sys.create(), pin_sys.create() };
 
 	nets.pins(n1, net_pins);
@@ -57,9 +57,9 @@ TEST_CASE("nets/assign pins","[netlist][nets]") {
 
 TEST_CASE("nets/connect pin","[netlist][nets]") {
 
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
-	ophidian::entity::system pin_sys;
+    ophidian::entity_system::entity_system pin_sys;
 
 	auto n1 = nets_system.create();
 
@@ -81,9 +81,9 @@ TEST_CASE("nets/connect pin","[netlist][nets]") {
 
 TEST_CASE("nets/disconnect pin","[netlist][nets]") {
 
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
-	ophidian::entity::system pin_sys;
+    ophidian::entity_system::entity_system pin_sys;
 
 	auto n1 = nets_system.create();
 

@@ -22,7 +22,8 @@ under the License.
 #include "../catch.hpp"
 
 #include "../netlist/netlist.h"
-#include "../entity/property.h"
+#include "../entity_system/vector_property.h"
+#include "../entity_system/entity.h"
 #include "../interconnection/rc_tree.h"
 
 #include <boost/units/systems/si/prefixes.hpp>
@@ -37,7 +38,7 @@ TEST_CASE("rc_tree_map","[timing][rc_tree][rc_tree_map]")
     standard_cell::standard_cells std_cells;
     netlist::netlist n{&std_cells};
 
-    entity::vector_property<interconnection::rc_tree> tree_map;
+    entity_system::vector_property<interconnection::rc_tree> tree_map;
     n.register_net_property(&tree_map);
 
     auto n1 = n.net_insert("n1");

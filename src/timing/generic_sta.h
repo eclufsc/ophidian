@@ -135,7 +135,7 @@ class generic_sta
 
     timing_data & m_timing;
     graph_and_topology & m_topology;
-    const entity::vector_property< interconnection::rc_tree > & m_rc_trees;
+    const entity_system::vector_property< interconnection::rc_tree > & m_rc_trees;
     MergeStrategy m_merge;
 
     SlewType compute_slew(lemon::ListDigraph::Node node, CapacitanceType load) const {
@@ -163,7 +163,7 @@ class generic_sta
     }
 
 public:
-    generic_sta( timing_data & timing, graph_and_topology & topology, const entity::vector_property< interconnection::rc_tree > & rc_trees) :
+    generic_sta( timing_data & timing, graph_and_topology & topology, const entity_system::vector_property< interconnection::rc_tree > & rc_trees) :
         m_timing(timing),
         m_topology(topology),
         m_rc_trees(rc_trees)
@@ -209,30 +209,30 @@ public:
     }
 
 
-    SlewType rise_arrival(const entity::entity pin) const
+    SlewType rise_arrival(const entity_system::entity pin) const
     {
         return m_timing.nodes.arrival(m_topology.g.rise_node(pin));
     }
-    SlewType fall_arrival(const entity::entity pin) const
+    SlewType fall_arrival(const entity_system::entity pin) const
     {
         return m_timing.nodes.arrival(m_topology.g.fall_node(pin));
     }
 
-    SlewType rise_slew(const entity::entity pin) const
+    SlewType rise_slew(const entity_system::entity pin) const
     {
         return m_timing.nodes.slew(m_topology.g.rise_node(pin));
     }
-    SlewType fall_slew(const entity::entity pin) const
+    SlewType fall_slew(const entity_system::entity pin) const
     {
         return m_timing.nodes.slew(m_topology.g.fall_node(pin));
     }
 
-    SlewType rise_slack(const entity::entity pin) const
+    SlewType rise_slack(const entity_system::entity pin) const
     {
         auto node = m_topology.g.rise_node(pin);
         return MergeStrategy::slack_signal()*(m_timing.nodes.required(node)-m_timing.nodes.arrival(node));
     }
-    SlewType fall_slack(const entity::entity pin) const
+    SlewType fall_slack(const entity_system::entity pin) const
     {
         auto node = m_topology.g.fall_node(pin);
         return MergeStrategy::slack_signal()*(m_timing.nodes.required(node)-m_timing.nodes.arrival(node));

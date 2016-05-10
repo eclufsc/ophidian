@@ -14,9 +14,9 @@ metal_layers::~metal_layers()
 
 }
 
-entity::entity metal_layers::layer_insert(ROUTING_DIRECTION direction, double pitch, double width)
+entity_system::entity metal_layers::layer_insert(ROUTING_DIRECTION direction, double pitch, double width)
 {
-    entity::entity the_layer = m_metal_layers_system.create();
+    entity_system::entity the_layer = m_metal_layers_system.create();
     m_routing_direction[m_metal_layers_system.lookup(the_layer)] = direction;
     m_pitch[m_metal_layers_system.lookup(the_layer)] = pitch;
     m_width[m_metal_layers_system.lookup(the_layer)] = width;

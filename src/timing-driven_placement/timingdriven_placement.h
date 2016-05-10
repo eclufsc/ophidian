@@ -50,17 +50,17 @@ struct bounds {
 };
 
 
-using Cell = entity::entity;
-using Pin = entity::entity;
-using StandardCellPin = entity::entity;
-using StandardCell = entity::entity;
-using Net = entity::entity;
+using Cell = entity_system::entity;
+using Pin = entity_system::entity;
+using StandardCellPin = entity_system::entity;
+using StandardCell = entity_system::entity;
+using Net = entity_system::entity;
 using Point = geometry::point<double>;
 using Geometry = geometry::multi_polygon< geometry::polygon<Point> >;
 using CapacitanceType = boost::units::quantity< boost::units::si::capacitance > ;
-using NetIterator = entity::bimap_iterator_adapter;
-using CellIterator = entity::bimap_iterator_adapter;
-using PinIterator = entity::bimap_iterator_adapter;
+using NetIterator = entity_system::entities_storage::const_iterator;
+using CellIterator = entity_system::entities_storage::const_iterator;
+using PinIterator = entity_system::entities_storage::const_iterator;
 
 
 struct cells_geometries {
@@ -80,7 +80,7 @@ class timingdriven_placement
     floorplan::floorplan m_floorplan;
     placement::library m_placement_lib{&m_std_cells};
     placement::placement m_placement{&m_netlist, &m_placement_lib};
-    entity::vector_property< interconnection::rc_tree > m_rc_trees;
+    entity_system::vector_property< interconnection::rc_tree > m_rc_trees;
     timing::design_constraints m_dc;
     flute_rc_tree_creator m_flute;
     std::set<Net> m_dirty_nets;
@@ -163,7 +163,7 @@ public:
         return m_netlist.net_system().lookup(net);
     }
 
-    void net_register_property(entity::property & p);
+    void net_register_property(entity_system::property & p);
 
     //! Gets the nets
     /*!

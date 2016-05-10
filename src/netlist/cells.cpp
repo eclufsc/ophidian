@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace netlist {
 
-cells::cells(entity::system & system) : m_system(system) {
+cells::cells(entity_system::entity_system & system) : m_system(system) {
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_standard_cells);
 	m_system.register_property(&m_pins);
@@ -32,24 +32,24 @@ cells::cells(entity::system & system) : m_system(system) {
 cells::~cells() {
 }
 
-void cells::insert_pin(entity::entity cell, entity::entity pin) {
+void cells::insert_pin(entity_system::entity cell, entity_system::entity pin) {
 	m_pins[m_system.lookup(cell)].push_back(pin);
 }
 
-void cells::pins(entity::entity cell, std::vector<entity::entity> pins) {
+void cells::pins(entity_system::entity cell, std::vector<entity_system::entity> pins) {
 	m_pins[m_system.lookup(cell)] = pins;
 }
 
-void cells::name(entity::entity cell, std::string name) {
+void cells::name(entity_system::entity cell, std::string name) {
 	m_names[m_system.lookup(cell)] = name;
 }
 
-void cells::standard_cell(entity::entity cell,
-		entity::entity std_cell) {
+void cells::standard_cell(entity_system::entity cell,
+        entity_system::entity std_cell) {
     m_standard_cells[m_system.lookup(cell)] = std_cell;
 }
 
-void cells::pins_preallocate(entity::entity cell, std::size_t pin_count)
+void cells::pins_preallocate(entity_system::entity cell, std::size_t pin_count)
 {
     m_pins[m_system.lookup(cell)].reserve(pin_count);
 }

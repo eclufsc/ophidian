@@ -61,7 +61,7 @@ public:
 
 class sta_interconnection_estimator {
 public:
-    virtual void update_net(timing::sta_timing_net_edge_calculator * tnet, entity::entity net, timing::graph_nodes_timing &nodes_timing) = 0;
+    virtual void update_net(timing::sta_timing_net_edge_calculator * tnet, entity_system::entity net, timing::graph_nodes_timing &nodes_timing) = 0;
 };
 
 

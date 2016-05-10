@@ -21,7 +21,7 @@ under the License.
 #ifndef OPHIDIAN_TIMING_ENDPOINTS_H
 #define OPHIDIAN_TIMING_ENDPOINTS_H
 
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 #include "../netlist/netlist.h"
 
 namespace ophidian {
@@ -29,17 +29,17 @@ namespace timing {
 
 class endpoints
 {
-    std::vector< entity::entity > m_entities;
+    std::vector< entity_system::entity > m_entities;
 
 public:
     endpoints();
     endpoints(const netlist::netlist & netlist);
     virtual ~endpoints();
 
-    std::vector< entity::entity >::const_iterator begin() const {
+    std::vector< entity_system::entity >::const_iterator begin() const {
         return m_entities.begin();
     }
-    std::vector< entity::entity >::const_iterator end() const {
+    std::vector< entity_system::entity >::const_iterator end() const {
         return m_entities.end();
     }
     std::size_t size() const {

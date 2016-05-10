@@ -27,10 +27,10 @@ under the License.
 
 
 TEST_CASE("pins/owner","[netlist][pins]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
 
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
 
 	auto u1 = cells_system.create();
@@ -53,10 +53,10 @@ TEST_CASE("pins/owner","[netlist][pins]") {
 }
 
 TEST_CASE("pins/net","[netlist][pins]") {
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
 
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
 
 	auto u1a = pins_system.create();
@@ -76,7 +76,7 @@ TEST_CASE("pins/std_cell pin","[netlist][pins]") {
 	auto INV_X1_a = std_cells.pin_create(INV_X1, "a");
 	auto INV_X1_o = std_cells.pin_create(INV_X1, "o");
 
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
 
 	auto pin = pins_system.create();

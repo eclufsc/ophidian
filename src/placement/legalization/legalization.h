@@ -24,13 +24,14 @@ under the License.
 #include "floorplan.h"
 #include "placement.h"
 #include "subrows.h"
+#include <entity_system.h>
 
 namespace ophidian {
     namespace placement {
         namespace legalization {
             class legalization {
             protected:
-                entity::system m_subrows_system;
+                entity_system::entity_system m_subrows_system;
                 subrows m_subrows;
 
                 floorplan::floorplan * m_floorplan;

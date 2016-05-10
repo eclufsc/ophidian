@@ -22,7 +22,7 @@ under the License.
 #define ophidian_BINS_H
 
 #include <vector_property.h>
-#include "entity.h"
+#include <entity_system.h>
 #include "../geometry/geometry.h"
 
 namespace ophidian {
@@ -31,17 +31,17 @@ namespace ophidian {
         class bins {
             using point = geometry::point<double>;
 
-            entity::system & m_system;
+            entity_system::entity_system & m_system;
 
-            entity::vector_property<point> m_positions;
-            entity::vector_property<point> m_dimensions;
-            entity::vector_property<double> m_movable_utilization;
-            entity::vector_property<double> m_fixed_utilization;
-            entity::vector_property<double> m_free_space;
+            entity_system::vector_property<point> m_positions;
+            entity_system::vector_property<point> m_dimensions;
+            entity_system::vector_property<double> m_movable_utilization;
+            entity_system::vector_property<double> m_fixed_utilization;
+            entity_system::vector_property<double> m_free_space;
 
         public:
 
-            bins(entity::system & system) : m_system(system) {
+            bins(entity_system::entity_system & system) : m_system(system) {
                 m_system.register_property(&m_positions);
                 m_system.register_property(&m_dimensions);
                 m_system.register_property(&m_movable_utilization);
@@ -51,23 +51,23 @@ namespace ophidian {
 
             virtual ~bins() { }
 
-            point position(entity::entity bin) {
+            point position(entity_system::entity bin) {
                 return m_positions[m_system.lookup(bin)];
             }
 
-            point dimension(entity::entity bin) {
+            point dimension(entity_system::entity bin) {
                 return m_dimensions[m_system.lookup(bin)];
             }
 
-            double movable_utilization(entity::entity bin) {
+            double movable_utilization(entity_system::entity bin) {
                 return m_movable_utilization[m_system.lookup(bin)];
             }
 
-            double fixed_utilization(entity::entity bin) {
+            double fixed_utilization(entity_system::entity bin) {
                 return m_fixed_utilization[m_system.lookup(bin)];
             }
 
-            double free_space(entity::entity bin) {
+            double free_space(entity_system::entity bin) {
                 return m_free_space[m_system.lookup(bin)];
             }
 
@@ -91,15 +91,15 @@ namespace ophidian {
                 return std::make_pair(m_free_space.begin(), m_free_space.end());
             }
 
-            void position(entity::entity bin, point position);
+            void position(entity_system::entity bin, point position);
 
-            void dimension(entity::entity bin, point dimension);
+            void dimension(entity_system::entity bin, point dimension);
 
-            void movable_utilization(entity::entity bin, double movable_utilization);
+            void movable_utilization(entity_system::entity bin, double movable_utilization);
 
-            void fixed_utilization(entity::entity bin, double fixed_utilization);
+            void fixed_utilization(entity_system::entity bin, double fixed_utilization);
 
-            void free_space(entity::entity bin, double free_space);
+            void free_space(entity_system::entity bin, double free_space);
         };
     }
 }

@@ -24,7 +24,7 @@ under the License.
 
 #include "../netlist/netlist.h"
 #include "../geometry/geometry.h"
-#include "../entity/vector_property.h"
+#include "../entity_system/vector_property.h"
 #include <boost/bimap.hpp>
 
 namespace ophidian {
@@ -35,34 +35,34 @@ class cells  {
 	using polygon = geometry::polygon<point>;
 	using multipolygon = geometry::multi_polygon<polygon>;
 
-	const entity::system & m_system;
+    const entity_system::entity_system & m_system;
 
-    entity::vector_property<multipolygon> m_geometries;
-	entity::vector_property<point> m_positions;
-	entity::vector_property<bool> m_fixed;
+    entity_system::vector_property<multipolygon> m_geometries;
+    entity_system::vector_property<point> m_positions;
+    entity_system::vector_property<bool> m_fixed;
 
 public:
 	cells(ophidian::netlist::netlist * netlist);
 	virtual ~cells();
 
-	void position(entity::entity cell, point position);
-	point position(entity::entity cell) const {
+    void position(entity_system::entity cell, point position);
+    point position(entity_system::entity cell) const {
 		return m_positions[m_system.lookup(cell)];
 	}
 	std::pair< std::vector<point>::const_iterator, std::vector<point>::const_iterator > positions() const {
 		return std::make_pair(m_positions.begin(), m_positions.end());
 	}
 
-    void geometry(entity::entity cell, multipolygon geometry);
-	multipolygon geometry(entity::entity cell) const {
+    void geometry(entity_system::entity cell, multipolygon geometry);
+    multipolygon geometry(entity_system::entity cell) const {
         return m_geometries[m_system.lookup(cell)];
     }
     std::pair< std::vector<multipolygon>::const_iterator, std::vector<multipolygon>::const_iterator > geometries() const {
         return std::make_pair(m_geometries.begin(), m_geometries.end());
     }
 
-	void fixed(entity::entity cell, bool fixed);
-	bool fixed(entity::entity cell) const {
+    void fixed(entity_system::entity cell, bool fixed);
+    bool fixed(entity_system::entity cell) const {
 		return m_fixed[m_system.lookup(cell)];
 	}
 };

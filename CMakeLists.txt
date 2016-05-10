@@ -43,7 +43,7 @@ find_package(SFML 2 REQUIRED system window graphics network audio)
 
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(apps)
+#add_subdirectory(apps)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
 ${CMAKE_SOURCE_DIR}/3rdparty

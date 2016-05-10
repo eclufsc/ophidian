@@ -45,12 +45,12 @@ class sta_flute_net_calculator: public timing::sta_interconnection_estimator {
     const timing::library & m_timing_lib; // to get pin capacitances
     flute_rc_tree_creator m_flute;
 
-    entity::vector_property< entity::entity > m_net_sources;
+    entity_system::vector_property< entity_system::entity > m_net_sources;
 
 public:
     sta_flute_net_calculator(const timing::graph & graph, const placement::placement & placement, const timing::library & timing_lib,  netlist::netlist & netlist);
 	virtual ~sta_flute_net_calculator();
-    void update_net(timing::sta_timing_net_edge_calculator * tnet, entity::entity net, timing::graph_nodes_timing &nodes_timing);
+    void update_net(timing::sta_timing_net_edge_calculator * tnet, entity_system::entity net, timing::graph_nodes_timing &nodes_timing);
 };
 
 } /* namespace timing */

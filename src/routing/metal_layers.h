@@ -21,7 +21,8 @@ under the License.
 #ifndef OPHIDIAN_SRC_METAL_LAYERS_H
 #define OPHIDIAN_SRC_METAL_LAYERS_H
 
-#include "../entity/vector_property.h"
+#include "../entity_system/vector_property.h"
+#include "../entity_system/entity_system.h"
 
 namespace ophidian{
 /// Namespace describing routing entities and basic routing interface.
@@ -31,11 +32,11 @@ enum class ROUTING_DIRECTION {HORIZONTAL, VERTICAL};
 
 class metal_layers
 {
-    entity::system m_metal_layers_system;
+    ophidian::entity_system::entity_system m_metal_layers_system;
 
-    entity::vector_property<ROUTING_DIRECTION> m_routing_direction;
-    entity::vector_property<double> m_pitch;
-    entity::vector_property<double> m_width;
+    entity_system::vector_property<ROUTING_DIRECTION> m_routing_direction;
+    entity_system::vector_property<double> m_pitch;
+    entity_system::vector_property<double> m_width;
 
 //    entity::vector_property<ROUTING_DIRECTION> m_resistance_per_micron;
 //    entity::vector_property<ROUTING_DIRECTION> m_capacitance_per_micron;
@@ -47,7 +48,7 @@ public:
     metal_layers();
     virtual ~metal_layers();
 
-    entity::entity layer_insert(ROUTING_DIRECTION direction, double pitch, double width);
+    entity_system::entity layer_insert(ROUTING_DIRECTION direction, double pitch, double width);
 };
 
 }  /* namespace routing */

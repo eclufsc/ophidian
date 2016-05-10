@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace standard_cell {
 
-pins::pins(entity::system & system) :
+pins::pins(entity_system::entity_system & system) :
 	m_system(system){
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_owners);
@@ -34,19 +34,19 @@ pins::pins(entity::system & system) :
 pins::~pins() {
 }
 
-void pins::name(entity::entity pin, std::string name) {
+void pins::name(entity_system::entity pin, std::string name) {
 	m_names[m_system.lookup(pin)] = name;
 }
 
-void pins::owner(entity::entity pin, entity::entity cell) {
+void pins::owner(entity_system::entity pin, entity_system::entity cell) {
 	m_owners[m_system.lookup(pin)] = cell;
 }
 
-void pins::direction(entity::entity pin, pin_directions direction) {
+void pins::direction(entity_system::entity pin, pin_directions direction) {
     m_directions[m_system.lookup(pin)] = direction;
 }
 
-void pins::clock_input(entity::entity pin, bool clock)
+void pins::clock_input(entity_system::entity pin, bool clock)
 {
     m_clock_input[m_system.lookup(pin)] = clock;
 }

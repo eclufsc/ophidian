@@ -1,7 +1,7 @@
 add_subdirectory (parsing)
 add_subdirectory (interconnection)
 add_subdirectory (standard_cell)
-add_subdirectory (entity)
+add_subdirectory (entity_system)
 add_subdirectory (netlist)
 add_subdirectory (placement)
 add_subdirectory (floorplan)

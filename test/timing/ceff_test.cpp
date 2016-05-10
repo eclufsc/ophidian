@@ -43,7 +43,7 @@ using namespace boost::units::si;
 
 struct simple_driver_model {
     timing::library & lib;
-    entity::entity tarc;
+    entity_system::entity tarc;
     const quantity<si::time> slew;
     quantity<si::time> operator()(const quantity<capacitance> load) const {
         return lib.timing_arc_rise_slew(tarc).compute(load, slew);

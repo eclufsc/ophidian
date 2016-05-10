@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_GEOMETRY_POINT_H
-#define OPENEDA_GEOMETRY_POINT_H
+#ifndef OPHIDIAN_SRC_GEOMETRY_H
+#define OPHIDIAN_SRC_GEOMETRY_H
 
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -72,4 +72,4 @@ using boost::geometry::envelope;
 }
 }
 
-#endif //OPENEDA_POINT_H
+#endif //OPHIDIAN_SRC_GEOMETRY_H

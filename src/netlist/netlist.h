@@ -22,13 +22,14 @@ under the License.
 #define SRC_NETLIST_NETLIST_H_
 
 #include "../standard_cell/standard_cells.h"
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 #include <boost/bimap.hpp>
 #include "cells.h"
 #include "pins.h"
 #include "nets.h"
 
 #include  <iostream>
+#include <unordered_map>
 
 namespace ophidian {
 	/// Namespace describing netlist entities and basic netlist interface.
@@ -43,24 +44,24 @@ class netlist {
 
 	std::string m_module_name;
 
-	entity::system m_cells_system;
-	entity::system m_pins_system;
-	entity::system m_nets_system;
+    entity_system::entity_system m_cells_system;
+    entity_system::entity_system m_pins_system;
+    entity_system::entity_system m_nets_system;
 
 	cells m_cells;
 	pins m_pins;
 	nets m_nets;
 
-	using entity2index_map = typename boost::bimap< entity::entity, std::size_t >;
+    using entity2index_map = typename boost::bimap< entity_system::entity, std::size_t >;
 	entity2index_map m_PI_mapping;
 	entity2index_map m_PO_mapping;
 
-	std::vector<entity::entity> m_PI;
-	std::vector<entity::entity> m_PO;
+    std::vector<entity_system::entity> m_PI;
+    std::vector<entity_system::entity> m_PO;
 
-	std::unordered_map<std::string, entity::entity> m_name2cell;
-	std::unordered_map<std::string, entity::entity> m_name2pin;
-	std::unordered_map<std::string, entity::entity> m_name2net;
+    std::unordered_map<std::string, entity_system::entity> m_name2cell;
+    std::unordered_map<std::string, entity_system::entity> m_name2pin;
+    std::unordered_map<std::string, entity_system::entity> m_name2net;
 
 public:
 
@@ -82,19 +83,19 @@ public:
 	 * Registers a property to the cells entity system.
 	 * \param property Property to be registered.
 	 */
-	void register_cell_property(entity::property * property);
+    void register_cell_property(entity_system::property * property);
 	/// Registers pin property.
 	/**
 	 * Registers a property to the pins entity system.
 	 * \param property Property to be registered.
 	 */
-	void register_pin_property(entity::property * property);
+    void register_pin_property(entity_system::property * property);
 	/// Registers net property.
 	/**
 	 * Registers a property to the nets entity system.
 	 * \param property Property to be registered.
 	 */
-	void register_net_property(entity::property * property);
+    void register_net_property(entity_system::property * property);
 
 	void module_name(std::string name) {
 		m_module_name = name;
@@ -119,7 +120,7 @@ public:
 	 * \param name Cell name.
 	 * \return Entity representing the found cell.
 	 */
-    entity::entity cell_find(std::string name) const;
+    entity_system::entity cell_find(std::string name) const;
 	/// Inserts a new cell.
 	/**
      * Inserts a new cell in the netlist. A cell has a name and type associated to it.
@@ -127,13 +128,13 @@ public:
      * \param type Standard cell type of the cell.
      * \return The created cell.
      */
-	entity::entity cell_insert(std::string name, std::string type);
+    entity_system::entity cell_insert(std::string name, std::string type);
 	/// Removes a cell.
 	/**
 	 * Removes an existing cell from the netlist.
 	 * \param cell Cell to be removed.
 	 */
-	void cell_remove(entity::entity cell);
+    void cell_remove(entity_system::entity cell);
 
 	/// Returns the number of cells.
 	/**
@@ -149,7 +150,7 @@ public:
 	 * \param cell Cell to get the name.
 	 * \return Name of the cell.
 	 */
-	std::string cell_name(entity::entity cell) const {
+    std::string cell_name(entity_system::entity cell) const {
 		return m_cells.name(cell);
 	}
 	/// Cell pins getter.
@@ -158,7 +159,7 @@ public:
 	 * \param cell Cell to get the pins.
 	 * \return Vector containing all pins of the cell.
 	 */
-    const std::vector<entity::entity> & cell_pins(entity::entity cell) const {
+    const std::vector<entity_system::entity> & cell_pins(entity_system::entity cell) const {
 		return m_cells.pins(cell);
 	}
 	/// Cell type getter.
@@ -167,7 +168,7 @@ public:
 	 * \param cell Cell to get the type.
 	 * \return Entity representing the standard cell type of the cell.
 	 */
-	entity::entity cell_std_cell(entity::entity cell) const {
+    entity_system::entity cell_std_cell(entity_system::entity cell) const {
 		return m_cells.standard_cell(cell);
 	}
 	/// Cell type setter.
@@ -177,7 +178,7 @@ public:
 	 * \param type Name of the type to set for the cell.
 	 * \return bool variable describing if it was possible to set the type of the cell.
 	 */
-	bool cell_std_cell(entity::entity cell, std::string type);
+    bool cell_std_cell(entity_system::entity cell, std::string type);
 	/// Cell type setter.
 	/**
 	 * Sets the standard cell type of a cell. The number of pins of the current cell type and the new one must match.
@@ -185,13 +186,13 @@ public:
 	 * \param type Entity of the type to set for the cell.
 	 * \return bool variable describing if it was possible to set the type of the cell.
 	 */
-	bool cell_std_cell(entity::entity cell, entity::entity std_cell);
+    bool cell_std_cell(entity_system::entity cell, entity_system::entity std_cell);
 	/// Cell system getter.
 	/**
 	 * Returns the cells entity system.
 	 * \return Constant reference to the cells entity system.
 	 */
-	const entity::system & cell_system() const {
+    const entity_system::entity_system & cell_system() const {
 		return m_cells_system;
 	}
 	/// Cell properties getter.
@@ -211,7 +212,7 @@ public:
      * \param name Name of the pin, used to identify it.
      * \return The created pin.
      */
-	entity::entity pin_insert(entity::entity cell, std::string name);
+    entity_system::entity pin_insert(entity_system::entity cell, std::string name);
 	/// Returns the number of pins.
 	/**
 	 * Returns the number of pins created in the pins system.
@@ -226,10 +227,10 @@ public:
 	 * \param pin Pin to get the name.
 	 * \return Name of the pin.
 	 */
-	std::string pin_name(entity::entity pin) const {
+    std::string pin_name(entity_system::entity pin) const {
 		auto owner = m_pins.owner(pin);
 		std::string the_name;
-		if (!(owner == entity::entity { }))
+        if (!(owner == entity_system::invalid_entity))
 		{
 			the_name = m_cells.name(owner) + ":";
 			std::string std_cell_pin_name = m_std_cells->pin_name(m_pins.standard_cell_pin(pin));
@@ -245,7 +246,7 @@ public:
 	 * \param pin Pin to get the owner.
 	 * \return Entity describing the cell owning the pin.
 	 */
-	entity::entity pin_owner(entity::entity pin) const {
+    entity_system::entity pin_owner(entity_system::entity pin) const {
 		return m_pins.owner(pin);
 	}
 	/// Pin net getter.
@@ -254,7 +255,7 @@ public:
 	 * \param pin Pin to get the net.
 	 * \return Entity describing the net of the pin.
 	 */
-	entity::entity pin_net(entity::entity pin) const {
+    entity_system::entity pin_net(entity_system::entity pin) const {
 		return m_pins.net(pin);
 	}
 	/// Pin type getter.
@@ -263,7 +264,7 @@ public:
 	 * \param pin Pin to get the type.
 	 * \return Entity describing the standard cell type of a pin.
 	 */
-	entity::entity pin_std_cell(entity::entity pin) const {
+    entity_system::entity pin_std_cell(entity_system::entity pin) const {
 		return m_pins.standard_cell_pin(pin);
 	}
 	/// Finds pin.
@@ -272,7 +273,7 @@ public:
 	 * \param name Pin name.
 	 * \return Entity representing the found pin.
 	 */
-	entity::entity pin_by_name(std::string name) const {
+    entity_system::entity pin_by_name(std::string name) const {
 		return m_name2pin.at(name);
 	}
 	/// Pin system getter.
@@ -280,7 +281,7 @@ public:
 	 * Returns the pins entity system.
 	 * \return Constant reference to the pins entity system.
 	 */
-	const entity::system & pin_system() const {
+    const entity_system::entity_system & pin_system() const {
 		return m_pins_system;
 	}
 	/// Pin properties getter.
@@ -299,7 +300,7 @@ public:
      * \param name Name of the net, used to identify it.
      * \return The created net.
      */
-	entity::entity net_insert(std::string name);
+    entity_system::entity net_insert(std::string name);
     /// Inserts a new net.
     /**
      * Inserts a new net in the netlist. A net has a name associated to it.
@@ -307,13 +308,13 @@ public:
      * \param pin_count Number of pins the net will connect
      * \return The created net.
      */
-    entity::entity net_insert(std::string name, std::size_t pin_count);
+    entity_system::entity net_insert(std::string name, std::size_t pin_count);
 	/// Removes a net.
 	/**
 	 * Removes an existing net from the netlist.
 	 * \param net Net to be removed.
 	 */
-	void net_remove(entity::entity net);
+    void net_remove(entity_system::entity net);
 	/// Returns the number of nets.
 	/**
 	 * Returns the number of nets created in the pins system.
@@ -328,7 +329,7 @@ public:
 	 * \param net Net to get the name.
 	 * \return Name of the net.
 	 */
-	std::string net_name(entity::entity net) const {
+    std::string net_name(entity_system::entity net) const {
 		return m_nets.name(net);
 	}
 	/// Net pins getter.
@@ -337,7 +338,7 @@ public:
 	 * \param net Net to get the pins.
 	 * \return Vector containing all pins of the net.
 	 */
-    const std::vector<entity::entity> & net_pins(entity::entity net) const {
+    const std::vector<entity_system::entity> & net_pins(entity_system::entity net) const {
 		return m_nets.pins(net);
 	}
 	/// Net names iterator.
@@ -354,7 +355,7 @@ public:
 	 * Returns the nets entity system.
 	 * \return Constant reference to the nets entity system.
 	 */
-	const entity::system & net_system() const {
+    const entity_system::entity_system & net_system() const {
 		return m_nets_system;
 	}
 	/// Finds net.
@@ -363,7 +364,7 @@ public:
 	 * \param name Net name.
 	 * \return Entity representing the found net.
 	 */
-	entity::entity net_by_name(std::string name) const {
+    entity_system::entity net_by_name(std::string name) const {
 		return m_name2net.at(name);
 	}
 	/// Net properties getter.
@@ -381,13 +382,13 @@ public:
 	 * \param net Net to be connnected.
 	 * \param pin Pin to be connected.
 	 */
-	void connect(entity::entity net, entity::entity pin);
+    void connect(entity_system::entity net, entity_system::entity pin);
 	/// Disconnects a pin from its net.
 	/**
 	 * Disconnects a pin from its net. This method removes the pin from the net pins property and leaves the pin without a net.
 	 * \param pin Pin to be disconnected.
 	 */
-	void disconnect(entity::entity pin);
+    void disconnect(entity_system::entity pin);
 
 	// PI
 	/// Inserts a new primary input.
@@ -396,13 +397,13 @@ public:
      * \param name Name of the primary input, used to identify it.
      * \return The created primary input.
      */
-	entity::entity PI_insert(std::string name);
+    entity_system::entity PI_insert(std::string name);
 	/// Removes a primary input.
 	/**
 	 * Removes an existing primary input from the netlist.
 	 * \param PI Primary input to be removed.
 	 */
-	void PI_remove(entity::entity PI);
+    void PI_remove(entity_system::entity PI);
 	/// Returns the number of primary inputs.
 	/**
 	 * Returns the number of primary inputs created in the netlist.
@@ -416,7 +417,7 @@ public:
 	 * Returns an iterator pointing to the beginning of the primary inputs in the netlist.
 	 * \return Constant iterator pointing to the beginning of the primary inputs.
 	 */
-	std::vector<entity::entity>::const_iterator PI_begin() const {
+    std::vector<entity_system::entity>::const_iterator PI_begin() const {
 		return m_PI.begin();
 	}
 	/// Primary input end iterator.
@@ -424,7 +425,7 @@ public:
 	 * Returns an iterator pointing to the end of the primary inputs in the netlist.
 	 * \return Constant iterator pointing to the end of the primary inputs.
 	 */
-	std::vector<entity::entity>::const_iterator PI_end() const {
+    std::vector<entity_system::entity>::const_iterator PI_end() const {
 		return m_PI.end();
 	}
 
@@ -435,13 +436,13 @@ public:
      * \param name Name of the primary output, used to identify it.
      * \return The created primary output.
      */
-	entity::entity PO_insert(std::string name);
+    entity_system::entity PO_insert(std::string name);
 	/// Removes a primary output.
 	/**
 	 * Removes an existing primary output from the netlist.
 	 * \param PO Primary output to be removed.
 	 */
-	void PO_remove(entity::entity PO);
+    void PO_remove(entity_system::entity PO);
 	/// Returns the number of primary outputs.
 	/**
 	 * Returns the number of primary outputs created in the netlist.
@@ -455,7 +456,7 @@ public:
 	 * Returns an iterator pointing to the beginning of the primary outputs in the netlist.
 	 * \return Constant iterator pointing to the beginning of the primary outputs.
 	 */
-	std::vector<entity::entity>::const_iterator PO_begin() const {
+    std::vector<entity_system::entity>::const_iterator PO_begin() const {
 		return m_PO.begin();
 	}
 	/// Primary output end iterator.
@@ -463,7 +464,7 @@ public:
 	 * Returns an iterator pointing to the end of the primary outputs in the netlist.
 	 * \return Constant iterator pointing to the end of the primary outputs.
 	 */
-	std::vector<entity::entity>::const_iterator PO_end() const {
+    std::vector<entity_system::entity>::const_iterator PO_end() const {
 		return m_PO.end();
 	}
 

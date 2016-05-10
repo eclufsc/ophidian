@@ -26,6 +26,7 @@ under the License.
 
 #include "graph_nodes_timing.h"
 #include "graph_arcs_timing.h"
+#include <deque>
 
 namespace ophidian {
 namespace timing {

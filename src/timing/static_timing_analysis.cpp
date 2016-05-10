@@ -82,7 +82,7 @@ void static_timing_analysis::graph(const ophidian::timing::graph &g)
     m_timing_graph = &g;
 }
 
-void static_timing_analysis::rc_trees(const entity::vector_property<interconnection::rc_tree> &trees)
+void static_timing_analysis::rc_trees(const entity_system::vector_property<interconnection::rc_tree> &trees)
 {
     m_rc_trees = &trees;
 }
