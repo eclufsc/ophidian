@@ -26,7 +26,11 @@ namespace placement {
 void def2placement(const parsing::def &def, placement &place)
 {
     for(auto & component : def.components())
-        place.cell_position(place.cell_create(component.name, component.macro), {component.position.x, component.position.y});
+    {
+        auto the_cell = place.cell_create(component.name, component.macro);
+        place.cell_position(the_cell, {component.position.x, component.position.y});
+        place.cell_fixed(the_cell, component.fixed);
+    }
 }
 
 }

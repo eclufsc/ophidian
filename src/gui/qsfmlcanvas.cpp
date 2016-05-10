@@ -1,5 +1,8 @@
 #include "qsfmlcanvas.h"
 
+namespace ophidian {
+namespace gui {
+
 QSFMLCanvas::QSFMLCanvas(QWidget *parent) : QWidget(parent)
 {
     // Setup some states to allow direct rendering into the widget
@@ -74,4 +77,7 @@ void QSFMLCanvas::paintEvent(QPaintEvent*)
 
     // Display on screen
     display();
+}
+
+}
 }

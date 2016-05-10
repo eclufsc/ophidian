@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="mysfmlcanvas" name="Canvas" native="true"/>
+     <widget class="uddac2016::canvas" name="Canvas" native="true"/>
     </item>
     <item>
      <widget class="QPushButton" name="button">
@@ -50,15 +50,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>mysfmlcanvas</class>
-   <extends>QWidget</extends>
-   <header>sfml/mysfmlcanvas.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>MainWindowMenuBar</class>
    <extends>QMenuBar</extends>
    <header>mainwindowmenubar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>canvas</class>
+   <extends>QWidget</extends>
+   <header>canvas.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

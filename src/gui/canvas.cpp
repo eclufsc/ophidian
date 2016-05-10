@@ -100,10 +100,21 @@ void canvas::quads_animate(batch_animation * animation)
     m_quads.animate(animation);
 }
 
+void canvas::destroy(const wire_quad &the_wirequad)
+{
+    for(int i = 0; i < 4; ++i)
+        destroy(the_wirequad.lines[i]);
+}
+
 void canvas::update()
 {
     m_quads.update();
     m_lines.update();
+}
+
+bool canvas::has_animation() const
+{
+    return m_quads.has_animation() || m_lines.has_animation();
 }
 
 

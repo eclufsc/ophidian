@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
     ui->menuBar->setController(m_controller);
-    m_controller.init_canvas_controller(ui->Canvas->controller());
+    m_controller.init_canvas_controller(ui->Canvas);
 }
 
 MainWindow::~MainWindow()

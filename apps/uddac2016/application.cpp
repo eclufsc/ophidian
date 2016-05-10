@@ -18,7 +18,6 @@ application::application() :
     m_placement_library(&m_std_cells),
     m_placement(&m_netlist, &m_placement_library)
 {
-
 }
 
 application::~application()
@@ -65,94 +64,94 @@ void application::cell_position(const entity::entity &cell, const ophidian::geom
 
 void application::run_SA(const std::string &verilog_file)
 {
+    if(!m_sa)
+        m_sa.reset(new SA(*this, verilog_file));
+    m_sa->run_it();
+}
+
+SA::SA(application &app, const std::string &verilog_file) :
+    m_app(app)
+{
     parsing::verilog verilog(verilog_file);
-    netlist::verilog2netlist(verilog, m_netlist);
+    netlist::verilog2netlist(verilog, m_app.m_netlist);
+}
 
-
-
-    std::uniform_real_distribution<double> SA_dist(0.0, 1.0);
-    std::default_random_engine engine;
-
-
-    double T = 10000.0;
+void SA::run_it()
+{
     int accepted_moves = 0;
-
     std::size_t i = 0;
-
-    for(int it = 0; it < 5; ++it)
+    std::cout << "T " << m_T << std::endl;
+    for(auto cell : m_app.m_netlist.cell_system())
     {
-        std::cout << "it " << it << " T " << T << std::endl;
-        for(auto cell : m_netlist.cell_system())
+
+        auto & cell_pins = m_app.m_netlist.cell_pins(cell.first);
+
+        double HPWL0 = 0.0;
+
+        for(auto pin : cell_pins)
         {
+            auto net = m_app.m_netlist.pin_net(pin);
+            auto & net_pins = m_app.m_netlist.net_pins(net);
+            std::vector< geometry::point<double> > pin_positions(net_pins.size());
+            for(std::size_t i = 0; i < net_pins.size(); ++i)
+                pin_positions[i] = m_app.m_placement.pin_position(net_pins[i]);
+            HPWL0 += interconnection::hpwl(pin_positions);
+        }
 
-            auto & cell_pins = m_netlist.cell_pins(cell.first);
+        geometry::point<double> pos0 = m_app.m_placement.cell_position(cell.first);
 
-            double HPWL0 = 0.0;
+        std::uniform_real_distribution<double> x_dist(pos0.x()-10000, pos0.x()+10000);
+        std::uniform_real_distribution<double> y_dist(pos0.y()-10000, pos0.y()+10000);
 
-            for(auto pin : cell_pins)
-            {
-                auto net = m_netlist.pin_net(pin);
-                auto & net_pins = m_netlist.net_pins(net);
-                std::vector< geometry::point<double> > pin_positions(net_pins.size());
-                for(std::size_t i = 0; i < net_pins.size(); ++i)
-                    pin_positions[i] = m_placement.pin_position(net_pins[i]);
-                HPWL0 += interconnection::hpwl(pin_positions);
-            }
+        geometry::point<double> position(x_dist(m_engine), y_dist(m_engine));
+        m_app.m_placement.cell_position(cell.first, position);
 
-            geometry::point<double> pos0 = m_placement.cell_position(cell.first);
+        double HPWLF = 0.0;
+        for(auto pin : cell_pins)
+        {
+            auto net = m_app.m_netlist.pin_net(pin);
+            auto & net_pins = m_app.m_netlist.net_pins(net);
+            std::vector< geometry::point<double> > pin_positions(net_pins.size());
+            for(std::size_t i = 0; i < net_pins.size(); ++i)
+                pin_positions[i] = m_app.m_placement.pin_position(net_pins[i]);
+            HPWLF += interconnection::hpwl(pin_positions);
+        }
 
-            std::uniform_real_distribution<double> x_dist(pos0.x()-10000, pos0.x()+10000);
-            std::uniform_real_distribution<double> y_dist(pos0.y()-10000, pos0.y()+10000);
+        double Delta = HPWLF-HPWL0;
 
-            geometry::point<double> position(x_dist(engine), y_dist(engine));
-            m_placement.cell_position(cell.first, position);
-
-            double HPWLF = 0.0;
-            for(auto pin : cell_pins)
-            {
-                auto net = m_netlist.pin_net(pin);
-                auto & net_pins = m_netlist.net_pins(net);
-                std::vector< geometry::point<double> > pin_positions(net_pins.size());
-                for(std::size_t i = 0; i < net_pins.size(); ++i)
-                    pin_positions[i] = m_placement.pin_position(net_pins[i]);
-                HPWLF += interconnection::hpwl(pin_positions);
-            }
-
-            double Delta = HPWLF-HPWL0;
-
-            //        std::cout << "trying cell " << m_netlist.cell_name(cell.first) << std::endl;
-            //        std::cout << "HPWL0 " << HPWL0 << " HPWLF " << HPWLF << " Delta " << Delta << std::endl;
-            //        std::cout << "T " << T << std::endl;
+        //        std::cout << "trying cell " << m_app.m_netlist.cell_name(cell.first) << std::endl;
+        //        std::cout << "HPWL0 " << HPWL0 << " HPWLF " << HPWLF << " Delta " << Delta << std::endl;
+        //        std::cout << "T " << T << std::endl;
 
 
-            bool accepted = false;
-            if(Delta > 0)
-            {
-                //            std::cout << "prob: " << exp(-Delta/T) << std::endl;
-                double rand = SA_dist(engine);
-                //            std::cout << "roulette: " << rand << std::endl;
+        bool accepted = false;
+        if(Delta > 0)
+        {
+            //            std::cout << "prob: " << exp(-Delta/T) << std::endl;
+            double rand = m_dist(m_engine);
+            //            std::cout << "roulette: " << rand << std::endl;
 
-                if(rand < exp(-Delta/T))
-                    accepted = true;
-
-            } else
+            if(rand < exp(-Delta/m_T))
                 accepted = true;
 
-            if(!accepted)
-            {
-                //            std::cout << " REJECTED!!" << std::endl;
-                m_placement.cell_position(cell.first, pos0);
-            }
-            else
-            {
-                //            std::cout << " ACCEPTED!!" << std::endl;
-                accepted_moves++;
-            }
-            ++i;
+        } else
+            accepted = true;
+
+        if(!accepted)
+        {
+            //            std::cout << " REJECTED!!" << std::endl;
+            m_app.m_placement.cell_position(cell.first, pos0);
         }
-        T *= .8;
+        else
+        {
+            //            std::cout << " ACCEPTED!!" << std::endl;
+            accepted_moves++;
+        }
+        ++i;
     }
+    m_T *= .8;
     std::cout << "accepted " << accepted_moves << " moves" << std::endl;
+
 }
 
 }

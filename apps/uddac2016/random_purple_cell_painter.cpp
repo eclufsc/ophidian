@@ -120,7 +120,8 @@ rgb hsv2rgb(hsv in)
     return out;
 }
 
-random_purple_cell_painter::random_purple_cell_painter() :
+random_purple_cell_painter::random_purple_cell_painter(std::function<bool(const ophidian::entity::entity&)> is_fixed) :
+    m_is_fixed(is_fixed),
     m_distribution(0.5, 0.05)
 {
 
@@ -128,6 +129,8 @@ random_purple_cell_painter::random_purple_cell_painter() :
 
 sf::Color random_purple_cell_painter::color(ophidian::entity::entity cell)
 {
+    if(m_is_fixed(cell))
+        return sf::Color(150,150,150);
     hsv color;
     color.h = 300.0;
     color.s = 0.8;

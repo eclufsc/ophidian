@@ -34,11 +34,15 @@ struct line {
 
 struct quad {
     entity::entity entity;
-
     bool operator==(const quad & o) const {
         return entity == o.entity;
     }
 };
+
+struct wire_quad {
+    std::array<line, 4> lines;
+};
+
 
 }}
 namespace std
@@ -85,11 +89,17 @@ public:
         return m_quads.points(the_quad.entity);
     }
 
+
+    void destroy(const wire_quad & the_wirequad);
+
     void update();
 
     drawable_batch<4>& quads() {
         return m_quads;
     }
+
+
+    bool has_animation() const;
 
 
 

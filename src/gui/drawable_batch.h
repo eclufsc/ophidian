@@ -62,6 +62,10 @@ public:
         m_vertices.preallocate(10000000);
     }
 
+    bool has_animation() const {
+        return m_animation != nullptr;
+    }
+
     const sf::Vertex operator[](const std::size_t i) const {
         return reinterpret_cast<const sf::Vertex*>(m_vertices.data())[i];
     }

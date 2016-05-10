@@ -11,10 +11,17 @@ using namespace ophidian;
 
 canvas_controller::canvas_controller(mysfmlcanvas *canvas) :
     m_canvas(canvas),
-    m_state(new idle_state(this)),
+    m_state(nullptr),
     m_index(*canvas->canvas())
 {
+    reset_state();
+}
 
+void canvas_controller::reset_state()
+{
+    if(m_state)
+        delete m_state;
+    m_state = new idle_state(this);
 }
 
 void canvas_controller::main_controller(controller *ctrl)
@@ -98,6 +105,36 @@ void canvas_controller::paint_quads(cell_painter &painter)
         for(auto & quad : entity_pair.second)
             m_canvas->paint(quad, color);
     }
+}
+
+gui::wire_quad canvas_controller::create_wire_quad(const gui::quad &quad)
+{
+    gui::wire_quad the_quad;
+    auto quad_points = m_canvas->quad_points(quad);
+    for(int i = 0; i < 4; i++)
+    {
+        the_quad.lines[i] = m_canvas->line_create(geometry::point<double>(quad_points[i].position.x, quad_points[i].position.y), geometry::point<double>(quad_points[(i+1)%4].position.x, quad_points[(i+1)%4].position.y));
+        m_canvas->paint(the_quad.lines[i], sf::Color::Red);
+    }
+    return the_quad;
+}
+
+void canvas_controller::remove_wire_quad(const gui::wire_quad &quad)
+{
+    m_canvas->destroy(quad.lines[0]);
+    m_canvas->destroy(quad.lines[1]);
+    m_canvas->destroy(quad.lines[2]);
+    m_canvas->destroy(quad.lines[3]);
+}
+
+void canvas_controller::move_wire_quad(const gui::wire_quad &quad, const ophidian::geometry::point<double> &delta)
+{
+    sf::Transform translation;
+    translation.translate(delta.x(), delta.y());
+    m_canvas->transform(quad.lines[0], translation);
+    m_canvas->transform(quad.lines[1], translation);
+    m_canvas->transform(quad.lines[2], translation);
+    m_canvas->transform(quad.lines[3], translation);
 }
 
 void canvas_controller::commit_quad_position(gui::quad the_quad)

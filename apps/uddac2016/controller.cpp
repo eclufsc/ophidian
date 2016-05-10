@@ -3,8 +3,11 @@
 #include "mainwindow.h"
 
 #include <fstream>
+#include <functional>
 
 #include "random_purple_cell_painter.h"
+
+#include <QDebug>
 
 using namespace ophidian;
 
@@ -26,10 +29,20 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
     if(m_app.read_lefdef(LEF, DEF))
     {
         std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
-        m_canvas_controller->create_quads(geometries);
-        m_canvas_controller->create_index(geometries);
-        random_purple_cell_painter painter;
-        m_canvas_controller->paint_quads(painter);
+        m_canvas->create_quads(geometries);
+        random_purple_cell_painter painter(std::bind(&application::cell_is_fixed, &m_app, std::placeholders::_1));
+        m_canvas->paint_quads(painter);
+        for(auto & pair : geometries)
+        {
+            if(m_app.cell_is_fixed(pair.first))
+                m_canvas->setFixed(pair.first);
+        }
+        auto boundaries = m_app.chip_boundaries();
+        auto quad = m_canvas->drawRect(boundaries[0],boundaries[1],boundaries[2],boundaries[3]);
+        sf::Transform mirror;
+        mirror.scale(1.0, -1.0);
+        for(std::size_t i = 0; i < 4; ++i)
+            m_canvas->transform(quad.lines[i], mirror);
         return true;
     }
     return false;
@@ -38,34 +51,29 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
 void controller::animate_solution()
 {
     std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
-    ophidian::gui::drawable_batch<4> destination_quads = m_canvas_controller->quads();
-    m_canvas_controller->update_quads(destination_quads, geometries);
-    ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas_controller->quads(), 30);
-    for(int i = 0; i < m_canvas_controller->quads().vertex_count(); ++i)
+    ophidian::gui::drawable_batch<4> destination_quads = m_canvas->quadsBatch();
+    m_canvas->update_quads(destination_quads, geometries);
+    ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas->quadsBatch(), 30);
+    for(int i = 0; i < m_canvas->quadsBatch().vertex_count(); ++i)
     {
-        (*animation)[i].position.x =  destination_quads[i].position.x-m_canvas_controller->quads()[i].position.x;
-        (*animation)[i].position.y = destination_quads[i].position.y-m_canvas_controller->quads()[i].position.y;
+        (*animation)[i].position.x =  destination_quads[i].position.x-m_canvas->quadsBatch()[i].position.x;
+        (*animation)[i].position.y = destination_quads[i].position.y-m_canvas->quadsBatch()[i].position.y;
     }
-    m_canvas_controller->animate_quads(animation);
-    m_canvas_controller->create_index(geometries);
+    m_canvas->animate(animation);
+    m_canvas->reindex(geometries);
 }
 
 void controller::read_def(const std::string &DEF)
 {
     m_app.read_def(DEF);
     animate_solution();
+    m_canvas->reset();
 }
 
-void controller::init_canvas_controller(canvas_controller *canvas)
+void controller::init_canvas_controller(uddac2016::canvas *canvas)
 {
-    m_canvas_controller = canvas;
+    m_canvas = canvas;
     canvas->main_controller(this);
-}
-
-
-void controller::quads_animate(gui::batch_animation *animation)
-{
-    m_canvas_controller->animate_quads(animation);
 }
 
 void controller::run_SA(const std::string & verilog_file)
@@ -77,6 +85,16 @@ void controller::run_SA(const std::string & verilog_file)
 void controller::place_cell(const entity::entity &cell, const ophidian::geometry::point<double> &p)
 {
     m_app.cell_position(cell, p);
+}
+
+void controller::unselect(const entity::entity &cell)
+{
+
+}
+
+void controller::select(const entity::entity &cell)
+{
+    qDebug() << QString::fromStdString(m_app.cell_name(cell));
 }
 
 

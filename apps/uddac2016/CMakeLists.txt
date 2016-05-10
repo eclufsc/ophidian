@@ -23,16 +23,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(SOURCES
     main.cpp
     controller.cpp
-    canvas_controller.cpp
-    canvas_state.cpp
+    canvas.cpp
     random_purple_cell_painter.cpp
     application.cpp
     mainwindow.cpp
     openlefdefdialog.cpp
     mainwindowmenubar.cpp
 )
-
-add_subdirectory(sfml)
 
 
 # Tell CMake to create the uddac2016 executable

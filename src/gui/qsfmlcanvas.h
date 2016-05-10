@@ -1,9 +1,12 @@
-#ifndef QSFMLCANVAS_H
-#define QSFMLCANVAS_H
+#ifndef OPHIDIAN_GUI_QSFMLCANVAS_H
+#define OPHIDIAN_GUI_QSFMLCANVAS_H
 
 #include <QWidget>
 #include <SFML/Graphics.hpp>
 #include <QTimer>
+
+namespace ophidian {
+namespace gui {
 
 class QSFMLCanvas : public QWidget, public sf::RenderWindow
 {
@@ -31,4 +34,7 @@ signals:
 public slots:
 };
 
-#endif // QSFMLCANVAS_H
+}
+}
+
+#endif // OPHIDIAN_GUI_QSFMLCANVAS_H
