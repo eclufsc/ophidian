@@ -21,7 +21,7 @@ under the License.
 #include "../catch.hpp"
 
 #include "../timing/graph.h"
-#include "../entity/entity.h"
+#include "../entity_system/entity.h"
 
 TEST_CASE("timing graph/", "[timing][graph]") {
 
@@ -34,7 +34,7 @@ TEST_CASE("timing graph/", "[timing][graph]") {
 TEST_CASE("timing graph/add rise node", "[timing][graph]") {
 	using namespace ophidian;
 	timing::graph g;
-	entity::entity pin { 0 };
+    entity_system::entity pin { 0 };
 	timing::graph::node node = g.rise_node_create(pin);
 	REQUIRE(g.rise_node(pin) == node);
 	REQUIRE_THROWS(g.fall_node(pin));
@@ -45,7 +45,7 @@ TEST_CASE("timing graph/add rise node", "[timing][graph]") {
 TEST_CASE("timing graph/add fall node", "[timing][graph]") {
 	using namespace ophidian;
 	timing::graph g;
-	entity::entity pin { 0 };
+    entity_system::entity pin { 0 };
 	timing::graph::node node = g.fall_node_create(pin);
 	REQUIRE(g.fall_node(pin) == node);
 	REQUIRE_THROWS(g.rise_node(pin));
@@ -55,9 +55,9 @@ TEST_CASE("timing graph/add fall node", "[timing][graph]") {
 TEST_CASE("timing graph/add edge", "[timing][graph]") {
 	using namespace ophidian;
 	timing::graph g;
-	entity::entity i { 0 };
-	entity::entity j { 1 };
-	entity::entity tarc { 3 };
+    entity_system::entity i { 0 };
+    entity_system::entity j { 1 };
+    entity_system::entity tarc { 3 };
 	timing::graph::node node_i = g.fall_node_create(i);
 	timing::graph::node node_j = g.rise_node_create(j);
 
@@ -72,10 +72,10 @@ TEST_CASE("timing graph/add edge", "[timing][graph]") {
 TEST_CASE("timing graph/out edges", "[timing][graph]") {
 	using namespace ophidian;
 	timing::graph g;
-	entity::entity i { 0 };
-	entity::entity j { 1 };
-	entity::entity k { 2 };
-	entity::entity tarc { 3 };
+    entity_system::entity i { 0 };
+    entity_system::entity j { 1 };
+    entity_system::entity k { 2 };
+    entity_system::entity tarc { 3 };
 	timing::graph::node node_i = g.fall_node_create(i);
 	timing::graph::node node_j = g.rise_node_create(j);
 	timing::graph::node node_k = g.rise_node_create(k);
@@ -133,7 +133,7 @@ TEST_CASE("graph/construct from netlist", "[timing][graph]") {
 	timing::library_timing_arcs tarcs { &std_cells };
 	timing::library timing_lib { &tarcs, &std_cells };
 
-	entity::entity tarc { timing_lib.timing_arc_create(netlist.pin_std_cell(netlist.pin_by_name("u1:a")), netlist.pin_std_cell(netlist.pin_by_name("u1:o"))) };
+    entity_system::entity tarc { timing_lib.timing_arc_create(netlist.pin_std_cell(netlist.pin_by_name("u1:a")), netlist.pin_std_cell(netlist.pin_by_name("u1:o"))) };
 
 	timing::graph graph;
 	timing::design_constraints dc;

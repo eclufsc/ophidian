@@ -32,7 +32,7 @@ namespace timingdriven_placement {
 using namespace boost::units;
 
 namespace flute_rc_tree_rtree {
-typedef std::pair<ophidian::geometry::point<double>, entity::entity> rtree_node;
+typedef std::pair<ophidian::geometry::point<double>, entity_system::entity> rtree_node;
 class rtree_node_comparator {
 public:
     bool operator()(const rtree_node & node1, const rtree_node & node2) const {
@@ -70,10 +70,10 @@ void flute_rc_tree_creator::capacitance_per_micron(boost::units::quantity<si::ca
     m_params.capacitance_per_micron = capacitance;
 }
 
-std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree_creator::create_tree(const placement::placement &placement, const entity::entity net, interconnection::rc_tree &rc_tree, const timing::library &library)
+std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree_creator::create_tree(const placement::placement &placement, const entity_system::entity net, interconnection::rc_tree &rc_tree, const timing::library &library)
 {
     auto net_pins = placement.netlist().net_pins(net);
-    std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
+    std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
 
     params dummy{0.0*si::ohms, 0.0*si::farads};
     params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
@@ -171,7 +171,7 @@ std::unordered_map<entity::entity, interconnection::rc_tree::capacitor_id> flute
         bool from_is_tap = !nearest.empty() && boost::geometry::equals(from, nearest.front().first);
 
         if (from_is_tap) {
-            entity::entity pin { nearest.front().second };
+            entity_system::entity pin { nearest.front().second };
 
             auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
 

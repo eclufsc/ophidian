@@ -23,8 +23,8 @@ under the License.
 namespace ophidian {
     namespace density {
 
-        entity::entity density_map::bin_insert(point position, point dimension, double movable_utilization, double fixed_utilization, double free_space) {
-            entity::entity bin = m_bins_system.create();
+        entity_system::entity density_map::bin_insert(point position, point dimension, double movable_utilization, double fixed_utilization, double free_space) {
+            entity_system::entity bin = m_bins_system.create();
             m_bins.position(bin, position);
             m_bins.dimension(bin, dimension);
             m_bins.movable_utilization(bin, movable_utilization);
@@ -38,7 +38,7 @@ namespace ophidian {
             return bin;
         }
 
-        void density_map::intersecting_bins(box region, std::vector<entity::entity> &bins) {
+        void density_map::intersecting_bins(box region, std::vector<entity_system::entity> &bins) {
             std::vector<rtree_node> intersecting_nodes;
             m_bins_rtree.query(boost::geometry::index::intersects(region), std::back_inserter(intersecting_nodes));
             bins.reserve(intersecting_nodes.size());
@@ -47,15 +47,15 @@ namespace ophidian {
             }
         }
 
-        void density_map::bin_movable_utilization(entity::entity bin, double movable_utilization) {
+        void density_map::bin_movable_utilization(entity_system::entity bin, double movable_utilization) {
             m_bins.movable_utilization(bin, movable_utilization);
         }
 
-        void density_map::bin_fixed_utilization(entity::entity bin, double fixed_utilization) {
+        void density_map::bin_fixed_utilization(entity_system::entity bin, double fixed_utilization) {
             m_bins.fixed_utilization(bin, fixed_utilization);
         }
 
-        void density_map::bin_free_space(entity::entity bin, double free_space) {
+        void density_map::bin_free_space(entity_system::entity bin, double free_space) {
             m_bins.free_space(bin, free_space);
         }
 
@@ -71,7 +71,7 @@ namespace ophidian {
                     point bin_dimensions(bin_top.x() - bin_position.x(), bin_top.y() - bin_position.y());
                     auto bin = bin_insert(bin_position, bin_dimensions, 0, 0);
                     box bin_region(bin_position, {bin_position.x() + bin_dimensions.x(), bin_position.y() + bin_dimensions.y()});
-                    std::vector<entity::entity> intersecting_rows;
+                    std::vector<entity_system::entity> intersecting_rows;
                     std::vector<rtree_node> intersecting_nodes;
                     m_rows_rtree.query(boost::geometry::index::intersects(bin_region), std::back_inserter(intersecting_nodes));
                     for (auto node : intersecting_nodes) {
@@ -85,11 +85,11 @@ namespace ophidian {
             }
 
             for (auto cell : m_placement->netlist().cell_system()) {
-                auto cell_geometry = m_placement->cell_geometry(cell.first);
+                auto cell_geometry = m_placement->cell_geometry(cell);
                 for (auto cell_polygon : cell_geometry) {
                     box cell_rectangle;
                     boost::geometry::envelope(cell_polygon, cell_rectangle);
-                    std::vector<entity::entity> cell_bins;
+                    std::vector<entity_system::entity> cell_bins;
                     intersecting_bins(cell_rectangle, cell_bins);
 
                     for (auto & bin : cell_bins) {
@@ -99,7 +99,7 @@ namespace ophidian {
                         box intersection;
                         boost::geometry::intersection(bin_boundaries, cell_rectangle, intersection);
                         double intersection_area = (intersection.max_corner().x() - intersection.min_corner().x()) * (intersection.max_corner().y() - intersection.min_corner().y());
-                        if (m_placement->cell_fixed(cell.first)) {
+                        if (m_placement->cell_fixed(cell)) {
                             bin_fixed_utilization(bin, bin_fixed_utilization(bin) + intersection_area);
                         } else {
                             bin_movable_utilization(bin, bin_movable_utilization(bin) + intersection_area);
@@ -110,13 +110,13 @@ namespace ophidian {
 
             utilizations.resize(bin_count());
             for (auto bin : bins_system()) {
-                double current_bin_area = bin_area(bin.first);
+                double current_bin_area = bin_area(bin);
                 if (current_bin_area > max_bin_dimensions.x() * max_bin_dimensions.y() * bin_area_threshold) {
-                    bin_free_space(bin.first, bin_free_space(bin.first) - bin_fixed_utilization(bin.first));
-                    double current_bin_free_space = bin_free_space(bin.first);
+                    bin_free_space(bin, bin_free_space(bin) - bin_fixed_utilization(bin));
+                    double current_bin_free_space = bin_free_space(bin);
                     if (current_bin_free_space > free_space_threshold * current_bin_area) {
-                        double utilization = bin_movable_utilization(bin.first) / current_bin_free_space;
-                        utilizations[bin.first.id()] = utilization;
+                        double utilization = bin_movable_utilization(bin) / current_bin_free_space;
+                        utilizations[bin] = utilization;
                     } else {
                         m_skipped_bins++;
                     }

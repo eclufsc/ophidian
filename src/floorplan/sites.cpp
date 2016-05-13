@@ -23,16 +23,16 @@ under the License.
 namespace ophidian {
     namespace floorplan {
 
-        sites::sites(entity::system &system) : m_system(system) {
+        sites::sites(entity_system::entity_system &system) : m_system(system) {
             m_system.register_property(&m_names);
             m_system.register_property(&m_dimensions);
         }
 
-        void sites::name(entity::entity site, std::string name) {
+        void sites::name(entity_system::entity site, std::string name) {
             m_names[m_system.lookup(site)] = name;
         }
 
-        void sites::dimensions(entity::entity site, sites::point dimensions) {
+        void sites::dimensions(entity_system::entity site, sites::point dimensions) {
             m_dimensions[m_system.lookup(site)] = dimensions;
         }
     }

@@ -29,7 +29,7 @@ using namespace ophidian::standard_cell;
 
 TEST_CASE("standard cells/cells", "[standard_cells][cells]")
 {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	cells cells(cells_system);
 	auto cell = cells_system.create();
 	cells.name(cell, "the cell");
@@ -39,8 +39,8 @@ TEST_CASE("standard cells/cells", "[standard_cells][cells]")
 
 TEST_CASE("standard cells/pins", "[standard_cells][pins]")
 {
-	ophidian::entity::system cells_system;
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system cells_system;
+    ophidian::entity_system::entity_system pins_system;
 	cells std_cells(cells_system);
 	pins std_cells_pins(pins_system);
 	auto INV_X1 = cells_system.create();
@@ -83,7 +83,7 @@ TEST_CASE("standard cells/ unique name ", "[standard_cell]") {
 	auto e1 = std_cells.cell_create("INVX1");
 	auto e2 = std_cells.cell_create("INVX1");
 
-	REQUIRE( e1.id() == e2.id() );
+    REQUIRE( e1 == e2 );
 
 	REQUIRE( std_cells.cell_count() == 1 );
 	REQUIRE( std_cells.cell_name(e1) == std_cells.cell_name(e2) );

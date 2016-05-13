@@ -24,9 +24,9 @@ under the License.
 #include "rows.h"
 
 TEST_CASE("sites/assign site", "[floorplan][rows]") {
-    ophidian::entity::system sites_system;
+    ophidian::entity_system::entity_system sites_system;
     ophidian::floorplan::sites sites(sites_system);
-    ophidian::entity::system rows_system;
+    ophidian::entity_system::entity_system rows_system;
     ophidian::floorplan::rows rows(rows_system);
 
     auto core_site = sites_system.create();
@@ -37,7 +37,7 @@ TEST_CASE("sites/assign site", "[floorplan][rows]") {
 }
 
 TEST_CASE("sites/assign number of sites", "[floorplan][rows]") {
-    ophidian::entity::system rows_system;
+    ophidian::entity_system::entity_system rows_system;
     ophidian::floorplan::rows rows(rows_system);
 
     auto row = rows_system.create();
@@ -48,7 +48,7 @@ TEST_CASE("sites/assign number of sites", "[floorplan][rows]") {
 }
 
 TEST_CASE("sites/assign origin", "[floorplan][rows]") {
-    ophidian::entity::system rows_system;
+    ophidian::entity_system::entity_system rows_system;
     ophidian::floorplan::rows rows(rows_system);
 
     auto row = rows_system.create();
@@ -59,7 +59,7 @@ TEST_CASE("sites/assign origin", "[floorplan][rows]") {
 }
 
 TEST_CASE("sites/read property from removed row", "[floorplan][rows]") {
-    ophidian::entity::system rows_system;
+    ophidian::entity_system::entity_system rows_system;
     ophidian::floorplan::rows rows(rows_system);
 
     auto row = rows_system.create();

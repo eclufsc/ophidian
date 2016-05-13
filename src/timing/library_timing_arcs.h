@@ -21,7 +21,7 @@ under the License.
 #ifndef SRC_TIMING_LIBRARY_TIMING_ARCS_H_
 #define SRC_TIMING_LIBRARY_TIMING_ARCS_H_
 
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 #include "../standard_cell/standard_cells.h"
 #include "lookup_table.h"
 #include <unordered_map>
@@ -32,15 +32,21 @@ namespace timing {
 
 // Only for pairs of std::hash-able types for simplicity.
 // You can of course template this struct to allow other hash functions
-struct pair_hash {
-    template <class T1, class T2>
-    std::size_t operator () (const std::pair<T1,T2> &p) const {
-        auto h1 = std::hash<T1>{}(p.first);
-        auto h2 = std::hash<T2>{}(p.second);
+//struct pair_hash {
+//    template <class T1, class T2>
+//    std::size_t operator () (const std::pair<T1,T2> &p) const {
+//        auto h1 = std::hash<T1>{}(p.first);
+//        auto h2 = std::hash<T2>{}(p.second);
 
-        // Mainly for demonstration purposes, i.e. works but is overly simple
-        // In the real world, use sth. like boost.hash_combine
-        return h1 ^ h2;
+//        // Mainly for demonstration purposes, i.e. works but is overly simple
+//        // In the real world, use sth. like boost.hash_combine
+//        return h1 ^ h2;
+//    }
+//};
+
+struct pair_entity_hash {
+    std::size_t operator () (const std::pair<entity_system::entity,entity_system::entity> &p) const {
+        return std::hash<uint32_t>{}(p.first) ^ std::hash<uint32_t>{}(p.second);
     }
 };
 
@@ -49,25 +55,25 @@ public:
 private:
 	standard_cell::standard_cells & m_std_cells;
 
-	entity::system m_system;
-	entity::vector_property<entity::entity> m_from;
-	entity::vector_property<entity::entity> m_to;
+        entity_system::entity_system m_system;
+        entity_system::vector_property<entity_system::entity> m_from;
+        entity_system::vector_property<entity_system::entity> m_to;
 
 	//	// std_cell properties
-		entity::vector_property< std::vector<entity::entity> > m_pin_timing_arcs;
+                entity_system::vector_property< std::vector<entity_system::entity> > m_pin_timing_arcs;
 
 
-        std::unordered_map< std::pair< entity::entity, entity::entity >, entity::entity,pair_hash > m_pinpair2arc;
+        std::unordered_map< std::pair< entity_system::entity, entity_system::entity >, entity_system::entity,pair_entity_hash > m_pinpair2arc;
 public:
 	library_timing_arcs(standard_cell::standard_cells * std_cells);
 	virtual ~library_timing_arcs();
-	entity::entity create(entity::entity from, entity::entity to);
-	entity::entity get(entity::entity from, entity::entity to) const;
+        entity_system::entity create(entity_system::entity from, entity_system::entity to);
+        entity_system::entity get(entity_system::entity from, entity_system::entity to) const;
 
-	entity::entity from(entity::entity arc) const {
+        entity_system::entity from(entity_system::entity arc) const {
 		return m_from[m_system.lookup(arc)];
 	}
-	entity::entity to(entity::entity arc) const {
+        entity_system::entity to(entity_system::entity arc) const {
 		return m_to[m_system.lookup(arc)];
 	}
 
@@ -75,15 +81,15 @@ public:
 		return m_system.size();
 	}
 
-	const entity::system & system() const {
+        const entity_system::entity_system & system() const {
 		return m_system;
 	}
 
-	const std::vector<entity::entity> & pin_timing_arcs(entity::entity pin) const {
+        const std::vector<entity_system::entity> & pin_timing_arcs(entity_system::entity pin) const {
 		return m_pin_timing_arcs[m_std_cells.pin_system().lookup(pin)];
 	}
 
-	void register_property(entity::property* property);
+        void register_property(entity_system::property* property);
 
 };
 

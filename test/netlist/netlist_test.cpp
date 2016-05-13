@@ -61,10 +61,10 @@ TEST_CASE("netlist/remove cell","[netlist]") {
 	ophidian::netlist::netlist netlist(&std_cells);
 	auto u1 = netlist.cell_insert("u1", "INVX1");
 	auto u2 = netlist.cell_insert("u2", "INVX1");
-	REQUIRE_NOTHROW(netlist.cell_remove(u1));
-	REQUIRE_THROWS(netlist.cell_remove(u1));
-	REQUIRE(netlist.cell_count() == 1);
-	REQUIRE_THROWS(netlist.cell_name(u1));
+    REQUIRE_NOTHROW(netlist.cell_remove(u1));
+    REQUIRE_THROWS(netlist.cell_remove(u1));
+    REQUIRE(netlist.cell_count() == 1);
+    REQUIRE_THROWS(netlist.cell_name(u1));
 }
 
 TEST_CASE("netlist/insert cell after removing","[netlist]") {
@@ -220,8 +220,8 @@ TEST_CASE("netlist/remove net", "[netlist]") {
 
 	REQUIRE_NOTHROW( netlist.net_remove(n1) );
 	REQUIRE( netlist.net_count() == 0 );
-	REQUIRE( netlist.pin_net(pi) == ophidian::entity::entity() );
-	REQUIRE( netlist.pin_net(u1a) == ophidian::entity::entity() );
+    REQUIRE( netlist.pin_net(pi) == ophidian::entity_system::entity() );
+    REQUIRE( netlist.pin_net(u1a) == ophidian::entity_system::entity() );
 
 }
 

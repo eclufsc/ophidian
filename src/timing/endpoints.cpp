@@ -34,14 +34,14 @@ endpoints::endpoints(const netlist::netlist & netlist) : m_entities(netlist.PO_c
         m_entities.push_back(*PO);
     for(auto pin : netlist.pin_system())
     {
-        auto pin_owner = netlist.pin_owner(pin.first);
-        auto pin_std_cell = netlist.pin_std_cell(pin.first);
-        if(pin_owner == entity::entity{}) continue;
+        auto pin_owner = netlist.pin_owner(pin);
+        auto pin_std_cell = netlist.pin_std_cell(pin);
+        if(pin_owner == entity_system::invalid_entity) continue;
         auto owner_std_cell = netlist.cell_std_cell(pin_owner);
         if(!netlist.std_cells().cell_sequential(owner_std_cell)) continue;
         if(netlist.std_cells().pin_direction(pin_std_cell) != standard_cell::pin_directions::INPUT) continue;
         if(netlist.std_cells().pin_clock_input(pin_std_cell)) continue;
-        m_entities.push_back(pin.first);
+        m_entities.push_back(pin);
     }
 }
 

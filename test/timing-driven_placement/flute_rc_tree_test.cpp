@@ -58,7 +58,7 @@ TEST_CASE("flute rc_tree/tap mapping for two pins", "[tdp][flute][rc_tree]")
 
     timing_library.pin_capacitance( netlist.pin_std_cell(u2a), quantity<capacitance>(0*femto*farad) );
 
-    entity::entity net{n1};
+    entity_system::entity net{n1};
     placement::library library{&std_cells};
     library.dist2microns(1000);
     placement::placement placement{&netlist, &library};
@@ -110,7 +110,7 @@ TEST_CASE("flute rc_tree/tap mapping for three pins", "[tdp][flute][rc_tree]")
 
     timing_library.pin_capacitance( netlist.pin_std_cell(u2a), quantity<capacitance>(0*femto*farad) );
 
-    entity::entity net{n1};
+    entity_system::entity net{n1};
     placement::library library{&std_cells};
     library.dist2microns(1000);
     placement::placement placement{&netlist, &library};
@@ -177,7 +177,7 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 
     timing_library.pin_capacitance( netlist.pin_std_cell(u2a), quantity<capacitance>(0*femto*farad) );
 
-    entity::entity net{n1};
+    entity_system::entity net{n1};
     placement::library library{&std_cells};
     library.dist2microns(1000);
     placement::placement placement{&netlist, &library};

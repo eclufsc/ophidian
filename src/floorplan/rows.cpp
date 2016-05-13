@@ -23,21 +23,21 @@ under the License.
 namespace ophidian {
     namespace floorplan {
 
-        rows::rows(entity::system &system) : m_system(system) {
+        rows::rows(entity_system::entity_system &system) : m_system(system) {
             m_system.register_property(&m_sites);
             m_system.register_property(&m_number_of_sites);
             m_system.register_property(&m_origins);
         }
 
-        void rows::site(entity::entity row, entity::entity site) {
+        void rows::site(entity_system::entity row, entity_system::entity site) {
             m_sites[m_system.lookup(row)] = site;
         }
 
-        void rows::number_of_sites(entity::entity row, unsigned number_of_sites) {
+        void rows::number_of_sites(entity_system::entity row, unsigned number_of_sites) {
             m_number_of_sites[m_system.lookup(row)] = number_of_sites;
         }
 
-        void rows::origin(entity::entity row, rows::point origin) {
+        void rows::origin(entity_system::entity row, rows::point origin) {
             m_origins[m_system.lookup(row)] = origin;
         }
     }

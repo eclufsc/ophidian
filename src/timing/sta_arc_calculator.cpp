@@ -34,7 +34,7 @@ sta_timing_arc_edge_calculator::sta_timing_arc_edge_calculator(const library &li
 
 void sta_timing_arc_edge_calculator::update(const graph &g, const graph::edge graph_arc, const graph_nodes_timing &nodes, graph_arcs_timing &arcs)
 {
-    const entity::entity tarc = g.edge_entity(graph_arc);
+    const entity_system::entity tarc = g.edge_entity(graph_arc);
     boost::units::quantity<boost::units::si::capacitance> target_load = nodes.load(g.edge_target(graph_arc));
     boost::units::quantity<boost::units::si::time> source_slew = nodes.slew(g.edge_source(graph_arc));
     boost::units::quantity<boost::units::si::time> delay, slew;

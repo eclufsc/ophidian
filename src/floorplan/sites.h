@@ -22,7 +22,7 @@ under the License.
 #define ophidian_SITES_H
 
 #include <vector_property.h>
-#include "entity.h"
+#include <entity_system.h>
 #include "../geometry/geometry.h"
 
 namespace ophidian {
@@ -34,10 +34,10 @@ namespace ophidian {
         class sites {
             using point = geometry::point<double>;
 
-            entity::system & m_system;
+            entity_system::entity_system & m_system;
 
-            entity::vector_property<std::string> m_names;
-            entity::vector_property<point> m_dimensions;
+            entity_system::vector_property<std::string> m_names;
+            entity_system::vector_property<point> m_dimensions;
 
         public:
             /// Constructor.
@@ -45,7 +45,7 @@ namespace ophidian {
              * Sites object constructor. Register the sites properties to the sites system.
              * \param system Sites entity system.
              */
-            sites(entity::system & system);
+            sites(entity_system::entity_system & system);
 
             /// Name getter.
             /**
@@ -53,7 +53,7 @@ namespace ophidian {
              * \param site Site entity to get the name.
              * \return Site name.
              */
-            std::string name(entity::entity site) const {
+            std::string name(entity_system::entity site) const {
                 return m_names[m_system.lookup(site)];
             }
 
@@ -63,7 +63,7 @@ namespace ophidian {
              * \param site Site entity to get the dimensions.
              * \return Point describing the site dimensions.
              */
-            point dimensions(entity::entity site) const {
+            point dimensions(entity_system::entity site) const {
                 return m_dimensions[m_system.lookup(site)];
             }
 
@@ -91,14 +91,14 @@ namespace ophidian {
              * \param site Site entity to set the name.
              * \param name Desired name to set.
              */
-            void name(entity::entity site, std::string name);
+            void name(entity_system::entity site, std::string name);
             /// Dimensions setter.
             /**
              * Sets the dimensions of a site.
              * \param site Site entity to set the dimensions.
              * \param name Desired dimensions to set.
              */
-            void dimensions(entity::entity site, point dimensions);
+            void dimensions(entity_system::entity site, point dimensions);
         };
     }
 }

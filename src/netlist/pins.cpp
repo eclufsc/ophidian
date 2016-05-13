@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace netlist {
 
-pins::pins(entity::system & system) : m_system(system) {
+pins::pins(entity_system::entity_system & system) : m_system(system) {
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_owners);
 	m_system.register_property(&m_nets);
@@ -33,20 +33,20 @@ pins::pins(entity::system & system) : m_system(system) {
 pins::~pins() {
 }
 
-void pins::name(entity::entity pin, std::string name) {
+void pins::name(entity_system::entity pin, std::string name) {
 	m_names[m_system.lookup(pin)] = name;
 }
 
-void pins::owner(entity::entity pin, entity::entity owner) {
+void pins::owner(entity_system::entity pin, entity_system::entity owner) {
 	m_owners[m_system.lookup(pin)] = owner;
 }
 
-void pins::net(entity::entity pin, entity::entity net) {
+void pins::net(entity_system::entity pin, entity_system::entity net) {
 	m_nets[m_system.lookup(pin)] = net;
 }
 
-void pins::standard_cell_pin(entity::entity pin,
-		entity::entity std_cell_pin) {
+void pins::standard_cell_pin(entity_system::entity pin,
+        entity_system::entity std_cell_pin) {
 	m_std_cell_pin[m_system.lookup(pin)] = std_cell_pin;
 }
 } /* namespace netlist */
