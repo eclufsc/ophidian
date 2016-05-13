@@ -54,7 +54,7 @@ public:
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > cell_geometry(
 			entity::entity cell) const {
         auto position = cell_position(cell);
-        auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
+        auto &lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
         geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
         geometry::translate(lib_geometry, position, translated);
         return translated;

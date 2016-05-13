@@ -129,6 +129,11 @@ wire_quad circuit_canvas::drawRect(const geometry::point<double> &p1, const geom
     return the_rect;
 }
 
+void circuit_canvas::cameraCenter(const sf::Vector2f &position)
+{
+    m_camera.setCenter(position);
+}
+
 void circuit_canvas::moveCamera(const sf::Vector2f &delta)
 {
     m_camera.move(delta);
@@ -137,6 +142,11 @@ void circuit_canvas::moveCamera(const sf::Vector2f &delta)
 sf::Vector2f circuit_canvas::cameraSize() const
 {
     return m_camera.getSize();
+}
+
+void circuit_canvas::cameraSize(const sf::Vector2f &new_size)
+{
+    m_camera.setSize(new_size);
 }
 
 void circuit_canvas::zoom(double value)

@@ -43,7 +43,7 @@ public:
 
 
     void run_SA(const std::string &verilog_file);
-    void animate_solution();
+    void animate_solution(std::size_t duration = 30);
 };
 
 

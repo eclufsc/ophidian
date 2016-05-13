@@ -8,6 +8,9 @@
 #include "../parsing/verilog.h"
 #include "../netlist/verilog2netlist.h"
 
+
+#include "../placement/hpwl.h"
+
 namespace uddac2016 {
 
 using namespace ophidian;
@@ -81,21 +84,21 @@ void SA::run_it()
     int accepted_moves = 0;
     std::size_t i = 0;
     std::cout << "T " << m_T << std::endl;
+
+    placement::hpwl HPWL(m_app.m_placement);
+    std::cout << "HPWL before " << HPWL.value() << std::endl;
+
     for(auto cell : m_app.m_netlist.cell_system())
     {
 
         auto & cell_pins = m_app.m_netlist.cell_pins(cell.first);
 
         double HPWL0 = 0.0;
-
         for(auto pin : cell_pins)
         {
             auto net = m_app.m_netlist.pin_net(pin);
-            auto & net_pins = m_app.m_netlist.net_pins(net);
-            std::vector< geometry::point<double> > pin_positions(net_pins.size());
-            for(std::size_t i = 0; i < net_pins.size(); ++i)
-                pin_positions[i] = m_app.m_placement.pin_position(net_pins[i]);
-            HPWL0 += interconnection::hpwl(pin_positions);
+            placement::hpwl net_hpwl(m_app.m_placement, net);
+            HPWL0 += net_hpwl.value();
         }
 
         geometry::point<double> pos0 = m_app.m_placement.cell_position(cell.first);
@@ -110,11 +113,8 @@ void SA::run_it()
         for(auto pin : cell_pins)
         {
             auto net = m_app.m_netlist.pin_net(pin);
-            auto & net_pins = m_app.m_netlist.net_pins(net);
-            std::vector< geometry::point<double> > pin_positions(net_pins.size());
-            for(std::size_t i = 0; i < net_pins.size(); ++i)
-                pin_positions[i] = m_app.m_placement.pin_position(net_pins[i]);
-            HPWLF += interconnection::hpwl(pin_positions);
+            placement::hpwl net_hpwl(m_app.m_placement, net);
+            HPWLF += net_hpwl.value();
         }
 
         double Delta = HPWLF-HPWL0;
@@ -150,8 +150,9 @@ void SA::run_it()
         ++i;
     }
     m_T *= .8;
-    std::cout << "accepted " << accepted_moves << " moves" << std::endl;
 
+    placement::hpwl HPWLF(m_app.m_placement);
+    std::cout << "HPWL after " << HPWLF.value() << std::endl;
 }
 
 }

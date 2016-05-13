@@ -29,8 +29,11 @@ void canvas::create_quads(const std::vector<std::pair<entity::entity, geometry::
         auto & cell_quads = m_cell2quads[cell_entity];
         for(const geometry::polygon<geometry::point<double> > & polygon : cell_geometry)
         {
+            sf::Transform translate;
+            translate.translate(-polygon.outer()[0].x()+m_camera.getCenter().x, -polygon.outer()[0].y()+(-m_camera.getCenter().y));
+            translate.combine(mirror);
             auto quad = drawQuad(polygon.outer()[0],polygon.outer()[1],polygon.outer()[2],polygon.outer()[3]);
-            transform(quad, mirror);
+            transform(quad, translate);
             cell_quads.push_back(quad);
             m_quad2cell[quad] = cell_entity;
         }

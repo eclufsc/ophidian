@@ -114,8 +114,10 @@ public:
 
 
     // camera
+    void cameraCenter(const sf::Vector2f & position);
     void moveCamera(const sf::Vector2f & delta);
     sf::Vector2f cameraSize() const;
+    void cameraSize(const sf::Vector2f & new_size);
     void zoom(double value);
 
     void reset();

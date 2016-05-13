@@ -66,7 +66,7 @@ public:
 	 * \param cell Cell to get the geometry.
 	 * \return Multi polygon representing the cell geometry.
 	 */
-	multipolygon geometry(entity::entity cell) const {
+    const multipolygon &geometry(entity::entity cell) const {
         return m_cell_geometry[m_std_cells.cell_system().lookup(cell)];
 	}
 	/// Cell geometry setter.
@@ -103,7 +103,7 @@ public:
 	 * \param pin Pin to get the offset.
 	 * \return Point describing the pin offset.
 	 */
-    point pin_offset(entity::entity pin) const {
+    const point &pin_offset(entity::entity pin) const {
         return m_pin_offset[m_std_cells.pin_system().lookup(pin)];
     }
 
