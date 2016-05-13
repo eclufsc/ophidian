@@ -46,7 +46,7 @@ class flute_rc_tree_creator {
     void resistance_per_microns(boost::units::quantity< boost::units::si::resistance > resistance);
     void capacitance_per_micron(boost::units::quantity< boost::units::si::capacitance > capacitance);
 
-    std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id, entity_system::entity_hash> create_tree(const placement::placement& placement,
+    std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> create_tree(const placement::placement& placement,
                                                                                            const entity_system::entity net, interconnection::rc_tree& rc_tree, const timing::library & library);
 
 };

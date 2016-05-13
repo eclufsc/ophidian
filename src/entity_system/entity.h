@@ -53,13 +53,25 @@ ENTITY_SYSTEM_STRONG_TYPEDEF(uint32_t, entity_index)
 static const entity_index invalid_entity_index = static_cast<entity_index>(std::numeric_limits<uint32_t>::max());
 static const entity invalid_entity = static_cast<entity>(std::numeric_limits<uint32_t>::max());
 
-struct entity_hash {
-    std::size_t operator () (const entity & e) const {
-        return std::hash<uint32_t>{}(e);
+} /* namespace entity system */
+} /* namespace ophidian */
+
+//adding to std namespace hash operators for entity and pair of entities
+namespace std
+{
+template<> struct hash<ophidian::entity_system::entity>
+{
+    std::size_t operator()(const ophidian::entity_system::entity & e) const{
+        return std::hash<std::uint32_t>()(e);
     }
 };
 
-} /* namespace entity system */
-} /* namespace ophidian */
+template<> struct hash<std::pair<ophidian::entity_system::entity,ophidian::entity_system::entity>>
+{
+    std::size_t operator () (const std::pair<ophidian::entity_system::entity,ophidian::entity_system::entity> &p) const {
+        return std::hash<uint32_t>{}(p.first) ^ std::hash<uint32_t>{}(p.second);
+}
+};
+}
 
 #endif //OPHIDIAN_SRC_ENTITY_SYSTEM_ENTITY_H

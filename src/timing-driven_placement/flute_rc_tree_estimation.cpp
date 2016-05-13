@@ -70,10 +70,10 @@ void flute_rc_tree_creator::capacitance_per_micron(boost::units::quantity<si::ca
     m_params.capacitance_per_micron = capacitance;
 }
 
-std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id, entity_system::entity_hash> flute_rc_tree_creator::create_tree(const placement::placement &placement, const entity_system::entity net, interconnection::rc_tree &rc_tree, const timing::library &library)
+std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree_creator::create_tree(const placement::placement &placement, const entity_system::entity net, interconnection::rc_tree &rc_tree, const timing::library &library)
 {
     auto net_pins = placement.netlist().net_pins(net);
-    std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id, entity_system::entity_hash> tap_mapping;
+    std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
 
     params dummy{0.0*si::ohms, 0.0*si::farads};
     params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);

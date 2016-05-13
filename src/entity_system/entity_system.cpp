@@ -19,6 +19,7 @@ under the License.
  */
 
 #include "entity_system.h"
+#include "property.h"
 
 namespace ophidian{
 namespace entity_system{
@@ -26,8 +27,7 @@ namespace entity_system{
 void entity_system::destroy(entity e){
     entity_index e_index = m_id_to_index.at(e);
 #ifndef NDEBUG
-    if(e_index == invalid_entity_index)
-        throw std::out_of_range("lookup::_invalid_entity");
+    m_live_entity_check(m_id_to_index.at(e));
 #endif
 
     auto last_entity_index = m_entities.size()-1;
@@ -47,7 +47,7 @@ entity entity_system::create(){
     m_id_to_index.push_back(new_entity_index);
     m_entities.push_back(new_entity);
     for(auto property : m_associated_properties)
-        attorney::create(*property, m_id_to_index.at(new_entity));
+        attorney::create(*property);
 
     return new_entity;
 }
@@ -65,7 +65,7 @@ void entity_system::register_property(property *property){
     attorney::preallocate(*property, m_last_prealloc_qnt);
     m_associated_properties.insert(property);
     for(auto entity : m_entities)
-        attorney::create(*property, m_id_to_index.at(entity));
+        attorney::create(*property);
 }
 
 } /* namespace entity system */

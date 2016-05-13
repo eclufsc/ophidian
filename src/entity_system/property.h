@@ -41,7 +41,6 @@ private:
     /// Virtual destroy method.
     /**
      * This method is called when an entity in the system is destroyed.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
      * \param e index of the entity whose property will be destroyed
      */
     virtual void destroy( entity_index e ) = 0;
@@ -49,19 +48,35 @@ private:
     /// Virtual create method.
     /**
      * This method is called when a new entity is created in the system.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
      * \param e index of the entity whose property will be created
      */
-    virtual void create( entity_index e ) = 0;
+    virtual void create( ) = 0;
 
     /// Virtual preallocate method.
     /**
      * This method preallocate a given quantity to be stored in the future.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
      * \param qnt quantity to be allocated.
      */
     virtual void preallocate( std::size_t qnt ) = 0;
 
+};
+
+/// attorney class.
+/*
+ * This class provides three static functions to access private methods from properties.
+ */
+class attorney {
+private:
+    inline static void destroy(property & p, entity_index e) {
+        return p.destroy(e);
+    }
+    inline static void create(property & p) {
+        return p.create();
+    }
+    inline static void preallocate(property & p, size_t qnt) {
+        return p.preallocate(qnt);
+    }
+    friend class entity_system;
 };
 
 } /* namespace entity system */

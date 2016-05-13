@@ -55,12 +55,12 @@ private:
     lemon::ListDigraph::ArcMap< entity_system::entity > m_arcs;
 
 
-    std::unordered_map< entity_system::entity, node, entity_system::entity_hash > m_rise_nodes;
-    std::unordered_map< entity_system::entity, node, entity_system::entity_hash > m_fall_nodes;
+    std::unordered_map< entity_system::entity, node > m_rise_nodes;
+    std::unordered_map< entity_system::entity, node > m_fall_nodes;
 
     std::vector< test > m_tests;
 
-    node node_create(entity_system::entity pin, edges node_edge, std::unordered_map<entity_system::entity, node, entity_system::entity_hash> &map);
+    node node_create(entity_system::entity pin, edges node_edge, std::unordered_map<entity_system::entity, node> &map);
 
 
 public:

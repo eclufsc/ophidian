@@ -46,7 +46,6 @@ class vector_property : public property {
     /// Destroys the property of an entity.
     /**
     * Implements the destroy method from property. Moves the last property in the vector to the position of the destroyed entity.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
      * \param e index of the entity whose property will be destroyed
     */
     void destroy(entity_index e ) {
@@ -58,17 +57,14 @@ class vector_property : public property {
     /// Creates property for an entity.
     /**
      * Implements the create method from property. Resizes the vector to contain the property of the new entity.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
-     * \param e index of the entity whose property will be created
      */
-    void create( entity_index e ) {
+    void create( ) {
         m_values.push_back(T());
     }
 
     /// Virtual preallocate method.
     /**
      * This method preallocate a given quantity to be stored in the future.
-     * \param pass_key<entity_system> parameter is required to grant exclusive access to the entity_system
      * \param qnt quantity to be allocated.
      */
     void preallocate( std::size_t qnt ) {
@@ -167,7 +163,7 @@ class vector_property<bool> : public property {
         m_values.pop_back();
     }
 
-    void create( entity_index e ) {
+    void create( ) {
         m_values.push_back(bool());
     }
 

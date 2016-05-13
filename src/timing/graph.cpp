@@ -38,7 +38,7 @@ void graph::test_insert(node ck, node d, entity_system::entity tarc)
     m_tests.push_back(test{ck, d, tarc});
 }
 
-graph::node graph::node_create(entity_system::entity pin, edges node_edge, std::unordered_map< entity_system::entity, node, entity_system::entity_hash > & map) {
+graph::node graph::node_create(entity_system::entity pin, edges node_edge, std::unordered_map<entity_system::entity, node> &map) {
 	auto new_node = m_graph.addNode();
 	if(map.find(pin) == map.end())
 		map[pin] = new_node;

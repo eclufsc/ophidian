@@ -22,7 +22,6 @@ under the License.
 #define OPHIDIAN_SRC_ENTITY_SYSTEM_ENTITY_SYSTEM_H
 
 #include "entity.h"
-#include "property.h"
 #include <vector>
 #include <unordered_set>
 #include <assert.h>
@@ -30,26 +29,10 @@ under the License.
 namespace ophidian{
 namespace entity_system{
 
-/// attorney class.
-/*
- * This class provides three static functions to access private methods from properties.
- */
-class attorney {
-private:
-    inline static void destroy(property & p, entity_index e) {
-        return p.destroy(e);
-    }
-    inline static void create(property & p, entity_index e) {
-        return p.create(e);
-    }
-    inline static void preallocate(property & p, size_t qnt) {
-        return p.preallocate(qnt);
-    }
-    friend class entity_system;
-};
-
 using entities_storage = typename std::vector<entity>;
 using entities_index_storage = typename std::vector<entity_index>;
+class property;
+
 /// entity_system class.
 /*
  * This class describes an entity system, which stores all its entities and pointers to the properties associated to them.

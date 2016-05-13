@@ -68,7 +68,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
 
     std::cout << "  graph_builder::build(): creating timing arc edges" << std::endl << std::flush;
     std::vector< entity_system::entity > input_pins;
-    std::unordered_map< entity_system::entity, entity_system::entity, entity_system::entity_hash > output_pins;
+    std::unordered_map< entity_system::entity, entity_system::entity> output_pins;
     std::size_t current_cell{0};
 
     std::vector<double> percentages {
