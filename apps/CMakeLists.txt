@@ -1,5 +1,5 @@
-add_subdirectory (placement_viewer)
+#add_subdirectory (placement_viewer)
 add_subdirectory (tdp)
 add_subdirectory (interconnect_delay)
 add_subdirectory (uddac2016)
-add_subdirectory (canvas)
+#add_subdirectory (canvas)

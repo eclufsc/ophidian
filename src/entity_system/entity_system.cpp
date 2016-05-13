@@ -26,9 +26,7 @@ namespace entity_system{
 
 void entity_system::destroy(entity e){
     entity_index e_index = m_id_to_index.at(e);
-#ifndef NDEBUG
     m_live_entity_check(m_id_to_index.at(e));
-#endif
 
     auto last_entity_index = m_entities.size()-1;
     auto entity_to_destroy_index = m_id_to_index.at(e);

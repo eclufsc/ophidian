@@ -341,6 +341,7 @@ public:
     const std::vector<entity_system::entity> & net_pins(entity_system::entity net) const {
 		return m_nets.pins(net);
 	}
+
 	/// Net names iterator.
 	/**
 	 * Returns the beginning and end iterators of the net names property.

@@ -16,7 +16,7 @@ void canvas::main_controller(controller *main_ctrl)
     m_main_ctrl = main_ctrl;
 }
 
-void canvas::create_quads(const std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
+void canvas::create_quads(const std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
 {
     m_quad2cell.clear();
     m_cell2quads.clear();
@@ -24,7 +24,7 @@ void canvas::create_quads(const std::vector<std::pair<entity::entity, geometry::
     mirror.scale(1.0, -1.0);
     for(auto & entity_pair : geometries)
     {
-        entity::entity cell_entity = entity_pair.first;
+        entity_system::entity cell_entity = entity_pair.first;
         const geometry::multi_polygon<geometry::polygon<geometry::point<double> > > & cell_geometry = entity_pair.second;
         auto & cell_quads = m_cell2quads[cell_entity];
         for(const geometry::polygon<geometry::point<double> > & polygon : cell_geometry)
@@ -41,13 +41,13 @@ void canvas::create_quads(const std::vector<std::pair<entity::entity, geometry::
     reindex(geometries);
 }
 
-void canvas::update_quads(gui::drawable_batch<4> & batch, const std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
+void canvas::update_quads(gui::drawable_batch<4> & batch, const std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
 {
     sf::Transform mirror;
     mirror.scale(1.0, -1.0);
     for(auto & entity_pair : geometries)
     {
-        entity::entity cell_entity = entity_pair.first;
+        entity_system::entity cell_entity = entity_pair.first;
         const geometry::multi_polygon<geometry::polygon<geometry::point<double> > > & cell_geometry = entity_pair.second;
         std::size_t quad_id = 0;
         auto & quad_vector = m_cell2quads[cell_entity];
@@ -72,12 +72,12 @@ void canvas::paint_quads(cell_painter &painter)
     }
 }
 
-void canvas::reindex(const std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
+void canvas::reindex(const std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
 {
     m_index.clear();
     for(auto & entity_pair : geometries)
     {
-        entity::entity cell_entity = entity_pair.first;
+        entity_system::entity cell_entity = entity_pair.first;
         const geometry::multi_polygon<geometry::polygon<geometry::point<double> > > & cell_geometry = entity_pair.second;
         std::size_t quad_id = 0;
         auto & quad_vector = m_cell2quads[cell_entity];
@@ -94,7 +94,7 @@ void canvas::reindex(const std::vector<std::pair<entity::entity, geometry::multi
     }
 }
 
-void canvas::setFixed(entity::entity cell)
+void canvas::setFixed(entity_system::entity cell)
 {
     std::vector< gui::quad > & quads = m_cell2quads.at(cell);
     for(gui::quad & quad : quads)

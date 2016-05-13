@@ -148,18 +148,13 @@ public:
      */
     inline entity_index lookup(entity e){
         entity_index e_index = m_id_to_index.at(e);
-#ifndef NDEBUG
-        if(e_index == invalid_entity_index)
-            throw std::out_of_range("lookup::_invalid_entity");
-#endif
+        m_live_entity_check(e_index);
         return e_index;
     }
 
     inline entity_index lookup(entity e) const {
         entity_index e_index = m_id_to_index.at(e);
-#ifndef NDEBUG
         m_live_entity_check(e_index);
-#endif
         return e_index;
     }
 };

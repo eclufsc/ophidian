@@ -146,6 +146,14 @@ public:
     typename std::vector<T>::const_iterator end() const {
         return m_values.end();
     }
+
+    T* data() {
+        return m_values.data();
+    }
+
+    const T* data() const {
+        return m_values.data();
+    }
 };
 
 template <>

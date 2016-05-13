@@ -47,20 +47,20 @@ bool application::read_def(const std::string &DEF)
     return true;
 }
 
-std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > application::cells_geometries() const
+std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > application::cells_geometries() const
 {
-    std::vector<std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries;
+    std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries;
     for(auto cell : m_netlist.cell_system())
-        geometries.push_back({cell.first, m_placement.cell_geometry(cell.first)});
+        geometries.push_back({cell, m_placement.cell_geometry(cell)});
     return geometries;
 }
 
-ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > application::cell_geometry(const entity::entity &cell) const
+ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > application::cell_geometry(const entity_system::entity &cell) const
 {
     return m_placement.cell_geometry(cell);
 }
 
-void application::cell_position(const entity::entity &cell, const ophidian::geometry::point<double> &p)
+void application::cell_position(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
 {
     m_placement.cell_position(cell, p);
 }
@@ -91,7 +91,7 @@ void SA::run_it()
     for(auto cell : m_app.m_netlist.cell_system())
     {
 
-        auto & cell_pins = m_app.m_netlist.cell_pins(cell.first);
+        auto & cell_pins = m_app.m_netlist.cell_pins(cell);
 
         double HPWL0 = 0.0;
         for(auto pin : cell_pins)
@@ -101,13 +101,13 @@ void SA::run_it()
             HPWL0 += net_hpwl.value();
         }
 
-        geometry::point<double> pos0 = m_app.m_placement.cell_position(cell.first);
+        geometry::point<double> pos0 = m_app.m_placement.cell_position(cell);
 
         std::uniform_real_distribution<double> x_dist(pos0.x()-10000, pos0.x()+10000);
         std::uniform_real_distribution<double> y_dist(pos0.y()-10000, pos0.y()+10000);
 
         geometry::point<double> position(x_dist(m_engine), y_dist(m_engine));
-        m_app.m_placement.cell_position(cell.first, position);
+        m_app.m_placement.cell_position(cell, position);
 
         double HPWLF = 0.0;
         for(auto pin : cell_pins)
@@ -140,7 +140,7 @@ void SA::run_it()
         if(!accepted)
         {
             //            std::cout << " REJECTED!!" << std::endl;
-            m_app.m_placement.cell_position(cell.first, pos0);
+            m_app.m_placement.cell_position(cell, pos0);
         }
         else
         {

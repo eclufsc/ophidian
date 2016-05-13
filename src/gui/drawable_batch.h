@@ -3,8 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "../geometry/geometry.h"
-#include "../entity/entity.h"
-#include "../entity/vector_property.h"
+#include "../entity_system/entity_system.h"
+#include "../entity_system/vector_property.h"
 
 namespace ophidian {
 namespace gui {
@@ -48,8 +48,8 @@ public:
 template<std::size_t NumberOfVertices>
 class drawable_batch : public sf::Drawable
 {
-    entity::system m_system;
-    entity::vector_property< std::array<sf::Vertex, NumberOfVertices> > m_vertices;
+    entity_system::entity_system m_system;
+    entity_system::vector_property< std::array<sf::Vertex, NumberOfVertices> > m_vertices;
     sf::PrimitiveType m_primitive;
 
     batch_animation * m_animation;
@@ -59,7 +59,7 @@ public:
         m_primitive(primitive),
         m_animation(nullptr){
         m_system.register_property(&m_vertices);
-        m_vertices.preallocate(10000000);
+        m_system.preallocate(10000000);
     }
 
     bool has_animation() const {
@@ -75,37 +75,37 @@ public:
         m_animation = animation;
     }
 
-    entity::entity create() {
+    entity_system::entity create() {
         auto the_entity = m_system.create();
         paint(the_entity, sf::Color::Black);
         return the_entity;
     }
 
-    void destroy(entity::entity the_entity) {
+    void destroy(entity_system::entity the_entity) {
         m_system.destroy(the_entity);
     }
 
-    void transform(entity::entity the_entity, const sf::Transform & trans)
+    void transform(entity_system::entity the_entity, const sf::Transform & trans)
     {
         std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
         for(sf::Vertex & v : vertices)
             v.position = trans.transformPoint(v.position);
     }
 
-    void paint(entity::entity the_entity, const sf::Color & color)
+    void paint(entity_system::entity the_entity, const sf::Color & color)
     {
         std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
         for(sf::Vertex & v : vertices)
             v.color = color;
     }
 
-    void set_point(entity::entity the_entity, std::size_t i, const geometry::point<double> &p)
+    void set_point(entity_system::entity the_entity, std::size_t i, const geometry::point<double> &p)
     {
         std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
         vertices.at(i).position = sf::Vector2f(p.x(), p.y());
     }
 
-    const geometry::point<double> point(entity::entity the_entity, std::size_t i) const {
+    const geometry::point<double> point(entity_system::entity the_entity, std::size_t i) const {
         std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
         return geometry::point<double>(vertices.front().position.x, vertices.front().position.y);
     }
@@ -114,7 +114,7 @@ public:
         return m_system.size()*NumberOfVertices;
     }
 
-    const std::array<sf::Vertex, NumberOfVertices> & points(entity::entity & the_entity) const {
+    const std::array<sf::Vertex, NumberOfVertices> & points(entity_system::entity & the_entity) const {
         return m_vertices[m_system.lookup(the_entity)];
     }
 

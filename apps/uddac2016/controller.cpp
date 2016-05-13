@@ -31,7 +31,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
         sf::Vector2f new_center((m_app.chip_boundaries()[0].x()+m_app.chip_boundaries()[3].x())/2.0, -(m_app.chip_boundaries()[0].y()+m_app.chip_boundaries()[1].y())/2.0);
         m_canvas->cameraCenter(new_center);
         m_canvas->cameraSize(sf::Vector2f(m_app.chip_boundaries()[3].x()-m_app.chip_boundaries()[0].x(), m_app.chip_boundaries()[1].y()-m_app.chip_boundaries()[0].y()));
-        std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
+        std::vector< std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
         m_canvas->create_quads(geometries);
         random_purple_cell_painter painter(std::bind(&application::cell_is_fixed, &m_app, std::placeholders::_1));
         m_canvas->paint_quads(painter);
@@ -57,7 +57,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
 
 void controller::animate_solution(std::size_t duration)
 {
-    std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
+    std::vector< std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
     ophidian::gui::drawable_batch<4> destination_quads = m_canvas->quadsBatch();
     m_canvas->update_quads(destination_quads, geometries);
     ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas->quadsBatch(), duration);
@@ -89,17 +89,17 @@ void controller::run_SA(const std::string & verilog_file)
     animate_solution();
 }
 
-void controller::place_cell(const entity::entity &cell, const ophidian::geometry::point<double> &p)
+void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
 {
     m_app.cell_position(cell, p);
 }
 
-void controller::unselect(const entity::entity &cell)
+void controller::unselect(const entity_system::entity &cell)
 {
 
 }
 
-void controller::select(const entity::entity &cell)
+void controller::select(const entity_system::entity &cell)
 {
     qDebug() << QString::fromStdString(m_app.cell_name(cell));
 }

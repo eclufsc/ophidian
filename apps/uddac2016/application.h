@@ -26,9 +26,9 @@ public:
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
     bool read_def(const std::string & DEF);
 
-    std::vector< std::pair<ophidian::entity::entity, ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > > > cells_geometries() const;
-    ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity::entity & cell) const;
-    void cell_position(const ophidian::entity::entity & cell, const ophidian::geometry::point<double> & p);
+    std::vector< std::pair<ophidian::entity_system::entity, ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > > > cells_geometries() const;
+    ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity_system::entity & cell) const;
+    void cell_position(const ophidian::entity_system::entity & cell, const ophidian::geometry::point<double> & p);
 
     std::array<ophidian::geometry::point<double>, 4> chip_boundaries() const {
         std::array<ophidian::geometry::point<double>, 4> result;
@@ -41,15 +41,15 @@ public:
 
 
 
-    bool cell_is_fixed(const ophidian::entity::entity & cell) const {
+    bool cell_is_fixed(const ophidian::entity_system::entity & cell) const {
         return m_placement.cell_fixed(cell);
     }
 
-    std::string cell_name(const ophidian::entity::entity & cell_name) const {
+    std::string cell_name(const ophidian::entity_system::entity & cell_name) const {
         return m_netlist.cell_name(cell_name);
     }
 
-    const ophidian::geometry::point<double> cell_position(const ophidian::entity::entity & cell) const {
+    const ophidian::geometry::point<double> cell_position(const ophidian::entity_system::entity & cell) const {
         return m_placement.cell_position(cell);
     }
 

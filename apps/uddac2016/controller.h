@@ -24,22 +24,22 @@ public:
     void init_canvas_controller(uddac2016::canvas *canvas);
 
 
-    void place_cell(const ophidian::entity::entity & cell, const ophidian::geometry::point<double> & p);
+    void place_cell(const ophidian::entity_system::entity & cell, const ophidian::geometry::point<double> & p);
 
-    std::string cell_name(const ophidian::entity::entity & cell) const {
+    std::string cell_name(const ophidian::entity_system::entity & cell) const {
         return m_app.cell_name(cell);
     }
 
-    ophidian::geometry::point<double> cell_position(const ophidian::entity::entity & cell) const {
+    ophidian::geometry::point<double> cell_position(const ophidian::entity_system::entity & cell) const {
         return m_app.cell_position(cell);
     }
 
-    ophidian::geometry::multi_polygon< ophidian::geometry::polygon< ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity::entity & cell) const {
+    ophidian::geometry::multi_polygon< ophidian::geometry::polygon< ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity_system::entity & cell) const {
         return m_app.cell_geometry(cell);
     }
 
-    void select(const ophidian::entity::entity & cell);
-    void unselect(const ophidian::entity::entity & cell);
+    void select(const ophidian::entity_system::entity & cell);
+    void unselect(const ophidian::entity_system::entity & cell);
 
 
     void run_SA(const std::string &verilog_file);

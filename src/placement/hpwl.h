@@ -3,7 +3,7 @@
 
 namespace ophidian {
 
-namespace entity {
+namespace entity_system {
 class entity;
 }
 
@@ -15,7 +15,7 @@ class hpwl
     double m_value;
 public:
     hpwl(const placement & place);
-    hpwl(const placement & place, const entity::entity & net);
+    hpwl(const placement & place, const entity_system::entity & net);
     double value() const {
         return m_value;
     }
