@@ -41,7 +41,7 @@ namespace ophidian {
                     this->end(subrow, floorplan->row_origin(row.first).x() + floorplan->row_dimensions(row.first).x() - 1);
                     this->row(subrow, row.first);
                     point subrow_min_corner = floorplan->row_origin(row.first);
-                    point subrow_max_corner(floorplan->row_origin(row.first).x() + floorplan->row_dimensions(row.first).x(), floorplan->row_origin(row.first).y() + floorplan->row_dimensions(row.first).y());
+                    point subrow_max_corner(floorplan->row_origin(row.first).x() + floorplan->row_dimensions(row.first).x() - 1, floorplan->row_origin(row.first).y() + floorplan->row_dimensions(row.first).y() - 1);
                     box subrow_box(subrow_min_corner, subrow_max_corner);
                     subrows_rtree.insert(std::make_pair(subrow_box, subrow));
                 }
@@ -63,7 +63,7 @@ namespace ophidian {
                                 this->end(left_subrow, cell_rectangle.min_corner().x() - 1);
                                 this->row(left_subrow, row);
                                 point left_subrow_min_corner(this->begin(left_subrow), floorplan->row_origin(row).y());
-                                point left_subrow_max_corner(cell_rectangle.min_corner().x() - 1, floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y());
+                                point left_subrow_max_corner(cell_rectangle.min_corner().x() - 1, floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
                                 box left_subrow_box(left_subrow_min_corner, left_subrow_max_corner);
                                 subrows_rtree.insert(std::make_pair(left_subrow_box, left_subrow));
 
@@ -72,7 +72,7 @@ namespace ophidian {
                                 this->end(right_subrow, this->end(subrow));
                                 this->row(right_subrow, this->row(subrow));
                                 point right_subrow_min_corner(cell_rectangle.max_corner().x(), floorplan->row_origin(row).y());
-                                point right_subrow_max_corner(this->end(subrow), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y());
+                                point right_subrow_max_corner(this->end(subrow), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
                                 box right_subrow_box(right_subrow_min_corner, right_subrow_max_corner);
                                 subrows_rtree.insert(std::make_pair(right_subrow_box, right_subrow));
 

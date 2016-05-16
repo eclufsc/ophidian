@@ -37,6 +37,7 @@ namespace ophidian {
                     entity::vector_property<entity::entity> m_netlist_cells;
                     entity::vector_property<unsigned> m_order_ids;
                     entity::vector_property<point> m_positions;
+                    entity::vector_property<double> m_widths;
                     entity::vector_property<double> m_weights;
 
                 public:
@@ -56,6 +57,11 @@ namespace ophidian {
                         return m_positions[m_system.lookup(cell)];
                     }
                     void position(entity::entity cell, point position);
+
+                    double width(entity::entity cell) const {
+                        return m_widths[m_system.lookup(cell)];
+                    }
+                    void width(entity::entity cell, double width);
 
                     double weight(entity::entity cell) const {
                         return m_weights[m_system.lookup(cell)];

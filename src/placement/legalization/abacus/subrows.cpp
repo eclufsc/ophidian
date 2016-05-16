@@ -18,6 +18,7 @@ specific language governing permissions and limitations
 under the License.
  */
 
+#include <floorplan.h>
 #include "subrows.h"
 
 namespace ophidian {
@@ -37,6 +38,12 @@ namespace ophidian {
                 void subrows::capacity(entity::entity row, double capacity) {
                     m_capacity[m_system.lookup(row)] = capacity;
                 }
+
+                void subrows::remove_last_cell(entity::entity row, double cell_width) {
+                    m_cells[m_system.lookup(row)].pop_back();
+                    m_capacity[m_system.lookup(row)] += cell_width;
+                }
+
             }
         }
     }

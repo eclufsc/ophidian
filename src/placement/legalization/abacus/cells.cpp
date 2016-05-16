@@ -30,6 +30,7 @@ namespace ophidian {
                     m_system.register_property(&m_netlist_cells);
                     m_system.register_property(&m_order_ids);
                     m_system.register_property(&m_positions);
+                    m_system.register_property(&m_widths);
                     m_system.register_property(&m_weights);
                 }
 
@@ -43,6 +44,10 @@ namespace ophidian {
 
                 void cells::position(entity::entity cell, cells::point position) {
                     m_positions[m_system.lookup(cell)] = position;
+                }
+
+                void cells::width(entity::entity cell, double width) {
+                    m_widths[m_system.lookup(cell)] = width;
                 }
 
                 void cells::weight(entity::entity cell, double weight) {

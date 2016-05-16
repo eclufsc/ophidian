@@ -30,16 +30,9 @@ namespace ophidian {
         namespace legalization {
             namespace abacus {
                 class cell_comparator {
-                private:
-                    placement * m_placement;
                 public:
-                    cell_comparator(placement * placement)
-                            : m_placement(placement) {
-
-                    }
-
-                    bool operator()(const entity::entity cell1, const entity::entity cell2) {
-                        return m_placement->cell_position(cell1).x() <= m_placement->cell_position(cell2).x();
+                    bool operator()(const std::pair<entity::entity, double> & cell_pair1, const std::pair<entity::entity, double> & cell_pair2) {
+                        return cell_pair1.second < cell_pair2.second;
                     }
                 };
 
@@ -81,9 +74,13 @@ namespace ophidian {
                     void collapse(std::list<cluster> & clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max);
                 public:
                     abacus(floorplan::floorplan *floorplan, placement *placement)
-                            : legalization(floorplan, placement), m_cells(m_cells_system), m_abacus_subrows(m_subrows_system) { }
+                            : legalization(floorplan, placement), m_cells(m_cells_system), m_abacus_subrows(m_subrows_system) {
+                        create_subrows();
+                    }
 
                     void legalize_placement();
+
+                    void create_subrows();
                 };
             }
         }

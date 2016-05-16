@@ -73,7 +73,10 @@ public:
 	 * \return Multi polygon representing the cell geometry.
 	 */
 	multipolygon geometry(entity::entity cell) const {
-		return m_cell_geometry[m_cell_system.lookup(cell)];
+		auto cell_index = m_cell_system.lookup(cell);
+		auto geometry = m_cell_geometry[cell_index];
+		return geometry;
+//		return m_cell_geometry[m_cell_system.lookup(cell)];
 	}
 	/// Cell geometry setter.
 	/**

@@ -26,17 +26,18 @@ namespace ophidian {
             namespace abacus {
 
                 void abacus::legalize_placement() {
-                    std::vector<entity::entity> sorted_cells;
+                    std::vector<std::pair<entity::entity, double>> sorted_cells;
                     sorted_cells.reserve(m_placement->netlist().cell_count());
                     for (auto cell : m_placement->netlist().cell_system()) {
                         if (!m_placement->cell_fixed(cell.first)) {
-                            sorted_cells.push_back(cell.first);
+                            auto cell_position = m_placement->cell_position(cell.first);
+                            sorted_cells.push_back(std::make_pair(cell.first, m_placement->cell_position(cell.first).x()));
                         }
                     }
-                    std::sort(sorted_cells.begin(), sorted_cells.end(), cell_comparator(m_placement));
+                    std::sort(sorted_cells.begin(), sorted_cells.end(), cell_comparator());
 
                     for (std::size_t sorted_cell_id = 0; sorted_cell_id < sorted_cells.size(); sorted_cell_id++) {
-                        auto cell = sorted_cells.at(sorted_cell_id);
+                        auto cell = sorted_cells.at(sorted_cell_id).first;
                         point cell_position = m_placement->cell_position(cell);
                         point cell_dimensions = m_placement->cell_dimensions(cell);
 
@@ -44,31 +45,53 @@ namespace ophidian {
                         m_cells.netlist_cell(abacus_cell, cell);
                         m_cells.order_id(abacus_cell, sorted_cell_id);
                         m_cells.position(abacus_cell, cell_position);
-                        m_cells.weight(abacus_cell, m_placement->netlist().cell_pins(cell).size());
+                        m_cells.width(abacus_cell, cell_dimensions.x());
+//                        m_cells.weight(abacus_cell, m_placement->netlist().cell_pins(cell).size());
+                        m_cells.weight(abacus_cell, 1);
 
                         int best_cost = std::numeric_limits<int>::max();
                         int best_y = cell_position.y();
                         unsigned rows_to_search = 3;
                         while (best_cost == std::numeric_limits<int>::max()) {
-                            unsigned row_height = 3420;
+                            unsigned row_height = cell_dimensions.y();
                             int base_y = std::max(m_floorplan->chip_origin().y(), cell_position.y() - (row_height * (rows_to_search - 1)));
                             int top_y = std::min(m_floorplan->chip_boundaries().y(), cell_position.y() + (row_height * rows_to_search));
                             for (int trial_y = base_y; trial_y < top_y; trial_y += row_height) {
                                 point target_position(cell_position.x(), trial_y);
                                 m_cells.position(abacus_cell, target_position);
-                                entity::entity trial_row = m_subrows.find_subrow(target_position);
-                                if (m_abacus_subrows.insert_cell(trial_row, abacus_cell, cell_dimensions.x())) {
-                                    place_row(trial_row);
-                                    auto last_cell = m_abacus_subrows.cells(trial_row).back();
-                                    point last_cell_position = m_cells.position(last_cell);
-                                    double cost = std::abs(last_cell_position.x() - cell_position.x()) + std::abs(last_cell_position.y() - cell_position.y());
-                                    if (cost < best_cost) {
-                                        best_cost = cost;
-                                        best_y = trial_y;
+                                try {
+                                    entity::entity trial_row = m_subrows.find_subrow(target_position);
+                                    if (m_abacus_subrows.insert_cell(trial_row, abacus_cell, cell_dimensions.x())) {
+                                        place_row(trial_row);
+                                        auto last_cell = m_abacus_subrows.cells(trial_row).back();
+                                        point last_cell_position = m_cells.position(last_cell);
+                                        double cost = std::abs(last_cell_position.x() - cell_position.x()) + std::abs(last_cell_position.y() - cell_position.y());
+                                        if (cost < best_cost) {
+                                            best_cost = cost;
+                                            best_y = trial_y;
+                                        }
+                                        m_abacus_subrows.remove_last_cell(trial_row, cell_dimensions.x());
                                     }
-                                    m_abacus_subrows.remove_last_cell(trial_row);
+                                } catch (subrow_not_found) {
+                                    continue;
                                 }
                             }
+                        }
+
+                        point final_position(cell_position.x(), best_y);
+                        m_cells.position(abacus_cell, final_position);
+                        auto final_row = m_subrows.find_subrow(final_position);
+                        if (m_abacus_subrows.insert_cell(final_row, abacus_cell, cell_dimensions.x())) {
+                            place_row(final_row);
+                        } else {
+                            assert(false);
+                        }
+                    }
+
+                    for (auto subrow : m_subrows_system) {
+                        auto & subrow_cells = m_abacus_subrows.cells(subrow.first);
+                        for (auto cell : subrow_cells) {
+                            m_placement->cell_position(m_cells.netlist_cell(cell), m_cells.position(cell));
                         }
                     }
                 }
@@ -78,7 +101,7 @@ namespace ophidian {
                     auto cells = m_abacus_subrows.cells(subrow);
                     for (auto cell : cells) {
                         double cell_begin = m_cells.position(cell).x();
-                        double cell_width = m_placement->cell_dimensions(m_cells.netlist_cell(cell)).x();
+                        double cell_width = m_cells.width(cell);
                         auto cluster_it = clusters.end();
                         if (!clusters.empty()) {
                             cluster_it--;
@@ -86,10 +109,28 @@ namespace ophidian {
                         if (clusters.empty() || cluster_it->m_begin + cluster_it->m_size <= cell_begin) {
                             cluster new_cluster(cell_begin);
                             new_cluster.insert_cell(m_cells.order_id(cell), cell_begin, cell_width, m_cells.weight(cell));
-                            cluster_it = clusters.insert(clusters.end(), new_cluster);
+                            clusters.insert(clusters.end(), new_cluster);
                         } else {
                             cluster_it->insert_cell(m_cells.order_id(cell), cell_begin, cell_width, m_cells.weight(cell));
                             collapse(clusters, cluster_it, m_subrows.begin(subrow), m_subrows.end(subrow));
+                        }
+                    }
+
+                    auto & subrow_cells = m_abacus_subrows.cells(subrow);
+                    auto cell_it = subrow_cells.begin();
+                    for (auto & cluster : clusters) {
+                        double x = cluster.m_begin;
+                        unsigned i = m_cells.order_id(*cell_it);
+                        while (i <= cluster.m_last_order_id) {
+                            point cell_position(x, m_cells.position(*cell_it).y());
+                            m_cells.position(*cell_it, cell_position);
+                            x += m_cells.width(*cell_it);
+                            cell_it++;
+                            if (cell_it != subrow_cells.end()) {
+                                i = m_cells.order_id(*cell_it);
+                            } else {
+                                i = std::numeric_limits<unsigned>::max();
+                            }
                         }
                     }
                 }
@@ -114,6 +155,14 @@ namespace ophidian {
                         } else {
                             collapsed = true;
                         }
+                    }
+                }
+
+                void abacus::create_subrows() {
+                    for (auto subrow : m_subrows_system) {
+                        double subrow_begin = m_subrows.begin(subrow.first);
+                        double subrow_end = m_subrows.end(subrow.first);
+                        m_abacus_subrows.capacity(subrow.first, subrow_end - subrow_begin + 1);
                     }
                 }
             }

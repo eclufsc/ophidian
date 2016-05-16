@@ -27,6 +27,7 @@ under the License.
 #include <vector>
 
 #include <boost/bimap.hpp>
+#include <boost/bimap/unordered_set_of.hpp>
 
 #include "property.h"
 
@@ -100,7 +101,7 @@ template<> struct hash<ophidian::entity::entity>
 namespace ophidian {
 namespace entity{
 
-	using entity2index_map = typename boost::bimap< entity, std::size_t >;
+	using entity2index_map = typename boost::bimap< boost::bimaps::unordered_set_of<entity, std::hash<ophidian::entity::entity> >, boost::bimaps::unordered_set_of< std::size_t> >;
 	using entity2index_map_iterator = typename entity2index_map::left_const_iterator;
 
 	class bimap_iterator_adapter {
@@ -125,13 +126,13 @@ namespace entity{
 			m_it++;
 		}
 		bimap_iterator_adapter operator--(int) {
-			m_it--;
+//			m_it--;
 		}
 		bimap_iterator_adapter& operator++() {
 			++m_it;
 		}
 		bimap_iterator_adapter& operator--() {
-			--m_it;
+//			--m_it;
 		}
 		bool operator!=(const bimap_iterator_adapter & other) const {
 			return m_it != other.m_it;
@@ -146,7 +147,7 @@ namespace entity{
 	 * This class describes an entity system, which stores all its entities and pointers to the properties associated to them.
 	 */
 class system {
-	using entity2index_map = typename boost::bimap< entity, std::size_t >;
+	using entity2index_map = typename boost::bimap< boost::bimaps::unordered_set_of<entity, std::hash<ophidian::entity::entity> >, boost::bimaps::unordered_set_of< std::size_t> >;
 	entity2index_map m_entities;
 	uint32_t m_next;
 

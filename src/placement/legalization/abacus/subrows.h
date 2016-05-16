@@ -22,6 +22,8 @@ under the License.
 #define OPHIDIAN_ABACUS_SUBROWS_H
 
 #include <vector_property.h>
+#include <placement.h>
+#include "../subrows.h"
 #include "entity.h"
 
 namespace ophidian {
@@ -31,16 +33,19 @@ namespace ophidian {
                 class subrows {
                     entity::system & m_system;
 
-                    entity::vector_property<std::list<entity::entity>> m_cells;
+                    entity::vector_property<std::vector<entity::entity>> m_cells;
                     entity::vector_property<double> m_capacity;
                 public:
-                    subrows(entity::system &m_system) : m_system(m_system) { }
+                    subrows(entity::system &m_system) : m_system(m_system) {
+                        m_system.register_property(&m_cells);
+                        m_system.register_property(&m_capacity);
+                    }
 
-                    const std::list<entity::entity> & cells(entity::entity row) {
+                    const std::vector<entity::entity> & cells(entity::entity row) {
                         return m_cells[m_system.lookup(row)];
                     }
                     bool insert_cell(entity::entity row, entity::entity cell, double cell_width);
-                    void remove_last_cell(entity::entity );
+                    void remove_last_cell(entity::entity row, double cell_width);
 
                     double capacity(entity::entity row) {
                         return m_capacity[m_system.lookup(row)];
