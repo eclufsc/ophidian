@@ -15,12 +15,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::select_cell(ophidian::entity::entity cell)
+void MainWindow::select_cell(ophidian::entity_system::entity cell)
 {
     std::string cell_name = m_app->netlist().cell_name(cell);
     ui->label_cell_name->setText(QString::fromStdString(cell_name));
 
-    ophidian::entity::entity cell_std_cell = m_app->netlist().cell_std_cell(cell);
+    ophidian::entity_system::entity cell_std_cell = m_app->netlist().cell_std_cell(cell);
     std::string std_cell_name = m_app->std_cells().cell_name(cell_std_cell);
     ui->combo_box_cell_type->setCurrentText(QString::fromStdString(std_cell_name));
 
@@ -56,7 +56,7 @@ void MainWindow::on_combo_box_cell_type_activated(const QString &current_text)
     if (!m_app->cell_std_cell(cell, std_cell_name)) {
         QMessageBox error_message;
         error_message.information(0, "Error", "Invalid cell type!");
-        ophidian::entity::entity cell_std_cell = m_app->netlist().cell_std_cell(cell);
+        ophidian::entity_system::entity cell_std_cell = m_app->netlist().cell_std_cell(cell);
         std_cell_name = m_app->std_cells().cell_name(cell_std_cell);
         ui->combo_box_cell_type->setCurrentText(QString::fromStdString(std_cell_name));
     } else {

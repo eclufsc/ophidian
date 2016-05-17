@@ -25,6 +25,7 @@ under the License.
 namespace ophidian {
     namespace interconnection {
         double stwl(const std::vector<geometry::point<double> >&points) {
+            readLUT();
             if(points.size() <= 3)
                 return hpwl(points);
             std::vector<unsigned> X(points.size());

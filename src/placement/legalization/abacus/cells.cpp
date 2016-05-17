@@ -25,7 +25,7 @@ namespace ophidian {
         namespace legalization {
             namespace abacus {
 
-                cells::cells(entity::system & system)
+                cells::cells(entity_system::entity_system &system)
                     : m_system(system) {
                     m_system.register_property(&m_netlist_cells);
                     m_system.register_property(&m_order_ids);
@@ -34,15 +34,15 @@ namespace ophidian {
                     m_system.register_property(&m_weights);
                 }
 
-                void cells::netlist_cell(entity::entity cell, entity::entity netlist_cell) {
+                void cells::netlist_cell(entity_system::entity cell, entity_system::entity netlist_cell) {
                     m_netlist_cells[m_system.lookup(cell)] = netlist_cell;
                 }
 
-                void cells::order_id(entity::entity cell, unsigned order_id) {
+                void cells::order_id(entity_system::entity cell, unsigned order_id) {
                     m_order_ids[m_system.lookup(cell)] = order_id;
                 }
 
-                void cells::position(entity::entity cell, cells::point position) {
+                void cells::position(entity_system::entity cell, cells::point position) {
                     m_positions[m_system.lookup(cell)] = position;
                 }
 

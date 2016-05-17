@@ -32,16 +32,16 @@ cells::cells(netlist::netlist * netlist) : m_system(netlist->cell_system()), m_f
 cells::~cells() {
 }
 
-void cells::position(entity::entity cell, point position) {
+void cells::position(entity_system::entity cell, point position) {
 	m_positions[m_system.lookup(cell)] = position;
 }
 
-void cells::geometry(entity::entity cell,
+void cells::geometry(entity_system::entity cell,
         multipolygon geometry) {
     m_geometries[m_system.lookup(cell)] = geometry;
 }
 
-void cells::fixed(entity::entity cell, bool fixed) {
+void cells::fixed(entity_system::entity cell, bool fixed) {
 	m_fixed[m_system.lookup(cell)] = fixed;
 }
 } /* namespace placement */

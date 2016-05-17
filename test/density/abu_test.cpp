@@ -19,234 +19,62 @@ under the License.
  */
 
 #include "../catch.hpp"
-#include <iostream>
-#include <fstream>
-#include <lef.h>
+
+#include "../parsing/lef.h"
+#include "../parsing/def.h"
+
+#include "../placement/def2placement.h"
+#include "../placement/lef2library.h"
+#include "../floorplan/lefdef2floorplan.h"
 
 #include "abu.h"
-#include "def.h"
 
-TEST_CASE("density/ abu of superblue18","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue18/superblue18.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue18/superblue18.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
+using namespace ophidian;
+
+bool run_circuit(const std::string & ckt_name, const double target_utilization, const double golden_abu) {
+    standard_cell::standard_cells std_cells;
+    netlist::netlist netlist(&std_cells);
+    placement::library lib(&std_cells);
+    placement::placement cells(&netlist, &lib);
+    floorplan::floorplan floorplan;
+
+    const std::string dot_lef_file{"benchmarks/" + ckt_name + "/" + ckt_name + ".lef"};
+    const std::string dot_def_file{"benchmarks/" + ckt_name + "/" + ckt_name + ".def"};
+
+    std::unique_ptr<parsing::lef> lef;
+    std::unique_ptr<parsing::def> def;
+
+#pragma omp single nowait
+    {
+#pragma omp task shared(lef, dot_lef_file)
+        lef.reset(new parsing::lef(dot_lef_file));
+#pragma omp task shared(def, dot_def_file)
+        def.reset(new parsing::def(dot_def_file));
+    }
+#pragma omp taskwait
+
+    placement::lef2library(*lef, lib);
+    placement::def2placement(*def, cells);
+    floorplan::lefdef2floorplan(*lef, *def, floorplan);
 
     auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
+    double row_height = floorplan.row_dimensions(*row_it).y();
     unsigned number_of_rows_in_each_bin = 9;
 
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.85;
+    density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
     double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0401271;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
+    return Approx(measured_abu) == golden_abu;
 }
 
-TEST_CASE("density/ abu of superblue16","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue16/superblue16.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue16/superblue16.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
 
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
 
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.85;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0333554;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue4","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue4/superblue4.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue4/superblue4.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.90;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0439752;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue10","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue10/superblue10.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue10/superblue10.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.87;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0417409;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue7","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue7/superblue7.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue7/superblue7.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.90;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0296557;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue1","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue1/superblue1.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue1/superblue1.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.80;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0536546;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue3","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue3/superblue3.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue3/superblue3.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.87;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0287357;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of superblue5","[regression][density][abu]") {
-    std::ifstream lef("benchmarks/superblue5/superblue5.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/superblue5/superblue5.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.85;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0208419;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
-}
-
-TEST_CASE("density/ abu of b19","[density][abu]") {
-    std::ifstream lef("benchmarks/b19/techlib.lef", std::ifstream::in);
-    std::ifstream def("benchmarks/b19/b19.def", std::ifstream::in);
-    REQUIRE(lef.good());
-    REQUIRE( def.good() );
-    ophidian::standard_cell::standard_cells std_cells;
-    ophidian::netlist::netlist netlist(&std_cells);
-    ophidian::placement::library lib(&std_cells);
-    ophidian::placement::placement cells(&netlist, &lib);
-    ophidian::floorplan::floorplan floorplan;
-    ophidian::placement::lef::read(lef, &std_cells, &lib, &floorplan);
-    ophidian::placement::def::read(def, &netlist, &cells, &floorplan);
-
-    auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
-    unsigned number_of_rows_in_each_bin = 9;
-
-    ophidian::density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
-    double target_utilization = 0.76;
-    double measured_abu = abu.measure_abu(target_utilization);
-    double golden_abu = 0.0259217;
-
-    REQUIRE(measured_abu == Approx(golden_abu));
+TEST_CASE("density/ abu of iccad2015 ckts","[density][abu][regression][iccad2015]") {
+    REQUIRE(run_circuit("superblue18", 0.85, 0.0401271));
+    REQUIRE(run_circuit("superblue16", 0.85, 0.0333554));
+    REQUIRE(run_circuit("superblue4", 0.9, 0.0439752));
+    REQUIRE(run_circuit("superblue10", 0.87, 0.0417409));
+    REQUIRE(run_circuit("superblue7", 0.9, 0.0296557));
+    REQUIRE(run_circuit("superblue1", 0.8, 0.0536546));
+    REQUIRE(run_circuit("superblue3", 0.87, 0.0287357));
+    REQUIRE(run_circuit("superblue5", 0.85, 0.0208419));
 }

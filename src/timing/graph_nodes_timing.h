@@ -23,7 +23,7 @@ under the License.
 
 #include <lemon/list_graph.h>
 #include <boost/units/systems/si.hpp>
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 
 namespace ophidian {
 namespace timing {

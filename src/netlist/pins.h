@@ -22,49 +22,49 @@ under the License.
 #define SRC_NETLIST_PINS_H_
 
 #include <vector>
-#include "../entity/entity.h"
-#include "../entity/vector_property.h"
+#include "../entity_system/entity_system.h"
+#include "../entity_system/vector_property.h"
 
 namespace ophidian {
 namespace netlist {
 
 class pins {
-	entity::system & m_system;
+    entity_system::entity_system & m_system;
 
-	entity::vector_property<std::string> m_names;
-	entity::vector_property<entity::entity> m_owners;
-	entity::vector_property<entity::entity> m_nets;
-	entity::vector_property<entity::entity> m_std_cell_pin;
+    entity_system::vector_property<std::string> m_names;
+    entity_system::vector_property<entity_system::entity> m_owners;
+    entity_system::vector_property<entity_system::entity> m_nets;
+    entity_system::vector_property<entity_system::entity> m_std_cell_pin;
 
 public:
-	pins(entity::system & system);
+    pins(entity_system::entity_system &system);
 	virtual ~pins();
 
-	std::string name(entity::entity pin) const {
+    std::string name(entity_system::entity pin) const {
 		return m_names[m_system.lookup(pin)];
 	}
-	entity::entity owner(entity::entity pin) const {
+    entity_system::entity owner(entity_system::entity pin) const {
 		return m_owners[m_system.lookup(pin)];
 	}
-	entity::entity net(entity::entity pin) const {
+    entity_system::entity net(entity_system::entity pin) const {
 		return m_nets[m_system.lookup(pin)];
 	}
-	entity::entity standard_cell_pin(entity::entity pin) const {
+    entity_system::entity standard_cell_pin(entity_system::entity pin) const {
 		return m_std_cell_pin[m_system.lookup(pin)];
 	}
 
-	std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > owners() const {
+    std::pair< std::vector<entity_system::entity>::const_iterator, std::vector<entity_system::entity>::const_iterator > owners() const {
 		return std::make_pair(m_owners.begin(), m_owners.end());
 	}
 
-	std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > nets() const {
+    std::pair< std::vector<entity_system::entity>::const_iterator, std::vector<entity_system::entity>::const_iterator > nets() const {
 		return std::make_pair(m_nets.begin(), m_nets.end());
 	}
 
-	void name(entity::entity pin, std::string name);
-	void owner(entity::entity pin, entity::entity owner);
-	void net(entity::entity pin, entity::entity net);
-	void standard_cell_pin(entity::entity pin, entity::entity std_cell_pin);
+    void name(entity_system::entity pin, std::string name);
+    void owner(entity_system::entity pin, entity_system::entity owner);
+    void net(entity_system::entity pin, entity_system::entity net);
+    void standard_cell_pin(entity_system::entity pin, entity_system::entity std_cell_pin);
 
 };
 

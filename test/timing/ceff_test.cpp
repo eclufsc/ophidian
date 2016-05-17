@@ -43,7 +43,7 @@ using namespace boost::units::si;
 
 struct simple_driver_model {
     timing::library & lib;
-    entity::entity tarc;
+    entity_system::entity tarc;
     const quantity<si::time> slew;
     quantity<si::time> operator()(const quantity<capacitance> load) const {
         return lib.timing_arc_rise_slew(tarc).compute(load, slew);
@@ -96,7 +96,7 @@ z        z        z        z
     standard_cell::standard_cells std_cell;
     timing::library_timing_arcs tarcs{&std_cell};
     timing::library lib{&tarcs, &std_cell};
-    timing::liberty::read("benchmarks/superblue16/superblue16_Late.lib", lib);
+    timing::liberty::read("input_files/superblue16_Early.lib", lib);
 
 
     auto tarc = lib.timing_arc(std_cell.pin_create(std_cell.cell_create("INV_X1"), "a"), std_cell.pin_create(std_cell.cell_create("INV_X1"), "o"));

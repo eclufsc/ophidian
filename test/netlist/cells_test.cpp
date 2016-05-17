@@ -26,7 +26,7 @@ under the License.
 #include "../netlist/pins.h"
 
 TEST_CASE("cells/assign name","[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
 	auto u1 = cells_system.create();
 	cells.name(u1, "u1");
@@ -34,7 +34,7 @@ TEST_CASE("cells/assign name","[netlist][cells]") {
 }
 
 TEST_CASE("cells/assign cell_type", "[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
 	ophidian::standard_cell::standard_cells std_cells;
 	auto NAND2_X2 = std_cells.cell_create("NAND2_X2");
@@ -44,9 +44,9 @@ TEST_CASE("cells/assign cell_type", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/insert pin", "[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
 	auto u1 = cells_system.create();
 	auto u1a = pins_system.create();
@@ -57,23 +57,23 @@ TEST_CASE("cells/insert pin", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/assign pins", "[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
 	auto u1 = cells_system.create();
-	std::vector<ophidian::entity::entity> cell_pins { pins_system.create(),
+    std::vector<ophidian::entity_system::entity> cell_pins { pins_system.create(),
 			pins_system.create(), pins_system.create() };
 	cells.pins(u1, cell_pins);
 	REQUIRE(cell_pins == cells.pins(u1));
 }
 
 TEST_CASE("cells/find interconnections of a cell", "[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
 
 	auto u1 = cells_system.create();
@@ -91,11 +91,11 @@ TEST_CASE("cells/find interconnections of a cell", "[netlist][cells]") {
 }
 
 TEST_CASE("cells/check cells connected to an interconnection", "[netlist][cells]") {
-	ophidian::entity::system cells_system;
+    ophidian::entity_system::entity_system cells_system;
 	ophidian::netlist::cells cells(cells_system);
-	ophidian::entity::system pins_system;
+    ophidian::entity_system::entity_system pins_system;
 	ophidian::netlist::pins pins(pins_system);
-	ophidian::entity::system nets_system;
+    ophidian::entity_system::entity_system nets_system;
 	ophidian::netlist::nets nets(nets_system);
 
 	auto u1 = cells_system.create();
@@ -119,7 +119,7 @@ TEST_CASE("cells/check cells connected to an interconnection", "[netlist][cells]
 	pins.net(u2a, n1); nets.connect(n1, u2a);
 
 	auto interconnection_pins = nets.pins(n1);
-	std::vector<ophidian::entity::entity> pins_owners;
+    std::vector<ophidian::entity_system::entity> pins_owners;
 	for( auto p : interconnection_pins )
 		pins_owners.push_back(pins.owner(p));
 

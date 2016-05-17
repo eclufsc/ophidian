@@ -41,74 +41,74 @@ library::library(library_timing_arcs * tarcs, ophidian::standard_cell::standard_
 library::~library() {
 }
 
-void library::pin_capacitance(entity::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance) {
+void library::pin_capacitance(entity_system::entity pin, boost::units::quantity<boost::units::si::capacitance> capacitance) {
     m_pin_capacitance[m_std_cells.pin_system().lookup(pin)] = capacitance;
 }
 
-void library::hold_rise_create(entity::entity arc, const library::TestLUT &lut)
+void library::hold_rise_create(entity_system::entity arc, const library::TestLUT &lut)
 {
     m_arc2hold_rise[ m_tarcs.system().lookup(arc) ] = m_tests.size();
     m_tests.push_back(lut);
 }
 
-void library::setup_rise_create(entity::entity arc, const library::TestLUT &lut)
+void library::setup_rise_create(entity_system::entity arc, const library::TestLUT &lut)
 {
     m_arc2setup_rise[ m_tarcs.system().lookup(arc) ] = m_tests.size();
     m_tests.push_back(lut);
 }
 
 
-void library::hold_fall_create(entity::entity arc, const library::TestLUT &lut)
+void library::hold_fall_create(entity_system::entity arc, const library::TestLUT &lut)
 {
     m_arc2hold_fall[ m_tarcs.system().lookup(arc) ] = m_tests.size();
     m_tests.push_back(lut);
 }
 
-void library::setup_fall_create(entity::entity arc, const library::TestLUT &lut)
+void library::setup_fall_create(entity_system::entity arc, const library::TestLUT &lut)
 {
     m_arc2setup_fall[ m_tarcs.system().lookup(arc) ] = m_tests.size();
     m_tests.push_back(lut);
 }
 
-void library::timing_arc_rise_slew(entity::entity arc, const LUT& lut) {
+void library::timing_arc_rise_slew(entity_system::entity arc, const LUT& lut) {
 	m_rise_slews[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_fall_slew(entity::entity arc, const LUT& lut) {
+void library::timing_arc_fall_slew(entity_system::entity arc, const LUT& lut) {
 	m_fall_slews[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_rise_delay(entity::entity arc, const LUT& lut) {
+void library::timing_arc_rise_delay(entity_system::entity arc, const LUT& lut) {
 	m_rise_delays[m_tarcs.system().lookup(arc)] = lut;
 }
 
-void library::timing_arc_fall_delay(entity::entity arc, const LUT& lut) {
+void library::timing_arc_fall_delay(entity_system::entity arc, const LUT& lut) {
 	m_fall_delays[m_tarcs.system().lookup(arc)] = lut;
 }
 
-entity::entity library::cell_create(std::string name) {
+entity_system::entity library::cell_create(std::string name) {
 	return m_std_cells.cell_create(name);
 }
 
-entity::entity library::pin_create(entity::entity cell, std::string name) {
+entity_system::entity library::pin_create(entity_system::entity cell, std::string name) {
     return m_std_cells.pin_create(cell, name);
 }
 
-void library::cell_sequential(entity::entity cell, bool sequential)
+void library::cell_sequential(entity_system::entity cell, bool sequential)
 {
     m_std_cells.cell_sequential(cell, sequential);
 }
 
-void library::pin_clock_input(entity::entity pin, bool clock_input)
+void library::pin_clock_input(entity_system::entity pin, bool clock_input)
 {
     m_std_cells.pin_clock_input(pin, clock_input);
 }
 
-void library::timing_arc_timing_sense(entity::entity arc, unateness timing_sense) {
+void library::timing_arc_timing_sense(entity_system::entity arc, unateness timing_sense) {
     m_timing_senses[m_tarcs.system().lookup(arc)] = timing_sense;
 }
 
-void library::timing_arc_timing_type(entity::entity arc, timing_arc_types type)
+void library::timing_arc_timing_type(entity_system::entity arc, timing_arc_types type)
 {
     m_timing_types[m_tarcs.system().lookup(arc)] = type;
 }

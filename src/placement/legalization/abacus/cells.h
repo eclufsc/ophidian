@@ -22,7 +22,7 @@ under the License.
 #define OPHIDIAN_ABACUS_CELLS_H
 
 #include <vector_property.h>
-#include "entity.h"
+#include "entity_system.h"
 #include "../../../geometry/geometry.h"
 
 namespace ophidian {
@@ -32,41 +32,40 @@ namespace ophidian {
                 class cells {
                     using point = geometry::point<double>;
 
-                    entity::system & m_system;
+                    entity_system::entity_system & m_system;
 
-                    entity::vector_property<entity::entity> m_netlist_cells;
-                    entity::vector_property<unsigned> m_order_ids;
-                    entity::vector_property<point> m_positions;
-                    entity::vector_property<double> m_widths;
-                    entity::vector_property<double> m_weights;
+                    entity_system::vector_property<entity_system::entity> m_netlist_cells;
+                    entity_system::vector_property<unsigned> m_order_ids;
+                    entity_system::vector_property<point> m_positions;
+                    entity_system::vector_property<double> m_weights;
 
                 public:
-                    cells(entity::system & system);
+                    cells(entity_system::entity_system & system);
 
-                    entity::entity netlist_cell(entity::entity cell) const {
+                    entity_system::entity netlist_cell(entity_system::entity cell) const {
                         return m_netlist_cells[m_system.lookup(cell)];
                     }
-                    void netlist_cell(entity::entity cell, entity::entity netlist_cell);
+                    void netlist_cell(entity_system::entity cell, entity_system::entity netlist_cell);
 
-                    unsigned order_id(entity::entity cell) const {
+                    unsigned order_id(entity_system::entity cell) const {
                         return m_order_ids[m_system.lookup(cell)];
                     }
-                    void order_id(entity::entity cell, unsigned order_id);
+                    void order_id(entity_system::entity cell, unsigned order_id);
 
-                    point position(entity::entity cell) const {
+                    point position(entity_system::entity cell) const {
                         return m_positions[m_system.lookup(cell)];
                     }
-                    void position(entity::entity cell, point position);
+                    void position(entity_system::entity cell, point position);
 
-                    double width(entity::entity cell) const {
+                    double width(entity_system::entity cell) const {
                         return m_widths[m_system.lookup(cell)];
                     }
-                    void width(entity::entity cell, double width);
+                    void width(entity_system::entity cell, double width);
 
-                    double weight(entity::entity cell) const {
+                    double weight(entity_system::entity cell) const {
                         return m_weights[m_system.lookup(cell)];
                     }
-                    void weight(entity::entity cell, double weight);
+                    void weight(entity_system::entity cell, double weight);
                 };
             }
         }
@@ -74,4 +73,4 @@ namespace ophidian {
 }
 
 
-#endif //OPHIDIAN_ABACUS_CELLS_H
+#endif //OPHIDIAN_CELLS_H

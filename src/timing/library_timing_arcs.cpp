@@ -34,13 +34,13 @@ library_timing_arcs::library_timing_arcs(standard_cell::standard_cells * std_cel
 library_timing_arcs::~library_timing_arcs() {
 }
 
-entity::entity library_timing_arcs::create(entity::entity from, entity::entity to) {
+entity_system::entity library_timing_arcs::create(entity_system::entity from, entity_system::entity to) {
 	auto pair = std::make_pair(from, to);
 	auto result = m_pinpair2arc.find(pair);
 	if (result != m_pinpair2arc.end())
 		return result->second;
 
-	entity::entity arc = m_system.create();
+        entity_system::entity arc = m_system.create();
 	m_pinpair2arc[pair] = arc;
 	m_from[m_system.lookup(arc)] = from;
 	m_to[m_system.lookup(arc)] = to;
@@ -49,11 +49,11 @@ entity::entity library_timing_arcs::create(entity::entity from, entity::entity t
 	return arc;
 }
 
-entity::entity library_timing_arcs::get(entity::entity from, entity::entity to) const {
+entity_system::entity library_timing_arcs::get(entity_system::entity from, entity_system::entity to) const {
 	return m_pinpair2arc.at(std::make_pair(from, to));
 }
 
-void library_timing_arcs::register_property(entity::property* property) {
+void library_timing_arcs::register_property(entity_system::property* property) {
 	m_system.register_property(property);
 }
 

@@ -24,26 +24,27 @@ under the License.
 #include <boost/geometry/index/rtree.hpp>
 #include "floorplan.h"
 #include <placement.h>
+#include <entity_system.h>
 
 namespace ophidian {
     namespace placement {
         namespace legalization {
             using point = geometry::point<double>;
             using box = geometry::box<point>;
-            using rtree_node = std::pair<box, entity::entity>;
+            using rtree_node = std::pair<box, entity_system::entity>;
             using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
             class subrows {
 
-                entity::system & m_system;
+                entity_system::entity_system & m_system;
 
-                entity::vector_property<double> m_begin;
-                entity::vector_property<double> m_end;
-                entity::vector_property<entity::entity> m_row;
+                entity_system::vector_property<double> m_begin;
+                entity_system::vector_property<double> m_end;
+                entity_system::vector_property<entity_system::entity> m_row;
 
                 rtree subrows_rtree;
             public:
 
-                subrows(entity::system & system)
+                subrows(entity_system::entity_system & system)
                     : m_system(system){
                     m_system.register_property(&m_begin);
                     m_system.register_property(&m_end);
@@ -56,22 +57,22 @@ namespace ophidian {
 
                 void create_subrows(floorplan::floorplan * floorplan, placement * placement);
 
-                double begin(entity::entity subrow) {
+                double begin(entity_system::entity subrow) {
                     return m_begin[m_system.lookup(subrow)];
                 }
-                void begin(entity::entity subrow, double begin);
+                void begin(entity_system::entity subrow, double begin);
 
-                double end(entity::entity subrow) {
+                double end(entity_system::entity subrow) {
                     return m_end[m_system.lookup(subrow)];
                 }
-                void end(entity::entity subrow, double end);
+                void end(entity_system::entity subrow, double end);
 
-                entity::entity row(entity::entity subrow) {
+                entity_system::entity row(entity_system::entity subrow) {
                     return m_row[m_system.lookup(subrow)];
                 }
-                void row(entity::entity subrow, entity::entity row);
+                void row(entity_system::entity subrow, entity_system::entity row);
 
-                entity::entity find_subrow(point coordinate);
+                entity_system::entity find_subrow(point coordinate);
 
             };
 

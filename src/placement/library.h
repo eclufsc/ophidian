@@ -21,8 +21,8 @@ under the License.
 #ifndef SRC_PLACEMENT_LIBRARY_H_
 #define SRC_PLACEMENT_LIBRARY_H_
 
-#include "../entity/property.h"
-#include "../entity/vector_property.h"
+#include "../entity_system/property.h"
+#include "../entity_system/vector_property.h"
 #include "../standard_cell/standard_cells.h"
 #include "../geometry/geometry.h"
 #include <boost/bimap.hpp>
@@ -45,17 +45,11 @@ class library {
 	using polygon = geometry::polygon<point>;
 	using multipolygon = geometry::multi_polygon<polygon>;
 
-	const entity::system & m_cell_system;
-	const entity::system & m_pin_system;
-
-
-	entity::vector_property< multipolygon > m_cell_geometry;
-
-	entity::vector_property< point > m_pin_offset;
-
+    ophidian::standard_cell::standard_cells & m_std_cells;
+    entity_system::vector_property< multipolygon > m_cell_geometry;
+    entity_system::vector_property< point > m_pin_offset;
 
     int32_t m_dist2microns;
-
 
 public:
 	/// Constructor.
@@ -72,11 +66,8 @@ public:
 	 * \param cell Cell to get the geometry.
 	 * \return Multi polygon representing the cell geometry.
 	 */
-	multipolygon geometry(entity::entity cell) const {
-		auto cell_index = m_cell_system.lookup(cell);
-		auto geometry = m_cell_geometry[cell_index];
-		return geometry;
-//		return m_cell_geometry[m_cell_system.lookup(cell)];
+    multipolygon geometry(entity_system::entity cell) const {
+        return m_cell_geometry[m_std_cells.cell_system().lookup(cell)];
 	}
 	/// Cell geometry setter.
 	/**
@@ -84,7 +75,10 @@ public:
 	 * \param cell Cell to set the geometry.
 	 * \param geometry Multi polygon representing the cell geometry.
 	 */
-	void geometry(entity::entity cell, multipolygon geometry);
+    void geometry(entity_system::entity cell, multipolygon geometry);
+
+
+    entity_system::entity cell_create(std::string name);
 
 	/// Distance unit to microns ratio getter.
 	/**
@@ -102,16 +96,18 @@ public:
 	 * \param pin Pin to set the offset.
 	 * \param offset Point describing the pin offset.
 	 */
-    void pin_offset(entity::entity pin, point offset);
+    void pin_offset(entity_system::entity pin, point offset);
 	/// Pin offset getter.
 	/**
 	 * Returns the offset of a pin with relation to its owner cell.
 	 * \param pin Pin to get the offset.
 	 * \return Point describing the pin offset.
 	 */
-    point pin_offset(entity::entity pin) const {
-    	return m_pin_offset[m_pin_system.lookup(pin)];
+    point pin_offset(entity_system::entity pin) const {
+        return m_pin_offset[m_std_cells.pin_system().lookup(pin)];
     }
+
+    entity_system::entity pin_create(entity_system::entity cell, std::string name);
 
 	/// Distance unit to microns ratio setter.
 	/**
@@ -119,7 +115,6 @@ public:
 	 * \param dist Number of microns in a distance unit.
 	 */
     void dist2microns(int32_t dist);
-
 
 };
 

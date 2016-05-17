@@ -64,7 +64,7 @@ rc_tree &rc_tree::operator=(const rc_tree &other)
 rc_tree::~rc_tree() {
 }
 
-packed_rc_tree rc_tree::pack(capacitor_id source)
+packed_rc_tree rc_tree::pack(capacitor_id source) const
 {
     packed_rc_tree result(capacitor_count());
 

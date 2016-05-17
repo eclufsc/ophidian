@@ -3,7 +3,7 @@
 sf::Font resources::m_font;
 
 void resources::load_resources(){
-    if(!resources::m_font.loadFromFile("fonts/sourcesans/SourceSansPro-ExtraLight.ttf"))
+    if(!resources::m_font.loadFromFile("../../3rdparty/fonts/sourcesans/SourceSansPro-ExtraLight.ttf"))
         throw std::runtime_error("cannot load font fonts/sourcesans/SourceSansPro-ExtraLight.ttf");
 }
 

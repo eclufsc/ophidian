@@ -126,7 +126,7 @@ public:
 		return m_graph;
 	}
 
-    packed_rc_tree pack(capacitor_id source);
+    packed_rc_tree pack(capacitor_id source) const;
 
 };
 

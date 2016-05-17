@@ -21,9 +21,6 @@ under the License.
 #include "../catch.hpp"
 
 #include "../geometry/geometry.h"
-#include "../netlist/verilog.h"
-#include "../placement/def.h"
-#include "../placement/lef.h"
 #include "../placement/placement.h"
 
 #include "../timing/endpoints.h"
@@ -66,6 +63,8 @@ double measure_HPWL(ophidian::netlist::netlist& netlist, ophidian::placement::pl
     return HPWL;
 }
 
+
+#include "../floorplan/floorplan.h"
 TEST_CASE("regression/hpwl", "[regression][hpwl]") {
     std::vector<std::string> circuits { "simple", "superblue16" };
     std::vector<double> golden_HPWL { 36.4645, 9.08702e+07 };
@@ -77,13 +76,15 @@ TEST_CASE("regression/hpwl", "[regression][hpwl]") {
         REQUIRE(dot_lef.good());
         REQUIRE(dot_v.good());
         ophidian::standard_cell::standard_cells std_cells;
+
+        ophidian::floorplan::floorplan fplan;
+
         ophidian::netlist::netlist netlist(&std_cells);
         ophidian::placement::library library(&std_cells);
         ophidian::placement::placement placement(&netlist, &library);
-        ophidian::floorplan::floorplan floorplan;
-        ophidian::placement::def::read(dot_def, &netlist, &placement, &floorplan);
-        ophidian::placement::lef::read(dot_lef, &std_cells, &library, &floorplan);
-        ophidian::netlist::verilog::read(dot_v, &netlist);
+        // READ DEF
+        // READ LEF
+        // READ V
         double HPWL = measure_HPWL(netlist, placement, library);
         std::stringstream ss;
         ss.precision(5);
@@ -128,8 +129,7 @@ struct circuit {
 
     circuit(const std::string & name, double clk)
     {
-        std::ifstream dot_v("benchmarks/"+name+"/"+name+".v", std::ifstream::in);
-        netlist::verilog::read(dot_v, &netlist);
+//        std::ifstream dot_v("benchmarks/"+name+"/"+name+".v", std::ifstream::in); TODO READ V
 #pragma omp critical
         {
         timing::liberty::read("benchmarks/"+name+"/"+name+"_Late.lib", lib_late);
@@ -139,9 +139,11 @@ struct circuit {
         timing::liberty::read("benchmarks/"+name+"/"+name+"_Early.lib", lib_early);
         }
         std::ifstream dot_def("benchmarks/"+name+"/"+name+".def", std::ifstream::in);
-        placement::def::read(dot_def, &netlist, &placement, &floorplan);
+//        placement::def::read(dot_def, &netlist, &placement, &floorplan); TODO READ DEF
         std::ifstream dot_lef("benchmarks/"+name+"/"+name+".lef", std::ifstream::in);
-        placement::lef::read(dot_lef, &std_cells, &placement_lib, &floorplan);
+
+
+//        placement::lef::read(dot_lef, &std_cells, &placement_lib); TODO READ LEF
         dc = timing::default_design_constraints{netlist}.dc();
         dc.clock.period = clk;
         for(auto driver : dc.input_drivers)
@@ -277,5 +279,8 @@ TEST_CASE("regression/iccad 2015 sta", "[regression][sta][flute]") {
         }
     }
     }
+
+
+
 
 }

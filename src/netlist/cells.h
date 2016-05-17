@@ -22,29 +22,30 @@ under the License.
 #define SRC_NETLIST_CELLS_H_
 
 #include <vector>
-#include "../entity/vector_property.h"
+#include "../entity_system/entity_system.h"
+#include "../entity_system/vector_property.h"
 #include "../standard_cell/standard_cells.h"
 
 namespace ophidian {
 namespace netlist {
 
 class cells {
-	entity::system & m_system;
+    entity_system::entity_system & m_system;
 
-	entity::vector_property<std::string> m_names;
-	entity::vector_property<entity::entity> m_standard_cells;
-	entity::vector_property<std::vector<entity::entity> > m_pins;
+    entity_system::vector_property<std::string> m_names;
+    entity_system::vector_property<entity_system::entity> m_standard_cells;
+    entity_system::vector_property<std::vector<entity_system::entity> > m_pins;
 public:
-	cells(entity::system & system);
+    cells(entity_system::entity_system &system);
 	virtual ~cells();
 
-	std::string name(entity::entity cell) const {
+    std::string name(entity_system::entity cell) const {
 		return m_names[m_system.lookup(cell)];
 	}
-	entity::entity standard_cell(entity::entity cell) const {
+    entity_system::entity standard_cell(entity_system::entity cell) const {
 		return m_standard_cells[m_system.lookup(cell)];
 	}
-	std::vector<entity::entity> pins(entity::entity cell) const {
+    const std::vector<entity_system::entity> & pins(entity_system::entity cell) const {
 		return m_pins[m_system.lookup(cell)];
 	}
 
@@ -52,18 +53,21 @@ public:
 		return std::make_pair(m_names.begin(), m_names.end());
 	}
 
-	std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > standard_cells() const {
+    std::pair< std::vector<entity_system::entity>::const_iterator, std::vector<entity_system::entity>::const_iterator > standard_cells() const {
 		return std::make_pair(m_standard_cells.begin(), m_standard_cells.end());
 	}
 
-	std::pair< std::vector<std::vector<entity::entity>>::const_iterator, std::vector<std::vector<entity::entity>>::const_iterator > pins() const {
+    std::pair< std::vector<std::vector<entity_system::entity>>::const_iterator, std::vector<std::vector<entity_system::entity>>::const_iterator > pins() const {
 		return std::make_pair(m_pins.begin(), m_pins.end());
 	}
 
-	void insert_pin(entity::entity cell, entity::entity pin);
-	void pins(entity::entity cell, std::vector<entity::entity> pins);
-	void name(entity::entity cell, std::string name);
-	void standard_cell(entity::entity cell, entity::entity std_cell);
+    void insert_pin(entity_system::entity cell, entity_system::entity pin);
+    void pins(entity_system::entity cell, std::vector<entity_system::entity> pins);
+    void name(entity_system::entity cell, std::string name);
+    void standard_cell(entity_system::entity cell, entity_system::entity std_cell);
+
+
+    void pins_preallocate(entity_system::entity cell, std::size_t pin_count);
 
 };
 

@@ -23,7 +23,7 @@ under the License.
 #include "sites.h"
 
 TEST_CASE("sites/assign name", "[floorplan][sites]") {
-    ophidian::entity::system sites_system;
+    ophidian::entity_system::entity_system sites_system;
     ophidian::floorplan::sites sites(sites_system);
 
     auto core_site = sites_system.create();
@@ -33,7 +33,7 @@ TEST_CASE("sites/assign name", "[floorplan][sites]") {
 }
 
 TEST_CASE("sites/assign dimensions", "[floorplan][sites]") {
-    ophidian::entity::system sites_system;
+    ophidian::entity_system::entity_system sites_system;
     ophidian::floorplan::sites sites(sites_system);
 
     auto core_site = sites_system.create();
@@ -43,7 +43,7 @@ TEST_CASE("sites/assign dimensions", "[floorplan][sites]") {
 }
 
 TEST_CASE("sites/read property from removed site", "[floorplan][sites]") {
-    ophidian::entity::system sites_system;
+    ophidian::entity_system::entity_system sites_system;
     ophidian::floorplan::sites sites(sites_system);
 
     auto core_site = sites_system.create();

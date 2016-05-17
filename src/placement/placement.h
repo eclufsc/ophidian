@@ -52,7 +52,7 @@ public:
 	 * \return Multi polygon with the cell geometry.
 	 */
 	geometry::multi_polygon<geometry::polygon<geometry::point<double> > > cell_geometry(
-			entity::entity cell) const {
+            entity_system::entity cell) const {
         auto position = cell_position(cell);
         auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
         geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
@@ -65,7 +65,7 @@ public:
 	 * \param cell Cell to move.
 	 * \param position Target position of the cell.
 	 */
-	void cell_position(entity::entity cell,
+    void cell_position(entity_system::entity cell,
 			geometry::point<double> position);
 	/// Cell position getter.
 	/**
@@ -73,11 +73,11 @@ public:
 	 * \param cell Cell to get the position.
 	 * \return Point describing the cell position.
 	 */
-	geometry::point<double> cell_position(entity::entity cell) const {
+    geometry::point<double> cell_position(entity_system::entity cell) const {
 		return m_cells.position(cell);
 	}
-	void cell_fixed(entity::entity cell, bool fixed);
-	bool cell_fixed(entity::entity cell) const {
+    void cell_fixed(entity_system::entity cell, bool fixed);
+    bool cell_fixed(entity_system::entity cell) const {
 		return m_cells.fixed(cell);
 	}
 	geometry::point<double> cell_dimensions(entity::entity cell) const {
@@ -88,18 +88,20 @@ public:
 		return dimensions;
 	}
 
+    entity_system::entity cell_create(std::string name, std::string type);
+
 	/// Pin position getter.
 	/**
 	 * Returns the position of a pin, calculated from the cell position and the pin offset.
 	 * \param pin Pin to get the position.
 	 * \return Point describing the pin position.
 	 */
-	geometry::point<double> pin_position(entity::entity pin) const {
-		entity::entity owner = m_netlist->pin_owner(pin);
-		entity::entity std_cell_pin = m_netlist->pin_std_cell(pin);
+    geometry::point<double> pin_position(entity_system::entity pin) const {
+        entity_system::entity owner = m_netlist->pin_owner(pin);
+        entity_system::entity std_cell_pin = m_netlist->pin_std_cell(pin);
 
 		geometry::point<double> position = m_library->pin_offset(std_cell_pin);
-		if(!(owner == entity::entity{}))
+        if(!(owner == entity_system::invalid_entity))
 		{
 			auto owner_position = m_cells.position(owner);
 			position.x( position.x() + owner_position.x() );
@@ -114,7 +116,7 @@ public:
 	 * \param pad Pad to move.
 	 * \param position Target position of the pad.
 	 */
-	void pad_position(entity::entity pad, geometry::point<double> position);
+    void pad_position(entity_system::entity pad, geometry::point<double> position);
 
 
 	/// Netlist getter.

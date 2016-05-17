@@ -41,7 +41,7 @@ TEST_CASE("legalization/create subrows","[legalization][subrows]") {
     placement.cell_position(cell, {100, 0});
     placement.cell_fixed(cell, true);
 
-    ophidian::entity::system subrows_system;
+    ophidian::entity_system::entity_system subrows_system;
     ophidian::placement::legalization::subrows subrows(subrows_system);
     subrows.create_subrows(&floorplan, &placement);
     REQUIRE(subrows.count() == 2);

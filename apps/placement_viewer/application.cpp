@@ -2,14 +2,16 @@
 
 #include <fstream>
 
-#include "../../src/placement/lef.h"
-#include "../../src/placement/def.h"
-#include "../../src/netlist/verilog.h"
+
 #include "../../src/timing/liberty.h"
 
 #include "../../src/timing/graph_builder.h"
 
 #include "../../src/standard_cell/standard_cells.h"
+
+#include "../../src/parsing/def.h"
+#include "../../src/parsing/lef.h"
+#include "../../src/parsing/verilog.h"
 
 #include <omp.h>
 
@@ -22,20 +24,13 @@ application::application(const std::string v_file, const std::string lef_file, c
 
 
 {
-    std::ifstream dot_lef(lef_file.c_str(), std::ifstream::in);
-    std::ifstream dot_v(v_file.c_str(), std::ifstream::in);
-    std::ifstream dot_def(def_file.c_str(), std::ifstream::in);
-    if (!dot_def.good() || !dot_v.good() || !dot_def.good())
-        throw std::runtime_error("Error reading the files");
 
 
     std::cout << "reading inputs..." << std::endl;
-    ophidian::netlist::verilog::read(dot_v, &m_netlist);
-    dot_v.close();
-    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library, &m_floorplan);
-    dot_lef.close();
-    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan);
-    dot_def.close();
+
+
+//    ophidian::placement::lef::read(dot_lef, &m_std_cells, &m_library); TODO READ LEF
+//    ophidian::placement::def::read(dot_def, &m_netlist, &m_placement, &m_floorplan); TODO READ DEF
     ophidian::timing::liberty::read(lib_file, m_timing_library);
 
 
@@ -85,7 +80,7 @@ application::~application() {
 
 
 std::vector<rtree_node> application::create_rtree_nodes(
-        ophidian::entity::entity cell) {
+        ophidian::entity_system::entity cell) {
 
     auto geometry = m_placement.cell_geometry(cell);
     std::vector<rtree_node> nodes;
@@ -99,7 +94,7 @@ std::vector<rtree_node> application::create_rtree_nodes(
 }
 
 
-void application::place_cell_and_update_index(ophidian::entity::entity cell,
+void application::place_cell_and_update_index(ophidian::entity_system::entity cell,
                                               point position) {
     // remove from index
     std::vector<rtree_node> nodes = create_rtree_nodes(cell);
@@ -124,17 +119,17 @@ void application::place_cell_and_update_index(ophidian::entity::entity cell,
 
 }
 
-ophidian::entity::entity application::get_cell(point position) const
+ophidian::entity_system::entity application::get_cell(point position) const
 {
     std::vector<rtree_node> result;
     m_position2cellentity.query(boost::geometry::index::contains(position),
                                 std::back_inserter(result));
     if(result.empty())
-        return ophidian::entity::entity{};
+        return ophidian::entity_system::entity{};
     return result.front().second;
 }
 
-bool application::cell_std_cell(ophidian::entity::entity cell, std::string std_cell_name)
+bool application::cell_std_cell(ophidian::entity_system::entity cell, std::string std_cell_name)
 {
     auto old_rtree_nodes = create_rtree_nodes(cell);
     bool result = m_netlist.cell_std_cell(cell, std_cell_name);
@@ -146,7 +141,7 @@ bool application::cell_std_cell(ophidian::entity::entity cell, std::string std_c
     return result;
 }
 
-boost::units::quantity<boost::units::si::time> application::cell_worst_slack(ophidian::entity::entity cell) const
+boost::units::quantity<boost::units::si::time> application::cell_worst_slack(ophidian::entity_system::entity cell) const
 {
 //    boost::units::quantity<boost::units::si::time> worst = std::numeric_limits<boost::units::quantity<boost::units::si::time> >::infinity();
 //    auto cell_pins = m_netlist.cell_pins(cell);
@@ -167,28 +162,28 @@ void application::run_sta()
 
 }
 
-boost::units::quantity<boost::units::si::time> application::rise_arrival(ophidian::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::rise_arrival(ophidian::entity_system::entity pin) const
 {
 //    return m_sta->rise_arrival(pin);
 }
 
-boost::units::quantity<boost::units::si::time> application::fall_arrival(ophidian::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::fall_arrival(ophidian::entity_system::entity pin) const
 {
 //    return  m_sta->fall_arrival(pin);
 }
 
-boost::units::quantity<boost::units::si::time> application::fall_slack(ophidian::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::fall_slack(ophidian::entity_system::entity pin) const
 {
 //    return m_sta->fall_slack(pin);
 }
 
-std::vector<ophidian::entity::entity> application::critical_path() const
+std::vector<ophidian::entity_system::entity> application::critical_path() const
 {
 //    return m_sta->critical_path();
 
 }
 
-boost::units::quantity<boost::units::si::time> application::rise_slack(ophidian::entity::entity pin) const
+boost::units::quantity<boost::units::si::time> application::rise_slack(ophidian::entity_system::entity pin) const
 {
 //    return m_sta->rise_slack(pin);
 }

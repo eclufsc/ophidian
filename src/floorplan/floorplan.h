@@ -21,9 +21,10 @@ under the License.
 #ifndef ophidian_FLOORPLAN_H
 #define ophidian_FLOORPLAN_H
 
-#include <entity.h>
+#include <entity_system.h>
 #include "rows.h"
 #include "sites.h"
+#include <unordered_map>
 
 namespace ophidian {
     /// Namespace describing floorplan entities and basic floorplan interface.
@@ -35,8 +36,8 @@ namespace ophidian {
         class floorplan {
             using point = geometry::point<double>;
 
-            entity::system m_sites_system;
-            entity::system m_rows_system;
+            entity_system::entity_system m_sites_system;
+            entity_system::entity_system m_rows_system;
 
             sites m_sites;
             rows m_rows;
@@ -44,7 +45,7 @@ namespace ophidian {
             point m_chip_origin;
             point m_chip_boundaries;
 
-            std::unordered_map<std::string, entity::entity> m_name2site;
+            std::unordered_map<std::string, entity_system::entity> m_name2site;
 
         public:
             floorplan();
@@ -71,13 +72,13 @@ namespace ophidian {
              * \param dimensions Point describing the site dimensions.
              * \return The created site.
              */
-            entity::entity site_insert(std::string name, point dimensions);
+            entity_system::entity site_insert(std::string name, point dimensions);
             /// Destroys a site.
             /**
              * Destroys an existing site.
              * \param site Site to be destroyed.
              */
-            void site_destroy(entity::entity site);
+            void site_destroy(entity_system::entity site);
 
             /// Returns the number of sites.
             /**
@@ -94,7 +95,7 @@ namespace ophidian {
              * \param site Site entity to get the name.
              * \return Name of the site.
              */
-            std::string site_name(entity::entity site) const {
+            std::string site_name(entity_system::entity site) const {
                 return m_sites.name(site);
             }
             /// Site dimensions getter.
@@ -103,7 +104,7 @@ namespace ophidian {
              * \param site Site entity to get the dimensions.
              * \return Point describing the site dimensions.
              */
-            point site_dimensions(entity::entity site) const {
+            point site_dimensions(entity_system::entity site) const {
                 return m_sites.dimensions(site);
             }
             /// Sites properties getter.
@@ -124,15 +125,15 @@ namespace ophidian {
              * \param origin Point describing the row origin.
              * \return The created row.
              */
-            entity::entity row_insert(entity::entity site, unsigned number_of_sites, point origin);
-            entity::entity row_insert(std::string site, unsigned number_of_sites, point origin);
+            entity_system::entity row_insert(entity_system::entity site, unsigned number_of_sites, point origin);
+            entity_system::entity row_insert(std::string site, unsigned number_of_sites, point origin);
 
             /// Destroys a row.
             /**
              * Destroys an existing row.
              * \param row Row to be destroyed.
              */
-            void row_destroy(entity::entity row);
+            void row_destroy(entity_system::entity row);
 
             /// Returns the number of rows.
             /**
@@ -149,7 +150,7 @@ namespace ophidian {
              * \param row Row entity to get the site.
              * \return Entity representing the site of the row.
              */
-            entity::entity row_site(entity::entity row) const {
+            entity_system::entity row_site(entity_system::entity row) const {
                 return m_rows.site(row);
             }
             /// Row number of sites getter.
@@ -158,7 +159,7 @@ namespace ophidian {
              * \param row Row entity to get the number of sites.
              * \return Number of sites in that row.
              */
-            unsigned row_number_of_sites(entity::entity row) const {
+            unsigned row_number_of_sites(entity_system::entity row) const {
                 return m_rows.number_of_sites(row);
             }
             /// Row origin getter.
@@ -167,7 +168,7 @@ namespace ophidian {
              * \param row Row entity to get the origin.
              * \return Point describing the origin of that row.
              */
-            point row_origin(entity::entity row) const {
+            point row_origin(entity_system::entity row) const {
                 return m_rows.origin(row);
             }
             /// Row dimensions getter.
@@ -176,7 +177,7 @@ namespace ophidian {
              * \param row Row entity to gets the dimensions.
              * \return Point describing the dimensions of that row.
              */
-            point row_dimensions(entity::entity row) const;
+            point row_dimensions(entity_system::entity row) const;
             /// Rows properties getter.
             /**
              * Returns the object describing rows properties.
@@ -186,7 +187,7 @@ namespace ophidian {
                 return m_rows;
             }
 
-            const entity::system & rows_system() const {
+            const entity_system::entity_system & rows_system() const {
                 return m_rows_system;
             };
         };

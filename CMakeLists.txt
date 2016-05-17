@@ -30,13 +30,16 @@ if (OPENMP_FOUND)
 endif()
 
 
-# Detect and add SFML
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
-#Find any version 2.X of SFML
-#See the FindSFML.cmake file for additional details and instructions
-find_package(SFML 2 REQUIRED system window graphics network audio)
+set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
+
+
 
 
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(apps)
+#add_subdirectory(apps)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+${CMAKE_SOURCE_DIR}/3rdparty
+${CMAKE_BINARY_DIR}/3rdparty)
+

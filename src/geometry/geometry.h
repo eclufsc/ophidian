@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_GEOMETRY_POINT_H
-#define OPENEDA_GEOMETRY_POINT_H
+#ifndef OPHIDIAN_SRC_GEOMETRY_H
+#define OPHIDIAN_SRC_GEOMETRY_H
 
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -32,6 +32,7 @@ under the License.
 
 #include <boost/geometry/io/wkt/wkt.hpp>
 
+#include <limits>
 #include <cmath>
 
 namespace ophidian {
@@ -54,6 +55,15 @@ void translate(Geometry geometry, point<CoordinateType> point,
 //	boost::geometry::correct(result);
 }
 
+template<class Geometry, class CoordinateType>
+void scale(Geometry geometry, point<CoordinateType> point,
+                Geometry & result) {
+        boost::geometry::strategy::transform::scale_transformer<CoordinateType,
+                        2, 2> translate(point.x(), point.y());
+        boost::geometry::transform(geometry, result, translate);
+//	boost::geometry::correct(result);
+}
+
 template<class CoordinateType>
 CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<CoordinateType> & p2)
 {
@@ -64,7 +74,12 @@ CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<
 using boost::geometry::equals;
 using boost::geometry::wkt;
 
+using boost::geometry::correct;
+using boost::geometry::append;
+using boost::geometry::envelope;
+
+
 }
 }
 
-#endif //OPENEDA_POINT_H
+#endif //OPHIDIAN_SRC_GEOMETRY_H

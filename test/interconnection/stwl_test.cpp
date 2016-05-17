@@ -29,7 +29,7 @@ TEST_CASE("interconnection_estimation/stwl test with two points", "[interconnect
     };
     double StWL{ophidian::interconnection::stwl(points)};
     double HPWL{ophidian::interconnection::hpwl(points)};
-    REQUIRE( StWL == HPWL );
+    REQUIRE( Approx(StWL) == HPWL );
 }
 
 TEST_CASE("interconnection_estimation/stwl test with three points", "[interconnection][stwl]") {
@@ -40,7 +40,7 @@ TEST_CASE("interconnection_estimation/stwl test with three points", "[interconne
     };
     double StWL{ophidian::interconnection::stwl(points)};
     double HPWL{ophidian::interconnection::hpwl(points)};
-    REQUIRE( StWL == HPWL );
+    REQUIRE( Approx(StWL) == HPWL );
 }
 
 TEST_CASE("interconnection_estimation/stwl test with four points", "[interconnection][stwl]") {
@@ -51,5 +51,5 @@ TEST_CASE("interconnection_estimation/stwl test with four points", "[interconnec
         ophidian::geometry::point<double>{207, 445}
     };
     double StWL{ophidian::interconnection::stwl(points)};
-    REQUIRE( StWL == 797.0 );
+    REQUIRE( Approx(StWL) == 797.0 );
 }

@@ -146,7 +146,7 @@ void read_constraint(si2drGroupIdT group, library::TestLUT*& test_LUT, boost::un
     si2drIterQuit(attrs, &err);
 }
 
-void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit, bool setup, bool hold) {
+void read_LUTs(si2drGroupIdT timing, entity_system::entity arc, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit, bool setup, bool hold) {
 
     si2drGroupsIdT groups = si2drGroupGetGroups(timing, &err);
     si2drGroupIdT group;
@@ -193,14 +193,14 @@ void read_LUTs(si2drGroupIdT timing, entity::entity arc, library& library, boost
 
 }
 
-void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit) {
+void read_timing(si2drGroupIdT timing, entity_system::entity pin_entity, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit) {
 
     std::string timing_sense { "negative_unate" };
     std::string timing_type { "combinational" };
     std::string related_pin { "default_related_pin" };
     si2drAttrsIdT attrs = si2drGroupGetAttrs(timing, &err);
     si2drAttrIdT attr;
-    entity::entity from;
+    entity_system::entity from;
 
     while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
         std::string attr_name { si2drAttrGetName(attr, &err) };
@@ -261,7 +261,7 @@ void read_timing(si2drGroupIdT timing, entity::entity pin_entity, library& libra
 
 }
 
-void read_pin(entity::entity cell_entity, si2drGroupIdT pin, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit) {
+void read_pin(entity_system::entity cell_entity, si2drGroupIdT pin, library& library, boost::units::quantity<boost::units::si::time> time_unit, boost::units::quantity<boost::units::si::capacitance> capacitive_load_unit) {
 
     si2drNamesIdT current_cell_group_names = si2drGroupGetNames(pin, &err);
     std::string pin_name { si2drIterNextName(current_cell_group_names, &err) };

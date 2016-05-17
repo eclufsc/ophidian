@@ -19,33 +19,47 @@ under the License.
  */
 
 #include "../catch.hpp"
+#include "../parsing/def.h"
 
-#include <def.h>
-#include "../placement/placement.h"
-#include <boost/geometry/algorithms/equals.hpp>
-#include <iostream>
-#include <fstream>
+TEST_CASE("cadence def read", "[cadence][def]") {
 
-TEST_CASE("def read", "[def]") {
+    const std::string filename{"input_files/superblue16.def"};
+    ophidian::parsing::def def{filename};
 
-    std::ifstream superblue16_def("benchmarks/superblue16/superblue16.def", std::ifstream::in);
-	REQUIRE( superblue16_def.good() );
-	ophidian::standard_cell::standard_cells std_cells;
-	ophidian::netlist::netlist netlist(&std_cells);
-	ophidian::placement::library lib(&std_cells);
-	ophidian::placement::placement cells(&netlist, &lib);
-	ophidian::floorplan::floorplan floorplan;
-	ophidian::placement::def::read(superblue16_def, &netlist, &cells, &floorplan);
+    REQUIRE( def.rows().size() == 1788 );
+    REQUIRE( def.components().size() == 981559 );
+    REQUIRE( def.rows().at(1776).name == "coreROW_1777" );
 
-	auto position = cells.cell_position(netlist.cell_insert("o641083", "INV_Z4"));
-	auto golden = ophidian::geometry::point<double> { 7214680.0, 1402200.0 };
+    REQUIRE( Approx(def.rows().at(1776).origin.x) == 13680.0 );
+    REQUIRE( Approx(def.rows().at(1776).origin.y) == 6080760.0 );
+    REQUIRE( def.rows().at(1776).num.x == 29658 );
+    REQUIRE( def.rows().at(1776).num.y == 1 );
+    REQUIRE( def.rows().at(1776).site == "core" );
+    REQUIRE( Approx(def.rows().at(1776).step.x) == 380.0 );
+    REQUIRE( Approx(def.rows().at(1776).step.y) == 0.0 );
 
-	auto pad_position = cells.pin_position(netlist.pin_by_name("iccad_clk"));
-	auto golden_pad_position = ophidian::geometry::point<double> {5807950, 6121800};
-	golden_pad_position.x(golden_pad_position.x() + 0.5*(-140+140));
-	golden_pad_position.y(golden_pad_position.y() + 0.5*(0+280));
+//    o670506 INV_Y1
+//       + PLACED ( 74480.000000 2824920.000000 ) N ;
+    const ophidian::parsing::def::component * c{nullptr};
+    for(auto & component : def.components())
+    {
+        if(component.name == "o670506")
+        {
+            c = &component;
+            break;
+        }
+    }
 
-	REQUIRE( boost::geometry::equals( position, golden ) );
-	REQUIRE( boost::geometry::equals( pad_position, golden_pad_position ) );
+    REQUIRE( c );
+    REQUIRE( !c->fixed );
+    REQUIRE( Approx(c->position.x) == 74480.0 );
+    REQUIRE( Approx(c->position.y) == 2824920.0 );
+
+
+    REQUIRE( Approx(def.die().lower.x) == 0.0 );
+    REQUIRE( Approx(def.die().lower.y) == 0.0 );
+    REQUIRE( Approx(def.die().upper.x) == 11283720.0 );
+    REQUIRE( Approx(def.die().upper.y) == 6121800.0 );
+
 
 }

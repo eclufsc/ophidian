@@ -22,8 +22,9 @@ under the License.
 #define SRC_TIMING_GRAPH_H_
 
 #include <lemon/list_graph.h>
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 #include "transition.h"
+#include <unordered_map>
 
 namespace ophidian {
 namespace timing {
@@ -37,7 +38,7 @@ struct test {
 
     lemon::ListDigraph::Node ck;
     lemon::ListDigraph::Node d;
-    entity::entity tarc;
+    entity_system::entity tarc;
 };
 
 class graph {
@@ -48,18 +49,18 @@ public:
 private:
     graph_t m_graph;
 
-    lemon::ListDigraph::NodeMap< entity::entity > m_pins;
+    lemon::ListDigraph::NodeMap< entity_system::entity > m_pins;
     lemon::ListDigraph::NodeMap< edges > m_node_edges;
     lemon::ListDigraph::ArcMap< edge_types > m_arc_types;
-    lemon::ListDigraph::ArcMap< entity::entity > m_arcs;
+    lemon::ListDigraph::ArcMap< entity_system::entity > m_arcs;
 
 
-    std::unordered_map< entity::entity, node > m_rise_nodes;
-    std::unordered_map< entity::entity, node > m_fall_nodes;
+    std::unordered_map< entity_system::entity, node > m_rise_nodes;
+    std::unordered_map< entity_system::entity, node > m_fall_nodes;
 
     std::vector< test > m_tests;
 
-    node node_create(entity::entity pin, edges node_edge, std::unordered_map< entity::entity, node > & map);
+    node node_create(entity_system::entity pin, edges node_edge, std::unordered_map<entity_system::entity, node> &map);
 
 
 public:
@@ -68,7 +69,7 @@ public:
 
     void test_insert(node ck,
                   node d,
-                  entity::entity tarc);
+                  entity_system::entity tarc);
 
     const std::vector< test > & tests() const {
         return m_tests;
@@ -87,13 +88,13 @@ public:
         return lemon::countArcs(m_graph);
     }
 
-    node rise_node_create(entity::entity pin);
-    node rise_node(entity::entity pin) const {
+    node rise_node_create(entity_system::entity pin);
+    node rise_node(entity_system::entity pin) const {
         return m_rise_nodes.at(pin);
     }
 
-    node fall_node_create(entity::entity pin);
-    node fall_node(entity::entity pin) const {
+    node fall_node_create(entity_system::entity pin);
+    node fall_node(entity_system::entity pin) const {
         return m_fall_nodes.at(pin);
     }
 
@@ -103,12 +104,12 @@ public:
     }
 
 
-    edge edge_create(node u, node v, edge_types type, entity::entity entity);
-    entity::entity edge_entity(edge e) const{
+    edge edge_create(node u, node v, edge_types type, entity_system::entity entity);
+    entity_system::entity edge_entity(edge e) const{
         return m_arcs[e];
     }
 
-    entity::entity pin(node u) const {
+    entity_system::entity pin(node u) const {
         return m_pins[u];
     }
 

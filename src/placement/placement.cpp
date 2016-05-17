@@ -24,31 +24,36 @@ namespace ophidian {
 namespace placement {
 
 placement::placement(netlist::netlist* netlist, library* lib) :
-		m_netlist(netlist), m_library(lib), m_cells(netlist) {
+    m_netlist(netlist), m_library(lib), m_cells(netlist) {
 }
 
 placement::~placement() {
 }
 
-void placement::cell_position(entity::entity cell,
-		geometry::point<double> position) {
-	if (!cell_fixed(cell)) {
-		m_cells.position(cell, position);
-		auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
-		geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
-		geometry::translate(lib_geometry, position, translated);
-		m_cells.geometry(cell, translated);
-	}
+void placement::cell_position(entity_system::entity cell,
+                              geometry::point<double> position) {
+    if (!cell_fixed(cell)) {
+        m_cells.position(cell, position);
+        auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
+        geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
+        geometry::translate(lib_geometry, position, translated);
+        m_cells.geometry(cell, translated);
+    }
 }
 
-void placement::pad_position(entity::entity pad,
-		geometry::point<double> position) {
-	m_library->pin_offset(m_netlist->pin_std_cell(pad), position);
+void placement::pad_position(entity_system::entity pad,
+                             geometry::point<double> position) {
+    m_library->pin_offset(m_netlist->pin_std_cell(pad), position);
 }
 
-	void placement::cell_fixed(entity::entity cell, bool fixed) {
-		m_cells.fixed(cell, fixed);
-	}
+void placement::cell_fixed(entity_system::entity cell, bool fixed) {
+    m_cells.fixed(cell, fixed);
+}
+
+entity_system::entity placement::cell_create(std::string name, std::string type)
+{
+    return m_netlist->cell_insert(name, type);
+}
 } /* namespace placement */
 } /* namespace ophidian */
 

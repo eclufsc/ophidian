@@ -61,12 +61,12 @@ public:
 
     void update_view_position();
 
-    void drag_cell(ophidian::entity::entity cell, point position);
-    ophidian::entity::entity get_cell(point position);
-    point cell_position(ophidian::entity::entity  cell) const;
+    void drag_cell(ophidian::entity_system::entity cell, point position);
+    ophidian::entity_system::entity get_cell(point position);
+    point cell_position(ophidian::entity_system::entity  cell) const;
 
     void unselect();
-    void select(ophidian::entity::entity  cell);
+    void select(ophidian::entity_system::entity  cell);
 
     void render_circuit();
 
@@ -74,7 +74,7 @@ public:
 
     void main_window(MainWindow * main_window);
 
-    void update_cell(ophidian::entity::entity cell);
+    void update_cell(ophidian::entity_system::entity cell);
 
     void load_circuit();
 
@@ -111,10 +111,10 @@ public:
 
 class selected_holding : public canvas_state {
     mysfmlcanvas & m_canvas;
-    ophidian::entity::entity m_cell;
+    ophidian::entity_system::entity m_cell;
     double m_xoffset, m_yoffset;
 public:
-    selected_holding(mysfmlcanvas & canvas, ophidian::entity::entity cell, double x, double y);
+    selected_holding(mysfmlcanvas & canvas, ophidian::entity_system::entity cell, double x, double y);
     virtual canvas_state* mouse_move(double x, double y);
     virtual canvas_state* release();
 
@@ -122,18 +122,18 @@ public:
 
 class selected : public canvas_state {
     mysfmlcanvas & m_canvas;
-    ophidian::entity::entity m_cell;
+    ophidian::entity_system::entity m_cell;
 public:
-    selected(mysfmlcanvas & canvas, ophidian::entity::entity cell);
+    selected(mysfmlcanvas & canvas, ophidian::entity_system::entity cell);
     virtual canvas_state* click(double x, double y);
 };
 
 class dragging : public canvas_state {
     mysfmlcanvas & m_canvas;
-    ophidian::entity::entity m_cell;
+    ophidian::entity_system::entity m_cell;
     double m_xoffset, m_yoffset;
 public:
-    dragging(mysfmlcanvas & canvas, ophidian::entity::entity cell, double x, double y);
+    dragging(mysfmlcanvas & canvas, ophidian::entity_system::entity cell, double x, double y);
     virtual canvas_state* release();
     virtual canvas_state* mouse_move(double x, double y);
 };

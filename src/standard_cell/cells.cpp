@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace standard_cell {
 
-cells::cells(entity::system& system) :
+cells::cells(entity_system::entity_system& system) :
 		m_system(system) {
 	system.register_property(&m_names);
 	system.register_property(&m_pins);
@@ -33,19 +33,19 @@ cells::cells(entity::system& system) :
 cells::~cells() {
 }
 
-void cells::name(entity::entity e, std::string name) {
+void cells::name(entity_system::entity e, std::string name) {
 	m_names[m_system.lookup(e)] = name;
 }
 
-void cells::insert_pin(entity::entity cell, entity::entity pin) {
+void cells::insert_pin(entity_system::entity cell, entity_system::entity pin) {
 	m_pins[m_system.lookup(cell)].push_back(pin);
 }
 
-void cells::pins(entity::entity cell, std::vector<entity::entity> pins) {
+void cells::pins(entity_system::entity cell, std::vector<entity_system::entity> pins) {
     m_pins[m_system.lookup(cell)] = pins;
 }
 
-void cells::sequential(entity::entity cell, bool sequential)
+void cells::sequential(entity_system::entity cell, bool sequential)
 {
     m_sequential[m_system.lookup(cell)] = sequential;
 }

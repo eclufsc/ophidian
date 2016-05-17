@@ -10,5 +10,6 @@ set(SOURCE
    ${CMAKE_CURRENT_SOURCE_DIR}/graph_test.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/design_constraints_test.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/spef_test.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/parallel_elmore_test.cpp
    PARENT_SCOPE
 )

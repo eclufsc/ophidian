@@ -4,8 +4,8 @@
 
 #ifndef ophidian_FLUTE_H
 
-#define POWVFILE "POWV9.dat"    // LUT for POWV (Wirelength Vector)
-#define PORTFILE "PORT9.dat"    // LUT for PORT (Routing Tree)
+#define POWVFILE "3rdparty/flute/POWV9.dat"    // LUT for POWV (Wirelength Vector)
+#define PORTFILE "3rdparty/flute/PORT9.dat"    // LUT for PORT (Routing Tree)
 #define FLUTE_D 9        // LUT is used for d <= FLUTE_D, FLUTE_D <= 9
 #define FLUTEROUTING 1   // 1 to construct routing, 0 to estimate WL only
 #define REMOVE_DUPLICATE_PIN 0  // Remove dup. pin for flute_wl() & flute()

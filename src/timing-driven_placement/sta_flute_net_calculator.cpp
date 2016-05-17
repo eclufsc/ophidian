@@ -34,11 +34,11 @@ sta_flute_net_calculator::sta_flute_net_calculator(const timing::graph & graph, 
     m_timing_lib(timing_lib) {
     netlist.register_net_property(&m_net_sources);
 
-    std::vector< entity::entity >net_pins;
+
     for(auto net_it : netlist.net_system())
     {
-        entity::entity net = net_it.first;
-        net_pins = netlist.net_pins(net);
+        entity_system::entity net = net_it;
+        auto net_pins = netlist.net_pins(net);
         bool source_found = false;
         for(auto pin : net_pins)
         {
@@ -64,11 +64,11 @@ sta_flute_net_calculator::sta_flute_net_calculator(const timing::graph & graph, 
 sta_flute_net_calculator::~sta_flute_net_calculator() {
 }
 
-void sta_flute_net_calculator::update_net(timing::sta_timing_net_edge_calculator *tnet, entity::entity net, timing::graph_nodes_timing & nodes_timing)
+void sta_flute_net_calculator::update_net(timing::sta_timing_net_edge_calculator *tnet, entity_system::entity net, timing::graph_nodes_timing & nodes_timing)
 {
     interconnection::rc_tree tree;
     auto tap_map = m_flute.create_tree(m_placement, net, tree, m_timing_lib);
-    entity::entity source_pin = m_net_sources[m_placement.netlist().net_system().lookup(net)];
+    entity_system::entity source_pin = m_net_sources[m_placement.netlist().net_system().lookup(net)];
 
     nodes_timing.load(m_graph.rise_node(source_pin), tree.lumped());
     nodes_timing.load(m_graph.fall_node(source_pin), tree.lumped());

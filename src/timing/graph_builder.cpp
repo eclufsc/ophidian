@@ -36,14 +36,13 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
     std::cout << "  graph_builder::build(): creating two nodes for each pin" << std::endl << std::flush;
     // create a node for each pin
     for (auto pin : netlist.pin_system())
-        util::transitions<graph::node> node { graph.rise_node_create(pin.first), graph.fall_node_create(pin.first) };
+        util::transitions<graph::node> node { graph.rise_node_create(pin), graph.fall_node_create(pin) };
 
     std::cout << "  graph_builder::build(): creating net edges" << std::endl << std::flush;
     // create net edges
-    std::vector< entity::entity > net_pins;
     for (auto net : netlist.net_system()) {
-        net_pins = netlist.net_pins(net.first);
-        entity::entity source;
+        auto net_pins = netlist.net_pins(net);
+        entity_system::entity source;
         for (auto pin : net_pins) {
             std::string pin_name = netlist.pin_name(pin);
             standard_cell::pin_directions direction = lib.pin_direction(netlist.pin_std_cell(pin));
@@ -56,21 +55,20 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
                 break;
             }
         }
-        assert(!(source == entity::entity { }));
+        assert(!(source == entity_system::invalid_entity));
         for (auto pin : net_pins) {
             if (pin == source)
                 continue;
-            graph.edge_create(graph.rise_node(source), graph.rise_node(pin), edge_types::NET, net.first);
-            graph.edge_create(graph.fall_node(source), graph.fall_node(pin), edge_types::NET, net.first);
+            graph.edge_create(graph.rise_node(source), graph.rise_node(pin), edge_types::NET, net);
+            graph.edge_create(graph.fall_node(source), graph.fall_node(pin), edge_types::NET, net);
         }
     }
 
     // create timing arc edges
 
     std::cout << "  graph_builder::build(): creating timing arc edges" << std::endl << std::flush;
-    std::vector< entity::entity > input_pins;
-    std::unordered_map< entity::entity, entity::entity > output_pins;
-    std::vector< entity::entity > arcs;
+    std::vector< entity_system::entity > input_pins;
+    std::unordered_map< entity_system::entity, entity_system::entity> output_pins;
     std::size_t current_cell{0};
 
     std::vector<double> percentages {
@@ -84,12 +82,12 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
             if(static_cast<std::size_t>(p*netlist.cell_system().size()) == current_cell)
                 std::cout << "       graph_builder::build(): ["<<100*p<<"%]" << std::endl << std::flush;
         }
-        auto cell_pins = netlist.cell_pins(cell.first);
+        auto cell_pins = netlist.cell_pins(cell);
 //        std::cout << "  graph_builder::build(): creating timing arcs for cell " << netlist.cell_name(cell.first) << std::endl << std::endl << std::flush;
         input_pins.resize(0);
         output_pins.clear();
 
-        entity::entity data_pin, clk_pin;
+        entity_system::entity data_pin, clk_pin;
 
         for(auto pin : cell_pins)
         {
@@ -118,8 +116,8 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         bool test_created = false;
         for (auto from : input_pins) {
 
-            entity::entity from_std_cell = netlist.pin_std_cell(from);
-            arcs = lib.pin_timing_arcs(from_std_cell);
+            entity_system::entity from_std_cell = netlist.pin_std_cell(from);
+            auto arcs = lib.pin_timing_arcs(from_std_cell);
             for(auto arc : arcs)
             {
                 if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL && !test_created)
@@ -180,7 +178,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         for (auto arc : out_fall_arcs)
             graph.edge_source(arc, new_fall_node);
 
-        arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
+        auto arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
         for (auto arc : arcs) {
             switch (lib.timing_arc_timing_sense(arc)) {
             case unateness::POSITIVE_UNATE:
