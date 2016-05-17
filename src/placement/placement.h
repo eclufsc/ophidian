@@ -80,7 +80,7 @@ public:
     bool cell_fixed(entity_system::entity cell) const {
 		return m_cells.fixed(cell);
 	}
-	geometry::point<double> cell_dimensions(entity::entity cell) const {
+	geometry::point<double> cell_dimensions(entity_system::entity cell) const {
 		auto geometry = cell_geometry(cell);
 		geometry::box<geometry::point<double>> cell_box;
 		boost::geometry::envelope(geometry, cell_box);

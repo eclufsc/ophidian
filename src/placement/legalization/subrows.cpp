@@ -43,7 +43,7 @@ namespace ophidian {
                     this->end(subrow, floorplan->row_origin(row).x() + floorplan->row_dimensions(row).x() - 1);
                     this->row(subrow, row);
                     point subrow_min_corner = floorplan->row_origin(row);
-                    point subrow_max_corner(floorplan->row_origin(row).x() + floorplan->row_dimensions(row).x(), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y());
+                    point subrow_max_corner(floorplan->row_origin(row).x() + floorplan->row_dimensions(row).x() - 1, floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
                     box subrow_box(subrow_min_corner, subrow_max_corner);
                     subrows_rtree.insert(std::make_pair(subrow_box, subrow));
                 }

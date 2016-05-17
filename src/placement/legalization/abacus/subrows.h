@@ -31,26 +31,26 @@ namespace ophidian {
         namespace legalization {
             namespace abacus {
                 class subrows {
-                    entity::system & m_system;
+                    entity_system::entity_system & m_system;
 
-                    entity::vector_property<std::vector<entity::entity>> m_cells;
-                    entity::vector_property<double> m_capacity;
+                    entity_system::vector_property<std::vector<entity_system::entity>> m_cells;
+                    entity_system::vector_property<double> m_capacity;
                 public:
-                    subrows(entity::system &m_system) : m_system(m_system) {
+                    subrows(entity_system::entity_system &m_system) : m_system(m_system) {
                         m_system.register_property(&m_cells);
                         m_system.register_property(&m_capacity);
                     }
 
-                    const std::vector<entity::entity> & cells(entity::entity row) {
+                    const std::vector<entity_system::entity> & cells(entity_system::entity row) {
                         return m_cells[m_system.lookup(row)];
                     }
-                    bool insert_cell(entity::entity row, entity::entity cell, double cell_width);
-                    void remove_last_cell(entity::entity row, double cell_width);
+                    bool insert_cell(entity_system::entity row, entity_system::entity cell, double cell_width);
+                    void remove_last_cell(entity_system::entity row, double cell_width);
 
-                    double capacity(entity::entity row) {
+                    double capacity(entity_system::entity row) {
                         return m_capacity[m_system.lookup(row)];
                     }
-                    void capacity(entity::entity row, double capacity);
+                    void capacity(entity_system::entity row, double capacity);
 
                 };
             }

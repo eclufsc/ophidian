@@ -31,7 +31,7 @@ namespace ophidian {
             namespace abacus {
                 class cell_comparator {
                 public:
-                    bool operator()(const std::pair<entity::entity, double> & cell_pair1, const std::pair<entity::entity, double> & cell_pair2) {
+                    bool operator()(const std::pair<entity_system::entity, double> & cell_pair1, const std::pair<entity_system::entity, double> & cell_pair2) {
                         return cell_pair1.second < cell_pair2.second;
                     }
                 };
@@ -64,12 +64,12 @@ namespace ophidian {
                 };
 
                 class abacus : public legalization {
-                    entity::system m_cells_system;
+                    entity_system::entity_system m_cells_system;
                     cells m_cells;
 
                     subrows m_abacus_subrows;
 
-                    void place_row(entity::entity subrow);
+                    void place_row(entity_system::entity subrow);
 
                     void collapse(std::list<cluster> & clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max);
                 public:

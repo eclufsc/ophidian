@@ -37,6 +37,7 @@ namespace ophidian {
                     entity_system::vector_property<entity_system::entity> m_netlist_cells;
                     entity_system::vector_property<unsigned> m_order_ids;
                     entity_system::vector_property<point> m_positions;
+                    entity_system::vector_property<double> m_widths;
                     entity_system::vector_property<double> m_weights;
 
                 public:

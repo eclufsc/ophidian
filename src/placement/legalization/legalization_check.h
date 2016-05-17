@@ -31,7 +31,7 @@ namespace ophidian {
         namespace legalization {
             using point = geometry::point<double>;
             using box = geometry::box<point>;
-            using rtree_node = std::pair<box, entity::entity>;
+            using rtree_node = std::pair<box, entity_system::entity>;
             using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
             class legalization_check {

@@ -26,7 +26,7 @@ namespace ophidian {
         namespace legalization {
             namespace abacus {
 
-                bool subrows::insert_cell(entity::entity row, entity::entity cell, double cell_width) {
+                bool subrows::insert_cell(entity_system::entity row, entity_system::entity cell, double cell_width) {
                     if (cell_width <= capacity(row)) {
                         m_cells[m_system.lookup(row)].push_back(cell);
                         m_capacity[m_system.lookup(row)] -= cell_width;
@@ -35,11 +35,11 @@ namespace ophidian {
                     return false;
                 }
 
-                void subrows::capacity(entity::entity row, double capacity) {
+                void subrows::capacity(entity_system::entity row, double capacity) {
                     m_capacity[m_system.lookup(row)] = capacity;
                 }
 
-                void subrows::remove_last_cell(entity::entity row, double cell_width) {
+                void subrows::remove_last_cell(entity_system::entity row, double cell_width) {
                     m_cells[m_system.lookup(row)].pop_back();
                     m_capacity[m_system.lookup(row)] += cell_width;
                 }

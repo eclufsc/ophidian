@@ -46,11 +46,11 @@ namespace ophidian {
                     m_positions[m_system.lookup(cell)] = position;
                 }
 
-                void cells::width(entity::entity cell, double width) {
+                void cells::width(entity_system::entity cell, double width) {
                     m_widths[m_system.lookup(cell)] = width;
                 }
 
-                void cells::weight(entity::entity cell, double weight) {
+                void cells::weight(entity_system::entity cell, double weight) {
                     m_weights[m_system.lookup(cell)] = weight;
                 }
             }

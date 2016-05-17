@@ -26,12 +26,11 @@ namespace ophidian {
             namespace abacus {
 
                 void abacus::legalize_placement() {
-                    std::vector<std::pair<entity::entity, double>> sorted_cells;
+                    std::vector<std::pair<entity_system::entity, double>> sorted_cells;
                     sorted_cells.reserve(m_placement->netlist().cell_count());
                     for (auto cell : m_placement->netlist().cell_system()) {
-                        if (!m_placement->cell_fixed(cell.first)) {
-                            auto cell_position = m_placement->cell_position(cell.first);
-                            sorted_cells.push_back(std::make_pair(cell.first, m_placement->cell_position(cell.first).x()));
+                        if (!m_placement->cell_fixed(cell)) {
+                            sorted_cells.push_back(std::make_pair(cell, m_placement->cell_position(cell).x()));
                         }
                     }
                     std::sort(sorted_cells.begin(), sorted_cells.end(), cell_comparator());
@@ -60,7 +59,7 @@ namespace ophidian {
                                 point target_position(cell_position.x(), trial_y);
                                 m_cells.position(abacus_cell, target_position);
                                 try {
-                                    entity::entity trial_row = m_subrows.find_subrow(target_position);
+                                    entity_system::entity trial_row = m_subrows.find_subrow(target_position);
                                     if (m_abacus_subrows.insert_cell(trial_row, abacus_cell, cell_dimensions.x())) {
                                         place_row(trial_row);
                                         auto last_cell = m_abacus_subrows.cells(trial_row).back();
@@ -89,14 +88,14 @@ namespace ophidian {
                     }
 
                     for (auto subrow : m_subrows_system) {
-                        auto & subrow_cells = m_abacus_subrows.cells(subrow.first);
+                        auto & subrow_cells = m_abacus_subrows.cells(subrow);
                         for (auto cell : subrow_cells) {
                             m_placement->cell_position(m_cells.netlist_cell(cell), m_cells.position(cell));
                         }
                     }
                 }
 
-                void abacus::place_row(entity::entity subrow) {
+                void abacus::place_row(entity_system::entity subrow) {
                     std::list<cluster> clusters;
                     auto cells = m_abacus_subrows.cells(subrow);
                     for (auto cell : cells) {
@@ -160,9 +159,9 @@ namespace ophidian {
 
                 void abacus::create_subrows() {
                     for (auto subrow : m_subrows_system) {
-                        double subrow_begin = m_subrows.begin(subrow.first);
-                        double subrow_end = m_subrows.end(subrow.first);
-                        m_abacus_subrows.capacity(subrow.first, subrow_end - subrow_begin + 1);
+                        double subrow_begin = m_subrows.begin(subrow);
+                        double subrow_end = m_subrows.end(subrow);
+                        m_abacus_subrows.capacity(subrow, subrow_end - subrow_begin + 1);
                     }
                 }
             }

@@ -32,7 +32,7 @@ namespace ophidian {
             bool legalization_check::check_cell_overlaps() {
                 rtree cell_boxes_rtree;
                 for (auto cell : m_placement->netlist().cell_system()) {
-                    auto cell_geometry = m_placement->cell_geometry(cell.first);
+                    auto cell_geometry = m_placement->cell_geometry(cell);
                     for (auto cell_polygon : cell_geometry) {
                         box cell_box;
                         boost::geometry::envelope(cell_polygon, cell_box);
@@ -42,7 +42,7 @@ namespace ophidian {
                         std::vector<rtree_node> intersecting_nodes;
                         cell_boxes_rtree.query(boost::geometry::index::intersects(cell_box), std::back_inserter(intersecting_nodes));
                         if (intersecting_nodes.empty()) {
-                            cell_boxes_rtree.insert(std::make_pair(cell_box, cell.first));
+                            cell_boxes_rtree.insert(std::make_pair(cell_box, cell));
                         } else {
                             return false;
                         }
