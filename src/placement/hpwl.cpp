@@ -11,12 +11,12 @@ hpwl::hpwl(const placement & place) {
     m_value = 0;
     for(auto net_pair : place.netlist().net_system())
     {
-        hpwl net_hpwl(place, net_pair.first);
+        hpwl net_hpwl(place, net_pair);
         m_value += net_hpwl.value();
     }
 }
 
-hpwl::hpwl(const placement & place, const entity::entity & net) {
+hpwl::hpwl(const placement & place, const entity_system::entity & net) {
     auto net_pins = place.netlist().net_pins(net);
     std::vector<geometry::point<double> > pin_positions(net_pins.size());
     pin_positions.resize(0);

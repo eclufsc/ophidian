@@ -10,18 +10,18 @@ add_subdirectory (standard_cell)
 add_subdirectory (netlist)
 add_subdirectory (placement)
 add_subdirectory (geometry)
-add_subdirectory (regression)
+#add_subdirectory (regression)
 add_subdirectory (floorplan)
 add_subdirectory (interconnection)
 add_subdirectory (timing)
 add_subdirectory (timing-driven_placement)
 add_subdirectory (density)
-add_subdirectory (parsing)
+add_subdirectory (routing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
-target_link_libraries ( run_tests LINK_PUBLIC entity standard_cell netlist placement floorplan interconnection timing timing-driven_placement density legalization emon parsing )
-
+target_link_libraries ( run_tests LINK_PUBLIC entity_system standard_cell netlist parsing placement floorplan interconnection timing timing-driven_placement density legalization routing emon )
+add_subdirectory (parsing)
 
 add_custom_command(
     TARGET run_tests POST_BUILD

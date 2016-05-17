@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPENEDA_DENSITY_H
-#define OPENEDA_DENSITY_H
+#ifndef ophidian_DENSITY_H
+#define ophidian_DENSITY_H
 
 #include <boost/geometry/index/rtree.hpp>
 #include "bins.h"
@@ -33,13 +33,13 @@ namespace ophidian {
         class density_map {
             using point = geometry::point<double>;
             using box = geometry::box<point>;
-            using rtree_node = std::pair<box, entity::entity>;
+            using rtree_node = std::pair<box, entity_system::entity>;
             using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
             floorplan::floorplan * m_floorplan;
             placement::placement * m_placement;
 
-            entity::system m_bins_system;
+            entity_system::entity_system m_bins_system;
 
             bins m_bins;
             rtree m_bins_rtree;
@@ -51,59 +51,59 @@ namespace ophidian {
             density_map(floorplan::floorplan * floorplan, placement::placement * placement)
                     : m_floorplan(floorplan), m_placement(placement), m_bins(m_bins_system), m_skipped_bins(0) {
                 for (auto row : m_floorplan->rows_system()) {
-                    point row_origin = m_floorplan->row_origin(row.first);
-                    point row_dimensions = m_floorplan->row_dimensions(row.first);
+                    point row_origin = m_floorplan->row_origin(row);
+                    point row_dimensions = m_floorplan->row_dimensions(row);
                     box row_box(row_origin, {row_origin.x() + row_dimensions.x(), row_origin.y() + row_dimensions.y()});
-                    m_rows_rtree.insert(std::make_pair(row_box, row.first));
+                    m_rows_rtree.insert(std::make_pair(row_box, row));
                 }
             }
 
             ~density_map() { }
 
-            entity::entity bin_insert(point position, point dimension, double movable_utilization = 0.0, double fixed_utilization = 0.0, double free_space = 0.0);
+            entity_system::entity bin_insert(point position, point dimension, double movable_utilization = 0.0, double fixed_utilization = 0.0, double free_space = 0.0);
 
             std::size_t bin_count() {
                 return m_bins_system.size();
             }
 
-            point bin_position(entity::entity bin) {
+            point bin_position(entity_system::entity bin) {
                 return m_bins.position(bin);
             }
 
-            point bin_dimension(entity::entity bin) {
+            point bin_dimension(entity_system::entity bin) {
                 return m_bins.dimension(bin);
             }
 
-            double bin_movable_utilization(entity::entity bin) {
+            double bin_movable_utilization(entity_system::entity bin) {
                 return m_bins.movable_utilization(bin);
             }
 
-            double bin_fixed_utilization(entity::entity bin) {
+            double bin_fixed_utilization(entity_system::entity bin) {
                 return m_bins.fixed_utilization(bin);
             }
 
-            double bin_free_space(entity::entity bin) {
+            double bin_free_space(entity_system::entity bin) {
                 return m_bins.free_space(bin);
             }
 
-            double bin_area(entity::entity bin) {
+            double bin_area(entity_system::entity bin) {
                 double area = m_bins.dimension(bin).x() * m_bins.dimension(bin).y();
                 return area;
             }
 
-            void bin_movable_utilization(entity::entity bin, double movable_utilization);
-            void bin_fixed_utilization(entity::entity bin, double fixed_utilization);
-            void bin_free_space(entity::entity bin, double free_space);
+            void bin_movable_utilization(entity_system::entity bin, double movable_utilization);
+            void bin_fixed_utilization(entity_system::entity bin, double fixed_utilization);
+            void bin_free_space(entity_system::entity bin, double free_space);
 
             const bins & bins_properties() const {
                 return m_bins;
             }
 
-            const entity::system & bins_system() const {
+            const entity_system::entity_system & bins_system() const {
                 return m_bins_system;
             }
 
-            void intersecting_bins(box region, std::vector<entity::entity> & bins);
+            void intersecting_bins(box region, std::vector<entity_system::entity> & bins);
 
             void build_density_map(point max_bin_dimensions, std::vector<double> &utilizations, double bin_area_threshold = 0.2, double free_space_threshold = 0.2);
 
@@ -113,4 +113,4 @@ namespace ophidian {
 }
 
 
-#endif //OPENEDA_DENSITY_H
+#endif //ophidian_DENSITY_H

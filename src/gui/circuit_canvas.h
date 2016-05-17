@@ -58,6 +58,7 @@ public:
 class dragging : public state {
     quad m_quad;
     sf::Vector2f m_initial;
+    bool m_moved;
 public:
     dragging(circuit_canvas * canvas, const sf::Vector2f & pos);
     void mouseMoveEvent(QMouseEvent *e);
@@ -78,8 +79,6 @@ protected:
     fps m_fps;
 
     std::unordered_set< ophidian::gui::quad > m_non_movable_quads;
-
-
     void render();
 public:
     circuit_canvas(QWidget *parent = 0);
@@ -144,6 +143,10 @@ public:
     void erase(T element) {
         m_canvas.destroy(element);
     }
+
+
+    void clear();
+    void clear(const sf::Color & color);
 
 
 };

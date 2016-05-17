@@ -21,9 +21,10 @@ under the License.
 #ifndef SRC_STANDARD_CELL_STANDARD_CELLS_H_
 #define SRC_STANDARD_CELL_STANDARD_CELLS_H_
 
-#include "../entity/entity.h"
+#include "../entity_system/entity_system.h"
 #include "../standard_cell/cells.h"
 #include "../standard_cell/pins.h"
+#include <unordered_map>
 
 namespace ophidian {
 	/// Namespace describing standard cell entities and basic standard cell interface.
@@ -35,14 +36,14 @@ namespace standard_cell {
          */
 class standard_cells {
 
-	entity::system m_cell_system;
-	entity::system m_pin_system;
+        entity_system::entity_system m_cell_system;
+        entity_system::entity_system m_pin_system;
 
 	cells m_cells;
 	pins m_pins;
 
-	std::unordered_map<std::string, entity::entity> m_name2cell;
-	std::unordered_map<std::string, entity::entity> m_name2pin;
+        std::unordered_map<std::string, entity_system::entity> m_name2cell;
+        std::unordered_map<std::string, entity_system::entity> m_name2pin;
 public:
 	/// Constructor.
 	/**
@@ -56,20 +57,20 @@ public:
 	 * Registers a property to the cells entity system.
 	 * \param property Property to be registered.
 	 */
-	void register_cell_property(entity::property* property);
+        void register_cell_property(entity_system::property* property);
 	/// Registers pin property.
 	/**
 	 * Registers a property to the pins entity system.
 	 * \param property Property to be registered.
 	 */
-	void register_pin_property(entity::property* property);
+        void register_pin_property(entity_system::property* property);
 
 	/// Cell names getter.
 	/**
 	 * Returns the names of all cells.
 	 * \return Constant reference to the cell names property.
 	 */
-	const entity::vector_property<std::string> & cell_names() const {
+        const entity_system::vector_property<std::string> & cell_names() const {
 		return m_cells.names();
 	}
 	/// Creates a cell.
@@ -78,14 +79,14 @@ public:
 	 * \param name Name of the new cell.
 	 * \return Entity of the created cell.
 	 */
-	entity::entity cell_create(std::string name);
+        entity_system::entity cell_create(std::string name);
 	/// Cell name getter.
 	/**
 	 * Returns the name of a cell.
 	 * \param cell Cell entity to get the name.
 	 * \return Name of the cell.
 	 */
-	std::string cell_name(entity::entity cell) const {
+        std::string cell_name(entity_system::entity cell) const {
 		return m_cells.name(cell);
 	}
 	/// Cell pins getter.
@@ -94,7 +95,7 @@ public:
 	 * \param cell Cell entity to get the pins.
 	 * \return Constant reference to a vector with all pins of that cell.
 	 */
-	const std::vector<entity::entity> & cell_pins(entity::entity cell) const {
+        const std::vector<entity_system::entity> & cell_pins(entity_system::entity cell) const {
 		return m_cells.pins(cell);
 	}
 	/// Returns the number of cells.
@@ -110,7 +111,7 @@ public:
 	 * Returns the cell system.
 	 * \return Constant reference to the cell system.
 	 */
-	const entity::system & cell_system() const {
+        const entity_system::entity_system & cell_system() const {
 		return m_cell_system;
 	}
 	/// Cell sequential attribute setter.
@@ -119,14 +120,14 @@ public:
 	 * \param cell Cell entity to be set.
 	 * \param sequential bool variable describing if the cell is sequential or not.
 	 */
-    void  cell_sequential(entity::entity cell, bool sequential);
+    void  cell_sequential(entity_system::entity cell, bool sequential);
 	/// Cell sequential attribute getter.
 	/**
 	 * Gets if a cell is a sequential cell.
 	 * \param cell Cell entity to get the attribute.
 	 * \return bool variable describing if the cell is sequential or not.
 	 */
-    bool cell_sequential(entity::entity cell) const {
+    bool cell_sequential(entity_system::entity cell) const {
         return m_cells.sequential(cell);
     }
 
@@ -137,14 +138,14 @@ public:
 	 * \param name Name of the new pin.
 	 * \return Entity of the created pin.
 	 */
-	entity::entity pin_create(entity::entity cell, std::string name);
+        entity_system::entity pin_create(entity_system::entity cell, std::string name);
 	/// Pin owner getter.
 	/**
 	 * Returns the owner of a pin.
 	 * \param pin Pin entity to get the owner.
 	 * \return Owner of the pin.
 	 */
-	entity::entity pin_owner(entity::entity pin) const
+        entity_system::entity pin_owner(entity_system::entity pin) const
 	{
 		return m_pins.owner(pin);
 	}
@@ -154,10 +155,10 @@ public:
 	 * \param pin Pin entity to get the name.
 	 * \return Name of the pin.
 	 */
-	std::string pin_name(entity::entity pin) const {
+        std::string pin_name(entity_system::entity pin) const {
 		std::string the_name;
-		entity::entity owner{m_pins.owner(pin)};
-		if(!(owner == entity::entity{}))
+                entity_system::entity owner{m_pins.owner(pin)};
+                if(!(owner == entity_system::invalid_entity))
 			the_name = m_cells.name(owner) + ":";
 		the_name += m_pins.name(pin);
 		return the_name;
@@ -175,7 +176,7 @@ public:
 	 * Returns the pin system.
 	 * \return Constant reference to the pin system.
 	 */
-	const entity::system & pin_system() const {
+        const entity_system::entity_system & pin_system() const {
 		return m_pin_system;
 	}
 	/// Pin direction getter.
@@ -184,7 +185,7 @@ public:
 	 * \param pin Pin entity to get the name.
 	 * \return Direction of the pin.
 	 */
-	pin_directions pin_direction(entity::entity pin) const {
+        pin_directions pin_direction(entity_system::entity pin) const {
 		return m_pins.direction(pin);
 	}
 	/// Pin clock input attribute getter.
@@ -193,7 +194,7 @@ public:
 	 * \param pin Pin entity to get the attribute.
 	 * \return bool variable describing if the pin is a clock input or not.
 	 */
-    bool pin_clock_input(entity::entity pin) const {
+    bool pin_clock_input(entity_system::entity pin) const {
         return m_pins.clock_input(pin);
     }
 	/// Pin clock input attribute setter.
@@ -202,14 +203,14 @@ public:
 	 * \param pin Pin entity to be set.
 	 * \param clock_input bool variable describing if the pin is a clock input or not.
 	 */
-    void pin_clock_input(entity::entity pin, bool clock_input);
+    void pin_clock_input(entity_system::entity pin, bool clock_input);
 	/// Pin direction setter.
 	/**
 	 * Sets the direction of a pin. Possible direction values are NOT_ASSIGNED, INPUT and OUTPUT.
 	 * \param pin Pin entity to sets the direction.
 	 * \param Direction of the pin.
 	 */
-	void pin_direction(entity::entity pin, pin_directions direction);
+        void pin_direction(entity_system::entity pin, pin_directions direction);
 
 	/// Creates a pad.
 	/**
@@ -217,7 +218,7 @@ public:
 	 * \param name Name of the new pad.
 	 * \return Entity of the created pad.
 	 */
-	entity::entity pad_create(std::string name);
+        entity_system::entity pad_create(std::string name);
 
 
 

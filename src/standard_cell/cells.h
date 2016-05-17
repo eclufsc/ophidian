@@ -21,36 +21,36 @@ under the License.
 #ifndef SRC_STANDARD_CELL_CELLS_H_
 #define SRC_STANDARD_CELL_CELLS_H_
 
-#include "../entity/entity.h"
-#include "../entity/vector_property.h"
+#include "../entity_system/entity_system.h"
+#include "../entity_system/vector_property.h"
 
 namespace ophidian {
 namespace standard_cell {
 
 class cells {
-	entity::system & m_system;
-	entity::vector_property<std::string> m_names;
-    entity::vector_property<std::vector<entity::entity> > m_pins;
-    entity::vector_property<bool> m_sequential;
+        entity_system::entity_system & m_system;
+        entity_system::vector_property<std::string> m_names;
+    entity_system::vector_property<std::vector<entity_system::entity> > m_pins;
+    entity_system::vector_property<bool> m_sequential;
 public:
-	cells(entity::system & system);
+        cells(entity_system::entity_system & system);
 	virtual ~cells();
-	const entity::vector_property<std::string>& names() const {
+        const entity_system::vector_property<std::string>& names() const {
 		return m_names;
 	}
-	std::string name(entity::entity e) const {
+        std::string name(entity_system::entity e) const {
 		return m_names[m_system.lookup(e)];
 	}
-	const std::vector<entity::entity> & pins(entity::entity cell) const {
+        const std::vector<entity_system::entity> & pins(entity_system::entity cell) const {
 		return m_pins[m_system.lookup(cell)];
 	}
-    bool sequential(entity::entity cell) const {
+    bool sequential(entity_system::entity cell) const {
         return m_sequential[m_system.lookup(cell)];
     }
-	void name(entity::entity e, std::string name);
-	void insert_pin(entity::entity cell, entity::entity pin);
-    void pins(entity::entity cell, std::vector<entity::entity> pins);
-    void sequential(entity::entity cell, bool sequential);
+        void name(entity_system::entity e, std::string name);
+        void insert_pin(entity_system::entity cell, entity_system::entity pin);
+    void pins(entity_system::entity cell, std::vector<entity_system::entity> pins);
+    void sequential(entity_system::entity cell, bool sequential);
 };
 
 } /* namespace standard_cell */

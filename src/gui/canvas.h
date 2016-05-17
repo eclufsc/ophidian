@@ -29,11 +29,11 @@ namespace ophidian {
 namespace gui {
 
 struct line {
-    entity::entity entity;
+    entity_system::entity entity;
 };
 
 struct quad {
-    entity::entity entity;
+    entity_system::entity entity;
     bool operator==(const quad & o) const {
         return entity == o.entity;
     }
@@ -53,7 +53,7 @@ template<> struct hash<ophidian::gui::quad>
     typedef std::size_t result_type;
     result_type operator()(argument_type const& s) const
     {
-        hash<ophidian::entity::entity> hash1;
+        hash<ophidian::entity_system::entity> hash1;
         return hash1(s.entity);
     }
 };
@@ -101,7 +101,7 @@ public:
 
     bool has_animation() const;
 
-
+    void clear();
 
 };
 

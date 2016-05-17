@@ -15,7 +15,7 @@ using namespace boost::units::si;
 struct calculator {
 
     timing::library & lib;
-    entity::entity tarc;
+    entity_system::entity tarc;
     double islew;
     quantity<si::time> operator()(const quantity<capacitance> & load) const {
         return lib.timing_arc_rise_slew(tarc).compute(load, quantity<si::time>(islew*pico*seconds));

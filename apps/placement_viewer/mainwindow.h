@@ -27,7 +27,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void select_cell(ophidian::entity::entity cell);
+    void select_cell(ophidian::entity_system::entity cell);
 
     void load_circuit();
 

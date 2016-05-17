@@ -160,7 +160,7 @@ timingdriven_placement::~timingdriven_placement()
 
 }
 
-void timingdriven_placement::net_register_property(entity::property &p)
+void timingdriven_placement::net_register_property(entity_system::property &p)
 {
     m_netlist.register_net_property(&p);
 }

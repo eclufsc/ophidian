@@ -13,7 +13,7 @@ circuit_canvas::circuit_canvas(QWidget *parent) :
     m_state(nullptr),
     m_camera(sf::FloatRect(0,0,51599.25,34200.0))
 {
-    reset();
+    clear();
 }
 
 circuit_canvas::~circuit_canvas()
@@ -208,6 +208,20 @@ void circuit_canvas::mouseReleaseEvent(QMouseEvent *e)
     m_state->mouseReleaseEvent(e);
 }
 
+void circuit_canvas::clear()
+{
+    m_canvas.clear();
+    m_index.clear();
+    m_save_state = nullptr;
+    m_non_movable_quads.clear();
+    reset();
+}
+
+void circuit_canvas::clear(const sf::Color &color)
+{
+    QSFMLCanvas::clear(color);
+}
+
 void circuit_canvas::render()
 {
     setView(m_camera);
@@ -220,7 +234,6 @@ void circuit_canvas::render()
 canvas_states::idle::idle(circuit_canvas *canvas) :
     state(canvas)
 {
-
 }
 
 void canvas_states::idle::mousePressEvent(QMouseEvent *e)
@@ -242,7 +255,8 @@ void canvas_states::idle::mousePressEvent(QMouseEvent *e)
 
 canvas_states::dragging::dragging(circuit_canvas *canvas, const sf::Vector2f &pos) :
     state(canvas),
-    m_initial(pos)
+    m_initial(pos),
+    m_moved(false)
 {
     m_quad = m_canvas->quadAt(pos);
 }
@@ -256,11 +270,13 @@ void canvas_states::dragging::mouseMoveEvent(QMouseEvent *e)
     translation.translate(delta.x, delta.y);
     m_canvas->transform(m_quad, translation);
     m_initial = viewCoord;
+    m_moved = true;
 }
 
 void canvas_states::dragging::mouseReleaseEvent(QMouseEvent *e)
 {
-    m_canvas->dropQuad(m_quad);
+    if(m_moved)
+        m_canvas->dropQuad(m_quad);
     m_canvas->state(new selected(m_canvas, m_quad));
     delete this;
 }
@@ -275,7 +291,6 @@ canvas_states::selected::selected(circuit_canvas *canvas, quad the_quad) :
 
 canvas_states::selected::~selected()
 {
-    m_canvas->unselect(m_quad);
     m_canvas->erase(m_wirequad);
 }
 
@@ -284,7 +299,8 @@ void canvas_states::selected::mousePressEvent(QMouseEvent *e)
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
     sf::Vector2f viewCoord{m_canvas->mapPixelToCamera(pixelCoord)};
     bool hasQuad{m_canvas->hasQuad(viewCoord)};
-    qDebug() << "canvas_states::idle::mousePressEvent() " << viewCoord.x << ", " << viewCoord.y;
+    qDebug() << "canvas_states::selected::mousePressEvent() " << viewCoord.x << ", " << viewCoord.y;
+    m_canvas->unselect(m_quad);
     if(hasQuad)
     {
         if(m_canvas->isFixed(m_canvas->quadAt(viewCoord)))

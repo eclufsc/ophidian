@@ -30,16 +30,16 @@ namespace timing {
 
 
 using TimeType = boost::units::quantity< boost::units::si::time > ;
-using Cell = entity::entity;
-using Net = entity::entity;
-using Pin = entity::entity;
+using Cell = entity_system::entity;
+using Net = entity_system::entity;
+using Pin = entity_system::entity;
 
 
 
 class static_timing_analysis
 {
     const timing::graph * m_timing_graph;
-    const entity::vector_property< interconnection::rc_tree > * m_rc_trees;
+    const entity_system::vector_property< interconnection::rc_tree > * m_rc_trees;
     const library * m_late_lib;
     const library * m_early_lib;
     const netlist::netlist * m_netlist;
@@ -73,7 +73,7 @@ class static_timing_analysis
 public:
     static_timing_analysis();
     void graph(const timing::graph& g);
-    void rc_trees(const entity::vector_property< interconnection::rc_tree > & trees);
+    void rc_trees(const entity_system::vector_property< interconnection::rc_tree > & trees);
     void late_lib(const library& lib);
     void early_lib(const library& lib);
     void netlist(const netlist::netlist & netlist);

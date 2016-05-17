@@ -26,11 +26,11 @@ namespace ophidian {
             namespace abacus {
 
                 void abacus::legalize_placement() {
-                    std::vector<entity::entity> sorted_cells;
+                    std::vector<entity_system::entity> sorted_cells;
                     sorted_cells.reserve(m_placement->netlist().cell_count());
                     for (auto cell : m_placement->netlist().cell_system()) {
-                        if (!m_placement->cell_fixed(cell.first)) {
-                            sorted_cells.push_back(cell.first);
+                        if (!m_placement->cell_fixed(cell)) {
+                            sorted_cells.push_back(cell);
                         }
                     }
                     std::sort(sorted_cells.begin(), sorted_cells.end(), cell_comparator(m_placement));
@@ -55,7 +55,7 @@ namespace ophidian {
                             for (int trial_y = base_y; trial_y < top_y; trial_y += row_height) {
                                 point target_position(cell_position.x(), trial_y);
                                 m_cells.position(abacus_cell, target_position);
-                                entity::entity trial_row = m_subrows.find_subrow(target_position);
+                                entity_system::entity trial_row = m_subrows.find_subrow(target_position);
                                 // insert cell in row
                                 // update best cost
                             }

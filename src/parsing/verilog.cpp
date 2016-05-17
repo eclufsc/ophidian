@@ -74,11 +74,11 @@ void verilog::read(const std::string &filename)
     in << file.rdbuf();
     file.close();
 
+
+    read_module(in);
+
     std::string line;
-    std::getline(in, line);
-    auto tokens = tokenize(line);
-    assert(tokens[0] == "module");
-    m_design = tokens[1];
+    std::vector<std::string> tokens;
     do {
         std::getline(in, line);
         tokens = tokenize(line);
@@ -160,6 +160,39 @@ void verilog::read(const std::string &filename)
     boost::posix_time::time_duration msdiff = mst2 - mst1;
     std::cout << "verilog::verilog(): " << msdiff.total_milliseconds() << " ms" << std::endl;
 
+}
+
+void verilog::read_module(std::istream &in)
+{
+    std::vector<std::string> tokens;
+    std::string line;
+    bool valid = false;
+    std::getline(in, line);
+    tokens = tokenize(line);
+    valid = !tokens.empty();
+    while (valid)
+    {
+        if (tokens.size() == 2 && tokens[0] == "module")
+        {
+            m_design = tokens[1];
+            break;
+        }
+        std::getline(in, line);
+        tokens = tokenize(line);
+        valid = !tokens.empty();
+
+    }
+
+    // Read and skip the port names in the module definition
+    // until we encounter the tokens {"Start", "PIs"}
+    while (valid && !(tokens.size() == 2 && tokens[0] == "Start" && tokens[1] == "PIs"))
+    {
+        std::getline(in, line);
+        tokens = tokenize(line);
+        valid = !tokens.empty();
+        assert(valid);
+    }
+    assert(valid);
 }
 
 verilog::verilog(const std::string &filename) :

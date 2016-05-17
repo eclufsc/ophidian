@@ -28,40 +28,40 @@ namespace floorplan {
 
     }
 
-    entity::entity floorplan::site_insert(std::string name, floorplan::point dimensions) {
+    entity_system::entity floorplan::site_insert(std::string name, floorplan::point dimensions) {
         auto result = m_name2site.find(name);
         if (result != m_name2site.end())
             return result->second;
 
-        entity::entity site = m_sites_system.create();
+        entity_system::entity site = m_sites_system.create();
         m_name2site[name] = site;
         m_sites.name(site, name);
         m_sites.dimensions(site, dimensions);
         return site;
     }
 
-    void floorplan::site_destroy(entity::entity site) {
+    void floorplan::site_destroy(entity_system::entity site) {
         m_sites_system.destroy(site);
     }
 
-    entity::entity floorplan::row_insert(std::string site_name, unsigned number_of_sites, floorplan::point origin) {
+    entity_system::entity floorplan::row_insert(std::string site_name, unsigned number_of_sites, floorplan::point origin) {
         auto site = site_insert(site_name, {0, 0});
         return row_insert(site, number_of_sites, origin);
     }
 
-    entity::entity floorplan::row_insert(entity::entity site, unsigned number_of_sites, floorplan::point origin) {
-        entity::entity row = m_rows_system.create();
+    entity_system::entity floorplan::row_insert(entity_system::entity site, unsigned number_of_sites, floorplan::point origin) {
+        entity_system::entity row = m_rows_system.create();
         m_rows.site(row, site);
         m_rows.number_of_sites(row, number_of_sites);
         m_rows.origin(row, origin);
         return row;
     }
 
-    void floorplan::row_destroy(entity::entity row) {
+    void floorplan::row_destroy(entity_system::entity row) {
         m_rows_system.destroy(row);
     }
 
-    floorplan::point floorplan::row_dimensions(entity::entity row) const {
+    floorplan::point floorplan::row_dimensions(entity_system::entity row) const {
         auto row_site = m_rows.site(row);
         unsigned number_of_sites = m_rows.number_of_sites(row);
         point site_dimensions = m_sites.dimensions(row_site);

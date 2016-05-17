@@ -1,8 +1,5 @@
 cmake_minimum_required (VERSION 2.8.12.2)
 project (ophidian)
-
-
- 
  
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -29,10 +26,8 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
-
-
 
 
 add_subdirectory(src)

@@ -30,7 +30,7 @@ placement::placement(netlist::netlist* netlist, library* lib) :
 placement::~placement() {
 }
 
-void placement::cell_position(entity::entity cell,
+void placement::cell_position(entity_system::entity cell,
                               geometry::point<double> position) {
     if (!cell_fixed(cell)) {
         m_cells.position(cell, position);
@@ -41,16 +41,16 @@ void placement::cell_position(entity::entity cell,
     }
 }
 
-void placement::pad_position(entity::entity pad,
+void placement::pad_position(entity_system::entity pad,
                              geometry::point<double> position) {
     m_library->pin_offset(m_netlist->pin_std_cell(pad), position);
 }
 
-void placement::cell_fixed(entity::entity cell, bool fixed) {
+void placement::cell_fixed(entity_system::entity cell, bool fixed) {
     m_cells.fixed(cell, fixed);
 }
 
-entity::entity placement::cell_create(std::string name, std::string type)
+entity_system::entity placement::cell_create(std::string name, std::string type)
 {
     return m_netlist->cell_insert(name, type);
 }

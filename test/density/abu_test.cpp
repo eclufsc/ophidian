@@ -58,7 +58,7 @@ bool run_circuit(const std::string & ckt_name, const double target_utilization, 
     floorplan::lefdef2floorplan(*lef, *def, floorplan);
 
     auto row_it = floorplan.rows_system().begin();
-    double row_height = floorplan.row_dimensions(row_it->first).y();
+    double row_height = floorplan.row_dimensions(*row_it).y();
     unsigned number_of_rows_in_each_bin = 9;
 
     density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});

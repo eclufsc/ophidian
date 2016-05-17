@@ -22,7 +22,7 @@ under the License.
 #define ophidian_ROWS_H
 
 #include <vector_property.h>
-#include "entity.h"
+#include <entity_system.h>
 #include "../geometry/geometry.h"
 
 namespace ophidian {
@@ -34,11 +34,11 @@ namespace ophidian {
         class rows {
             using point = geometry::point<double>;
 
-            entity::system & m_system;
+            entity_system::entity_system & m_system;
 
-            entity::vector_property<entity::entity> m_sites;
-            entity::vector_property<unsigned> m_number_of_sites;
-            entity::vector_property<point> m_origins;
+            entity_system::vector_property<entity_system::entity> m_sites;
+            entity_system::vector_property<unsigned> m_number_of_sites;
+            entity_system::vector_property<point> m_origins;
 
         public:
             /// Constructor.
@@ -46,7 +46,7 @@ namespace ophidian {
              * Rows object constructor. Register the rows properties to the rows system.
              * \param system Rows entity system.
              */
-            rows(entity::system & system);
+            rows(entity_system::entity_system & system);
 
             /// Site getter.
             /**
@@ -54,7 +54,7 @@ namespace ophidian {
              * \param row Row entity to get the site.
              * \return Site entity.
              */
-            entity::entity site(entity::entity row) const {
+            entity_system::entity site(entity_system::entity row) const {
                 return m_sites[m_system.lookup(row)];
             }
             /// Number of sites getter.
@@ -63,7 +63,7 @@ namespace ophidian {
              * \param row Row entity to get the number of sites.
              * \return Number of sites of the row.
              */
-            unsigned number_of_sites(entity::entity row) const {
+            unsigned number_of_sites(entity_system::entity row) const {
                 return m_number_of_sites[m_system.lookup(row)];
             }
             /// Row origin getter.
@@ -72,7 +72,7 @@ namespace ophidian {
              * \param row Row entity to get the origin.
              * \return Point describing the row origin.
              */
-            point origin(entity::entity row) const {
+            point origin(entity_system::entity row) const {
                 return m_origins[m_system.lookup(row)];
             }
 
@@ -81,7 +81,7 @@ namespace ophidian {
              * Returns the begin and end iterator of the row sites property.
              * \return Pair with constant iterators pointing the the beginning and end of the sites property.
              */
-            std::pair< std::vector<entity::entity>::const_iterator, std::vector<entity::entity>::const_iterator > sites() const {
+            std::pair< std::vector<entity_system::entity>::const_iterator, std::vector<entity_system::entity>::const_iterator > sites() const {
                 return std::make_pair(m_sites.begin(), m_sites.end());
             }
             /// Number of sites iterator getter.
@@ -107,21 +107,21 @@ namespace ophidian {
              * \param row Row entity to set the site.
              * \param site Site entity to set.
              */
-            void site(entity::entity row, entity::entity site);
+            void site(entity_system::entity row, entity_system::entity site);
             /// Number of sites setter.
             /**
              * Sets the number of sites of a row.
              * \param row Row entity to set the number of sites.
              * \param number_of_sites Number of sites to set.
              */
-            void number_of_sites(entity::entity row, unsigned number_of_sites);
+            void number_of_sites(entity_system::entity row, unsigned number_of_sites);
             /// Origin setter.
             /**
              * Sets the origin of a row.
              * \param row Row entity to set the origin.
              * \param origin Origin to set.
              */
-            void origin(entity::entity row, point origin);
+            void origin(entity_system::entity row, point origin);
         };
     }
 }

@@ -19,7 +19,7 @@ using polygon = ophidian::geometry::polygon<point>;
 using multi_polygon = ophidian::geometry::multi_polygon<polygon>;
 
 using box = typename boost::geometry::model::box<ophidian::geometry::point<double> >;
-typedef std::pair<box, ophidian::entity::entity> rtree_node;
+typedef std::pair<box, ophidian::entity_system::entity> rtree_node;
 class rtree_node_comparator {
 public:
     bool operator()(const rtree_node & node1, const rtree_node & node2) const {
@@ -46,7 +46,7 @@ class application
 
     rtree m_position2cellentity;
 
-    std::vector<rtree_node> create_rtree_nodes(ophidian::entity::entity cell);
+    std::vector<rtree_node> create_rtree_nodes(ophidian::entity_system::entity cell);
 
 public:
     application(const std::string v_file, const std::string lef_file, const std::string def_file, const std::string lib_file);
@@ -66,25 +66,25 @@ public:
         return m_std_cells;
     }
 
-    void place_cell_and_update_index(ophidian::entity::entity cell, point position);
+    void place_cell_and_update_index(ophidian::entity_system::entity cell, point position);
 
-    ophidian::entity::entity get_cell(point position) const;
+    ophidian::entity_system::entity get_cell(point position) const;
 
-    bool cell_std_cell(ophidian::entity::entity cell, std::string std_cell_name);
+    bool cell_std_cell(ophidian::entity_system::entity cell, std::string std_cell_name);
 
 
-    boost::units::quantity< boost::units::si::time > cell_worst_slack(ophidian::entity::entity cell) const;
+    boost::units::quantity< boost::units::si::time > cell_worst_slack(ophidian::entity_system::entity cell) const;
 
     void run_sta();
 
-    boost::units::quantity< boost::units::si::time > rise_arrival(ophidian::entity::entity pin) const;
-    boost::units::quantity< boost::units::si::time > fall_arrival(ophidian::entity::entity pin) const;
+    boost::units::quantity< boost::units::si::time > rise_arrival(ophidian::entity_system::entity pin) const;
+    boost::units::quantity< boost::units::si::time > fall_arrival(ophidian::entity_system::entity pin) const;
 
 
-    boost::units::quantity< boost::units::si::time > rise_slack(ophidian::entity::entity pin) const;
-    boost::units::quantity< boost::units::si::time > fall_slack(ophidian::entity::entity pin) const;
+    boost::units::quantity< boost::units::si::time > rise_slack(ophidian::entity_system::entity pin) const;
+    boost::units::quantity< boost::units::si::time > fall_slack(ophidian::entity_system::entity pin) const;
 
-    std::vector< ophidian::entity::entity > critical_path() const;
+    std::vector< ophidian::entity_system::entity > critical_path() const;
 };
 
 #endif // APPLICATION_H

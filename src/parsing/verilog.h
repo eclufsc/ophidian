@@ -62,7 +62,7 @@ private:
 
     std::vector<std::string> tokenize(std::string line);
     void read(const std::string & filename);
-
+    void read_module(std::istream & in);
 
 
 public:

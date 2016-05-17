@@ -37,13 +37,13 @@ namespace ophidian {
 
                     }
 
-                    bool operator()(const entity::entity cell1, const entity::entity cell2) {
+                    bool operator()(const entity_system::entity cell1, const entity_system::entity cell2) {
                         return m_placement->cell_position(cell1).x() <= m_placement->cell_position(cell2).x();
                     }
                 };
 
                 class abacus : public legalization {
-                    entity::system m_cells_system;
+                    entity_system::entity_system m_cells_system;
                     cells m_cells;
                 public:
                     abacus(floorplan::floorplan *floorplan, placement *placement)

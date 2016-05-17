@@ -20,6 +20,15 @@ controller::controller(MainWindow &mainwindow) :
 
 }
 
+void controller::update_ckt_info()
+{
+    m_mainwindow.cell_count(m_app.cell_count());
+    m_mainwindow.pin_count(m_app.pin_count());
+    m_mainwindow.net_count(m_app.net_count());
+    m_mainwindow.die_area(QPoint(m_app.chip_boundaries()[3].x(), m_app.chip_boundaries()[1].y()));
+    m_mainwindow.circuit_name(QString::fromStdString(m_app.circuit_name()));
+}
+
 bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
 {
     std::ifstream lef(LEF.c_str());
@@ -31,7 +40,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
         sf::Vector2f new_center((m_app.chip_boundaries()[0].x()+m_app.chip_boundaries()[3].x())/2.0, -(m_app.chip_boundaries()[0].y()+m_app.chip_boundaries()[1].y())/2.0);
         m_canvas->cameraCenter(new_center);
         m_canvas->cameraSize(sf::Vector2f(m_app.chip_boundaries()[3].x()-m_app.chip_boundaries()[0].x(), m_app.chip_boundaries()[1].y()-m_app.chip_boundaries()[0].y()));
-        std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
+        std::vector< std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
         m_canvas->create_quads(geometries);
         random_purple_cell_painter painter(std::bind(&application::cell_is_fixed, &m_app, std::placeholders::_1));
         m_canvas->paint_quads(painter);
@@ -47,6 +56,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
         for(std::size_t i = 0; i < 4; ++i)
             m_canvas->transform(quad.lines[i], mirror);
 
+        update_ckt_info();
 
         animate_solution(30);
 
@@ -57,7 +67,7 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
 
 void controller::animate_solution(std::size_t duration)
 {
-    std::vector< std::pair<entity::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
+    std::vector< std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries = m_app.cells_geometries();
     ophidian::gui::drawable_batch<4> destination_quads = m_canvas->quadsBatch();
     m_canvas->update_quads(destination_quads, geometries);
     ophidian::gui::batch_animation * animation = new ophidian::gui::batch_animation(m_canvas->quadsBatch(), duration);
@@ -77,31 +87,43 @@ void controller::read_def(const std::string &DEF)
     m_canvas->reset();
 }
 
+void controller::read_verilog(const std::string &v)
+{
+    if(m_app.read_verilog(v))
+        update_ckt_info();
+}
+
 void controller::init_canvas_controller(uddac2016::canvas *canvas)
 {
     m_canvas = canvas;
     canvas->main_controller(this);
 }
 
-void controller::run_SA(const std::string & verilog_file)
+void controller::run_SA()
 {
-    m_app.run_SA(verilog_file);
+    for(int i = 0; i < 40; ++i)
+        m_app.run_SA();
+
+    m_app.legalize();
+
     animate_solution();
 }
 
-void controller::place_cell(const entity::entity &cell, const ophidian::geometry::point<double> &p)
+void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
 {
     m_app.cell_position(cell, p);
+    m_canvas->update_quad(cell, m_app.cell_geometry(cell));
 }
 
-void controller::unselect(const entity::entity &cell)
+void controller::unselect(const entity_system::entity &cell)
 {
-
+    m_mainwindow.unselect();
 }
 
-void controller::select(const entity::entity &cell)
+void controller::select(const entity_system::entity &cell)
 {
     qDebug() << QString::fromStdString(m_app.cell_name(cell));
+    m_mainwindow.select(cell);
 }
 
 

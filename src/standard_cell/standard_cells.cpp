@@ -31,7 +31,7 @@ standard_cells::standard_cells() :
 standard_cells::~standard_cells() {
 }
 
-entity::entity standard_cells::cell_create(std::string name) {
+entity_system::entity standard_cells::cell_create(std::string name) {
 	auto result = m_name2cell.find(name);
 	if (result != m_name2cell.end())
 		return result->second;
@@ -42,21 +42,21 @@ entity::entity standard_cells::cell_create(std::string name) {
     return id;
 }
 
-void standard_cells::cell_sequential(entity::entity cell, bool sequential)
+void standard_cells::cell_sequential(entity_system::entity cell, bool sequential)
 {
     m_cells.sequential(cell, sequential);
 }
 
-void standard_cells::register_cell_property(entity::property* property) {
+void standard_cells::register_cell_property(entity_system::property* property) {
 	m_cell_system.register_property(property);
 }
 
 void standard_cells::register_pin_property(
-		entity::property* property) {
+        entity_system::property* property) {
 	m_pin_system.register_property(property);
 }
 
-entity::entity standard_cells::pin_create(entity::entity cell,
+entity_system::entity standard_cells::pin_create(entity_system::entity cell,
 		std::string name) {
 
 	const std::string std_cell_name = m_cells.name(cell);
@@ -74,12 +74,12 @@ entity::entity standard_cells::pin_create(entity::entity cell,
     return id;
 }
 
-void standard_cells::pin_clock_input(entity::entity pin, bool clock_input)
+void standard_cells::pin_clock_input(entity_system::entity pin, bool clock_input)
 {
     m_pins.clock_input(pin, clock_input);
 }
 
-entity::entity standard_cells::pad_create(std::string pin_name) {
+entity_system::entity standard_cells::pad_create(std::string pin_name) {
 
 	auto result = m_name2pin.find(pin_name);
 	if (result != m_name2pin.end())
@@ -91,7 +91,7 @@ entity::entity standard_cells::pad_create(std::string pin_name) {
 	return id;
 }
 
-void standard_cells::pin_direction(entity::entity pin, pin_directions direction) {
+void standard_cells::pin_direction(entity_system::entity pin, pin_directions direction) {
 	m_pins.direction(pin, direction);
 }
 

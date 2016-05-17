@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace netlist {
 
-nets::nets(entity::system & system) : m_system(system) {
+nets::nets(entity_system::entity_system & system) : m_system(system) {
 	m_system.register_property(&m_names);
 	m_system.register_property(&m_pins);
 }
@@ -31,11 +31,11 @@ nets::nets(entity::system & system) : m_system(system) {
 nets::~nets() {
 }
 
-void nets::connect(entity::entity net, entity::entity pin) {
+void nets::connect(entity_system::entity net, entity_system::entity pin) {
 	m_pins[m_system.lookup(net)].push_back(pin);
 }
 
-void nets::disconnect(entity::entity net, entity::entity pin) {
+void nets::disconnect(entity_system::entity net, entity_system::entity pin) {
 	auto & pins_vector = m_pins[m_system.lookup(net)];
 	std::size_t i = 0;
 	while(i < pins_vector.size())
@@ -51,15 +51,15 @@ void nets::disconnect(entity::entity net, entity::entity pin) {
 	throw std::runtime_error("pin already disconnected");
 }
 
-void nets::pins(entity::entity net, std::vector<entity::entity> pins) {
+void nets::pins(entity_system::entity net, std::vector<entity_system::entity> pins) {
 	m_pins[m_system.lookup(net)] = pins;
 }
 
-void nets::name(entity::entity net, std::string name) {
+void nets::name(entity_system::entity net, std::string name) {
     m_names[m_system.lookup(net)] = name;
 }
 
-void nets::preallocate_pins(entity::entity net, std::size_t pin_count)
+void nets::preallocate_pins(entity_system::entity net, std::size_t pin_count)
 {
     m_pins[m_system.lookup(net)].reserve(pin_count);
 }
