@@ -8,6 +8,7 @@
 #include "random_purple_cell_painter.h"
 
 #include <QDebug>
+#include <QDateTime>
 
 using namespace ophidian;
 
@@ -93,6 +94,16 @@ void controller::read_verilog(const std::string &v)
         update_ckt_info();
 }
 
+void controller::read_tau2014_lib(const std::string &file)
+{
+    m_app.read_tau2014_lib(file);
+}
+
+void controller::read_liberty(const std::string &file)
+{
+    m_app.read_liberty(file);
+}
+
 void controller::init_canvas_controller(uddac2016::canvas *canvas)
 {
     m_canvas = canvas;
@@ -101,12 +112,38 @@ void controller::init_canvas_controller(uddac2016::canvas *canvas)
 
 void controller::run_SA()
 {
-    for(int i = 0; i < 40; ++i)
+    for(int i = 0; i < 10; ++i)
         m_app.run_SA();
 
-    m_app.legalize();
+//    std::cout << "will legalize " << std::endl;
+//    m_app.legalize();
+//    std::cout << "legalize DONE" << std::endl;
 
     animate_solution();
+}
+
+void controller::run_STA()
+{
+    m_app.run_STA();
+    auto worst_slacks = m_app.worst_slacks();
+    range_painter painter;
+
+    QColor negative0 = QColor::fromHsv(0, .7*255, .9*255);
+    QColor negativeF = QColor::fromHsv(60, .7*255, .9*255);
+    QColor zero = QColor::fromHsv(140, .7*255, .9*255);
+    QColor positive = QColor::fromHsv(230, .7*255, .9*255);
+
+    painter.negative(std::make_pair(
+                         sf::Color(negative0.red(), negative0.green(), negative0.blue()),
+                         sf::Color(negativeF.red(), negativeF.green(), negativeF.blue())
+                         ));
+    painter.zero(sf::Color(zero.red(), zero.green(), zero.blue()));
+    painter.positive(sf::Color(positive.red(), positive.green(), positive.blue()));
+    painter.color_map(worst_slacks);
+    m_canvas->paint_quads(painter);
+
+
+
 }
 
 void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
@@ -118,6 +155,13 @@ void controller::place_cell(const entity_system::entity &cell, const ophidian::g
 void controller::unselect(const entity_system::entity &cell)
 {
     m_mainwindow.unselect();
+}
+
+void controller::screenshot()
+{
+    QDateTime date = QDateTime::currentDateTime();
+    const std::string filename = "uddac2016-" + date.toString().toStdString() + ".png";
+    m_canvas->save_to_file(filename);
 }
 
 void controller::select(const entity_system::entity &cell)

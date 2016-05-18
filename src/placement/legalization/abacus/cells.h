@@ -18,8 +18,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef OPHIDIAN_CELLS_H
-#define OPHIDIAN_CELLS_H
+#ifndef OPHIDIAN_ABACUS_CELLS_H
+#define OPHIDIAN_ABACUS_CELLS_H
 
 #include <vector_property.h>
 #include "entity_system.h"
@@ -37,6 +37,7 @@ namespace ophidian {
                     entity_system::vector_property<entity_system::entity> m_netlist_cells;
                     entity_system::vector_property<unsigned> m_order_ids;
                     entity_system::vector_property<point> m_positions;
+                    entity_system::vector_property<double> m_widths;
                     entity_system::vector_property<double> m_weights;
 
                 public:
@@ -56,6 +57,11 @@ namespace ophidian {
                         return m_positions[m_system.lookup(cell)];
                     }
                     void position(entity_system::entity cell, point position);
+
+                    double width(entity_system::entity cell) const {
+                        return m_widths[m_system.lookup(cell)];
+                    }
+                    void width(entity_system::entity cell, double width);
 
                     double weight(entity_system::entity cell) const {
                         return m_weights[m_system.lookup(cell)];

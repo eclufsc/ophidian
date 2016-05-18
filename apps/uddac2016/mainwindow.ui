@@ -174,6 +174,20 @@
             </item>
            </layout>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Worst Slack&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_selected_slack">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -189,6 +203,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionScreenshot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="MainWindowMenuBar" name="menuBar">
@@ -201,6 +216,11 @@
     </rect>
    </property>
   </widget>
+  <action name="actionScreenshot">
+   <property name="text">
+    <string>Screenshot</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

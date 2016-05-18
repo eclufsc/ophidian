@@ -6,6 +6,15 @@
 #include "../placement/placement.h"
 #include "../floorplan/floorplan.h"
 
+#include "../timing/library.h"
+
+#include "../timing/generic_sta.h"
+#include "../timing/ceff.h"
+
+#include "../interconnection/rc_tree.h"
+#include "../timing-driven_placement/flute_rc_tree_estimation.h"
+
+
 namespace uddac2016 {
 
 class SA;
@@ -19,14 +28,34 @@ class application
     std::unique_ptr<ophidian::placement::placement> m_placement;
     std::unique_ptr<ophidian::floorplan::floorplan> m_floorplan;
 
+
+
+    ophidian::timingdriven_placement::flute_rc_tree_creator m_flute;
+
+    ophidian::timing::design_constraints m_dc;
+    std::unique_ptr<ophidian::timing::library_timing_arcs> m_tarcs;
+    std::unique_ptr<ophidian::timing::library> m_timing_library;
+    std::unique_ptr< ophidian::entity_system::vector_property< ophidian::interconnection::rc_tree > >  m_rc_trees;
+    std::unique_ptr< ophidian::timing::graph > m_graph;
+    std::unique_ptr< ophidian::timing::timing_data > m_timing_data;
+    std::unique_ptr< ophidian::timing::graph_and_topology> m_topology;
+    std::unique_ptr< ophidian::timing::generic_sta<ophidian::timing::effective_capacitance_wire_model, ophidian::timing::pessimistic> > m_STA;
+    std::set< ophidian::entity_system::entity> m_dirty_nets;
+
     std::unique_ptr<SA> m_sa;
 public:
     application();
     virtual ~application();
 
+    void make_cell_nets_dirty(ophidian::entity_system::entity cell);
+    void update_dirty_rc_trees();
+
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
     bool read_def(const std::string & DEF);
     bool read_verilog(const std::string & v);
+    void read_tau2014_lib(const std::string & file);
+    void read_liberty(const std::string & file);
+
 
     std::vector< std::pair<ophidian::entity_system::entity, ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > > > cells_geometries() const;
     ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity_system::entity & cell) const;
@@ -60,9 +89,7 @@ public:
         return m_netlist->cell_std_cell(cell);
     }
 
-    void cell_std_cell(const ophidian::entity_system::entity & cell, const ophidian::entity_system::entity & std_cell) const {
-        m_netlist->cell_std_cell(cell, std_cell);
-    }
+    void cell_std_cell(const ophidian::entity_system::entity & cell, const ophidian::entity_system::entity & std_cell);
 
     const ophidian::geometry::point<double> cell_position(const ophidian::entity_system::entity & cell) const {
         return m_placement->cell_position(cell);
@@ -97,15 +124,35 @@ public:
         return *m_std_cells;
     }
 
+    double cell_worst_slack(const ophidian::entity_system::entity & cell) const
+    {
+        double worst = std::numeric_limits<double>::infinity();
+        if(!m_STA)
+            return worst;
+        auto & cell_pins = m_netlist->cell_pins(cell);
+        for(auto pin : cell_pins)
+            worst = std::min(worst, std::min(m_STA->rise_slack(pin).value(),m_STA->fall_slack(pin).value()));
+        return worst;
+    }
+
+
+    std::unordered_map<ophidian::entity_system::entity, std::pair<double, bool> > worst_slacks() const {
+        std::unordered_map<ophidian::entity_system::entity, std::pair<double, bool> > worst_slacks;
+        worst_slacks.reserve(m_netlist->cell_count());
+        for(auto cell : m_netlist->cell_system())
+            worst_slacks.insert(std::make_pair(cell, std::make_pair(cell_worst_slack(cell), m_placement->cell_fixed(cell))));
+        return worst_slacks;
+    }
 
     void run_SA();
+    void run_STA();
 
     void legalize();
 };
 
 class SA {
     application & m_app;
-    double m_T{2048.0};
+    double m_T{1024.0};
     std::uniform_real_distribution<double> m_dist{0.0, 1.0};
     std::default_random_engine m_engine;
 public:

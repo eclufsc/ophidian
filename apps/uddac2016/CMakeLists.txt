@@ -38,4 +38,4 @@ set(SOURCES
 add_executable(uddac2016 WIN32 ${SOURCES})
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(uddac2016 Qt5::Widgets interconnection floorplan standard_cell placement parsing gui entity_system ${SFML_LIBRARIES} LEF DEF  )
+target_link_libraries(uddac2016 Qt5::Widgets timing-driven_placement timing abacus interconnection floorplan standard_cell placement parsing gui entity_system ${SFML_LIBRARIES} LEF DEF  )

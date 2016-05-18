@@ -79,7 +79,7 @@ protected:
     fps m_fps;
 
     std::unordered_set< ophidian::gui::quad > m_non_movable_quads;
-    void render();
+    void render(sf::RenderTarget & target);
 public:
     circuit_canvas(QWidget *parent = 0);
     virtual ~circuit_canvas();
@@ -120,6 +120,8 @@ public:
     void zoom(double value);
 
     void reset();
+
+    void save_to_file(const std::string & filename);
 
     void OnUpdate();
     void wheelEvent(QWheelEvent * e);

@@ -76,7 +76,8 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
     std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
 
     params dummy{0.0*si::ohms, 0.0*si::farads};
-    params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
+//    params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
+    params & param = m_params;
 
     if(net_pins.size() == 1)
     {

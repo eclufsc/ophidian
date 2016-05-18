@@ -80,6 +80,13 @@ public:
     bool cell_fixed(entity_system::entity cell) const {
 		return m_cells.fixed(cell);
 	}
+	geometry::point<double> cell_dimensions(entity_system::entity cell) const {
+		auto geometry = cell_geometry(cell);
+		geometry::box<geometry::point<double>> cell_box;
+		boost::geometry::envelope(geometry, cell_box);
+		geometry::point<double> dimensions(cell_box.max_corner().x() - cell_box.min_corner().x(), cell_box.max_corner().y() - cell_box.min_corner().y());
+		return dimensions;
+	}
 
     entity_system::entity cell_create(std::string name, std::string type);
 

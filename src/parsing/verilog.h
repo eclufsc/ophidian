@@ -61,8 +61,17 @@ private:
     std::size_t m_net_count;
 
     std::vector<std::string> tokenize(std::string line);
+
+    bool read_line_as_tokens(std::istream &in, std::vector<std::string> & tokens);
+    bool read_module(std::istream & in, std::string & token);
+    bool read_primary_input(std::istream & in, std::string & token);
+    bool read_primary_output(std::istream & in, std::string & token);
+    bool read_cell_inst(std::istream & in, std::string &cell_type, std::string &cell_inst, std::vector<std::pair<std::string, std::string> > &pin_net_pairs);
+
+
+    bool read_wire(std::istream & in, std::string & token);
+
     void read(const std::string & filename);
-    void read_module(std::istream & in);
 
 
 public:

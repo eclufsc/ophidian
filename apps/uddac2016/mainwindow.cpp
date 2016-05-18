@@ -29,6 +29,7 @@ void MainWindow::update_selected()
    ui->line_edit_selected_x->setText(QString::number(m_selected.position().x()));
    ui->line_edit_selected_y->setText(QString::number(m_selected.position().y()));
    ui->combo_selected_type->setCurrentText(m_selected.std_cell());
+   ui->label_selected_slack->setText(QString::number(m_selected.worst_slack()));
 }
 
 MainWindow::MainWindow(QWidget *parent):
@@ -148,6 +149,13 @@ QPoint selected_cell::position()
     return QPoint(position.x(), position.y());
 }
 
+double selected_cell::worst_slack()
+{
+    if(!m_ctrl)
+        return 0.0;
+    return m_ctrl->cell_worst_slack(m_entity);
+}
+
 bool selected_cell::fixed()
 {
     if(!m_ctrl)
@@ -155,6 +163,11 @@ bool selected_cell::fixed()
     return m_ctrl->cell_is_fixed(m_entity);
 }
 
+void MainWindow::on_actionScreenshot_triggered()
+{
+    m_controller.screenshot();
+}
 
 }
+
 

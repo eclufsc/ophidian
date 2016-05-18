@@ -69,7 +69,7 @@ void canvas::paint_quads(cell_painter &painter)
     {
         sf::Color cell_color = painter.color(entity_pair.first);
         for(auto & quad : entity_pair.second)
-            paint(quad, painter.color(entity_pair.first));
+            paint(quad, cell_color);
     }
 }
 

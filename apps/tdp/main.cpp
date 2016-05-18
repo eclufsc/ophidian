@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     command_line_args args(argv);
 
     // initializes the TDP module
-    timingdriven_placement::timingdriven_placement tdp(args.dot_v, args.dot_def, args.dot_lef, args.dot_lib_late, args.dot_lib_early, args.clock);
+//    timingdriven_placement::timingdriven_placement tdp(args.dot_v, args.dot_def, args.dot_lef, args.dot_lib_late, args.dot_lib_early, args.clock);
 
 //    // calls STA
 //    tdp.update_timing();

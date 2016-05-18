@@ -73,9 +73,9 @@ void timingdriven_placement::update_dirty_rc_trees()
     std::cout << "    creating rc_trees DONE!!" << std::endl << std::flush;
 }
 
-timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_file, const std::string & dot_def_file, const std::string & dot_lef_file, const std::string & dot_lib_late, const std::string & dot_lib_early, double clock_in_picosseconds):
-    m_dot_lib_late(dot_lib_late),
-    m_dot_lib_early(dot_lib_early)
+timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_file, const std::string & dot_def_file, const std::string & dot_lef_file, const std::string m_dot_lib_late, const std::string m_dot_lib_early, double clock_in_ps) :
+    m_dot_lib_early(m_dot_lib_early),
+    m_dot_lib_late(m_dot_lib_late)
 {
 
     std::unique_ptr<parsing::lef> lef;
@@ -142,7 +142,7 @@ timingdriven_placement::timingdriven_placement(const std::string & dot_verilog_f
 
     mst1 = boost::posix_time::microsec_clock::local_time();
     m_dc = timing::default_design_constraints{m_netlist}.dc();
-    m_dc.clock.period = clock_in_picosseconds;
+    m_dc.clock.period = clock_in_ps;
     for(auto driver : m_dc.input_drivers)
         m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
     m_std_cells.pin_direction(m_netlist.pin_std_cell(m_netlist.pin_by_name(m_dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);

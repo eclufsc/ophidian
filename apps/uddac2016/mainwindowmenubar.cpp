@@ -8,6 +8,24 @@
 
 namespace uddac2016 {
 
+void MainWindowMenuBar::update()
+{
+    if(m_lef_def)
+    {
+        m_actions.at("read_sol")->setEnabled(true);
+        m_actions.at("verilog")->setEnabled(true);
+        m_actions.at("timing_lib")->setEnabled(true);
+    }
+
+    if(m_verilog)
+        m_actions.at("run_SA")->setEnabled(true);
+
+    if(m_timing_lib && m_verilog)
+        m_actions.at("STA")->setEnabled(true);
+
+
+}
+
 MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QMenuBar(parent),
     m_mainwindow(*dynamic_cast<MainWindow*>(parent))
@@ -33,12 +51,22 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     connect(runSAAction, SIGNAL(triggered()), this, SLOT(action_run_SA_triggered()));
     runSAAction->setDisabled(true);
 
+    QMenu * timingMenu = this->addMenu("Timing");
+    QAction * readLibraryAction = timingMenu->addAction("Open Timing Library");
+    QAction * runSTAAction = timingMenu->addAction("Run Static Timing Analysis");
+
+    connect(readLibraryAction, SIGNAL(triggered()), this, SLOT(action_open_timing_library_triggered()));
+    connect(runSTAAction, SIGNAL(triggered()), this, SLOT(action_run_STA_triggered()));
+    readLibraryAction->setDisabled(true);
+    runSTAAction->setDisabled(true);
 
     m_actions["file"] = action;
     m_actions["read_sol"] = read_sol;
     m_actions["exit"] = exit;
     m_actions["verilog"] = openVerilogAction;
     m_actions["run_SA"] = runSAAction;
+    m_actions["timing_lib"] = readLibraryAction;
+    m_actions["STA"] = runSTAAction;
 }
 
 MainWindowMenuBar::~MainWindowMenuBar()
@@ -72,10 +100,8 @@ void MainWindowMenuBar::LEFDEF_accept(QString LEF, QString DEF)
     if(!m_ctrl->read_lefdef(LEF.toStdString(), DEF.toStdString()))
         QMessageBox::critical(this, "Error!", "Error reading LEF/DEF!!");
     else
-    {
-        m_actions.at("read_sol")->setEnabled(true);
-        m_actions.at("verilog")->setEnabled(true);
-    }
+        m_lef_def = true;
+    update();
 
 }
 
@@ -90,13 +116,40 @@ void MainWindowMenuBar::action_open_verilog_triggered()
     if(!text.isEmpty())
     {
         m_ctrl->read_verilog(text.toStdString());
-        m_actions.at("run_SA")->setEnabled(true);
+        m_verilog = true;
     }
+    update();
 }
 
 void MainWindowMenuBar::action_run_SA_triggered()
 {
     m_ctrl->run_SA();
+}
+
+void MainWindowMenuBar::action_run_STA_triggered()
+{
+    m_ctrl->run_STA();
+}
+
+void MainWindowMenuBar::action_open_timing_library_triggered()
+{
+    auto text = QFileDialog::getOpenFileName(this, tr("Open Timing Library File..."), "", tr("Timing Library (*.tau2014 *.lib)"));
+    if(!text.isEmpty())
+    {
+        if(text.endsWith(".tau2014"))
+        {
+            m_ctrl->read_tau2014_lib(text.toStdString());
+        }
+        else if(text.endsWith(".lib"))
+        {
+            m_ctrl->read_liberty(text.toStdString());
+        }
+        else{
+        }
+        m_timing_lib = true;
+    }
+    update();
+
 }
 
 }

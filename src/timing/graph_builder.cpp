@@ -83,7 +83,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
                 std::cout << "       graph_builder::build(): ["<<100*p<<"%]" << std::endl << std::flush;
         }
         auto cell_pins = netlist.cell_pins(cell);
-//        std::cout << "  graph_builder::build(): creating timing arcs for cell " << netlist.cell_name(cell.first) << std::endl << std::endl << std::flush;
+        //        std::cout << "  graph_builder::build(): creating timing arcs for cell " << netlist.cell_name(cell.first) << std::endl << std::endl << std::flush;
         input_pins.resize(0);
         output_pins.clear();
 
@@ -178,7 +178,7 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
         for (auto arc : out_fall_arcs)
             graph.edge_source(arc, new_fall_node);
 
-        auto arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
+        auto& arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(dc.input_drivers.at(i).lib_cell), dc.input_drivers.at(i).pin_name));
         for (auto arc : arcs) {
             switch (lib.timing_arc_timing_sense(arc)) {
             case unateness::POSITIVE_UNATE:
@@ -217,6 +217,107 @@ void graph_builder::build(const netlist::netlist & netlist, library & lib, const
     //	}
 
 }
+
+void graph_builder::repower(const netlist::netlist &netlist, library &lib, timing::graph &graph, const entity_system::entity & cell)
+{
+
+    std::set< timing::graph::edge > to_remove;
+
+    for(lemon::ListDigraph::ArcIt arc(graph.G()); arc != lemon::INVALID; ++arc)
+    {
+        auto source = graph.edge_source(arc);
+        auto target = graph.edge_target(arc);
+
+        auto source_owner = netlist.pin_owner(graph.pin(source));
+        auto target_owner = netlist.pin_owner(graph.pin(target));
+
+        if(source_owner == target_owner && target_owner == cell)
+            to_remove.insert(arc);
+    }
+
+    graph.edge_destroy(to_remove.begin(), to_remove.end());
+
+    auto& cell_pins = netlist.cell_pins(cell);
+
+    std::vector< entity_system::entity > input_pins;
+    std::unordered_map< entity_system::entity, entity_system::entity> output_pins;
+    std::size_t current_cell{0};
+    input_pins.resize(0);
+    output_pins.clear();
+
+    entity_system::entity data_pin, clk_pin;
+
+    for(auto pin : cell_pins)
+    {
+        standard_cell::pin_directions direction = lib.pin_direction(netlist.pin_std_cell(pin));
+        switch(direction)
+        {
+        case standard_cell::pin_directions::INPUT:
+            input_pins.push_back(pin);
+
+            if(lib.pin_clock_input(netlist.pin_std_cell(pin)))
+                clk_pin = pin;
+            else if(lib.cell_sequential(netlist.cell_std_cell(netlist.pin_owner(pin))))
+                data_pin = pin;
+
+            break;
+        case standard_cell::pin_directions::OUTPUT:
+            output_pins[ netlist.pin_std_cell(pin) ] = pin;
+            break;
+        default:
+            break;
+        }
+
+
+    }
+
+    bool test_created = false;
+    for (auto from : input_pins) {
+
+        entity_system::entity from_std_cell = netlist.pin_std_cell(from);
+        auto arcs = lib.pin_timing_arcs(from_std_cell);
+        for(auto arc : arcs)
+        {
+            if(lib.timing_arc_timing_type(arc) == timing_arc_types::SEQUENTIAL && !test_created)
+            {
+                graph.test_insert(graph.rise_node(clk_pin), graph.rise_node(data_pin), arc);
+                graph.test_insert(graph.fall_node(clk_pin), graph.fall_node(data_pin), arc);
+                test_created = true;
+            }
+            else
+            {
+                auto result = output_pins.find(lib.timing_arc_to(arc));
+                if(result == output_pins.end()) continue;
+                auto to = result->second;
+                switch (lib.timing_arc_timing_sense(arc)) {
+                case unateness::POSITIVE_UNATE:
+                    graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                        graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                    break;
+                case unateness::NON_UNATE:
+                    graph.edge_create(graph.rise_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                        graph.edge_create(graph.fall_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                    graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                        graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                    break;
+                case unateness::NEGATIVE_UNATE:
+                default:
+                    graph.edge_create(graph.rise_node(from), graph.fall_node(to), edge_types::TIMING_ARC, arc);
+                    if(lib.timing_arc_timing_type(arc) != timing_arc_types::RISING_EDGE)
+                        graph.edge_create(graph.fall_node(from), graph.rise_node(to), edge_types::TIMING_ARC, arc);
+                    break;
+                }
+            }
+        }
+    }
+
+
+
+}
+
 } /* namespace timing */
 } /* namespace ophidian */
 

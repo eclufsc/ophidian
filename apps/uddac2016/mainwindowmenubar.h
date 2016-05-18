@@ -15,6 +15,14 @@ class MainWindowMenuBar : public QMenuBar
 
     std::map<std::string, QAction*> m_actions;
 
+
+
+    bool m_lef_def{false};
+    bool m_verilog{false};
+    bool m_timing_lib{false};
+
+    void update();
+
 public:
     explicit MainWindowMenuBar(QMainWindow * parent = 0);
     virtual ~MainWindowMenuBar();
@@ -28,6 +36,8 @@ public slots:
     void LEFDEF_reject();
     void action_open_verilog_triggered();
     void action_run_SA_triggered();
+    void action_run_STA_triggered();
+    void action_open_timing_library_triggered();
 };
 
 }

@@ -161,6 +161,14 @@ void circuit_canvas::reset()
     state(new canvas_states::idle(this));
 }
 
+void circuit_canvas::save_to_file(const std::string &filename)
+{
+    sf::RenderTexture texture;
+    texture.create(1920, 1080);
+    render(texture);
+    texture.getTexture().copyToImage().saveToFile(filename);
+}
+
 void circuit_canvas::resizeEvent(QResizeEvent *e)
 {
     sf::RenderWindow::create((sf::WindowHandle) winId());
@@ -179,7 +187,7 @@ void circuit_canvas::OnUpdate()
         m_state = m_save_state;
         m_save_state = nullptr;
     }
-    render();
+    render(*this);
     QSFMLCanvas::update();
 }
 
@@ -222,13 +230,13 @@ void circuit_canvas::clear(const sf::Color &color)
     QSFMLCanvas::clear(color);
 }
 
-void circuit_canvas::render()
+void circuit_canvas::render(sf::RenderTarget &target)
 {
-    setView(m_camera);
-    clear(sf::Color::White);
-    draw(m_canvas);
-    setView(getDefaultView());
-    draw(m_fps);
+    target.setView(m_camera);
+    target.clear(sf::Color::White);
+    target.draw(m_canvas);
+    target.setView(target.getDefaultView());
+    target.draw(m_fps);
 }
 
 canvas_states::idle::idle(circuit_canvas *canvas) :

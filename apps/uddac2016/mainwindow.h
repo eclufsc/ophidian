@@ -24,6 +24,7 @@ public:
     QString std_cell();
     QStringList std_cells();
     QPoint position();
+    double worst_slack();
     bool fixed();
 
      ophidian::entity_system::entity entity() const {
@@ -61,6 +62,8 @@ private slots:
     void on_combo_selected_type_activated(QString text);
     void on_line_edit_selected_x_returnPressed();
     void on_line_edit_selected_y_returnPressed();
+    void on_actionScreenshot_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

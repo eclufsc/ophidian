@@ -86,8 +86,8 @@ class timingdriven_placement
     std::set<Net> m_dirty_nets;
 
     // timing info is initialized in a lazy fashion >>
-    const std::string & m_dot_lib_late;
-    const std::string & m_dot_lib_early;
+    const std::string m_dot_lib_late;
+    const std::string m_dot_lib_early;
     timing::graph m_timing_graph;
     std::unique_ptr<timing::library_timing_arcs> m_tarcs;
     std::unique_ptr<timing::library> m_lib_late;
@@ -98,7 +98,7 @@ class timingdriven_placement
     void make_cell_nets_dirty(Cell cell);
     void update_dirty_rc_trees();
 public:
-    timingdriven_placement(const std::string & dot_verilog_file, const std::string & dot_def_file, const std::string & dot_lef_file, const std::string & dot_lib_late, const std::string & dot_lib_early, double clock_in_picosseconds);
+    timingdriven_placement(const std::string & dot_verilog_file, const std::string & dot_def_file, const std::string & dot_lef_file, const std::string m_dot_lib_late, const std::string m_dot_lib_early, double clock_in_ps);
     virtual ~timingdriven_placement();
 
 

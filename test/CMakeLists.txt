@@ -1,6 +1,6 @@
 set(SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.cpp
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.cpp
+        )
 
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/)
@@ -20,12 +20,12 @@ add_subdirectory (routing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
-target_link_libraries ( run_tests LINK_PUBLIC entity_system standard_cell netlist parsing placement floorplan interconnection timing timing-driven_placement density legalization routing emon )
+target_link_libraries ( run_tests LINK_PUBLIC entity_system standard_cell netlist parsing placement floorplan interconnection timing timing-driven_placement density legalization abacus routing emon )
 add_subdirectory (parsing)
 
 add_custom_command(
-    TARGET run_tests POST_BUILD
-    COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_CURRENT_BINARY_DIR}/input_files
-    COMMAND ln -sf ${THIRD_PARTY_PATH} ${CMAKE_CURRENT_BINARY_DIR}
+        TARGET run_tests POST_BUILD
+        COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_CURRENT_BINARY_DIR}/input_files
+        COMMAND ln -sf ${THIRD_PARTY_PATH} ${CMAKE_CURRENT_BINARY_DIR}
 
 )

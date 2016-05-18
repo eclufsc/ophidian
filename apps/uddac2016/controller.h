@@ -22,6 +22,12 @@ public:
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
     void read_def(const std::string & DEF);
     void read_verilog(const std::string & v);
+
+
+    void read_tau2014_lib(const std::string & file);
+    void read_liberty(const std::string & file);
+
+
     void init_canvas_controller(uddac2016::canvas *canvas);
 
 
@@ -67,12 +73,19 @@ public:
     {
         return m_app.cell_is_fixed(cell);
     }
+    double cell_worst_slack(const ophidian::entity_system::entity & cell) const
+    {
+        return m_app.cell_worst_slack(cell);
+    }
 
     void select(const ophidian::entity_system::entity & cell);
     void unselect(const ophidian::entity_system::entity & cell);
 
+    void screenshot();
+
 
     void run_SA();
+    void run_STA();
     void animate_solution(std::size_t duration = 30);
     void update_ckt_info();
 };

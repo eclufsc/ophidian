@@ -28,7 +28,6 @@ public:
     }
 
     batch_animation* update(sf::Vertex * v) {
-        std::cout << m_current << " / " << c_DURATION << std::endl;
         if(m_current == c_DURATION)
         {
             delete this;
