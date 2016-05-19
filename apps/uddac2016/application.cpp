@@ -142,8 +142,8 @@ void application::cell_std_cell(const entity_system::entity &cell, const entity_
     if(m_graph)
     {
         timing::graph_builder::repower(*m_netlist, *m_timing_library, *m_graph, cell);
-        m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
-        m_STA->topology(*m_topology);
+//        m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
+//        m_STA->topology(*m_topology);
         make_cell_nets_dirty(cell);
     }
 

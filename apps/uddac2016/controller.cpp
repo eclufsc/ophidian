@@ -127,7 +127,6 @@ void controller::run_STA()
     m_app.run_STA();
     auto worst_slacks = m_app.worst_slacks();
     range_painter painter;
-
     QColor negative0 = QColor::fromHsv(0, .7*255, .9*255);
     QColor negativeF = QColor::fromHsv(60, .7*255, .9*255);
     QColor zero = QColor::fromHsv(140, .7*255, .9*255);
@@ -141,9 +140,6 @@ void controller::run_STA()
     painter.positive(sf::Color(positive.red(), positive.green(), positive.blue()));
     painter.color_map(worst_slacks);
     m_canvas->paint_quads(painter);
-
-
-
 }
 
 void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
