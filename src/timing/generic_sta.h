@@ -135,7 +135,7 @@ class generic_sta
 
     timing_data & m_timing;
     graph_and_topology * m_topology;
-    const entity_system::vector_property< interconnection::rc_tree > & m_rc_trees;
+    const entity_system::vector_property< interconnection::packed_rc_tree > & m_rc_trees;
     MergeStrategy m_merge;
 
     SlewType compute_slew(lemon::ListDigraph::Node node, CapacitanceType load) const {
@@ -163,7 +163,7 @@ class generic_sta
     }
 
 public:
-    generic_sta( timing_data & timing, graph_and_topology & topology, const entity_system::vector_property< interconnection::rc_tree > & rc_trees) :
+    generic_sta( timing_data & timing, graph_and_topology & topology, const entity_system::vector_property< interconnection::packed_rc_tree > & rc_trees) :
         m_timing(timing),
         m_topology(&topology),
         m_rc_trees(rc_trees)
@@ -258,20 +258,21 @@ public:
                     {
                         auto pin = m_topology->g.pin(node);
                         auto net = m_topology->netlist.pin_net(pin);
-                        auto tree = m_rc_trees[m_topology->netlist.net_system().lookup(net)];
-                        lemon::ListGraph::NodeMap< SlewType > slews(tree.graph());
-                        lemon::ListGraph::NodeMap< SlewType > delays(tree.graph());
-                        lemon::ListGraph::NodeMap< CapacitanceType > ceffs(tree.graph());
+                        auto & tree = m_rc_trees[m_topology->netlist.net_system().lookup(net)];
+
+                        std::vector< SlewType > slews(tree.node_count());
+                        std::vector< SlewType > delays(tree.node_count());
+                        std::vector< CapacitanceType > ceffs(tree.node_count());
                         WireDelayModel calculator;
                         calculator.delay_map(delays);
                         calculator.slew_map(slews);
                         calculator.ceff_map(ceffs);
                         std::function<SlewType(CapacitanceType)> s_calculator = std::bind(&generic_sta::compute_slew, this, node, std::placeholders::_1);
-                        auto source_capacitor = tree.capacitor_by_name(m_topology->netlist.pin_name(pin));
-                        CapacitanceType load = calculator.simulate(s_calculator, tree, source_capacitor);
+
+                        CapacitanceType load = calculator.simulate(s_calculator, tree);
 
                         m_timing.nodes.load(node, load);
-                        m_timing.nodes.slew(node, slews[source_capacitor]);
+                        m_timing.nodes.slew(node, slews[0]);
 
                         SlewType worst_arrival = MergeStrategy::best();
                         switch(m_topology->g.node_edge(node))
@@ -302,12 +303,11 @@ public:
                             break;
                         }
                         m_timing.nodes.arrival(node, worst_arrival);
-
                         for(lemon::ListDigraph::OutArcIt arc(m_topology->g.G(), node); arc != lemon::INVALID; ++arc)
                         {
                             auto arc_target = m_topology->g.edge_target(arc);
                             auto target_pin = m_topology->g.pin(arc_target);
-                            auto target_capacitor = tree.capacitor_by_name(m_topology->netlist.pin_name(target_pin));
+                            auto target_capacitor = tree.tap(m_topology->netlist.pin_name(target_pin));
                             m_timing.arcs.slew(arc, slews[target_capacitor]);
                             m_timing.arcs.delay(arc, delays[target_capacitor]);
                             m_timing.nodes.slew(arc_target, m_timing.arcs.slew(arc));

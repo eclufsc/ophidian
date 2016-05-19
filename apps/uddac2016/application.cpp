@@ -57,7 +57,20 @@ void application::update_dirty_rc_trees()
     for(i = 0; i < nets.size(); ++i)
     {
         auto & rc_tree_late = (*m_rc_trees)[m_netlist->net_system().lookup(nets[i])];
-        m_flute.create_tree(*m_placement, nets[i], rc_tree_late, *m_timing_library);
+        auto & net_pins = m_netlist->net_pins(nets[i]);
+        entity_system::entity source;
+        for(auto pin : net_pins)
+        {
+            if(m_std_cells->pin_direction(m_netlist->pin_std_cell(pin)) == standard_cell::pin_directions::OUTPUT)
+            {
+                source = pin;
+                break;
+            }
+        }
+        assert( !(source == entity_system::entity{}) );
+        interconnection::rc_tree tree;
+        auto map = m_flute.create_tree(*m_placement, nets[i], tree, *m_timing_library);
+        m_rc_trees->at(m_netlist->net_system().lookup(nets[i])) = tree.pack(map.at(source));
     }
 #pragma omp barrier
     m_dirty_nets.clear();
@@ -170,7 +183,7 @@ void application::run_STA()
              m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
          m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(m_dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
 
-         m_rc_trees.reset(new entity_system::vector_property< ophidian::interconnection::rc_tree >());
+         m_rc_trees.reset(new entity_system::vector_property< ophidian::interconnection::packed_rc_tree >());
          m_netlist->register_net_property(m_rc_trees.get());
          for(auto cell : m_netlist->cell_system())
              make_cell_nets_dirty(cell);

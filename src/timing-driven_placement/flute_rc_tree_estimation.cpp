@@ -79,6 +79,8 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
 //    params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
     params & param = m_params;
 
+    std::set< interconnection::rc_tree::capacitor_id > taps;
+
     if(net_pins.size() == 1)
     {
         auto pin_u = net_pins[0];
@@ -86,9 +88,14 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
         auto u = rc_tree.capacitor_insert("C0");
         auto tap_u = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_u));
         tap_mapping[pin_u] = tap_u;
+        taps.insert(tap_u);
         auto pin_cap_u = library.pin_capacitance(placement.netlist().pin_std_cell(pin_u));
         rc_tree.capacitance(tap_u, pin_cap_u);
         rc_tree.resistor_insert(u, tap_u, quantity<si::resistance>(0.0 * si::ohms));
+
+        for(auto t : taps)
+            rc_tree.tap_insert(t);
+
         return tap_mapping;
     }
 
@@ -112,6 +119,11 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
         tap_mapping[pin_u] = tap_u;
         tap_mapping[pin_v] = tap_v;
 
+        taps.insert(tap_u);
+        taps.insert(tap_v);
+
+
+
         auto pin_cap_u = library.pin_capacitance(placement.netlist().pin_std_cell(pin_u));
         rc_tree.capacitance(tap_u, pin_cap_u);
         rc_tree.resistor_insert(u, tap_u, quantity<si::resistance>(0.0 * si::ohms));
@@ -119,6 +131,11 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
         auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
         rc_tree.capacitance(tap_v, pin_cap_v);
         rc_tree.resistor_insert(v, tap_v, quantity<si::resistance>(0.0 * si::ohms));
+
+
+        for(auto t : taps)
+            rc_tree.tap_insert(t);
+
         return tap_mapping;
     }
 
@@ -177,6 +194,7 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
             auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
 
             tap_mapping[pin] = tap_cap;
+            rc_tree.tap_insert(tap_cap);
 
             auto pin_cap = library.pin_capacitance(placement.netlist().pin_std_cell(pin));
             rc_tree.capacitance(tap_cap, pin_cap); // tap pin capacitance
@@ -184,6 +202,7 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
                 rc_tree.resistor_insert(cap_from, tap_cap, quantity<si::resistance>(0.0 * si::ohms));
         }
     }
+
     return tap_mapping;
 }
 

@@ -44,6 +44,23 @@ public:
 	}
 };
 
+
+class packed_elmore_second_moment {
+    const packed_elmore * m_elmore;
+    const interconnection::packed_rc_tree * m_tree;
+    std::vector<boost::units::quantity<second_moment> > m_second_moment;
+public:
+    packed_elmore_second_moment();
+    virtual ~packed_elmore_second_moment();
+    void elmore(const packed_elmore & elmore);
+    void tree(const interconnection::packed_rc_tree & tree);
+
+    const boost::units::quantity<second_moment>& at(std::size_t i) const {
+        return m_second_moment.at(i);
+    }
+    void run();
+};
+
 } /* namespace timing */
 } /* namespace ophidian */
 

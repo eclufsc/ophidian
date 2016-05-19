@@ -46,19 +46,19 @@ void effective_capacitance_wire_model::precision(double epsilon)
     m_precision = epsilon;
 }
 
-void effective_capacitance_wire_model::slew_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::SlewType> &sm)
+void effective_capacitance_wire_model::slew_map(std::vector<effective_capacitance_wire_model::SlewType> &sm)
 {
     m_slews_owner = false;
     m_slews = &sm;
 }
 
-void effective_capacitance_wire_model::delay_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::SlewType> &dm)
+void effective_capacitance_wire_model::delay_map(std::vector<effective_capacitance_wire_model::SlewType> &dm)
 {
     m_delays_owner = false;
     m_delays = &dm;
 }
 
-void effective_capacitance_wire_model::ceff_map(lemon::ListGraph::NodeMap<effective_capacitance_wire_model::CapacitanceType> &cm)
+void effective_capacitance_wire_model::ceff_map(std::vector<CapacitanceType> &cm)
 {
     m_ceff_owner = false;
     m_ceff = &cm;
@@ -82,19 +82,19 @@ lumped_capacitance_wire_model::~lumped_capacitance_wire_model()
     if(m_slews_owner && m_slews) delete m_slews;
 }
 
-void lumped_capacitance_wire_model::slew_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::SlewType> &sm)
+void lumped_capacitance_wire_model::slew_map(std::vector<lumped_capacitance_wire_model::SlewType> &sm)
 {
     m_slews_owner = false;
     m_slews = &sm;
 }
 
-void lumped_capacitance_wire_model::delay_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::SlewType> &dm)
+void lumped_capacitance_wire_model::delay_map(std::vector<lumped_capacitance_wire_model::SlewType> &dm)
 {
     m_delays_owner = false;
     m_delays = &dm;
 }
 
-void lumped_capacitance_wire_model::ceff_map(lemon::ListGraph::NodeMap<lumped_capacitance_wire_model::CapacitanceType> &cm)
+void lumped_capacitance_wire_model::ceff_map(std::vector<lumped_capacitance_wire_model::CapacitanceType> &cm)
 {
     m_ceff_owner = false;
     m_ceff = &cm;

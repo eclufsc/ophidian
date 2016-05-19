@@ -30,9 +30,9 @@ namespace boost {
 namespace units {
 
 typedef derived_dimension<length_base_dimension,-2,
-                          mass_base_dimension,-1,
-                          time_base_dimension,5,
-                          current_base_dimension,2>::type capacitance_time_dimension;
+mass_base_dimension,-1,
+time_base_dimension,5,
+current_base_dimension,2>::type capacitance_time_dimension;
 
 
 }
@@ -49,32 +49,74 @@ typedef boost::units::unit<boost::units::capacitance_time_dimension, boost::unit
 
 
 elmore_second_moment::elmore_second_moment(const interconnection::rc_tree & tree, const elmore& e) :
-		m_elmore(e), m_tree(tree), m_second_moment(tree.graph()) {
-	update();
+    m_elmore(e), m_tree(tree), m_second_moment(tree.graph()) {
+    update();
 }
 
 void elmore_second_moment::update() {
 
-	using namespace boost::units;
-	lemon::ListGraph::NodeMap<quantity<capacitance_time_unit> > m_downstream_capacitance(m_tree.graph());
+    using namespace boost::units;
+    lemon::ListGraph::NodeMap<quantity<capacitance_time_unit> > m_downstream_capacitance(m_tree.graph());
 
-	for (auto c : m_elmore.order())
-		m_downstream_capacitance[c] = m_tree.capacitance(c) * m_elmore.at(c);
+    for (auto c : m_elmore.order())
+        m_downstream_capacitance[c] = m_tree.capacitance(c) * m_elmore.at(c);
 
-	for (auto it = m_elmore.order().rbegin(); it != m_elmore.order().rend(); ++it) {
-		if (m_elmore.pred()[*it].first != lemon::INVALID)
-			m_downstream_capacitance[m_elmore.pred()[*it].first] += m_downstream_capacitance[*it];
-	}
+    for (auto it = m_elmore.order().rbegin(); it != m_elmore.order().rend(); ++it) {
+        if (m_elmore.pred()[*it].first != lemon::INVALID)
+            m_downstream_capacitance[m_elmore.pred()[*it].first] += m_downstream_capacitance[*it];
+    }
 
-	m_second_moment[m_elmore.order().front()] = 0.0 * boost::units::si::seconds*boost::units::si::seconds;
-	for (auto c : m_elmore.order()) {
-		if (m_elmore.pred()[c].first != lemon::INVALID)
-			m_second_moment[c] = m_second_moment[m_elmore.pred()[c].first] + m_tree.resistance(m_elmore.pred()[c].second) * m_downstream_capacitance[c];
-	}
+    m_second_moment[m_elmore.order().front()] = 0.0 * boost::units::si::seconds*boost::units::si::seconds;
+    for (auto c : m_elmore.order()) {
+        if (m_elmore.pred()[c].first != lemon::INVALID)
+            m_second_moment[c] = m_second_moment[m_elmore.pred()[c].first] + m_tree.resistance(m_elmore.pred()[c].second) * m_downstream_capacitance[c];
+    }
 
 }
 
 elmore_second_moment::~elmore_second_moment() {
+}
+
+packed_elmore_second_moment::packed_elmore_second_moment() :
+    m_elmore(nullptr),
+    m_tree(nullptr)
+{
+
+}
+
+packed_elmore_second_moment::~packed_elmore_second_moment()
+{
+
+}
+
+void packed_elmore_second_moment::elmore(const packed_elmore &elmore)
+{
+    m_elmore = &elmore;
+}
+
+void packed_elmore_second_moment::tree(const interconnection::packed_rc_tree &tree)
+{
+    m_tree = &tree;
+    m_second_moment.resize(m_tree->node_count());
+}
+
+void packed_elmore_second_moment::run()
+{
+    using namespace boost::units;
+    std::vector<quantity<capacitance_time_unit> > downstream(m_tree->node_count());
+
+    for (std::size_t i = 0; i < m_tree->node_count(); ++i)
+        downstream[i] = m_tree->capacitance(i) * m_elmore->at(i);
+
+    for(std::size_t i = 0; i < m_tree->node_count()-1; ++i)
+    {
+        std::size_t n = m_tree->node_count()-(i+1);
+        downstream[ m_tree->pred(n) ] += downstream[n];
+    }
+
+    m_second_moment[0] = 0.0 * si::seconds*si::seconds;
+    for (std::size_t i = 1; i < m_tree->node_count(); ++i)
+        m_second_moment[i] = m_second_moment[m_tree->pred(i)] + m_tree->resistance(i) * downstream[i];
 }
 
 } /* namespace timing */

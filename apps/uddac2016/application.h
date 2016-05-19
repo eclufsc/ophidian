@@ -35,7 +35,7 @@ class application
     ophidian::timing::design_constraints m_dc;
     std::unique_ptr<ophidian::timing::library_timing_arcs> m_tarcs;
     std::unique_ptr<ophidian::timing::library> m_timing_library;
-    std::unique_ptr< ophidian::entity_system::vector_property< ophidian::interconnection::rc_tree > >  m_rc_trees;
+    std::unique_ptr< ophidian::entity_system::vector_property< ophidian::interconnection::packed_rc_tree > >  m_rc_trees;
     std::unique_ptr< ophidian::timing::graph > m_graph;
     std::unique_ptr< ophidian::timing::timing_data > m_timing_data;
     std::unique_ptr< ophidian::timing::graph_and_topology> m_topology;

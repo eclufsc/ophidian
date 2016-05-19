@@ -54,17 +54,17 @@ int main(int argc, char *argv[])
     input.read(argv[1]);
 
     std::size_t i = 0;
-    for(auto & tree : input.trees())
-    {
-        std::cout << "net " << tree.net_name << std::endl;
-        std::cout << "BEGIN" << std::endl;
-        timing::effective_capacitance_wire_model ceff;
-        ceff.simulate(calc, tree.tree, tree.tree.capacitor_by_name(tree.source));
-        const interconnection::rc_tree & rc_tree = tree.tree;
-        for(lemon::ListGraph::NodeIt it(rc_tree.graph()); it != lemon::INVALID; ++it)
-            std::cout << rc_tree.capacitor_name(it) << " " << ceff.delays()[it].value() << std::endl;
-        std::cout << "END" << std::endl;
-    }
+//    for(auto & tree : input.trees())
+//    {
+//        std::cout << "net " << tree.net_name << std::endl;
+//        std::cout << "BEGIN" << std::endl;
+//        timing::effective_capacitance_wire_model ceff;
+////        ceff.simulate(calc, tree.tree.pack());
+//        const interconnection::rc_tree & rc_tree = tree.tree;
+//        for(lemon::ListGraph::NodeIt it(rc_tree.graph()); it != lemon::INVALID; ++it)
+//            std::cout << rc_tree.capacitor_name(it) << " " << ceff.delays()[it].value() << std::endl;
+//        std::cout << "END" << std::endl;
+//    }
 
     return 0;
 }

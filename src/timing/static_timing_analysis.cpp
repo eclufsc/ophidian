@@ -31,8 +31,8 @@ void static_timing_analysis::init_timing_data()
     m_late.reset(new timing::timing_data(*m_late_lib, *m_timing_graph));
     m_early.reset(new timing::timing_data(*m_early_lib, *m_timing_graph));
     m_topology.reset(new timing::graph_and_topology(*m_timing_graph, *m_netlist, *m_late_lib));
-    m_late_sta.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::pessimistic>(*m_late, *m_topology, *m_rc_trees));
-    m_early_sta.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::optimistic>(*m_early, *m_topology, *m_rc_trees));
+//    m_late_sta.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::pessimistic>(*m_late, *m_topology, *m_rc_trees));
+//    m_early_sta.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::optimistic>(*m_early, *m_topology, *m_rc_trees));
     m_test.reset(new timing::test_calculator{*m_topology, *m_early, *m_late, TimeType(m_dc.clock.period*boost::units::si::pico*boost::units::si::seconds)});
     m_endpoints = timing::endpoints(*m_netlist);
 }
