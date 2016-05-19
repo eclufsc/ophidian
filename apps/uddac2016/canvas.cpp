@@ -95,6 +95,7 @@ void canvas::reindex(const std::vector<std::pair<entity_system::entity, geometry
     }
 }
 
+
 void canvas::setFixed(entity_system::entity cell)
 {
     std::vector< gui::quad > & quads = m_cell2quads.at(cell);

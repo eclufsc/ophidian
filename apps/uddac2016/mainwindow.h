@@ -4,10 +4,6 @@
 #include <QMainWindow>
 #include "controller.h"
 
-
-
-
-
 namespace uddac2016 {
 
 namespace Ui {
@@ -32,6 +28,7 @@ public:
      }
 
 };
+
 
 class MainWindow : public QMainWindow
 {
@@ -63,6 +60,9 @@ private slots:
     void on_line_edit_selected_x_returnPressed();
     void on_line_edit_selected_y_returnPressed();
     void on_actionScreenshot_triggered();
+    void on_lineEdit_name_regex_returnPressed();
+    void on_list_visible_nets_itemSelectionChanged();
+    void on_button_delete_visible_net_clicked();
 
 private:
     Ui::MainWindow *ui;

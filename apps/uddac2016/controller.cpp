@@ -10,10 +10,28 @@
 #include <QDebug>
 #include <QDateTime>
 
+#include "../interconnection/flute.h"
+
+#include <QRegularExpression>
+
 using namespace ophidian;
 
 namespace uddac2016
 {
+
+std::vector<entity_system::entity> controller::nets_matching(const QString &regex )
+{
+    std::vector<entity_system::entity> result;
+    QRegularExpression expression(regex);
+    for(auto net : m_app.nets())
+    {
+        std::string net_name = m_app.net_name(net);
+        auto match = expression.match(QString::fromStdString(net_name));
+        if(match.hasMatch())
+            result.push_back(net);
+    }
+    return result;
+}
 
 controller::controller(MainWindow &mainwindow) :
     m_mainwindow(mainwindow)
@@ -26,7 +44,7 @@ void controller::update_ckt_info()
     m_mainwindow.cell_count(m_app.cell_count());
     m_mainwindow.pin_count(m_app.pin_count());
     m_mainwindow.net_count(m_app.net_count());
-    m_mainwindow.die_area(QPoint(m_app.chip_boundaries()[3].x(), m_app.chip_boundaries()[1].y()));
+    m_mainwindow.die_area(QPoint(m_app.chip_boundaries()[3].x()/m_app.placement_units2micron(), m_app.chip_boundaries()[1].y()/m_app.placement_units2micron()));
     m_mainwindow.circuit_name(QString::fromStdString(m_app.circuit_name()));
 }
 
@@ -110,14 +128,85 @@ void controller::init_canvas_controller(uddac2016::canvas *canvas)
     canvas->main_controller(this);
 }
 
+std::size_t controller::show_nets(const QString &regex)
+{
+    auto matching = nets_matching(regex);
+    for(auto net : matching)
+        show_net(net);
+    qDebug() << matching.size() << " matches";
+}
+
+void controller::remove_nets(const QString &regex)
+{
+    auto matching = nets_matching(regex);
+    qDebug() << "remove nets matching " << regex << " (" <<  matching.size() << ")";
+
+
+    for(const net & n : m_nets)
+    {
+        if(std::find(matching.begin(), matching.end(), n.the_net) != matching.end())
+        {
+
+            for(auto & line : n.lines)
+                m_canvas->erase(line);
+        }
+    }
+
+    m_nets.erase( std::remove_if(m_nets.begin(), m_nets.end(), [matching](const net& n)->bool{
+        return std::find(matching.begin(), matching.end(), n.the_net) != matching.end();
+    }), m_nets.end() );
+
+    for(auto entity : matching)
+        m_visible_nets.erase(entity);
+}
+
+void controller::show_net(const entity_system::entity &net)
+{
+    if(!m_visible_nets.insert(net).second) return;
+    uddac2016::net the_net;
+    the_net.the_net = net;
+
+    auto net_pins = m_app.net_pins(net);
+    std::vector<unsigned> X(net_pins.size()), Y(net_pins.size());
+    X.resize(0);
+    Y.resize(0);
+    for(auto pin : net_pins)
+    {
+        auto pos = m_app.pin_position(pin);
+        X.push_back(static_cast<unsigned>(pos.x()));
+        Y.push_back(static_cast<unsigned>(pos.y()));
+    }
+    auto tree = interconnection::flute(X.size(), X.data(), Y.data(), ACCURACY);
+    std::size_t num_branches = 2 * tree.deg - 2;
+
+    the_net.lines.reserve(2*num_branches);
+
+    for(std::size_t i = 0; i < num_branches; ++i)
+    {
+        if(i == tree.branch[i].n) continue;
+        geometry::point<double> p1(tree.branch[i].x, tree.branch[i].y);
+        geometry::point<double> p2(tree.branch[tree.branch[i].n].x, tree.branch[i].y);
+        geometry::point<double> p3(tree.branch[tree.branch[i].n].x, tree.branch[tree.branch[i].n].y);
+
+        p1.y(-p1.y());
+        p2.y(-p2.y());
+        p3.y(-p3.y());
+
+        the_net.lines.push_back(m_canvas->drawLine(p1, p2));
+        the_net.lines.push_back(m_canvas->drawLine(p2, p3));
+    }
+    m_nets.push_back(the_net);
+    delete[] tree.branch;
+}
+
 void controller::run_SA()
 {
     for(int i = 0; i < 10; ++i)
         m_app.run_SA();
 
-//    std::cout << "will legalize " << std::endl;
-//    m_app.legalize();
-//    std::cout << "legalize DONE" << std::endl;
+    //    std::cout << "will legalize " << std::endl;
+    //    m_app.legalize();
+    //    std::cout << "legalize DONE" << std::endl;
 
     animate_solution();
 }

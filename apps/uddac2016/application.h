@@ -57,6 +57,14 @@ public:
     void read_liberty(const std::string & file);
 
 
+    const std::vector<ophidian::entity_system::entity> &  net_pins(const ophidian::entity_system::entity & net) const {
+        return m_netlist->net_pins(net);
+    }
+
+    const ophidian::geometry::point<double> pin_position(const ophidian::entity_system::entity & pin) const {
+        return m_placement->pin_position(pin);
+    }
+
     std::vector< std::pair<ophidian::entity_system::entity, ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > > > cells_geometries() const;
     ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > cell_geometry(const ophidian::entity_system::entity & cell) const;
     void cell_position(const ophidian::entity_system::entity & cell, const ophidian::geometry::point<double> & p);
@@ -75,6 +83,10 @@ public:
         return m_std_cells->cell_create(name);
     }
 
+
+    double placement_units2micron() const {
+        return m_placement_library->dist2microns();
+    }
 
 
     bool cell_is_fixed(const ophidian::entity_system::entity & cell) const {
@@ -142,6 +154,14 @@ public:
         for(auto cell : m_netlist->cell_system())
             worst_slacks.insert(std::make_pair(cell, std::make_pair(cell_worst_slack(cell), m_placement->cell_fixed(cell))));
         return worst_slacks;
+    }
+
+    const ophidian::entity_system::entity_system & nets() const {
+        return m_netlist->net_system();
+    }
+
+    const std::string net_name(const ophidian::entity_system::entity & net) const {
+        return m_netlist->net_name(net);
     }
 
     void run_SA();

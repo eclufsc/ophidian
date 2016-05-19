@@ -10,7 +10,6 @@
 #include "../geometry/geometry.h"
 
 
-
 using namespace ophidian;
 
 namespace uddac2016 {
@@ -56,7 +55,7 @@ void MainWindow::circuit_name(const QString &name)
 
 void MainWindow::die_area(const QPoint &size)
 {
-    ui->label_die_area->setText(QString::number(size.x()) + "x" + QString::number(size.y()));
+    ui->label_die_area->setText(QString::number(size.x()) + "μm X " + QString::number(size.y()) + "μm");
 }
 
 void MainWindow::cell_count(int cells)
@@ -168,6 +167,35 @@ void MainWindow::on_actionScreenshot_triggered()
     m_controller.screenshot();
 }
 
+void MainWindow::on_lineEdit_name_regex_returnPressed()
+{
+    if(!ui->lineEdit_name_regex->text().isEmpty())
+    {
+        ui->list_visible_nets->addItem(ui->lineEdit_name_regex->text());
+        auto matches = m_controller.show_nets(ui->lineEdit_name_regex->text());
+
+    }
+    ui->lineEdit_name_regex->clear();
 }
+
+void MainWindow::on_button_delete_visible_net_clicked()
+{
+    for(auto item : ui->list_visible_nets->selectedItems())
+    {
+        m_controller.remove_nets(item->text());
+        delete item;
+    }
+}
+
+
+void MainWindow::on_list_visible_nets_itemSelectionChanged()
+{
+    ui->button_delete_visible_net->setDisabled(ui->list_visible_nets->selectedItems().isEmpty());
+}
+
+}
+
+
+
 
 

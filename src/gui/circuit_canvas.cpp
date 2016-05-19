@@ -129,6 +129,11 @@ wire_quad circuit_canvas::drawRect(const geometry::point<double> &p1, const geom
     return the_rect;
 }
 
+line circuit_canvas::drawLine(const geometry::point<double> &p1, const geometry::point<double> &p2)
+{
+    return m_canvas.line_create(p1, p2);
+}
+
 void circuit_canvas::cameraCenter(const sf::Vector2f &position)
 {
     m_camera.setCenter(position);

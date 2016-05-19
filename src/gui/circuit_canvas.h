@@ -110,6 +110,9 @@ public:
 
     wire_quad drawRect(quad from_quad);
     wire_quad drawRect(const geometry::point<double> & p1, const geometry::point<double> & p2, const geometry::point<double> & p3, const geometry::point<double> & p4);
+    line drawLine(const geometry::point<double> & p1, const geometry::point<double> & p2);
+
+
 
 
     // camera

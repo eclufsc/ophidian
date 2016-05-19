@@ -11,12 +11,24 @@
 namespace uddac2016
 {
 
+struct net {
+    ophidian::entity_system::entity the_net;
+    std::vector< ophidian::gui::line > lines;
+};
+
+
 class MainWindow;
 class controller
 {
     MainWindow & m_mainwindow;
     application m_app;
     uddac2016::canvas * m_canvas; // lazy init
+
+
+    std::vector<net> m_nets;
+    std::unordered_set<ophidian::entity_system::entity> m_visible_nets;
+
+    std::vector<ophidian::entity_system::entity> nets_matching(const QString & regex);
 public:
     controller(MainWindow & mainwindow);
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
@@ -29,6 +41,12 @@ public:
 
 
     void init_canvas_controller(uddac2016::canvas *canvas);
+
+
+
+    std::size_t show_nets(const QString & regex);
+    void remove_nets(const QString & regex);
+    void show_net(const ophidian::entity_system::entity & net);
 
 
     void place_cell(const ophidian::entity_system::entity & cell, const ophidian::geometry::point<double> & p);
