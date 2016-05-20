@@ -57,6 +57,10 @@ public:
     void read_liberty(const std::string & file);
 
 
+    bool STA() const {
+        return m_STA != nullptr;
+    }
+
     const std::vector<ophidian::entity_system::entity> &  net_pins(const ophidian::entity_system::entity & net) const {
         return m_netlist->net_pins(net);
     }

@@ -128,6 +128,28 @@ void controller::init_canvas_controller(uddac2016::canvas *canvas)
     canvas->main_controller(this);
 }
 
+void controller::repaint()
+{
+    if(m_app.STA())
+    {
+        auto worst_slacks = m_app.worst_slacks();
+        range_painter painter;
+        QColor negative0 = m_mainwindow.negativeSlackBegin();
+        QColor negativeF = m_mainwindow.negativeSlackEnd();
+        QColor zero = m_mainwindow.zeroSlack();
+        QColor positive = m_mainwindow.positiveSlack();
+
+        painter.negative(std::make_pair(
+                             sf::Color(negative0.red(), negative0.green(), negative0.blue()),
+                             sf::Color(negativeF.red(), negativeF.green(), negativeF.blue())
+                             ));
+        painter.zero(sf::Color(zero.red(), zero.green(), zero.blue()));
+        painter.positive(sf::Color(positive.red(), positive.green(), positive.blue()));
+        painter.color_map(worst_slacks);
+        m_canvas->paint_quads(painter);
+    }
+}
+
 std::size_t controller::show_nets(const QString &regex)
 {
     auto matching = nets_matching(regex);
@@ -214,21 +236,7 @@ void controller::run_SA()
 void controller::run_STA()
 {
     m_app.run_STA();
-    auto worst_slacks = m_app.worst_slacks();
-    range_painter painter;
-    QColor negative0 = QColor::fromHsv(0, .7*255, .9*255);
-    QColor negativeF = QColor::fromHsv(60, .7*255, .9*255);
-    QColor zero = QColor::fromHsv(140, .7*255, .9*255);
-    QColor positive = QColor::fromHsv(230, .7*255, .9*255);
-
-    painter.negative(std::make_pair(
-                         sf::Color(negative0.red(), negative0.green(), negative0.blue()),
-                         sf::Color(negativeF.red(), negativeF.green(), negativeF.blue())
-                         ));
-    painter.zero(sf::Color(zero.red(), zero.green(), zero.blue()));
-    painter.positive(sf::Color(positive.red(), positive.green(), positive.blue()));
-    painter.color_map(worst_slacks);
-    m_canvas->paint_quads(painter);
+    repaint();
 }
 
 void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)

@@ -48,6 +48,26 @@ MainWindow::~MainWindow()
 
 }
 
+const QColor &MainWindow::negativeSlackBegin() const
+{
+    return ui->menuBar->negativeSlackBegin();
+}
+
+const QColor &MainWindow::negativeSlackEnd() const
+{
+    return ui->menuBar->negativeSlackEnd();
+}
+
+const QColor &MainWindow::zeroSlack() const
+{
+    return ui->menuBar->zeroSlack();
+}
+
+const QColor &MainWindow::positiveSlack() const
+{
+    return ui->menuBar->positiveSlack();
+}
+
 void MainWindow::circuit_name(const QString &name)
 {
     ui->label_circuit_name->setText(name);
@@ -84,6 +104,11 @@ void MainWindow::select(ophidian::entity_system::entity entity)
     unselect();
     m_selected = selected_cell(m_controller, entity);
     update_selected();
+}
+
+void MainWindow::repaintQuads()
+{
+    m_controller.repaint();
 }
 
 

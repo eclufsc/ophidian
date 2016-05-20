@@ -43,6 +43,8 @@ public:
     void init_canvas_controller(uddac2016::canvas *canvas);
 
 
+    void repaint();
+
 
     std::size_t show_nets(const QString & regex);
     void remove_nets(const QString & regex);

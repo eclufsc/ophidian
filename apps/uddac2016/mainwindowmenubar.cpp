@@ -6,6 +6,7 @@
 
 #include <QFileDialog>
 
+
 namespace uddac2016 {
 
 void MainWindowMenuBar::update()
@@ -28,8 +29,12 @@ void MainWindowMenuBar::update()
 
 MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QMenuBar(parent),
-    m_mainwindow(*dynamic_cast<MainWindow*>(parent))
+    m_mainwindow(*dynamic_cast<MainWindow*>(parent)),
+    m_preferences(&m_mainwindow)
 {
+    connect(&m_preferences, SIGNAL(accepted()), &m_mainwindow, SLOT(repaintQuads()));
+
+
     QMenu * file = this->addMenu("File");
     QAction * action = file->addAction("Open LEF/DEF...");
     connect(action, SIGNAL(triggered()), this, SLOT(action_open_LEFDEF_triggered()));
@@ -40,6 +45,11 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
 
     QAction * exit = file->addAction("Exit");
     connect(exit, SIGNAL(triggered()), &m_mainwindow, SLOT(close()));
+
+    QMenu * editMenu = this->addMenu("Edit");
+    QAction * preferencesAction = editMenu->addAction("Preferences");
+    connect(preferencesAction, SIGNAL(triggered()), this, SLOT(openPreferencesWindow()));
+
 
     QMenu * netlistMenu = this->addMenu("Netlist");
     QAction * openVerilogAction = netlistMenu->addAction("Open Verilog File...");
@@ -60,6 +70,8 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     readLibraryAction->setDisabled(true);
     runSTAAction->setDisabled(true);
 
+
+
     m_actions["file"] = action;
     m_actions["read_sol"] = read_sol;
     m_actions["exit"] = exit;
@@ -67,6 +79,7 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     m_actions["run_SA"] = runSAAction;
     m_actions["timing_lib"] = readLibraryAction;
     m_actions["STA"] = runSTAAction;
+    m_actions["preferences"] = preferencesAction;
 }
 
 MainWindowMenuBar::~MainWindowMenuBar()
@@ -150,6 +163,12 @@ void MainWindowMenuBar::action_open_timing_library_triggered()
     }
     update();
 
+}
+
+void MainWindowMenuBar::openPreferencesWindow()
+{
+    m_preferences.draw();
+    m_preferences.show();
 }
 
 }

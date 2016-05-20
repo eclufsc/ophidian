@@ -5,8 +5,12 @@
 #include "mainwindow.h"
 #include "controller.h"
 
+#include "preferencesdialog.h"
+
+
 namespace uddac2016 {
 
+class PreferencesDialog;
 class MainWindowMenuBar : public QMenuBar
 {
     Q_OBJECT
@@ -15,7 +19,7 @@ class MainWindowMenuBar : public QMenuBar
 
     std::map<std::string, QAction*> m_actions;
 
-
+    PreferencesDialog m_preferences;
 
     bool m_lef_def{false};
     bool m_verilog{false};
@@ -29,6 +33,23 @@ public:
 
     void setController(controller& ctrl);
 
+
+    const QColor & negativeSlackBegin() const {
+        return m_preferences.negativeSlackBegin();
+    }
+
+    const QColor & negativeSlackEnd() const {
+        return m_preferences.negativeSlackEnd();
+    }
+
+    const QColor & zeroSlack() const {
+        return m_preferences.zeroSlack();
+    }
+
+    const QColor & positiveSlack() const {
+        return m_preferences.positiveSlack();
+    }
+
 public slots:
     void action_open_LEFDEF_triggered();
     void action_open_placement_solution_triggered();
@@ -38,6 +59,7 @@ public slots:
     void action_run_SA_triggered();
     void action_run_STA_triggered();
     void action_open_timing_library_triggered();
+    void openPreferencesWindow();
 };
 
 }

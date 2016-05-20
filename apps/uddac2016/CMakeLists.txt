@@ -30,6 +30,7 @@ set(SOURCES
     application.cpp
     mainwindow.cpp
     openlefdefdialog.cpp
+    preferencesdialog.cpp
     mainwindowmenubar.cpp
 )
 

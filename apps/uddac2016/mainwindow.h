@@ -44,6 +44,11 @@ public:
     ~MainWindow();
 
 
+    const QColor & negativeSlackBegin() const;
+    const QColor & negativeSlackEnd() const;
+    const QColor & zeroSlack() const;
+    const QColor & positiveSlack() const;
+
     void circuit_name(const QString & name);
     void die_area(const QPoint & size);
     void cell_count(int cells);
@@ -53,6 +58,10 @@ public:
 
     void unselect();
     void select(ophidian::entity_system::entity entity);
+
+
+public slots:
+    void repaintQuads();
 
 
 private slots:
