@@ -39,8 +39,10 @@ class packed_rc_tree {
     std::vector< std::size_t > m_pred;
     std::vector< quantity<si::resistance> > m_resistances;
     std::vector< quantity<si::capacitance> > m_capacitances;
+    std::unordered_map<std::string, std::size_t> m_taps;
+
 public:
-    packed_rc_tree(std::size_t node_count);
+    packed_rc_tree(std::size_t node_count=0);
     virtual ~packed_rc_tree();
     void pred(std::size_t i, std::size_t pred);
     void capacitance(std::size_t i, quantity<si::capacitance> cap);
@@ -57,6 +59,15 @@ public:
     quantity<si::capacitance> capacitance(std::size_t i) const {
         return m_capacitances[i];
     }
+
+    std::size_t tap(const std::string & name) const {
+        return m_taps.at(name);
+    }
+
+
+    void tap(const std::string & name, std::size_t value);
+
+
 };
 
 class rc_tree {
@@ -68,6 +79,7 @@ private:
 	graph_t::NodeMap<quantity<si::capacitance> > m_capacitances;
 	graph_t::EdgeMap<quantity<si::resistance> > m_resistances;
 	quantity<si::capacitance> m_lumped_capacitance;
+    std::vector< graph_t::Node > m_taps;
 
 	std::unordered_map<std::string, lemon::ListGraph::Node> m_name2node;
 public:
@@ -82,6 +94,8 @@ public:
 	quantity<si::capacitance> lumped() const {
 		return m_lumped_capacitance;
 	}
+
+    void tap_insert(capacitor_id cap);
 
 	capacitor_id capacitor_insert(std::string name);
 

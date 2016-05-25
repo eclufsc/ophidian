@@ -28,7 +28,6 @@ public:
     }
 
     batch_animation* update(sf::Vertex * v) {
-        std::cout << m_current << " / " << c_DURATION << std::endl;
         if(m_current == c_DURATION)
         {
             delete this;
@@ -127,6 +126,11 @@ public:
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(reinterpret_cast<const sf::Vertex*>(m_vertices.data()), m_system.size()*NumberOfVertices, m_primitive, states);
+    }
+
+    void clear() {
+        for(auto entity : m_system)
+            m_system.destroy(entity);
     }
 
 };

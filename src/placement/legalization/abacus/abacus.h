@@ -21,7 +21,7 @@ under the License.
 #ifndef OPHIDIAN_ABACUS_H
 #define OPHIDIAN_ABACUS_H
 
-#include <legalization.h>
+#include "../legalization.h"
 #include "cells.h"
 #include "subrows.h"
 

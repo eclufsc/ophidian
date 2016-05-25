@@ -101,7 +101,7 @@ public:
 
     bool has_animation() const;
 
-
+    void clear();
 
 };
 

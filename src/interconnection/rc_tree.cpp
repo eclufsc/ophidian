@@ -64,6 +64,11 @@ rc_tree &rc_tree::operator=(const rc_tree &other)
 rc_tree::~rc_tree() {
 }
 
+void rc_tree::tap_insert(rc_tree::capacitor_id cap)
+{
+    m_taps.push_back(cap);
+}
+
 packed_rc_tree rc_tree::pack(capacitor_id source) const
 {
     packed_rc_tree result(capacitor_count());
@@ -116,7 +121,8 @@ packed_rc_tree rc_tree::pack(capacitor_id source) const
             result.pred(current_order, order[parent]);
         }
     }
-
+    for(auto tap : m_taps)
+        result.tap(m_names[tap], order[tap]);
     return result;
 }
 
@@ -171,6 +177,11 @@ void packed_rc_tree::capacitance(std::size_t i, quantity<si::capacitance> cap)
 void packed_rc_tree::resistance(std::size_t i, quantity<si::resistance> res)
 {
     m_resistances[i] = res;
+}
+
+void packed_rc_tree::tap(const std::string &name, std::size_t value)
+{
+    m_taps[name] = value;
 }
 
 } /* namespace timing */

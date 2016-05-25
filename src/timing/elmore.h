@@ -29,28 +29,43 @@ namespace timing {
 class elmore {
 
     const interconnection::rc_tree& m_tree;
-	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_delay;
-	lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::capacitance > > m_downstream_capacitance;
-	lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > m_pred;
-	std::vector< interconnection::rc_tree::capacitor_id > m_order;
-	interconnection::rc_tree::capacitor_id m_source;
+    lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::time > > m_elmore_delay;
+    lemon::ListGraph::NodeMap< boost::units::quantity< boost::units::si::capacitance > > m_downstream_capacitance;
+    lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > m_pred;
+    std::vector< interconnection::rc_tree::capacitor_id > m_order;
+    interconnection::rc_tree::capacitor_id m_source;
 public:
     elmore(const interconnection::rc_tree& tree, interconnection::rc_tree::capacitor_id source);
-	virtual ~elmore();
+    virtual ~elmore();
 
-	void update();
+    void update();
 
-	boost::units::quantity<boost::units::si::time> at(interconnection::rc_tree::capacitor_id capacitor) const {
-		return m_elmore_delay[capacitor];
-	}
+    boost::units::quantity<boost::units::si::time> at(interconnection::rc_tree::capacitor_id capacitor) const {
+        return m_elmore_delay[capacitor];
+    }
 
-	const lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > & pred() const {
-		return m_pred;
-	}
-	const std::vector< interconnection::rc_tree::capacitor_id > & order() const {
-		return m_order;
-	}
+    const lemon::ListGraph::NodeMap< std::pair<interconnection::rc_tree::capacitor_id, interconnection::rc_tree::resistor_id> > & pred() const {
+        return m_pred;
+    }
+    const std::vector< interconnection::rc_tree::capacitor_id > & order() const {
+        return m_order;
+    }
 };
+
+class packed_elmore {
+    const interconnection::packed_rc_tree * m_tree;
+    std::vector<boost::units::quantity< boost::units::si::time > > m_delays;
+public:
+    packed_elmore();
+    virtual ~packed_elmore();
+    void tree(const interconnection::packed_rc_tree & tree);
+
+    const boost::units::quantity< boost::units::si::time >& at(std::size_t i) const {
+        return m_delays.at(i);
+    }
+    void run();
+};
+
 
 } /* namespace timing */
 } /* namespace ophidian */

@@ -9,4 +9,7 @@ add_subdirectory (timing)
 add_subdirectory (timing-driven_placement)
 add_subdirectory (density)
 add_subdirectory (routing)
-add_subdirectory (gui)
+
+if(BUILD_GUI)
+    add_subdirectory (gui)
+endif(BUILD_GUI)

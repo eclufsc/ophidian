@@ -117,6 +117,12 @@ bool canvas::has_animation() const
     return m_quads.has_animation() || m_lines.has_animation();
 }
 
+void canvas::clear()
+{
+    m_lines.clear();
+    m_quads.clear();
+}
+
 
 }
 }

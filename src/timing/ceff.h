@@ -44,53 +44,65 @@ namespace timing {
 class lumped_capacitance_wire_model {
     using CapacitanceType = boost::units::quantity < boost::units::si::capacitance >;
     using SlewType = boost::units::quantity < boost::units::si::time >;
-    lemon::ListGraph::NodeMap< SlewType > * m_slews;
-    lemon::ListGraph::NodeMap< SlewType > * m_delays;
-    lemon::ListGraph::NodeMap< CapacitanceType > * m_ceff;
+    std::vector< SlewType > * m_slews;
+    std::vector< SlewType > * m_delays;
+    std::vector< CapacitanceType > * m_ceff;
     bool m_slews_owner;
     bool m_delays_owner;
     bool m_ceff_owner;
 public:
     lumped_capacitance_wire_model();
     virtual ~lumped_capacitance_wire_model();
-    void slew_map(lemon::ListGraph::NodeMap< SlewType >& sm);
-    void delay_map(lemon::ListGraph::NodeMap< SlewType >& dm);
-    void ceff_map(lemon::ListGraph::NodeMap<CapacitanceType> &cm);
-    const lemon::ListGraph::NodeMap< SlewType >& slews() const {
+    void slew_map(std::vector< SlewType >& sm);
+    void delay_map(std::vector< SlewType >& dm);
+    void ceff_map(std::vector<CapacitanceType> &cm);
+    const std::vector< SlewType >& slews() const {
         return *m_slews;
     }
-    const lemon::ListGraph::NodeMap< SlewType >& delays() const {
+    const std::vector< SlewType >& delays() const {
         return *m_delays;
     }
-    const lemon::ListGraph::NodeMap< CapacitanceType >& ceffs() const {
+    const std::vector< CapacitanceType >& ceffs() const {
         return *m_ceff;
     }
     template <class SlewCalculator>
-    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::rc_tree & tree,  const interconnection::rc_tree::capacitor_id source)
+    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::packed_rc_tree & tree)
     {
         if(!m_slews)
-            m_slews = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+            m_slews = new std::vector< SlewType >(tree.node_count());
         if(!m_delays)
-            m_delays = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+            m_delays = new std::vector< SlewType >(tree.node_count());
         if(!m_ceff)
-            m_ceff = new lemon::ListGraph::NodeMap< CapacitanceType >(tree.graph());
+            m_ceff = new std::vector< CapacitanceType >(tree.node_count());
 
-        lemon::ListGraph::NodeMap< SlewType > & slews = *m_slews;
-        lemon::ListGraph::NodeMap< SlewType > & delays = *m_delays;
-        lemon::ListGraph::NodeMap< CapacitanceType > & ceff = *m_ceff;
+        std::vector< SlewType > & slews = *m_slews;
+        std::vector< SlewType > & delays = *m_delays;
+        std::vector< CapacitanceType > & ceff = *m_ceff;
 
-        elmore delay(tree, source);
-        elmore_second_moment second_moment(tree, delay);
-        auto source_slew = slew_calculator(tree.lumped());
 
-        for(lemon::ListGraph::NodeIt node(tree.graph()); node != lemon::INVALID; ++node)
+        CapacitanceType lumped;
+        for(std::size_t i = 0; i < tree.node_count(); ++i)
+            lumped += tree.capacitance(i);
+
+        auto source_slew = slew_calculator(lumped);
+
+        packed_elmore delay;
+        delay.tree(tree);
+        delay.run();
+
+        packed_elmore_second_moment second_moment;
+        second_moment.elmore(delay);
+        second_moment.tree(tree);
+        second_moment.run();
+
+        for(std::size_t i = 0; i < tree.node_count(); ++i)
         {
-            delays[node] = delay.at(node);
-            auto step_slew = boost::units::sqrt( second_moment.at(node)*2.0 - boost::units::pow<2>(delay.at(node)) );
-            slews[node] = boost::units::sqrt(boost::units::pow<2>(source_slew) + boost::units::pow<2>(step_slew));
+            delays[i] = delay.at(i);
+            auto step_slew = boost::units::sqrt( second_moment.at(i)*2.0 - boost::units::pow<2>(delay.at(i)) );
+            slews[i] = boost::units::sqrt(boost::units::pow<2>(source_slew) + boost::units::pow<2>(step_slew));
         }
 
-        return tree.lumped();
+        return lumped;
     }
 };
 
@@ -101,9 +113,9 @@ class effective_capacitance_wire_model
     using SlewType = boost::units::quantity < boost::units::si::time >;
     double m_precision;
 
-    lemon::ListGraph::NodeMap< SlewType > * m_slews;
-    lemon::ListGraph::NodeMap< SlewType > * m_delays;
-    lemon::ListGraph::NodeMap< CapacitanceType > * m_ceff;
+    std::vector< SlewType > * m_slews;
+    std::vector< SlewType > * m_delays;
+    std::vector< CapacitanceType > * m_ceff;
 
     bool m_slews_owner;
     bool m_delays_owner;
@@ -113,85 +125,49 @@ public:
     virtual ~effective_capacitance_wire_model();
     void precision(double epsilon);
 
-    void slew_map(lemon::ListGraph::NodeMap< SlewType >& sm);
-    void delay_map(lemon::ListGraph::NodeMap< SlewType >& dm);
-    void ceff_map(lemon::ListGraph::NodeMap<CapacitanceType> &cm);
+    void slew_map(std::vector< SlewType >& sm);
+    void delay_map(std::vector< SlewType >& dm);
+    void ceff_map(std::vector<CapacitanceType> &cm);
 
-    const lemon::ListGraph::NodeMap< SlewType >& slews() const {
+    const std::vector< SlewType >& slews() const {
         return *m_slews;
     }
-    const lemon::ListGraph::NodeMap< SlewType >& delays() const {
+    const std::vector< SlewType >& delays() const {
         return *m_delays;
     }
-    const lemon::ListGraph::NodeMap< CapacitanceType >& ceffs() const {
+    const std::vector< CapacitanceType >& ceffs() const {
         return *m_ceff;
     }
 
     template <class SlewCalculator>
-    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::rc_tree & tree,  const interconnection::rc_tree::capacitor_id source)
+    CapacitanceType simulate(const SlewCalculator & slew_calculator, const interconnection::packed_rc_tree & tree)
     {
         if(!m_slews)
-            m_slews = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+            m_slews = new std::vector< SlewType >(tree.node_count());
         if(!m_delays)
-            m_delays = new lemon::ListGraph::NodeMap< SlewType >(tree.graph());
+            m_delays = new std::vector< SlewType >(tree.node_count());
         if(!m_ceff)
-            m_ceff = new lemon::ListGraph::NodeMap< CapacitanceType >(tree.graph());
+            m_ceff = new std::vector< CapacitanceType >(tree.node_count());
 
-        lemon::ListGraph::NodeMap< SlewType > & slews = *m_slews;
-        lemon::ListGraph::NodeMap< SlewType > & delays = *m_delays;
-        lemon::ListGraph::NodeMap< CapacitanceType > & ceff = *m_ceff;
+        std::vector< SlewType > & slews = *m_slews;
+        std::vector< SlewType > & delays = *m_delays;
+        std::vector< CapacitanceType > & ceff = *m_ceff;
 
-        lemon::ListGraph::NodeMap< lemon::ListGraph::Arc > pred(tree.graph());
-        for(lemon::ListGraph::NodeIt it(tree.graph()); it != lemon::INVALID; ++it)
-            pred[it] = lemon::INVALID;
-
-        std::deque<lemon::ListGraph::Node> to_process;
-        std::vector< lemon::ListGraph::Node > order(tree.capacitor_count());
-        order.resize(0);
-        to_process.push_back(source);
-        while(!to_process.empty())
-        {
-            auto current = to_process.front();
-            to_process.pop_front();
-            order.push_back(current);
-            for(interconnection::rc_tree::resistor_it it(tree.capacitor_resistors(current)); it != lemon::INVALID; ++it)
-            {
-                auto opposite_capacitor = tree.other_capacitor(it, current);
-                if(opposite_capacitor != source && pred[opposite_capacitor] == lemon::INVALID)
-                {
-                    pred[opposite_capacitor] = it;
-                    to_process.push_back(opposite_capacitor);
-                }
-            }
-        }
-        assert(pred[source] == lemon::INVALID);
-        for(std::size_t i{0}; i < order.size(); ++i)
-        {
-            auto current = order[i];
-            ceff[current] = tree.capacitance(current);
-        }
-        for(std::size_t i = order.size()-1; i > 0; --i)
-        {
-            auto current = order[i];
-            auto parent = tree.graph().oppositeNode(current, pred[current]);
-            ceff[parent] += ceff[current];
-        }
 
 
         double error = 1.0;
         std::size_t iteration = 0;
 
         CapacitanceType current_ceff;
-        delays[source] = SlewType(0.0*boost::units::si::seconds);
+        delays[0] = SlewType(0.0*boost::units::si::seconds);
         while (error > m_precision) {
-            current_ceff = ceff[source];
-//            std::cout << "iteration #" << iteration++ << " ceff " << current_ceff << std::endl;
-            slews[source] = slew_calculator(current_ceff);
-            for(std::size_t i = 1; i < order.size(); ++i)
+            current_ceff = ceff[0];
+            ////            std::cout << "iteration #" << iteration++ << " ceff " << current_ceff << std::endl;
+            slews[0] = slew_calculator(current_ceff);
+            for(std::size_t current = 1; current < tree.node_count(); ++current)
             {
-                auto current = order[i];
-                auto parent = tree.graph().oppositeNode(order[i], pred[order[i]]);
-                auto resistance_with_parent = tree.resistance(pred[order[i]]);
+                auto parent = tree.pred(current);
+                auto resistance_with_parent = tree.resistance(current);
 
                 slews[current] = slews[parent];
                 if(slews[parent] > 0.0*boost::units::si::seconds){
@@ -200,23 +176,19 @@ public:
                 }
                 delays[current] = delays[parent] + resistance_with_parent*ceff[current];
             }
-            for(auto node : order)
+            for(std::size_t node = 0; node < tree.node_count(); ++node)
                 ceff[node] = tree.capacitance(node);
-            for(auto node_it = order.rbegin(); node_it != order.rend(); ++node_it)
+            for(std::size_t i = 0; i < tree.node_count()-1; ++i)
             {
-                auto current = *node_it;
-                if(pred[*node_it] != lemon::INVALID)
-                {
-                    auto parent = tree.graph().oppositeNode(current, pred[current]);
-                    auto resistance_with_parent = tree.resistance(pred[current]);
-                    double x = 2.0 * resistance_with_parent  * ceff[current] / slews[parent];
-                    double y = 1.0 - std::exp(-1.0/x);
-                    double shielding_factor = (slews[parent] > 0.0*boost::units::si::seconds?1.0 - x * y:1.0);
-                    ceff[parent] += shielding_factor*ceff[current];
-
-                }
+                std::size_t current = tree.node_count() - (i+1);
+                auto parent = tree.pred(current);
+                auto resistance_with_parent = tree.resistance(current);
+                double x = 2.0 * resistance_with_parent  * ceff[current] / slews[parent];
+                double y = 1.0 - std::exp(-1.0/x);
+                double shielding_factor = (slews[parent] > 0.0*boost::units::si::seconds?1.0 - x * y:1.0);
+                ceff[parent] += shielding_factor*ceff[current];
             }
-            error = boost::units::abs(current_ceff-ceff[source])/std::max(current_ceff, ceff[source]);
+            error = boost::units::abs(current_ceff-ceff[0])/std::max(current_ceff, ceff[0]);
         }
         return current_ceff;
     }

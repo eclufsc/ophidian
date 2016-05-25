@@ -62,6 +62,174 @@ std::vector<std::string> verilog::tokenize(std::string line) {
     return tokens;
 }
 
+bool verilog::read_line_as_tokens(std::istream & in, std::vector<std::string> &tokens)
+{
+    tokens.clear();
+    std::string line;
+    std::getline(in, line);
+    tokens.reserve(100);
+    std::string token;
+    token.reserve(100);
+    while (in && tokens.empty())
+    {
+        token.clear();
+        for (unsigned i = 0; i < line.size(); ++i)
+        {
+            char currChar = line[i];
+            if (isspace(currChar) || is_special_char(currChar))
+            {
+                if (!token.empty())
+                {
+                    // Add the current token to the list of tokens
+                    tokens.push_back(token);
+                    token.clear();
+                }
+                // else if the token is empty, simply skip the whitespace or special char
+            }
+            else
+            {
+                // Add the char to the current token
+                token.push_back(currChar);
+            }
+        }
+
+        if (!token.empty())
+            tokens.push_back(token);
+
+        if (tokens.empty())
+            // Previous line read was empty. Read the next one.
+            std::getline(in, line);
+    }
+
+    return !tokens.empty();
+}
+
+bool verilog::read_module(std::istream &in, std::string &token)
+{
+    std::vector<std::string> tokens;
+    bool valid = read_line_as_tokens(in, tokens);
+
+    while (valid)
+    {
+        if (tokens.size() == 2 && tokens[0] == "module")
+        {
+            token = tokens[1];
+            break;
+        }
+        valid = read_line_as_tokens(in, tokens);
+    }
+
+    // Read and skip the port names in the module definition
+    // until we encounter the tokens {"Start", "PIs"}
+    while (valid && !(tokens.size() == 2 && tokens[0] == "Start" && tokens[1] == "PIs"))
+    {
+        valid = read_line_as_tokens(in, tokens);
+        assert(valid);
+    }
+
+    return valid;
+}
+
+bool verilog::read_primary_input(std::istream &in, std::string &token)
+{
+    token = "";
+
+    std::vector<std::string> tokens;
+    bool valid = read_line_as_tokens(in, tokens);
+
+    assert(valid);
+    assert(tokens.size() == 2);
+
+    if (valid && tokens[0] == "input")
+    {
+        token = tokens[1];
+    }
+    else
+    {
+        assert (tokens[0] == "Start" && tokens[1] == "POs");
+        return false;
+    }
+
+    return valid;
+}
+
+bool verilog::read_primary_output(std::istream &in, std::string &token)
+{
+    token = "";
+
+    std::vector<std::string> tokens;
+    bool valid = read_line_as_tokens(in, tokens);
+
+    assert(valid);
+    assert(tokens.size() == 2);
+
+    if (valid && tokens[0] == "output")
+    {
+        token = tokens[1];
+    }
+    else
+    {
+        assert (tokens[0] == "Start" && tokens[1] == "wires");
+        return false;
+    }
+
+    return valid;
+}
+
+bool verilog::read_cell_inst(std::istream &in, std::string &cell_type, std::string &cell_inst, std::vector<std::pair<std::string, std::string> > &pin_net_pairs)
+{
+    cell_type.clear();
+    cell_inst.clear();
+    pin_net_pairs.clear();
+    std::vector<std::string> tokens;
+    bool valid = read_line_as_tokens(in, tokens);
+    assert(valid);
+
+    if(tokens.size() == 1)
+    {
+        assert(tokens.front() == "endmodule");
+        return false;
+    }
+
+    assert(tokens.size() >= 4);
+
+    cell_type = tokens.at(0);
+    cell_inst = tokens.at(1);
+
+    pin_net_pairs.reserve(tokens.size());
+    for(unsigned i = 2; i < tokens.size() - 1; i += 2)
+    {
+        assert(tokens.at(i).at(0) == '.');
+        std::string pin_name = tokens.at(i).substr(1);
+        pin_net_pairs.push_back(std::make_pair(pin_name, tokens.at(i+1)));
+    }
+
+    return valid;
+}
+
+bool verilog::read_wire(std::istream &in, std::string &token)
+{
+    token = "";
+
+    std::vector<std::string> tokens;
+    bool valid = read_line_as_tokens(in, tokens);
+
+    assert(valid);
+    assert(tokens.size() == 2);
+
+    if (valid && tokens[0] == "wire")
+    {
+        token = tokens[1];
+    }
+    else
+    {
+        assert (tokens[0] == "Start" && tokens[1] == "cells");
+        return false;
+    }
+
+    return valid;
+}
+
 
 void verilog::read(const std::string &filename)
 {
@@ -74,87 +242,72 @@ void verilog::read(const std::string &filename)
     in << file.rdbuf();
     file.close();
 
-    std::string line;
-    std::getline(in, line);
-    auto tokens = tokenize(line);
-    assert(tokens[0] == "module");
-    m_design = tokens[1];
-    do {
-        std::getline(in, line);
-        tokens = tokenize(line);
-    } while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "PIs");
+    m_pin_count = 0;
+    m_net_count = 0;
+
+    bool valid = read_module(in, m_design);
+    assert(valid);
+
+    std::unordered_set<std::string> nets;
 
 
-
-    std::vector<std::string> strings;
-    strings.reserve(1024);
-
-    std::unordered_set<std::string> unique_net_names;
-    std::unordered_set<std::string> unique_pin_names;
-
-    // PI
-    do {
-        std::getline(in, line);
-        tokens = tokenize(line);
-        if (tokens.size() == 2 && tokens[0] == "input")
-            strings.push_back(tokens[1]);
-    } while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "POs");
-
-    unique_pin_names.insert(strings.begin(), strings.end());
-    m_inputs=strings;
-    strings.resize(0);
-
-    // PO
-    do {
-        std::getline(in, line);
-        tokens = tokenize(line);
-        if (tokens.size() == 2 && tokens[0] == "output")
-            strings.push_back(tokens[1]);
-    } while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "wires");
-
-    unique_pin_names.insert(strings.begin(), strings.end());
-    m_outputs=strings;
-    strings.resize(0);
-
-    // PO
-    do {
-        std::getline(in, line);
-        tokens = tokenize(line);
-        if (tokens.size() == 2 && tokens[0] == "wire")
-            strings.push_back(tokens[1]);
-    } while (tokens.size() != 2 || tokens[0] != "Start" || tokens[1] != "cells");
-
-    unique_pin_names.insert(strings.begin(), strings.end());
-    m_wires=strings;
-    strings.resize(0);
-
-
-    std::vector<module> modules;
-    do {
-        std::getline(in, line);
-        tokens = tokenize(line);
-        if(tokens.empty())
-            continue;
-        if(tokens.size() == 1 && tokens[0] == "endmodule")
-            break;
-        module m;
-        m.type = tokens[0];
-        m.name = tokens[1];
-        m.pinnet_pairs.reserve((tokens.size()-2)<<1);
-        for(std::size_t i = 2; i < tokens.size()-1; i+=2)
+    std::string token;
+    do
+    {
+        valid = read_primary_input(in, token);
+        std::unordered_set<std::string> nets;
+        if(valid)
         {
-            auto pin_name = tokens[i].substr(1);
-            m.pinnet_pairs.push_back(std::make_pair(pin_name, tokens[i+1]));
-            unique_pin_names.insert(m.name + ":" + pin_name);
-            unique_net_names.insert(tokens[i+1]);
+            m_inputs.push_back(token);
+            m_pin_count++;
+            nets.insert(token);
         }
-        modules.push_back(m);
-    } while (tokens.size() != 1 || tokens[0] != "endmodule");
-    m_modules=modules;
-    std::cout << "reading .v file DONE" << std::endl<< std::flush;
+    } while (valid);
 
-    m_net_count = unique_net_names.size();
-    m_pin_count = unique_pin_names.size();
+    do
+    {
+        valid = read_primary_output(in, token);
+        std::unordered_set<std::string> nets;
+        if(valid)
+        {
+            m_outputs.push_back(token);
+            m_pin_count++;
+            nets.insert(token);
+        }
+    } while (valid);
+
+
+    do
+    {
+        valid = read_wire(in, token);
+        if(valid)
+            nets.insert(token);
+    } while (valid);
+
+
+
+
+    do {
+        std::string cellType, cellInst;
+        std::vector<std::pair<std::string, std::string> > pinNetPairs;   /* (port name, net name) */
+
+        valid = read_cell_inst(in, cellType, cellInst, pinNetPairs);
+        if (valid)
+        {
+            for(auto pair : pinNetPairs)
+                nets.insert(pair.second);
+            module m;
+            m.name = cellInst;
+            m.type = cellType;
+            m.pinnet_pairs = pinNetPairs;
+            m_modules.push_back(m);
+            m_pin_count += pinNetPairs.size();
+        }
+
+    } while(valid);
+
+    m_wires.insert(m_wires.end(), nets.begin(), nets.end());
+    m_net_count = m_wires.size();
 
     boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration msdiff = mst2 - mst1;

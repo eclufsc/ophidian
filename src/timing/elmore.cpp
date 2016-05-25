@@ -68,7 +68,43 @@ void elmore::update() {
 	for (auto c : m_order) {
 		if (m_pred[c].first != lemon::INVALID)
 			m_elmore_delay[c] = m_elmore_delay[m_pred[c].first] + m_tree.resistance(m_pred[c].second) * m_downstream_capacitance[c];
-	}
+    }
+}
+
+packed_elmore::packed_elmore() :
+    m_tree(nullptr)
+{
+
+}
+
+packed_elmore::~packed_elmore()
+{
+
+}
+
+void packed_elmore::tree(const interconnection::packed_rc_tree &tree)
+{
+    m_tree = &tree;
+    m_delays.resize(m_tree->node_count());
+}
+
+void packed_elmore::run()
+{
+    assert(m_tree);
+
+    std::vector<boost::units::quantity< boost::units::si::capacitance > > downstream(m_tree->node_count());
+    for(std::size_t i = 0; i < m_tree->node_count(); ++i)
+        downstream[i] = m_tree->capacitance(i);
+
+    for(std::size_t i = 0; i < m_tree->node_count()-1; ++i)
+    {
+        std::size_t n = m_tree->node_count()-(i+1);
+        downstream[ m_tree->pred(n) ] += downstream[n];
+    }
+
+    m_delays[0] = boost::units::quantity< boost::units::si::time >(0.0*boost::units::si::seconds);
+    for(std::size_t i = 1; i < m_tree->node_count(); ++i)
+        m_delays[i] = m_delays[ m_tree->pred(i) ] + m_tree->resistance(i) * downstream.at(i);
 }
 
 } /* namespace timing */

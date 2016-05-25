@@ -58,6 +58,7 @@ public:
 class dragging : public state {
     quad m_quad;
     sf::Vector2f m_initial;
+    bool m_moved;
 public:
     dragging(circuit_canvas * canvas, const sf::Vector2f & pos);
     void mouseMoveEvent(QMouseEvent *e);
@@ -78,9 +79,7 @@ protected:
     fps m_fps;
 
     std::unordered_set< ophidian::gui::quad > m_non_movable_quads;
-
-
-    void render();
+    void render(sf::RenderTarget & target);
 public:
     circuit_canvas(QWidget *parent = 0);
     virtual ~circuit_canvas();
@@ -111,6 +110,9 @@ public:
 
     wire_quad drawRect(quad from_quad);
     wire_quad drawRect(const geometry::point<double> & p1, const geometry::point<double> & p2, const geometry::point<double> & p3, const geometry::point<double> & p4);
+    line drawLine(const geometry::point<double> & p1, const geometry::point<double> & p2);
+
+
 
 
     // camera
@@ -121,6 +123,8 @@ public:
     void zoom(double value);
 
     void reset();
+
+    void save_to_file(const std::string & filename);
 
     void OnUpdate();
     void wheelEvent(QWheelEvent * e);
@@ -144,6 +148,10 @@ public:
     void erase(T element) {
         m_canvas.destroy(element);
     }
+
+
+    void clear();
+    void clear(const sf::Color & color);
 
 
 };

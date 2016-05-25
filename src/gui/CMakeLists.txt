@@ -1,4 +1,8 @@
 # Detect and add SFML
+
+if(BUILD_GUI)
+
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 #Find any version 2.X of SFML
 #See the FindSFML.cmake file for additional details and instructions
@@ -16,3 +20,6 @@ include_directories(${SFML_INCLUDE_DIR})
 add_library (gui  canvas.cpp spatial_index.cpp drawable_batch.h qsfmlcanvas.cpp circuit_canvas.cpp fps.cpp)
 target_include_directories (gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries( gui Qt5::Widgets ${SFML_LIBRARIES} ${Boost_LIBRARIES} )
+
+
+endif(BUILD_GUI)

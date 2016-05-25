@@ -32,6 +32,8 @@ namespace timing {
 class graph_builder {
 public:
 	static void build(const netlist::netlist & netlist, library & lib, const timing::design_constraints & dc, graph& graph);
+
+    static void repower(const netlist::netlist & netlist, library & lib, graph& graph, const entity_system::entity &cell);
 };
 
 } /* namespace timing */

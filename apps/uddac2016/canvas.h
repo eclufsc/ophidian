@@ -10,6 +10,7 @@
 namespace uddac2016 {
 
 class controller;
+
 class canvas : public ophidian::gui::circuit_canvas
 {
     controller * m_main_ctrl;
@@ -25,11 +26,15 @@ public:
     void paint_quads(cell_painter & painter);
     void reindex(const std::vector< std::pair<ophidian::entity_system::entity, ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > > > & geometries);
 
-
     void setFixed(ophidian::entity_system::entity cell);
 
     virtual void select(ophidian::gui::quad the_quad);
     virtual void unselect(ophidian::gui::quad the_quad);
+
+    virtual void dropQuad(ophidian::gui::quad the_quad);
+
+
+    void update_quad(ophidian::entity_system::entity cell, const ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > & geometry);
 
 };
 

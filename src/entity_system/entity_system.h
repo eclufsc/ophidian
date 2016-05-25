@@ -146,12 +146,6 @@ public:
      * \param e Entity to lookup.
      * \return Index of the entity.
      */
-    inline entity_index lookup(entity e){
-        entity_index e_index = m_id_to_index.at(e);
-        m_live_entity_check(e_index);
-        return e_index;
-    }
-
     inline entity_index lookup(entity e) const {
         entity_index e_index = m_id_to_index.at(e);
         m_live_entity_check(e_index);

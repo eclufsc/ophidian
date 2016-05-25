@@ -63,6 +63,7 @@ private:
     node node_create(entity_system::entity pin, edges node_edge, std::unordered_map<entity_system::entity, node> &map);
 
 
+
 public:
     graph();
     virtual ~graph();
@@ -128,6 +129,13 @@ public:
     }
 
     void edge_source(edge e, node u);
+
+
+    template <class Iterator>
+    void edge_destroy(const Iterator begin, const Iterator end) {
+        for(Iterator it{begin}; it != end; ++it)
+            m_graph.erase(*it);
+    }
 
 
 };
