@@ -90,6 +90,8 @@ public:
 
     entity_system::entity cell_create(std::string name, std::string type);
 
+	const cells & cell_properties() { return m_cells; };
+
 	/// Pin position getter.
 	/**
 	 * Returns the position of a pin, calculated from the cell position and the pin offset.

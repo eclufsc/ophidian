@@ -54,11 +54,38 @@ namespace floorplan {
         m_rows.site(row, site);
         m_rows.number_of_sites(row, number_of_sites);
         m_rows.origin(row, origin);
+
+        point row_dimensions = this->row_dimensions(row);
+        box row_box(origin, point(origin.x() + row_dimensions.x() - 1, origin.y() + row_dimensions.y() - 1));
+        m_rows_rtree.insert(std::make_pair(row_box, row));
         return row;
     }
 
     void floorplan::row_destroy(entity_system::entity row) {
+        point row_origin = this->row_origin(row);
+        point row_dimensions = this->row_dimensions(row);
+        box row_box(row_origin, point(row_origin.x() + row_dimensions.x() - 1, row_origin.y() + row_dimensions.y() - 1));
+        m_rows_rtree.remove(std::make_pair(row_box, row));
         m_rows_system.destroy(row);
+    }
+
+    entity_system::entity floorplan::find_row(floorplan::point point)
+    {
+        std::vector<rtree_node> found_nodes;
+        m_rows_rtree.query(boost::geometry::index::intersects(point), std::back_inserter(found_nodes));
+        if (found_nodes.empty()) {
+            throw row_not_found();
+        }
+        assert(found_nodes.size() == 1);
+        return found_nodes.front().second;
+    }
+
+    entity_system::entity floorplan::find_closest_row(floorplan::point point)
+    {
+        std::vector<rtree_node> found_nodes;
+        m_rows_rtree.query(boost::geometry::index::nearest(point, 1), std::back_inserter(found_nodes));
+        assert(found_nodes.size() == 1);
+        return found_nodes.front().second;
     }
 
     floorplan::point floorplan::row_dimensions(entity_system::entity row) const {

@@ -35,15 +35,17 @@ TEST_CASE("legalization/ legalizing simple after random movements","[legalizatio
     double site_width = floorplan.sites_properties().dimensions().first->x();
     double row_height = floorplan.sites_properties().dimensions().first->y();
     for (auto cell : netlist.cell_system()) {
-        int movement_x = movement_distribution(random_generator);
-        int movement_y = movement_distribution(random_generator);
-        ophidian::geometry::point<double> current_position = placement.cell_position(cell);
-        double new_x = std::min(std::max(floorplan.chip_origin().x(), current_position.x() + movement_x), floorplan.chip_boundaries().x());
-        new_x = std::floor(new_x / site_width) * site_width;
-        double new_y = std::min(std::max(floorplan.chip_origin().y(), current_position.y() + movement_y), floorplan.chip_boundaries().y());
-        new_y = std::floor(new_y / row_height) * row_height;
-        ophidian::geometry::point<double> new_position(new_x, new_y);
-        placement.cell_position(cell, new_position);
+        if (!placement.cell_fixed(cell)) {
+            int movement_x = movement_distribution(random_generator);
+            int movement_y = movement_distribution(random_generator);
+            ophidian::geometry::point<double> current_position = placement.cell_position(cell);
+            double new_x = std::min(std::max(floorplan.chip_origin().x(), current_position.x() + movement_x), floorplan.chip_boundaries().x() - placement.cell_dimensions(cell).x());
+            new_x = std::floor(new_x / site_width) * site_width;
+            double new_y = std::min(std::max(floorplan.chip_origin().y(), current_position.y() + movement_y), floorplan.chip_boundaries().y() - placement.cell_dimensions(cell).y());
+            new_y = std::floor(new_y / row_height) * row_height;
+            ophidian::geometry::point<double> new_position(new_x, new_y);
+            placement.cell_position(cell, new_position);
+        }
     }
 
     ophidian::placement::legalization::legalization_check legalization_check(&floorplan, &placement);
@@ -56,9 +58,13 @@ TEST_CASE("legalization/ legalizing simple after random movements","[legalizatio
     REQUIRE(legalization_check.check_legality());
 }
 
-TEST_CASE("legalization/ legalizing vga after random movements","[legalization][abacus]") {
-    ophidian::parsing::lef lef("benchmarks/vga_lcd/techlib.lef");
-    ophidian::parsing::def def("benchmarks/vga_lcd/vga_lcd.def");
+bool run_circuit(std::string circuit_name) {
+    struct timeval start_time, end_time;
+
+    std::cout << "running abacus regression test for circuit " << circuit_name << std::endl;
+
+    ophidian::parsing::lef lef("benchmarks/" + circuit_name + "/" + circuit_name + ".lef");
+    ophidian::parsing::def def("benchmarks/" + circuit_name + "/" + circuit_name + ".def");
 
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
@@ -76,15 +82,17 @@ TEST_CASE("legalization/ legalizing vga after random movements","[legalization][
     double site_width = floorplan.sites_properties().dimensions().first->x();
     double row_height = floorplan.sites_properties().dimensions().first->y();
     for (auto cell : netlist.cell_system()) {
-        int movement_x = movement_distribution(random_generator);
-        int movement_y = movement_distribution(random_generator);
-        ophidian::geometry::point<double> current_position = placement.cell_position(cell);
-        double new_x = std::min(std::max(floorplan.chip_origin().x(), current_position.x() + movement_x), floorplan.chip_boundaries().x());
-        new_x = std::floor(new_x / site_width) * site_width;
-        double new_y = std::min(std::max(floorplan.chip_origin().y(), current_position.y() + movement_y), floorplan.chip_boundaries().y());
-        new_y = std::floor(new_y / row_height) * row_height;
-        ophidian::geometry::point<double> new_position(new_x, new_y);
-        placement.cell_position(cell, new_position);
+        if (!placement.cell_fixed(cell)) {
+            int movement_x = movement_distribution(random_generator);
+            int movement_y = movement_distribution(random_generator);
+            ophidian::geometry::point<double> current_position = placement.cell_position(cell);
+            double new_x = std::min(std::max(floorplan.chip_origin().x(), current_position.x() + movement_x), floorplan.chip_boundaries().x() - placement.cell_dimensions(cell).x());
+            new_x = std::floor(new_x / site_width) * site_width;
+            double new_y = std::min(std::max(floorplan.chip_origin().y(), current_position.y() + movement_y), floorplan.chip_boundaries().y() - placement.cell_dimensions(cell).y());
+            new_y = std::floor(new_y / row_height) * row_height;
+            ophidian::geometry::point<double> new_position(new_x, new_y);
+            placement.cell_position(cell, new_position);
+        }
     }
 
     ophidian::placement::legalization::legalization_check legalization_check(&floorplan, &placement);
@@ -92,7 +100,26 @@ TEST_CASE("legalization/ legalizing vga after random movements","[legalization][
     REQUIRE(!legalization_check.check_legality());
 
     ophidian::placement::legalization::abacus::abacus abacus(&floorplan, &placement);
+    gettimeofday(&start_time, NULL);
     abacus.legalize_placement();
+    gettimeofday(&end_time, NULL);
+    std::cout << "runtime " << end_time.tv_sec - start_time.tv_sec << std::endl;
 
     REQUIRE(legalization_check.check_legality());
+}
+
+TEST_CASE("legalization/ legalizing iccad 2014 circuits after random movements","[legalization][abacus][regression][iccad2014]") {
+    run_circuit("vga_lcd");
+    run_circuit("b19");
+    run_circuit("mgc_edit_dist");
+    run_circuit("mgc_matrix_mult");
+}
+
+TEST_CASE("legalization/ legalizing iccad 2015 circuits after random movements","[legalization][abacus][regression][iccad2015]") {
+    run_circuit("superblue18");
+    run_circuit("superblue16");
+    run_circuit("superblue4");
+    run_circuit("superblue1");
+    run_circuit("superblue5");
+    run_circuit("superblue3");
 }

@@ -32,13 +32,11 @@ placement::~placement() {
 
 void placement::cell_position(entity_system::entity cell,
                               geometry::point<double> position) {
-    if (!cell_fixed(cell)) {
-        m_cells.position(cell, position);
-        auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
-        geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
-        geometry::translate(lib_geometry, position, translated);
-        m_cells.geometry(cell, translated);
-    }
+    m_cells.position(cell, position);
+    auto lib_geometry = m_library->geometry(m_netlist->cell_std_cell(cell));
+    geometry::multi_polygon<geometry::polygon<geometry::point<double> > > translated;
+    geometry::translate(lib_geometry, position, translated);
+    m_cells.geometry(cell, translated);
 }
 
 void placement::pad_position(entity_system::entity pad,

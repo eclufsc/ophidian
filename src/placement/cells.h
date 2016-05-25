@@ -49,16 +49,16 @@ public:
     point position(entity_system::entity cell) const {
 		return m_positions[m_system.lookup(cell)];
 	}
-	std::pair< std::vector<point>::const_iterator, std::vector<point>::const_iterator > positions() const {
-		return std::make_pair(m_positions.begin(), m_positions.end());
+	const entity_system::vector_property<point> positions() const {
+		return m_positions;
 	}
 
     void geometry(entity_system::entity cell, multipolygon geometry);
     multipolygon geometry(entity_system::entity cell) const {
         return m_geometries[m_system.lookup(cell)];
     }
-    std::pair< std::vector<multipolygon>::const_iterator, std::vector<multipolygon>::const_iterator > geometries() const {
-        return std::make_pair(m_geometries.begin(), m_geometries.end());
+    const entity_system::vector_property<multipolygon> geometries() const {
+        return m_geometries;
     }
 
     void fixed(entity_system::entity cell, bool fixed);

@@ -21,6 +21,7 @@ under the License.
 #ifndef ophidian_FLOORPLAN_H
 #define ophidian_FLOORPLAN_H
 
+#include <boost/geometry/index/rtree.hpp>
 #include <entity_system.h>
 #include "rows.h"
 #include "sites.h"
@@ -35,6 +36,9 @@ namespace ophidian {
          */
         class floorplan {
             using point = geometry::point<double>;
+            using box = geometry::box<point>;
+            using rtree_node = std::pair<box, entity_system::entity>;
+            using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
             entity_system::entity_system m_sites_system;
             entity_system::entity_system m_rows_system;
@@ -46,6 +50,7 @@ namespace ophidian {
             point m_chip_boundaries;
 
             std::unordered_map<std::string, entity_system::entity> m_name2site;
+            rtree m_rows_rtree;
 
         public:
             floorplan();
@@ -135,6 +140,22 @@ namespace ophidian {
              */
             void row_destroy(entity_system::entity row);
 
+            /// Finds a row.
+            /**
+              Finds the row that contains a given point.
+              \param point Point to query for the row.
+              \return The row containing the point
+             */
+            entity_system::entity find_row(point point);
+
+            /// Finds closest row to a point.
+            /**
+              Finds the row that is the closest to a given point.
+              \param point Point to query for the row.
+              \return The closest row to that point
+             */
+            entity_system::entity find_closest_row(point point);
+
             /// Returns the number of rows.
             /**
              * Returns the number of rows created in the rows system.
@@ -190,6 +211,13 @@ namespace ophidian {
             const entity_system::entity_system & rows_system() const {
                 return m_rows_system;
             };
+        };
+
+        class row_not_found : public std::exception {
+        public:
+            const char * what() const throw() {
+                return "No row found in the given coordinate";
+            }
         };
     }
 }
