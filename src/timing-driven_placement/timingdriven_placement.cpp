@@ -56,8 +56,8 @@ void timingdriven_placement::make_cell_nets_dirty(Cell cell)
 
 void timingdriven_placement::update_dirty_rc_trees()
 {
-    std::cout << "    creating rc_trees for dirty nets..." << std::endl << std::flush;
-    std::vector<Net> nets; //to process in parallel
+    std::cout << "    creating rc_trees for dirty nets (" << m_dirty_nets.size() << ")..." << std::endl << std::flush;
+    std::vector<entity_system::entity> nets; //to process in parallel
     nets.reserve(m_dirty_nets.size());
     nets.insert(nets.end(), m_dirty_nets.begin(), m_dirty_nets.end());
 
@@ -66,7 +66,20 @@ void timingdriven_placement::update_dirty_rc_trees()
     for(i = 0; i < nets.size(); ++i)
     {
         auto & rc_tree_late = m_rc_trees[m_netlist.net_system().lookup(nets[i])];
-        m_flute.create_tree(m_placement, nets[i], rc_tree_late, *m_lib_late);
+        auto & net_pins = m_netlist.net_pins(nets[i]);
+        entity_system::entity source;
+        for(auto pin : net_pins)
+        {
+            if(m_std_cells.pin_direction(m_netlist.pin_std_cell(pin)) == standard_cell::pin_directions::OUTPUT)
+            {
+                source = pin;
+                break;
+            }
+        }
+        assert( !(source == entity_system::entity{}) );
+        interconnection::rc_tree tree;
+        auto map = m_flute.create_tree(m_placement, nets[i], tree, *m_lib_late);
+        m_rc_trees.at(m_netlist.net_system().lookup(nets[i])) = tree.pack(map.at(source));
     }
 #pragma omp barrier
     m_dirty_nets.clear();

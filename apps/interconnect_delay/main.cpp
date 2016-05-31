@@ -24,7 +24,7 @@ struct calculator {
 
 int main(int argc, char *argv[])
 {
-/*
+    /*
  *      1 = spef file
  *      2 = liberty file
  *      3 = driver type
@@ -54,17 +54,27 @@ int main(int argc, char *argv[])
     input.read(argv[1]);
 
     std::size_t i = 0;
-//    for(auto & tree : input.trees())
-//    {
-//        std::cout << "net " << tree.net_name << std::endl;
-//        std::cout << "BEGIN" << std::endl;
-//        timing::effective_capacitance_wire_model ceff;
-////        ceff.simulate(calc, tree.tree.pack());
-//        const interconnection::rc_tree & rc_tree = tree.tree;
-//        for(lemon::ListGraph::NodeIt it(rc_tree.graph()); it != lemon::INVALID; ++it)
-//            std::cout << rc_tree.capacitor_name(it) << " " << ceff.delays()[it].value() << std::endl;
-//        std::cout << "END" << std::endl;
-//    }
+    for(auto & tree : input.trees())
+    {
+        std::cout << "net " << tree.net_name << std::endl;
+        std::cout << "BEGIN" << std::endl;
+        const interconnection::rc_tree& the_tree = tree.tree;
+        timing::effective_capacitance_wire_model ceff;
+        interconnection::packed_rc_tree packed = the_tree.pack(the_tree.capacitor_by_name(tree.source));
+        ceff.simulate(calc, packed);
+        const interconnection::rc_tree & rc_tree = tree.tree;
+        for(lemon::ListGraph::NodeIt it(rc_tree.graph()); it != lemon::INVALID; ++it)
+        {
+            std::size_t tap_id = -1;
+            try {
+                tap_id = packed.tap(rc_tree.capacitor_name(it));
+                std::cout << rc_tree.capacitor_name(it) << " " << ceff.delays()[tap_id] << std::endl;
+            }catch(std::exception&e)
+            {
+            }
+        }
+        std::cout << "END" << std::endl;
+    }
 
     return 0;
 }

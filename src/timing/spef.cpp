@@ -62,7 +62,7 @@ void spef::skip_header(std::istream &in, std::vector<std::string> &tokens)
 
 bool spef::read_net(std::istream &in, std::vector<std::string> &tokens)
 {
-//    tokens.resize(0);
+    //    tokens.resize(0);
     std::string line;
     bool continue_reading = false;
     m_trees.push_back({tokens[1], interconnection::rc_tree{}});
@@ -115,6 +115,8 @@ std::string spef::read_conn(std::istream &in, std::vector<std::string> &tokens, 
             auto cap = current_tree.tree.capacitor_insert(tokens[1]);
             if(is_source(tokens))
                 source_name = tokens[1];
+            else
+                current_tree.tree.tap_insert(current_tree.tree.capacitor_insert(tokens[1]));
         }
     }
     return source_name;

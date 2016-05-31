@@ -58,6 +58,9 @@ rc_tree &rc_tree::operator=(const rc_tree &other)
     for(lemon::ListGraph::NodeIt it(m_graph); it != lemon::INVALID; ++it)
         m_name2node[m_names[it]] = it;
 
+    for(auto tap : other.m_taps)
+        m_taps.push_back(nr[tap]);
+
     return *this;
 }
 

@@ -80,7 +80,7 @@ class timingdriven_placement
     floorplan::floorplan m_floorplan;
     placement::library m_placement_lib{&m_std_cells};
     placement::placement m_placement{&m_netlist, &m_placement_lib};
-    entity_system::vector_property< interconnection::rc_tree > m_rc_trees;
+    entity_system::vector_property< interconnection::packed_rc_tree > m_rc_trees;
     timing::design_constraints m_dc;
     flute_rc_tree_creator m_flute;
     std::set<Net> m_dirty_nets;
@@ -159,7 +159,7 @@ public:
         return m_netlist.net_pins(net);
     }
 
-    std::size_t net_lookup(Net net) const {
+    entity_system::entity_index net_lookup(Net net) const {
         return m_netlist.net_system().lookup(net);
     }
 
