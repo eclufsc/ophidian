@@ -38,11 +38,8 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QMenu * file = this->addMenu("File");
     QAction * action = file->addAction("Open LEF/DEF...");
     connect(action, SIGNAL(triggered()), this, SLOT(action_open_LEFDEF_triggered()));
-
     QAction * read_sol = file->addAction("Open placement solution (.DEF)...");
     connect(read_sol, SIGNAL(triggered()), this, SLOT(action_open_placement_solution_triggered()));
-    read_sol->setEnabled(false);
-
     QAction * exit = file->addAction("Exit");
     connect(exit, SIGNAL(triggered()), &m_mainwindow, SLOT(close()));
 
@@ -50,27 +47,19 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QAction * preferencesAction = editMenu->addAction("Preferences");
     connect(preferencesAction, SIGNAL(triggered()), this, SLOT(openPreferencesWindow()));
 
-
     QMenu * netlistMenu = this->addMenu("Netlist");
     QAction * openVerilogAction = netlistMenu->addAction("Open Verilog File...");
     connect(openVerilogAction, SIGNAL(triggered()), this, SLOT(action_open_verilog_triggered()));
-    openVerilogAction->setDisabled(true);
 
     QMenu * optimizationMenu = this->addMenu("Optimization");
     QAction * runSAAction = optimizationMenu->addAction("Run Simulated Annealing Placement");
     connect(runSAAction, SIGNAL(triggered()), this, SLOT(action_run_SA_triggered()));
-    runSAAction->setDisabled(true);
 
     QMenu * timingMenu = this->addMenu("Timing");
     QAction * readLibraryAction = timingMenu->addAction("Open Timing Library");
-    QAction * runSTAAction = timingMenu->addAction("Run Static Timing Analysis");
-
     connect(readLibraryAction, SIGNAL(triggered()), this, SLOT(action_open_timing_library_triggered()));
+    QAction * runSTAAction = timingMenu->addAction("Run Static Timing Analysis");
     connect(runSTAAction, SIGNAL(triggered()), this, SLOT(action_run_STA_triggered()));
-    readLibraryAction->setDisabled(true);
-    runSTAAction->setDisabled(true);
-
-
 
     m_actions["file"] = action;
     m_actions["read_sol"] = read_sol;
@@ -80,6 +69,8 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     m_actions["timing_lib"] = readLibraryAction;
     m_actions["STA"] = runSTAAction;
     m_actions["preferences"] = preferencesAction;
+
+    reset();
 }
 
 MainWindowMenuBar::~MainWindowMenuBar()
@@ -90,6 +81,21 @@ MainWindowMenuBar::~MainWindowMenuBar()
 void MainWindowMenuBar::setController(controller &ctrl)
 {
     m_ctrl = &ctrl;
+}
+
+void MainWindowMenuBar::reset()
+{
+    qDebug() << "MainWindowMenuBar::reset()";
+
+    m_lef_def = false;
+    m_verilog = false;
+    m_timing_lib = false;
+
+    m_actions["read_sol"]->setDisabled(true);
+    m_actions["verilog"]->setDisabled(true);
+    m_actions["run_SA"]->setDisabled(true);
+    m_actions["timing_lib"]->setDisabled(true);
+    m_actions["STA"]->setDisabled(true);
 }
 
 void MainWindowMenuBar::action_open_LEFDEF_triggered()

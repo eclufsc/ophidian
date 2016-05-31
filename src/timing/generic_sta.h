@@ -36,6 +36,7 @@ under the License.
 #include "graph_arcs_timing.h"
 
 #include <omp.h>
+#include <lemon/path.h>
 
 #ifndef OPHIDIAN_TIMING_GENERIC_STA_H
 #define OPHIDIAN_TIMING_GENERIC_STA_H
@@ -332,6 +333,49 @@ public:
                 m_timing.nodes.required(node, required);
             }
         }
+    }
+
+
+    lemon::Path<lemon::ListDigraph> critical_path() const {
+        lemon::Path<lemon::ListDigraph> cp;
+        SlewType worst_slack = std::numeric_limits<SlewType>::infinity();
+        lemon::ListDigraph::Node worst_PO;
+        for(auto node_it = m_topology->sorted.rbegin(); node_it != m_topology->sorted.rend(); ++node_it)
+        {
+            auto node = *node_it;
+            if(lemon::countOutArcs(m_topology->g.G(), node) == 0)
+            {
+                SlewType current_PO_slack = MergeStrategy::slack_signal()*(m_timing.nodes.required(node)-m_timing.nodes.arrival(node));
+                if(current_PO_slack < worst_slack)
+                {
+                    worst_slack = current_PO_slack;
+                    worst_PO = node;
+                }
+            }
+        }
+        lemon::ListDigraph::Node current_node = worst_PO;
+        lemon::ListDigraph::Node next_node = current_node;
+        while(next_node != lemon::INVALID)
+        {
+            current_node = next_node;
+            next_node = lemon::INVALID;
+            lemon::ListDigraph::Arc worst_arc = lemon::INVALID;
+            SlewType worst_slack_input = std::numeric_limits<SlewType>::infinity();
+            for(lemon::ListDigraph::InArcIt in(m_topology->g.G(), current_node); in != lemon::INVALID; ++in)
+            {
+                auto source = m_topology->g.G().source(in);
+                SlewType slack = MergeStrategy::slack_signal()*(m_timing.nodes.required(source)-m_timing.nodes.arrival(source));
+                if(slack < worst_slack_input)
+                {
+                    worst_slack_input = slack;
+                    worst_arc = in;
+                    next_node = source;
+                }
+            }
+            if(worst_arc != lemon::INVALID)
+                cp.addFront(worst_arc);
+        }
+        return cp;
     }
 
 

@@ -56,6 +56,8 @@ bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
         return false;
     if(m_app.read_lefdef(LEF, DEF))
     {
+        m_mainwindow.reset();
+
         sf::Vector2f new_center((m_app.chip_boundaries()[0].x()+m_app.chip_boundaries()[3].x())/2.0, -(m_app.chip_boundaries()[0].y()+m_app.chip_boundaries()[1].y())/2.0);
         m_canvas->cameraCenter(new_center);
         m_canvas->cameraSize(sf::Vector2f(m_app.chip_boundaries()[3].x()-m_app.chip_boundaries()[0].x(), m_app.chip_boundaries()[1].y()-m_app.chip_boundaries()[0].y()));
@@ -126,6 +128,7 @@ void controller::init_canvas_controller(uddac2016::canvas *canvas)
 {
     m_canvas = canvas;
     canvas->main_controller(this);
+
 }
 
 void controller::repaint()
@@ -237,6 +240,8 @@ void controller::run_STA()
 {
     m_app.run_STA();
     repaint();
+    if(m_mainwindow.isCriticalPathChecked())
+        show_CP();
 }
 
 void controller::place_cell(const entity_system::entity &cell, const ophidian::geometry::point<double> &p)
@@ -257,12 +262,28 @@ void controller::screenshot()
     m_canvas->save_to_file(filename);
 }
 
+void controller::update_visible_nets()
+{
+    m_mainwindow.update_visible_nets();
+}
+
+void controller::show_CP()
+{
+    qDebug() << "controller::show_CP()";
+    auto cp = m_app.critical_path();
+    m_canvas->create_cp_arrows(cp);
+}
+
+void controller::clear_CP()
+{
+    qDebug() << "controller::clear_CP()";
+    m_canvas->destroy_cp_arrows();
+}
+
 void controller::select(const entity_system::entity &cell)
 {
     qDebug() << QString::fromStdString(m_app.cell_name(cell));
     m_mainwindow.select(cell);
 }
-
-
 
 }

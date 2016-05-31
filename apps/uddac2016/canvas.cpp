@@ -8,12 +8,19 @@ namespace uddac2016 {
 canvas::canvas(QWidget *parent) :
     gui::circuit_canvas(parent)
 {
-
 }
 
 void canvas::main_controller(controller *main_ctrl)
 {
     m_main_ctrl = main_ctrl;
+
+
+    //    auto line = m_canvas.thick_line_create({0.0,0.0}, {100.0,100.0}, 20);
+    //    auto q1 = drawQuad({0.0, 0.0}, {0.0, 5000.0}, {5000.0, 5000.0}, {5000.0, 0.0});
+    //    auto q2 = drawQuad({10000.0, 10000.0}, {10000.0, 15000.0}, {15000.0, 15000.0}, {15000.0, 10000.0});
+
+    //    m_canvas.arrow_create(line, q1, q2, {0.0, 0.0}, {0.0, 0.0});
+
 }
 
 void canvas::create_quads(const std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
@@ -40,6 +47,7 @@ void canvas::create_quads(const std::vector<std::pair<entity_system::entity, geo
         }
     }
     reindex(geometries);
+    m_origin_quad = m_canvas.quad_create({0.0, 0.0},{0.0, 0.0},{0.0, 0.0},{0.0, 0.0});
 }
 
 void canvas::update_quads(gui::drawable_batch<4> & batch, const std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > &geometries)
@@ -126,6 +134,7 @@ void canvas::dropQuad(gui::quad the_quad)
     position.y( -m_canvas.quad_points(the_quad)[0].position.y );
     m_main_ctrl->place_cell(the_cell, position);
     m_main_ctrl->select(the_cell);
+    m_main_ctrl->update_visible_nets();
 }
 
 void canvas::update_quad(entity_system::entity cell_entity, const ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > &geometry)
@@ -145,6 +154,34 @@ void canvas::update_quad(entity_system::entity cell_entity, const ophidian::geom
     }
     for(auto quad : quad_vector)
         indexQuad(quad);
+}
+
+void canvas::create_cp_arrows(const std::vector<std::pair<std::pair<entity_system::entity, ophidian::geometry::point<double> >, std::pair<entity_system::entity, ophidian::geometry::point<double> > > > &quads)
+{
+    destroy_cp_arrows();
+    for(auto & element : quads)
+    {
+        auto line = m_canvas.thick_line_create({0.0,0.0}, {100.0,100.0}, 15);
+
+        m_canvas.paint(line, sf::Color(120, 0, 0));
+
+        gui::quad quad_from = m_origin_quad;
+        gui::quad quad_to = m_origin_quad;
+
+        auto quad_from_it = m_cell2quads.find(element.first.first);
+        auto quad_to_it = m_cell2quads.find(element.second.first);
+        if(quad_from_it != m_cell2quads.end())
+            quad_from = quad_from_it->second.front();
+        if(quad_to_it != m_cell2quads.end())
+            quad_to = quad_to_it->second.front();
+
+        m_canvas.arrow_create(line, quad_from, quad_to, {element.first.second.x(), -element.first.second.y()}, {element.second.second.x(), -element.second.second.y()});
+    }
+}
+
+void canvas::destroy_cp_arrows()
+{
+    m_canvas.clear_arrows();
 }
 
 }

@@ -240,6 +240,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionScreenshot"/>
+   <addaction name="actionCritical_Path"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="MainWindowMenuBar" name="menuBar">
@@ -255,6 +256,14 @@
   <action name="actionScreenshot">
    <property name="text">
     <string>Screenshot</string>
+   </property>
+  </action>
+  <action name="actionCritical_Path">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Critical Path</string>
    </property>
   </action>
  </widget>

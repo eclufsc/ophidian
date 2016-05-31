@@ -62,12 +62,16 @@ lef::lef(const std::string &filename)
         layer lay;
         lay.name = l->name();
         lay.type = (l->hasType()?l->type():"");
-        if(std::string(l->direction()) == "HORIZONTAL" ||
-           std::string(l->direction()) == "horizontal")
-            lay.direction = layer::HORIZONTAL;
-        else if(std::string(l->direction()) == "VERTICAL" ||
-                std::string(l->direction()) == "vertical")
-            lay.direction = layer::VERTICAL;
+        lay.direction = layer::NOT_ASSIGNED;
+        if(l->hasDirection())
+        {
+            if(std::string(l->direction()) == "HORIZONTAL" ||
+                    std::string(l->direction()) == "horizontal")
+                lay.direction = layer::HORIZONTAL;
+            else if(std::string(l->direction()) == "VERTICAL" ||
+                    std::string(l->direction()) == "vertical")
+                lay.direction = layer::VERTICAL;
+        }
         lay.pitch = l->pitch();
         lay.width = l->width();
         static_cast<lef*>(ud)->m_layers.push_back(lay);
@@ -95,7 +99,7 @@ lef::lef(const std::string &filename)
                 case lefiGeomLayerE:
                     pt.layers.push_back(l->port(i)->getLayer(j));
                     break;
-                 case lefiGeomRectE:
+                case lefiGeomRectE:
                     rect r;
                     r.xl = l->port(i)->getRect(j)->xl;
                     r.yl = l->port(i)->getRect(j)->yl;
@@ -131,7 +135,7 @@ lef::lef(const std::string &filename)
             case lefiGeomLayerE:
                 last_layer = geometries->getLayer(i);
                 break;
-             case lefiGeomRectE:
+            case lefiGeomRectE:
                 auto geom_rect =  geometries->getRect(i);
                 rect r{geom_rect->xl, geom_rect->yl, geom_rect->xh, geom_rect->yh};
                 m.obses.layer2rects[last_layer].push_back(r);

@@ -104,9 +104,9 @@ public:
         vertices.at(i).position = sf::Vector2f(p.x(), p.y());
     }
 
-    const geometry::point<double> point(entity_system::entity the_entity, std::size_t i) const {
-        std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
-        return geometry::point<double>(vertices.front().position.x, vertices.front().position.y);
+    geometry::point<double> point(entity_system::entity the_entity, std::size_t i) const {
+        const std::array<sf::Vertex, NumberOfVertices> & vertices = m_vertices[m_system.lookup(the_entity)];
+        return geometry::point<double>(vertices[i].position.x, vertices[i].position.y);
     }
 
     std::size_t vertex_count() const {

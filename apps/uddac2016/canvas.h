@@ -14,10 +14,9 @@ class controller;
 class canvas : public ophidian::gui::circuit_canvas
 {
     controller * m_main_ctrl;
-
+    ophidian::gui::quad m_origin_quad;
     std::unordered_map< ophidian::entity_system::entity, std::vector< ophidian::gui::quad > > m_cell2quads;
     std::unordered_map< ophidian::gui::quad, ophidian::entity_system::entity > m_quad2cell;
-
 public:
     canvas(QWidget * parent = 0);
     void main_controller(controller * main_ctrl);
@@ -36,6 +35,8 @@ public:
 
     void update_quad(ophidian::entity_system::entity cell, const ophidian::geometry::multi_polygon<ophidian::geometry::polygon<ophidian::geometry::point<double> > > & geometry);
 
+    void create_cp_arrows(const std::vector< std::pair< std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> >, std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> > > > & quads);
+    void destroy_cp_arrows();
 };
 
 }

@@ -60,6 +60,13 @@ public:
     void select(ophidian::entity_system::entity entity);
 
 
+    bool isCriticalPathChecked();
+
+
+    void reset();
+    void update_visible_nets();
+
+
 public slots:
     void repaintQuads();
 
@@ -72,6 +79,7 @@ private slots:
     void on_lineEdit_name_regex_returnPressed();
     void on_list_visible_nets_itemSelectionChanged();
     void on_button_delete_visible_net_clicked();
+    void on_actionCritical_Path_toggled();
 
 private:
     Ui::MainWindow *ui;

@@ -77,6 +77,7 @@ using boost::geometry::wkt;
 using boost::geometry::correct;
 using boost::geometry::append;
 using boost::geometry::envelope;
+using boost::geometry::add_point;
 
 
 }

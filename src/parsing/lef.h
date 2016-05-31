@@ -49,7 +49,7 @@ public:
 
     struct layer {
         enum directions {
-            HORIZONTAL, VERTICAL
+            NOT_ASSIGNED, HORIZONTAL, VERTICAL
         };
         std::string name;
         std::string type;

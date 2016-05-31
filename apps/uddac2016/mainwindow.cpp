@@ -17,18 +17,18 @@ namespace uddac2016 {
 void MainWindow::update_selected()
 {
     bool enable = !m_selected.name().isEmpty();
-   ui->combo_selected_type->setEnabled(enable);
-   ui->line_edit_selected_x->setEnabled(enable);
-   ui->line_edit_selected_y->setEnabled(enable);
-   ui->combo_selected_type->clear();
-   ui->label_selected_name->setText(m_selected.name());
-   ui->combo_selected_type->addItems(m_selected.std_cells());
-   ui->line_edit_selected_x->setDisabled(m_selected.fixed());
-   ui->line_edit_selected_y->setDisabled(m_selected.fixed());
-   ui->line_edit_selected_x->setText(QString::number(m_selected.position().x()));
-   ui->line_edit_selected_y->setText(QString::number(m_selected.position().y()));
-   ui->combo_selected_type->setCurrentText(m_selected.std_cell());
-   ui->label_selected_slack->setText(QString::number(m_selected.worst_slack()));
+    ui->combo_selected_type->setEnabled(enable);
+    ui->line_edit_selected_x->setEnabled(enable);
+    ui->line_edit_selected_y->setEnabled(enable);
+    ui->combo_selected_type->clear();
+    ui->label_selected_name->setText(m_selected.name());
+    ui->combo_selected_type->addItems(m_selected.std_cells());
+    ui->line_edit_selected_x->setDisabled(m_selected.fixed());
+    ui->line_edit_selected_y->setDisabled(m_selected.fixed());
+    ui->line_edit_selected_x->setText(QString::number(m_selected.position().x()));
+    ui->line_edit_selected_y->setText(QString::number(m_selected.position().y()));
+    ui->combo_selected_type->setCurrentText(m_selected.std_cell());
+    ui->label_selected_slack->setText(QString::number(m_selected.worst_slack()));
 }
 
 MainWindow::MainWindow(QWidget *parent):
@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui->menuBar->setController(m_controller);
     m_controller.init_canvas_controller(ui->Canvas);
     update_selected();
+
 
 }
 
@@ -104,6 +105,32 @@ void MainWindow::select(ophidian::entity_system::entity entity)
     unselect();
     m_selected = selected_cell(m_controller, entity);
     update_selected();
+}
+
+bool MainWindow::isCriticalPathChecked()
+{
+    return ui->actionCritical_Path->isChecked();
+}
+
+void MainWindow::reset()
+{
+    ui->menuBar->reset();
+}
+
+void MainWindow::update_visible_nets()
+{
+
+    for(int row = 0; row < ui->list_visible_nets->count(); row++)
+    {
+        QListWidgetItem *item = ui->list_visible_nets->item(row);
+        m_controller.remove_nets(item->text());
+    }
+
+    for(int row = 0; row < ui->list_visible_nets->count(); row++)
+    {
+        QListWidgetItem *item = ui->list_visible_nets->item(row);
+        m_controller.show_nets(item->text());
+    }
 }
 
 void MainWindow::repaintQuads()
@@ -198,7 +225,6 @@ void MainWindow::on_lineEdit_name_regex_returnPressed()
     {
         ui->list_visible_nets->addItem(ui->lineEdit_name_regex->text());
         auto matches = m_controller.show_nets(ui->lineEdit_name_regex->text());
-
     }
     ui->lineEdit_name_regex->clear();
 }
@@ -210,6 +236,17 @@ void MainWindow::on_button_delete_visible_net_clicked()
         m_controller.remove_nets(item->text());
         delete item;
     }
+}
+
+void MainWindow::on_actionCritical_Path_toggled()
+{
+    qDebug() << ui->actionCritical_Path->isChecked();
+
+    if(ui->actionCritical_Path->isChecked())
+        m_controller.show_CP();
+    else
+        m_controller.clear_CP();
+
 }
 
 

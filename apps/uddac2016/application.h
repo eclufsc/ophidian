@@ -56,6 +56,8 @@ public:
     void read_tau2014_lib(const std::string & file);
     void read_liberty(const std::string & file);
 
+    void reset();
+
 
     bool STA() const {
         return m_STA != nullptr;
@@ -167,6 +169,9 @@ public:
     const std::string net_name(const ophidian::entity_system::entity & net) const {
         return m_netlist->net_name(net);
     }
+
+
+    const std::vector< std::pair< std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> >, std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> > > > critical_path() const;
 
     void run_SA();
     void run_STA();

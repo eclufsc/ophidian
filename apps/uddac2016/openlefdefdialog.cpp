@@ -11,6 +11,7 @@ OpenLEFDEFDialog::OpenLEFDEFDialog(MainWindow *parent) :
     ui(new Ui::OpenLEFDEFDialog)
 {
     ui->setupUi(this);
+    setWindowTitle("Open LEF/DEF");
 }
 
 OpenLEFDEFDialog::~OpenLEFDEFDialog()

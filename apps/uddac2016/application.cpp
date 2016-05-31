@@ -82,12 +82,7 @@ bool application::read_lefdef(const std::string &LEF, const std::string &DEF)
     parsing::lef lef(LEF);
     parsing::def def(DEF);
 
-    m_std_cells.reset(new standard_cell::standard_cells);
-    m_netlist.reset(new netlist::netlist{m_std_cells.get()});
-    m_placement_library.reset(new placement::library{m_std_cells.get()});
-    m_placement.reset(new placement::placement{m_netlist.get(), m_placement_library.get()});
-    m_floorplan.reset(new floorplan::floorplan);
-    m_sa.reset();
+    reset();
 
     placement::def2placement(def, *m_placement);
     placement::lef2library(lef, *m_placement_library);
@@ -130,6 +125,28 @@ void application::read_liberty(const std::string &file)
     timing::liberty::read(file, *m_timing_library);
 }
 
+void application::reset()
+{
+    std::cout << "application::reset()" << std::endl;
+    m_STA.reset();
+    m_tarcs.reset();
+    m_timing_library.reset();
+    m_timing_data.reset();
+    m_rc_trees.reset();
+    m_graph.reset();
+    m_topology.reset();
+    m_dirty_nets.clear();
+
+    m_sa.reset();
+    m_std_cells.reset(new standard_cell::standard_cells);
+    m_netlist.reset(new netlist::netlist{m_std_cells.get()});
+    m_placement_library.reset(new placement::library{m_std_cells.get()});
+    m_placement.reset(new placement::placement{m_netlist.get(), m_placement_library.get()});
+    m_floorplan.reset(new floorplan::floorplan);
+
+
+}
+
 std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > application::cells_geometries() const
 {
     std::vector<std::pair<entity_system::entity, geometry::multi_polygon<geometry::polygon<geometry::point<double> > > > > geometries;
@@ -155,11 +172,43 @@ void application::cell_std_cell(const entity_system::entity &cell, const entity_
     if(m_graph)
     {
         timing::graph_builder::repower(*m_netlist, *m_timing_library, *m_graph, cell);
-//        m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
-//        m_STA->topology(*m_topology);
+        //        m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
+        //        m_STA->topology(*m_topology);
         make_cell_nets_dirty(cell);
     }
 
+}
+
+const std::vector<std::pair<std::pair<entity_system::entity, ophidian::geometry::point<double> >, std::pair<entity_system::entity, ophidian::geometry::point<double> > > > application::critical_path() const
+{
+    std::vector<std::pair<std::pair<entity_system::entity, ophidian::geometry::point<double> >, std::pair<entity_system::entity, ophidian::geometry::point<double> > > > cp;
+    if(m_graph)
+    {
+        auto CP = m_STA->critical_path();
+        cp.reserve(CP.length());
+
+        for(int i = 0; i < CP.length(); ++i)
+        {
+            const lemon::ListDigraph::Arc & the_arc = CP.nth(i);
+
+            auto source = m_graph->edge_source(the_arc);
+            auto target = m_graph->edge_target(the_arc);
+
+            auto source_pin = m_graph->pin(source);
+            auto target_pin = m_graph->pin(target);
+
+            auto source_pin_std_cell = m_netlist->pin_std_cell(source_pin);
+            auto target_pin_std_cell = m_netlist->pin_std_cell(target_pin);
+
+            auto source_owner = m_netlist->pin_owner(source_pin);
+            auto target_owner = m_netlist->pin_owner(target_pin);
+
+            auto source_pair = std::make_pair(source_owner, m_placement_library->pin_offset(source_pin_std_cell));
+            auto target_pair = std::make_pair(target_owner, m_placement_library->pin_offset(target_pin_std_cell));
+            cp.push_back(std::make_pair(source_pair, target_pair));
+        }
+    }
+    return cp;
 }
 
 void application::run_SA()
@@ -179,20 +228,20 @@ void application::run_STA()
         m_dc = dc.dc();
         timing::graph_builder::build(*m_netlist, *m_timing_library, m_dc, *m_graph);
         m_dc.clock.period = 80;
-         for(auto driver : m_dc.input_drivers)
-             m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
-         m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(m_dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
+        for(auto driver : m_dc.input_drivers)
+            m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(driver.port_name)), standard_cell::pin_directions::OUTPUT);
+        m_std_cells->pin_direction(m_netlist->pin_std_cell(m_netlist->pin_by_name(m_dc.clock.port_name)), standard_cell::pin_directions::OUTPUT);
 
-         m_rc_trees.reset(new entity_system::vector_property< ophidian::interconnection::packed_rc_tree >());
-         m_netlist->register_net_property(m_rc_trees.get());
-         for(auto cell : m_netlist->cell_system())
-             make_cell_nets_dirty(cell);
+        m_rc_trees.reset(new entity_system::vector_property< ophidian::interconnection::packed_rc_tree >());
+        m_netlist->register_net_property(m_rc_trees.get());
+        for(auto cell : m_netlist->cell_system())
+            make_cell_nets_dirty(cell);
 
-         m_timing_data.reset(new timing::timing_data(*m_timing_library, *m_graph));
-         m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
-         m_STA.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::pessimistic>(*m_timing_data, *m_topology, *m_rc_trees));
+        m_timing_data.reset(new timing::timing_data(*m_timing_library, *m_graph));
+        m_topology.reset(new timing::graph_and_topology(*m_graph, *m_netlist, *m_timing_library));
+        m_STA.reset(new timing::generic_sta<timing::effective_capacitance_wire_model, timing::pessimistic>(*m_timing_data, *m_topology, *m_rc_trees));
 
-         m_STA->set_constraints(m_dc);
+        m_STA->set_constraints(m_dc);
     }
 
     update_dirty_rc_trees();
@@ -202,16 +251,16 @@ void application::run_STA()
     m_STA->update_rts();
 
 
-//    std::cout << "-- timing report" << std::endl;
-//    for(auto pin : m_netlist->pin_system())
-//    {
-//        std::cout << "  ";
-//        std::cout << m_netlist->pin_name(pin) << " ";
-//        std::cout << "arrival rise " << m_STA->rise_arrival(pin) << " fall " << m_STA->fall_arrival(pin) << " ";
-//        std::cout << "slew rise " << m_STA->rise_slew(pin) << " fall " << m_STA->fall_slew(pin) << " ";
-//        std::cout << "slack rise " << m_STA->rise_slack(pin) << " fall " << m_STA->fall_slack(pin) << " ";
-//        std::cout << std::endl;
-//    }
+    //    std::cout << "-- timing report" << std::endl;
+    //    for(auto pin : m_netlist->pin_system())
+    //    {
+    //        std::cout << "  ";
+    //        std::cout << m_netlist->pin_name(pin) << " ";
+    //        std::cout << "arrival rise " << m_STA->rise_arrival(pin) << " fall " << m_STA->fall_arrival(pin) << " ";
+    //        std::cout << "slew rise " << m_STA->rise_slew(pin) << " fall " << m_STA->fall_slew(pin) << " ";
+    //        std::cout << "slack rise " << m_STA->rise_slack(pin) << " fall " << m_STA->fall_slack(pin) << " ";
+    //        std::cout << std::endl;
+    //    }
 }
 
 void application::legalize()
@@ -232,7 +281,7 @@ void SA::run_it()
     std::cout << "T " << m_T << std::endl;
 
     placement::hpwl HPWL(*m_app.m_placement);
-//    std::cout << "HPWL before " << HPWL.value() << std::endl;
+    //    std::cout << "HPWL before " << HPWL.value() << std::endl;
 
     for(auto cell : m_app.m_netlist->cell_system())
     {

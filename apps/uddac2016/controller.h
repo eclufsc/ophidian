@@ -104,6 +104,10 @@ public:
     void screenshot();
 
 
+    void update_visible_nets();
+
+    void show_CP();
+    void clear_CP();
     void run_SA();
     void run_STA();
     void animate_solution(std::size_t duration = 30);

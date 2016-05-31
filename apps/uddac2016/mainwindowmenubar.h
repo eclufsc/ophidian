@@ -50,6 +50,8 @@ public:
         return m_preferences.positiveSlack();
     }
 
+    void reset();
+
 public slots:
     void action_open_LEFDEF_triggered();
     void action_open_placement_solution_triggered();
