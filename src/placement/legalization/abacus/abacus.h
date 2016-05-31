@@ -69,9 +69,12 @@ namespace ophidian {
 
                     subrows m_abacus_subrows;
 
+                    void align_cells();
+                    void align_position(point & position);
+
                     void place_row(entity_system::entity subrow);
 
-                    void collapse(std::list<cluster> & clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max);
+                    void collapse(std::list<cluster> & clusters, std::list<cluster>::iterator cluster_it, double x_min, double x_max, double y);
                 public:
                     abacus(floorplan::floorplan *floorplan, placement *placement)
                             : legalization(floorplan, placement), m_cells(m_cells_system), m_abacus_subrows(m_subrows_system) {

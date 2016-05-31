@@ -2,7 +2,6 @@
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
-#include <boost/geometry/index/detail/is_bounding_geometry.hpp>
 
 
 namespace ophidian {

@@ -74,6 +74,8 @@ namespace ophidian {
 
                 entity_system::entity find_subrow(point coordinate);
 
+                std::vector<entity_system::entity> find_closest_subrows(point coordinate, unsigned number_of_rows);
+
             };
 
             class subrow_not_found : public std::exception {

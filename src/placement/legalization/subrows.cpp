@@ -95,6 +95,18 @@ namespace ophidian {
                 assert(intersecting_nodes.size() == 1);
                 return intersecting_nodes.front().second;
             }
+
+            std::vector<entity_system::entity> subrows::find_closest_subrows(point coordinate, unsigned number_of_rows)
+            {
+                std::vector<rtree_node> closest_nodes;
+                subrows_rtree.query(boost::geometry::index::nearest(coordinate, number_of_rows), std::back_inserter(closest_nodes));
+                std::vector<entity_system::entity> subrows;
+                subrows.reserve(closest_nodes.size());
+                for (auto node : closest_nodes) {
+                    subrows.push_back(node.second);
+                }
+                return subrows;
+            }
         }
     }
 }

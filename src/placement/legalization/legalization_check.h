@@ -38,6 +38,8 @@ namespace ophidian {
                 floorplan::floorplan * m_floorplan;
                 placement * m_placement;
 
+                bool check_alignment();
+                bool check_boundaries();
                 bool check_cell_overlaps();
 
             public:
