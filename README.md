@@ -10,6 +10,17 @@ Code Your Own Timing-Driven Placement Algorithm With the Brand-New TDP Module
 -------------------------
 [Sample Code](https://github.com/eclufsc/ophidian/blob/master/apps/tdp/main.cpp)
 
+How to build Ophidian
+---------------------
+```
+cmake [-DCMAKE_BUILD_TYPE=(Release|Debug)] [-DBUILD_GUI:BOOLEAN=true] $OPHIDIAN_ROOT
+make [-jX]
+```
+
+UDDAC 2016 Demonstration
+-------------------------
+To build the app presented in University Demonstration at DAC 2016, you need to build de GUI module, passing the argument ```-DBUILD_GUI:BOOLEAN=true``` to the cmake command.
+The sample app is located inside the apps/uddac2016 folder.
 
 Eclipse user attention
 -------------------------
@@ -31,7 +42,4 @@ __cplusplus=201103L
 
 Step by Step: Right-Click on Project -> Properties -> C/C++ General -> Preprocessor Include Paths, Macros etc. -> Entries Tab -> Language GNU C++ -> Select CDT User Setting Entries from Setting Entries -> Click Add... -> Type = Preprocessor Macro, Name = __cplusplus, Value = 201103L
 
-How to build Ophidian
----------------------
 
-Just cmake && make :)
