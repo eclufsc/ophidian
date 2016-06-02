@@ -1,0 +1,356 @@
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells}{\section{ophidian\-:\-:standard\-\_\-cell\-:\-:standard\-\_\-cells Class Reference}
+\label{classophidian_1_1standard__cell_1_1standard__cells}\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+}
+
+
+Standard cell class.  
+
+
+
+
+{\ttfamily \#include $<$standard\-\_\-cells.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a550904ff92dda77064942532e4ffb0cd}{standard\-\_\-cells} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a59bdbe24b51d536117ba906ab376d6cc}{register\-\_\-cell\-\_\-property} (\hyperlink{classophidian_1_1entity__system_1_1property}{entity\-\_\-system\-::property} $\ast$property)
+\begin{DoxyCompactList}\small\item\em Registers cell property. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a10d6efa4ce611c8ef30bedaa06a6ce35}{register\-\_\-pin\-\_\-property} (\hyperlink{classophidian_1_1entity__system_1_1property}{entity\-\_\-system\-::property} $\ast$property)
+\begin{DoxyCompactList}\small\item\em Registers pin property. \end{DoxyCompactList}\item 
+const \\*
+\hyperlink{classophidian_1_1entity__system_1_1vector__property}{entity\-\_\-system\-::vector\-\_\-property}\\*
+$<$ std\-::string $>$ \& \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_ad6a4d7285bd8f1b33b70791f1e4c3c8f}{cell\-\_\-names} () const 
+\begin{DoxyCompactList}\small\item\em Cell names getter. \end{DoxyCompactList}\item 
+entity\-\_\-system\-::entity \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a3c5fefdff534fa2887e7248dbdfd47f2}{cell\-\_\-create} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Creates a cell. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a418c0387f20b6a563b1a0fcde4e5c07c}{cell\-\_\-name} (entity\-\_\-system\-::entity cell) const 
+\begin{DoxyCompactList}\small\item\em Cell name getter. \end{DoxyCompactList}\item 
+const std\-::vector\\*
+$<$ entity\-\_\-system\-::entity $>$ \& \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a8d048038d137045d091bac94d7c5f66c}{cell\-\_\-pins} (entity\-\_\-system\-::entity cell) const 
+\begin{DoxyCompactList}\small\item\em Cell pins getter. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a704442c2289df257ab5cd779f1307eef}{cell\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of cells. \end{DoxyCompactList}\item 
+const \\*
+\hyperlink{classophidian_1_1entity__system_1_1entity__system}{entity\-\_\-system\-::entity\-\_\-system} \& \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a252355a56e1275da8993337e1a329d33}{cell\-\_\-system} () const 
+\begin{DoxyCompactList}\small\item\em Cell system getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_addf513c86860b5c22524d6d8e1e997a6}{cell\-\_\-sequential} (entity\-\_\-system\-::entity cell, bool sequential)
+\begin{DoxyCompactList}\small\item\em Cell sequential attribute setter. \end{DoxyCompactList}\item 
+bool \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a7924494a06f6fc3087ddb9f6914c0840}{cell\-\_\-sequential} (entity\-\_\-system\-::entity cell) const 
+\begin{DoxyCompactList}\small\item\em Cell sequential attribute getter. \end{DoxyCompactList}\item 
+entity\-\_\-system\-::entity \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a8f293bfb46f9849fab0c2bb407e2032c}{pin\-\_\-create} (entity\-\_\-system\-::entity cell, std\-::string name)
+\begin{DoxyCompactList}\small\item\em Creates a pin. \end{DoxyCompactList}\item 
+entity\-\_\-system\-::entity \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a9ce88f364f7e66837c6768875d21ac1e}{pin\-\_\-owner} (entity\-\_\-system\-::entity pin) const 
+\begin{DoxyCompactList}\small\item\em Pin owner getter. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a357808e456fab2325e761786b49c59a8}{pin\-\_\-name} (entity\-\_\-system\-::entity pin) const 
+\begin{DoxyCompactList}\small\item\em Pin name getter. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a144aaa53cc5d9808f5d26d51b76fad01}{pin\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Returns the number of pins. \end{DoxyCompactList}\item 
+const \\*
+\hyperlink{classophidian_1_1entity__system_1_1entity__system}{entity\-\_\-system\-::entity\-\_\-system} \& \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_af7e49aa525e4ac0d34582254026db007}{pin\-\_\-system} () const 
+\begin{DoxyCompactList}\small\item\em Pin system getter. \end{DoxyCompactList}\item 
+pin\-\_\-directions \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a8d407ff04cdf14937d320ea2d8941cf1}{pin\-\_\-direction} (entity\-\_\-system\-::entity pin) const 
+\begin{DoxyCompactList}\small\item\em Pin direction getter. \end{DoxyCompactList}\item 
+bool \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a460b055197ff1ef7b3c9a19b28297e87}{pin\-\_\-clock\-\_\-input} (entity\-\_\-system\-::entity pin) const 
+\begin{DoxyCompactList}\small\item\em Pin clock input attribute getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a7f5bb2c77f83cf3eb207d3f7af3a11be}{pin\-\_\-clock\-\_\-input} (entity\-\_\-system\-::entity pin, bool clock\-\_\-input)
+\begin{DoxyCompactList}\small\item\em Pin clock input attribute setter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_a26fff067382dc82633808019b8c1abbc}{pin\-\_\-direction} (entity\-\_\-system\-::entity pin, pin\-\_\-directions direction)
+\begin{DoxyCompactList}\small\item\em Pin direction setter. \end{DoxyCompactList}\item 
+entity\-\_\-system\-::entity \hyperlink{classophidian_1_1standard__cell_1_1standard__cells_ac33d44c650f27486372c86e25417d627}{pad\-\_\-create} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Creates a pad. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides the basic standard cell interface, such as creation of cell and pin types. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a550904ff92dda77064942532e4ffb0cd}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!standard\-\_\-cells@{standard\-\_\-cells}}
+\index{standard\-\_\-cells@{standard\-\_\-cells}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{standard\-\_\-cells}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::standard\-\_\-cells (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a550904ff92dda77064942532e4ffb0cd}
+Default constructor of the standard cell class. Initializes an empty system for cells and pins. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a704442c2289df257ab5cd779f1307eef}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-count@{cell\-\_\-count}}
+\index{cell\-\_\-count@{cell\-\_\-count}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a704442c2289df257ab5cd779f1307eef}
+Returns the number of cells created in the cells system. \begin{DoxyReturn}{Returns}
+Number of cells. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a3c5fefdff534fa2887e7248dbdfd47f2}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-create@{cell\-\_\-create}}
+\index{cell\-\_\-create@{cell\-\_\-create}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}entity\-\_\-system\-::entity ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a3c5fefdff534fa2887e7248dbdfd47f2}
+Creates a new cell in the standard cell library. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the new cell. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity of the created cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a418c0387f20b6a563b1a0fcde4e5c07c}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-name@{cell\-\_\-name}}
+\index{cell\-\_\-name@{cell\-\_\-name}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a418c0387f20b6a563b1a0fcde4e5c07c}
+Returns the name of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell entity to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_ad6a4d7285bd8f1b33b70791f1e4c3c8f}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-names@{cell\-\_\-names}}
+\index{cell\-\_\-names@{cell\-\_\-names}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-\_\-system\-::vector\-\_\-property}$<$std\-::string$>$\& ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-names (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_ad6a4d7285bd8f1b33b70791f1e4c3c8f}
+Returns the names of all cells. \begin{DoxyReturn}{Returns}
+Constant reference to the cell names property. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a8d048038d137045d091bac94d7c5f66c}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-pins@{cell\-\_\-pins}}
+\index{cell\-\_\-pins@{cell\-\_\-pins}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-pins}]{\setlength{\rightskip}{0pt plus 5cm}const std\-::vector$<$entity\-\_\-system\-::entity$>$\& ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-pins (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a8d048038d137045d091bac94d7c5f66c}
+Returns the pins of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell entity to get the pins. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Constant reference to a vector with all pins of that cell. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_addf513c86860b5c22524d6d8e1e997a6}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-sequential@{cell\-\_\-sequential}}
+\index{cell\-\_\-sequential@{cell\-\_\-sequential}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-sequential}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-sequential (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell, }
+\item[{bool}]{sequential}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_addf513c86860b5c22524d6d8e1e997a6}
+Sets if a cell is a sequential cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell entity to be set. \\
+\hline
+{\em sequential} & bool variable describing if the cell is sequential or not. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a7924494a06f6fc3087ddb9f6914c0840}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-sequential@{cell\-\_\-sequential}}
+\index{cell\-\_\-sequential@{cell\-\_\-sequential}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-sequential}]{\setlength{\rightskip}{0pt plus 5cm}bool ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-sequential (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a7924494a06f6fc3087ddb9f6914c0840}
+Gets if a cell is a sequential cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell entity to get the attribute. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool variable describing if the cell is sequential or not. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a252355a56e1275da8993337e1a329d33}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!cell\-\_\-system@{cell\-\_\-system}}
+\index{cell\-\_\-system@{cell\-\_\-system}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{cell\-\_\-system}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-\_\-system\-::entity\-\_\-system}\& ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::cell\-\_\-system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a252355a56e1275da8993337e1a329d33}
+Returns the cell system. \begin{DoxyReturn}{Returns}
+Constant reference to the cell system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_ac33d44c650f27486372c86e25417d627}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pad\-\_\-create@{pad\-\_\-create}}
+\index{pad\-\_\-create@{pad\-\_\-create}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pad\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}entity\-\_\-system\-::entity ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pad\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_ac33d44c650f27486372c86e25417d627}
+Creates a new pad in the standard cell library. A pad is a special pin without owner. 
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the new pad. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity of the created pad. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a460b055197ff1ef7b3c9a19b28297e87}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-clock\-\_\-input@{pin\-\_\-clock\-\_\-input}}
+\index{pin\-\_\-clock\-\_\-input@{pin\-\_\-clock\-\_\-input}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-clock\-\_\-input}]{\setlength{\rightskip}{0pt plus 5cm}bool ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-clock\-\_\-input (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a460b055197ff1ef7b3c9a19b28297e87}
+Gets if a pin is a clock input. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to get the attribute. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool variable describing if the pin is a clock input or not. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a7f5bb2c77f83cf3eb207d3f7af3a11be}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-clock\-\_\-input@{pin\-\_\-clock\-\_\-input}}
+\index{pin\-\_\-clock\-\_\-input@{pin\-\_\-clock\-\_\-input}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-clock\-\_\-input}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-clock\-\_\-input (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin, }
+\item[{bool}]{clock\-\_\-input}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a7f5bb2c77f83cf3eb207d3f7af3a11be}
+Sets if a pin is a clock input. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to be set. \\
+\hline
+{\em clock\-\_\-input} & bool variable describing if the pin is a clock input or not. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a144aaa53cc5d9808f5d26d51b76fad01}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-count@{pin\-\_\-count}}
+\index{pin\-\_\-count@{pin\-\_\-count}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a144aaa53cc5d9808f5d26d51b76fad01}
+Returns the number of pins created in the pins system. \begin{DoxyReturn}{Returns}
+Number of pins. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a8f293bfb46f9849fab0c2bb407e2032c}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-create@{pin\-\_\-create}}
+\index{pin\-\_\-create@{pin\-\_\-create}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}entity\-\_\-system\-::entity ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell, }
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a8f293bfb46f9849fab0c2bb407e2032c}
+Creates a new pin in the standard cell library. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell entity owner of the new pin. \\
+\hline
+{\em name} & Name of the new pin. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Entity of the created pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a8d407ff04cdf14937d320ea2d8941cf1}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-direction@{pin\-\_\-direction}}
+\index{pin\-\_\-direction@{pin\-\_\-direction}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-direction}]{\setlength{\rightskip}{0pt plus 5cm}pin\-\_\-directions ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-direction (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a8d407ff04cdf14937d320ea2d8941cf1}
+Returns the direction of a pin. Possible direction values are N\-O\-T\-\_\-\-A\-S\-S\-I\-G\-N\-E\-D, I\-N\-P\-U\-T and O\-U\-T\-P\-U\-T. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Direction of the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a26fff067382dc82633808019b8c1abbc}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-direction@{pin\-\_\-direction}}
+\index{pin\-\_\-direction@{pin\-\_\-direction}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-direction}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-direction (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin, }
+\item[{pin\-\_\-directions}]{direction}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a26fff067382dc82633808019b8c1abbc}
+Sets the direction of a pin. Possible direction values are N\-O\-T\-\_\-\-A\-S\-S\-I\-G\-N\-E\-D, I\-N\-P\-U\-T and O\-U\-T\-P\-U\-T. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to sets the direction. \\
+\hline
+{\em Direction} & of the pin. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a357808e456fab2325e761786b49c59a8}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-name@{pin\-\_\-name}}
+\index{pin\-\_\-name@{pin\-\_\-name}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a357808e456fab2325e761786b49c59a8}
+Returns the name of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to get the name. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name of the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a9ce88f364f7e66837c6768875d21ac1e}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-owner@{pin\-\_\-owner}}
+\index{pin\-\_\-owner@{pin\-\_\-owner}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-owner}]{\setlength{\rightskip}{0pt plus 5cm}entity\-\_\-system\-::entity ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-owner (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_a9ce88f364f7e66837c6768875d21ac1e}
+Returns the owner of a pin. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin entity to get the owner. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Owner of the pin. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_af7e49aa525e4ac0d34582254026db007}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!pin\-\_\-system@{pin\-\_\-system}}
+\index{pin\-\_\-system@{pin\-\_\-system}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{pin\-\_\-system}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf entity\-\_\-system\-::entity\-\_\-system}\& ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::pin\-\_\-system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1standard__cell_1_1standard__cells_af7e49aa525e4ac0d34582254026db007}
+Returns the pin system. \begin{DoxyReturn}{Returns}
+Constant reference to the pin system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a59bdbe24b51d536117ba906ab376d6cc}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!register\-\_\-cell\-\_\-property@{register\-\_\-cell\-\_\-property}}
+\index{register\-\_\-cell\-\_\-property@{register\-\_\-cell\-\_\-property}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{register\-\_\-cell\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::register\-\_\-cell\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-\_\-system\-::property} $\ast$}]{property}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a59bdbe24b51d536117ba906ab376d6cc}
+Registers a property to the cells entity system. 
+\begin{DoxyParams}{Parameters}
+{\em property} & Property to be registered. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1standard__cell_1_1standard__cells_a10d6efa4ce611c8ef30bedaa06a6ce35}{\index{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}!register\-\_\-pin\-\_\-property@{register\-\_\-pin\-\_\-property}}
+\index{register\-\_\-pin\-\_\-property@{register\-\_\-pin\-\_\-property}!ophidian::standard_cell::standard_cells@{ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells}}
+\subsubsection[{register\-\_\-pin\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::standard\-\_\-cell\-::standard\-\_\-cells\-::register\-\_\-pin\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf entity\-\_\-system\-::property} $\ast$}]{property}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1standard__cell_1_1standard__cells_a10d6efa4ce611c8ef30bedaa06a6ce35}
+Registers a property to the pins entity system. 
+\begin{DoxyParams}{Parameters}
+{\em property} & Property to be registered. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/csguth/workspace/openeda/src/standard\-\_\-cell/standard\-\_\-cells.\-h\item 
+/home/csguth/workspace/openeda/src/standard\-\_\-cell/standard\-\_\-cells.\-cpp\end{DoxyCompactItemize}

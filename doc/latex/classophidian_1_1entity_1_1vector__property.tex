@@ -1,0 +1,151 @@
+\hypertarget{classophidian_1_1entity_1_1vector__property}{\section{ophidian\-:\-:entity\-:\-:vector\-\_\-property$<$ T $>$ Class Template Reference}
+\label{classophidian_1_1entity_1_1vector__property}\index{ophidian\-::entity\-::vector\-\_\-property$<$ T $>$@{ophidian\-::entity\-::vector\-\_\-property$<$ T $>$}}
+}
+
+
+Implementation of the property class.  
+
+
+
+
+{\ttfamily \#include $<$vector\-\_\-property.\-h$>$}
+
+Inheritance diagram for ophidian\-:\-:entity\-:\-:vector\-\_\-property$<$ T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classophidian_1_1entity_1_1vector__property}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1entity_1_1vector__property_aebd7abc7f2a79b3cfa098ce9be6327dd}{vector\-\_\-property} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1entity_1_1vector__property_a6b239378e987a33fd05c69bd57158bdc}{destroy} (\hyperlink{classophidian_1_1entity_1_1entity}{entity} \&e, std\-::size\-\_\-t index)
+\begin{DoxyCompactList}\small\item\em Destroys the property of an entity. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1entity_1_1vector__property_a15ebc0490d8232671cd9111f11351acf}{create} (\hyperlink{classophidian_1_1entity_1_1entity}{entity} \&e, std\-::size\-\_\-t index)
+\begin{DoxyCompactList}\small\item\em Creates property for an entity. \end{DoxyCompactList}\item 
+T \& \hyperlink{classophidian_1_1entity_1_1vector__property_a2b372566da6796a1db0bd10b42696aec}{operator\mbox{[}$\,$\mbox{]}} (std\-::size\-\_\-t entity\-\_\-index)
+\begin{DoxyCompactList}\small\item\em Property getter. \end{DoxyCompactList}\item 
+const T \& \hyperlink{classophidian_1_1entity_1_1vector__property_a775e8ebd43e4f32a3f84ffc6b6a025b6}{operator\mbox{[}$\,$\mbox{]}} (std\-::size\-\_\-t entity\-\_\-index) const 
+\begin{DoxyCompactList}\small\item\em Constant property getter. \end{DoxyCompactList}\item 
+std\-::vector$<$ T $>$\-::const\-\_\-iterator \hyperlink{classophidian_1_1entity_1_1vector__property_a8c6f753870ea6946573d5db86f7ab8c9}{begin} () const 
+\begin{DoxyCompactList}\small\item\em Begin iterator. \end{DoxyCompactList}\item 
+std\-::vector$<$ T $>$\-::const\-\_\-iterator \hyperlink{classophidian_1_1entity_1_1vector__property_a2f52e3cd85861b854717c64b2d045df8}{end} () const 
+\begin{DoxyCompactList}\small\item\em End iterator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class ophidian\-::entity\-::vector\-\_\-property$<$ T $>$}
+
+Describes an implementation of the property class that stores the properties in a vector, acessed by the entity index. 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the property value to be stored. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1entity_1_1vector__property_aebd7abc7f2a79b3cfa098ce9be6327dd}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!vector\-\_\-property@{vector\-\_\-property}}
+\index{vector\-\_\-property@{vector\-\_\-property}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{vector\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::{\bf vector\-\_\-property} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1vector__property_aebd7abc7f2a79b3cfa098ce9be6327dd}
+Default constructor. Creates an empty vector property. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1entity_1_1vector__property_a8c6f753870ea6946573d5db86f7ab8c9}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!begin@{begin}}
+\index{begin@{begin}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{begin}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ std\-::vector$<$T$>$\-::const\-\_\-iterator {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1vector__property_a8c6f753870ea6946573d5db86f7ab8c9}
+Returns an iterator pointing to the beginning of the vector of properties. \begin{DoxyReturn}{Returns}
+Iterator pointing to the beginning of the vector of properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1vector__property_a15ebc0490d8232671cd9111f11351acf}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!create@{create}}
+\index{create@{create}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{create}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::create (
+\begin{DoxyParamCaption}
+\item[{{\bf entity} \&}]{e, }
+\item[{std\-::size\-\_\-t}]{index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classophidian_1_1entity_1_1vector__property_a15ebc0490d8232671cd9111f11351acf}
+Implements the create method from property. Resizes the vector to contain the property of the new entity. 
+\begin{DoxyParams}{Parameters}
+{\em e} & Entity that was created \\
+\hline
+{\em index} & The index of the created entity \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classophidian_1_1entity_1_1property_a25f0188c1d920cbdb55583772b4817ce}{ophidian\-::entity\-::property}.
+
+\hypertarget{classophidian_1_1entity_1_1vector__property_a6b239378e987a33fd05c69bd57158bdc}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!destroy@{destroy}}
+\index{destroy@{destroy}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{destroy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf entity} \&}]{e, }
+\item[{std\-::size\-\_\-t}]{index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classophidian_1_1entity_1_1vector__property_a6b239378e987a33fd05c69bd57158bdc}
+Implements the destroy method from property. Moves the last property in the vector to the position of the destroyed entity. 
+\begin{DoxyParams}{Parameters}
+{\em e} & Entity that was destroyed \\
+\hline
+{\em index} & The index of the destroyed entity \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classophidian_1_1entity_1_1property_a41d49c84d20e3bc9cba0162c9aba6f2b}{ophidian\-::entity\-::property}.
+
+\hypertarget{classophidian_1_1entity_1_1vector__property_a2f52e3cd85861b854717c64b2d045df8}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!end@{end}}
+\index{end@{end}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{end}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ std\-::vector$<$T$>$\-::const\-\_\-iterator {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1vector__property_a2f52e3cd85861b854717c64b2d045df8}
+Returns an iterator pointing to the end of the vector of properties. \begin{DoxyReturn}{Returns}
+Iterator pointing to the end of the vector of properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1vector__property_a2b372566da6796a1db0bd10b42696aec}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!operator\mbox{[}$\,$\mbox{]}@{operator[]}}
+\index{operator\mbox{[}$\,$\mbox{]}@{operator[]}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ T\& {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{std\-::size\-\_\-t}]{entity\-\_\-index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1vector__property_a2b372566da6796a1db0bd10b42696aec}
+Returns the property value for an entity. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A reference to the property of that entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1vector__property_a775e8ebd43e4f32a3f84ffc6b6a025b6}{\index{ophidian\-::entity\-::vector\-\_\-property@{ophidian\-::entity\-::vector\-\_\-property}!operator\mbox{[}$\,$\mbox{]}@{operator[]}}
+\index{operator\mbox{[}$\,$\mbox{]}@{operator[]}!ophidian::entity::vector_property@{ophidian\-::entity\-::vector\-\_\-property}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ const T\& {\bf ophidian\-::entity\-::vector\-\_\-property}$<$ T $>$\-::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{std\-::size\-\_\-t}]{entity\-\_\-index}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1vector__property_a775e8ebd43e4f32a3f84ffc6b6a025b6}
+Returns the property value for an entity. Necessary when there is only a constant reference to the properties. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A constant reference to the property of that entity. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/csguth/workspace/openeda/src/entity/vector\-\_\-property.\-h\end{DoxyCompactItemize}

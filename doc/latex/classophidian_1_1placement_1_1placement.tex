@@ -1,0 +1,173 @@
+\hypertarget{classophidian_1_1placement_1_1placement}{\section{ophidian\-:\-:placement\-:\-:placement Class Reference}
+\label{classophidian_1_1placement_1_1placement}\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}}
+}
+
+
+Placement class.  
+
+
+
+
+{\ttfamily \#include $<$placement.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1placement_1_1placement_a17dbf29ab5648b435f49bdeff92066fb}{placement} (\hyperlink{classophidian_1_1netlist_1_1netlist}{netlist\-::netlist} $\ast$\hyperlink{classophidian_1_1placement_1_1placement_a2e1a15ace1eb476ea2f7ce6d8d84e3c3}{netlist}, \hyperlink{classophidian_1_1placement_1_1library}{library} $\ast$\hyperlink{classophidian_1_1placement_1_1placement_a302206279c67c772dff944b9fd4d19fb}{lib})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+geometry\-::multi\-\_\-polygon\\*
+$<$ geometry\-::polygon\\*
+$<$ geometry\-::point$<$ double $>$ $>$ $>$ \hyperlink{classophidian_1_1placement_1_1placement_a0a612df812b39e9e49ae8c25d4ea475b}{cell\-\_\-geometry} (entity\-\_\-system\-::entity cell) const 
+\begin{DoxyCompactList}\small\item\em Cell geometry getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1placement_1_1placement_ab36b1998b1fbc3f3aa489479cf3f73e0}{cell\-\_\-position} (entity\-\_\-system\-::entity cell, geometry\-::point$<$ double $>$ position)
+\begin{DoxyCompactList}\small\item\em Places a cell. \end{DoxyCompactList}\item 
+geometry\-::point$<$ double $>$ \hyperlink{classophidian_1_1placement_1_1placement_a5b7ff09e96a0824b1cf28595a4d3e05b}{cell\-\_\-position} (entity\-\_\-system\-::entity cell) const 
+\begin{DoxyCompactList}\small\item\em Cell position getter. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1placement_1_1placement_abe4caac631153c222ff14f1119c46559}{void {\bfseries cell\-\_\-fixed} (entity\-\_\-system\-::entity cell, bool fixed)}\label{classophidian_1_1placement_1_1placement_abe4caac631153c222ff14f1119c46559}
+
+\item 
+\hypertarget{classophidian_1_1placement_1_1placement_a13525a008e83a1a61f82b1b9c6915821}{bool {\bfseries cell\-\_\-fixed} (entity\-\_\-system\-::entity cell) const }\label{classophidian_1_1placement_1_1placement_a13525a008e83a1a61f82b1b9c6915821}
+
+\item 
+\hypertarget{classophidian_1_1placement_1_1placement_a76b6c79c8b670c832112864189137134}{geometry\-::point$<$ double $>$ {\bfseries cell\-\_\-dimensions} (entity\-\_\-system\-::entity cell) const }\label{classophidian_1_1placement_1_1placement_a76b6c79c8b670c832112864189137134}
+
+\item 
+\hypertarget{classophidian_1_1placement_1_1placement_a813d4f9884a785d6ac2661deb3d8c2d1}{entity\-\_\-system\-::entity {\bfseries cell\-\_\-create} (std\-::string name, std\-::string type)}\label{classophidian_1_1placement_1_1placement_a813d4f9884a785d6ac2661deb3d8c2d1}
+
+\item 
+\hypertarget{classophidian_1_1placement_1_1placement_a2fabbc69e4dea233981afb71051319da}{const \hyperlink{classophidian_1_1placement_1_1cells}{cells} \& {\bfseries cell\-\_\-properties} ()}\label{classophidian_1_1placement_1_1placement_a2fabbc69e4dea233981afb71051319da}
+
+\item 
+geometry\-::point$<$ double $>$ \hyperlink{classophidian_1_1placement_1_1placement_ad10656b5a3f46a885e3b9cc5a6bd38d9}{pin\-\_\-position} (entity\-\_\-system\-::entity pin) const 
+\begin{DoxyCompactList}\small\item\em Pin position getter. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1placement_1_1placement_a8c7a6d62c69974f408cbfabf8cf70ed3}{pad\-\_\-position} (entity\-\_\-system\-::entity pad, geometry\-::point$<$ double $>$ position)
+\begin{DoxyCompactList}\small\item\em Places a pad. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1netlist_1_1netlist}{netlist\-::netlist} \& \hyperlink{classophidian_1_1placement_1_1placement_a2e1a15ace1eb476ea2f7ce6d8d84e3c3}{netlist} () const 
+\begin{DoxyCompactList}\small\item\em Netlist getter. \end{DoxyCompactList}\item 
+const \hyperlink{classophidian_1_1placement_1_1library}{library} \& \hyperlink{classophidian_1_1placement_1_1placement_a302206279c67c772dff944b9fd4d19fb}{lib} () const 
+\begin{DoxyCompactList}\small\item\em Placement library getter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides the basic placement interface, such as cells and pads position manipulation. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1placement_1_1placement_a17dbf29ab5648b435f49bdeff92066fb}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!placement@{placement}}
+\index{placement@{placement}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{placement}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::placement\-::placement\-::placement (
+\begin{DoxyParamCaption}
+\item[{{\bf netlist\-::netlist} $\ast$}]{netlist, }
+\item[{{\bf library} $\ast$}]{lib}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1placement_a17dbf29ab5648b435f49bdeff92066fb}
+Placement constructor. Initializes the placement cell properties, such as positions and geometries. 
+\begin{DoxyParams}{Parameters}
+{\em netlist} & Circuit netlist. \\
+\hline
+{\em lib} & Placement library. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1placement_1_1placement_a0a612df812b39e9e49ae8c25d4ea475b}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!cell\-\_\-geometry@{cell\-\_\-geometry}}
+\index{cell\-\_\-geometry@{cell\-\_\-geometry}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{cell\-\_\-geometry}]{\setlength{\rightskip}{0pt plus 5cm}geometry\-::multi\-\_\-polygon$<$geometry\-::polygon$<$geometry\-::point$<$double$>$ $>$ $>$ ophidian\-::placement\-::placement\-::cell\-\_\-geometry (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1placement_a0a612df812b39e9e49ae8c25d4ea475b}
+Returns the geometry of a cell as a multi polygon. Each polygon in the multi polygon represents a rectangle of the cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the geometry. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Multi polygon with the cell geometry. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1placement_ab36b1998b1fbc3f3aa489479cf3f73e0}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!cell\-\_\-position@{cell\-\_\-position}}
+\index{cell\-\_\-position@{cell\-\_\-position}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{cell\-\_\-position}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::placement\-::placement\-::cell\-\_\-position (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell, }
+\item[{geometry\-::point$<$ double $>$}]{position}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1placement_ab36b1998b1fbc3f3aa489479cf3f73e0}
+Changes the position of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to move. \\
+\hline
+{\em position} & Target position of the cell. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1placement_1_1placement_a5b7ff09e96a0824b1cf28595a4d3e05b}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!cell\-\_\-position@{cell\-\_\-position}}
+\index{cell\-\_\-position@{cell\-\_\-position}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{cell\-\_\-position}]{\setlength{\rightskip}{0pt plus 5cm}geometry\-::point$<$double$>$ ophidian\-::placement\-::placement\-::cell\-\_\-position (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{cell}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1placement_a5b7ff09e96a0824b1cf28595a4d3e05b}
+Returns the position of a cell. 
+\begin{DoxyParams}{Parameters}
+{\em cell} & Cell to get the position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the cell position. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1placement_a302206279c67c772dff944b9fd4d19fb}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!lib@{lib}}
+\index{lib@{lib}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{lib}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf library}\& ophidian\-::placement\-::placement\-::lib (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1placement_a302206279c67c772dff944b9fd4d19fb}
+Returns the placement library used in the placement construction. \begin{DoxyReturn}{Returns}
+Constant reference to the library object. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1placement_a2e1a15ace1eb476ea2f7ce6d8d84e3c3}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!netlist@{netlist}}
+\index{netlist@{netlist}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{netlist}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf netlist\-::netlist}\& ophidian\-::placement\-::placement\-::netlist (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1placement_a2e1a15ace1eb476ea2f7ce6d8d84e3c3}
+Returns the netlist used in the placement construction. \begin{DoxyReturn}{Returns}
+Constant reference to the netlist object. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1placement_1_1placement_a8c7a6d62c69974f408cbfabf8cf70ed3}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!pad\-\_\-position@{pad\-\_\-position}}
+\index{pad\-\_\-position@{pad\-\_\-position}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{pad\-\_\-position}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::placement\-::placement\-::pad\-\_\-position (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pad, }
+\item[{geometry\-::point$<$ double $>$}]{position}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1placement_1_1placement_a8c7a6d62c69974f408cbfabf8cf70ed3}
+Changes the position of a pad. 
+\begin{DoxyParams}{Parameters}
+{\em pad} & Pad to move. \\
+\hline
+{\em position} & Target position of the pad. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1placement_1_1placement_ad10656b5a3f46a885e3b9cc5a6bd38d9}{\index{ophidian\-::placement\-::placement@{ophidian\-::placement\-::placement}!pin\-\_\-position@{pin\-\_\-position}}
+\index{pin\-\_\-position@{pin\-\_\-position}!ophidian::placement::placement@{ophidian\-::placement\-::placement}}
+\subsubsection[{pin\-\_\-position}]{\setlength{\rightskip}{0pt plus 5cm}geometry\-::point$<$double$>$ ophidian\-::placement\-::placement\-::pin\-\_\-position (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-system\-::entity}]{pin}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1placement_1_1placement_ad10656b5a3f46a885e3b9cc5a6bd38d9}
+Returns the position of a pin, calculated from the cell position and the pin offset. 
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin to get the position. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Point describing the pin position. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/csguth/workspace/openeda/src/placement/placement.\-h\item 
+/home/csguth/workspace/openeda/src/placement/placement.\-cpp\end{DoxyCompactItemize}

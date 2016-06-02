@@ -1,0 +1,153 @@
+\hypertarget{classophidian_1_1entity_1_1system}{\section{ophidian\-:\-:entity\-:\-:system Class Reference}
+\label{classophidian_1_1entity_1_1system}\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}}
+}
+
+
+System class.  
+
+
+
+
+{\ttfamily \#include $<$entity.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1entity_1_1system_ae0c31e9ba22d9d52fbd9a405b49afb27}{system} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1entity_1_1entity}{entity} \hyperlink{classophidian_1_1entity_1_1system_a4860ce43a8f6639e0fd4dc56fae07d1f}{create} ()
+\begin{DoxyCompactList}\small\item\em Creates an entity. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1entity_1_1system_a7b61729df0d01e9c71d622f67dd09103}{destroy} (\hyperlink{classophidian_1_1entity_1_1entity}{entity} e)
+\begin{DoxyCompactList}\small\item\em Destroy an entity. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1entity_1_1system_a71cc15925a15ecb74e15dc55b1a39549}{size} () const 
+\begin{DoxyCompactList}\small\item\em Returns the size of the system. \end{DoxyCompactList}\item 
+bool \hyperlink{classophidian_1_1entity_1_1system_a200d96480d9fc4209013de90f58715e9}{empty} () const 
+\begin{DoxyCompactList}\small\item\em Returns if the system is empty. \end{DoxyCompactList}\item 
+entity2index\-\_\-map\-::left\-\_\-const\-\_\-iterator \hyperlink{classophidian_1_1entity_1_1system_a51574421bf28a9d4042fba8368d1550f}{begin} () const 
+\begin{DoxyCompactList}\small\item\em Begin iterator. \end{DoxyCompactList}\item 
+entity2index\-\_\-map\-::left\-\_\-const\-\_\-iterator \hyperlink{classophidian_1_1entity_1_1system_a4f3e05ec55e1baed2decd82018adc564}{end} () const 
+\begin{DoxyCompactList}\small\item\em End iterator. \end{DoxyCompactList}\item 
+void \hyperlink{classophidian_1_1entity_1_1system_a8c561a5a3c74d6f49a93292891a6ebf3}{register\-\_\-property} (\hyperlink{classophidian_1_1entity_1_1property}{property} $\ast$p)
+\begin{DoxyCompactList}\small\item\em Registers property. \end{DoxyCompactList}\item 
+const entity2index\-\_\-map\-::left\-\_\-map \& \hyperlink{classophidian_1_1entity_1_1system_a2d54e36c24ad6ca3f7a84df39118258a}{entities} () const 
+\begin{DoxyCompactList}\small\item\em Entities map getter. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1entity_1_1system_af00b52abfa1fb60f319cd1ffa922b577}{lookup} (\hyperlink{classophidian_1_1entity_1_1entity}{entity} \&e) const 
+\begin{DoxyCompactList}\small\item\em Gets the index of an entity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1entity_1_1system_ae0c31e9ba22d9d52fbd9a405b49afb27}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!system@{system}}
+\index{system@{system}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{system}]{\setlength{\rightskip}{0pt plus 5cm}ophidian\-::entity\-::system\-::system (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1entity_1_1system_ae0c31e9ba22d9d52fbd9a405b49afb27}
+Creates an empty system. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1entity_1_1system_a51574421bf28a9d4042fba8368d1550f}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!begin@{begin}}
+\index{begin@{begin}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{begin}]{\setlength{\rightskip}{0pt plus 5cm}entity2index\-\_\-map\-::left\-\_\-const\-\_\-iterator ophidian\-::entity\-::system\-::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_a51574421bf28a9d4042fba8368d1550f}
+Returns an iterator pointing to the beginning of the entities in the system. The iterator can be used to iterate through the entities. \begin{DoxyReturn}{Returns}
+Iterator pointing to the beginning of the entities in the system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_a4860ce43a8f6639e0fd4dc56fae07d1f}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!create@{create}}
+\index{create@{create}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{create}]{\setlength{\rightskip}{0pt plus 5cm}{\bf entity} ophidian\-::entity\-::system\-::create (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1entity_1_1system_a4860ce43a8f6639e0fd4dc56fae07d1f}
+Creates a new entity and add it to the system. If there are properties associtated to the system they are notified that a new entity has been created. \begin{DoxyReturn}{Returns}
+The created entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_a7b61729df0d01e9c71d622f67dd09103}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!destroy@{destroy}}
+\index{destroy@{destroy}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{destroy}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::entity\-::system\-::destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf entity}}]{e}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1entity_1_1system_a7b61729df0d01e9c71d622f67dd09103}
+Destroys a entity from the system. If there are properties associtated to the system they are notified that an entity has been destroyed. 
+\begin{DoxyParams}{Parameters}
+{\em e} & Entity to be destroyed \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1entity_1_1system_a200d96480d9fc4209013de90f58715e9}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!empty@{empty}}
+\index{empty@{empty}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{empty}]{\setlength{\rightskip}{0pt plus 5cm}bool ophidian\-::entity\-::system\-::empty (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_a200d96480d9fc4209013de90f58715e9}
+Returns if the system is empty or not. An empty system do not have entities belonging to it. \begin{DoxyReturn}{Returns}
+true if the system is empty, false otherwise. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_a4f3e05ec55e1baed2decd82018adc564}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!end@{end}}
+\index{end@{end}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{end}]{\setlength{\rightskip}{0pt plus 5cm}entity2index\-\_\-map\-::left\-\_\-const\-\_\-iterator ophidian\-::entity\-::system\-::end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_a4f3e05ec55e1baed2decd82018adc564}
+Returns an interator pointing to the end of the entities in the system. \begin{DoxyReturn}{Returns}
+Iterator pointing to the end of the entities in the system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_a2d54e36c24ad6ca3f7a84df39118258a}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!entities@{entities}}
+\index{entities@{entities}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{entities}]{\setlength{\rightskip}{0pt plus 5cm}const entity2index\-\_\-map\-::left\-\_\-map\& ophidian\-::entity\-::system\-::entities (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_a2d54e36c24ad6ca3f7a84df39118258a}
+Getter of the entities map. \begin{DoxyReturn}{Returns}
+A constant reference to the map containing all entities in the system. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_af00b52abfa1fb60f319cd1ffa922b577}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!lookup@{lookup}}
+\index{lookup@{lookup}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{lookup}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::entity\-::system\-::lookup (
+\begin{DoxyParamCaption}
+\item[{{\bf entity} \&}]{e}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_af00b52abfa1fb60f319cd1ffa922b577}
+Gets the index of an entity, which can be used to acess its properties. 
+\begin{DoxyParams}{Parameters}
+{\em e} & Entity to lookup. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Index of the entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity_1_1system_a8c561a5a3c74d6f49a93292891a6ebf3}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!register\-\_\-property@{register\-\_\-property}}
+\index{register\-\_\-property@{register\-\_\-property}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{register\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void ophidian\-::entity\-::system\-::register\-\_\-property (
+\begin{DoxyParamCaption}
+\item[{{\bf property} $\ast$}]{p}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1entity_1_1system_a8c561a5a3c74d6f49a93292891a6ebf3}
+Registers a new property in the system. If tere are already entities created in the system the property is notified to create values to them. 
+\begin{DoxyParams}{Parameters}
+{\em p} & Pointer to the new property. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classophidian_1_1entity_1_1system_a71cc15925a15ecb74e15dc55b1a39549}{\index{ophidian\-::entity\-::system@{ophidian\-::entity\-::system}!size@{size}}
+\index{size@{size}!ophidian::entity::system@{ophidian\-::entity\-::system}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::entity\-::system\-::size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity_1_1system_a71cc15925a15ecb74e15dc55b1a39549}
+Returns the number of entities as the size of the system. \begin{DoxyReturn}{Returns}
+Number of entities in the system. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/csguth/workspace/openeda/src/entity/entity.\-h\item 
+/home/csguth/workspace/openeda/src/entity/entity.\-cpp\end{DoxyCompactItemize}
