@@ -88,241 +88,213 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * This file is part of Ophidian.</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Ophidian is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * it under the terms of the GNU General Public License as published by</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * the Free Software Foundation, either version 3 of the License, or</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * (at your option) any later version.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * Ophidian is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * GNU General Public License for more details.</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * You should have received a copy of the GNU General Public License</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> * along with Ophidian.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">// This is an implementation of the algorithm presented on paper</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">//    &quot;Fast and accurate wire delay estimation for physical synthesis of large ASICs&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// by Ruchir Puri, David S. Kung, and Anthony D. Drumm.</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// published i nProceedings of the 12th ACM Great Lakes symposium on VLSI (GLSVLSI &#39;02).</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// ACM, New York, NY, USA, 30-36. DOI=http://dx.doi.org/10.1145/505306.505314</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright 2016 Ophidian</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">Licensed to the Apache Software Foundation (ASF) under one</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">or more contributor license agreements.  See the NOTICE file</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">distributed with this work for additional information</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">regarding copyright ownership.  The ASF licenses this file</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">to you under the Apache License, Version 2.0 (the</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">&quot;License&quot;); you may not use this file except in compliance</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">with the License.  You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">  http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">Unless required by applicable law or agreed to in writing,</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">software distributed under the License is distributed on an</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">&quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">KIND, either express or implied.  See the License for the</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">specific language governing permissions and limitations</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">under the License.</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">// This is an implementation of the algorithm presented on paper</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">//    &quot;Fast and accurate wire delay estimation for physical synthesis of large ASICs&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// by Ruchir Puri, David S. Kung, and Anthony D. Drumm.</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// published i nProceedings of the 12th ACM Great Lakes symposium on VLSI (GLSVLSI &#39;02).</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">// ACM, New York, NY, USA, 30-36. DOI=http://dx.doi.org/10.1145/505306.505314</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#ifndef OPHIDIAN_TIMING_CEFF_H</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPHIDIAN_TIMING_CEFF_H</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;deque&gt;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;boost/units/cmath.hpp&gt;</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &quot;../interconnection/rc_tree.h&quot;</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &quot;elmore.h&quot;</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &quot;elmore_second_moment.h&quot;</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">namespace </span>timing {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#ifndef OPHIDIAN_TIMING_CEFF_H</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define OPHIDIAN_TIMING_CEFF_H</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;deque&gt;</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;boost/units/cmath.hpp&gt;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &quot;../interconnection/rc_tree.h&quot;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &quot;elmore.h&quot;</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include &quot;elmore_second_moment.h&quot;</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">namespace </span>timing {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">   43</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a> {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">using</span> CapacitanceType = boost::units::quantity &lt; boost::units::si::capacitance &gt;;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">using</span> SlewType = boost::units::quantity &lt; boost::units::si::time &gt;;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    lemon::ListGraph::NodeMap&lt; SlewType &gt; * m_slews;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    lemon::ListGraph::NodeMap&lt; SlewType &gt; * m_delays;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    lemon::ListGraph::NodeMap&lt; CapacitanceType &gt; * m_ceff;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">bool</span> m_slews_owner;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> m_delays_owner;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> m_ceff_owner;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a>();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a>();</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> slew_map(lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; sm);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> delay_map(lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; dm);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> ceff_map(lemon::ListGraph::NodeMap&lt;CapacitanceType&gt; &amp;cm);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; slews()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordflow">return</span> *m_slews;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; delays()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> *m_delays;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; CapacitanceType &gt;&amp; ceffs()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">return</span> *m_ceff;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> SlewCalculator&gt;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    CapacitanceType simulate(<span class="keyword">const</span> SlewCalculator &amp; slew_calculator, <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; tree,  <span class="keyword">const</span> interconnection::rc_tree::capacitor_id source)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">if</span>(!m_slews)</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            m_slews = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;(tree.graph());</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">if</span>(!m_delays)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            m_delays = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;(tree.graph());</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordflow">if</span>(!m_ceff)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            m_ceff = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; CapacitanceType &gt;(tree.graph());</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp; slews = *m_slews;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp; delays = *m_delays;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        lemon::ListGraph::NodeMap&lt; CapacitanceType &gt; &amp; ceff = *m_ceff;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a> delay(tree, source);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a> second_moment(tree, delay);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">auto</span> source_slew = slew_calculator(tree.lumped());</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">for</span>(lemon::ListGraph::NodeIt node(tree.graph()); node != lemon::INVALID; ++node)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            delays[node] = delay.at(node);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            <span class="keyword">auto</span> step_slew = boost::units::sqrt( second_moment.at(node)*2.0 - boost::units::pow&lt;2&gt;(delay.at(node)) );</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            slews[node] = boost::units::sqrt(boost::units::pow&lt;2&gt;(source_slew) + boost::units::pow&lt;2&gt;(step_slew));</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">return</span> tree.lumped();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;};</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">   97</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">using</span> CapacitanceType = boost::units::quantity &lt; boost::units::si::capacitance &gt;;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keyword">using</span> SlewType = boost::units::quantity &lt; boost::units::si::time &gt;;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordtype">double</span> m_precision;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    lemon::ListGraph::NodeMap&lt; SlewType &gt; * m_slews;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    lemon::ListGraph::NodeMap&lt; SlewType &gt; * m_delays;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    lemon::ListGraph::NodeMap&lt; CapacitanceType &gt; * m_ceff;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordtype">bool</span> m_slews_owner;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordtype">bool</span> m_delays_owner;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">bool</span> m_ceff_owner;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a>();</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a>();</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> precision(<span class="keywordtype">double</span> epsilon);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> slew_map(lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; sm);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> delay_map(lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; dm);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> ceff_map(lemon::ListGraph::NodeMap&lt;CapacitanceType&gt; &amp;cm);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; slews()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">return</span> *m_slews;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    }</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;&amp; delays()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordflow">return</span> *m_delays;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keyword">const</span> lemon::ListGraph::NodeMap&lt; CapacitanceType &gt;&amp; ceffs()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">return</span> *m_ceff;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> SlewCalculator&gt;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    CapacitanceType simulate(<span class="keyword">const</span> SlewCalculator &amp; slew_calculator, <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; tree,  <span class="keyword">const</span> interconnection::rc_tree::capacitor_id source)</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    {</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">if</span>(!m_slews)</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            m_slews = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;(tree.graph());</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordflow">if</span>(!m_delays)</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            m_delays = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; SlewType &gt;(tree.graph());</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">if</span>(!m_ceff)</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            m_ceff = <span class="keyword">new</span> lemon::ListGraph::NodeMap&lt; CapacitanceType &gt;(tree.graph());</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp; slews = *m_slews;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp; delays = *m_delays;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        lemon::ListGraph::NodeMap&lt; CapacitanceType &gt; &amp; ceff = *m_ceff;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        lemon::ListGraph::NodeMap&lt; lemon::ListGraph::Arc &gt; pred(tree.graph());</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="keywordflow">for</span>(lemon::ListGraph::NodeIt it(tree.graph()); it != lemon::INVALID; ++it)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            pred[it] = lemon::INVALID;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        std::deque&lt;lemon::ListGraph::Node&gt; to_process;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        std::vector&lt; lemon::ListGraph::Node &gt; order(tree.capacitor_count());</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        order.resize(0);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        to_process.push_back(source);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">while</span>(!to_process.empty())</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            <span class="keyword">auto</span> current = to_process.front();</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;            to_process.pop_front();</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            order.push_back(current);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;            <span class="keywordflow">for</span>(interconnection::rc_tree::resistor_it it(tree.capacitor_resistors(current)); it != lemon::INVALID; ++it)</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                <span class="keyword">auto</span> opposite_capacitor = tree.other_capacitor(it, current);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;                <span class="keywordflow">if</span>(opposite_capacitor != source &amp;&amp; pred[opposite_capacitor] == lemon::INVALID)</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;                    pred[opposite_capacitor] = it;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                    to_process.push_back(opposite_capacitor);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;                }</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        assert(pred[source] == lemon::INVALID);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordflow">for</span>(std::size_t i{0}; i &lt; order.size(); ++i)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            <span class="keyword">auto</span> current = order[i];</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            ceff[current] = tree.capacitance(current);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        }</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keywordflow">for</span>(std::size_t i = order.size()-1; i &gt; 0; --i)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            <span class="keyword">auto</span> current = order[i];</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            <span class="keyword">auto</span> parent = tree.graph().oppositeNode(current, pred[current]);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            ceff[parent] += ceff[current];</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        }</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="keywordtype">double</span> error = 1.0;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        std::size_t iteration = 0;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        CapacitanceType current_ceff;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        delays[source] = SlewType(0.0*boost::units::si::seconds);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">while</span> (error &gt; m_precision) {</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            current_ceff = ceff[source];</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="comment">//            std::cout &lt;&lt; &quot;iteration #&quot; &lt;&lt; iteration++ &lt;&lt; &quot; ceff &quot; &lt;&lt; current_ceff &lt;&lt; std::endl;</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            slews[source] = slew_calculator(current_ceff);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            <span class="keywordflow">for</span>(std::size_t i = 1; i &lt; order.size(); ++i)</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                <span class="keyword">auto</span> current = order[i];</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                <span class="keyword">auto</span> parent = tree.graph().oppositeNode(order[i], pred[order[i]]);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                <span class="keyword">auto</span> resistance_with_parent = tree.resistance(pred[order[i]]);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                slews[current] = slews[parent];</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                <span class="keywordflow">if</span>(slews[parent] &gt; 0.0*boost::units::si::seconds){</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                    <span class="keywordtype">double</span> x = resistance_with_parent*ceff[current]/slews[parent];</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                    slews[current] = slews[parent]/ (1-x*(1-std::exp(-1/x)));</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                delays[current] = delays[parent] + resistance_with_parent*ceff[current];</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> node : order)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                ceff[node] = tree.capacitance(node);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> node_it = order.rbegin(); node_it != order.rend(); ++node_it)</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            {</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                <span class="keyword">auto</span> current = *node_it;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                <span class="keywordflow">if</span>(pred[*node_it] != lemon::INVALID)</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                    <span class="keyword">auto</span> parent = tree.graph().oppositeNode(current, pred[current]);</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                    <span class="keyword">auto</span> resistance_with_parent = tree.resistance(pred[current]);</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                    <span class="keywordtype">double</span> x = 2.0 * resistance_with_parent  * ceff[current] / slews[parent];</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                    <span class="keywordtype">double</span> y = 1.0 - std::exp(-1.0/x);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;                    <span class="keywordtype">double</span> shielding_factor = (slews[parent] &gt; 0.0*boost::units::si::seconds?1.0 - x * y:1.0);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;                    ceff[parent] += shielding_factor*ceff[current];</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;                }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            error = boost::units::abs(current_ceff-ceff[source])/std::max(current_ceff, ceff[source]);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">return</span> current_ceff;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;};</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;}</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="preprocessor">#endif // OPHIDIAN_TIMING_CEFF_H</span></div>
-<div class="ttc" id="classophidian_1_1timing_1_1elmore_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore.html">ophidian::timing::elmore</a></div><div class="ttdef"><b>Definition:</b> elmore.h:27</div></div>
-<div class="ttc" id="classophidian_1_1timing_1_1effective__capacitance__wire__model_html"><div class="ttname"><a href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">ophidian::timing::effective_capacitance_wire_model</a></div><div class="ttdef"><b>Definition:</b> ceff.h:97</div></div>
-<div class="ttc" id="classophidian_1_1timing_1_1lumped__capacitance__wire__model_html"><div class="ttname"><a href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">ophidian::timing::lumped_capacitance_wire_model</a></div><div class="ttdef"><b>Definition:</b> ceff.h:43</div></div>
-<div class="ttc" id="classophidian_1_1timing_1_1elmore__second__moment_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore__second__moment.html">ophidian::timing::elmore_second_moment</a></div><div class="ttdef"><b>Definition:</b> elmore_second_moment.h:31</div></div>
-<div class="ttc" id="classophidian_1_1interconnection_1_1rc__tree_html"><div class="ttname"><a href="classophidian_1_1interconnection_1_1rc__tree.html">ophidian::interconnection::rc_tree</a></div><div class="ttdef"><b>Definition:</b> rc_tree.h:36</div></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">   44</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a> {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">using</span> CapacitanceType = boost::units::quantity &lt; boost::units::si::capacitance &gt;;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">using</span> SlewType = boost::units::quantity &lt; boost::units::si::time &gt;;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::vector&lt; SlewType &gt; * m_slews;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    std::vector&lt; SlewType &gt; * m_delays;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    std::vector&lt; CapacitanceType &gt; * m_ceff;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> m_slews_owner;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> m_delays_owner;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">bool</span> m_ceff_owner;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a>();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">lumped_capacitance_wire_model</a>();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> slew_map(std::vector&lt; SlewType &gt;&amp; sm);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> delay_map(std::vector&lt; SlewType &gt;&amp; dm);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> ceff_map(std::vector&lt;CapacitanceType&gt; &amp;cm);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">const</span> std::vector&lt; SlewType &gt;&amp; slews()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">return</span> *m_slews;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">const</span> std::vector&lt; SlewType &gt;&amp; delays()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordflow">return</span> *m_delays;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">const</span> std::vector&lt; CapacitanceType &gt;&amp; ceffs()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">return</span> *m_ceff;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> SlewCalculator&gt;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    CapacitanceType simulate(<span class="keyword">const</span> SlewCalculator &amp; slew_calculator, <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> &amp; tree)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordflow">if</span>(!m_slews)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            m_slews = <span class="keyword">new</span> std::vector&lt; SlewType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">if</span>(!m_delays)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            m_delays = <span class="keyword">new</span> std::vector&lt; SlewType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">if</span>(!m_ceff)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            m_ceff = <span class="keyword">new</span> std::vector&lt; CapacitanceType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        std::vector&lt; SlewType &gt; &amp; slews = *m_slews;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        std::vector&lt; SlewType &gt; &amp; delays = *m_delays;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        std::vector&lt; CapacitanceType &gt; &amp; ceff = *m_ceff;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        CapacitanceType lumped;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; tree.node_count(); ++i)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            lumped += tree.capacitance(i);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keyword">auto</span> source_slew = slew_calculator(lumped);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <a class="code" href="classophidian_1_1timing_1_1packed__elmore.html">packed_elmore</a> delay;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        delay.tree(tree);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        delay.run();</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">packed_elmore_second_moment</a> second_moment;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        second_moment.elmore(delay);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        second_moment.tree(tree);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        second_moment.run();</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; tree.node_count(); ++i)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            delays[i] = delay.at(i);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            <span class="keyword">auto</span> step_slew = boost::units::sqrt( second_moment.at(i)*2.0 - boost::units::pow&lt;2&gt;(delay.at(i)) );</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            slews[i] = boost::units::sqrt(boost::units::pow&lt;2&gt;(source_slew) + boost::units::pow&lt;2&gt;(step_slew));</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">return</span> lumped;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">  110</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">using</span> CapacitanceType = boost::units::quantity &lt; boost::units::si::capacitance &gt;;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keyword">using</span> SlewType = boost::units::quantity &lt; boost::units::si::time &gt;;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">double</span> m_precision;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    std::vector&lt; SlewType &gt; * m_slews;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    std::vector&lt; SlewType &gt; * m_delays;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    std::vector&lt; CapacitanceType &gt; * m_ceff;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">bool</span> m_slews_owner;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">bool</span> m_delays_owner;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">bool</span> m_ceff_owner;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a>();</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">effective_capacitance_wire_model</a>();</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">void</span> precision(<span class="keywordtype">double</span> epsilon);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">void</span> slew_map(std::vector&lt; SlewType &gt;&amp; sm);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">void</span> delay_map(std::vector&lt; SlewType &gt;&amp; dm);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">void</span> ceff_map(std::vector&lt;CapacitanceType&gt; &amp;cm);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">const</span> std::vector&lt; SlewType &gt;&amp; slews()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">return</span> *m_slews;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keyword">const</span> std::vector&lt; SlewType &gt;&amp; delays()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">return</span> *m_delays;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keyword">const</span> std::vector&lt; CapacitanceType &gt;&amp; ceffs()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordflow">return</span> *m_ceff;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> SlewCalculator&gt;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    CapacitanceType simulate(<span class="keyword">const</span> SlewCalculator &amp; slew_calculator, <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> &amp; tree)</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">if</span>(!m_slews)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            m_slews = <span class="keyword">new</span> std::vector&lt; SlewType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">if</span>(!m_delays)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            m_delays = <span class="keyword">new</span> std::vector&lt; SlewType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">if</span>(!m_ceff)</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;            m_ceff = <span class="keyword">new</span> std::vector&lt; CapacitanceType &gt;(tree.node_count());</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        std::vector&lt; SlewType &gt; &amp; slews = *m_slews;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        std::vector&lt; SlewType &gt; &amp; delays = *m_delays;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        std::vector&lt; CapacitanceType &gt; &amp; ceff = *m_ceff;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordtype">double</span> error = 1.0;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        std::size_t iteration = 0;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        CapacitanceType current_ceff;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        delays[0] = SlewType(0.0*boost::units::si::seconds);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <span class="keywordflow">while</span> (error &gt; m_precision) {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            current_ceff = ceff[0];</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            slews[0] = slew_calculator(current_ceff);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            <span class="keywordflow">for</span>(std::size_t current = 1; current &lt; tree.node_count(); ++current)</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            {</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;                <span class="keyword">auto</span> parent = tree.pred(current);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;                <span class="keyword">auto</span> resistance_with_parent = tree.resistance(current);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                slews[current] = slews[parent];</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                <span class="keywordflow">if</span>(slews[parent] &gt; 0.0*boost::units::si::seconds){</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                    <span class="keywordtype">double</span> x = resistance_with_parent*ceff[current]/slews[parent];</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                    slews[current] = slews[parent]/ (1-x*(1-std::exp(-1/x)));</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                delays[current] = delays[parent] + resistance_with_parent*ceff[current];</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            <span class="keywordflow">for</span>(std::size_t node = 0; node &lt; tree.node_count(); ++node)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                ceff[node] = tree.capacitance(node);</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; tree.node_count()-1; ++i)</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                std::size_t current = tree.node_count() - (i+1);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                <span class="keyword">auto</span> parent = tree.pred(current);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;                <span class="keyword">auto</span> resistance_with_parent = tree.resistance(current);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;                <span class="keywordtype">double</span> x = 2.0 * resistance_with_parent  * ceff[current] / slews[parent];</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                <span class="keywordtype">double</span> y = 1.0 - std::exp(-1.0/x);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                <span class="keywordtype">double</span> shielding_factor = (slews[parent] &gt; 0.0*boost::units::si::seconds?1.0 - x * y:1.0);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                ceff[parent] += shielding_factor*ceff[current];</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            error = boost::units::abs(current_ceff-ceff[0])/std::max(current_ceff, ceff[0]);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        }</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keywordflow">return</span> current_ceff;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;};</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;}</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">#endif // OPHIDIAN_TIMING_CEFF_H</span></div>
+<div class="ttc" id="classophidian_1_1interconnection_1_1packed__rc__tree_html"><div class="ttname"><a href="classophidian_1_1interconnection_1_1packed__rc__tree.html">ophidian::interconnection::packed_rc_tree</a></div><div class="ttdoc">Packed RC Tree Class. </div><div class="ttdef"><b>Definition:</b> rc_tree.h:39</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1packed__elmore_html"><div class="ttname"><a href="classophidian_1_1timing_1_1packed__elmore.html">ophidian::timing::packed_elmore</a></div><div class="ttdef"><b>Definition:</b> elmore.h:55</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1effective__capacitance__wire__model_html"><div class="ttname"><a href="classophidian_1_1timing_1_1effective__capacitance__wire__model.html">ophidian::timing::effective_capacitance_wire_model</a></div><div class="ttdef"><b>Definition:</b> ceff.h:110</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1lumped__capacitance__wire__model_html"><div class="ttname"><a href="classophidian_1_1timing_1_1lumped__capacitance__wire__model.html">ophidian::timing::lumped_capacitance_wire_model</a></div><div class="ttdef"><b>Definition:</b> ceff.h:44</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1packed__elmore__second__moment_html"><div class="ttname"><a href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">ophidian::timing::packed_elmore_second_moment</a></div><div class="ttdef"><b>Definition:</b> elmore_second_moment.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

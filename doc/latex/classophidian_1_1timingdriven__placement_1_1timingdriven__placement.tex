@@ -4,43 +4,64 @@
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adc48b1b9f58578b40d76a6185065bd23}{{\bfseries timingdriven\-\_\-placement} (const std\-::string \&dot\-\_\-verilog\-\_\-file, const std\-::string \&dot\-\_\-def\-\_\-file, const std\-::string \&dot\-\_\-lef\-\_\-file, const std\-::string \&dot\-\_\-lib\-\_\-late, const std\-::string \&dot\-\_\-lib\-\_\-early, double clock\-\_\-in\-\_\-picosseconds)}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adc48b1b9f58578b40d76a6185065bd23}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a40d265730b04f7a9cbb84d5e31a832f7}{{\bfseries timingdriven\-\_\-placement} (const std\-::string \&dot\-\_\-verilog\-\_\-file, const std\-::string \&dot\-\_\-def\-\_\-file, const std\-::string \&dot\-\_\-lef\-\_\-file, const std\-::string m\-\_\-dot\-\_\-lib\-\_\-late, const std\-::string m\-\_\-dot\-\_\-lib\-\_\-early, double clock\-\_\-in\-\_\-ps)}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a40d265730b04f7a9cbb84d5e31a832f7}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}{\hyperlink{classophidian_1_1entity_1_1entity}{Cell} \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}{cell\-\_\-find} (std\-::string name) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}{Cell \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}{cell\-\_\-find} (std\-::string name) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af1c4f2864c164e6d4fdcec3da391bce1}
 
 \begin{DoxyCompactList}\small\item\em Finds a Cell by its name. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}{cell\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{Cell} c) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}{cell\-\_\-name} (Cell c) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_afd0781cae7f35b46803228bd8c037963}
 
 \begin{DoxyCompactList}\small\item\em Gets the name of a cell. \end{DoxyCompactList}\item 
-\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ \hyperlink{classophidian_1_1entity_1_1bimap__iterator__adapter}{Cell\-Iterator} $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0965d132300319bd2e88d9a5cb62e34}{cells} () const 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a848f5249103a6ff029dc13d22410cef9}{std\-::size\-\_\-t {\bfseries cell\-\_\-lookup} (Cell c) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a848f5249103a6ff029dc13d22410cef9}
+
+\item 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af92078dc67a498243960f5e21f127a52}{const std\-::vector$<$ Pin $>$ \& {\bfseries cell\-\_\-pins} (Cell c) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af92078dc67a498243960f5e21f127a52}
+
+\item 
+\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ Cell\-Iterator $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0965d132300319bd2e88d9a5cb62e34}{cells} () const 
 \begin{DoxyCompactList}\small\item\em Gets the cells. \end{DoxyCompactList}\item 
-\hyperlink{classophidian_1_1entity_1_1entity}{Net} \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa52e8805ef88d8ff565387c5c095f3a2}{net\-\_\-find} (std\-::string name) const 
+Net \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa52e8805ef88d8ff565387c5c095f3a2}{net\-\_\-find} (std\-::string name) const 
 \begin{DoxyCompactList}\small\item\em Finds a Net by its name. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}{net\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{Net} n) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}{net\-\_\-name} (Net n) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa1d834e036fff7913c1fd7d5a299240a}
 
 \begin{DoxyCompactList}\small\item\em Gets the name of a net. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a8ba46aac08407d4c8f5ee2e200a47059}{std\-::vector$<$ \hyperlink{classophidian_1_1entity_1_1entity}{Pin} $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a8ba46aac08407d4c8f5ee2e200a47059}{net\-\_\-pins} (\hyperlink{classophidian_1_1entity_1_1entity}{Net} net) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a8ba46aac08407d4c8f5ee2e200a47059}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a958405bda3fb6aaf373d08be7c62919b}{const std\-::vector$<$ Pin $>$ \& \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a958405bda3fb6aaf373d08be7c62919b}{net\-\_\-pins} (Net net) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a958405bda3fb6aaf373d08be7c62919b}
 
 \begin{DoxyCompactList}\small\item\em Gets the pin of a net. \end{DoxyCompactList}\item 
-\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ \hyperlink{classophidian_1_1entity_1_1bimap__iterator__adapter}{Net\-Iterator} $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a589ff318ee01712569ef982c389b568a}{nets} () const 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_acfd1ce9403cffdf426ba8e76db605f68}{entity\-\_\-system\-::entity\-\_\-index {\bfseries net\-\_\-lookup} (Net net) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_acfd1ce9403cffdf426ba8e76db605f68}
+
+\item 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae6f9ec0384d363f9ef4592ca0e572174}{void {\bfseries net\-\_\-register\-\_\-property} (\hyperlink{classophidian_1_1entity__system_1_1property}{entity\-\_\-system\-::property} \&p)}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae6f9ec0384d363f9ef4592ca0e572174}
+
+\item 
+\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ Net\-Iterator $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a589ff318ee01712569ef982c389b568a}{nets} () const 
 \begin{DoxyCompactList}\small\item\em Gets the nets. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}{pin\-\_\-name} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}{std\-::string \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}{pin\-\_\-name} (Pin pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3709b3ff794bb4b1cb0034af51af41c3}
 
 \begin{DoxyCompactList}\small\item\em Gets the name of a pin. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}{\hyperlink{classophidian_1_1entity_1_1entity}{Net} \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}{pin\-\_\-net} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}{Net \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}{pin\-\_\-net} (Pin pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a6dddbac5a6bc575785ad867948e6fc6f}
 
 \begin{DoxyCompactList}\small\item\em Gets the net of a pin. \end{DoxyCompactList}\item 
-\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ \hyperlink{classophidian_1_1entity_1_1bimap__iterator__adapter}{Pin\-Iterator} $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a1323f510249c391a228a1aba65bbc3f7}{pins} () const 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a7e55935180bf2a909059d72e1b231453}{std\-::size\-\_\-t {\bfseries pin\-\_\-lookup} (Pin pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a7e55935180bf2a909059d72e1b231453}
+
+\item 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a1a3d1a0b6cfa51031d182e7ed1d03b77}{Cell {\bfseries pin\-\_\-owner} (Pin pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a1a3d1a0b6cfa51031d182e7ed1d03b77}
+
+\item 
+\hyperlink{structophidian_1_1timingdriven__placement_1_1bounds}{bounds}$<$ Pin\-Iterator $>$ \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a1323f510249c391a228a1aba65bbc3f7}{pins} () const 
 \begin{DoxyCompactList}\small\item\em Gets the pins. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}{void \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}{place\-\_\-cell} (\hyperlink{classophidian_1_1entity_1_1entity}{Cell} cell, Point destination)}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}{void \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}{place\-\_\-cell} (Cell cell, Point destination)}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a169ccee6e83cb7f2debb7a938463faab}
 
 \begin{DoxyCompactList}\small\item\em Places a cell in a position. \end{DoxyCompactList}\item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}{Point \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}{cell\-\_\-position} (\hyperlink{classophidian_1_1entity_1_1entity}{Cell} cell) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}{Point \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}{cell\-\_\-position} (Cell cell) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa5ccf07957d6dfe4fe0ed94fe16880b4}
 
 \begin{DoxyCompactList}\small\item\em Gets the cell's position. \end{DoxyCompactList}\item 
-Geometry \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a7a73d743dde7e2c79271a81649fb9402}{cell\-\_\-geometry} (\hyperlink{classophidian_1_1entity_1_1entity}{Cell} cell) const 
+Geometry \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a7a73d743dde7e2c79271a81649fb9402}{cell\-\_\-geometry} (Cell cell) const 
 \begin{DoxyCompactList}\small\item\em Gets the cell's geometry. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aae8a4992d0bc6635e99b7b87da95538f}{Point {\bfseries pin\-\_\-position} (Pin pin) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aae8a4992d0bc6635e99b7b87da95538f}
+
+\item 
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0e7ff8965e80fb1a8f2da03fe7b8a53}{void \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0e7ff8965e80fb1a8f2da03fe7b8a53}{update\-\_\-timing} ()}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0e7ff8965e80fb1a8f2da03fe7b8a53}
 
 \begin{DoxyCompactList}\small\item\em Updates the timing information. \end{DoxyCompactList}\item 
@@ -56,40 +77,40 @@ Geometry \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__pl
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ffdc93b18d791ecc93e07cf4128e568}{timing\-::\-Time\-Type {\bfseries early\-\_\-tns} () const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ffdc93b18d791ecc93e07cf4128e568}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad7068a5df76228c1f13d58ae103458b1}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-slack} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad7068a5df76228c1f13d58ae103458b1}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad7068a5df76228c1f13d58ae103458b1}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-slack} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad7068a5df76228c1f13d58ae103458b1}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adac5f7beb774ff37db0d9bd79c404c58}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-slack} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adac5f7beb774ff37db0d9bd79c404c58}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adac5f7beb774ff37db0d9bd79c404c58}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-slack} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_adac5f7beb774ff37db0d9bd79c404c58}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af305682fd56c092525c891d42b7ccb1a}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-slack} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af305682fd56c092525c891d42b7ccb1a}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af305682fd56c092525c891d42b7ccb1a}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-slack} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_af305682fd56c092525c891d42b7ccb1a}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa0c97ae57c4c9b82edb3afcfd4458868}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-slack} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa0c97ae57c4c9b82edb3afcfd4458868}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa0c97ae57c4c9b82edb3afcfd4458868}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-slack} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa0c97ae57c4c9b82edb3afcfd4458868}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa8658e533ba50a26cbbb0c2aef937458}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-arrival} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa8658e533ba50a26cbbb0c2aef937458}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa8658e533ba50a26cbbb0c2aef937458}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-arrival} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa8658e533ba50a26cbbb0c2aef937458}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a218dc1caff8442d5f4c32bd10e003f76}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-arrival} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a218dc1caff8442d5f4c32bd10e003f76}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a218dc1caff8442d5f4c32bd10e003f76}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-arrival} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a218dc1caff8442d5f4c32bd10e003f76}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ac1bfe96b3407533d82fc3d95dc81bec3}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-arrival} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ac1bfe96b3407533d82fc3d95dc81bec3}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ac1bfe96b3407533d82fc3d95dc81bec3}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-arrival} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ac1bfe96b3407533d82fc3d95dc81bec3}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad3c882c9fb69417fcccbb6661eb08c29}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-arrival} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad3c882c9fb69417fcccbb6661eb08c29}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad3c882c9fb69417fcccbb6661eb08c29}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-arrival} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ad3c882c9fb69417fcccbb6661eb08c29}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ab60a24db0fbbb9535becf52fbf99cbe8}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ab60a24db0fbbb9535becf52fbf99cbe8}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ab60a24db0fbbb9535becf52fbf99cbe8}{timing\-::\-Time\-Type {\bfseries early\-\_\-rise\-\_\-slew} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ab60a24db0fbbb9535becf52fbf99cbe8}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ac9ad6fb1d90effcdbe8420834d1e8e}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ac9ad6fb1d90effcdbe8420834d1e8e}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ac9ad6fb1d90effcdbe8420834d1e8e}{timing\-::\-Time\-Type {\bfseries early\-\_\-fall\-\_\-slew} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a3ac9ad6fb1d90effcdbe8420834d1e8e}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a58857f5b0c03d7ae1076edf5c1ed3650}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a58857f5b0c03d7ae1076edf5c1ed3650}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a58857f5b0c03d7ae1076edf5c1ed3650}{timing\-::\-Time\-Type {\bfseries late\-\_\-rise\-\_\-slew} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a58857f5b0c03d7ae1076edf5c1ed3650}
 
 \item 
-\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a05a0cc44a3f837e431c2cd0505534e26}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-slew} (\hyperlink{classophidian_1_1entity_1_1entity}{Pin} p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a05a0cc44a3f837e431c2cd0505534e26}
+\hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a05a0cc44a3f837e431c2cd0505534e26}{timing\-::\-Time\-Type {\bfseries late\-\_\-fall\-\_\-slew} (Pin p) const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a05a0cc44a3f837e431c2cd0505534e26}
 
 \item 
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a5436af9462e922dccd0b6bd002425f51}{const \hyperlink{classophidian_1_1timing_1_1endpoints}{timing\-::endpoints} \& {\bfseries timing\-\_\-endpoints} () const }\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a5436af9462e922dccd0b6bd002425f51}
@@ -102,7 +123,7 @@ Geometry \hyperlink{classophidian_1_1timingdriven__placement_1_1timingdriven__pl
 \index{cell\-\_\-geometry@{cell\-\_\-geometry}!ophidian::timingdriven_placement::timingdriven_placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}}
 \subsubsection[{cell\-\_\-geometry}]{\setlength{\rightskip}{0pt plus 5cm}Geometry ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::cell\-\_\-geometry (
 \begin{DoxyParamCaption}
-\item[{{\bf Cell}}]{cell}
+\item[{Cell}]{cell}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a7a73d743dde7e2c79271a81649fb9402}
 
@@ -115,7 +136,7 @@ the cell geometry, translated to the cell position
 \end{DoxyReturn}
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_ae0965d132300319bd2e88d9a5cb62e34}{\index{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}!cells@{cells}}
 \index{cells@{cells}!ophidian::timingdriven_placement::timingdriven_placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}}
-\subsubsection[{cells}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<${\bf Cell\-Iterator}$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::cells (
+\subsubsection[{cells}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<$Cell\-Iterator$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::cells (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -125,7 +146,7 @@ bounds$<$\-Cell\-Iterator$>$ of Netlist's Cell Entity System
 \end{DoxyReturn}
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_aa52e8805ef88d8ff565387c5c095f3a2}{\index{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}!net\-\_\-find@{net\-\_\-find}}
 \index{net\-\_\-find@{net\-\_\-find}!ophidian::timingdriven_placement::timingdriven_placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}}
-\subsubsection[{net\-\_\-find}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Net} ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::net\-\_\-find (
+\subsubsection[{net\-\_\-find}]{\setlength{\rightskip}{0pt plus 5cm}Net ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::net\-\_\-find (
 \begin{DoxyParamCaption}
 \item[{std\-::string}]{name}
 \end{DoxyParamCaption}
@@ -140,7 +161,7 @@ Net entity representing the Net you are looking for, an exception is thrown if t
 \end{DoxyReturn}
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a589ff318ee01712569ef982c389b568a}{\index{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}!nets@{nets}}
 \index{nets@{nets}!ophidian::timingdriven_placement::timingdriven_placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}}
-\subsubsection[{nets}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<${\bf Net\-Iterator}$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::nets (
+\subsubsection[{nets}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<$Net\-Iterator$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::nets (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -150,7 +171,7 @@ bounds$<$\-Net\-Iterator$>$ of Netlist's Net Entity System
 \end{DoxyReturn}
 \hypertarget{classophidian_1_1timingdriven__placement_1_1timingdriven__placement_a1323f510249c391a228a1aba65bbc3f7}{\index{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}!pins@{pins}}
 \index{pins@{pins}!ophidian::timingdriven_placement::timingdriven_placement@{ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement}}
-\subsubsection[{pins}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<${\bf Pin\-Iterator}$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::pins (
+\subsubsection[{pins}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bounds}$<$Pin\-Iterator$>$ ophidian\-::timingdriven\-\_\-placement\-::timingdriven\-\_\-placement\-::pins (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}

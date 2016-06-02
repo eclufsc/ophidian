@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['geometry',['geometry',['../classophidian_1_1placement_1_1library.html#afc2a71a35aa645d13c4e55884a46b219',1,'ophidian::placement::library::geometry(entity::entity cell) const '],['../classophidian_1_1placement_1_1library.html#af050cbfc19f4e4294b8a21a01f0c8b9d',1,'ophidian::placement::library::geometry(entity::entity cell, multipolygon geometry)']]]
+  ['find_5fclosest_5frow',['find_closest_row',['../classophidian_1_1floorplan_1_1floorplan.html#a1b58f8ddb6bbf4bd75daa9bac6809512',1,'ophidian::floorplan::floorplan']]],
+  ['find_5frow',['find_row',['../classophidian_1_1floorplan_1_1floorplan.html#a30675071a626b20eb3406e4ea2c851c6',1,'ophidian::floorplan::floorplan']]]
 ];

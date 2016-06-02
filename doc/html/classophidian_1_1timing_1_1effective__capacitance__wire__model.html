@@ -99,34 +99,29 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa18d4d2dd3dbc66a65fbcd746c638632"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa18d4d2dd3dbc66a65fbcd746c638632"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>precision</b> (double epsilon)</td></tr>
 <tr class="separator:aa18d4d2dd3dbc66a65fbcd746c638632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae38681e3edd43d0bac7efbd7293cbc89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae38681e3edd43d0bac7efbd7293cbc89"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>slew_map</b> (lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp;sm)</td></tr>
-<tr class="separator:ae38681e3edd43d0bac7efbd7293cbc89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fa3ef063233d16e21b94f910802cc9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fa3ef063233d16e21b94f910802cc9b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>delay_map</b> (lemon::ListGraph::NodeMap&lt; SlewType &gt; &amp;dm)</td></tr>
-<tr class="separator:a1fa3ef063233d16e21b94f910802cc9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a414dc2fd42b2b51b2a2e29f19f5ed1d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a414dc2fd42b2b51b2a2e29f19f5ed1d8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>ceff_map</b> (lemon::ListGraph::NodeMap&lt; CapacitanceType &gt; &amp;cm)</td></tr>
-<tr class="separator:a414dc2fd42b2b51b2a2e29f19f5ed1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcb954dded8db155b6b0a3f43444996e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcb954dded8db155b6b0a3f43444996e"></a>
-const <br class="typebreak"/>
-lemon::ListGraph::NodeMap<br class="typebreak"/>
-&lt; SlewType &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>slews</b> () const </td></tr>
-<tr class="separator:adcb954dded8db155b6b0a3f43444996e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4376b848eaddca514112919fcb40b879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4376b848eaddca514112919fcb40b879"></a>
-const <br class="typebreak"/>
-lemon::ListGraph::NodeMap<br class="typebreak"/>
-&lt; SlewType &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>delays</b> () const </td></tr>
-<tr class="separator:a4376b848eaddca514112919fcb40b879"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c5c700e08957253238cb8a1f9d55096"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c5c700e08957253238cb8a1f9d55096"></a>
-const <br class="typebreak"/>
-lemon::ListGraph::NodeMap<br class="typebreak"/>
+<tr class="memitem:a8b39a287f09bdca01263d17eb9e9391d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b39a287f09bdca01263d17eb9e9391d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>slew_map</b> (std::vector&lt; SlewType &gt; &amp;sm)</td></tr>
+<tr class="separator:a8b39a287f09bdca01263d17eb9e9391d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad62550fe147307510a0a5afa51fa8993"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad62550fe147307510a0a5afa51fa8993"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>delay_map</b> (std::vector&lt; SlewType &gt; &amp;dm)</td></tr>
+<tr class="separator:ad62550fe147307510a0a5afa51fa8993"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc2f0a782ac51842cbe2de7b725bd699"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc2f0a782ac51842cbe2de7b725bd699"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>ceff_map</b> (std::vector&lt; CapacitanceType &gt; &amp;cm)</td></tr>
+<tr class="separator:afc2f0a782ac51842cbe2de7b725bd699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c592f1d0abb6e0c2bd4b38c782867e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5c592f1d0abb6e0c2bd4b38c782867e"></a>
+const std::vector&lt; SlewType &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>slews</b> () const </td></tr>
+<tr class="separator:aa5c592f1d0abb6e0c2bd4b38c782867e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a210665426d271c9efb1fad0e6aee8549"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a210665426d271c9efb1fad0e6aee8549"></a>
+const std::vector&lt; SlewType &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>delays</b> () const </td></tr>
+<tr class="separator:a210665426d271c9efb1fad0e6aee8549"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51698d2c565a70e7e66c4a26a8e9befd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51698d2c565a70e7e66c4a26a8e9befd"></a>
+const std::vector<br class="typebreak"/>
 &lt; CapacitanceType &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>ceffs</b> () const </td></tr>
-<tr class="separator:a7c5c700e08957253238cb8a1f9d55096"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a681989322ec4ca83203d766caaaf1c32"><td class="memTemplParams" colspan="2"><a class="anchor" id="a681989322ec4ca83203d766caaaf1c32"></a>
+<tr class="separator:a51698d2c565a70e7e66c4a26a8e9befd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33d191562404dd3358a1120e17326bfb"><td class="memTemplParams" colspan="2"><a class="anchor" id="a33d191562404dd3358a1120e17326bfb"></a>
 template&lt;class SlewCalculator &gt; </td></tr>
-<tr class="memitem:a681989322ec4ca83203d766caaaf1c32"><td class="memTemplItemLeft" align="right" valign="top">CapacitanceType&#160;</td><td class="memTemplItemRight" valign="bottom"><b>simulate</b> (const SlewCalculator &amp;slew_calculator, const <a class="el" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp;tree, const interconnection::rc_tree::capacitor_id source)</td></tr>
-<tr class="separator:a681989322ec4ca83203d766caaaf1c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33d191562404dd3358a1120e17326bfb"><td class="memTemplItemLeft" align="right" valign="top">CapacitanceType&#160;</td><td class="memTemplItemRight" valign="bottom"><b>simulate</b> (const SlewCalculator &amp;slew_calculator, const <a class="el" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> &amp;tree)</td></tr>
+<tr class="separator:a33d191562404dd3358a1120e17326bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/csguth/workspace/openeda/src/timing/<a class="el" href="ceff_8h_source.html">ceff.h</a></li>
@@ -135,7 +130,7 @@ template&lt;class SlewCalculator &gt; </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -88,92 +88,93 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * This file is part of Ophidian.</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Ophidian is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * it under the terms of the GNU General Public License as published by</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * the Free Software Foundation, either version 3 of the License, or</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * (at your option) any later version.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * Ophidian is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * GNU General Public License for more details.</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * You should have received a copy of the GNU General Public License</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> * along with Ophidian.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifndef ophidian_SITES_H</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define ophidian_SITES_H</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;vector_property.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;entity.h&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;../geometry/geometry.h&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">namespace </span>floorplan {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html">   32</a></span>&#160;        <span class="keyword">class </span><a class="code" href="classophidian_1_1floorplan_1_1sites.html">sites</a> {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;            <span class="keyword">using</span> point = geometry::point&lt;double&gt;;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            <a class="code" href="classophidian_1_1entity_1_1system.html">entity::system</a> &amp; m_system;</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright 2016 Ophidian</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">Licensed to the Apache Software Foundation (ASF) under one</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">or more contributor license agreements.  See the NOTICE file</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">distributed with this work for additional information</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">regarding copyright ownership.  The ASF licenses this file</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">to you under the Apache License, Version 2.0 (the</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">&quot;License&quot;); you may not use this file except in compliance</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">with the License.  You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">  http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">Unless required by applicable law or agreed to in writing,</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">software distributed under the License is distributed on an</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">&quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">KIND, either express or implied.  See the License for the</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">specific language governing permissions and limitations</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">under the License.</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef ophidian_SITES_H</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define ophidian_SITES_H</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;vector_property.h&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;entity_system.h&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;../geometry/geometry.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">namespace </span>floorplan {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html">   34</a></span>&#160;        <span class="keyword">class </span><a class="code" href="classophidian_1_1floorplan_1_1sites.html">sites</a> {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            <span class="keyword">using</span> point = geometry::point&lt;double&gt;;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            <a class="code" href="classophidian_1_1entity_1_1vector__property.html">entity::vector_property&lt;std::string&gt;</a> m_names;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            <a class="code" href="classophidian_1_1entity_1_1vector__property.html">entity::vector_property&lt;point&gt;</a> m_dimensions;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a448e8d956831330bad88f3bc41ad3897">sites</a>(<a class="code" href="classophidian_1_1entity_1_1system.html">entity::system</a> &amp; system);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            <a class="code" href="classophidian_1_1entity__system_1_1entity__system.html">entity_system::entity_system</a> &amp; m_system;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            <a class="code" href="classophidian_1_1entity__system_1_1vector__property.html">entity_system::vector_property&lt;std::string&gt;</a> m_names;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            <a class="code" href="classophidian_1_1entity__system_1_1vector__property.html">entity_system::vector_property&lt;point&gt;</a> m_dimensions;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a1491b5143f884e055af2237672eb831e">sites</a>(<a class="code" href="classophidian_1_1entity__system_1_1entity__system.html">entity_system::entity_system</a> &amp; system);</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#aedaadf66a689a9542f3c33da9f76cfd4">   54</a></span>&#160;            std::string <a class="code" href="classophidian_1_1floorplan_1_1sites.html#aedaadf66a689a9542f3c33da9f76cfd4">name</a>(<a class="code" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> site)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                <span class="keywordflow">return</span> m_names[m_system.<a class="code" href="classophidian_1_1entity_1_1system.html#af00b52abfa1fb60f319cd1ffa922b577">lookup</a>(site)];</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#a29827e155ac9dc999e9fb79a499176d5">   56</a></span>&#160;            std::string <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a29827e155ac9dc999e9fb79a499176d5">name</a>(entity_system::entity site)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <span class="keywordflow">return</span> m_names[m_system.<a class="code" href="classophidian_1_1entity__system_1_1entity__system.html#ab0ec0cc5dd829cd9cd67f51dab21cc51">lookup</a>(site)];</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#addce4102309e4f3f07e9869ced4bfbc6">   64</a></span>&#160;            point <a class="code" href="classophidian_1_1floorplan_1_1sites.html#addce4102309e4f3f07e9869ced4bfbc6">dimensions</a>(<a class="code" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> site)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                <span class="keywordflow">return</span> m_dimensions[m_system.<a class="code" href="classophidian_1_1entity_1_1system.html#af00b52abfa1fb60f319cd1ffa922b577">lookup</a>(site)];</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#a4b93e80224ecb35489fbf38d16930430">   66</a></span>&#160;            point <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a4b93e80224ecb35489fbf38d16930430">dimensions</a>(entity_system::entity site)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <span class="keywordflow">return</span> m_dimensions[m_system.<a class="code" href="classophidian_1_1entity__system_1_1entity__system.html#ab0ec0cc5dd829cd9cd67f51dab21cc51">lookup</a>(site)];</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">   73</a></span>&#160;            std::pair&lt; std::vector&lt;std::string&gt;::const_iterator, std::vector&lt;std::string&gt;::const_iterator &gt; <a class="code" href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">names</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                <span class="keywordflow">return</span> std::make_pair(m_names.begin(), m_names.end());</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">   75</a></span>&#160;            std::pair&lt; std::vector&lt;std::string&gt;::const_iterator, std::vector&lt;std::string&gt;::const_iterator &gt; <a class="code" href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">names</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                <span class="keywordflow">return</span> std::make_pair(m_names.begin(), m_names.end());</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            }</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">   82</a></span>&#160;            std::pair&lt; std::vector&lt;point&gt;::const_iterator, std::vector&lt;point&gt;::const_iterator &gt; <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                <span class="keywordflow">return</span> std::make_pair(m_dimensions.<a class="code" href="classophidian_1_1entity_1_1vector__property.html#a8c6f753870ea6946573d5db86f7ab8c9">begin</a>(), m_dimensions.<a class="code" href="classophidian_1_1entity_1_1vector__property.html#a2f52e3cd85861b854717c64b2d045df8">end</a>());</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            }</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">   84</a></span>&#160;            std::pair&lt; std::vector&lt;point&gt;::const_iterator, std::vector&lt;point&gt;::const_iterator &gt; <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                <span class="keywordflow">return</span> std::make_pair(m_dimensions.<a class="code" href="classophidian_1_1entity__system_1_1vector__property.html#a626598dfceff63015555d40e7b150b46">begin</a>(), m_dimensions.<a class="code" href="classophidian_1_1entity__system_1_1vector__property.html#a3e5adc4e4c7bc89b1226f7493131e017">end</a>());</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            }</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordtype">void</span> <a class="code" href="classophidian_1_1floorplan_1_1sites.html#aedaadf66a689a9542f3c33da9f76cfd4">name</a>(<a class="code" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> site, std::string <a class="code" href="classophidian_1_1floorplan_1_1sites.html#aedaadf66a689a9542f3c33da9f76cfd4">name</a>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="keywordtype">void</span> <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>(<a class="code" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> site, point <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        };</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            <span class="keywordtype">void</span> <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a29827e155ac9dc999e9fb79a499176d5">name</a>(entity_system::entity site, std::string <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a29827e155ac9dc999e9fb79a499176d5">name</a>);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            <span class="keywordtype">void</span> <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>(entity_system::entity site, point <a class="code" href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">dimensions</a>);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        };</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">#endif //ophidian_SITES_H</span></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_aedaadf66a689a9542f3c33da9f76cfd4"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#aedaadf66a689a9542f3c33da9f76cfd4">ophidian::floorplan::sites::name</a></div><div class="ttdeci">std::string name(entity::entity site) const </div><div class="ttdoc">Name getter. </div><div class="ttdef"><b>Definition:</b> sites.h:54</div></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_abcd874e49de890637581e8b192274b5e"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">ophidian::floorplan::sites::names</a></div><div class="ttdeci">std::pair&lt; std::vector&lt; std::string &gt;::const_iterator, std::vector&lt; std::string &gt;::const_iterator &gt; names() const </div><div class="ttdoc">Name iterator getter. </div><div class="ttdef"><b>Definition:</b> sites.h:73</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1vector__property_html_a8c6f753870ea6946573d5db86f7ab8c9"><div class="ttname"><a href="classophidian_1_1entity_1_1vector__property.html#a8c6f753870ea6946573d5db86f7ab8c9">ophidian::entity::vector_property::begin</a></div><div class="ttdeci">std::vector&lt; T &gt;::const_iterator begin() const </div><div class="ttdoc">Begin iterator. </div><div class="ttdef"><b>Definition:</b> vector_property.h:95</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1system_html_af00b52abfa1fb60f319cd1ffa922b577"><div class="ttname"><a href="classophidian_1_1entity_1_1system.html#af00b52abfa1fb60f319cd1ffa922b577">ophidian::entity::system::lookup</a></div><div class="ttdeci">std::size_t lookup(entity &amp;e) const </div><div class="ttdoc">Gets the index of an entity. </div><div class="ttdef"><b>Definition:</b> entity.h:218</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1entity_html"><div class="ttname"><a href="classophidian_1_1entity_1_1entity.html">ophidian::entity::entity</a></div><div class="ttdoc">Entity class. </div><div class="ttdef"><b>Definition:</b> entity.h:39</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1vector__property_html_a2f52e3cd85861b854717c64b2d045df8"><div class="ttname"><a href="classophidian_1_1entity_1_1vector__property.html#a2f52e3cd85861b854717c64b2d045df8">ophidian::entity::vector_property::end</a></div><div class="ttdeci">std::vector&lt; T &gt;::const_iterator end() const </div><div class="ttdoc">End iterator. </div><div class="ttdef"><b>Definition:</b> vector_property.h:104</div></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a448e8d956831330bad88f3bc41ad3897"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a448e8d956831330bad88f3bc41ad3897">ophidian::floorplan::sites::sites</a></div><div class="ttdeci">sites(entity::system &amp;system)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> sites.cpp:24</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1vector__property_html"><div class="ttname"><a href="classophidian_1_1entity_1_1vector__property.html">ophidian::entity::vector_property&lt; std::string &gt;</a></div></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html">ophidian::floorplan::sites</a></div><div class="ttdoc">Sites class. </div><div class="ttdef"><b>Definition:</b> sites.h:32</div></div>
-<div class="ttc" id="classophidian_1_1entity_1_1system_html"><div class="ttname"><a href="classophidian_1_1entity_1_1system.html">ophidian::entity::system</a></div><div class="ttdoc">System class. </div><div class="ttdef"><b>Definition:</b> entity.h:146</div></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a2cdf9c4052e6ffe35f55e258e18686ce"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">ophidian::floorplan::sites::dimensions</a></div><div class="ttdeci">std::pair&lt; std::vector&lt; point &gt;::const_iterator, std::vector&lt; point &gt;::const_iterator &gt; dimensions() const </div><div class="ttdoc">Dimensions iterator getter. </div><div class="ttdef"><b>Definition:</b> sites.h:82</div></div>
-<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_addce4102309e4f3f07e9869ced4bfbc6"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#addce4102309e4f3f07e9869ced4bfbc6">ophidian::floorplan::sites::dimensions</a></div><div class="ttdeci">point dimensions(entity::entity site) const </div><div class="ttdoc">Dimensions getter. </div><div class="ttdef"><b>Definition:</b> sites.h:64</div></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#endif //ophidian_SITES_H</span></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a4b93e80224ecb35489fbf38d16930430"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a4b93e80224ecb35489fbf38d16930430">ophidian::floorplan::sites::dimensions</a></div><div class="ttdeci">point dimensions(entity_system::entity site) const </div><div class="ttdoc">Dimensions getter. </div><div class="ttdef"><b>Definition:</b> sites.h:66</div></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_abcd874e49de890637581e8b192274b5e"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#abcd874e49de890637581e8b192274b5e">ophidian::floorplan::sites::names</a></div><div class="ttdeci">std::pair&lt; std::vector&lt; std::string &gt;::const_iterator, std::vector&lt; std::string &gt;::const_iterator &gt; names() const </div><div class="ttdoc">Name iterator getter. </div><div class="ttdef"><b>Definition:</b> sites.h:75</div></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a1491b5143f884e055af2237672eb831e"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a1491b5143f884e055af2237672eb831e">ophidian::floorplan::sites::sites</a></div><div class="ttdeci">sites(entity_system::entity_system &amp;system)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> sites.cpp:26</div></div>
+<div class="ttc" id="classophidian_1_1entity__system_1_1vector__property_html_a626598dfceff63015555d40e7b150b46"><div class="ttname"><a href="classophidian_1_1entity__system_1_1vector__property.html#a626598dfceff63015555d40e7b150b46">ophidian::entity_system::vector_property::begin</a></div><div class="ttdeci">std::vector&lt; T &gt;::const_iterator begin() const </div><div class="ttdoc">Begin iterator. </div><div class="ttdef"><b>Definition:</b> vector_property.h:137</div></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a29827e155ac9dc999e9fb79a499176d5"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a29827e155ac9dc999e9fb79a499176d5">ophidian::floorplan::sites::name</a></div><div class="ttdeci">std::string name(entity_system::entity site) const </div><div class="ttdoc">Name getter. </div><div class="ttdef"><b>Definition:</b> sites.h:56</div></div>
+<div class="ttc" id="classophidian_1_1entity__system_1_1vector__property_html_a3e5adc4e4c7bc89b1226f7493131e017"><div class="ttname"><a href="classophidian_1_1entity__system_1_1vector__property.html#a3e5adc4e4c7bc89b1226f7493131e017">ophidian::entity_system::vector_property::end</a></div><div class="ttdeci">std::vector&lt; T &gt;::const_iterator end() const </div><div class="ttdoc">End iterator. </div><div class="ttdef"><b>Definition:</b> vector_property.h:146</div></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html">ophidian::floorplan::sites</a></div><div class="ttdoc">Sites class. </div><div class="ttdef"><b>Definition:</b> sites.h:34</div></div>
+<div class="ttc" id="classophidian_1_1entity__system_1_1vector__property_html"><div class="ttname"><a href="classophidian_1_1entity__system_1_1vector__property.html">ophidian::entity_system::vector_property&lt; std::string &gt;</a></div></div>
+<div class="ttc" id="classophidian_1_1floorplan_1_1sites_html_a2cdf9c4052e6ffe35f55e258e18686ce"><div class="ttname"><a href="classophidian_1_1floorplan_1_1sites.html#a2cdf9c4052e6ffe35f55e258e18686ce">ophidian::floorplan::sites::dimensions</a></div><div class="ttdeci">std::pair&lt; std::vector&lt; point &gt;::const_iterator, std::vector&lt; point &gt;::const_iterator &gt; dimensions() const </div><div class="ttdoc">Dimensions iterator getter. </div><div class="ttdef"><b>Definition:</b> sites.h:84</div></div>
+<div class="ttc" id="classophidian_1_1entity__system_1_1entity__system_html"><div class="ttname"><a href="classophidian_1_1entity__system_1_1entity__system.html">ophidian::entity_system::entity_system</a></div><div class="ttdoc">entity_system class. </div><div class="ttdef"><b>Definition:</b> entity_system.h:40</div></div>
+<div class="ttc" id="classophidian_1_1entity__system_1_1entity__system_html_ab0ec0cc5dd829cd9cd67f51dab21cc51"><div class="ttname"><a href="classophidian_1_1entity__system_1_1entity__system.html#ab0ec0cc5dd829cd9cd67f51dab21cc51">ophidian::entity_system::entity_system::lookup</a></div><div class="ttdeci">entity_index lookup(entity e) const </div><div class="ttdoc">Gets the index of an entity. </div><div class="ttdef"><b>Definition:</b> entity_system.h:149</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

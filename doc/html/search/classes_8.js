@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['optimistic',['optimistic',['../structophidian_1_1timing_1_1optimistic.html',1,'ophidian::timing']]]
+  ['idle',['idle',['../classophidian_1_1gui_1_1canvas__states_1_1idle.html',1,'ophidian::gui::canvas_states']]]
 ];

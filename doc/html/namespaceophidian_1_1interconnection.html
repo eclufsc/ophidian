@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="namespaces.html"><span>Namespace&#160;List</span></a></li>
+      <li><a href="namespacemembers.html"><span>Namespace&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -93,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Namespace describing interconnection estimation functions.  
+<p>The Interonnection namespace.  
 </p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -110,7 +111,11 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structophidian_1_1interconnection_1_1tree.html">tree</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">packed_rc_tree</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Packed RC Tree Class.  <a href="classophidian_1_1interconnection_1_1packed__rc__tree.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1interconnection_1_1rc__tree.html">rc_tree</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">RC Tree Class.  <a href="classophidian_1_1interconnection_1_1rc__tree.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -167,11 +172,11 @@ DTYPE&#160;</td><td class="memItemRight" valign="bottom"><b>wirelength</b> (<a c
 <tr class="memitem:a5cddd51e3f6f16752c84ed9471fd4ce5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5cddd51e3f6f16752c84ed9471fd4ce5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>printtree</b> (<a class="el" href="structophidian_1_1interconnection_1_1tree.html">tree</a> t)</td></tr>
 <tr class="separator:a5cddd51e3f6f16752c84ed9471fd4ce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cbfe985312eaa1afe39a7602df8a68b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2cbfe985312eaa1afe39a7602df8a68b"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>hpwl</b> (const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;points)</td></tr>
+<tr class="memitem:a2cbfe985312eaa1afe39a7602df8a68b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceophidian_1_1interconnection.html#a2cbfe985312eaa1afe39a7602df8a68b">hpwl</a> (const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;points)</td></tr>
+<tr class="memdesc:a2cbfe985312eaa1afe39a7602df8a68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">HPWL calculation.  <a href="#a2cbfe985312eaa1afe39a7602df8a68b">More...</a><br/></td></tr>
 <tr class="separator:a2cbfe985312eaa1afe39a7602df8a68b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa96a309fc4b8d957125433cbf9204358"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa96a309fc4b8d957125433cbf9204358"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>stwl</b> (const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;points)</td></tr>
+<tr class="memitem:aa96a309fc4b8d957125433cbf9204358"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceophidian_1_1interconnection.html#aa96a309fc4b8d957125433cbf9204358">stwl</a> (const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;points)</td></tr>
+<tr class="memdesc:aa96a309fc4b8d957125433cbf9204358"><td class="mdescLeft">&#160;</td><td class="mdescRight">StWL calculation.  <a href="#aa96a309fc4b8d957125433cbf9204358">More...</a><br/></td></tr>
 <tr class="separator:aa96a309fc4b8d957125433cbf9204358"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -186,10 +191,57 @@ struct <a class="el" href="structophidian_1_1interconnection_1_1csoln.html">csol
 int&#160;</td><td class="memItemRight" valign="bottom"><b>numsoln</b> [FLUTE_D+1][MGROUP]</td></tr>
 <tr class="separator:abb432985df6a870a130521f3fa43b773"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a2cbfe985312eaa1afe39a7602df8a68b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ophidian::interconnection::hpwl </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Calculates the half-perimeter of the minimum bounding box that covers a set of points. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">points</td><td>A vector of points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aa96a309fc4b8d957125433cbf9204358"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ophidian::interconnection::stwl </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; geometry::point&lt; double &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Calculates the the length of a Steiner tree connecting a set of points. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">points</td><td>A vector of points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

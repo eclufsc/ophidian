@@ -88,60 +88,82 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * This file is part of Ophidian.</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Ophidian is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * it under the terms of the GNU General Public License as published by</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * the Free Software Foundation, either version 3 of the License, or</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * (at your option) any later version.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * Ophidian is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * GNU General Public License for more details.</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * You should have received a copy of the GNU General Public License</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> * along with Ophidian.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifndef SRC_TIMING_ELMORE_SECOND_MOMENT_H_</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SRC_TIMING_ELMORE_SECOND_MOMENT_H_</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;elmore.h&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">namespace </span>timing {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">typedef</span> boost::units::derived_dimension&lt;boost::units::time_base_dimension,2&gt;::type  squared_time_dimension;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">typedef</span> boost::units::unit&lt;squared_time_dimension, boost::units::si::system&gt; second_moment;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1elmore__second__moment.html">   31</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a> {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a> &amp; m_elmore;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; m_tree;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    lemon::ListGraph::NodeMap&lt;boost::units::quantity&lt;second_moment&gt; &gt; m_second_moment;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> update();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a>(<span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; tree, <span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a> &amp; e);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a>();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    boost::units::quantity&lt;second_moment&gt; at(interconnection::rc_tree::capacitor_id capacitor)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordflow">return</span> m_second_moment[capacitor];</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;} <span class="comment">/* namespace timing */</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;} <span class="comment">/* namespace ophidian */</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright 2016 Ophidian</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">Licensed to the Apache Software Foundation (ASF) under one</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">or more contributor license agreements.  See the NOTICE file</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">distributed with this work for additional information</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">regarding copyright ownership.  The ASF licenses this file</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">to you under the Apache License, Version 2.0 (the</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">&quot;License&quot;); you may not use this file except in compliance</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">with the License.  You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">  http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">Unless required by applicable law or agreed to in writing,</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">software distributed under the License is distributed on an</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">&quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">KIND, either express or implied.  See the License for the</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">specific language governing permissions and limitations</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">under the License.</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef SRC_TIMING_ELMORE_SECOND_MOMENT_H_</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SRC_TIMING_ELMORE_SECOND_MOMENT_H_</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;elmore.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">namespace </span>ophidian {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">namespace </span>timing {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">typedef</span> boost::units::derived_dimension&lt;boost::units::time_base_dimension,2&gt;::type  squared_time_dimension;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">typedef</span> boost::units::unit&lt;squared_time_dimension, boost::units::si::system&gt; second_moment;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1elmore__second__moment.html">   33</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a> {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a> &amp; m_elmore;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; m_tree;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    lemon::ListGraph::NodeMap&lt;boost::units::quantity&lt;second_moment&gt; &gt; m_second_moment;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">void</span> update();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a>(<span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &amp; tree, <span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a> &amp; e);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1elmore__second__moment.html">elmore_second_moment</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    boost::units::quantity&lt;second_moment&gt; at(interconnection::rc_tree::capacitor_id capacitor)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordflow">return</span> m_second_moment[capacitor];</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SRC_TIMING_ELMORE_SECOND_MOMENT_H_ */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="classophidian_1_1timing_1_1elmore_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore.html">ophidian::timing::elmore</a></div><div class="ttdef"><b>Definition:</b> elmore.h:27</div></div>
-<div class="ttc" id="classophidian_1_1timing_1_1elmore__second__moment_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore__second__moment.html">ophidian::timing::elmore_second_moment</a></div><div class="ttdef"><b>Definition:</b> elmore_second_moment.h:31</div></div>
-<div class="ttc" id="classophidian_1_1interconnection_1_1rc__tree_html"><div class="ttname"><a href="classophidian_1_1interconnection_1_1rc__tree.html">ophidian::interconnection::rc_tree</a></div><div class="ttdef"><b>Definition:</b> rc_tree.h:36</div></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">   48</a></span>&#160;<span class="keyword">class </span><a class="code" href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">packed_elmore_second_moment</a> {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1packed__elmore.html">packed_elmore</a> * m_elmore;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> * m_tree;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::vector&lt;boost::units::quantity&lt;second_moment&gt; &gt; m_second_moment;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">packed_elmore_second_moment</a>();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">packed_elmore_second_moment</a>();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a>(<span class="keyword">const</span> <a class="code" href="classophidian_1_1timing_1_1packed__elmore.html">packed_elmore</a> &amp; <a class="code" href="classophidian_1_1timing_1_1elmore.html">elmore</a>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> tree(<span class="keyword">const</span> <a class="code" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> &amp; tree);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">const</span> boost::units::quantity&lt;second_moment&gt;&amp; at(std::size_t i)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordflow">return</span> m_second_moment.at(i);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">void</span> run();</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;};</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;} <span class="comment">/* namespace timing */</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;} <span class="comment">/* namespace ophidian */</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SRC_TIMING_ELMORE_SECOND_MOMENT_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="classophidian_1_1timing_1_1elmore_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore.html">ophidian::timing::elmore</a></div><div class="ttdef"><b>Definition:</b> elmore.h:29</div></div>
+<div class="ttc" id="classophidian_1_1interconnection_1_1packed__rc__tree_html"><div class="ttname"><a href="classophidian_1_1interconnection_1_1packed__rc__tree.html">ophidian::interconnection::packed_rc_tree</a></div><div class="ttdoc">Packed RC Tree Class. </div><div class="ttdef"><b>Definition:</b> rc_tree.h:39</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1packed__elmore_html"><div class="ttname"><a href="classophidian_1_1timing_1_1packed__elmore.html">ophidian::timing::packed_elmore</a></div><div class="ttdef"><b>Definition:</b> elmore.h:55</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1elmore__second__moment_html"><div class="ttname"><a href="classophidian_1_1timing_1_1elmore__second__moment.html">ophidian::timing::elmore_second_moment</a></div><div class="ttdef"><b>Definition:</b> elmore_second_moment.h:33</div></div>
+<div class="ttc" id="classophidian_1_1interconnection_1_1rc__tree_html"><div class="ttname"><a href="classophidian_1_1interconnection_1_1rc__tree.html">ophidian::interconnection::rc_tree</a></div><div class="ttdoc">RC Tree Class. </div><div class="ttdef"><b>Definition:</b> rc_tree.h:78</div></div>
+<div class="ttc" id="classophidian_1_1timing_1_1packed__elmore__second__moment_html"><div class="ttname"><a href="classophidian_1_1timing_1_1packed__elmore__second__moment.html">ophidian::timing::packed_elmore_second_moment</a></div><div class="ttdef"><b>Definition:</b> elmore_second_moment.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

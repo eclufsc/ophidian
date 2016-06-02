@@ -1,6 +1,15 @@
 \hypertarget{classophidian_1_1interconnection_1_1rc__tree}{\section{ophidian\-:\-:interconnection\-:\-:rc\-\_\-tree Class Reference}
 \label{classophidian_1_1interconnection_1_1rc__tree}\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
 }
+
+
+R\-C Tree Class.  
+
+
+
+
+{\ttfamily \#include $<$rc\-\_\-tree.\-h$>$}
+
 \subsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
@@ -19,24 +28,28 @@
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}{{\bfseries rc\-\_\-tree} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)}\label{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a87e3ebed9d80a5c80867a8685374738b}{\hyperlink{classophidian_1_1interconnection_1_1rc__tree_a87e3ebed9d80a5c80867a8685374738b}{rc\-\_\-tree} ()}\label{classophidian_1_1interconnection_1_1rc__tree_a87e3ebed9d80a5c80867a8685374738b}
 
-\item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}{\hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \& {\bfseries operator=} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)}\label{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}
+\begin{DoxyCompactList}\small\item\em Creates an R\-C Tree. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}{\hyperlink{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}{rc\-\_\-tree} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)}\label{classophidian_1_1interconnection_1_1rc__tree_a0df0ca1855bfac8e8b762d1421de7017}
 
-\item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}{quantity$<$ si\-::capacitance $>$ {\bfseries lumped} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}
+\begin{DoxyCompactList}\small\item\em Copies an R\-C Tree. \end{DoxyCompactList}\item 
+\hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \& \hyperlink{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}{operator=} (const \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree} \&other)
+\begin{DoxyCompactList}\small\item\em Assigns the contents from another R\-C Tree, replacing its current. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a22096aeed3b9bbff29ec45e16f2152d2}{virtual \hyperlink{classophidian_1_1interconnection_1_1rc__tree_a22096aeed3b9bbff29ec45e16f2152d2}{$\sim$rc\-\_\-tree} ()}\label{classophidian_1_1interconnection_1_1rc__tree_a22096aeed3b9bbff29ec45e16f2152d2}
 
-\item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}{capacitor\-\_\-id {\bfseries capacitor\-\_\-insert} (std\-::string name)}\label{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}
+\begin{DoxyCompactList}\small\item\em R\-C Tree destructor. \end{DoxyCompactList}\item 
+quantity$<$ si\-::capacitance $>$ \hyperlink{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}{lumped} () const 
+\begin{DoxyCompactList}\small\item\em Returns the sum of the capacitance of all capacitors in the R\-C Tree. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_adef2b9bd9b3945bfaa92296aa0914485}{void \hyperlink{classophidian_1_1interconnection_1_1rc__tree_adef2b9bd9b3945bfaa92296aa0914485}{tap\-\_\-insert} (capacitor\-\_\-id cap)}\label{classophidian_1_1interconnection_1_1rc__tree_adef2b9bd9b3945bfaa92296aa0914485}
 
-\item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}{std\-::string {\bfseries capacitor\-\_\-name} (capacitor\-\_\-id u) const }\label{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}
-
-\item 
-\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}{std\-::size\-\_\-t {\bfseries capacitor\-\_\-count} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}
-
-\item 
+\begin{DoxyCompactList}\small\item\em Set a capacitor as a tap node of the R\-C Tree. \end{DoxyCompactList}\item 
+capacitor\-\_\-id \hyperlink{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}{capacitor\-\_\-insert} (std\-::string name)
+\begin{DoxyCompactList}\small\item\em Capacitor insertion. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}{capacitor\-\_\-name} (capacitor\-\_\-id u) const 
+\begin{DoxyCompactList}\small\item\em Return capacitor's name. \end{DoxyCompactList}\item 
+std\-::size\-\_\-t \hyperlink{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}{capacitor\-\_\-count} () const 
+\begin{DoxyCompactList}\small\item\em Number of Capacitors. \end{DoxyCompactList}\item 
 \hypertarget{classophidian_1_1interconnection_1_1rc__tree_a9d9fa55505a49e5adc7847f485711987}{resistor\-\_\-id {\bfseries resistor\-\_\-insert} (capacitor\-\_\-id u, capacitor\-\_\-id v, quantity$<$ si\-::resistance $>$ res)}\label{classophidian_1_1interconnection_1_1rc__tree_a9d9fa55505a49e5adc7847f485711987}
 
 \item 
@@ -60,6 +73,9 @@
 \item 
 \hypertarget{classophidian_1_1interconnection_1_1rc__tree_a52102a355b292bca74f6494663c477e8}{const graph\-\_\-t \& {\bfseries graph} () const }\label{classophidian_1_1interconnection_1_1rc__tree_a52102a355b292bca74f6494663c477e8}
 
+\item 
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a0a852fd1963a93694f0bebdc24eee69a}{\hyperlink{classophidian_1_1interconnection_1_1packed__rc__tree}{packed\-\_\-rc\-\_\-tree} {\bfseries pack} (capacitor\-\_\-id source) const }\label{classophidian_1_1interconnection_1_1rc__tree_a0a852fd1963a93694f0bebdc24eee69a}
+
 \end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -67,6 +83,77 @@
 \hypertarget{classophidian_1_1interconnection_1_1rc__tree_aa4187806724136382911946a0112ccf4}{static resistor\-\_\-it {\bfseries invalid} ()}\label{classophidian_1_1interconnection_1_1rc__tree_aa4187806724136382911946a0112ccf4}
 
 \end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A graph where the vertex set represents capacitors and the edge set represents resistors. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}{\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}!capacitor\-\_\-count@{capacitor\-\_\-count}}
+\index{capacitor\-\_\-count@{capacitor\-\_\-count}!ophidian::interconnection::rc_tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+\subsubsection[{capacitor\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}std\-::size\-\_\-t ophidian\-::interconnection\-::rc\-\_\-tree\-::capacitor\-\_\-count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1interconnection_1_1rc__tree_a29601551ac7d8d622ef12dd72a373dab}
+Returns the number of capacitors. \begin{DoxyReturn}{Returns}
+The number of capacitors. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}{\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}!capacitor\-\_\-insert@{capacitor\-\_\-insert}}
+\index{capacitor\-\_\-insert@{capacitor\-\_\-insert}!ophidian::interconnection::rc_tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+\subsubsection[{capacitor\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}lemon\-::\-List\-Graph\-::\-Node ophidian\-::interconnection\-::rc\-\_\-tree\-::capacitor\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1interconnection_1_1rc__tree_a800437d718c8a08ddc406aad005fe305}
+Inserts a capacitor. 
+\begin{DoxyParams}{Parameters}
+{\em name} & The name of the capacitor. The names must be unique. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The handler to the capacitor. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}{\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}!capacitor\-\_\-name@{capacitor\-\_\-name}}
+\index{capacitor\-\_\-name@{capacitor\-\_\-name}!ophidian::interconnection::rc_tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+\subsubsection[{capacitor\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string ophidian\-::interconnection\-::rc\-\_\-tree\-::capacitor\-\_\-name (
+\begin{DoxyParamCaption}
+\item[{capacitor\-\_\-id}]{u}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1interconnection_1_1rc__tree_a89db718c78d9ab237e3bcc461b10c350}
+Returns the name of a capacitor. 
+\begin{DoxyParams}{Parameters}
+{\em u} & handler to a capacitor. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The name of the capacitor u. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}{\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}!lumped@{lumped}}
+\index{lumped@{lumped}!ophidian::interconnection::rc_tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+\subsubsection[{lumped}]{\setlength{\rightskip}{0pt plus 5cm}quantity$<$si\-::capacitance$>$ ophidian\-::interconnection\-::rc\-\_\-tree\-::lumped (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1interconnection_1_1rc__tree_a592637445f8764ca6749d6baf04ca8ba}
+Return Lumped Capacitance. \begin{DoxyReturn}{Returns}
+The R\-C Tree's lumped capacitance. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}{\index{ophidian\-::interconnection\-::rc\-\_\-tree@{ophidian\-::interconnection\-::rc\-\_\-tree}!operator=@{operator=}}
+\index{operator=@{operator=}!ophidian::interconnection::rc_tree@{ophidian\-::interconnection\-::rc\-\_\-tree}}
+\subsubsection[{operator=}]{\setlength{\rightskip}{0pt plus 5cm}{\bf rc\-\_\-tree} \& ophidian\-::interconnection\-::rc\-\_\-tree\-::operator= (
+\begin{DoxyParamCaption}
+\item[{const {\bf rc\-\_\-tree} \&}]{other}
+\end{DoxyParamCaption}
+)}}\label{classophidian_1_1interconnection_1_1rc__tree_aa7c55c652bed438a4aee8f677b23106d}
+
+\begin{DoxyParams}{Parameters}
+{\em other\-\_\-capacitor(resistor\-\_\-id} & res, capacitor\-\_\-id cap) const \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$\ast$this 
+\end{DoxyReturn}
 
 
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}

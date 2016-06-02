@@ -1,0 +1,149 @@
+\hypertarget{classophidian_1_1entity__system_1_1vector__property}{\section{ophidian\-:\-:entity\-\_\-system\-:\-:vector\-\_\-property$<$ T $>$ Class Template Reference}
+\label{classophidian_1_1entity__system_1_1vector__property}\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property$<$ T $>$@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property$<$ T $>$}}
+}
+
+
+Implementation of the vector property class.  
+
+
+
+
+{\ttfamily \#include $<$vector\-\_\-property.\-h$>$}
+
+Inheritance diagram for ophidian\-:\-:entity\-\_\-system\-:\-:vector\-\_\-property$<$ T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classophidian_1_1entity__system_1_1vector__property}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classophidian_1_1entity__system_1_1vector__property_a496d8541dd8b5f30f8ad0895103db195}{vector\-\_\-property} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+T \& \hyperlink{classophidian_1_1entity__system_1_1vector__property_ae74e2a7810409a4ae4b64d924342ff7f}{operator\mbox{[}$\,$\mbox{]}} (entity\-\_\-index e)
+\begin{DoxyCompactList}\small\item\em Property getter. \end{DoxyCompactList}\item 
+const T \& \hyperlink{classophidian_1_1entity__system_1_1vector__property_ac208bfcebb8bbc95facab6bfa0071691}{operator\mbox{[}$\,$\mbox{]}} (entity\-\_\-index e) const 
+\begin{DoxyCompactList}\small\item\em Constant property getter. \end{DoxyCompactList}\item 
+T \& \hyperlink{classophidian_1_1entity__system_1_1vector__property_ad8a02ea98fb22534a4d1f36eefab7838}{at} (entity\-\_\-index e)
+\begin{DoxyCompactList}\small\item\em Property getter with range check. \end{DoxyCompactList}\item 
+const T \& \hyperlink{classophidian_1_1entity__system_1_1vector__property_a09c2b43e6a9ee44ed65cc367dd15af0b}{at} (entity\-\_\-index e) const 
+\begin{DoxyCompactList}\small\item\em Constant property getter with range check. \end{DoxyCompactList}\item 
+std\-::vector$<$ T $>$\-::const\-\_\-iterator \hyperlink{classophidian_1_1entity__system_1_1vector__property_a626598dfceff63015555d40e7b150b46}{begin} () const 
+\begin{DoxyCompactList}\small\item\em Begin iterator. \end{DoxyCompactList}\item 
+std\-::vector$<$ T $>$\-::const\-\_\-iterator \hyperlink{classophidian_1_1entity__system_1_1vector__property_a3e5adc4e4c7bc89b1226f7493131e017}{end} () const 
+\begin{DoxyCompactList}\small\item\em End iterator. \end{DoxyCompactList}\item 
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_aeff3ad843abcfab284492496ddb0963d}{T $\ast$ {\bfseries data} ()}\label{classophidian_1_1entity__system_1_1vector__property_aeff3ad843abcfab284492496ddb0963d}
+
+\item 
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_a6ecf9b103bfe95d4501708fc87c8b2d5}{const T $\ast$ {\bfseries data} () const }\label{classophidian_1_1entity__system_1_1vector__property_a6ecf9b103bfe95d4501708fc87c8b2d5}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class ophidian\-::entity\-\_\-system\-::vector\-\_\-property$<$ T $>$}
+
+Describes an implementation of the property class that stores the properties in a vector, acessed by the entity index. 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the property value to be stored. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_a496d8541dd8b5f30f8ad0895103db195}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!vector\-\_\-property@{vector\-\_\-property}}
+\index{vector\-\_\-property@{vector\-\_\-property}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{vector\-\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::{\bf vector\-\_\-property} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_a496d8541dd8b5f30f8ad0895103db195}
+Default constructor. Creates an empty vector property. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_ad8a02ea98fb22534a4d1f36eefab7838}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!at@{at}}
+\index{at@{at}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{at}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ T\& {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::at (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-index}]{e}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_ad8a02ea98fb22534a4d1f36eefab7838}
+Returns the property value for an entity after checking the range. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A reference to the property of that entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_a09c2b43e6a9ee44ed65cc367dd15af0b}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!at@{at}}
+\index{at@{at}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{at}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ const T\& {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::at (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-index}]{e}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_a09c2b43e6a9ee44ed65cc367dd15af0b}
+Returns the property value for an entity after checking the range. Necessary when there is only a constant reference to the properties. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A constant reference to the property of that entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_a626598dfceff63015555d40e7b150b46}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!begin@{begin}}
+\index{begin@{begin}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{begin}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ std\-::vector$<$T$>$\-::const\-\_\-iterator {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_a626598dfceff63015555d40e7b150b46}
+Returns an iterator pointing to the beginning of the vector of properties. \begin{DoxyReturn}{Returns}
+Iterator pointing to the beginning of the vector of properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_a3e5adc4e4c7bc89b1226f7493131e017}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!end@{end}}
+\index{end@{end}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{end}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ std\-::vector$<$T$>$\-::const\-\_\-iterator {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_a3e5adc4e4c7bc89b1226f7493131e017}
+Returns an iterator pointing to the end of the vector of properties. \begin{DoxyReturn}{Returns}
+Iterator pointing to the end of the vector of properties. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_ae74e2a7810409a4ae4b64d924342ff7f}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!operator\mbox{[}$\,$\mbox{]}@{operator[]}}
+\index{operator\mbox{[}$\,$\mbox{]}@{operator[]}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ T\& {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-index}]{e}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_ae74e2a7810409a4ae4b64d924342ff7f}
+Returns the property value for an entity. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A reference to the property of that entity. 
+\end{DoxyReturn}
+\hypertarget{classophidian_1_1entity__system_1_1vector__property_ac208bfcebb8bbc95facab6bfa0071691}{\index{ophidian\-::entity\-\_\-system\-::vector\-\_\-property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}!operator\mbox{[}$\,$\mbox{]}@{operator[]}}
+\index{operator\mbox{[}$\,$\mbox{]}@{operator[]}!ophidian::entity_system::vector_property@{ophidian\-::entity\-\_\-system\-::vector\-\_\-property}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ const T\& {\bf ophidian\-::entity\-\_\-system\-::vector\-\_\-property}$<$ T $>$\-::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{entity\-\_\-index}]{e}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classophidian_1_1entity__system_1_1vector__property_ac208bfcebb8bbc95facab6bfa0071691}
+Returns the property value for an entity. Necessary when there is only a constant reference to the properties. 
+\begin{DoxyParams}{Parameters}
+{\em entity\-\_\-index} & The index of the entity to get the property. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A constant reference to the property of that entity. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/csguth/workspace/openeda/src/entity\-\_\-system/vector\-\_\-property.\-h\end{DoxyCompactItemize}

@@ -25,8 +25,16 @@ under the License.
 #include "placement.h"
 #include "floorplan.h"
 
+/// The namespace of Ophidian
 namespace ophidian {
+    /// Classes and algorithms related to density
     namespace density {
+
+        /// ABU, a placement density metric.
+        /**
+        * ABU is the average bin utilization of the top γ% densest bins excluding bins fully occupied by fixed macros.
+        * From: Kim, Myung-Chul, et al. "MAPLE: multilevel adaptive placement for mixed-size designs." Proceedings of the 2012 ACM international symposium on International Symposium on Physical Design. ACM, 2012.
+        **/
         class abu {
             using point = geometry::point<double>;
 

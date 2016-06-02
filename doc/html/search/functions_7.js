@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['lib',['lib',['../classophidian_1_1placement_1_1placement.html#a302206279c67c772dff944b9fd4d19fb',1,'ophidian::placement::placement']]],
-  ['library',['library',['../classophidian_1_1placement_1_1library.html#a33f89c4a0aa6a5f27a0f7b6b1021bac5',1,'ophidian::placement::library']]],
-  ['lookup',['lookup',['../classophidian_1_1entity_1_1system.html#af00b52abfa1fb60f319cd1ffa922b577',1,'ophidian::entity::system']]]
+  ['height',['height',['../classophidian_1_1routing_1_1grid__3d.html#a5e08cbbf03bccd5b74ccac73ed8cf00a',1,'ophidian::routing::grid_3d']]],
+  ['hpwl',['hpwl',['../namespaceophidian_1_1interconnection.html#a2cbfe985312eaa1afe39a7602df8a68b',1,'ophidian::interconnection']]]
 ];

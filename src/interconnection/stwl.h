@@ -25,6 +25,11 @@ under the License.
 
 namespace ophidian {
 namespace interconnection {
+/// StWL calculation
+/**
+*   Calculates the the length of a Steiner tree connecting a set of points.
+*   \param points A vector of points.
+**/
 double stwl(const std::vector<geometry::point<double> >&points);
 }
 }

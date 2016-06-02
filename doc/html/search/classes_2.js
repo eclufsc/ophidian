@@ -1,10 +1,17 @@
 var searchData=
 [
-  ['dc_5fclock',['dc_clock',['../structophidian_1_1timing_1_1dc__clock.html',1,'ophidian::timing']]],
-  ['dc_5fdriving_5fcell',['dc_driving_cell',['../structophidian_1_1timing_1_1dc__driving__cell.html',1,'ophidian::timing']]],
-  ['dc_5finput_5fdelays',['dc_input_delays',['../structophidian_1_1timing_1_1dc__input__delays.html',1,'ophidian::timing']]],
-  ['dc_5foutput_5fdelay',['dc_output_delay',['../structophidian_1_1timing_1_1dc__output__delay.html',1,'ophidian::timing']]],
-  ['dc_5foutput_5fload',['dc_output_load',['../structophidian_1_1timing_1_1dc__output__load.html',1,'ophidian::timing']]],
-  ['default_5fdesign_5fconstraints',['default_design_constraints',['../classophidian_1_1timing_1_1default__design__constraints.html',1,'ophidian::timing']]],
-  ['design_5fconstraints',['design_constraints',['../structophidian_1_1timing_1_1design__constraints.html',1,'ophidian::timing']]]
+  ['canvas',['canvas',['../classophidian_1_1gui_1_1canvas.html',1,'ophidian::gui']]],
+  ['cell',['cell',['../structophidian_1_1parsing_1_1tau2014_1_1linear__library_1_1cell.html',1,'ophidian::parsing::tau2014::linear_library']]],
+  ['cell_5fcomparator',['cell_comparator',['../classophidian_1_1placement_1_1legalization_1_1abacus_1_1cell__comparator.html',1,'ophidian::placement::legalization::abacus']]],
+  ['cells',['cells',['../classophidian_1_1placement_1_1cells.html',1,'ophidian::placement']]],
+  ['cells',['cells',['../classophidian_1_1placement_1_1legalization_1_1abacus_1_1cells.html',1,'ophidian::placement::legalization::abacus']]],
+  ['cells',['cells',['../classophidian_1_1netlist_1_1cells.html',1,'ophidian::netlist']]],
+  ['cells',['cells',['../classophidian_1_1standard__cell_1_1cells.html',1,'ophidian::standard_cell']]],
+  ['cells_5fgeometries',['cells_geometries',['../structophidian_1_1timingdriven__placement_1_1cells__geometries.html',1,'ophidian::timingdriven_placement']]],
+  ['circuit_5fcanvas',['circuit_canvas',['../classophidian_1_1gui_1_1circuit__canvas.html',1,'ophidian::gui']]],
+  ['cluster',['cluster',['../structophidian_1_1placement_1_1legalization_1_1abacus_1_1cluster.html',1,'ophidian::placement::legalization::abacus']]],
+  ['compare_5fxcoord',['compare_xcoord',['../classophidian_1_1interconnection_1_1compare__xcoord.html',1,'ophidian::interconnection']]],
+  ['compare_5fycoord',['compare_ycoord',['../classophidian_1_1interconnection_1_1compare__ycoord.html',1,'ophidian::interconnection']]],
+  ['component',['component',['../structophidian_1_1parsing_1_1def_1_1component.html',1,'ophidian::parsing::def']]],
+  ['csoln',['csoln',['../structophidian_1_1interconnection_1_1csoln.html',1,'ophidian::interconnection']]]
 ];

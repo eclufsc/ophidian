@@ -3,7 +3,7 @@
 }
 
 
-Namespace describing interconnection estimation functions.  
+The Interonnection namespace.  
 
 
 \subsection*{Classes}
@@ -21,8 +21,10 @@ struct \hyperlink{structophidian_1_1interconnection_1_1tree__branch}{tree\-\_\-b
 \item 
 struct \hyperlink{structophidian_1_1interconnection_1_1tree}{tree}
 \item 
+class \hyperlink{classophidian_1_1interconnection_1_1packed__rc__tree}{packed\-\_\-rc\-\_\-tree}
+\begin{DoxyCompactList}\small\item\em Packed R\-C Tree Class. \end{DoxyCompactList}\item 
 class \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em R\-C Tree Class. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
@@ -78,12 +80,10 @@ class \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree}
 \hypertarget{namespaceophidian_1_1interconnection_a5cddd51e3f6f16752c84ed9471fd4ce5}{void {\bfseries printtree} (\hyperlink{structophidian_1_1interconnection_1_1tree}{tree} t)}\label{namespaceophidian_1_1interconnection_a5cddd51e3f6f16752c84ed9471fd4ce5}
 
 \item 
-\hypertarget{namespaceophidian_1_1interconnection_a2cbfe985312eaa1afe39a7602df8a68b}{double {\bfseries hpwl} (const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&points)}\label{namespaceophidian_1_1interconnection_a2cbfe985312eaa1afe39a7602df8a68b}
-
-\item 
-\hypertarget{namespaceophidian_1_1interconnection_aa96a309fc4b8d957125433cbf9204358}{double {\bfseries stwl} (const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&points)}\label{namespaceophidian_1_1interconnection_aa96a309fc4b8d957125433cbf9204358}
-
-\end{DoxyCompactItemize}
+double \hyperlink{namespaceophidian_1_1interconnection_a2cbfe985312eaa1afe39a7602df8a68b}{hpwl} (const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&points)
+\begin{DoxyCompactList}\small\item\em H\-P\-W\-L calculation. \end{DoxyCompactList}\item 
+double \hyperlink{namespaceophidian_1_1interconnection_aa96a309fc4b8d957125433cbf9204358}{stwl} (const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&points)
+\begin{DoxyCompactList}\small\item\em St\-W\-L calculation. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -96,3 +96,30 @@ class \hyperlink{classophidian_1_1interconnection_1_1rc__tree}{rc\-\_\-tree}
 \hypertarget{namespaceophidian_1_1interconnection_abb432985df6a870a130521f3fa43b773}{int {\bfseries numsoln} \mbox{[}F\-L\-U\-T\-E\-\_\-\-D+1\mbox{]}\mbox{[}M\-G\-R\-O\-U\-P\mbox{]}}\label{namespaceophidian_1_1interconnection_abb432985df6a870a130521f3fa43b773}
 
 \end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespaceophidian_1_1interconnection_a2cbfe985312eaa1afe39a7602df8a68b}{\index{ophidian\-::interconnection@{ophidian\-::interconnection}!hpwl@{hpwl}}
+\index{hpwl@{hpwl}!ophidian::interconnection@{ophidian\-::interconnection}}
+\subsubsection[{hpwl}]{\setlength{\rightskip}{0pt plus 5cm}double ophidian\-::interconnection\-::hpwl (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&}]{points}
+\end{DoxyParamCaption}
+)}}\label{namespaceophidian_1_1interconnection_a2cbfe985312eaa1afe39a7602df8a68b}
+Calculates the half-\/perimeter of the minimum bounding box that covers a set of points. 
+\begin{DoxyParams}{Parameters}
+{\em points} & A vector of points. \\
+\hline
+\end{DoxyParams}
+\hypertarget{namespaceophidian_1_1interconnection_aa96a309fc4b8d957125433cbf9204358}{\index{ophidian\-::interconnection@{ophidian\-::interconnection}!stwl@{stwl}}
+\index{stwl@{stwl}!ophidian::interconnection@{ophidian\-::interconnection}}
+\subsubsection[{stwl}]{\setlength{\rightskip}{0pt plus 5cm}double ophidian\-::interconnection\-::stwl (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ geometry\-::point$<$ double $>$ $>$ \&}]{points}
+\end{DoxyParamCaption}
+)}}\label{namespaceophidian_1_1interconnection_aa96a309fc4b8d957125433cbf9204358}
+Calculates the the length of a Steiner tree connecting a set of points. 
+\begin{DoxyParams}{Parameters}
+{\em points} & A vector of points. \\
+\hline
+\end{DoxyParams}

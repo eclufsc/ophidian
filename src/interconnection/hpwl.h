@@ -24,7 +24,13 @@ under the License.
 #include "../geometry/geometry.h"
 
 namespace ophidian {
+/// The Interonnection namespace
 namespace interconnection {
+/// HPWL calculation
+/**
+*   Calculates the half-perimeter of the minimum bounding box that covers a set of points.
+*   \param points A vector of points.
+**/
 double hpwl(const std::vector<geometry::point<double> > & points);
 }
 }

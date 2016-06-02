@@ -99,9 +99,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1ec4043e2d269b5a8c637d09464a3454"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ec4043e2d269b5a8c637d09464a3454"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>graph</b> (const <a class="el" href="classophidian_1_1timing_1_1graph.html">timing::graph</a> &amp;g)</td></tr>
 <tr class="separator:a1ec4043e2d269b5a8c637d09464a3454"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a445b401a59c35ab8df965a63de5067fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a445b401a59c35ab8df965a63de5067fe"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>rc_trees</b> (const <a class="el" href="classophidian_1_1entity_1_1vector__property.html">entity::vector_property</a>&lt; <a class="el" href="classophidian_1_1interconnection_1_1rc__tree.html">interconnection::rc_tree</a> &gt; &amp;trees)</td></tr>
-<tr class="separator:a445b401a59c35ab8df965a63de5067fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b8730a643e02468274060bd00715d2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b8730a643e02468274060bd00715d2d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>rc_trees</b> (const <a class="el" href="classophidian_1_1entity__system_1_1vector__property.html">entity_system::vector_property</a>&lt; <a class="el" href="classophidian_1_1interconnection_1_1packed__rc__tree.html">interconnection::packed_rc_tree</a> &gt; &amp;trees)</td></tr>
+<tr class="separator:a0b8730a643e02468274060bd00715d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d883dfeb217ef975052f4f106d253b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d883dfeb217ef975052f4f106d253b3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>late_lib</b> (const <a class="el" href="classophidian_1_1timing_1_1library.html">library</a> &amp;lib)</td></tr>
 <tr class="separator:a2d883dfeb217ef975052f4f106d253b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,40 +130,40 @@ TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_tns</b> () c
 TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_tns</b> () const </td></tr>
 <tr class="separator:a187b3b022072d233eb796219b4f125a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3484bce86ef88fe153587fcd518be099"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3484bce86ef88fe153587fcd518be099"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slack</b> (Pin p) const </td></tr>
 <tr class="separator:a3484bce86ef88fe153587fcd518be099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebb36df7ea3147c0c3728f0195a00f23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebb36df7ea3147c0c3728f0195a00f23"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slack</b> (Pin p) const </td></tr>
 <tr class="separator:aebb36df7ea3147c0c3728f0195a00f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6263432253884a629692951efec37e23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6263432253884a629692951efec37e23"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slack</b> (Pin p) const </td></tr>
 <tr class="separator:a6263432253884a629692951efec37e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc8a75f52c90e7474432c7aa48e93c64"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc8a75f52c90e7474432c7aa48e93c64"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slack</b> (Pin p) const </td></tr>
 <tr class="separator:abc8a75f52c90e7474432c7aa48e93c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a574e05e8ba14dca800ea8f3dad25b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a574e05e8ba14dca800ea8f3dad25b6"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:a7a574e05e8ba14dca800ea8f3dad25b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91b79cd8bbc79cafec357943d9df1464"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91b79cd8bbc79cafec357943d9df1464"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:a91b79cd8bbc79cafec357943d9df1464"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ba9d3d191b2848dc10b09922cba3fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60ba9d3d191b2848dc10b09922cba3fa"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:a60ba9d3d191b2848dc10b09922cba3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c7f984d4fb6eb3815e5c7fa1d8f62d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c7f984d4fb6eb3815e5c7fa1d8f62d2"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:a7c7f984d4fb6eb3815e5c7fa1d8f62d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a274a0a9c32844ac58dd6c351803e7dcb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a274a0a9c32844ac58dd6c351803e7dcb"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a274a0a9c32844ac58dd6c351803e7dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7865a454c88143a4d2c5eb70f5363dac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7865a454c88143a4d2c5eb70f5363dac"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a7865a454c88143a4d2c5eb70f5363dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad5216c335999dee985a8d8048b557a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aad5216c335999dee985a8d8048b557a5"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slew</b> (Pin p) const </td></tr>
 <tr class="separator:aad5216c335999dee985a8d8048b557a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c9b7ea2e367a8557f8e77410a4c0bf3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c9b7ea2e367a8557f8e77410a4c0bf3"></a>
-TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a4c9b7ea2e367a8557f8e77410a4c0bf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac03ee85b1021876ad1b8ba8f4a0bf64d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac03ee85b1021876ad1b8ba8f4a0bf64d"></a>
 const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">endpoints</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>timing_endpoints</b> () const </td></tr>
@@ -176,7 +176,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">endpoints</
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

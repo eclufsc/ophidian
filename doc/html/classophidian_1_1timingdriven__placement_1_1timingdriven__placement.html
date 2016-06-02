@@ -96,56 +96,77 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adc48b1b9f58578b40d76a6185065bd23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc48b1b9f58578b40d76a6185065bd23"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>timingdriven_placement</b> (const std::string &amp;dot_verilog_file, const std::string &amp;dot_def_file, const std::string &amp;dot_lef_file, const std::string &amp;dot_lib_late, const std::string &amp;dot_lib_early, double clock_in_picosseconds)</td></tr>
-<tr class="separator:adc48b1b9f58578b40d76a6185065bd23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40d265730b04f7a9cbb84d5e31a832f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40d265730b04f7a9cbb84d5e31a832f7"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>timingdriven_placement</b> (const std::string &amp;dot_verilog_file, const std::string &amp;dot_def_file, const std::string &amp;dot_lef_file, const std::string m_dot_lib_late, const std::string m_dot_lib_early, double clock_in_ps)</td></tr>
+<tr class="separator:a40d265730b04f7a9cbb84d5e31a832f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1c4f2864c164e6d4fdcec3da391bce1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1c4f2864c164e6d4fdcec3da391bce1"></a>
-<a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#af1c4f2864c164e6d4fdcec3da391bce1">cell_find</a> (std::string name) const </td></tr>
+Cell&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#af1c4f2864c164e6d4fdcec3da391bce1">cell_find</a> (std::string name) const </td></tr>
 <tr class="memdesc:af1c4f2864c164e6d4fdcec3da391bce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a Cell by its name. <br/></td></tr>
 <tr class="separator:af1c4f2864c164e6d4fdcec3da391bce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd0781cae7f35b46803228bd8c037963"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd0781cae7f35b46803228bd8c037963"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#afd0781cae7f35b46803228bd8c037963">cell_name</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a> c) const </td></tr>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#afd0781cae7f35b46803228bd8c037963">cell_name</a> (Cell c) const </td></tr>
 <tr class="memdesc:afd0781cae7f35b46803228bd8c037963"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the name of a cell. <br/></td></tr>
 <tr class="separator:afd0781cae7f35b46803228bd8c037963"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0965d132300319bd2e88d9a5cb62e34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; <a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">CellIterator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#ae0965d132300319bd2e88d9a5cb62e34">cells</a> () const </td></tr>
+<tr class="memitem:a848f5249103a6ff029dc13d22410cef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a848f5249103a6ff029dc13d22410cef9"></a>
+std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>cell_lookup</b> (Cell c) const </td></tr>
+<tr class="separator:a848f5249103a6ff029dc13d22410cef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af92078dc67a498243960f5e21f127a52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af92078dc67a498243960f5e21f127a52"></a>
+const std::vector&lt; Pin &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>cell_pins</b> (Cell c) const </td></tr>
+<tr class="separator:af92078dc67a498243960f5e21f127a52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0965d132300319bd2e88d9a5cb62e34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; CellIterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#ae0965d132300319bd2e88d9a5cb62e34">cells</a> () const </td></tr>
 <tr class="memdesc:ae0965d132300319bd2e88d9a5cb62e34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cells.  <a href="#ae0965d132300319bd2e88d9a5cb62e34">More...</a><br/></td></tr>
 <tr class="separator:ae0965d132300319bd2e88d9a5cb62e34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa52e8805ef88d8ff565387c5c095f3a2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classophidian_1_1entity_1_1entity.html">Net</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa52e8805ef88d8ff565387c5c095f3a2">net_find</a> (std::string name) const </td></tr>
+<tr class="memitem:aa52e8805ef88d8ff565387c5c095f3a2"><td class="memItemLeft" align="right" valign="top">Net&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa52e8805ef88d8ff565387c5c095f3a2">net_find</a> (std::string name) const </td></tr>
 <tr class="memdesc:aa52e8805ef88d8ff565387c5c095f3a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a Net by its name.  <a href="#aa52e8805ef88d8ff565387c5c095f3a2">More...</a><br/></td></tr>
 <tr class="separator:aa52e8805ef88d8ff565387c5c095f3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1d834e036fff7913c1fd7d5a299240a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1d834e036fff7913c1fd7d5a299240a"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa1d834e036fff7913c1fd7d5a299240a">net_name</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Net</a> n) const </td></tr>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa1d834e036fff7913c1fd7d5a299240a">net_name</a> (Net n) const </td></tr>
 <tr class="memdesc:aa1d834e036fff7913c1fd7d5a299240a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the name of a net. <br/></td></tr>
 <tr class="separator:aa1d834e036fff7913c1fd7d5a299240a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ba46aac08407d4c8f5ee2e200a47059"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ba46aac08407d4c8f5ee2e200a47059"></a>
-std::vector&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a8ba46aac08407d4c8f5ee2e200a47059">net_pins</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Net</a> net) const </td></tr>
-<tr class="memdesc:a8ba46aac08407d4c8f5ee2e200a47059"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pin of a net. <br/></td></tr>
-<tr class="separator:a8ba46aac08407d4c8f5ee2e200a47059"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a589ff318ee01712569ef982c389b568a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; <a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">NetIterator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a589ff318ee01712569ef982c389b568a">nets</a> () const </td></tr>
+<tr class="memitem:a958405bda3fb6aaf373d08be7c62919b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a958405bda3fb6aaf373d08be7c62919b"></a>
+const std::vector&lt; Pin &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a958405bda3fb6aaf373d08be7c62919b">net_pins</a> (Net net) const </td></tr>
+<tr class="memdesc:a958405bda3fb6aaf373d08be7c62919b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pin of a net. <br/></td></tr>
+<tr class="separator:a958405bda3fb6aaf373d08be7c62919b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfd1ce9403cffdf426ba8e76db605f68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfd1ce9403cffdf426ba8e76db605f68"></a>
+entity_system::entity_index&#160;</td><td class="memItemRight" valign="bottom"><b>net_lookup</b> (Net net) const </td></tr>
+<tr class="separator:acfd1ce9403cffdf426ba8e76db605f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6f9ec0384d363f9ef4592ca0e572174"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6f9ec0384d363f9ef4592ca0e572174"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>net_register_property</b> (<a class="el" href="classophidian_1_1entity__system_1_1property.html">entity_system::property</a> &amp;p)</td></tr>
+<tr class="separator:ae6f9ec0384d363f9ef4592ca0e572174"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a589ff318ee01712569ef982c389b568a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; NetIterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a589ff318ee01712569ef982c389b568a">nets</a> () const </td></tr>
 <tr class="memdesc:a589ff318ee01712569ef982c389b568a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the nets.  <a href="#a589ff318ee01712569ef982c389b568a">More...</a><br/></td></tr>
 <tr class="separator:a589ff318ee01712569ef982c389b568a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3709b3ff794bb4b1cb0034af51af41c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3709b3ff794bb4b1cb0034af51af41c3"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a3709b3ff794bb4b1cb0034af51af41c3">pin_name</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> pin) const </td></tr>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a3709b3ff794bb4b1cb0034af51af41c3">pin_name</a> (Pin pin) const </td></tr>
 <tr class="memdesc:a3709b3ff794bb4b1cb0034af51af41c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the name of a pin. <br/></td></tr>
 <tr class="separator:a3709b3ff794bb4b1cb0034af51af41c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dddbac5a6bc575785ad867948e6fc6f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6dddbac5a6bc575785ad867948e6fc6f"></a>
-<a class="el" href="classophidian_1_1entity_1_1entity.html">Net</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a6dddbac5a6bc575785ad867948e6fc6f">pin_net</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> pin) const </td></tr>
+Net&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a6dddbac5a6bc575785ad867948e6fc6f">pin_net</a> (Pin pin) const </td></tr>
 <tr class="memdesc:a6dddbac5a6bc575785ad867948e6fc6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the net of a pin. <br/></td></tr>
 <tr class="separator:a6dddbac5a6bc575785ad867948e6fc6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1323f510249c391a228a1aba65bbc3f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; <a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">PinIterator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a1323f510249c391a228a1aba65bbc3f7">pins</a> () const </td></tr>
+<tr class="memitem:a7e55935180bf2a909059d72e1b231453"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7e55935180bf2a909059d72e1b231453"></a>
+std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>pin_lookup</b> (Pin pin) const </td></tr>
+<tr class="separator:a7e55935180bf2a909059d72e1b231453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a3d1a0b6cfa51031d182e7ed1d03b77"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a3d1a0b6cfa51031d182e7ed1d03b77"></a>
+Cell&#160;</td><td class="memItemRight" valign="bottom"><b>pin_owner</b> (Pin pin) const </td></tr>
+<tr class="separator:a1a3d1a0b6cfa51031d182e7ed1d03b77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1323f510249c391a228a1aba65bbc3f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt; PinIterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a1323f510249c391a228a1aba65bbc3f7">pins</a> () const </td></tr>
 <tr class="memdesc:a1323f510249c391a228a1aba65bbc3f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pins.  <a href="#a1323f510249c391a228a1aba65bbc3f7">More...</a><br/></td></tr>
 <tr class="separator:a1323f510249c391a228a1aba65bbc3f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a169ccee6e83cb7f2debb7a938463faab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a169ccee6e83cb7f2debb7a938463faab"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a169ccee6e83cb7f2debb7a938463faab">place_cell</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a> cell, Point destination)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a169ccee6e83cb7f2debb7a938463faab">place_cell</a> (Cell cell, Point destination)</td></tr>
 <tr class="memdesc:a169ccee6e83cb7f2debb7a938463faab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Places a cell in a position. <br/></td></tr>
 <tr class="separator:a169ccee6e83cb7f2debb7a938463faab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5ccf07957d6dfe4fe0ed94fe16880b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5ccf07957d6dfe4fe0ed94fe16880b4"></a>
-Point&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa5ccf07957d6dfe4fe0ed94fe16880b4">cell_position</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a> cell) const </td></tr>
+Point&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#aa5ccf07957d6dfe4fe0ed94fe16880b4">cell_position</a> (Cell cell) const </td></tr>
 <tr class="memdesc:aa5ccf07957d6dfe4fe0ed94fe16880b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cell's position. <br/></td></tr>
 <tr class="separator:aa5ccf07957d6dfe4fe0ed94fe16880b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a73d743dde7e2c79271a81649fb9402"><td class="memItemLeft" align="right" valign="top">Geometry&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a7a73d743dde7e2c79271a81649fb9402">cell_geometry</a> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a> cell) const </td></tr>
+<tr class="memitem:a7a73d743dde7e2c79271a81649fb9402"><td class="memItemLeft" align="right" valign="top">Geometry&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#a7a73d743dde7e2c79271a81649fb9402">cell_geometry</a> (Cell cell) const </td></tr>
 <tr class="memdesc:a7a73d743dde7e2c79271a81649fb9402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cell's geometry.  <a href="#a7a73d743dde7e2c79271a81649fb9402">More...</a><br/></td></tr>
 <tr class="separator:a7a73d743dde7e2c79271a81649fb9402"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae8a4992d0bc6635e99b7b87da95538f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae8a4992d0bc6635e99b7b87da95538f"></a>
+Point&#160;</td><td class="memItemRight" valign="bottom"><b>pin_position</b> (Pin pin) const </td></tr>
+<tr class="separator:aae8a4992d0bc6635e99b7b87da95538f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0e7ff8965e80fb1a8f2da03fe7b8a53"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae0e7ff8965e80fb1a8f2da03fe7b8a53"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classophidian_1_1timingdriven__placement_1_1timingdriven__placement.html#ae0e7ff8965e80fb1a8f2da03fe7b8a53">update_timing</a> ()</td></tr>
 <tr class="memdesc:ae0e7ff8965e80fb1a8f2da03fe7b8a53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the timing information. <br/></td></tr>
@@ -163,40 +184,40 @@ timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_tns<
 timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_tns</b> () const </td></tr>
 <tr class="separator:a3ffdc93b18d791ecc93e07cf4128e568"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7068a5df76228c1f13d58ae103458b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7068a5df76228c1f13d58ae103458b1"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slack</b> (Pin p) const </td></tr>
 <tr class="separator:ad7068a5df76228c1f13d58ae103458b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adac5f7beb774ff37db0d9bd79c404c58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adac5f7beb774ff37db0d9bd79c404c58"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slack</b> (Pin p) const </td></tr>
 <tr class="separator:adac5f7beb774ff37db0d9bd79c404c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af305682fd56c092525c891d42b7ccb1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af305682fd56c092525c891d42b7ccb1a"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slack</b> (Pin p) const </td></tr>
 <tr class="separator:af305682fd56c092525c891d42b7ccb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0c97ae57c4c9b82edb3afcfd4458868"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0c97ae57c4c9b82edb3afcfd4458868"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slack</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slack</b> (Pin p) const </td></tr>
 <tr class="separator:aa0c97ae57c4c9b82edb3afcfd4458868"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8658e533ba50a26cbbb0c2aef937458"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa8658e533ba50a26cbbb0c2aef937458"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:aa8658e533ba50a26cbbb0c2aef937458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a218dc1caff8442d5f4c32bd10e003f76"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a218dc1caff8442d5f4c32bd10e003f76"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:a218dc1caff8442d5f4c32bd10e003f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1bfe96b3407533d82fc3d95dc81bec3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1bfe96b3407533d82fc3d95dc81bec3"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:ac1bfe96b3407533d82fc3d95dc81bec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3c882c9fb69417fcccbb6661eb08c29"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3c882c9fb69417fcccbb6661eb08c29"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_arrival</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_arrival</b> (Pin p) const </td></tr>
 <tr class="separator:ad3c882c9fb69417fcccbb6661eb08c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab60a24db0fbbb9535becf52fbf99cbe8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab60a24db0fbbb9535becf52fbf99cbe8"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_rise_slew</b> (Pin p) const </td></tr>
 <tr class="separator:ab60a24db0fbbb9535becf52fbf99cbe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ac9ad6fb1d90effcdbe8420834d1e8e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3ac9ad6fb1d90effcdbe8420834d1e8e"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>early_fall_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a3ac9ad6fb1d90effcdbe8420834d1e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58857f5b0c03d7ae1076edf5c1ed3650"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58857f5b0c03d7ae1076edf5c1ed3650"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_rise_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a58857f5b0c03d7ae1076edf5c1ed3650"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05a0cc44a3f837e431c2cd0505534e26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05a0cc44a3f837e431c2cd0505534e26"></a>
-timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slew</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">Pin</a> p) const </td></tr>
+timing::TimeType&#160;</td><td class="memItemRight" valign="bottom"><b>late_fall_slew</b> (Pin p) const </td></tr>
 <tr class="separator:a05a0cc44a3f837e431c2cd0505534e26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5436af9462e922dccd0b6bd002425f51"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5436af9462e922dccd0b6bd002425f51"></a>
 const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::endpoints</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>timing_endpoints</b> () const </td></tr>
@@ -213,7 +234,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
         <tr>
           <td class="memname">Geometry ophidian::timingdriven_placement::timingdriven_placement::cell_geometry </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classophidian_1_1entity_1_1entity.html">Cell</a>&#160;</td>
+          <td class="paramtype">Cell&#160;</td>
           <td class="paramname"><em>cell</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -242,7 +263,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;<a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">CellIterator</a>&gt; ophidian::timingdriven_placement::timingdriven_placement::cells </td>
+          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;CellIterator&gt; ophidian::timingdriven_placement::timingdriven_placement::cells </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -266,7 +287,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classophidian_1_1entity_1_1entity.html">Net</a> ophidian::timingdriven_placement::timingdriven_placement::net_find </td>
+          <td class="memname">Net ophidian::timingdriven_placement::timingdriven_placement::net_find </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
@@ -297,7 +318,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;<a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">NetIterator</a>&gt; ophidian::timingdriven_placement::timingdriven_placement::nets </td>
+          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;NetIterator&gt; ophidian::timingdriven_placement::timingdriven_placement::nets </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -321,7 +342,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;<a class="el" href="classophidian_1_1entity_1_1bimap__iterator__adapter.html">PinIterator</a>&gt; ophidian::timingdriven_placement::timingdriven_placement::pins </td>
+          <td class="memname"><a class="el" href="structophidian_1_1timingdriven__placement_1_1bounds.html">bounds</a>&lt;PinIterator&gt; ophidian::timingdriven_placement::timingdriven_placement::pins </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -344,7 +365,7 @@ const <a class="el" href="classophidian_1_1timing_1_1endpoints.html">timing::end
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

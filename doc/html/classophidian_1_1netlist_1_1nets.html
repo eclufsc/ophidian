@@ -96,15 +96,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa351bf8c8019a6531f45b214def8fa74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa351bf8c8019a6531f45b214def8fa74"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>nets</b> (<a class="el" href="classophidian_1_1entity_1_1system.html">entity::system</a> &amp;system)</td></tr>
-<tr class="separator:aa351bf8c8019a6531f45b214def8fa74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56ac53bbd743101fc7dfaae9299fa831"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56ac53bbd743101fc7dfaae9299fa831"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net) const </td></tr>
-<tr class="separator:a56ac53bbd743101fc7dfaae9299fa831"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36be79709421f579420034aea356247d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36be79709421f579420034aea356247d"></a>
-std::vector&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>pins</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net) const </td></tr>
-<tr class="separator:a36be79709421f579420034aea356247d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a6044f1fdbd945f0fe81fe18a69d2f0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a6044f1fdbd945f0fe81fe18a69d2f0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>nets</b> (<a class="el" href="classophidian_1_1entity__system_1_1entity__system.html">entity_system::entity_system</a> &amp;system)</td></tr>
+<tr class="separator:a2a6044f1fdbd945f0fe81fe18a69d2f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dcfc37a15aa29046e9593dae7e2b72f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3dcfc37a15aa29046e9593dae7e2b72f"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> (entity_system::entity net) const </td></tr>
+<tr class="separator:a3dcfc37a15aa29046e9593dae7e2b72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a821b53430d9dc921897fb7ae2504c235"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a821b53430d9dc921897fb7ae2504c235"></a>
+const std::vector<br class="typebreak"/>
+&lt; entity_system::entity &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>pins</b> (entity_system::entity net) const </td></tr>
+<tr class="separator:a821b53430d9dc921897fb7ae2504c235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9cfc72e8f37515d27f76ba3f213bc15"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9cfc72e8f37515d27f76ba3f213bc15"></a>
 std::pair&lt; std::vector<br class="typebreak"/>
 &lt; std::string &gt;<br class="typebreak"/>
@@ -112,26 +113,30 @@ std::pair&lt; std::vector<br class="typebreak"/>
 &lt; std::string &gt;<br class="typebreak"/>
 ::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>names</b> () const </td></tr>
 <tr class="separator:ae9cfc72e8f37515d27f76ba3f213bc15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57d8a47cf106a56430e1a63d71ff0ab4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57d8a47cf106a56430e1a63d71ff0ab4"></a>
+<tr class="memitem:a94427d262a255ed26b4bb6c15bdcfb3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94427d262a255ed26b4bb6c15bdcfb3e"></a>
 std::pair&lt; std::vector<br class="typebreak"/>
-&lt; std::vector&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> &gt;<br class="typebreak"/>
+&lt; std::vector<br class="typebreak"/>
+&lt; entity_system::entity &gt;<br class="typebreak"/>
  &gt;::const_iterator, <br class="typebreak"/>
 std::vector&lt; std::vector<br class="typebreak"/>
-&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> &gt;<br class="typebreak"/>
+&lt; entity_system::entity &gt;<br class="typebreak"/>
  &gt;::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>pins</b> () const </td></tr>
-<tr class="separator:a57d8a47cf106a56430e1a63d71ff0ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef35861695fc28ecc4b71a00e24adf97"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef35861695fc28ecc4b71a00e24adf97"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>connect</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net, <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin)</td></tr>
-<tr class="separator:aef35861695fc28ecc4b71a00e24adf97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1477fd894470960f368ee16a5029075f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1477fd894470960f368ee16a5029075f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>disconnect</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net, <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> pin)</td></tr>
-<tr class="separator:a1477fd894470960f368ee16a5029075f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a7db9d745a634a1e63373aef9b72630"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a7db9d745a634a1e63373aef9b72630"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>pins</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net, std::vector&lt; <a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> &gt; <a class="el" href="classophidian_1_1netlist_1_1pins.html">pins</a>)</td></tr>
-<tr class="separator:a0a7db9d745a634a1e63373aef9b72630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a011db22f9fede13f3bdb91f917c3d775"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a011db22f9fede13f3bdb91f917c3d775"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> (<a class="el" href="classophidian_1_1entity_1_1entity.html">entity::entity</a> net, std::string name)</td></tr>
-<tr class="separator:a011db22f9fede13f3bdb91f917c3d775"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a94427d262a255ed26b4bb6c15bdcfb3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe4fb6dd59ab36b9d6619223f9e5dbab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe4fb6dd59ab36b9d6619223f9e5dbab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>connect</b> (entity_system::entity net, entity_system::entity pin)</td></tr>
+<tr class="separator:afe4fb6dd59ab36b9d6619223f9e5dbab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a903c66cc5a191f8d0916a9719618f7df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a903c66cc5a191f8d0916a9719618f7df"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>disconnect</b> (entity_system::entity net, entity_system::entity pin)</td></tr>
+<tr class="separator:a903c66cc5a191f8d0916a9719618f7df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24ef9c3e4d174ac7930f88b94f52ee43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a24ef9c3e4d174ac7930f88b94f52ee43"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>pins</b> (entity_system::entity net, std::vector&lt; entity_system::entity &gt; <a class="el" href="classophidian_1_1netlist_1_1pins.html">pins</a>)</td></tr>
+<tr class="separator:a24ef9c3e4d174ac7930f88b94f52ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a933f9efaecb385ca94e15abd2a6e448a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a933f9efaecb385ca94e15abd2a6e448a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> (entity_system::entity net, std::string name)</td></tr>
+<tr class="separator:a933f9efaecb385ca94e15abd2a6e448a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20f57391f9e0e74005f2ef919b550eef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20f57391f9e0e74005f2ef919b550eef"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>preallocate_pins</b> (entity_system::entity net, std::size_t pin_count)</td></tr>
+<tr class="separator:a20f57391f9e0e74005f2ef919b550eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/csguth/workspace/openeda/src/netlist/<a class="el" href="nets_8h_source.html">nets.h</a></li>
@@ -140,7 +145,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> (<a class="e
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 17:15:19 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 1 2016 15:54:18 for Ophidian by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
