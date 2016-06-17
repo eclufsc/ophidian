@@ -18,16 +18,38 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#include "legalization.h"
+#ifndef OPHIDIAN_LEGALIZATION_H
+#define OPHIDIAN_LEGALIZATION_H
+
+#include "floorplan.h"
+#include "placement.h"
+#include "subrows.h"
+#include <entity_system.h>
 
 namespace ophidian {
-    namespace placement {
-        namespace legalization {
+namespace legalization {
+class legalization {
+protected:
+    entity_system::entity_system m_subrows_system;
+    subrows m_subrows;
 
+    floorplan::floorplan * m_floorplan;
+    placement::placement * m_placement;
+public:
 
-            void legalization::create_subrows() {
-                m_subrows.create_subrows(m_floorplan, m_placement);
-            }
-        }
+    legalization(floorplan::floorplan * floorplan, placement::placement *placement)
+        : m_subrows(m_subrows_system), m_floorplan(floorplan), m_placement(placement) {
+        create_subrows();
     }
+    virtual ~legalization() {}
+
+    virtual void legalize_placement() = 0;
+
+    void create_subrows();
+};
 }
+}
+
+
+
+#endif //OPHIDIAN_LEGALIZATION_H

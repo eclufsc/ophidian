@@ -27,30 +27,28 @@ under the License.
 #include "floorplan.h"
 
 namespace ophidian {
-    namespace placement {
-        namespace legalization {
-            using point = geometry::point<double>;
-            using box = geometry::box<point>;
-            using rtree_node = std::pair<box, entity_system::entity>;
-            using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
+namespace legalization {
+using point = geometry::point<double>;
+using box = geometry::box<point>;
+using rtree_node = std::pair<box, entity_system::entity>;
+using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
-            class legalization_check {
-                floorplan::floorplan * m_floorplan;
-                placement * m_placement;
+class legalization_check {
+    floorplan::floorplan * m_floorplan;
+    placement::placement * m_placement;
 
-                bool check_alignment();
-                bool check_boundaries();
-                bool check_cell_overlaps();
+    bool check_alignment();
+    bool check_boundaries();
+    bool check_cell_overlaps();
 
-            public:
+public:
 
-                legalization_check(floorplan::floorplan *m_floorplan, placement *m_placement) : m_floorplan(
-                        m_floorplan), m_placement(m_placement) { }
+    legalization_check(floorplan::floorplan *m_floorplan, placement::placement *m_placement) : m_floorplan(
+                                                                                        m_floorplan), m_placement(m_placement) { }
 
-                bool check_legality();
-            };
-        }
-    }
+    bool check_legality();
+};
+}
 }
 
 

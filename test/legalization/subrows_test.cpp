@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#include "../../catch.hpp"
+#include "../catch.hpp"
 #include "subrows.h"
 
 TEST_CASE("legalization/create subrows","[legalization][subrows]") {
@@ -42,7 +42,7 @@ TEST_CASE("legalization/create subrows","[legalization][subrows]") {
     placement.cell_fixed(cell, true);
 
     ophidian::entity_system::entity_system subrows_system;
-    ophidian::placement::legalization::subrows subrows(subrows_system);
+    ophidian::legalization::subrows subrows(subrows_system);
     subrows.create_subrows(&floorplan, &placement);
     REQUIRE(subrows.count() == 2);
 

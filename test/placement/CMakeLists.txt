@@ -1,5 +1,3 @@
-add_subdirectory(legalization)
-
 set(SOURCE
    ${SOURCE}
    ${CMAKE_CURRENT_SOURCE_DIR}/cells_test.cpp

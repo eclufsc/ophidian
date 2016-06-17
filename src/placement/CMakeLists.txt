@@ -10,8 +10,6 @@ set(PLACEMENT_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/def2placement.cpp
 )
 
-add_subdirectory(legalization)
-
 add_library (placement ${PLACEMENT_SOURCE} )
 
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)

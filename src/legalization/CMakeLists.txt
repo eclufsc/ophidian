@@ -1,4 +1,4 @@
-add_subdirectory(abacus)
+add_subdirectory(algorithms)
 
 find_package( Boost 1.59 )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )

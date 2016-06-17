@@ -4,7 +4,7 @@
 
 #include <fstream>
 #include <sys/time.h>
-#include "../../../catch.hpp"
+#include "../../catch.hpp"
 
 #include "lef.h"
 #include "def.h"
@@ -48,11 +48,11 @@ TEST_CASE("legalization/ legalizing simple after random movements","[legalizatio
         }
     }
 
-    ophidian::placement::legalization::legalization_check legalization_check(&floorplan, &placement);
+    ophidian::legalization::legalization_check legalization_check(&floorplan, &placement);
 
     REQUIRE(!legalization_check.check_legality());
 
-    ophidian::placement::legalization::abacus::abacus abacus(&floorplan, &placement);
+    ophidian::legalization::abacus::abacus abacus(&floorplan, &placement);
     abacus.legalize_placement();
 
     REQUIRE(legalization_check.check_legality());
@@ -95,11 +95,11 @@ bool run_circuit(std::string circuit_name) {
         }
     }
 
-    ophidian::placement::legalization::legalization_check legalization_check(&floorplan, &placement);
+    ophidian::legalization::legalization_check legalization_check(&floorplan, &placement);
 
     REQUIRE(!legalization_check.check_legality());
 
-    ophidian::placement::legalization::abacus::abacus abacus(&floorplan, &placement);
+    ophidian::legalization::abacus::abacus abacus(&floorplan, &placement);
     gettimeofday(&start_time, NULL);
     abacus.legalize_placement();
     gettimeofday(&end_time, NULL);
