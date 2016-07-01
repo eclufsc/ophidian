@@ -80,6 +80,13 @@ public:
 	 * \return Entity of the created cell.
 	 */
         entity_system::entity cell_create(std::string name);
+
+        entity_system::entity cell_find(std::string name) const {
+            auto result = m_name2cell.find(name);
+            if (result == m_name2cell.end())
+                return entity_system::invalid_entity;
+            return result->second;
+        }
 	/// Cell name getter.
 	/**
 	 * Returns the name of a cell.

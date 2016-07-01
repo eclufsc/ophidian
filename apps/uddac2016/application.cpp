@@ -11,7 +11,7 @@
 
 #include "../placement/hpwl.h"
 
-#include "../placement/legalization/abacus/abacus.h"
+#include "../legalization/algorithms/abacus.h"
 
 #include "../parsing/tau2014/linear_library.h"
 #include "../timing/tau2015lib2library.h"
@@ -265,7 +265,7 @@ void application::run_STA()
 
 void application::legalize()
 {
-    placement::legalization::abacus::abacus abacus(m_floorplan.get(), m_placement.get());
+    legalization::abacus::abacus abacus(m_floorplan.get(), m_placement.get());
     abacus.legalize_placement();
 }
 
