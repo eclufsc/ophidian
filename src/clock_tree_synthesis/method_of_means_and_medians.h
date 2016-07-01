@@ -32,10 +32,28 @@ class method_of_means_and_medians
 public:
     using point = geometry::point<double>;
 
+    class coordinate_comparator{
+        public:
+            coordinate_comparator(bool order_by_x_coordinate) : m_order_by_x_coordinate(order_by_x_coordinate){}
+            bool operator()(const point & position1, const point & position2) const {
+                if(m_order_by_x_coordinate)
+                    return position1.x() < position2.x();
+                else
+                    return position1.y() < position2.y();
+            }
+        private:
+            bool m_order_by_x_coordinate;
+        };
+
+private:
+    void build_topology(clock_topology::node parent_node, std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology & clock_topology, bool order_by_x_coordinate);
+
+    point calculate_center_of_mass(std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end);
+public:
     method_of_means_and_medians();
     ~method_of_means_and_medians();
 
-    void build_topology(std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology * clock_topology);
+    void build_topology(point clock_source, std::vector<point> & flip_flop_positions, clock_topology & clock_topology);
 };
 }
 }

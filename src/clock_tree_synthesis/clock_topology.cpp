@@ -23,13 +23,26 @@ under the License.
 namespace ophidian {
 namespace clock_tree_synthesis {
 clock_topology::clock_topology()
-{
+    : m_positions(m_graph){
 
 }
 
 clock_topology::~clock_topology()
 {
 
+}
+
+clock_topology::node clock_topology::node_create(clock_topology::point position)
+{
+    auto node = m_graph.addNode();
+    m_positions[node] = position;
+    return node;
+}
+
+clock_topology::edge clock_topology::edge_create(clock_topology::node source, clock_topology::node target)
+{
+    auto edge = m_graph.addArc(source, target);
+    return edge;
 }
 }
 

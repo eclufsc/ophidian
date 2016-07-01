@@ -23,15 +23,37 @@ under the License.
 
 #include <lemon/list_graph.h>
 
+#include "../geometry/geometry.h"
+
 namespace ophidian {
 namespace clock_tree_synthesis {
 class clock_topology
 {
-    lemon::ListDigraph m_graph;
+public:
+    using point = geometry::point<double>;
+    using graph_t = lemon::ListDigraph;
+    using node = graph_t::Node;
+    using edge = graph_t::Arc;
+private:
+    graph_t m_graph;
+    lemon::ListDigraph::NodeMap<point> m_positions;
 
 public:
+
     clock_topology();
     ~clock_topology();
+
+    node node_create(point position);
+
+    point node_position(node graph_node) const {
+        return m_positions[graph_node];
+    }
+
+    edge edge_create(node source, node target);
+
+    const graph_t & graph() const {
+        return m_graph;
+    }
 };
 }
 }

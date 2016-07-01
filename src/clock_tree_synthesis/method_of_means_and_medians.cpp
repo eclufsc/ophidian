@@ -33,22 +33,38 @@ method_of_means_and_medians::~method_of_means_and_medians()
 
 }
 
-void method_of_means_and_medians::build_topology(std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology *clock_topology)
+void method_of_means_and_medians::build_topology(method_of_means_and_medians::point clock_source, std::vector<method_of_means_and_medians::point> &flip_flop_positions, clock_topology &clock_topology)
+{
+    auto source_node = clock_topology.node_create(clock_source);
+    build_topology(source_node, flip_flop_positions.begin(), flip_flop_positions.end(), clock_topology, true);
+}
+
+method_of_means_and_medians::point method_of_means_and_medians::calculate_center_of_mass(std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end)
 {
     std::size_t size = std::distance(positions_begin, positions_end);
-    if (size <= 1) {
-        return;
-    }
-
     point center_of_mass{0.0, 0.0};
     for (auto position = positions_begin; position != positions_end; ++position) {
-        center_of_mass.x(center_of_mass.x() + positions_begin->x());
-        center_of_mass.y(center_of_mass.y() + positions_begin->y());
+        center_of_mass.x(center_of_mass.x() + position->x());
+        center_of_mass.y(center_of_mass.y() + position->y());
     }
-    center_of_mass.x(center_of_mass.x() / size);
-    center_of_mass.y(center_of_mass.y() / size);
+    center_of_mass.x(center_of_mass.x() / (double)size);
+    center_of_mass.y(center_of_mass.y() / (double)size);
+    return center_of_mass;
+}
 
-    return;
+void method_of_means_and_medians::build_topology(clock_topology::node parent_node, std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology &clock_topology, bool order_by_x_coordinate)
+{
+    point center_of_mass = calculate_center_of_mass(positions_begin, positions_end);
+    auto center_of_mass_node = clock_topology.node_create(center_of_mass);
+    clock_topology.edge_create(parent_node, center_of_mass_node);
+
+    auto size = std::distance(positions_begin, positions_end);
+    if (size > 1) {
+        std::sort(positions_begin, positions_end, coordinate_comparator(order_by_x_coordinate));
+        auto positions_middle = std::next(positions_begin, std::ceil(size / 2.0));
+        build_topology(center_of_mass_node, positions_begin, positions_middle, clock_topology, !order_by_x_coordinate);
+        build_topology(center_of_mass_node, positions_middle, positions_end, clock_topology, !order_by_x_coordinate);
+    }
 }
 }
 }
