@@ -45,6 +45,10 @@ public:
 
     node node_create(point position);
 
+    std::size_t nodes_count() const {
+        return lemon::countNodes(m_graph);
+    }
+
     point node_position(node graph_node) const {
         return m_positions[graph_node];
     }
