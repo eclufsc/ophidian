@@ -45,6 +45,8 @@ template<class Polygon_Type>
 using multi_polygon = typename boost::geometry::model::multi_polygon<Polygon_Type>;
 template<class Point_Type>
 using box = typename boost::geometry::model::box<Point_Type>;
+template<class Point_Type>
+using segment = typename boost::geometry::model::segment<Point_Type>;
 
 template<class Geometry, class CoordinateType>
 void translate(Geometry geometry, point<CoordinateType> point,

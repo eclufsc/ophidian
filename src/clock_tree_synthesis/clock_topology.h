@@ -36,7 +36,7 @@ public:
     using edge = graph_t::Arc;
 private:
     graph_t m_graph;
-    lemon::ListDigraph::NodeMap<point> m_positions;
+    graph_t::NodeMap<point> m_positions;
 
 public:
 
@@ -52,12 +52,17 @@ public:
     point node_position(node graph_node) const {
         return m_positions[graph_node];
     }
+    void node_position(node graph_node, point position);
+
+    void node_children(node graph_node, std::vector<node> & children);
+    node node_parent(node graph_node);
 
     edge edge_create(node source, node target);
 
     const graph_t & graph() const {
         return m_graph;
     }
+
 };
 }
 }

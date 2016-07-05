@@ -39,6 +39,28 @@ clock_topology::node clock_topology::node_create(clock_topology::point position)
     return node;
 }
 
+void clock_topology::node_position(clock_topology::node graph_node, clock_topology::point position)
+{
+    m_positions[graph_node] = position;
+}
+
+void clock_topology::node_children(clock_topology::node graph_node, std::vector<clock_topology::node> &children)
+{
+    for(auto arc_it = graph_t::OutArcIt(m_graph, graph_node); arc_it != lemon::INVALID; ++arc_it) {
+        children.push_back(m_graph.target(arc_it));
+    }
+}
+
+clock_topology::node clock_topology::node_parent(clock_topology::node graph_node)
+{
+    std::vector<node> source_nodes;
+    for(auto arc_it = graph_t::InArcIt(m_graph, graph_node); arc_it != lemon::INVALID; ++arc_it) {
+        source_nodes.push_back(m_graph.source(arc_it));
+    }
+    assert(source_nodes.size() == 1);
+    return source_nodes.front();
+}
+
 clock_topology::edge clock_topology::edge_create(clock_topology::node source, clock_topology::node target)
 {
     auto edge = m_graph.addArc(source, target);
