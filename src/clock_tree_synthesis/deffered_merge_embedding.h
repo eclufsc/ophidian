@@ -60,9 +60,10 @@ public:
 
 private:
     void build_tree_of_segments(std::vector<clock_topology::node> & sorted_nodes, clock_topology::graph_t::NodeMap<segment> & merging_segments, clock_topology::graph_t::NodeMap<trr> & trrs, clock_topology & clock_topology);
-    void find_exact_locations(std::vector<clock_topology::node> & sorted_nodes, clock_topology::graph_t::NodeMap<segment> & merging_segments, clock_topology::graph_t::NodeMap<trr> & trrs, clock_topology & clock_topology);
+    void find_exact_locations(std::vector<clock_topology::node> & sorted_nodes, const clock_topology::graph_t::NodeMap<segment> &merging_segments, clock_topology & clock_topology);
 
     std::pair<double, double> calculate_edge_length(clock_topology::node node_a, clock_topology::node node_b);
+    double distance(const segment & merging_segment, const point & target_point);
 public:
     deffered_merge_embedding();
     ~deffered_merge_embedding();

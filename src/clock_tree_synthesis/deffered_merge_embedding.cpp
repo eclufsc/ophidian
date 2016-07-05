@@ -53,7 +53,7 @@ void deffered_merge_embedding::build_tree_of_segments(std::vector<clock_topology
     }
 }
 
-void deffered_merge_embedding::find_exact_locations(std::vector<clock_topology::node> & sorted_nodes, clock_topology::graph_t::NodeMap<segment> &merging_segments, clock_topology::graph_t::NodeMap<trr> & trrs, clock_topology &clock_topology)
+void deffered_merge_embedding::find_exact_locations(std::vector<clock_topology::node> & sorted_nodes, const clock_topology::graph_t::NodeMap<segment> &merging_segments, clock_topology &clock_topology)
 {
     for (auto node_it = sorted_nodes.begin(); node_it != sorted_nodes.end(); ++node_it) {
         if (lemon::countInArcs(clock_topology.graph(), *node_it) == 0) {
@@ -63,9 +63,9 @@ void deffered_merge_embedding::find_exact_locations(std::vector<clock_topology::
             auto parent = clock_topology.node_parent(*node_it);
             auto parent_position = clock_topology.node_position(parent);
             segment parent_merging_segment(parent_position, parent_position);
-            double parent_radius = trrs[*node_it].distance(parent_position);
-            trrs[parent] = trr(parent_merging_segment, parent_radius);
-            auto intersection = trrs[parent].intersection(trrs[*node_it].m_core);
+            double parent_radius = distance(merging_segments[*node_it], parent_position);
+            auto trr_parent = trr(parent_merging_segment, parent_radius);
+            auto intersection = trr_parent.intersection(merging_segments[*node_it]);
             clock_topology.node_position(*node_it, intersection.first);
         }
     }
@@ -74,6 +74,11 @@ void deffered_merge_embedding::find_exact_locations(std::vector<clock_topology::
 std::pair<double, double> deffered_merge_embedding::calculate_edge_length(clock_topology::node node_a, clock_topology::node node_b)
 {
     return std::make_pair(0.0, 0.0);
+}
+
+double deffered_merge_embedding::distance(const deffered_merge_embedding::segment &merging_segment, const deffered_merge_embedding::point &target_point)
+{
+    return 0.0;
 }
 
 void deffered_merge_embedding::run_deffered_merge_embedding(clock_topology &clock_topology)
@@ -88,7 +93,7 @@ void deffered_merge_embedding::run_deffered_merge_embedding(clock_topology &cloc
     clock_topology::graph_t::NodeMap<segment> merging_segments(clock_topology.graph());
     clock_topology::graph_t::NodeMap<trr> trrs(clock_topology.graph());
     build_tree_of_segments(sorted_nodes, merging_segments, trrs, clock_topology);
-    find_exact_locations(sorted_nodes, merging_segments, trrs, clock_topology);
+    find_exact_locations(sorted_nodes, merging_segments, clock_topology);
 }
 }
 }
