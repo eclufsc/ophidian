@@ -24,6 +24,7 @@ under the License.
 #include "clock_topology.h"
 #include "../geometry/geometry.h"
 #include "lemon/connectivity.h"
+#include "boost/geometry.hpp"
 
 namespace ophidian {
 namespace clock_tree_synthesis {
@@ -32,29 +33,40 @@ class deffered_merge_embedding
 public:
     using point = geometry::point<double>;
     using segment = geometry::segment<point>;
+    using box = geometry::box<point>;
 
     struct trr {
+    private:
         segment m_core;
         double m_radius;
-
+        box m_box;
+    public:
         trr() {
 
         }
 
         trr(segment core, double radius) : m_core(core), m_radius(radius) {
-
+            point min_corner(std::min(core.first.x() - radius, core.second.x() - radius), std::min(core.first.y() - radius, core.second.y() - radius));
+            point max_corner(std::max(core.first.x() + radius, core.second.x() + radius), std::max(core.first.y() + radius, core.second.y() + radius));
+            point rotated_min_corner;
+            geometry::rotate(min_corner, 45.0, rotated_min_corner);
+            point rotated_max_corner;
+            geometry::rotate(max_corner, 45.0, rotated_max_corner);
+            m_box = box(rotated_min_corner, rotated_max_corner);
         }
 
         segment intersection(const trr & other_trr) {
-            return segment({0.0, 0.0}, {0.0, 0.0});
+            box intersection_box;
+            boost::geometry::intersection(m_box, other_trr.m_box, intersection_box);
+            segment merge_segment(intersection_box.min_corner(), intersection_box.max_corner());
+            segment rotated_merge_segment;
+            geometry::rotate(merge_segment, -45.0, rotated_merge_segment);
+            return rotated_merge_segment;
         }
 
         segment intersection(const segment & merging_segment) {
-            return segment({0.0, 0.0}, {0.0, 0.0});
-        }
-
-        double distance(const point & target_point) {
-            return 0.0;
+            trr other_trr(merging_segment, 0);
+            return intersection(other_trr);
         }
     };
 

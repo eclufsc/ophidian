@@ -166,4 +166,3 @@ TEST_CASE("method of means and medians/ build topology of network with 9 flip fl
     }
 }
 
-
