@@ -19,10 +19,11 @@ add_subdirectory (timing-driven_placement)
 add_subdirectory (density)
 add_subdirectory (routing)
 add_subdirectory (clock_tree_synthesis)
+add_subdirectory (register_clustering)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 
-target_link_libraries ( run_tests LINK_PUBLIC entity_system standard_cell netlist parsing placement floorplan interconnection timing timing-driven_placement density legalization abacus routing clock_tree_synthesis emon )
+target_link_libraries ( run_tests LINK_PUBLIC entity_system standard_cell netlist parsing placement floorplan interconnection timing timing-driven_placement density legalization abacus routing clock_tree_synthesis register_clustering emon )
 add_subdirectory (parsing)
 
 add_custom_command(

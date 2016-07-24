@@ -34,19 +34,19 @@ public:
 
     class coordinate_comparator{
         public:
-            coordinate_comparator(bool order_by_x_coordinate) : m_order_by_x_coordinate(order_by_x_coordinate){}
+            coordinate_comparator(bool sort_by_x_coordinate) : m_sort_by_x_coordinate(sort_by_x_coordinate){}
             bool operator()(const point & position1, const point & position2) const {
-                if(m_order_by_x_coordinate)
+                if(m_sort_by_x_coordinate)
                     return position1.x() < position2.x();
                 else
                     return position1.y() < position2.y();
             }
         private:
-            bool m_order_by_x_coordinate;
+            bool m_sort_by_x_coordinate;
         };
 
 private:
-    void build_topology(clock_topology::node parent_node, std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology & clock_topology, bool order_by_x_coordinate);
+    void build_topology(clock_topology::node parent_node, std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end, clock_topology & clock_topology, bool sort_by_x_coordinate);
 
     point calculate_center_of_mass(std::vector<point>::iterator positions_begin, std::vector<point>::iterator positions_end);
 public:

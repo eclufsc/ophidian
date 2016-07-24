@@ -23,7 +23,7 @@ under the License.
 namespace ophidian {
 namespace clock_tree_synthesis {
 clock_topology::clock_topology()
-    : m_positions(m_graph){
+    : m_positions(m_graph), m_delays(m_graph), m_capacitances(m_graph){
 
 }
 
@@ -42,6 +42,16 @@ clock_topology::node clock_topology::node_create(clock_topology::point position)
 void clock_topology::node_position(clock_topology::node graph_node, clock_topology::point position)
 {
     m_positions[graph_node] = position;
+}
+
+void clock_topology::node_delay(clock_topology::node graph_node, double delay)
+{
+    m_delays[graph_node] = delay;
+}
+
+void clock_topology::node_capacitance(clock_topology::node graph_node, double capacitance)
+{
+    m_capacitances[graph_node] = capacitance;
 }
 
 void clock_topology::node_children(clock_topology::node graph_node, std::vector<clock_topology::node> &children)

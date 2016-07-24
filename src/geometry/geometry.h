@@ -75,6 +75,20 @@ void rotate(Geometry geometry, CoordinateType degree,
 //	boost::geometry::correct(result);
 }
 
+template<class Geometry, class CoordinateType>
+void rotate(Geometry geometry, CoordinateType degree, point<CoordinateType> origin,
+                Geometry & result) {
+        Geometry translated_geometry;
+        point<CoordinateType> inverted_origin(-origin.x(), -origin.y());
+        translate(geometry, inverted_origin, translated_geometry);
+        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, CoordinateType,
+                        2, 2> rotate(degree);
+        Geometry rotated_geometry;
+        boost::geometry::transform(translated_geometry, rotated_geometry, rotate);
+        translate(rotated_geometry, origin, result);
+//	boost::geometry::correct(result);
+}
+
 
 template<class CoordinateType>
 CoordinateType manhattan_distance(const point<CoordinateType> & p1, const point<CoordinateType> & p2)

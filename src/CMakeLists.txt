@@ -11,6 +11,7 @@ add_subdirectory (timing-driven_placement)
 add_subdirectory (density)
 add_subdirectory (routing)
 add_subdirectory (clock_tree_synthesis)
+add_subdirectory (register_clustering)
 
 if(BUILD_GUI)
     add_subdirectory (gui)
