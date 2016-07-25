@@ -53,7 +53,7 @@ public:
 
     }
 
-    void assign_flops_to_clusters(entity_system::entity_system & clusters_system, clusters & cluster_properties, const std::vector<point> & flip_flop_positions);
+    void assign_flops_to_clusters(entity_system::entity_system & clusters_system, clusters & cluster_properties, const std::vector<clusters::cluster_element> & flip_flop_positions);
 };
 
 class update_center_as_mean {
@@ -86,9 +86,9 @@ public:
         m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
     }
 
-    void cluster_registers(const std::vector<point> & flip_flop_positions, unsigned iterations = 1) {
+    void cluster_registers(const std::vector<clusters::cluster_element> & flip_flops, unsigned iterations = 1) {
         for (unsigned iteration = 0; iteration < iterations; ++iteration) {
-            m_assignment_strategy.assign_flops_to_clusters(m_clusters_system, m_clusters, flip_flop_positions);
+            m_assignment_strategy.assign_flops_to_clusters(m_clusters_system, m_clusters, flip_flops);
             m_center_update_strategy.update_cluster_centers(m_clusters_system, m_clusters);
         }
     }
@@ -101,7 +101,7 @@ public:
         return m_clusters.center(cluster);
     }
 
-    const std::vector<point> & cluster_flip_flops(entity_system::entity cluster) const {
+    const std::vector<clusters::cluster_element> & cluster_flip_flops(entity_system::entity cluster) const {
         return m_clusters.flip_flops(cluster);
     }
 };

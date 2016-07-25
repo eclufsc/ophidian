@@ -22,8 +22,8 @@ under the License.
 #define CLUSTERS_H
 
 #include "../geometry/geometry.h"
-#include "entity_system.h"
-#include "vector_property.h"
+#include "../entity_system/entity_system.h"
+#include "../entity_system/vector_property.h"
 
 namespace ophidian {
 namespace register_clustering {
@@ -31,19 +31,20 @@ class clusters
 {
 public:
     using point = geometry::point<double>;
+    using cluster_element = std::pair<entity_system::entity, point>;
 private:
     entity_system::entity_system & m_system;
 
-    entity_system::vector_property<std::vector<point>> m_flip_flops;
+    entity_system::vector_property<std::vector<cluster_element>> m_flip_flops;
     entity_system::vector_property<point> m_centers;
 public:
     clusters(entity_system::entity_system & system);
 
-    const std::vector<point> & flip_flops(entity_system::entity cluster) const {
+    const std::vector<cluster_element> & flip_flops(entity_system::entity cluster) const {
         return m_flip_flops[m_system.lookup(cluster)];
     }
 
-    void insert_flip_flop(entity_system::entity cluster, point flip_flop);
+    void insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop);
     void remove_flip_flops(entity_system::entity cluster);
 
     point center(entity_system::entity cluster) const {
