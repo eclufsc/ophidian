@@ -77,6 +77,9 @@ class canvas : public sf::Drawable
 
     std::vector< arrow > m_arrows;
 
+
+    bool m_show_cells;
+
 public:
     canvas();
     virtual ~canvas();
@@ -124,6 +127,9 @@ public:
     bool has_animation() const;
 
     void clear();
+
+
+    void show_cells(bool show);
 
 };
 

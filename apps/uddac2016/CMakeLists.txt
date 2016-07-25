@@ -32,6 +32,9 @@ set(SOURCES
     openlefdefdialog.cpp
     preferencesdialog.cpp
     mainwindowmenubar.cpp
+    preferencesdialog.ui
+    mainwindow.ui
+    openlefdefdialog.ui
 )
 
 

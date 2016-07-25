@@ -255,9 +255,12 @@ void MainWindow::on_list_visible_nets_itemSelectionChanged()
     ui->button_delete_visible_net->setDisabled(ui->list_visible_nets->selectedItems().isEmpty());
 }
 
+
+void MainWindow::on_actionShow_Cells_toggled(bool arg1)
+{
+    qDebug() << arg1;
+    m_controller.show_cells(arg1);
 }
 
-
-
-
+}
 
