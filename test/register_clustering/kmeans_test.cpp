@@ -22,6 +22,40 @@ under the License.
 #include "../catch.hpp"
 #include "kmeans.h"
 
+class point_comparator {
+    ophidian::geometry::point<double> m_expected_point;
+public:
+    point_comparator(ophidian::geometry::point<double> expected_point)
+        : m_expected_point(expected_point){
+
+    }
+
+    bool operator()(const ophidian::geometry::point<double> & point) {
+        return boost::geometry::equals(point, m_expected_point);
+    }
+};
+
+class cluster_comparator {
+    std::vector<ophidian::geometry::point<double>> m_expected_cluster;
+public:
+    cluster_comparator(std::vector<ophidian::geometry::point<double>> & expected_cluster)
+        : m_expected_cluster(expected_cluster){
+
+    }
+
+    bool operator()(const std::vector<ophidian::geometry::point<double>> & cluster) {
+        if (cluster.size() != m_expected_cluster.size()) {
+            return false;
+        }
+        for (unsigned flip_flop_index = 0; flip_flop_index < cluster.size(); ++flip_flop_index) {
+            if (!boost::geometry::equals(cluster[flip_flop_index], m_expected_cluster[flip_flop_index])) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
 TEST_CASE("kmeans/ clustering 16 registers","[kmeans]") {
     std::vector<ophidian::geometry::point<double>> flip_flop_positions = {
         {1, 1},
@@ -41,6 +75,13 @@ TEST_CASE("kmeans/ clustering 16 registers","[kmeans]") {
         {7, 8},
         {8, 7}
     };
+    ophidian::entity_system::entity_system flip_flop_system;
+    std::vector<ophidian::register_clustering::clusters::cluster_element> flip_flops;
+    flip_flops.reserve(flip_flop_positions.size());
+    for (unsigned flip_flop_index = 0; flip_flop_index < flip_flop_positions.size(); ++flip_flop_index) {
+        auto flip_flop = flip_flop_system.create();
+        flip_flops.push_back(ophidian::register_clustering::clusters::cluster_element(flip_flop, flip_flop_positions[flip_flop_index]));
+    }
     std::vector<ophidian::geometry::point<double>> initial_centers = {
         {2, 2},
         {8, 2},
@@ -60,24 +101,24 @@ TEST_CASE("kmeans/ clustering 16 registers","[kmeans]") {
         {{7, 7}, {7, 9}, {7, 8}, {8, 7}}
     };
     ophidian::register_clustering::kmeans<ophidian::register_clustering::initialize_centers_from_vector, ophidian::register_clustering::assign_flip_flop_to_closest_cluster, ophidian::register_clustering::update_center_as_mean> kmeans(initial_centers);
-    kmeans.cluster_registers(flip_flop_positions);
+    kmeans.cluster_registers(flip_flops);
 
     REQUIRE(kmeans.clusters_system().size() == initial_centers.size());
     for (auto & cluster : kmeans.clusters_system()) {
+        auto cluster_center = kmeans.cluster_center(cluster);
+        auto center_it = std::find_if(expected_centers.begin(), expected_centers.end(), point_comparator(cluster_center));
+        REQUIRE(center_it != expected_centers.end());
+        expected_centers.erase(center_it);
+
         auto cluster_flip_flops = kmeans.cluster_flip_flops(cluster);
-        REQUIRE(cluster_flip_flops.size() == 4);
-        std::cout << "cluster" << std::endl;
-        for (auto & position : cluster_flip_flops) {
-            std::cout << "flip flop " << position.x() << ", " << position.y() << std::endl;
+        std::vector<ophidian::geometry::point<double>> cluster_positions;
+        cluster_positions.reserve(cluster_flip_flops.size());
+        for (auto flip_flop : cluster_flip_flops) {
+            cluster_positions.push_back(flip_flop.second);
         }
-//        auto cluster_center = kmeans.cluster_center(cluster);
-//        auto center_it = std::find(expected_centers.begin(), expected_centers.end(), cluster_center);
-//        REQUIRE(center_it != expected_centers.end());
-//        expected_centers.erase(center_it);
-//        auto cluster_flip_flops = kmeans.cluster_flip_flops(cluster);
-//        auto flip_flops_it = std::find(expected_clusters.begin(), expected_clusters.end(), cluster_flip_flops);
-//        REQUIRE(flip_flops_it != expected_clusters.end());
-//        expected_clusters.erase(flip_flops_it);
+        auto flip_flops_it = std::find_if(expected_clusters.begin(), expected_clusters.end(), cluster_comparator(cluster_positions));
+        REQUIRE(flip_flops_it != expected_clusters.end());
+        expected_clusters.erase(flip_flops_it);
     }
 }
 

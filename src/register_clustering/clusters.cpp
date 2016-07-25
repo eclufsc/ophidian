@@ -28,7 +28,7 @@ clusters::clusters(entity_system::entity_system &system)
     m_system.register_property(&m_centers);
 }
 
-void clusters::insert_flip_flop(entity_system::entity cluster, point flip_flop)
+void clusters::insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop)
 {
     m_flip_flops[m_system.lookup(cluster)].push_back(flip_flop);
 }

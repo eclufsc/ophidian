@@ -31,7 +31,7 @@ void initialize_centers_from_vector::initialize_centers(entity_system::entity_sy
     }
 }
 
-void assign_flip_flop_to_closest_cluster::assign_flops_to_clusters(entity_system::entity_system & clusters_system, clusters & cluster_properties, const std::vector<point> & flip_flop_positions)
+void assign_flip_flop_to_closest_cluster::assign_flops_to_clusters(entity_system::entity_system & clusters_system, clusters & cluster_properties, const std::vector<clusters::cluster_element> &flip_flops)
 {
     rtree clusters_rtree;
     for (auto & cluster : clusters_system) {
@@ -39,25 +39,25 @@ void assign_flip_flop_to_closest_cluster::assign_flops_to_clusters(entity_system
         cluster_properties.remove_flip_flops(cluster);
     }
 
-    for (auto & position : flip_flop_positions) {
+    for (auto & flip_flop : flip_flops) {
         std::vector<rtree_node> closest_nodes;
-        clusters_rtree.query(boost::geometry::index::nearest(position, 1), std::back_inserter(closest_nodes));
+        clusters_rtree.query(boost::geometry::index::nearest(flip_flop.second, 1), std::back_inserter(closest_nodes));
         auto closest_cluster = closest_nodes.front().second;
-        cluster_properties.insert_flip_flop(closest_cluster, position);
+        cluster_properties.insert_flip_flop(closest_cluster, flip_flop);
     }
 }
 
 void update_center_as_mean::update_cluster_centers(entity_system::entity_system &clusters_system, clusters &cluster_properties)
 {
     for (auto & cluster : clusters_system) {
-        auto flip_flop_positions = cluster_properties.flip_flops(cluster);
+        auto flip_flops = cluster_properties.flip_flops(cluster);
         point center_of_mass(0.0, 0.0);
-        for (auto & position : flip_flop_positions) {
-            center_of_mass.x(center_of_mass.x() + position.x());
-            center_of_mass.y(center_of_mass.y() + position.y());
+        for (auto & flip_flop : flip_flops) {
+            center_of_mass.x(center_of_mass.x() + flip_flop.second.x());
+            center_of_mass.y(center_of_mass.y() + flip_flop.second.y());
         }
-        center_of_mass.x(center_of_mass.x() / (double)flip_flop_positions.size());
-        center_of_mass.x(center_of_mass.y() / (double)flip_flop_positions.size());
+        center_of_mass.x(center_of_mass.x() / (double)flip_flops.size());
+        center_of_mass.y(center_of_mass.y() / (double)flip_flops.size());
         cluster_properties.center(cluster, center_of_mass);
     }
 }
