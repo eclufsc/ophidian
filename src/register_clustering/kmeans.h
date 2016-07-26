@@ -81,6 +81,11 @@ private:
     AssignmentStrategy m_assignment_strategy;
     CenterUpdateStrategy m_center_update_strategy;
 public:
+    kmeans(InitializationStrategy & initialization_strategy, AssignmentStrategy & assignment_strategy, CenterUpdateStrategy & center_update_strategy)
+        : m_clusters(m_clusters_system), m_initialization_strategy(initialization_strategy), m_assignment_strategy(assignment_strategy), m_center_update_strategy(center_update_strategy) {
+        m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
+    }
+
     kmeans(const std::vector<point> & initial_centers)
         : m_clusters(m_clusters_system), m_initialization_strategy(initial_centers) {
         m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
