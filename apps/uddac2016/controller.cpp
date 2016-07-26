@@ -48,6 +48,11 @@ void controller::update_ckt_info()
     m_mainwindow.circuit_name(QString::fromStdString(m_app.circuit_name()));
 }
 
+void controller::show_cells(bool show)
+{
+    m_canvas->showCells(show);
+}
+
 bool controller::read_lefdef(const std::string &LEF, const std::string &DEF)
 {
     std::ifstream lef(LEF.c_str());

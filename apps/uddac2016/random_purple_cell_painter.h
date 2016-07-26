@@ -5,6 +5,7 @@
 #include <random>
 
 #include <unordered_map>
+#include <functional>
 
 namespace uddac2016 {
 

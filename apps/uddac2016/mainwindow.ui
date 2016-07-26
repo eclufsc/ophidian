@@ -241,6 +241,7 @@
    </attribute>
    <addaction name="actionScreenshot"/>
    <addaction name="actionCritical_Path"/>
+   <addaction name="actionShow_Cells"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="MainWindowMenuBar" name="menuBar">
@@ -264,6 +265,17 @@
    </property>
    <property name="text">
     <string>Critical Path</string>
+   </property>
+  </action>
+  <action name="actionShow_Cells">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Cells</string>
    </property>
   </action>
  </widget>

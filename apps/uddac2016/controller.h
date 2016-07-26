@@ -112,6 +112,8 @@ public:
     void run_STA();
     void animate_solution(std::size_t duration = 30);
     void update_ckt_info();
+
+    void show_cells(bool show);
 };
 
 

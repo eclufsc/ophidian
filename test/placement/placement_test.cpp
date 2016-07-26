@@ -108,12 +108,12 @@ TEST_CASE("placement/trying to move fixed cell", "[placement]") {
 	placement.cell_fixed(u1, true);
 	placement.cell_position(u1, {300.0, 400.0});
 
-	REQUIRE(placement.cell_position(u1).x() == 100.0);
-	REQUIRE(placement.cell_position(u1).y() == 200.0);
+    REQUIRE(placement.cell_position(u1).x() == 100.0);
+    REQUIRE(placement.cell_position(u1).y() == 200.0);
 
-	REQUIRE(placement.pin_position(u1a).x() == 101.0);
-	REQUIRE(placement.pin_position(u1a).y() == 202.0);
+    REQUIRE(placement.pin_position(u1a).x() == 101.0);
+    REQUIRE(placement.pin_position(u1a).y() == 202.0);
 
-	REQUIRE(placement.pin_position(u1o).x() == 103.0);
-	REQUIRE(placement.pin_position(u1o).y() == 204.0);
+    REQUIRE(placement.pin_position(u1o).x() == 103.0);
+    REQUIRE(placement.pin_position(u1o).y() == 204.0);
 }

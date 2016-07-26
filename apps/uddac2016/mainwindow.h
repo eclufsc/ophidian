@@ -81,6 +81,8 @@ private slots:
     void on_button_delete_visible_net_clicked();
     void on_actionCritical_Path_toggled();
 
+    void on_actionShow_Cells_toggled(bool arg1);
+
 private:
     Ui::MainWindow *ui;
 };

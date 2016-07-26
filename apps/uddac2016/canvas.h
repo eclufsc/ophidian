@@ -37,6 +37,7 @@ public:
 
     void create_cp_arrows(const std::vector< std::pair< std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> >, std::pair< ophidian::entity_system::entity, ophidian::geometry::point<double> > > > & quads);
     void destroy_cp_arrows();
+
 };
 
 }

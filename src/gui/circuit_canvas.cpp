@@ -235,6 +235,11 @@ void circuit_canvas::clear(const sf::Color &color)
     QSFMLCanvas::clear(color);
 }
 
+void circuit_canvas::showCells(bool show)
+{
+    m_canvas.show_cells(show);
+}
+
 void circuit_canvas::render(sf::RenderTarget &target)
 {
     target.setView(m_camera);

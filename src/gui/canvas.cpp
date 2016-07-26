@@ -23,7 +23,8 @@ under the License.
 namespace ophidian {
 namespace gui {
 
-canvas::canvas()
+canvas::canvas() :
+    m_show_cells(true)
 {
 
 }
@@ -35,7 +36,8 @@ canvas::~canvas()
 
 void canvas::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-    target.draw(m_quads, states);
+    if(m_show_cells)
+        target.draw(m_quads, states);
     target.draw(m_lines, states);
     target.draw(m_arrow_lines, states);
 }
@@ -197,6 +199,11 @@ void canvas::clear()
     m_lines.clear();
     m_quads.clear();
     clear_arrows();
+}
+
+void canvas::show_cells(bool show)
+{
+    m_show_cells = show;
 }
 
 void arrow::update(gui::canvas &canvas)

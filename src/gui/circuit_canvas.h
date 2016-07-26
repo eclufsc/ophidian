@@ -80,6 +80,8 @@ protected:
 
     std::unordered_set< ophidian::gui::quad > m_non_movable_quads;
     void render(sf::RenderTarget & target);
+
+
 public:
     circuit_canvas(QWidget *parent = 0);
     virtual ~circuit_canvas();
@@ -152,6 +154,9 @@ public:
 
     void clear();
     void clear(const sf::Color & color);
+
+
+    void showCells(bool show);
 
 
 };
