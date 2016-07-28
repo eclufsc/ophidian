@@ -31,10 +31,14 @@ clusters::clusters(entity_system::entity_system &system)
 void clusters::insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop)
 {
     m_flip_flops[m_system.lookup(cluster)].push_back(flip_flop);
+    m_flip_flop_to_cluster[flip_flop.first] = cluster;
 }
 
 void clusters::remove_flip_flops(entity_system::entity cluster)
 {
+    for (auto flip_flop : m_flip_flops[m_system.lookup(cluster)]) {
+        m_flip_flop_to_cluster.erase(flip_flop.first);
+    }
     m_flip_flops[m_system.lookup(cluster)].clear();
 }
 

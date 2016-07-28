@@ -1,5 +1,5 @@
 find_package( Boost 1.59 )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_library (clock_tree_synthesis clock_tree_synthesis.cpp flip_flops.cpp extract_flip_flops.cpp clock_topology.cpp method_of_means_and_medians.cpp deffered_merge_embedding.cpp)
+add_library (clock_tree_synthesis extract_flip_flops.cpp clock_topology.cpp method_of_means_and_medians.cpp deffered_merge_embedding.cpp)
 target_include_directories ( clock_tree_synthesis PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries( clock_tree_synthesis ${Boost_LIBRARIES} emon netlist placement entity_system )

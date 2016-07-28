@@ -21,6 +21,7 @@ under the License.
 #ifndef CLUSTERS_H
 #define CLUSTERS_H
 
+#include <unordered_map>
 #include "../geometry/geometry.h"
 #include "../entity_system/entity_system.h"
 #include "../entity_system/vector_property.h"
@@ -37,21 +38,36 @@ private:
 
     entity_system::vector_property<std::vector<cluster_element>> m_flip_flops;
     entity_system::vector_property<point> m_centers;
+
+    std::unordered_map<entity_system::entity, entity_system::entity> m_flip_flop_to_cluster;
 public:
     clusters(entity_system::entity_system & system);
+
+    void insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop);
+    void remove_flip_flops(entity_system::entity cluster);
+
+    void center(entity_system::entity cluster, point center);
 
     const std::vector<cluster_element> & flip_flops(entity_system::entity cluster) const {
         return m_flip_flops[m_system.lookup(cluster)];
     }
 
-    void insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop);
-    void remove_flip_flops(entity_system::entity cluster);
+    std::pair<std::vector<std::vector<cluster_element>>::const_iterator, std::vector<std::vector<cluster_element>>::const_iterator> flip_flops() const {
+        return std::make_pair(m_flip_flops.begin(), m_flip_flops.end());
+    }
 
     point center(entity_system::entity cluster) const {
         return m_centers[m_system.lookup(cluster)];
     }
 
-    void center(entity_system::entity cluster, point center);
+    std::pair<std::vector<point>::const_iterator, std::vector<point>::const_iterator> centers() const {
+        return std::make_pair(m_centers.begin(), m_centers.end());
+    }
+
+    entity_system::entity cluster(entity_system::entity flip_flop) {
+        return m_flip_flop_to_cluster[flip_flop];
+    }
+
 };
 }
 }

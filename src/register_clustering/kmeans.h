@@ -83,11 +83,15 @@ private:
 public:
     kmeans(InitializationStrategy & initialization_strategy, AssignmentStrategy & assignment_strategy, CenterUpdateStrategy & center_update_strategy)
         : m_clusters(m_clusters_system), m_initialization_strategy(initialization_strategy), m_assignment_strategy(assignment_strategy), m_center_update_strategy(center_update_strategy) {
-        m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
+        initialize_centers();
     }
 
     kmeans(const std::vector<point> & initial_centers)
         : m_clusters(m_clusters_system), m_initialization_strategy(initial_centers) {
+        initialize_centers();
+    }
+
+    void initialize_centers() {
         m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
     }
 
@@ -96,6 +100,11 @@ public:
             m_assignment_strategy.assign_flops_to_clusters(m_clusters_system, m_clusters, flip_flops);
             m_center_update_strategy.update_cluster_centers(m_clusters_system, m_clusters);
         }
+    }
+
+    void cluster_insert(point center) {
+        auto cluster = m_clusters_system.create();
+        m_clusters.center(cluster, center);
     }
 
     const entity_system::entity_system & clusters_system() const {
@@ -108,6 +117,10 @@ public:
 
     const std::vector<clusters::cluster_element> & cluster_flip_flops(entity_system::entity cluster) const {
         return m_clusters.flip_flops(cluster);
+    }
+
+    entity_system::entity flip_flop_cluster(entity_system::entity flip_flop) {
+        return m_clusters.cluster(flip_flop);
     }
 };
 }

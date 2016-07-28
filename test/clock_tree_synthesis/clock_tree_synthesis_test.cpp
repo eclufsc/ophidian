@@ -18,46 +18,13 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#include "clock_tree_synthesis.h"
 #include "extract_flip_flops.h"
 #include "verilog.h"
 #include "verilog2netlist.h"
 #include "liberty.h"
 #include "../catch.hpp"
 
-TEST_CASE("clock_tree_synthesis/ empty","[clock_tree_synthesis]") {
-    ophidian::clock_tree_synthesis::clock_tree_synthesis clock_tree_synthesis;
-
-    REQUIRE(clock_tree_synthesis.flip_flop_count() == 0);
-}
-
-TEST_CASE("clock_tree_synthesis/ insert flip flop","[clock_tree_synthesis]") {
-    ophidian::clock_tree_synthesis::clock_tree_synthesis clock_tree_synthesis;
-
-    ophidian::entity_system::entity_system cell_system;
-    auto cell1 = cell_system.create();
-
-    auto flip_flop1 = clock_tree_synthesis.flip_flop_insert(cell1);
-
-    REQUIRE(clock_tree_synthesis.flip_flop_count() == 1);
-    REQUIRE(clock_tree_synthesis.flip_flop_cell(flip_flop1) == cell1);
-}
-
-TEST_CASE("clock_tree_synthesis/ remove flip flop","[clock_tree_synthesis]") {
-    ophidian::clock_tree_synthesis::clock_tree_synthesis clock_tree_synthesis;
-
-    ophidian::entity_system::entity_system cell_system;
-    auto cell1 = cell_system.create();
-
-    auto flip_flop1 = clock_tree_synthesis.flip_flop_insert(cell1);
-
-    clock_tree_synthesis.flip_flop_remove(flip_flop1);
-
-    REQUIRE(clock_tree_synthesis.flip_flop_count() == 0);
-    REQUIRE_THROWS(clock_tree_synthesis.flip_flop_cell(flip_flop1));
-}
-
-TEST_CASE("clock_tree_synthesis/ create clock tree synthesis with simple flip flops","[clock_tree_synthesis]") {
+TEST_CASE("flip flops/ extractf flip flops from simple","[flip_flops]") {
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
 
@@ -68,10 +35,10 @@ TEST_CASE("clock_tree_synthesis/ create clock tree synthesis with simple flip fl
     ophidian::timing::library library(&tarcs, &std_cells);
     ophidian::timing::liberty::read("input_files/simple_Late.lib", library);
 
-    ophidian::clock_tree_synthesis::clock_tree_synthesis clock_tree_synthesis;
-    ophidian::clock_tree_synthesis::extract_flip_flops(&netlist, &std_cells, &clock_tree_synthesis);
+    std::vector<ophidian::entity_system::entity> flip_flops;
+    ophidian::clock_tree_synthesis::extract_flip_flops(netlist, std_cells, flip_flops);
 
-    REQUIRE(clock_tree_synthesis.flip_flop_count() == 1);
-    auto flip_flop = clock_tree_synthesis.flip_flop_system().entities().front();
-    REQUIRE(netlist.cell_name(clock_tree_synthesis.flip_flop_cell(flip_flop)) == "f1");
+    REQUIRE(flip_flops.size() == 1);
+    auto flip_flop = flip_flops.front();
+    REQUIRE(netlist.cell_name(flip_flop) == "f1");
 }

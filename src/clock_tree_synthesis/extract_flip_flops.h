@@ -21,13 +21,12 @@ under the License.
 #ifndef EXTRACT_FLIP_FLOPS_H
 #define EXTRACT_FLIP_FLOPS_H
 
-#include "standard_cells.h"
-#include "netlist.h"
-#include "clock_tree_synthesis.h"
+#include "../standard_cell/standard_cells.h"
+#include "../netlist/netlist.h"
 
 namespace ophidian {
 namespace clock_tree_synthesis {
-    void extract_flip_flops(ophidian::netlist::netlist * netlist, standard_cell::standard_cells *standard_cells, ophidian::clock_tree_synthesis::clock_tree_synthesis * clock_tree_synthesis);
+    void extract_flip_flops(const ophidian::netlist::netlist & netlist, const standard_cell::standard_cells &standard_cells, std::vector<entity_system::entity> & flip_flops);
 }
 }
 

@@ -23,12 +23,12 @@ under the License.
 namespace ophidian {
 namespace clock_tree_synthesis {
 
-void extract_flip_flops(netlist::netlist *netlist, standard_cell::standard_cells *standard_cells, ophidian::clock_tree_synthesis::clock_tree_synthesis * clock_tree_synthesis)
+void extract_flip_flops(const netlist::netlist &netlist, const standard_cell::standard_cells &standard_cells, std::vector<entity_system::entity> &flip_flops)
 {
-    for (auto cell : netlist->cell_system()) {
-        auto std_cell = netlist->cell_std_cell(cell);
-        if (standard_cells->cell_sequential(std_cell)) {
-            clock_tree_synthesis->flip_flop_insert(cell);
+    for (auto cell : netlist.cell_system()) {
+        auto std_cell = netlist.cell_std_cell(cell);
+        if (standard_cells.cell_sequential(std_cell)) {
+            flip_flops.push_back(cell);
         }
     }
 }
