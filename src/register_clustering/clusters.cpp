@@ -36,8 +36,9 @@ void clusters::insert_flip_flop(entity_system::entity cluster, cluster_element f
 
 void clusters::remove_flip_flop(entity_system::entity cluster, clusters::cluster_element flip_flop)
 {
-    auto cluster_flip_flops = m_flip_flops[m_system.lookup(cluster)];
-    std::remove_if(cluster_flip_flops.begin(), cluster_flip_flops.end(), cluster_element_comparator(flip_flop));
+    auto & cluster_flip_flops = m_flip_flops[m_system.lookup(cluster)];
+    auto flip_flop_it = std::find_if(cluster_flip_flops.begin(), cluster_flip_flops.end(), cluster_element_comparator(flip_flop));
+    cluster_flip_flops.erase(flip_flop_it);
     m_flip_flop_to_cluster.erase(flip_flop.first);
 }
 
