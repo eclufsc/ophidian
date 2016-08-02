@@ -24,6 +24,7 @@ under the License.
 #include <boost/geometry/index/rtree.hpp>
 #include "../geometry/geometry.h"
 #include "clusters.h"
+#include "register_clustering.h"
 
 namespace ophidian {
 namespace register_clustering {
@@ -39,21 +40,33 @@ public:
 
     }
 
-    void initialize_centers(entity_system::entity_system & clusters_system, clusters & cluster_properties);
+    void initialize_centers(register_clustering & register_clustering);
 };
 
 class assign_flip_flop_to_closest_cluster {
 public:
     using point = geometry::point<double>;
-    using rtree_node = std::pair<point, entity_system::entity>;
-    using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
     assign_flip_flop_to_closest_cluster()
     {
 
     }
 
-    void assign_flops_to_clusters(entity_system::entity_system & clusters_system, clusters & cluster_properties, const std::vector<clusters::cluster_element> & flip_flop_positions);
+    void assign_flops_to_clusters(const std::vector<clusters::cluster_element> & flip_flops, register_clustering & register_clustering);
+};
+
+class assign_flip_flop_to_closest_cluster_using_rtree {
+public:
+    using point = geometry::point<double>;
+    using rtree_node = std::pair<point, entity_system::entity>;
+    using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
+
+    assign_flip_flop_to_closest_cluster_using_rtree()
+    {
+
+    }
+
+    void assign_flops_to_clusters(const std::vector<clusters::cluster_element> & flip_flops, register_clustering & register_clustering);
 };
 
 class update_center_as_mean {
@@ -65,7 +78,7 @@ public:
 
     }
 
-    void update_cluster_centers(entity_system::entity_system & clusters_system, clusters & cluster_properties);
+    void update_cluster_centers(register_clustering & register_clustering);
 };
 
 template <class InitializationStrategy = initialize_centers_from_vector, class AssignmentStrategy = assign_flip_flop_to_closest_cluster, class CenterUpdateStrategy = update_center_as_mean>
@@ -74,53 +87,31 @@ class kmeans
 public:
     using point = geometry::point<double>;    
 private:
-    entity_system::entity_system m_clusters_system;
-    clusters m_clusters;
+    register_clustering & m_register_clustering;
 
     InitializationStrategy m_initialization_strategy;
     AssignmentStrategy m_assignment_strategy;
     CenterUpdateStrategy m_center_update_strategy;
 public:
-    kmeans(InitializationStrategy & initialization_strategy, AssignmentStrategy & assignment_strategy, CenterUpdateStrategy & center_update_strategy)
-        : m_clusters(m_clusters_system), m_initialization_strategy(initialization_strategy), m_assignment_strategy(assignment_strategy), m_center_update_strategy(center_update_strategy) {
+    kmeans(ophidian::register_clustering::register_clustering & register_clustering, InitializationStrategy & initialization_strategy, AssignmentStrategy & assignment_strategy, CenterUpdateStrategy & center_update_strategy)
+        : m_register_clustering(register_clustering), m_initialization_strategy(initialization_strategy), m_assignment_strategy(assignment_strategy), m_center_update_strategy(center_update_strategy) {
         initialize_centers();
     }
 
-    kmeans(const std::vector<point> & initial_centers)
-        : m_clusters(m_clusters_system), m_initialization_strategy(initial_centers) {
+    kmeans(ophidian::register_clustering::register_clustering & register_clustering, const std::vector<point> & initial_centers)
+        : m_register_clustering(register_clustering), m_initialization_strategy(initial_centers) {
         initialize_centers();
     }
 
     void initialize_centers() {
-        m_initialization_strategy.initialize_centers(m_clusters_system, m_clusters);
+        m_initialization_strategy.initialize_centers(m_register_clustering);
     }
 
     void cluster_registers(const std::vector<clusters::cluster_element> & flip_flops, unsigned iterations = 1) {
         for (unsigned iteration = 0; iteration < iterations; ++iteration) {
-            m_assignment_strategy.assign_flops_to_clusters(m_clusters_system, m_clusters, flip_flops);
-            m_center_update_strategy.update_cluster_centers(m_clusters_system, m_clusters);
+            m_assignment_strategy.assign_flops_to_clusters(flip_flops, m_register_clustering);
+            m_center_update_strategy.update_cluster_centers(m_register_clustering);
         }
-    }
-
-    void cluster_insert(point center) {
-        auto cluster = m_clusters_system.create();
-        m_clusters.center(cluster, center);
-    }
-
-    const entity_system::entity_system & clusters_system() const {
-        return m_clusters_system;
-    }
-
-    point cluster_center(entity_system::entity cluster) const {
-        return m_clusters.center(cluster);
-    }
-
-    const std::vector<clusters::cluster_element> & cluster_flip_flops(entity_system::entity cluster) const {
-        return m_clusters.flip_flops(cluster);
-    }
-
-    entity_system::entity flip_flop_cluster(entity_system::entity flip_flop) {
-        return m_clusters.cluster(flip_flop);
     }
 };
 }

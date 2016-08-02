@@ -28,11 +28,26 @@ under the License.
 
 namespace ophidian {
 namespace register_clustering {
+
 class clusters
 {
 public:
     using point = geometry::point<double>;
     using cluster_element = std::pair<entity_system::entity, point>;
+
+    class cluster_element_comparator {
+    private:
+        cluster_element m_expected_element;
+    public:
+        cluster_element_comparator(cluster_element expected_element)
+            : m_expected_element(expected_element){
+
+        }
+
+        bool operator()(const cluster_element & element) {
+            return (element.first == m_expected_element.first) && boost::geometry::equals(element.second, m_expected_element.second);
+        }
+    };
 private:
     entity_system::entity_system & m_system;
 
@@ -44,6 +59,7 @@ public:
     clusters(entity_system::entity_system & system);
 
     void insert_flip_flop(entity_system::entity cluster, cluster_element flip_flop);
+    void remove_flip_flop(entity_system::entity cluster, cluster_element flip_flop);
     void remove_flip_flops(entity_system::entity cluster);
 
     void center(entity_system::entity cluster, point center);

@@ -100,17 +100,18 @@ TEST_CASE("kmeans/ clustering 16 registers","[kmeans]") {
         {{1, 9}, {3, 7}, {1, 8}, {2, 7}},
         {{7, 7}, {7, 9}, {7, 8}, {8, 7}}
     };
-    ophidian::register_clustering::kmeans<ophidian::register_clustering::initialize_centers_from_vector, ophidian::register_clustering::assign_flip_flop_to_closest_cluster, ophidian::register_clustering::update_center_as_mean> kmeans(initial_centers);
+    ophidian::register_clustering::register_clustering register_clustering;
+    ophidian::register_clustering::kmeans<ophidian::register_clustering::initialize_centers_from_vector, ophidian::register_clustering::assign_flip_flop_to_closest_cluster_using_rtree, ophidian::register_clustering::update_center_as_mean> kmeans(register_clustering, initial_centers);
     kmeans.cluster_registers(flip_flops);
 
-    REQUIRE(kmeans.clusters_system().size() == initial_centers.size());
-    for (auto & cluster : kmeans.clusters_system()) {
-        auto cluster_center = kmeans.cluster_center(cluster);
+    REQUIRE(register_clustering.clusters_system().size() == initial_centers.size());
+    for (auto & cluster : register_clustering.clusters_system()) {
+        auto cluster_center = register_clustering.cluster_center(cluster);
         auto center_it = std::find_if(expected_centers.begin(), expected_centers.end(), point_comparator(cluster_center));
         REQUIRE(center_it != expected_centers.end());
         expected_centers.erase(center_it);
 
-        auto cluster_flip_flops = kmeans.cluster_flip_flops(cluster);
+        auto cluster_flip_flops = register_clustering.cluster_flip_flops(cluster);
         std::vector<ophidian::geometry::point<double>> cluster_positions;
         cluster_positions.reserve(cluster_flip_flops.size());
         for (auto flip_flop : cluster_flip_flops) {
