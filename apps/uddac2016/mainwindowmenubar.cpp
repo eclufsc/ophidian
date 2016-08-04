@@ -18,8 +18,10 @@ void MainWindowMenuBar::update()
         m_actions.at("timing_lib")->setEnabled(true);
     }
 
-    if(m_verilog)
+    if(m_verilog) {
         m_actions.at("run_SA")->setEnabled(true);
+        m_actions.at("ops")->setEnabled(true);
+    }
 
     if(m_timing_lib && m_verilog)
         m_actions.at("STA")->setEnabled(true);
@@ -50,6 +52,8 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     QMenu * netlistMenu = this->addMenu("Netlist");
     QAction * openVerilogAction = netlistMenu->addAction("Open Verilog File...");
     connect(openVerilogAction, SIGNAL(triggered()), this, SLOT(action_open_verilog_triggered()));
+    QAction * openOps = netlistMenu->addAction("Open Ops File...");
+    connect(openOps, SIGNAL(triggered()), this, SLOT(action_open_ops_triggered()));
 
     QMenu * optimizationMenu = this->addMenu("Optimization");
     QAction * runSAAction = optimizationMenu->addAction("Run Simulated Annealing Placement");
@@ -65,6 +69,7 @@ MainWindowMenuBar::MainWindowMenuBar(QMainWindow *parent) :
     m_actions["read_sol"] = read_sol;
     m_actions["exit"] = exit;
     m_actions["verilog"] = openVerilogAction;
+    m_actions["ops"] = openOps;
     m_actions["run_SA"] = runSAAction;
     m_actions["timing_lib"] = readLibraryAction;
     m_actions["STA"] = runSTAAction;
@@ -96,6 +101,7 @@ void MainWindowMenuBar::reset()
     m_actions["run_SA"]->setDisabled(true);
     m_actions["timing_lib"]->setDisabled(true);
     m_actions["STA"]->setDisabled(true);
+    m_actions["ops"]->setDisabled(true);
 }
 
 void MainWindowMenuBar::action_open_LEFDEF_triggered()
@@ -169,6 +175,16 @@ void MainWindowMenuBar::action_open_timing_library_triggered()
     }
     update();
 
+}
+
+void MainWindowMenuBar::action_open_ops_triggered()
+{
+    auto text = QFileDialog::getOpenFileName(this, tr("Open Ops File..."), "", tr("Ops (*.ops)"));
+    if(!text.isEmpty())
+    {
+        m_ctrl->read_ops(text.toStdString());
+    }
+    update();
 }
 
 void MainWindowMenuBar::openPreferencesWindow()

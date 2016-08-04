@@ -42,6 +42,7 @@ void ops::read(std::string filename)
     {
         std::string connect_or_disconnect_token;
         in >> connect_or_disconnect_token;
+        if(connect_or_disconnect_token.empty()) continue;
         if(connect_or_disconnect_token == "disconnect_pin")
         {
             ss.str(std::string());

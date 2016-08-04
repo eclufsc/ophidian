@@ -34,6 +34,7 @@ public:
     bool read_lefdef(const std::string & LEF, const std::string & DEF);
     void read_def(const std::string & DEF);
     void read_verilog(const std::string & v);
+    void read_ops(const std::string& ops);
 
 
     void read_tau2014_lib(const std::string & file);

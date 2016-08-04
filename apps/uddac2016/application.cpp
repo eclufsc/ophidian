@@ -8,6 +8,8 @@
 #include "../parsing/verilog.h"
 #include "../netlist/verilog2netlist.h"
 
+#include "../parsing/ops.h"
+
 
 #include "../placement/hpwl.h"
 
@@ -108,6 +110,17 @@ bool application::read_verilog(const std::string &v)
     parsing::verilog verilog(v);
     netlist::verilog2netlist(verilog, *m_netlist);
     return true;
+}
+
+void application::read_ops(const std::string &ops)
+{
+    parsing::ops Ops(ops);
+
+    for(auto p : Ops.register_pins_to_disconnect())
+        m_netlist->disconnect(m_netlist->pin_by_name(p));
+    for(auto p : Ops.pairs_of_register_pin_and_net_to_connect())
+        m_netlist->connect(m_netlist->net_by_name(p.second), m_netlist->pin_by_name(p.first));
+
 }
 
 void application::read_tau2014_lib(const std::string &file)

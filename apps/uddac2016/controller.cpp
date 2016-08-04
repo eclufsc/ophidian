@@ -119,6 +119,11 @@ void controller::read_verilog(const std::string &v)
         update_ckt_info();
 }
 
+void controller::read_ops(const std::string &ops)
+{
+    m_app.read_ops(ops);
+}
+
 void controller::read_tau2014_lib(const std::string &file)
 {
     m_app.read_tau2014_lib(file);
