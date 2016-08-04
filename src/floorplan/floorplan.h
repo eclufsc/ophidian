@@ -22,7 +22,7 @@ under the License.
 #define ophidian_FLOORPLAN_H
 
 #include <boost/geometry/index/rtree.hpp>
-#include <entity_system.h>
+#include "../entity_system//entity_system.h"
 #include "rows.h"
 #include "sites.h"
 #include <unordered_map>

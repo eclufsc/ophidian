@@ -43,7 +43,8 @@ TEST_CASE("legalization/create subrows","[legalization][subrows]") {
 
     ophidian::entity_system::entity_system subrows_system;
     ophidian::legalization::subrows subrows(subrows_system);
-    subrows.create_subrows(&floorplan, &placement);
+    std::vector<ophidian::legalization::multi_polygon> obstacles;
+    subrows.create_subrows(&floorplan, obstacles);
     REQUIRE(subrows.count() == 2);
 
     auto first_subrow = subrows.find_subrow({0, 0});

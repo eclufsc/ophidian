@@ -25,7 +25,9 @@ namespace legalization {
 
 
 void legalization::create_subrows() {
-    m_subrows.create_subrows(m_floorplan, m_placement);
+    std::vector<multi_polygon> obstacles;
+    extract_obstacles(*m_placement, obstacles);
+    m_subrows.create_subrows(m_floorplan, obstacles);
 }
 }
 }
