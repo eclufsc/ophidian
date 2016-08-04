@@ -23,98 +23,98 @@ under the License.
 #include "../catch.hpp"
 #include "deffered_merge_embedding.h"
 
-TEST_CASE("trr intersection/ edge intersection of two squared trrs","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 3.0}, {3.0, 3.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 2.0);
+//TEST_CASE("trr intersection/ edge intersection of two squared trrs","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 3.0}, {3.0, 3.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 2.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {1.0, 3.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {1.0, 3.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ point intersection of two squared trrs","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({5.0, 1.0}, {5.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 2.0);
+//TEST_CASE("trr intersection/ point intersection of two squared trrs","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({5.0, 1.0}, {5.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 2.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {3.0, 1.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {3.0, 1.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ edge intersection of two rectangular trrs","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 1.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 3.0}, {4.0, 4.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 1.0);
+//TEST_CASE("trr intersection/ edge intersection of two rectangular trrs","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 1.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 3.0}, {4.0, 4.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 1.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {2.0, 3.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {2.0, 3.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ point intersection of two rectangular trrs","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 1.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({4.0, 2.0}, {5.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 1.0);
+//TEST_CASE("trr intersection/ point intersection of two rectangular trrs","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 1.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({4.0, 2.0}, {5.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 1.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {3.0, 2.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {3.0, 2.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ edge intersection between segment and squared trr","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({2.0, 1.0}, {4.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
+//TEST_CASE("trr intersection/ edge intersection between segment and squared trr","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({2.0, 1.0}, {4.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({2.0, 1.0}, {3.0, 1.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({2.0, 1.0}, {3.0, 1.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ point intersection between segment and squared trr","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 1.0}, {4.0, 1.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
+//TEST_CASE("trr intersection/ point intersection between segment and squared trr","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {1.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 1.0}, {4.0, 1.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {3.0, 1.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 1.0}, {3.0, 1.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ edge intersection between segment and rectangular trr","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 2.0}, {5.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
+//TEST_CASE("trr intersection/ edge intersection between segment and rectangular trr","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({3.0, 2.0}, {5.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {4.0, 2.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({3.0, 2.0}, {4.0, 2.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}
 
-TEST_CASE("trr intersection/ point intersection between segment and rectangular trr","[trr]") {
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({4.0, 2.0}, {5.0, 2.0});
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
+//TEST_CASE("trr intersection/ point intersection between segment and rectangular trr","[trr]") {
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr1({1.0, 1.0}, {2.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr1(core_trr1, 2.0);
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment core_trr2({4.0, 2.0}, {5.0, 2.0});
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::trr trr2(core_trr2, 0.0);
 
-    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({4.0, 2.0}, {4.0, 2.0});
-    auto intersection = trr1.intersection(trr2);
-    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
-    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
-}
+//    ophidian::clock_tree_synthesis::deffered_merge_embedding::segment expected_intersection({4.0, 2.0}, {4.0, 2.0});
+//    auto intersection = trr1.intersection(trr2);
+//    std::cout << intersection.first.x() << ", " << intersection.first.y() << " -> " << intersection.second.x() << ", " << intersection.second.y() << std::endl;
+//    REQUIRE(boost::geometry::equals(expected_intersection, intersection));
+//}

@@ -16,8 +16,8 @@
 #include "legalization_check.h"
 
 TEST_CASE("legalization/ legalizing simple after random movements","[legalization][abacus]") {
-    ophidian::parsing::lef lef("benchmarks/simple/simple.lef");
-    ophidian::parsing::def def("benchmarks/simple/simple.def");
+    ophidian::parsing::lef lef("input_files/simple.lef");
+    ophidian::parsing::def def("input_files/simple.def");
 
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);
@@ -63,8 +63,8 @@ bool run_circuit(std::string circuit_name) {
 
     std::cout << "running abacus regression test for circuit " << circuit_name << std::endl;
 
-    ophidian::parsing::lef lef("benchmarks/" + circuit_name + "/" + circuit_name + ".lef");
-    ophidian::parsing::def def("benchmarks/" + circuit_name + "/" + circuit_name + ".def");
+    ophidian::parsing::lef lef("input_files/" + circuit_name + "/" + circuit_name + ".lef");
+    ophidian::parsing::def def("input_files/" + circuit_name + "/" + circuit_name + ".def");
 
     ophidian::standard_cell::standard_cells std_cells;
     ophidian::netlist::netlist netlist(&std_cells);

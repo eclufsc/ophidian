@@ -20,6 +20,7 @@ under the License.
 
 #include "../catch.hpp"
 #include "subrows.h"
+#include "extract_obstacles.h"
 
 TEST_CASE("legalization/create subrows","[legalization][subrows]") {
     ophidian::standard_cell::standard_cells std_cells;
@@ -44,6 +45,7 @@ TEST_CASE("legalization/create subrows","[legalization][subrows]") {
     ophidian::entity_system::entity_system subrows_system;
     ophidian::legalization::subrows subrows(subrows_system);
     std::vector<ophidian::legalization::multi_polygon> obstacles;
+    ophidian::legalization::extract_obstacles(placement, obstacles);
     subrows.create_subrows(&floorplan, obstacles);
     REQUIRE(subrows.count() == 2);
 
