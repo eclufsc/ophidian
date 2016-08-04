@@ -8,6 +8,7 @@ set(PARSING_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/lef.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/def.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/verilog.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops.cpp
 )
 
 add_subdirectory(tau2014)
