@@ -33,6 +33,7 @@ using namespace boost::units;
 
 namespace flute_rc_tree_rtree {
 typedef std::pair<ophidian::geometry::point<double>, entity_system::entity> rtree_node;
+
 class rtree_node_comparator {
 public:
     bool operator()(const rtree_node & node1, const rtree_node & node2) const {
@@ -42,15 +43,19 @@ public:
 
 typedef boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>, boost::geometry::index::indexable<rtree_node>, rtree_node_comparator> rtree;
 
+
+
+
 }
 
 
-flute_rc_tree_creator::flute_rc_tree_creator()
+flute_rc_tree_creator::flute_rc_tree_creator(double max_segment_length)
 {
 #pragma omp critical
     {
-    interconnection::readLUT();
+        interconnection::readLUT();
     }
+    m_params.max_segment_length = max_segment_length;
     m_params.capacitance_per_micron = quantity<si::capacitance>(1.6e-16 * si::farads);
     m_params.resistance_per_micron = quantity<si::resistance>(2.535 * si::ohms);
 }
@@ -70,14 +75,19 @@ void flute_rc_tree_creator::capacitance_per_micron(boost::units::quantity<si::ca
     m_params.capacitance_per_micron = capacitance;
 }
 
+void flute_rc_tree_creator::max_segment_length(double max_segment_length)
+{
+    m_params.max_segment_length = max_segment_length;
+}
+
 std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> flute_rc_tree_creator::create_tree(const placement::placement &placement, const entity_system::entity net, interconnection::rc_tree &rc_tree, const timing::library &library)
 {
     auto net_pins = placement.netlist().net_pins(net);
     std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
 
-    params dummy{0.0*si::ohms, 0.0*si::farads};
-//    params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
-    params & param = m_params;
+    params dummy{10.0, 0.0*si::ohms, 0.0*si::farads};
+    params& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_params);
+    //    params & param = m_params;
 
     std::set< interconnection::rc_tree::capacitor_id > taps;
 
@@ -106,32 +116,62 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
         auto pin_v = net_pins[1];
         auto u_position = placement.pin_position(pin_u);
         auto v_position = placement.pin_position(pin_v);
-        auto u = rc_tree.capacitor_insert("C0");
-        auto v = rc_tree.capacitor_insert("C1");
+        const interconnection::rc_tree::graph_t::Node CAP_U = rc_tree.capacitor_insert("C0");
         double length = ophidian::geometry::manhattan_distance(u_position, v_position);
         length /= static_cast<double>(placement.lib().dist2microns());
-        rc_tree.capacitance(u, quantity<si::capacitance>((length / 2.0) * param.capacitance_per_micron));
-        rc_tree.capacitance(v, quantity<si::capacitance>((length / 2.0) * param.capacitance_per_micron));
-        auto res = rc_tree.resistor_insert(u, v, quantity<si::resistance>(length * param.resistance_per_micron));
+
+        if(length > 0)
+        {
+
+            int number_of_sliced_segments = std::ceil(length / m_params.max_segment_length);
+
+            const interconnection::rc_tree::graph_t::Node CAP_V = rc_tree.capacitor_insert("C1");
+            interconnection::rc_tree::graph_t::Node previous = CAP_U;
+            double remaining = length;
+            for(int j = 0; j < number_of_sliced_segments; ++j)
+            {
+                double local_length = std::min(remaining, m_params.max_segment_length);
+
+                rc_tree.capacitance(previous, rc_tree.capacitance(previous) + quantity<si::capacitance>((local_length / 2.0) *param.capacitance_per_micron));
+
+                interconnection::rc_tree::graph_t::Node next;
+                if(j != number_of_sliced_segments-1)
+                    next = rc_tree.capacitor_insert("C_0_" + std::to_string(j));
+                else
+                    next = CAP_V;
+
+                rc_tree.capacitance(next, rc_tree.capacitance(next) + quantity<si::capacitance>((local_length / 2.0) *param.capacitance_per_micron));
+                rc_tree.resistor_insert(previous, next, quantity<si::resistance>(local_length *param.resistance_per_micron));
+
+                previous = next;
+                remaining -= local_length;
+            }
+
+//            auto tap_v = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_v));
+//            tap_mapping[pin_v] = tap_v;
+//            taps.insert(tap_v);
+//            auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
+//            rc_tree.capacitance(tap_v, pin_cap_v);
+//            rc_tree.resistor_insert(CAP_V, tap_v, quantity<si::resistance>(0.0 * si::ohms));
+
+        } else {
+
+            auto tap_v = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_v));
+            tap_mapping[pin_v] = tap_v;
+            taps.insert(tap_v);
+            auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
+            rc_tree.capacitance(tap_v, pin_cap_v);
+            rc_tree.resistor_insert(CAP_U, tap_v, quantity<si::resistance>(0.0 * si::ohms));
+        }
+
+
+
         auto tap_u = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_u));
-        auto tap_v = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_v));
-
         tap_mapping[pin_u] = tap_u;
-        tap_mapping[pin_v] = tap_v;
-
         taps.insert(tap_u);
-        taps.insert(tap_v);
-
-
-
         auto pin_cap_u = library.pin_capacitance(placement.netlist().pin_std_cell(pin_u));
         rc_tree.capacitance(tap_u, pin_cap_u);
-        rc_tree.resistor_insert(u, tap_u, quantity<si::resistance>(0.0 * si::ohms));
-
-        auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
-        rc_tree.capacitance(tap_v, pin_cap_v);
-        rc_tree.resistor_insert(v, tap_v, quantity<si::resistance>(0.0 * si::ohms));
-
+        rc_tree.resistor_insert(CAP_U, tap_u, quantity<si::resistance>(0.0 * si::ohms));
 
         for(auto t : taps)
             rc_tree.tap_insert(t);
@@ -154,41 +194,114 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
     auto tree = ophidian::interconnection::flute(net_pins.size(), X.data(), Y.data(), ACCURACY);
     std::size_t num_branches = 2 * tree.deg - 2;
 
-    flute_rc_tree_rtree::rtree indexing;
+    flute_rc_tree_rtree::rtree tap_indexing;
     std::vector<flute_rc_tree_rtree::rtree_node> nodes(net_pins.size());
     nodes.resize(0);
     for (int i = 0; i < net_pins.size(); ++i)
         nodes.push_back( { geometry::point<double>(X[i], Y[i]), net_pins[i] });
-    indexing.insert(nodes.begin(), nodes.end());
+    tap_indexing.insert(nodes.begin(), nodes.end());
 
+
+    std::vector<bool> tap_created(num_branches, false);
+
+
+    std::map< std::pair< unsigned, unsigned >, int > branch_map;
 
     for (std::size_t i { 0 }; i < num_branches; ++i) {
         std::size_t n { static_cast<std::size_t>(tree.branch[i].n) };
         if (n == i)
             continue;
 
+        int from_i = i;
+        int to_i = n;
+
         ophidian::geometry::point<double> from { static_cast<double>(tree.branch[i].x), static_cast<double>(tree.branch[i].y) };
         ophidian::geometry::point<double> to { static_cast<double>(tree.branch[n].x), static_cast<double>(tree.branch[n].y) };
+
         double length = ophidian::geometry::manhattan_distance(from, to);
         length /= static_cast<double>(placement.lib().dist2microns());
 
+        std::string from_name = "C_" + std::to_string(i);
+        auto from_position_pair = std::make_pair(tree.branch[i].x, tree.branch[i].y);
+        auto cached = branch_map.find(from_position_pair);
+        if(cached != branch_map.end())
+        {
+            from_i = cached->second;
+            from_name = "C_" + std::to_string(from_i);
+        }
+        else
+            branch_map[from_position_pair] = i;
+
+        std::string to_name = "C_" + std::to_string(n);
+        auto to_position_pair = std::make_pair(tree.branch[n].x, tree.branch[n].y);
+        cached = branch_map.find(to_position_pair);
+        if(cached != branch_map.end())
+        {
+            to_i = cached->second;
+            to_name = "C_" + std::to_string(to_i);
+        }
+        else
+            branch_map[to_position_pair] = n;
+
         // Capacitor U
-        lemon::ListGraph::Node cap_from = rc_tree.capacitor_insert("C_" + std::to_string(i));
-        rc_tree.capacitance(cap_from, rc_tree.capacitance(cap_from) + quantity<si::capacitance>((length / 2.0) *param.capacitance_per_micron));
+        const interconnection::rc_tree::graph_t::Node CAP_FROM = rc_tree.capacitor_insert(from_name);
 
-        // Capacitor V
-        lemon::ListGraph::Node cap_to = rc_tree.capacitor_insert("C_" + std::to_string(n));
-        rc_tree.capacitance(cap_to, rc_tree.capacitance(cap_to) + quantity<si::capacitance>((length / 2.0) * param.capacitance_per_micron));
+        if(from_i != to_i)
+        {
+            // Capacitor V
+            const interconnection::rc_tree::graph_t::Node CAP_TO = rc_tree.capacitor_insert(to_name);
 
-        // Resistor
-        auto res = rc_tree.resistor_insert(cap_from, cap_to, quantity<si::resistance>(length *param.resistance_per_micron));
+            int num_PIs = std::ceil(length / m_params.max_segment_length);
+
+            interconnection::rc_tree::graph_t::Node previous = CAP_FROM;
+            double remaining = length;
+            for(int j = 0; j < num_PIs; ++j)
+            {
+                double local_length = std::min(remaining, m_params.max_segment_length);
+
+                rc_tree.capacitance(previous, rc_tree.capacitance(previous) + quantity<si::capacitance>((local_length / 2.0) *param.capacitance_per_micron));
+
+                interconnection::rc_tree::graph_t::Node next;
+                if(j != num_PIs-1)
+                    next = rc_tree.capacitor_insert(from_name + "_" + std::to_string(j));
+                else
+                    next = CAP_TO;
+
+                rc_tree.capacitance(next, rc_tree.capacitance(next) + quantity<si::capacitance>((local_length / 2.0) *param.capacitance_per_micron));
+                rc_tree.resistor_insert(previous, next, quantity<si::resistance>(local_length *param.resistance_per_micron));
+
+                previous = next;
+                remaining -= local_length;
+            }
+
+
+            std::vector<flute_rc_tree_rtree::rtree_node> nearest;
+            tap_indexing.query(boost::geometry::index::nearest(to, 1), std::back_inserter(nearest));
+
+            bool to_is_tap = !nearest.empty() && boost::geometry::equals(to, nearest.front().first);
+            if (to_is_tap && !tap_created[to_i]) {
+                entity_system::entity pin { nearest.front().second };
+
+                auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
+
+                tap_mapping[pin] = tap_cap;
+                rc_tree.tap_insert(tap_cap);
+
+                auto pin_cap = library.pin_capacitance(placement.netlist().pin_std_cell(pin));
+                rc_tree.capacitance(tap_cap, pin_cap); // tap pin capacitance
+                rc_tree.resistor_insert(CAP_TO, tap_cap, quantity<si::resistance>(0.0 * si::ohms));
+
+                tap_created[to_i]  = true;
+            }
+        }
+
 
         std::vector<flute_rc_tree_rtree::rtree_node> nearest;
-        indexing.query(boost::geometry::index::nearest(from, 1), std::back_inserter(nearest));
+        tap_indexing.query(boost::geometry::index::nearest(from, 1), std::back_inserter(nearest));
 
         bool from_is_tap = !nearest.empty() && boost::geometry::equals(from, nearest.front().first);
 
-        if (from_is_tap) {
+        if (from_is_tap && !tap_created[from_i]) {
             entity_system::entity pin { nearest.front().second };
 
             auto tap_cap = rc_tree.capacitor_insert(placement.netlist().pin_name(pin));
@@ -198,9 +311,11 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
 
             auto pin_cap = library.pin_capacitance(placement.netlist().pin_std_cell(pin));
             rc_tree.capacitance(tap_cap, pin_cap); // tap pin capacitance
-            if (from_is_tap)
-                rc_tree.resistor_insert(cap_from, tap_cap, quantity<si::resistance>(0.0 * si::ohms));
+            rc_tree.resistor_insert(CAP_FROM, tap_cap, quantity<si::resistance>(0.0 * si::ohms));
+
+            tap_created[from_i]  = true;
         }
+
     }
 
     return tap_mapping;
@@ -208,4 +323,3 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
 
 } /* namespace timingdriven_placement */
 } /* namespace ophidian */
-

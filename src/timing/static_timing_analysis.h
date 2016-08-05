@@ -50,8 +50,8 @@ class static_timing_analysis
     std::unique_ptr<timing_data> m_late;
     std::unique_ptr<timing_data> m_early;
     std::unique_ptr<graph_and_topology> m_topology;
-    std::unique_ptr<generic_sta<effective_capacitance_wire_model, pessimistic> > m_late_sta;
-    std::unique_ptr<generic_sta<effective_capacitance_wire_model, optimistic> > m_early_sta;
+    std::unique_ptr<generic_sta<lumped_capacitance_wire_model, pessimistic> > m_late_sta;
+    std::unique_ptr<generic_sta<lumped_capacitance_wire_model, optimistic> > m_early_sta;
     std::unique_ptr<test_calculator> m_test;
     endpoints m_endpoints;
     TimeType m_lwns;

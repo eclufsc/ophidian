@@ -36,19 +36,22 @@ namespace timingdriven_placement {
 
 class flute_rc_tree_creator {
     struct params {
+        double max_segment_length;
         boost::units::quantity< boost::units::si::resistance > resistance_per_micron;
         boost::units::quantity< boost::units::si::capacitance > capacitance_per_micron;
     };
     params m_params;
   public:
-    flute_rc_tree_creator();
+    flute_rc_tree_creator(double max_segment_length = 100.0);
     virtual ~flute_rc_tree_creator();
     void resistance_per_microns(boost::units::quantity< boost::units::si::resistance > resistance);
     void capacitance_per_micron(boost::units::quantity< boost::units::si::capacitance > capacitance);
+    void max_segment_length(double max_segment_length);
 
     std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> create_tree(const placement::placement& placement,
                                                                                            const entity_system::entity net, interconnection::rc_tree& rc_tree, const timing::library & library);
 
+private:
 };
 
 } /* namespace timingdriven_placement */
