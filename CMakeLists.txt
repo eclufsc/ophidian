@@ -33,6 +33,7 @@ set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(apps)
+add_subdirectory(regression)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
 ${CMAKE_SOURCE_DIR}/3rdparty

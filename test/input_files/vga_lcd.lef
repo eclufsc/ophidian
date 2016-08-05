@@ -1,0 +1,1375 @@
+VERSION 5.5 ;
+NAMESCASESENSITIVE ON ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+UNITS
+  DATABASE MICRONS 100 ;
+END UNITS
+
+MANUFACTURINGGRID	0.005 ;
+
+SITE core
+  SIZE 0.10 BY 2.00 ;
+  CLASS CORE ;
+END core
+
+LAYER metal1
+  TYPE			ROUTING ;
+  DIRECTION		HORIZONTAL ;
+  PITCH			0.200 ;
+  OFFSET		0.000 ;
+  WIDTH			0.100 ;
+END metal1
+
+LAYER metal2
+  TYPE			ROUTING ;
+  DIRECTION		VERTICAL ;
+  PITCH			0.200 ;
+  OFFSET		0.100 ;
+  WIDTH			0.1 ;
+END metal2
+
+LAYER metal3
+  TYPE			ROUTING ;
+  DIRECTION		HORIZONTAL ;
+  PITCH			0.200 ;
+  OFFSET		0.000 ;
+  WIDTH			0.1 ;
+END metal3
+
+MACRO DFF_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN Q DIRECTION OUTPUT ;
+    PORT
+			LAYER metal2 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END Q 
+  PIN CK DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END CK
+  PIN D DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 1.05 0.500 1.15 1.500 ;
+    END
+  END D
+END DFF_X2 
+
+MACRO INV_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 0.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A
+END INV_X1
+
+MACRO INV_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A
+END INV_X2
+
+MACRO INV_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 3.2 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A
+END INV_X4
+
+MACRO INV_X8
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 6.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A
+END INV_X8
+
+MACRO INV_X16
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 12.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 6.45 0.500 6.55 1.500 ;
+    END
+  END A
+END INV_X16
+
+MACRO INV_X32
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 25.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 12.85 0.500 12.95 1.500 ;
+    END
+  END A
+END INV_X32
+
+MACRO NAND2_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.2 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+END NAND2_X1
+
+MACRO NAND2_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A2
+END NAND2_X2
+
+MACRO NAND2_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+END NAND2_X4
+
+MACRO NAND3_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A3
+END NAND3_X1
+
+MACRO NAND3_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 3.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.65 0.500 2.75 1.500 ;
+    END
+  END A3
+END NAND3_X2
+
+MACRO NAND3_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 6.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END A3
+END NAND3_X4
+
+MACRO NAND4_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.45 0.500 1.55 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END A4
+END NAND4_X1
+
+MACRO NAND4_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.0 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A4
+END NAND4_X2
+
+MACRO NAND4_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 8.0 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 6.45 0.500 6.55 1.500 ;
+    END
+  END A4
+END NAND4_X4
+
+MACRO NOR2_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.2 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+			LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+END NOR2_X1
+
+MACRO NOR2_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A2
+END NOR2_X2
+
+MACRO NOR2_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN 
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+END NOR2_X4
+
+MACRO NOR3_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 1.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A3
+END NOR3_X1
+
+MACRO NOR3_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 3.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.65 0.500 2.75 1.500 ;
+    END
+  END A3
+END NOR3_X2
+
+MACRO NOR3_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 6.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END A3
+END NOR3_X4
+
+MACRO NOR4_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.45 0.500 0.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.45 0.500 1.55 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END A4
+END NOR4_X1
+
+MACRO NOR4_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.0 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.85 0.500 0.95 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A4
+END NOR4_X2
+
+MACRO NOR4_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 8.0 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.65 0.500 1.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.25 0.500 3.35 1.500 ;
+    END
+  END A2
+  PIN A3 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END A3
+  PIN A4 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 6.45 0.500 6.55 1.500 ;
+    END
+  END A4
+END NOR4_X4
+
+MACRO AOI21_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B2
+END AOI21_X1
+
+MACRO AOI21_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.65 0.500 3.75 1.500 ;
+    END
+  END B2
+END AOI21_X2
+
+MACRO AOI21_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 9.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.25 0.500 7.35 1.500 ;
+    END
+  END B2
+END AOI21_X4
+
+MACRO OAI21_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B2
+END OAI21_X1
+
+MACRO OAI21_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.65 0.500 3.75 1.500 ;
+    END
+  END B2
+END OAI21_X2
+
+MACRO OAI21_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 9.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.25 0.500 7.35 1.500 ;
+    END
+  END B2
+END OAI21_X4
+
+MACRO AOI22_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 3.2 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B2
+END AOI22_X1
+
+MACRO AOI22_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 6.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.85 0.500 3.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 5.05 0.500 5.15 1.500 ;
+    END
+  END B2
+END AOI22_X2
+
+MACRO AOI22_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 12.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 5.05 0.500 5.15 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.65 0.500 7.75 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 10.25 0.500 10.35 1.500 ;
+    END
+  END B2
+END AOI22_X4
+
+MACRO OAI21_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B2
+END OAI21_X1
+
+MACRO OAI21_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.65 0.500 3.75 1.500 ;
+    END
+  END B2
+END OAI21_X2
+
+MACRO OAI21_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 9.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.25 0.500 7.35 1.500 ;
+    END
+  END B2
+END OAI21_X4
+
+MACRO OAI21_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 2.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B2
+END OAI21_X1
+
+MACRO OAI21_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 4.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.65 0.500 3.75 1.500 ;
+    END
+  END B2
+END OAI21_X2
+
+MACRO OAI21_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 9.6 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 4.85 0.500 4.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.25 0.500 7.35 1.500 ;
+    END
+  END B2
+END OAI21_X4
+
+MACRO OAI22_X1
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 3.2 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.65 0.500 0.75 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.85 0.500 1.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END B2
+END OAI22_X1
+
+MACRO OAI22_X2
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 6.4 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 1.25 0.500 1.35 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 3.85 0.500 3.95 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 5.05 0.500 5.15 1.500 ;
+    END
+  END B2
+END OAI22_X2
+
+MACRO OAI22_X4
+  CLASS CORE ;
+  ORIGIN 0 0  ;
+  SIZE 12.8 BY 2.0 ;
+
+  SITE  core ;
+  PIN ZN DIRECTION OUTPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 0.05 0.500 0.15 1.500 ;
+    END
+  END ZN
+  PIN A1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 2.45 0.500 2.55 1.500 ;
+    END
+  END A1
+  PIN A2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 5.05 0.500 5.15 1.500 ;
+    END
+  END A2
+  PIN B1 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 7.65 0.500 7.75 1.500 ;
+    END
+  END B1
+  PIN B2 DIRECTION INPUT ;
+    PORT
+      LAYER metal1 ;
+      RECT 10.25 0.500 10.35 1.500 ;
+    END
+  END B2
+END OAI22_X4
+
+END LIBRARY

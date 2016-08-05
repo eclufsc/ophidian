@@ -31,15 +31,18 @@ under the License.
 
 using namespace ophidian;
 
-bool run_circuit(const std::string & ckt_name, const double target_utilization, const double golden_abu) {
+TEST_CASE("density/ abu of simple","[density][abu]") {
+    double target_utilization = 0.7;
+    double golden_abu = 0.0125911;
+
     standard_cell::standard_cells std_cells;
     netlist::netlist netlist(&std_cells);
     placement::library lib(&std_cells);
     placement::placement cells(&netlist, &lib);
     floorplan::floorplan floorplan;
 
-    const std::string dot_lef_file{"benchmarks/" + ckt_name + "/" + ckt_name + ".lef"};
-    const std::string dot_def_file{"benchmarks/" + ckt_name + "/" + ckt_name + ".def"};
+    const std::string dot_lef_file{"input_files/vga_lcd.lef"};
+    const std::string dot_def_file{"input_files/vga_lcd.def"};
 
     std::unique_ptr<parsing::lef> lef;
     std::unique_ptr<parsing::def> def;
@@ -63,18 +66,5 @@ bool run_circuit(const std::string & ckt_name, const double target_utilization, 
 
     density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
     double measured_abu = abu.measure_abu(target_utilization);
-    return Approx(measured_abu) == golden_abu;
-}
-
-
-
-TEST_CASE("density/ abu of iccad2015 ckts","[density][abu][regression][iccad2015]") {
-    REQUIRE(run_circuit("superblue18", 0.85, 0.0401271));
-    REQUIRE(run_circuit("superblue16", 0.85, 0.0333554));
-    REQUIRE(run_circuit("superblue4", 0.9, 0.0439752));
-    REQUIRE(run_circuit("superblue10", 0.87, 0.0417409));
-    REQUIRE(run_circuit("superblue7", 0.9, 0.0296557));
-    REQUIRE(run_circuit("superblue1", 0.8, 0.0536546));
-    REQUIRE(run_circuit("superblue3", 0.87, 0.0287357));
-    REQUIRE(run_circuit("superblue5", 0.85, 0.0208419));
+    REQUIRE(Approx(measured_abu) == golden_abu);
 }

@@ -63,25 +63,29 @@ void subrows::create_subrows(floorplan::floorplan * floorplan, const std::vector
                 auto subrow = node.second;
                 auto row = this->row(subrow);
 
-                auto left_subrow = m_system.create();
-                this->begin(left_subrow, this->begin(subrow));
-                this->end(left_subrow, rectangle.min_corner().x() - 1);
-                this->y(left_subrow, this->y(subrow));
-                this->row(left_subrow, row);
-                point left_subrow_min_corner(this->begin(left_subrow), floorplan->row_origin(row).y());
-                point left_subrow_max_corner(rectangle.min_corner().x() - 1, floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
-                box left_subrow_box(left_subrow_min_corner, left_subrow_max_corner);
-                subrows_rtree.insert(std::make_pair(left_subrow_box, left_subrow));
+                if (rectangle.min_corner().x() - this->begin(subrow) > 0) {
+                    auto left_subrow = m_system.create();
+                    this->begin(left_subrow, this->begin(subrow));
+                    this->end(left_subrow, rectangle.min_corner().x() - 1);
+                    this->y(left_subrow, this->y(subrow));
+                    this->row(left_subrow, row);
+                    point left_subrow_min_corner(this->begin(left_subrow), floorplan->row_origin(row).y());
+                    point left_subrow_max_corner(this->end(left_subrow), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
+                    box left_subrow_box(left_subrow_min_corner, left_subrow_max_corner);
+                    subrows_rtree.insert(std::make_pair(left_subrow_box, left_subrow));
+                }
 
-                auto right_subrow = m_system.create();
-                this->begin(right_subrow, rectangle.max_corner().x());
-                this->end(right_subrow, this->end(subrow));
-                this->y(right_subrow, this->y(subrow));
-                this->row(right_subrow, this->row(subrow));
-                point right_subrow_min_corner(rectangle.max_corner().x(), floorplan->row_origin(row).y());
-                point right_subrow_max_corner(this->end(subrow), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
-                box right_subrow_box(right_subrow_min_corner, right_subrow_max_corner);
-                subrows_rtree.insert(std::make_pair(right_subrow_box, right_subrow));
+                if (this->end(subrow) - rectangle.max_corner().x() > 0) {
+                    auto right_subrow = m_system.create();
+                    this->begin(right_subrow, rectangle.max_corner().x());
+                    this->end(right_subrow, this->end(subrow));
+                    this->y(right_subrow, this->y(subrow));
+                    this->row(right_subrow, this->row(subrow));
+                    point right_subrow_min_corner(rectangle.max_corner().x(), floorplan->row_origin(row).y());
+                    point right_subrow_max_corner(this->end(subrow), floorplan->row_origin(row).y() + floorplan->row_dimensions(row).y() - 1);
+                    box right_subrow_box(right_subrow_min_corner, right_subrow_max_corner);
+                    subrows_rtree.insert(std::make_pair(right_subrow_box, right_subrow));
+                }
 
                 m_system.destroy(subrow);
                 subrows_rtree.remove(node);
