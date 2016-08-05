@@ -61,6 +61,7 @@ public slots:
     void action_run_SA_triggered();
     void action_run_STA_triggered();
     void action_open_timing_library_triggered();
+    void action_open_ops_triggered();
     void openPreferencesWindow();
 };
 
