@@ -221,8 +221,37 @@ TEST_CASE("flute rc_tree/tap mapping", "[tdp][flute][rc_tree]")
 
 }
 
+TEST_CASE("slice flute rc_tree/with one point", "[tdp][flute][rc_tree]")
+{
+    standard_cell::standard_cells std_cells;
 
-TEST_CASE("flute rc_tree/flute slice", "[tdp][flute][rc_tree][flute_slice]")
+    netlist::netlist netlist{&std_cells};
+    auto n1 = netlist.net_insert("n1");
+    auto u1 = netlist.cell_insert("u1", "INV_X1");
+    auto u1o = netlist.pin_insert(u1, "o");
+
+    timing::library_timing_arcs tarcs{&std_cells};
+    timing::library timing_library{&tarcs, &std_cells};
+
+    netlist.connect(n1, u1o);
+
+
+    entity_system::entity net{n1};
+    placement::library library{&std_cells};
+    library.dist2microns(1000);
+    placement::placement placement{&netlist, &library};
+
+    placement.cell_position(u1, geometry::point<double>(100000, 100000));
+
+    interconnection::rc_tree rc_tree;
+    timingdriven_placement::flute_rc_tree_creator flute;
+
+    auto tap_mapping = flute.create_tree(placement, net, rc_tree, timing_library);
+
+    REQUIRE( rc_tree.capacitor_count() == 2 );
+}
+
+TEST_CASE("slice flute rc_tree/with no divisions", "[tdp][flute][rc_tree]")
 {
     standard_cell::standard_cells std_cells;
 
@@ -239,28 +268,91 @@ TEST_CASE("flute rc_tree/flute slice", "[tdp][flute][rc_tree][flute_slice]")
     netlist.connect(n1, u1o);
     netlist.connect(n1, u2a);
 
-    timing_library.pin_capacitance( netlist.pin_std_cell(u2a), quantity<capacitance>(0*femto*farad) );
+    entity_system::entity net{n1};
+    placement::library library{&std_cells};
+    library.dist2microns(1000);
+    placement::placement placement{&netlist, &library};
+
+    placement.cell_position(u1, geometry::point<double>(100000, 100000));
+    placement.cell_position(u2, geometry::point<double>(200000, 100000));
+
+    interconnection::rc_tree rc_tree;
+    timingdriven_placement::flute_rc_tree_creator flute;
+
+    auto tap_mapping = flute.create_tree(placement, net, rc_tree, timing_library);
+
+    REQUIRE( rc_tree.capacitor_count() == 4 );
+}
+
+TEST_CASE("slice flute rc_tree/with only one division", "[tdp][flute][rc_tree]")
+{
+    standard_cell::standard_cells std_cells;
+
+    netlist::netlist netlist{&std_cells};
+    auto n1 = netlist.net_insert("n1");
+    auto u1 = netlist.cell_insert("u1", "INV_X1");
+    auto u2 = netlist.cell_insert("u2", "INV_X1");
+    auto u1o = netlist.pin_insert(u1, "o");
+    auto u2a = netlist.pin_insert(u2, "a");
+
+    timing::library_timing_arcs tarcs{&std_cells};
+    timing::library timing_library{&tarcs, &std_cells};
+
+    netlist.connect(n1, u1o);
+    netlist.connect(n1, u2a);
 
     entity_system::entity net{n1};
     placement::library library{&std_cells};
     library.dist2microns(1000);
     placement::placement placement{&netlist, &library};
 
-    const double pos1_in_dbu = 10 * static_cast<double>(placement.lib().dist2microns());
-    const double pos2_in_dbu = 20 * static_cast<double>(placement.lib().dist2microns());
-
-    placement.cell_position(u1, geometry::point<double>(pos1_in_dbu, pos1_in_dbu));
-    placement.cell_position(u2, geometry::point<double>(pos2_in_dbu, pos1_in_dbu));
+    placement.cell_position(u1, geometry::point<double>(100000, 100000));
+    placement.cell_position(u2, geometry::point<double>(200001, 100000));
 
     interconnection::rc_tree rc_tree;
     timingdriven_placement::flute_rc_tree_creator flute;
 
-    //flute.max_segment_length(1);
-
     auto tap_mapping = flute.create_tree(placement, net, rc_tree, timing_library);
-    auto dist = ophidian::geometry::manhattan_distance(placement.cell_position(u1), placement.cell_position(u2));
 
-    std::cout<<rc_tree.capacitor_count()<<std::endl;
+    REQUIRE( rc_tree.capacitor_count() == 5 );
+}
 
-    REQUIRE( rc_tree.capacitor_count() == 3 );
+TEST_CASE("slice flute rc_tree/with four points", "[tdp][flute][rc_tree]")
+{
+    standard_cell::standard_cells std_cells;
+
+    netlist::netlist netlist{&std_cells};
+    auto n1 = netlist.net_insert("n1");
+    auto u1 = netlist.cell_insert("u1", "INV_X1");
+    auto u2 = netlist.cell_insert("u2", "INV_X1");
+    auto u3 = netlist.cell_insert("u3", "INV_X1");
+    auto u4 = netlist.cell_insert("u4", "INV_X1");
+    auto u1o = netlist.pin_insert(u1, "o");
+    auto u2a = netlist.pin_insert(u2, "a");
+    auto u3a = netlist.pin_insert(u3, "a");
+    auto u4a = netlist.pin_insert(u4, "a");
+
+    timing::library_timing_arcs tarcs{&std_cells};
+    timing::library timing_library{&tarcs, &std_cells};
+
+    netlist.connect(n1, u1o);
+    netlist.connect(n1, u2a);
+    netlist.connect(n1, u3a);
+    netlist.connect(n1, u4a);
+
+    entity_system::entity net{n1};
+    placement::library library{&std_cells};
+    library.dist2microns(1000);
+    placement::placement placement{&netlist, &library};
+
+    placement.cell_position(u1, geometry::point<double>(200000, 200000));
+    placement.cell_position(u2, geometry::point<double>(300000, 400000));
+    placement.cell_position(u3, geometry::point<double>(500000, 100000));
+    placement.cell_position(u4, geometry::point<double>(500000, 500000));
+
+    interconnection::rc_tree rc_tree;
+    timingdriven_placement::flute_rc_tree_creator flute;
+    auto tap_mapping = flute.create_tree(placement, net, rc_tree, timing_library);
+
+    REQUIRE( rc_tree.capacitor_count() == 14 );
 }

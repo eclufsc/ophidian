@@ -147,12 +147,12 @@ std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id
                 remaining -= local_length;
             }
 
-//            auto tap_v = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_v));
-//            tap_mapping[pin_v] = tap_v;
-//            taps.insert(tap_v);
-//            auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
-//            rc_tree.capacitance(tap_v, pin_cap_v);
-//            rc_tree.resistor_insert(CAP_V, tap_v, quantity<si::resistance>(0.0 * si::ohms));
+              auto tap_v = rc_tree.capacitor_insert(placement.netlist().pin_name(pin_v));
+              tap_mapping[pin_v] = tap_v;
+              taps.insert(tap_v);
+              auto pin_cap_v = library.pin_capacitance(placement.netlist().pin_std_cell(pin_v));
+              rc_tree.capacitance(tap_v, pin_cap_v);
+              rc_tree.resistor_insert(CAP_V, tap_v, quantity<si::resistance>(0.0 * si::ohms));
 
         } else {
 
