@@ -21,7 +21,7 @@ before_install:
   - ./configure
   - make
   - sudo make install
-  - cd ..
+  - cd ../../
 
 before_script:
   - mkdir build
