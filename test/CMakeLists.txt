@@ -11,4 +11,4 @@ add_executable( run_tests ${SOURCE} ${HEADERS} )
 target_link_libraries(run_tests Catch ophidian_entitysystem)
 
 include_directories(${CMAKE_SOURCE_DIR})
-add_test(NAME entity_system COMMAND run_tests)
+add_test(NAME unit_test COMMAND run_tests)

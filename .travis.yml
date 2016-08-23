@@ -6,14 +6,6 @@ dist: trusty
 compiler:
     - gcc
 
-before_install:
-  - mkdir boost
-  - cd boost
-  - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
-  - tar jxf download
-  - sudo cp -r boost_1_59_0/boost /usr/include/
-  - cd ..
-
 before_script:
   - mkdir build
   - cd build
