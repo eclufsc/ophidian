@@ -16,3 +16,4 @@ install_manifest.txt
 /benchmarks
 .project
 .cproject
+/build
