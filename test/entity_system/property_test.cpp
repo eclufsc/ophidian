@@ -1,107 +1,131 @@
+#include "property_test.h"
 #include <catch.hpp>
 
-#include <ophidian/entity_system/property.h>
-
-#include "entity_system_fixture.h"
+#include <ophidian/entity_system/Property.h>
 
 using namespace ophidian::entity_system;
 
-TEST_CASE("property: constructor & destructor", "[property]"){
-    property<int> * prop;
-    REQUIRE_NOTHROW(prop = new property<int>);
-    REQUIRE_NOTHROW(delete prop);
-    REQUIRE(entity_system::null().properties_size() == 0);
-}
+MyEntity::MyEntity() : EntityBase()
+{}
 
-TEST_CASE("property: assignment", "[property]"){
-    entity_system sys;
-    make_entities<10>(sys);
-    property<int> prop{make_property<int>(sys)};
-    property<int> prop2;
-    prop2 = prop;
+MyEntity::MyEntity(uint32_t id, EntitySystemBase *system) :
+    EntityBase(id, system)
+{}
 
-    REQUIRE( sys.properties_size() == 2 );
-    REQUIRE( prop2.system() == prop.system() );
-    REQUIRE( !entity_system::null().has_property(prop) );
-    REQUIRE( !entity_system::null().has_property(prop2) );
-    REQUIRE( entity_system::null().properties_size() == 0 );
-    REQUIRE( sys.has_property(prop) );
-    REQUIRE( sys.has_property(prop2) );
-    REQUIRE( prop.size() == 10 );
-    REQUIRE( prop2.size() == 10 );
+class MyDummyProperty {
+public:
+    MyDummyProperty() {}
+};
 
-    auto last_created = sys.create();
-
-    REQUIRE(prop.size() == 11);
-    REQUIRE(prop2.size() == 11);
-
-    sys.destroy(last_created);
-
-    REQUIRE( prop.size() == 10 );
-    REQUIRE( prop2.size() == 10 );
-
-    sys.clear();
-
+TEST_CASE("Property: null property", "[entity_system][Property]")
+{
+    Property<MyEntity, MyDummyProperty> prop;
+    REQUIRE( prop.empty() );
     REQUIRE( prop.size() == 0 );
-    REQUIRE( prop2.size() == 0 );
 }
 
 
-
-TEST_CASE("property: can't access", "[property]") {
-    property<int> prop;
-    entity_system::entity en;
-    REQUIRE_THROWS(prop[en]);
-    REQUIRE(entity_system::null().has_property(prop));
-    REQUIRE(prop.system() == entity_system::null());
+TEST_CASE("Property: constructor before creating entities", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   Property<MyEntity, MyDummyProperty> prop(sys);
+   REQUIRE( prop.size() == 0 );
+   sys.add();
+   REQUIRE( prop.size() == 1 );
 }
 
-TEST_CASE("property: set entity system", "[property]") {
-    entity_system sys1;
-    property<int> prop;
-    prop.system(sys1);
-    REQUIRE(!entity_system::null().has_property(prop));
-    REQUIRE(entity_system::null().properties_size() == 0);
-    REQUIRE(sys1.has_property(prop));
-    REQUIRE(sys1.properties_size() == 1);
-    REQUIRE(prop.system() == sys1);
+TEST_CASE("Property: constructor after creating entities", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   sys.add();
+   Property<MyEntity, MyDummyProperty> prop(sys);
+   REQUIRE( prop.size() == 1 );
 }
 
-TEST_CASE_METHOD(entity_system_test::empty_system, "property: is attached to system", "[property]") {
-    property<int> prop{make_property<int>(sys)};
-    REQUIRE(prop.system() == sys);
-    REQUIRE(sys.has_property(prop));
-}
-
-TEST_CASE_METHOD(entity_system_test::empty_system, "property: dettach property from system", "[property]") {
-    property<int> prop{make_property<int>(sys)};
-    prop.system(entity_system::null());
-    REQUIRE(entity_system::null().has_property(prop));
-    REQUIRE(prop.system() == entity_system::null());
-    REQUIRE(!sys.has_property(prop));
-    REQUIRE(sys.properties_size() == 0);
-}
-
-TEST_CASE_METHOD(entity_system_test::empty_system, "property: helper to create properties", "[property]") {
-    property<int> prop_1;
-    property<int> prop_2{make_property<int>(sys)};
-    auto en = sys.create();
-    REQUIRE(sys.has_property(prop_2));
-    REQUIRE(!sys.has_property(prop_1));
-    REQUIRE(entity_system::null().has_property(prop_1));
-    REQUIRE_NOTHROW(prop_2[en] = 2);
-    REQUIRE(prop_2[en] == 2);
-    REQUIRE_NOTHROW( prop_2[en] );
+TEST_CASE("Property: assignment operator", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   Property<MyEntity, MyDummyProperty> prop;
+   // ...
+   prop = Property<MyEntity, MyDummyProperty>(sys);
+   sys.add();
+   REQUIRE( prop.size() == 1 );
 }
 
 
+TEST_CASE("Property: lazy assignment operator", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   Property<MyEntity, MyDummyProperty> prop;
+   sys.add();
+   prop = Property<MyEntity, MyDummyProperty>(sys);
+   REQUIRE( prop.size() == 1 );
+}
 
-TEST_CASE_METHOD(entity_system_test::system_with_1_entity, "property<bool>", "[property]") {
-    property<bool> prop(make_property<bool>(sys));
-    prop[entity<0>()] = false;
-    REQUIRE( !prop[entity<0>()] );
-    prop[entity<0>()] = true;
-    REQUIRE( prop[entity<0>()] );
+TEST_CASE("Property: move constructor", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   Property<MyEntity, MyDummyProperty> prop = Property<MyEntity, MyDummyProperty>(sys);
+   REQUIRE( prop.size() == 0 );
+   sys.add();
+   REQUIRE( prop.size() == 1 );
+}
 
+TEST_CASE("Property: move constructor after creating entities", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   sys.add();
+   Property<MyEntity, MyDummyProperty> prop = Property<MyEntity, MyDummyProperty>(sys);
+   REQUIRE( prop.size() == 1 );
+}
+
+
+TEST_CASE("Property: subscript operator", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   auto entity = sys.add();
+   Property<MyEntity, int> prop(sys);
+   prop[entity] = 3;
+   REQUIRE( prop[entity] == 3 );
+   prop[entity] = 2;
+   REQUIRE( prop[entity] == 2 );
+}
+
+TEST_CASE("Property: const subscript operator", "[entity_system][Property]")
+{
+   EntitySystem<MyEntity> sys;
+   auto entity = sys.add();
+   Property<MyEntity, int> prop(sys);
+   prop[entity] = 3;
+
+   auto funct = [entity](const Property<MyEntity, int> & prop){
+        auto element = prop[entity];
+//        auto& element = prop[entity]; -> doesn't compile!!
+        element = 0;
+   };
+   funct(prop);
+   REQUIRE( prop[entity] == 3 );
+}
+
+TEST_CASE("Property: subscript operator (3 elements)", "[entity_system][Property]") {
+    EntitySystem<MyEntity> sys;
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    auto en3 = sys.add();
+
+    Property<MyEntity, int> prop(sys);
+    prop[en1] = 0;
+    prop[en2] = 1;
+    prop[en3] = 2;
+
+    REQUIRE( prop[en1] == 0 );
+    REQUIRE( prop[en2] == 1 );
+    REQUIRE( prop[en3] == 2 );
+
+    prop[en2] = 4;
+
+    REQUIRE( prop[en1] == 0 );
+    REQUIRE( prop[en2] == 4 );
+    REQUIRE( prop[en3] == 2 );
 }
 
