@@ -1,5 +1,5 @@
 project(ophidian)
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.2.2)
 set (CMAKE_CXX_STANDARD 14)
 
 # Fetch Lemon and setup project to use Lemon as 3rdparty library
