@@ -41,6 +41,44 @@ namespace ophidian
                 {
 
                 }
+
+                typename ContainerType::reference operator[](const Entity& entity)
+                {
+                    return properties_[Parent::notifier()->id(entity)];
+                }
+                typename ContainerType::const_reference operator[](const Entity& entity) const
+                {
+                    return properties_[Parent::notifier()->id(entity)];
+                }
+
+                typename ContainerType::iterator begin()
+                {
+                    return properties_.begin();
+                }
+                typename ContainerType::iterator end()
+                {
+                    return properties_.end();
+                }
+
+                typename ContainerType::const_iterator begin() const
+                {
+                    return properties_.begin();
+                }
+                typename ContainerType::const_iterator end() const
+                {
+                    return properties_.end();
+                }
+                typename ContainerType::size_type size() const
+                {
+                    return properties_.size();
+                }
+                bool empty() const
+                {
+                    return properties_.empty();
+                }
+
+        protected:
+
                 virtual void add(const Entity& item) override
                 {
                     properties_.resize(properties_.size() + 1);
@@ -61,38 +99,17 @@ namespace ophidian
                         erase(item);
                     }
                 }
+
                 virtual void build() override
                 {
 
                 }
+
                 virtual void clear() override
                 {
                     properties_.clear();
                 }
-                typename ContainerType::reference operator[](const Entity& entity)
-                {
-                    return properties_[Parent::notifier()->id(entity)];
-                }
-                typename ContainerType::const_reference operator[](const Entity& entity) const
-                {
-                    return properties_[Parent::notifier()->id(entity)];
-                }
-                typename ContainerType::const_iterator begin() const
-                {
-                    return properties_.begin();
-                }
-                typename ContainerType::const_iterator end() const
-                {
-                    return properties_.end();
-                }
-                typename ContainerType::size_type size() const
-                {
-                    return properties_.size();
-                }
-                bool empty() const
-                {
-                    return properties_.empty();
-                }
+
             protected:
                 ContainerType properties_;
         };
