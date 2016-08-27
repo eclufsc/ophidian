@@ -1,0 +1,5 @@
+#ifndef AGGREGATION_TEST_H
+#define AGGREGATION_TEST_H
+
+
+#endif // AGGREGATION_TEST_H

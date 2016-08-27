@@ -1,7 +1,6 @@
 #include "composition_test.h"
 #include <catch.hpp>
 
-
 using namespace ophidian::entity_system;
 
 PartEntity::PartEntity(uint32_t id, EntitySystemBase *system) :
