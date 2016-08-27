@@ -71,6 +71,7 @@ TEST_CASE_METHOD(AddWhole<PartAndWholeSystem>, "Composition: whole without parts
 TEST_CASE_METHOD(AddPart<PartAndWholeSystem>, "Composition: unassigned part", "[entity_system][Property][Composition][EntitySystem]")
 {
     REQUIRE( composition().whole(part()) == WholeSystem::Entity() );
+    parts().erase(part());
 }
 
 TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "Composition: add part to whole", "[entity_system][Property][Composition][EntitySystem]")
@@ -114,12 +115,59 @@ TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "Comp
     REQUIRE( parts().empty() );
 }
 
-TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "[entity_system][Property][Composition][EntitySystem]")
+TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "Composition: clear wholes, erase attached parts", "[entity_system][Property][Composition][EntitySystem]")
 {
     auto nonAttached = parts().add();
     wholes().clear();
     REQUIRE( !parts().valid(part()) );
     REQUIRE( parts().valid(nonAttached) );
 }
+
+TEST_CASE("Composition: self composition", "[entity_system][Property][Composition][EntitySystem]")
+{
+    EntitySystem<WholeEntity> sys;
+    Composition<WholeEntity, WholeEntity> compo(sys, sys);
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    compo.addPart(en1, en2);
+    REQUIRE( std::count(compo.parts(en1).begin(), compo.parts(en1).end(), en2) == 1 );
+}
+
+
+TEST_CASE("Composition: self composition erase parent", "[entity_system][Property][Composition][EntitySystem]")
+{
+    EntitySystem<WholeEntity> sys;
+    Composition<WholeEntity, WholeEntity> compo(sys, sys);
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    compo.addPart(en1, en2);
+    sys.erase(en1);
+    REQUIRE( !sys.valid(en2) );
+    REQUIRE( sys.empty() );
+}
+
+TEST_CASE("Composition: self composition erase child", "[entity_system][Property][Composition][EntitySystem]")
+{
+    EntitySystem<WholeEntity> sys;
+    Composition<WholeEntity, WholeEntity> compo(sys, sys);
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    compo.addPart(en1, en2);
+    sys.erase(en2);
+    REQUIRE( compo.parts(en1).empty() );
+    REQUIRE( !sys.valid(en2) );
+}
+
+TEST_CASE("Composition: self composition clear", "[entity_system][Property][Composition][EntitySystem]")
+{
+    EntitySystem<WholeEntity> sys;
+    Composition<WholeEntity, WholeEntity> compo(sys, sys);
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    compo.addPart(en1, en2);
+    sys.clear();
+    REQUIRE( compo.empty() );
+}
+
 
 

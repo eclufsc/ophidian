@@ -19,7 +19,7 @@ public:
 
 using WholeSystem = ophidian::entity_system::EntitySystem<WholeEntity> ;
 using PartSystem = ophidian::entity_system::EntitySystem<PartEntity> ;
-using SimpleComposition = ophidian::entity_system::Composition<WholeSystem::Entity, PartEntity::PartEntity>;
+using SimpleComposition = ophidian::entity_system::Composition<WholeSystem::Entity, PartSystem::Entity>;
 
 namespace fixture {
 

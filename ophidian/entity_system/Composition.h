@@ -29,11 +29,10 @@ namespace ophidian
         };
 
 
-
-
         template <class WholeEntity_, class PartEntity_>
-        class Composition : public Property<WholeEntity_, std::vector<PartEntity_> >
+        class CompositionBase : public Property<WholeEntity_, std::vector<PartEntity_> >
         {
+            protected:
                 using Whole = WholeEntity_;
                 using Part = PartEntity_;
                 using PartContainer = std::vector<Part>;
@@ -41,22 +40,45 @@ namespace ophidian
                 using WholeSystem = EntitySystem<Whole>;
                 using PartSystem = EntitySystem<Part>;
 
+                void eraseAllUnattachedParts()
+                {
+                    std::deque<Part> toErase;
+                    std::copy_if(partSystem_.begin(), partSystem_.end(),
+                                 std::back_inserter(toErase), [this](const Part & p)->bool{ return !(whole(p) == Whole()); });
+                    std::for_each(toErase.cbegin(), toErase.cend(), std::bind(&PartSystem::erase, &partSystem_,
+                                  std::placeholders::_1));
+                }
+
+                void eraseAllParts(const Whole& w)
+                {
+                    auto const& wholeParts = parts(w);
+                    std::for_each(wholeParts.begin(), wholeParts.end(), std::bind(&PartSystem::erase, &partSystem_,
+                                  std::placeholders::_1));
+                }
+
+
 
                 class PartOfComposition : public Property<Part, Whole >
                 {
                     public:
                         using Parent = Property<Part, Whole >;
-                        PartOfComposition(const EntitySystem<Part>& partSystem, Composition& composition) :
+                        PartOfComposition(const EntitySystem<Part>& partSystem, CompositionBase& composition) :
                             Parent(partSystem),
                             composition_(composition)
                         {
-
                         }
+
                     private:
 
                         void erase(const Part& item) override
                         {
-                            composition_.erasePart((*this)[item], item);
+                            const Whole& whole = (*this)[item];
+
+                            if (!(whole == Whole()))
+                            {
+                                composition_.erasePart((*this)[item], item);
+                            }
+
                             Parent::erase(item);
                         }
 
@@ -73,17 +95,17 @@ namespace ophidian
                             composition_.clearAllPartsContainers();
                         }
 
-                        Composition& composition_;
+                        CompositionBase& composition_;
                 };
 
             public:
 
-                Composition(const WholeSystem& whole, PartSystem& part)  :
+                CompositionBase(const WholeSystem& whole, PartSystem& part)  :
                     Parent(whole),
                     part2Whole_(part, *this),
                     partSystem_(part)
                 {
-
+                    Parent::detach();
                 }
 
                 Whole whole(const Part& p) const
@@ -107,47 +129,72 @@ namespace ophidian
                     parts.erase(std::find(parts.begin(), parts.end(), p), parts.end());
                 }
 
+                void clearParts(const Whole & w)
+                {
+                    auto& parts = (*this)[w];
+                    for(auto const & p : parts)
+                    {
+                        part2Whole_[p] = Whole();
+                    }
+                    parts.clear();
+                }
+
                 const PartContainer& parts(const Whole& w) const
                 {
                     return (*this)[w];
                 }
 
 
+                using Parent::clear;
+                using Parent::erase;
+
             private:
-                void eraseAllUnattachedParts()
-                {
-                    std::deque<Part> toErase;
-                    std::copy_if(partSystem_.begin(), partSystem_.end(), std::back_inserter(toErase), [this](const Part& p)->bool{ return !(part2Whole_[p] == Whole()); });
-                    std::for_each(toErase.cbegin(), toErase.cend(), std::bind(&PartSystem::erase, &partSystem_, std::placeholders::_1));
-                }
-
-                void eraseAllParts(const Whole& w)
-                {
-                    auto const &wholeParts = parts(w);
-                    std::for_each(wholeParts.begin(), wholeParts.end(), std::bind(&PartSystem::erase, &partSystem_, std::placeholders::_1));
-                }
-
                 void clearAllPartsContainers()
                 {
                     std::for_each(Parent::begin(), Parent::end(), std::bind(&PartContainer::clear, std::placeholders::_1));
                 }
 
+                PartOfComposition part2Whole_;
+            protected:
+                PartSystem& partSystem_;
+        };
+
+        template <typename WholeEntity_, typename PartEntity_>
+        class Composition : public CompositionBase<WholeEntity_, PartEntity_>
+        {
+            public:
+                using Parent = CompositionBase<WholeEntity_, PartEntity_>;
+                using WholeSystem = typename Parent::WholeSystem;
+                using PartSystem = typename Parent::PartSystem;
+                using Whole = typename Parent::Whole;
+                using Part = typename Parent::Part;
+
+                Composition(const WholeSystem& whole, PartSystem& part) :
+                    Parent(whole, part)
+                {
+                    Parent::attach(*whole.notifier());
+                }
                 void erase(const Whole& whole) override
                 {
-                    eraseAllParts(whole);
+                    while(!Parent::parts(whole).empty())
+                    {
+                        auto last_it = Parent::parts(whole).end();
+                        --last_it;
+                        Parent::partSystem_.erase(*last_it);
+                    }
                     Parent::erase(whole);
                 }
 
                 void clear() override
                 {
-                    eraseAllUnattachedParts();
+                    Parent::eraseAllUnattachedParts();
                     Parent::clear();
                 }
-
-
-                PartOfComposition part2Whole_;
-                PartSystem& partSystem_;
+            private:
         };
+
+
+
 
     }
 }
