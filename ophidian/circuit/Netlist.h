@@ -106,8 +106,9 @@ namespace ophidian
                 entity_system::EntitySystem<Cell>::const_iterator end(Cell) const;
                 //! Make Cell Property
                 /*!
-                  \brief Returns a Property for the Cell's Entity System.
-                  \return Property<Cell, Value>
+                  \brief Creates a Property for the Cell's Entity System.
+                  \tparam Value value type of the Property.
+                  \return An Cell => \p Value Map.
                 */
                 template <typename Value>
                 entity_system::Property<Cell, Value> makeProperty(Cell)
@@ -131,7 +132,7 @@ namespace ophidian
                 /*!
                   \brief Adds a Pin to a given Cell.
                   \param cell A handler to the Cell we want to add a Pin.
-                  \param pin A handler to the Pin we want to add in cell.
+                  \param pin A handler to the Pin we want to add in \p cell.
                 */
                 void add(const Cell& cell, const Pin& pin);
 
@@ -169,8 +170,9 @@ namespace ophidian
                 entity_system::EntitySystem<Pin>::const_iterator end(Pin) const;
                 //! Make Pin Property
                 /*!
-                  \brief Returns a Property for the Pin's Entity System.
-                  \return Property<Pin, Value>
+                  \brief Creates a Property for the Pin's Entity System.
+                  \tparam Value value type of the Property.
+                  \return An Pin => \p Value Map.
                 */
                 template <typename Value>
                 entity_system::Property<Pin, Value> makeProperty(Pin)
@@ -187,8 +189,8 @@ namespace ophidian
                 /*!
                   \brief Returns the Net of a given Pin.
                   \param pin A handler to the Pin we want to get the Net.
-                  \return A handler to the Net of pin.
-                  \remark If the Pin is disconnected, returns Net().
+                  \return A handler to the Net of \p pin.
+                  \remark If \p pin is disconnected, returns Net().
                 */
                 Net net(const Pin& pin) const;
                 //! Disconnect Pin
@@ -201,10 +203,9 @@ namespace ophidian
                 /*!
                   \brief Returns the Cell of a Pin.
                   \param pin A handler to the Pin we want to get the Cell.
-                  \remark If the Pin doesn't have a Cell, returns Cell().
+                  \remark If \p pin doesn't have a Cell, returns Cell().
                 */
                 Cell cell(const Pin& pin) const;
-
 
                 //! Add Net
                 /*!
@@ -238,8 +239,9 @@ namespace ophidian
                 entity_system::EntitySystem<Net>::const_iterator end(Net) const;
                 //! Make Net Property
                 /*!
-                  \brief Returns a Property for the Net's Entity System.
-                  \return Property<Net, Value>
+                  \brief Creates a Property for the Net's Entity System.
+                  \tparam Value value type of the Property.
+                  \return An Net => \p Value Map.
                 */
                 template <typename Value>
                 entity_system::Property<Net, Value> makeProperty(Net)
@@ -256,13 +258,13 @@ namespace ophidian
                 /*!
                   \brief Returns a constant reference to a Container containing the Pins of a given Net.
                   \param net A handler to a Net.
-                  \return A constant reference to a Container containing the Pins of net.
+                  \return A constant reference to a Container containing the Pins of \p net.
                 */
                 const entity_system::Aggregation<Net, Pin>::PartContainer& pins(const Net& net) const;
                 //! Connect Pin on Net
                 /*!
                   \brief Connects a Pin
-                  \param net A handler to the Net we want to connect pin.
+                  \param net A handler to the Net we want to connect \p pin.
                   \param pin A handler to the Pin we want to connect.
                 */
                 void connect(const Net& net, const Pin& pin);
@@ -275,24 +277,24 @@ namespace ophidian
                 uint32_t size(Input) const;
                 //! Create an Input
                 /*!
-                  \brief Creates an Input for a given Pin
-                  \param pin The Pin we want to create an Input
-                  \return A handler to the created Input
+                  \brief Creates an Input for a given Pin.
+                  \param pin The Pin we want to create an Input.
+                  \return A handler to the created Input.
                 */
                 Input add(Input, const Pin& pin);
                 //! Pin of an Input
                 /*!
-                  \brief Returns the Pin of a given Input
-                  \param input the Input we want the Pin
-                  \return A handler to the Pin of input
+                  \brief Returns the Pin of a given Input.
+                  \param input the Input we want the Pin.
+                  \return A handler to the Pin of \p input.
                 */
                 Pin pin(const Input& input) const;
                 //! Input of a Pin
                 /*!
-                  \brief Returns the Input of a given Pin
-                  \param pin the Pin we want the Input
-                  \return A handler to the Input of pin
-                  \remark If pin isn't associated with any Input, returns Input()
+                  \brief Returns the Input of a given Pin.
+                  \param pin the Pin we want the Input.
+                  \return A handler to the Input of \p pin.
+                  \remark If \p pin isn't associated with any Input, returns Input().
                 */
                 Input input(const Pin& pin) const;
                 //! Iterator to beginning
@@ -307,6 +309,23 @@ namespace ophidian
                   \return Iterator referring to the past-the-end element in the Input's EntitySystem.
                 */
                 entity_system::EntitySystem<Input>::const_iterator end(Input) const;
+                //! Make Input Property
+                /*!
+                  \brief Creates a Property for the Input's Entity System.
+                  \tparam Value value type of the Property.
+                  \return An Input => \p Value Map.
+                */
+                template <typename Value>
+                entity_system::Property<Input, Value> makeProperty(Input)
+                {
+                    return entity_system::Property<Input, Value>(inputs_);
+                }
+                //! Get the Input Notifier
+                /*!
+                  \brief Returns a pointer to the AlterationNotifier of the Input's Entity System.
+                  \return A pointer to the AlterationNotifier of the Input's Entity System.
+                */
+                entity_system::EntitySystem<Input>::NotifierType* notifier(Input) const;
 
                 //! Number of Outputs
                 /*!
@@ -316,38 +335,55 @@ namespace ophidian
                 uint32_t size(Output) const;
                 //! Create an Output
                 /*!
-                  \brief Creates an Output for a given Pin
-                  \param pin The Pin we want to create an Output
-                  \return A handler to the created Output
+                  \brief Creates an Output for a given Pin.
+                  \param pin The Pin we want to create an Output.
+                  \return A handler to the created Output.
                 */
                 Output add(Output, const Pin& pin);
                 //! Pin of an Output
                 /*!
-                  \brief Returns the Pin of a given Output
-                  \param output the Output we want the Pin
-                  \return A handler to the Pin of output
+                  \brief Returns the Pin of a given Output.
+                  \param output the Output we want the Pin.
+                  \return A handler to the Pin of \p output.
                 */
                 Pin pin(const Output& output) const;
                 //! Output of a Pin
                 /*!
                   \brief Returns the Output of a given Pin
-                  \param pin the Pin we want the Output
-                  \return A handler to the Output of pin
-                  \remark If pin isn't associated with any Output, returns Output()
+                  \param pin the Pin we want the Output.
+                  \return A handler to the Output of \p pin.
+                  \remark If pin isn't associated with any Output, returns Output().
                 */
                 Output output(const Pin& pin) const;
                 //! Iterator to beginning
                 /*!
-                  \brief Returns an iterator pointing to the first element in the Output's EntitySystem.
-                  \return Iterator to the first element in the Output's EntitySystem.
+                  \brief Returns an iterator pointing to the first element in the Output's Entity System.
+                  \return Iterator to the first element in the Output's Entity System.
                 */
                 entity_system::EntitySystem<Output>::const_iterator begin(Output) const;
                 //! Iterator to end
                 /*!
-                  \brief Returns an iterator referring to the past-the-end element in the Output's EntitySystem.
-                  \return Iterator referring to the past-the-end element in the Output's EntitySystem.
+                  \brief Returns an iterator referring to the past-the-end element in the Output's Entity System.
+                  \return Iterator referring to the past-the-end element in the Output's Entity System.
                 */
                 entity_system::EntitySystem<Output>::const_iterator end(Output) const;
+                //! Make Output Property
+                /*!
+                  \brief Creates a Property for the Output's Entity System.
+                  \tparam Value value type of the Property.
+                  \return An Output => \p Value Map.
+                */
+                template <typename Value>
+                entity_system::Property<Output, Value> makeProperty(Output)
+                {
+                    return entity_system::Property<Output, Value>(outputs_);
+                }
+                //! Get the Output Notifier
+                /*!
+                  \brief Returns a pointer to the AlterationNotifier of the Output's Entity System.
+                  \return A pointer to the AlterationNotifier of the Output's Entity System.
+                */
+                entity_system::EntitySystem<Output>::NotifierType* notifier(Output) const;
 
             private:
                 Netlist(const Netlist& nl) = delete;

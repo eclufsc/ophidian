@@ -191,6 +191,11 @@ entity_system::EntitySystem<Input>::const_iterator Netlist::end(Input) const
     return inputs_.end();
 }
 
+entity_system::EntitySystem<Input>::NotifierType *Netlist::notifier(Input) const
+{
+    return inputs_.notifier();
+}
+
 uint32_t Netlist::size(Output) const
 {
     return outputs_.size();
@@ -225,6 +230,11 @@ entity_system::EntitySystem<Output>::const_iterator Netlist::begin(Output) const
 entity_system::EntitySystem<Output>::const_iterator Netlist::end(Output) const
 {
     return outputs_.end();
+}
+
+entity_system::EntitySystem<Output>::NotifierType *Netlist::notifier(Output) const
+{
+    return outputs_.notifier();
 }
 
 }
