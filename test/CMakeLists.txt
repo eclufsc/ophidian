@@ -9,7 +9,7 @@ add_subdirectory(entity_system)
 add_subdirectory(circuit)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
-target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit)
+target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit verilogparser)
 
 include_directories(${CMAKE_SOURCE_DIR})
 add_test(NAME unit_test COMMAND run_tests)
