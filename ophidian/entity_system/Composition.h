@@ -19,6 +19,7 @@ namespace ophidian
                 using PartSystem = typename Parent::PartSystem;
                 using Whole = typename Parent::Whole;
                 using Part = typename Parent::Part;
+                using PartContainer = typename Parent::PartContainer;
 
                 Composition(const WholeSystem& whole, PartSystem& part) :
                     Parent(whole, part)

@@ -23,6 +23,7 @@ namespace ophidian
                 EntityBase();
                 ~EntityBase();
                 bool operator==(const EntityBase& entity) const;
+                bool operator!=(const EntityBase& entity) const;
             private:
                 uint32_t id_;
                 EntitySystemBase* system_;

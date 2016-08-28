@@ -15,6 +15,7 @@ class Aggregation : public Association<WholeEntity_, PartEntity_>
         using PartSystem = typename Parent::PartSystem;
         using Whole = typename Parent::Whole;
         using Part = typename Parent::Part;
+        using PartContainer = typename Parent::PartContainer;
 
         Aggregation(const WholeSystem& whole, PartSystem& part) :
             Parent(whole, part)
