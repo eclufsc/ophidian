@@ -102,7 +102,7 @@ class Association : public Property<WholeEntity_, std::vector<PartEntity_> >
             auto& parts = (*this)[w];
             assert(std::count(parts.cbegin(), parts.cend(), p) == 1);
             part2Whole_[p] = Whole();
-            parts.erase(std::find(parts.begin(), parts.end(), p), parts.end());
+            parts.erase(std::find(parts.begin(), parts.end(), p));
         }
 
         void clearParts(const Whole & w)
