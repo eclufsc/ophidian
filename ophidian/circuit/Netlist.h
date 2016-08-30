@@ -121,6 +121,14 @@ namespace ophidian
                   \return A pointer to the AlterationNotifier of the Cell's EntitySystem.
                 */
                 entity_system::EntitySystem<Cell>::NotifierType* notifier(Cell) const;
+                //! Allocate space for storing Cell entities
+                /*!
+                  \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the netlist.
+                  \param size Minimum capacity for the cell container.
+                */
+                void reserve(Cell, uint32_t size);
+
+                std::uint32_t capacity(Cell) const; // TODO documentation
                 //! Pins of a Cell
                 /*!
                   \brief Returns a constant reference to a Container containing the Pins of a given Cell.
@@ -185,6 +193,13 @@ namespace ophidian
                   \return A pointer to the AlterationNotifier of the Pin's EntitySystem.
                 */
                 entity_system::EntitySystem<Pin>::NotifierType* notifier(Pin) const;
+                //! Allocate space for storing Pin entities
+                /*!
+                  \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the netlist.
+                  \param size Minimum capacity for the Pin container.
+                */
+                void reserve(Pin, uint32_t size);
+                std::uint32_t capacity(Pin) const; // TODO documentation
                 //! Net of a Pin
                 /*!
                   \brief Returns the Net of a given Pin.
@@ -254,6 +269,14 @@ namespace ophidian
                   \return A pointer to the AlterationNotifier of the Net's EntitySystem.
                 */
                 entity_system::EntitySystem<Net>::NotifierType* notifier(Net) const;
+                //! Allocate space for storing Net entities
+                /*!
+                  \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions nets), then it is worth reserving space for this amount before starting to build the netlist.
+                  \param size Minimum capacity for the Net container.
+                */
+                void reserve(Net, uint32_t size);
+                std::uint32_t capacity(Net) const; // TODO documentation
+
                 //! Pins of a Net
                 /*!
                   \brief Returns a constant reference to a Container containing the Pins of a given Net.
@@ -385,6 +408,11 @@ namespace ophidian
                 */
                 entity_system::EntitySystem<Output>::NotifierType* notifier(Output) const;
 
+                //! Shrink Netlist
+                /*!
+                  \brief Shrink each EntitySystem in order to improve the memory usage.
+                */
+                void shrink();
             private:
                 Netlist(const Netlist& nl) = delete;
                 Netlist& operator =(const Netlist& nl) = delete;

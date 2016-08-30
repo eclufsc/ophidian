@@ -2,6 +2,7 @@
 #define VERILOGPARSER_H
 
 #include "Netlist.h"
+#include <unordered_map>
 
 namespace ophidian {
 namespace circuit {
@@ -12,9 +13,9 @@ public:
     VerilogParser();
     Netlist *createNetlist(std::istream & input);
 private:
-    std::map<std::string, Cell> cells_;
-    std::map<std::string, Pin> pins_;
-    std::map<std::string, Net> nets_;
+    std::unordered_map<std::string, Cell> cells_;
+    std::unordered_map<std::string, Pin> pins_;
+    std::unordered_map<std::string, Net> nets_;
     Cell createCell(Netlist *nl, const std::string & name);
     Pin createPin(Netlist *nl, const std::string & name);
     Net createNet(Netlist *nl, const std::string & name);

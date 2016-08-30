@@ -77,6 +77,19 @@ namespace ophidian
                     return properties_.empty();
                 }
 
+                void reserve(std::uint32_t size)
+                {
+                    properties_.reserve(size);
+                }
+
+                void shrink() {
+                    properties_.shrink_to_fit();
+                }
+
+                std::uint32_t capacity() const {
+                    return properties_.capacity();
+                }
+
         protected:
 
                 virtual void add(const Entity& item) override

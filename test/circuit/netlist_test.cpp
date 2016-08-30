@@ -252,3 +252,25 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
     REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
 
 }
+
+TEST_CASE("Netlist: Reserve, Capacity & Shrink.", "[circuit][Netlist]")
+{
+    Netlist nl;
+    nl.reserve(Cell(), 42);
+    nl.reserve(Net(), 43);
+    nl.reserve(Pin(), 44);
+    REQUIRE( nl.capacity(Cell()) == 42 );
+    REQUIRE( nl.capacity(Net()) == 43 );
+    REQUIRE( nl.capacity(Pin()) == 44 );
+    nl.add(Cell()); nl.add(Cell()); nl.add(Cell());
+    nl.add(Net()); nl.add(Net());
+    nl.add(Pin());
+    REQUIRE( nl.capacity(Cell()) == 42 );
+    REQUIRE( nl.capacity(Net()) == 43 );
+    REQUIRE( nl.capacity(Pin()) == 44 );
+    nl.shrink();
+    REQUIRE( nl.capacity(Cell()) == 3 );
+    REQUIRE( nl.capacity(Net()) == 2 );
+    REQUIRE( nl.capacity(Pin()) == 1 );
+
+}

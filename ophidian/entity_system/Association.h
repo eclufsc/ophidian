@@ -34,8 +34,6 @@ class Association : public Property<WholeEntity_, std::vector<PartEntity_> >
                           std::placeholders::_1));
         }
 
-
-
         class PartOfComposition : public Property<Part, Whole >
         {
             public:
@@ -120,6 +118,10 @@ class Association : public Property<WholeEntity_, std::vector<PartEntity_> >
         const PartContainer& parts(const Whole& w) const
         {
             return (*this)[w];
+        }
+
+        void reservePart(uint32_t size) {
+            part2Whole_.reserve(size);
         }
 
 

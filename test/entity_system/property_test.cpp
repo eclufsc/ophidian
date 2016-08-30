@@ -129,3 +129,18 @@ TEST_CASE("Property: subscript operator (3 elements)", "[entity_system][Property
     REQUIRE( prop[en3] == 2 );
 }
 
+
+TEST_CASE("Property: reserve, capacity & shrink", "[entity_system][Property]") {
+    EntitySystem<MyEntity> sys;
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+    auto en3 = sys.add();
+
+    Property<MyEntity, int> prop(sys);
+    prop.reserve(42);
+    REQUIRE( prop.capacity() == 42 );
+    prop.shrink();
+    REQUIRE( prop.capacity() == 3 );
+
+}
+

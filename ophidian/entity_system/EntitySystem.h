@@ -121,6 +121,10 @@ namespace ophidian
                     return id_;
                 }
 
+                void shrink() {
+                    container_.shrink_to_fit();
+                }
+
             private:
                 NotifierType notifier_;
                 ContainerType container_;

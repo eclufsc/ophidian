@@ -59,3 +59,14 @@ TEST_CASE("EntitySystem: clear", "[entity_system][EntitySystem]") {
     REQUIRE( sys.size() == 0 );
     REQUIRE( sys.empty() );
 }
+
+
+TEST_CASE("EntitySystem: shrink", "[entity_system][EntitySystem]") {
+    EntitySystem<Entity> sys;
+    sys.reserve(35);
+    sys.add();
+    sys.add();
+    sys.add();
+    sys.shrink();
+    REQUIRE( sys.capacity() == 3 );
+}

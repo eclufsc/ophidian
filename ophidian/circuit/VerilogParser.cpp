@@ -55,6 +55,10 @@ namespace ophidian
             std::vector<char> buffer((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
             int result = verilog_parse_string(buffer.data(), buffer.size());
 
+            nl->reserve(Cell(), 4000000);
+            nl->reserve(Net(), 4000000);
+            nl->reserve(Pin(), 8000000);
+
             if (result)
             {
                 return nullptr;
@@ -66,13 +70,16 @@ namespace ophidian
             ast_module_declaration* module = static_cast<ast_module_declaration*>(ast_list_get(source -> modules, 0));
 
 
-            for (uint32_t i = 0; i < module->module_ports->items; i++)
+            ast_list_element* portWalker0 = module->module_ports->head;
+            while (portWalker0)
             {
-                ast_port_declaration* port = static_cast<ast_port_declaration*>(ast_list_get(module->module_ports, i));
+                ast_port_declaration* port = static_cast<ast_port_declaration*>(portWalker0->data);
+                ast_list_element * portNameWalker = port->port_names->head;
 
-                for (uint32_t j = 0; j < port->port_names->items; ++j)
+                while (portNameWalker)
                 {
-                    ast_identifier identifier = static_cast<ast_identifier>(ast_list_get(port->port_names, j));
+
+                    ast_identifier identifier = static_cast<ast_identifier>(portNameWalker->data);
                     std::string portName = identifier->identifier;
 
                     const Pin p = createPin(nl.get(), portName);
@@ -96,29 +103,39 @@ namespace ophidian
                         case PORT_NONE:  //!< Used for when we don't know at declaration time.
                             break;
                     }
+
+                    portNameWalker = portNameWalker->next;
                 }
+                portWalker0 = portWalker0->next;
             }
 
-            for (uint32_t i = 0; i < module->net_declarations->items; ++i)
+
+            ast_list_element * netWalker = module->net_declarations->head;
+            while (netWalker)
             {
-                ast_net_declaration* net = static_cast<ast_net_declaration*>(ast_list_get(module->net_declarations, i));
+                ast_net_declaration* net = static_cast<ast_net_declaration*>(netWalker->data);
                 const std::string netName(net->identifier->identifier);
                 createNet(nl.get(), netName);
+                netWalker = netWalker->next;
             }
 
-            for (uint32_t i = 0; i < module->module_instantiations->items; ++i)
-            {
-                ast_module_instantiation* inst = static_cast<ast_module_instantiation*>(ast_list_get(module->module_instantiations, i));
 
-                for (uint32_t j = 0; j < inst->module_instances->items; ++j)
+            ast_list_element * walker = module->module_instantiations->head;
+            while (walker)
+            {
+                ast_module_instantiation* inst = static_cast<ast_module_instantiation*>(walker->data);
+
+                ast_list_element *instWalker = inst->module_instances->head;
+                while (instWalker)
                 {
-                    ast_module_instance* module_instance = static_cast<ast_module_instance*>(ast_list_get(inst->module_instances, j));
-                    const std::string cellName(module_instance->instance_identifier->identifier);
+                    ast_module_instance* moduleInstance = static_cast<ast_module_instance*>(instWalker->data);
+                    const std::string cellName(moduleInstance->instance_identifier->identifier);
                     const Cell c = createCell(nl.get(), cellName);
 
-                    for (uint32_t k = 0; k < module_instance->port_connections->items; ++k)
+                    ast_list_element * portWalker =  moduleInstance->port_connections->head;
+                    while (portWalker)
                     {
-                        ast_port_connection* connection = static_cast<ast_port_connection*>(ast_list_get(module_instance->port_connections, k));
+                        ast_port_connection* connection = static_cast<ast_port_connection*>(portWalker->data);
                         ast_expression* exp = connection->expression;
                         const std::string portName = connection->port_name->identifier;
                         const std::string netName = exp->primary->value.identifier->identifier;
@@ -127,12 +144,19 @@ namespace ophidian
                         const Net n = createNet(nl.get(), netName);
                         nl->add(c, p);
                         nl->connect(n, p);
+                        portWalker = portWalker->next;
                     }
+                    instWalker = instWalker->next;
                 }
+
+                walker = walker->next;
             }
             // TODO: verify how to free the syntax tree.
             yy_preproc = nullptr;
             yy_verilog_source_tree = nullptr;
+
+            nl->shrink();
+
             return nl.release();
         }
 
