@@ -7,7 +7,6 @@ using namespace ophidian::circuit;
 
 TEST_CASE("Netlist: Brand-new Netlist must be empty.", "[circuit][Netlist]")
 {
-
     Netlist nl;
     REQUIRE(nl.size(Cell()) == 0);
     REQUIRE(nl.size(Pin()) == 0);
@@ -19,7 +18,6 @@ TEST_CASE("Netlist: Brand-new Netlist must be empty.", "[circuit][Netlist]")
 
 TEST_CASE("Netlist: Add Cell.", "[circuit][Netlist]")
 {
-
     Netlist nl;
     auto cell = nl.add(Cell());
     REQUIRE(nl.size(Cell()) == 1);
@@ -240,5 +238,4 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
     auto out = nl.add(Output(), p2 = nl.add(Pin()));
     REQUIRE(std::count(nl.begin(Input()), nl.end(Input()), inp) == 1);
     REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
-
 }

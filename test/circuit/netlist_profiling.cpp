@@ -14,6 +14,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
     nl.reserve(Cell(), kNumCells);
     nl.reserve(Pin(), 4*kNumCells);
     std::vector<Cell> cells(kNumCells);
+    auto cellsPins = nl.makeProperty<std::vector<Pin> >(Cell());
     auto cellNames = nl.makeProperty<std::string>(Cell());
     for(uint32_t i = 0; i < cells.size(); ++i)
     {
@@ -29,8 +30,19 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 //        std::cout << "cell " << cellNames[cell] << " will have " << cellPins << " pins" << std::endl;
         for(uint32_t i = 0; i < cellPins; ++i)
         {
-            nl.add(cell, nl.add(Pin()));
+            auto pin = nl.add(Pin());
+            nl.add(cell, pin);
+            cellsPins[cell].push_back(pin);
         }
     }
+
+    std::for_each(nl.begin(Cell()), nl.end(Cell()), [&cellsPins, &nl](const Cell & cell){
+       auto const & pins = cellsPins[cell];
+       auto nlCellPins = nl.pins(cell);
+       std::for_each(nlCellPins.begin(), nlCellPins.end(), [&pins](const Pin &pin){
+           REQUIRE( std::count(pins.begin(), pins.end(), pin) == 1 );
+       });
+    });
+
     nl.shrink();
 }
