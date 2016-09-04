@@ -62,8 +62,8 @@ TEST_CASE("Netlist: Add Net.", "[circuit][Netlist]")
 {
     Netlist nl;
     auto net = nl.add(Net());
-//    REQUIRE(nl.pins(net).empty());
-//    REQUIRE(nl.pins(net).size() == 0);
+    REQUIRE(nl.pins(net).empty());
+    REQUIRE(nl.pins(net).size() == 0);
     REQUIRE(nl.size(Cell()) == 0);
     REQUIRE(nl.size(Pin()) == 0);
     REQUIRE(nl.size(Net()) == 1);
@@ -86,11 +86,11 @@ TEST_CASE("Netlist: Connect/Disconnect Net and Pin.", "[circuit][Netlist]")
     auto net = nl.add(Net());
     auto pin = nl.add(Pin());
     nl.connect(net, pin);
-//    REQUIRE(nl.pins(net).size() == 1);
-//    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 1);
+    REQUIRE(nl.pins(net).size() == 1);
+    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 1);
     REQUIRE(nl.net(pin) == net);
     nl.disconnect(pin);
-//    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 0);
+    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 0);
     REQUIRE(nl.net(pin) == Net());
 }
 
@@ -100,8 +100,8 @@ TEST_CASE("Netlist: Add Pin Into Cell.", "[circuit][Netlist]")
     auto cell = nl.add(Cell());
     auto pin = nl.add(Pin());
     nl.add(cell, pin);
-//    REQUIRE(nl.pins(cell).size());
-//    REQUIRE(std::count(nl.pins(cell).begin(), nl.pins(cell).end(), pin) == 1);
+    REQUIRE(nl.pins(cell).size());
+    REQUIRE(std::count(nl.pins(cell).begin(), nl.pins(cell).end(), pin) == 1);
     REQUIRE(nl.cell(pin) == cell);
 }
 
