@@ -12,7 +12,7 @@ before_script:
   - tar -zxvf bison-3.0.4.tar.gz
   - cd bison-3.0.4
   - mkdir inst
-  - ./configure --prefix=inst
+  - ./configure --prefix=$PWD/inst
   - make && make install
   - cd inst/bin
   - export PATH=$PATH:$PWD
