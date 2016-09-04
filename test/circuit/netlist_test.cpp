@@ -25,7 +25,6 @@ TEST_CASE("Netlist: Add Cell.", "[circuit][Netlist]")
     REQUIRE(nl.size(Cell()) == 1);
     REQUIRE(nl.size(Pin()) == 0);
     REQUIRE(nl.size(Net()) == 0);
-    REQUIRE(nl.pins(cell).empty());
 }
 
 TEST_CASE("Netlist: Erase Cell.", "[circuit][Netlist]")
@@ -63,8 +62,8 @@ TEST_CASE("Netlist: Add Net.", "[circuit][Netlist]")
 {
     Netlist nl;
     auto net = nl.add(Net());
-    REQUIRE(nl.pins(net).empty());
-    REQUIRE(nl.pins(net).size() == 0);
+//    REQUIRE(nl.pins(net).empty());
+//    REQUIRE(nl.pins(net).size() == 0);
     REQUIRE(nl.size(Cell()) == 0);
     REQUIRE(nl.size(Pin()) == 0);
     REQUIRE(nl.size(Net()) == 1);
@@ -87,11 +86,11 @@ TEST_CASE("Netlist: Connect/Disconnect Net and Pin.", "[circuit][Netlist]")
     auto net = nl.add(Net());
     auto pin = nl.add(Pin());
     nl.connect(net, pin);
-    REQUIRE(nl.pins(net).size() == 1);
-    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 1);
+//    REQUIRE(nl.pins(net).size() == 1);
+//    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 1);
     REQUIRE(nl.net(pin) == net);
     nl.disconnect(pin);
-    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 0);
+//    REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 0);
     REQUIRE(nl.net(pin) == Net());
 }
 
@@ -101,8 +100,8 @@ TEST_CASE("Netlist: Add Pin Into Cell.", "[circuit][Netlist]")
     auto cell = nl.add(Cell());
     auto pin = nl.add(Pin());
     nl.add(cell, pin);
-    REQUIRE(nl.pins(cell).size());
-    REQUIRE(std::count(nl.pins(cell).begin(), nl.pins(cell).end(), pin) == 1);
+//    REQUIRE(nl.pins(cell).size());
+//    REQUIRE(std::count(nl.pins(cell).begin(), nl.pins(cell).end(), pin) == 1);
     REQUIRE(nl.cell(pin) == cell);
 }
 
@@ -152,70 +151,61 @@ TEST_CASE("Netlist: Make Net Property (Lumped Capacitance).", "[circuit][Netlist
     REQUIRE(Approx(CLoad[n2]) == 2e-15);
 }
 
-class MyCustomCellObserver : public Netlist::CellNotifier::ObserverBase
+class DummyCellObserver : public Netlist::CellNotifier::ObserverBase
 {
     public:
-        MyCustomCellObserver(const Netlist & nl) :
+        DummyCellObserver(const Netlist & nl) :
             Netlist::CellNotifier::ObserverBase(*nl.notifier(Cell())),
-            added_(0),
-            erased_(0)
+            added(0),
+            erased(0),
+            capacity(0)
         {
 
         }
-        ~MyCustomCellObserver() {
+        ~DummyCellObserver() {
 
         }
-
+        void shrink() override
+        {
+            capacity = added - erased;
+        }
+        void reserve(uint32_t size) override
+        {
+            capacity = std::max(capacity, size);
+        }
         void add(const Cell&) override
         {
-            ++added_;
+            ++added;
         }
         void add(const std::vector<Cell>& cells) override
         {
-            added_ += cells.size();
+            added += cells.size();
         }
         void erase(const Cell&) override
         {
-            ++erased_;
-        }
-        void erase(const std::vector<Cell>& cells) override
-        {
-            erased_ += cells.size();
-        }
-        void build() override
-        {
-
+            ++erased;
         }
         void clear() override
         {
-            erased_ += added();
+            erased += added;
         }
-
-        uint32_t added() const
-        {
-            return added_;
-        }
-
-        uint32_t erased() const
-        {
-            return erased_;
-        }
-
-    private:
-        uint32_t added_;
-        uint32_t erased_;
+        uint32_t added;
+        uint32_t erased;
+        uint32_t capacity;
 };
 
 TEST_CASE("Netlist: Make Custom Cell Observer.", "[circuit][Netlist]")
 {
     Netlist nl;
-    auto prop = MyCustomCellObserver(nl);
+    auto prop = DummyCellObserver(nl);
     auto n1 = nl.add(Cell());
     auto n2  = nl.add(Cell());
     auto n3 = nl.add(Cell());
     nl.erase(n2);
-    REQUIRE( prop.added() == 3 );
-    REQUIRE( prop.erased() == 1 );
+    REQUIRE( prop.added == 3 );
+    REQUIRE( prop.erased == 1 );
+    nl.reserve(Cell(), 3214);
+    REQUIRE( prop.capacity == 3214 );
 }
 
 
@@ -250,27 +240,5 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
     auto out = nl.add(Output(), p2 = nl.add(Pin()));
     REQUIRE(std::count(nl.begin(Input()), nl.end(Input()), inp) == 1);
     REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
-
-}
-
-TEST_CASE("Netlist: Reserve, Capacity & Shrink.", "[circuit][Netlist]")
-{
-    Netlist nl;
-    nl.reserve(Cell(), 42);
-    nl.reserve(Net(), 43);
-    nl.reserve(Pin(), 44);
-    REQUIRE( nl.capacity(Cell()) == 42 );
-    REQUIRE( nl.capacity(Net()) == 43 );
-    REQUIRE( nl.capacity(Pin()) == 44 );
-    nl.add(Cell()); nl.add(Cell()); nl.add(Cell());
-    nl.add(Net()); nl.add(Net());
-    nl.add(Pin());
-    REQUIRE( nl.capacity(Cell()) == 42 );
-    REQUIRE( nl.capacity(Net()) == 43 );
-    REQUIRE( nl.capacity(Pin()) == 44 );
-    nl.shrink();
-    REQUIRE( nl.capacity(Cell()) == 3 );
-    REQUIRE( nl.capacity(Net()) == 2 );
-    REQUIRE( nl.capacity(Pin()) == 1 );
 
 }

@@ -20,7 +20,6 @@ Netlist::Netlist(Netlist &&nl) :
     cellPins_(std::move(nl.cellPins_)),
     pinInput_(std::move(nl.pinInput_)),
     pinOutput_(std::move(nl.pinOutput_))
-
 {
 
 }
@@ -98,20 +97,11 @@ entity_system::EntitySystem<Pin>::NotifierType *Netlist::notifier(Pin) const
 void Netlist::reserve(Pin, uint32_t size)
 {
     pins_.reserve(size);
-    pinInput_.reserve(size);
-    pinOutput_.reserve(size);
-    netPins_.reservePart(size);
-    cellPins_.reservePart(size);
 }
 
-std::uint32_t Netlist::capacity(Pin) const
+uint32_t Netlist::capacity(Pin) const
 {
     return pins_.capacity();
-}
-
-const entity_system::Aggregation<Net, Pin>::PartContainer &Netlist::pins(const Net &n) const
-{
-    return netPins_.parts(n);
 }
 
 entity_system::EntitySystem<Cell>::const_iterator Netlist::begin(Cell) const
@@ -122,11 +112,6 @@ entity_system::EntitySystem<Cell>::const_iterator Netlist::begin(Cell) const
 entity_system::EntitySystem<Cell>::const_iterator Netlist::end(Cell) const
 {
     return cells_.end();
-}
-
-const entity_system::Composition<Cell, Pin>::PartContainer &Netlist::pins(const Cell &c) const
-{
-    return cellPins_.parts(c);
 }
 
 void Netlist::add(const Cell &c, const Pin &p)
@@ -142,12 +127,16 @@ entity_system::EntitySystem<Cell>::NotifierType *Netlist::notifier(Cell) const
 void Netlist::reserve(Cell, uint32_t size)
 {
     cells_.reserve(size);
-    cellPins_.reserve(size);
 }
 
-std::uint32_t Netlist::capacity(Cell) const
+uint32_t Netlist::capacity(Cell) const
 {
     return cells_.capacity();
+}
+
+const entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
+{
+    return cellPins_.parts(cell);
 }
 
 entity_system::EntitySystem<Pin>::const_iterator Netlist::begin(Pin) const
@@ -183,12 +172,16 @@ entity_system::EntitySystem<Net>::NotifierType *Netlist::notifier(Net) const
 void Netlist::reserve(Net, uint32_t size)
 {
     nets_.reserve(size);
-    netPins_.reserve(size);
 }
 
-std::uint32_t Netlist::capacity(Net) const
+uint32_t Netlist::capacity(Net) const
 {
     return nets_.capacity();
+}
+
+const entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
+{
+    return netPins_.parts(net);
 }
 
 uint32_t Netlist::size(Input) const
@@ -212,9 +205,7 @@ Pin Netlist::pin(const Input &input) const
 
 Input Netlist::input(const Pin &pin) const
 {
-    if(pinInput_.parts(pin).empty())
-        return Input();
-    return pinInput_.parts(pin).front();
+    return pinInput_.firstPart(pin);
 }
 
 entity_system::EntitySystem<Input>::const_iterator Netlist::begin(Input) const
@@ -253,9 +244,7 @@ Pin Netlist::pin(const Output &output) const
 
 Output Netlist::output(const Pin &pin) const
 {
-    if(pinOutput_.parts(pin).empty())
-        return Output();
-    return pinOutput_.parts(pin).front();
+    return pinOutput_.firstPart(pin);
 }
 
 entity_system::EntitySystem<Output>::const_iterator Netlist::begin(Output) const
@@ -280,10 +269,6 @@ void Netlist::shrink()
     nets_.shrink();
     inputs_.shrink();
     outputs_.shrink();
-    netPins_.shrink();
-    cellPins_.shrink();
-    pinInput_.shrink();
-    pinOutput_.shrink();
 }
 
 }

@@ -128,24 +128,25 @@ namespace ophidian
                 */
                 void reserve(Cell, uint32_t size);
 
-                std::uint32_t capacity(Cell) const; // TODO documentation
+                //! Capacity of the Cell's System
+                /*!
+                  \return The capacity of the Cell EntitySystem.
+                */
+                uint32_t capacity(Cell) const;
                 //! Pins of a Cell
                 /*!
-                  \brief Returns a constant reference to a Container containing the Pins of a given Cell.
-                  \param cell A handler to a Cell.
-                  \return A constant reference to a Container containing the Pins of cell.
+                  \brief Returns a Container Wrapper for the Pins of a Cell.
+                  \param cell A handler for the Cell we want to get the Pins.
+                  \return Container Wrapper for the Pins of a Cell.
                 */
-                const entity_system::Composition<Cell, Pin>::PartContainer& pins(const Cell& cell) const;
+                const entity_system::Association<Cell, Pin>::Parts pins(const Cell& cell) const;
                 //! Add Pin into Cell
                 /*!
                   \brief Adds a Pin to a given Cell.
-                  \param cell A handler to the Cell we want to add a Pin.
-                  \param pin A handler to the Pin we want to add in \p cell.
+                  \param cell A handler for the Cell we want to add a Pin.
+                  \param pin A handler for the Pin we want to add in \p cell.
                 */
                 void add(const Cell& cell, const Pin& pin);
-
-
-
                 //! Add Pin
                 /*!
                   \brief Adds a Pin instance.
@@ -199,25 +200,29 @@ namespace ophidian
                   \param size Minimum capacity for the Pin container.
                 */
                 void reserve(Pin, uint32_t size);
-                std::uint32_t capacity(Pin) const; // TODO documentation
+                //! Capacity of the Pin's System
+                /*!
+                  \return The capacity of the Pin EntitySystem.
+                */
+                uint32_t capacity(Pin) const;
                 //! Net of a Pin
                 /*!
                   \brief Returns the Net of a given Pin.
-                  \param pin A handler to the Pin we want to get the Net.
-                  \return A handler to the Net of \p pin.
+                  \param pin A handler for the Pin we want to get the Net.
+                  \return A handler for the Net of \p pin.
                   \remark If \p pin is disconnected, returns Net().
                 */
                 Net net(const Pin& pin) const;
                 //! Disconnect Pin
                 /*!
                   \brief Disconnects a pin from its net.
-                  \param pin A handler to the Pin we want to disconnect.
+                  \param pin A handler for the Pin we want to disconnect.
                 */
                 void disconnect(const Pin& pin);
                 //! Cell of a Pin
                 /*!
                   \brief Returns the Cell of a Pin.
-                  \param pin A handler to the Pin we want to get the Cell.
+                  \param pin A handler for the Pin we want to get the Cell.
                   \remark If \p pin doesn't have a Cell, returns Cell().
                 */
                 Cell cell(const Pin& pin) const;
@@ -275,20 +280,23 @@ namespace ophidian
                   \param size Minimum capacity for the Net container.
                 */
                 void reserve(Net, uint32_t size);
-                std::uint32_t capacity(Net) const; // TODO documentation
-
+                //! Capacity of the Net's System
+                /*!
+                  \return The capacity of the Net EntitySystem.
+                */
+                uint32_t capacity(Net) const;
                 //! Pins of a Net
                 /*!
-                  \brief Returns a constant reference to a Container containing the Pins of a given Net.
-                  \param net A handler to a Net.
-                  \return A constant reference to a Container containing the Pins of \p net.
+                  \brief Returns a Container Wrapper for the Pins of a Net.
+                  \param net A handler for the Net we want to get the Pins.
+                  \return Container Wrapper for the Pins of a Net.
                 */
-                const entity_system::Aggregation<Net, Pin>::PartContainer& pins(const Net& net) const;
+                const entity_system::Association<Net, Pin>::Parts pins(const Net& net) const;
                 //! Connect Pin on Net
                 /*!
                   \brief Connects a Pin
-                  \param net A handler to the Net we want to connect \p pin.
-                  \param pin A handler to the Pin we want to connect.
+                  \param net A handler for the Net we want to connect \p pin.
+                  \param pin A handler for the Pin we want to connect.
                 */
                 void connect(const Net& net, const Pin& pin);
 
@@ -302,21 +310,21 @@ namespace ophidian
                 /*!
                   \brief Creates an Input for a given Pin.
                   \param pin The Pin we want to create an Input.
-                  \return A handler to the created Input.
+                  \return A handler for the created Input.
                 */
                 Input add(Input, const Pin& pin);
                 //! Pin of an Input
                 /*!
                   \brief Returns the Pin of a given Input.
                   \param input the Input we want the Pin.
-                  \return A handler to the Pin of \p input.
+                  \return A handler for the Pin of \p input.
                 */
                 Pin pin(const Input& input) const;
                 //! Input of a Pin
                 /*!
                   \brief Returns the Input of a given Pin.
                   \param pin the Pin we want the Input.
-                  \return A handler to the Input of \p pin.
+                  \return A handler for the Input of \p pin.
                   \remark If \p pin isn't associated with any Input, returns Input().
                 */
                 Input input(const Pin& pin) const;
@@ -360,21 +368,21 @@ namespace ophidian
                 /*!
                   \brief Creates an Output for a given Pin.
                   \param pin The Pin we want to create an Output.
-                  \return A handler to the created Output.
+                  \return A handler for the created Output.
                 */
                 Output add(Output, const Pin& pin);
                 //! Pin of an Output
                 /*!
                   \brief Returns the Pin of a given Output.
                   \param output the Output we want the Pin.
-                  \return A handler to the Pin of \p output.
+                  \return A handler for the Pin of \p output.
                 */
                 Pin pin(const Output& output) const;
                 //! Output of a Pin
                 /*!
                   \brief Returns the Output of a given Pin
                   \param pin the Pin we want the Output.
-                  \return A handler to the Output of \p pin.
+                  \return A handler for the Output of \p pin.
                   \remark If pin isn't associated with any Output, returns Output().
                 */
                 Output output(const Pin& pin) const;

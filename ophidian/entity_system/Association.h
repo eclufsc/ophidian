@@ -7,136 +7,353 @@
 namespace ophidian {
 namespace entity_system {
 
+template <class Key, class Value>
+class DetachedProperty :  public Property<Key, Value > {
+public:
+    using Parent = Property<Key, Value >;
+    DetachedProperty(const EntitySystem<Key>& system) :
+        Parent(system),
+        system_(system)
+    {
+        Parent::detach();
+    }
+
+    using Parent::add;
+    using Parent::build;
+    using Parent::clear;
+
+    virtual void erase(const Key& item) override
+    {
+        std::swap(Parent::properties_.back(), Parent::properties_[system_.id(item)]);
+        Parent::properties_.pop_back();
+    }
+
+    const Value& operator [](const Key & k) const {
+        return Parent::properties_[system_.id(k)];
+    }
+
+    Value& operator [](const Key & k) {
+        return Parent::properties_[system_.id(k)];
+    }
+private:
+    const EntitySystem<Key>& system_;
+};
+
+
+
+
+
 template <class WholeEntity_, class PartEntity_>
-class Association : public Property<WholeEntity_, std::vector<PartEntity_> >
+class Association :
+        public EntitySystem<WholeEntity_>::NotifierType::ObserverBase
 {
-    protected:
+    public:
         using Whole = WholeEntity_;
         using Part = PartEntity_;
-        using PartContainer = std::vector<Part>;
-        using Parent = Property<Whole, PartContainer >;
         using WholeSystem = EntitySystem<Whole>;
         using PartSystem = EntitySystem<Part>;
 
-        void eraseAllUnattachedParts()
-        {
-            std::deque<Part> toErase;
-            std::copy_if(partSystem_.begin(), partSystem_.end(),
-                         std::back_inserter(toErase), [this](const Part & p)->bool{ return !(whole(p) == Whole()); });
-            std::for_each(toErase.cbegin(), toErase.cend(), std::bind(&PartSystem::erase, &partSystem_,
-                          std::placeholders::_1));
-        }
-
-        void eraseAllParts(const Whole& w)
-        {
-            auto const& wholeParts = parts(w);
-            std::for_each(wholeParts.begin(), wholeParts.end(), std::bind(&PartSystem::erase, &partSystem_,
-                          std::placeholders::_1));
-        }
-
-        class PartOfComposition : public Property<Part, Whole >
+        class PartOfComposition :
+                public EntitySystem<Part>::NotifierType::ObserverBase
         {
             public:
-                using Parent = Property<Part, Whole >;
                 PartOfComposition(const EntitySystem<Part>& partSystem, Association& composition) :
-                    Parent(partSystem),
+                    EntitySystem<Part>::NotifierType::ObserverBase(*partSystem.notifier()),
+                    nextPart_(partSystem),
+                    whole_(partSystem),
                     association_(composition)
                 {
                 }
 
+                Whole whole(const Part & p) const
+                {
+                    return whole_[p];
+                }
+
+                void whole(const Part & p, const Whole & w)
+                {
+                    whole_[p] = w;
+                }
+
+                Part nextPart(const Part &p) const
+                {
+                    return nextPart_[p];
+                }
+
+                void nextPart(const Part& p1, const Part& p2)
+                {
+                    nextPart_[p1] = p2;
+                }
+
+
             private:
+
+                void shrink() override
+                {
+                    nextPart_.shrink();
+                    whole_.shrink();
+                }
+
+                void reserve(std::uint32_t size) override
+                {
+                    nextPart_.reserve(size);
+                    whole_.reserve(size);
+                }
+
+                void add(const Part & item ) override
+                {
+                    nextPart_.add(item);
+                    whole_.add(item);
+                }
+
+                void add(const std::vector<Part> & items) override
+                {
+                    nextPart_.add(items);
+                    whole_.add(items);
+                }
 
                 void erase(const Part& item) override
                 {
-                    const Whole& whole = (*this)[item];
-
-                    if (!(whole == Whole()))
+                    if(whole(item) != Whole())
                     {
-                        association_.erasePart((*this)[item], item);
+                        association_.erasePart(whole(item), item);
                     }
-
-                    Parent::erase(item);
-                }
-
-                void erase(const std::vector<Part>& parts) override
-                {
-                    for (auto const& part : parts)
-                    {
-                        erase(part);
-                    }
+                    nextPart_.erase(item);
+                    whole_.erase(item);
                 }
 
                 void clear() override
                 {
-                    association_.clearAllPartsContainers();
+                    association_.detachAllParts();
+                    nextPart_.clear();
+                    whole_.clear();
                 }
 
                 Association& association_;
+                DetachedProperty<Part, Part> nextPart_;
+                DetachedProperty<Part, Whole> whole_;
         };
 
     public:
 
+        class Parts {
+        public:
+
+            class PartIterator : public std::iterator<std::forward_iterator_tag, Part> {
+            public:
+                PartIterator(const Association * association, const Whole& w) :
+                    association_(association),
+                    whole_(w),
+                    part_(association->firstPart(w))
+                {
+
+                }
+
+                PartIterator() :
+                    association_(nullptr),
+                    whole_(Whole()),
+                    part_(Part())
+                {
+
+                }
+
+                const Part& operator*() {
+                    return part_;
+                }
+                PartIterator & operator++(void) {
+                    part_ = association_->nextPart(part_);
+                    return *this;
+                }
+                PartIterator & operator=(const PartIterator & p)
+                {
+                    association_ = p.association_;
+                    whole_ = p.whole_;
+                    return *this;
+                }
+                bool operator!=(const PartIterator & p) const
+                {
+                    return part_ != p.part_;
+                }
+                bool operator==(const PartIterator & p) const
+                {
+                    return !((*this) != p);
+                }
+            private:
+                const Association * association_;
+                Whole whole_;
+                Part part_;
+            };
+
+            Parts(const Association & association, const Whole & whole) :
+                association_(association),
+                whole_(whole)
+            {
+
+            }
+
+            PartIterator begin() const
+            {
+                return PartIterator(&association_, whole_);
+            }
+            PartIterator end() const
+            {
+                return PartIterator();
+            }
+            uint32_t size() const
+            {
+                return association_.numParts(whole_);
+            }
+            bool empty() const
+            {
+                return size() == 0;
+            }
+        private:
+            const Association & association_;
+            const Whole whole_;
+        };
+
         Association(const WholeSystem& whole, PartSystem& part)  :
-            Parent(whole),
+            EntitySystem<Whole>::NotifierType::ObserverBase(*whole.notifier()),
+            firstPart_(whole),
             part2Whole_(part, *this),
-            partSystem_(part)
+            partSystem_(part),
+            numParts_(whole, 0)
         {
-            Parent::detach();
+            EntitySystem<Whole>::NotifierType::ObserverBase::detach();
         }
 
         Whole whole(const Part& p) const
         {
-            return part2Whole_[p];
+            return part2Whole_.whole(p);
         }
 
         void addPart(const Whole& w, const Part& p)
         {
-            auto& parts = (*this)[w];
-            assert(std::count(parts.cbegin(), parts.cend(), p) == 0);
-            parts.push_back(p);
-            part2Whole_[p] = w;
+            auto first = firstPart(w);
+
+            part2Whole_.whole(p, w);
+
+            if(first == Whole())
+            {
+                firstPart_[w] = p;
+                numParts_[w] = 1;
+                return;
+            }
+
+            firstPart_[w] = p;
+            part2Whole_.nextPart(p, first);
+            ++numParts_[w];
+
         }
 
         void erasePart(const Whole& w, const Part& p)
         {
-            auto& parts = (*this)[w];
-            assert(std::count(parts.cbegin(), parts.cend(), p) == 1);
-            part2Whole_[p] = Whole();
-            parts.erase(std::find(parts.begin(), parts.end(), p));
-        }
+            --numParts_[w];
 
-        void clearParts(const Whole & w)
-        {
-            auto& parts = (*this)[w];
-            for(auto const & p : parts)
+            whole(p, Whole());
+
+
+            if(p == firstPart(w))
             {
-                part2Whole_[p] = Whole();
+                firstPart(w, nextPart(p));
+                return;
             }
-            parts.clear();
+
+            Part prev = firstPart(w);
+            Part curr = nextPart(firstPart(w));
+            while(curr != p && curr != Part())
+            {
+                prev = curr;
+                curr = nextPart(curr);
+            }
+
+            if(curr == p)
+            {
+                nextPart(prev, nextPart(curr));
+            }
+
         }
 
-        const PartContainer& parts(const Whole& w) const
+        const Parts parts(const Whole& w) const {
+            Parts theParts(*this, w);
+            return theParts;
+        }
+
+        bool empty() const {
+            return numParts_.empty();
+        }
+
+
+        Part firstPart(const Whole& w) const {
+            return firstPart_[w];
+        }
+
+        Part nextPart(const Part& p) const {
+            return part2Whole_.nextPart(p);
+        }
+
+        uint32_t numParts(const Whole& w) const {
+            return numParts_[w];
+        }
+
+    protected:
+
+        void detachAllParts()
         {
-            return (*this)[w];
+            std::fill(numParts_.begin(), numParts_.end(), 0);
+            std::fill(firstPart_.begin(), firstPart_.end(), Part());
         }
 
-        void reservePart(uint32_t size) {
-            part2Whole_.reserve(size);
-        }
-
-
-        using Parent::clear;
-        using Parent::erase;
-
-    private:
-        void clearAllPartsContainers()
+        virtual void shrink() override
         {
-            std::for_each(Parent::begin(), Parent::end(), std::bind(&PartContainer::clear, std::placeholders::_1));
+            firstPart_.shrink();
+        }
+
+        virtual void reserve(uint32_t size) override
+        {
+            firstPart_.reserve(size);
+        }
+
+        virtual void add(const Whole & item ) override
+        {
+            firstPart_.add(item);
+        }
+
+        virtual void add(const std::vector<Whole> & items) override
+        {
+            firstPart_.add(items);
+        }
+
+        virtual void erase(const Whole& item) override
+        {
+            firstPart_.erase(item);
+        }
+
+        virtual void clear() override
+        {
+            firstPart_.clear();
         }
 
         PartOfComposition part2Whole_;
-    protected:
+        DetachedProperty<Whole, Part> firstPart_;
+        Property<Whole, uint32_t> numParts_;
         PartSystem& partSystem_;
+
+private:
+        void whole(const Part& p, const Whole& w)
+        {
+            part2Whole_.whole(p, w);
+        }
+
+        void firstPart(const Whole & w, const Part & p) {
+            firstPart_[w] = p;
+        }
+
+        void nextPart(const Part& p1, const Part &p2) {
+            part2Whole_.nextPart(p1, p2);
+        }
+
+
 };
 
 }

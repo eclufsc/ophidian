@@ -19,27 +19,36 @@ namespace ophidian
                 using PartSystem = typename Parent::PartSystem;
                 using Whole = typename Parent::Whole;
                 using Part = typename Parent::Part;
-                using PartContainer = typename Parent::PartContainer;
 
                 Composition(const WholeSystem& whole, PartSystem& part) :
                     Parent(whole, part)
                 {
                     Parent::attach(*whole.notifier());
                 }
+
                 void erase(const Whole& whole) override
                 {
-                    while(!Parent::parts(whole).empty())
+                    Part current = Parent::firstPart(whole);
+
+                    while (current != Part())
                     {
-                        auto last_it = Parent::parts(whole).end();
-                        --last_it;
-                        Parent::partSystem_.erase(*last_it);
+                        Part next = Parent::nextPart(current);
+                        Parent::partSystem_.erase(current);
+                        current = next;
                     }
+
                     Parent::erase(whole);
                 }
 
                 void clear() override
                 {
-                    Parent::eraseAllUnattachedParts();
+                    std::vector<Part> toErase;
+                    std::copy_if(Parent::partSystem_.begin(), Parent::partSystem_.end(),
+                                 std::back_inserter(toErase), [this](const Part & p)->bool{ return (Parent::whole(p) != Whole()); });
+                    for(auto const & part : toErase)
+                    {
+                        Parent::partSystem_.erase(part);
+                    }
                     Parent::clear();
                 }
             private:

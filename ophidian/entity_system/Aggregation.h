@@ -15,31 +15,28 @@ class Aggregation : public Association<WholeEntity_, PartEntity_>
         using PartSystem = typename Parent::PartSystem;
         using Whole = typename Parent::Whole;
         using Part = typename Parent::Part;
-        using PartContainer = typename Parent::PartContainer;
 
         Aggregation(const WholeSystem& whole, PartSystem& part) :
             Parent(whole, part)
         {
             Parent::attach(*whole.notifier());
         }
+
         void erase(const Whole& whole) override
         {
-            while(!Parent::parts(whole).empty())
+            Part current = Parent::firstPart(whole);
+            while(current != Part())
             {
-                auto last_it = Parent::parts(whole).end();
-                --last_it;
-                Parent::erasePart(whole, *last_it);
+                Part next = Parent::nextPart(current);
+                Parent::erasePart(whole, current);
+                current = next;
             }
             Parent::erase(whole);
         }
 
         void clear() override
         {
-            for(auto const & part : Parent::partSystem_)
-            {
-                Parent::erasePart(Parent::whole(part), part);
-            }
-            Parent::clear();
+
         }
     private:
 };

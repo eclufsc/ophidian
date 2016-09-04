@@ -13,7 +13,6 @@ namespace ophidian
 {
     namespace entity_system
     {
-
         class EntitySystemBase;
         class EntityBase
         {
@@ -28,11 +27,60 @@ namespace ophidian
                 uint32_t id_;
                 EntitySystemBase* system_;
         };
-
         class EntitySystemBase
         {
             public:
                 uint32_t id(const EntityBase& en) const;
+        };
+        template <class EntitySystem_, class Entity_>
+        class EntitySystemNotifier : public lemon::AlterationNotifier<EntitySystem_, Entity_>
+        {
+        protected:
+            using EntitySystem = EntitySystem_;
+            using Entity = Entity_;
+            using Parent = lemon::AlterationNotifier<EntitySystem, Entity>;
+        public:
+            class ObserverBase : public Parent::ObserverBase
+            {
+            protected:
+                using Parent = typename Parent::ObserverBase;
+            public:
+                using Parent::Parent;
+                virtual void erase(const std::vector<Entity> &items) final {}
+                virtual void build() final {}
+                virtual void reserve(uint32_t size) = 0;
+                virtual void shrink() = 0;
+            };
+            using Parent::Parent;
+            void reserve(uint32_t size)
+            {
+                for (auto it = Parent::_observers.begin(); it != Parent::_observers.end(); ++it)
+                {
+                    auto observer = static_cast<ObserverBase*>(*it);
+                    observer->reserve(size);
+                }
+            }
+            void shrink()
+            {
+                for (auto it = Parent::_observers.begin(); it != Parent::_observers.end(); ++it)
+                {
+                    auto observer = static_cast<ObserverBase*>(*it);
+                    observer->shrink();
+                }
+            }
+            void erase(const Entity & item)
+            {
+                Parent::erase(item);
+            }
+        private:
+            void build()
+            {
+
+            }
+            void erase(const std::vector<Entity> &items)
+            {
+
+            }
         };
 
         template <class Entity_>
@@ -40,11 +88,15 @@ namespace ophidian
         {
             public:
                 using Entity = Entity_;
-                using NotifierType = lemon::AlterationNotifier<EntitySystem, Entity>;
+                using NotifierType = EntitySystemNotifier<EntitySystem, Entity>;
                 using ContainerType = std::vector<Entity>;
                 using const_iterator = typename ContainerType::const_iterator;
                 using size_type = typename ContainerType::size_type;
 
+                //! Construct EntitySystem
+                /*!
+                  Constructs an empty EntitySystem, with no Entities.
+                */
                 EntitySystem()
                 {
                     notifier_.setContainer(*this);
@@ -54,6 +106,12 @@ namespace ophidian
                 {
 
                 }
+
+                //! Add Entity
+                /*!
+                  \brief Creates an Entity instance.
+                  \return A handler for the created Entity.
+                */
                 Entity add()
                 {
                     uint32_t id = id2Index_.size();
@@ -63,68 +121,130 @@ namespace ophidian
                     notifier_.add(container_.back());
                     return entity;
                 }
-                void erase(const Entity& o)
+                //! Erase Entity
+                /*!
+                  \param entity A handler for the Entity to erase.
+                  \brief Erases an Entity instance as well as its atached Properties.
+                */
+                void erase(const Entity& entity)
                 {
-                    notifier_.erase(o);
-                    auto index = id(o);
+                    notifier_.erase(entity);
+                    auto index = id(entity);
                     auto lastEntityId = id(container_.back());
                     std::swap(container_[index], container_.back());
                     container_.pop_back();
                     id2Index_[lastEntityId] = index;
                     id2Index_[index] = std::numeric_limits<uint32_t>::max();
                 }
+                //! Clear Entities
+                /*!
+                  \brief Erases all Entities as well as its atached Properties.
+                */
                 void clear()
                 {
                     notifier_.clear();
                     container_.clear();
                 }
+                //! Allocate space for storing Entities
+                /*!
+                  \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the EntitySystem you want to build will be large (e.g. it will contain millions entities), then it is worth reserving space for this amount before starting to build the EntitySystem.
+                  \param size Minimum capacity for the Entity container.
+                */
                 void reserve(size_type size)
                 {
                     container_.reserve(size);
+                    notifier_.reserve(size);
                 }
-
+                //! Allocate space for storing Entities
+                /*!
+                  \brief Returns the capacity of the Entity Container. Entities can be added while size < capacity without internal reallocation.
+                  \param size Minimum capacity for the Entity container.
+                */
                 size_type capacity() const
                 {
                     return container_.capacity();
                 }
+                //! Size of the EntitySystem
+                /*!
+                  \brief Returns the number of Entities
+                  \return The number of Entities.
+                */
                 size_type size() const
                 {
                     return container_.size();
                 }
+                //! Empty EntitySystem
+                /*!
+                  \brief Returns a boolean indicating if the EntitySystem is empty (i.e., has no entities) or not.
+                  \return true if the EntitySystem is empty, false otherwise.
+                */
                 bool empty() const
                 {
                     return container_.empty();
                 }
+                //! Iterator to beginning
+                /*!
+                  \brief Returns an iterator pointing to the first element in the EntitySystem.
+                  \return Iterator to the first element in the EntitySystem.
+                */
                 const_iterator begin() const
                 {
                     return container_.begin();
                 }
+                //! Iterator to end
+                /*!
+                  \brief Returns an iterator referring to the past-the-end element in the EntitySystem.
+                  \return Iterator referring to the past-the-end element in the EntitySystem.
+                */
                 const_iterator end() const
                 {
                     return container_.end();
                 }
-                bool valid(const Entity& o) const
+                //! Valid Entity
+                /*!
+                  \brief Returns a boolean indicating if an Entity handler is pointing to a live entity.
+                  \param entity A handler to the Entity we want to check.
+                  \return true if the handler is valid, false otherwise.
+                */
+                bool valid(const Entity& entity) const
                 {
-                    return EntitySystemBase::id(o) != std::numeric_limits<uint32_t>::max() &&
-                           id2Index_[EntitySystemBase::id(o)] < container_.size();
+                    return EntitySystemBase::id(entity) != std::numeric_limits<uint32_t>::max() &&
+                           id2Index_[EntitySystemBase::id(entity)] < container_.size();
                 }
+                //! Get the Notifier
+                /*!
+                  \brief Returns a pointer to the System's EntitySystemNotifier.
+                  \return A pointer to the System's EntitySystemNotifier.
+                */
                 NotifierType* notifier() const
                 {
                     return const_cast<EntitySystem::NotifierType*>(&notifier_);
                 }
-                size_type id(const Entity& o) const
+                //! Entity id
+                /*!
+                  \brief Returns the id of an Entity.
+                  \param entity A handler to the Entity we want to get the id.
+                  \return The id of \p entity.
+                */
+                size_type id(const Entity& entity) const
                 {
-                    return id2Index_.at(EntitySystemBase::id(o));
+                    return id2Index_.at(EntitySystemBase::id(entity));
                 }
-
+                //! EntitySystem id
+                /*!
+                  \return The unique identifier of the EntitySystem.
+                */
                 uint32_t id() const {
                     return id_;
                 }
-
+                //! Shrink EntitySystem
+                /*!
+                  \brief Reallocate the EntitySystem and it's propertys to have capacity == size. This may help to
+                */
                 void shrink() {
                     container_.shrink_to_fit();
+                    notifier_.shrink();
                 }
-
             private:
                 NotifierType notifier_;
                 ContainerType container_;

@@ -19,10 +19,13 @@ namespace ophidian
                 using Entity = Entity_;
                 using ContainerType = std::vector<Value>;
 
-                Property(const EntitySystem<Entity_>& system) :
-                    Parent(*system.notifier())
+                Property(const EntitySystem<Entity_>& system, Value defaultValue = Value()) :
+                    Parent(*system.notifier()),
+                    defaultValue_(defaultValue)
                 {
+                    properties_.reserve(system.capacity());
                     properties_.resize(system.size());
+                    properties_.assign(properties_.size(), defaultValue_);
                 }
 
                 Property() :
@@ -31,7 +34,8 @@ namespace ophidian
 
                 }
 
-                Property& operator=(const Property & o) {
+                Property& operator=(const Property& o)
+                {
                     properties_ = o.properties_;
                     Parent::attach(*o.notifier());
                     return *this;
@@ -77,45 +81,35 @@ namespace ophidian
                     return properties_.empty();
                 }
 
-                void reserve(std::uint32_t size)
+                void reserve(std::uint32_t size) override
                 {
                     properties_.reserve(size);
                 }
 
-                void shrink() {
+                void shrink() override
+                {
                     properties_.shrink_to_fit();
                 }
 
-                std::uint32_t capacity() const {
+                std::uint32_t capacity() const
+                {
                     return properties_.capacity();
                 }
 
-        protected:
+            protected:
 
                 virtual void add(const Entity& item) override
                 {
-                    properties_.resize(properties_.size() + 1);
+                    properties_.push_back(defaultValue_);
                 }
                 virtual void add(const std::vector<Entity>& items) override
                 {
-                    properties_.resize(properties_.size() + items.size());
+                    properties_.resize(properties_.size() + items.size(), defaultValue_);
                 }
                 virtual void erase(const Entity& item) override
                 {
                     std::swap(properties_.back(), properties_[Parent::notifier()->id(item)]);
                     properties_.pop_back();
-                }
-                virtual void erase(const std::vector<Entity>& items) override
-                {
-                    for (auto const& item : items)
-                    {
-                        erase(item);
-                    }
-                }
-
-                virtual void build() override
-                {
-
                 }
 
                 virtual void clear() override
@@ -125,6 +119,8 @@ namespace ophidian
 
             protected:
                 ContainerType properties_;
+            private:
+                const Value defaultValue_;
         };
     }
 }
