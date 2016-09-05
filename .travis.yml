@@ -15,7 +15,7 @@ before_script:
   - ./configure --prefix=$PWD/inst
   - make -j && make install
   - cd inst/bin
-  - export PATH=$PATH:$PWD
+  - export PATH=$PWD:$PATH
   - cd ..
   - cd ..
   - cd ..
