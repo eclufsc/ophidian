@@ -7,7 +7,9 @@ compiler:
   - gcc
 
 before_script:
-  - sudo apt-get install g++-5
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install g++-4.9
   - mkdir build && cd build
   - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
   - tar -zxvf bison-3.0.4.tar.gz
