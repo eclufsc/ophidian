@@ -43,9 +43,8 @@ namespace ophidian
             class ObserverBase : public Parent::ObserverBase
             {
             protected:
-                using Parent = typename Parent::ObserverBase;
             public:
-                using Parent::Parent;
+                using Parent::ObserverBase::ObserverBase;
                 virtual void erase(const std::vector<Entity> &items) final {}
                 virtual void build() final {}
                 virtual void reserve(uint32_t size) = 0;
