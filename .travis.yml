@@ -16,7 +16,9 @@ before_script:
   - make && make install
   - cd inst/bin
   - export PATH=$PATH:$PWD
-  - cd ../../..
+  - cd ..
+  - cd ..
+  - cd ..
   - make
   - make install
   - cmake ..
