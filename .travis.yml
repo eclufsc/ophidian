@@ -13,14 +13,12 @@ before_script:
   - cd bison-3.0.4
   - mkdir inst
   - ./configure --prefix=$PWD/inst
-  - make && make install
+  - make -j && make install
   - cd inst/bin
   - export PATH=$PATH:$PWD
   - cd ..
   - cd ..
   - cd ..
-  - make
-  - make install
   - cmake ..
 
-script: make && make test
+script: make -j && make -j test
