@@ -3,23 +3,17 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-  - gcc
-
-addons:
-  apt:
-    sources:
-    # add PPAs with more up-to-date toolchains
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.6
-    packages:
-    # install toolchains
-    - gcc-5
-    - g++-5
-    - clang-3.6
-
-env: COMPILER=g++-5
-
+matrix:
+    include:
+        - compiler: gcc
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                packages:
+                    - g++-5
+        env: COMPILER=g++-5
+          
 before_script:
   - mkdir build && cd build
   - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
