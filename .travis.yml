@@ -27,6 +27,6 @@ before_script:
   - cd ..
   - cd ..
   - cd ..
-  - cmake ..
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
 
 script: make -j && make -j test
