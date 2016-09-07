@@ -120,7 +120,7 @@ TEST_CASE("VerilogParser: Parse Simple", "[circuit][VerilogParser]")
 }
 
 #include <fstream>
-TEST_CASE("VerilogParser: Parse Superblue 18", "[circuit][VerilogParser]")
+TEST_CASE("VerilogParser: Parse Superblue 18", "[circuit][VerilogParser][Profiling]")
 {
     VerilogParser vp;
     std::ifstream ss("superblue18.v", std::ifstream::in);
