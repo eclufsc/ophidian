@@ -18,6 +18,8 @@ addons:
     - g++-5
     - clang-3.6
 
+env: COMPILER=g++-5
+
 before_script:
   - mkdir build && cd build
   - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
