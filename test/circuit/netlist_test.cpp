@@ -210,10 +210,11 @@ TEST_CASE("Netlist: Make Custom Cell Observer.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Add Input.", "[circuit][Netlist]")
 {
     Netlist nl;
-    Pin p1, p2;
-    auto inp1 = nl.add(Input(), p1 = nl.add(Pin()) );
+    Pin p1 = nl.add(Pin());
+    Pin p2 = nl.add(Pin());
+    auto inp1 = nl.add(Input(), p1 );
     REQUIRE(nl.size(Input()) == 1);
-    auto inp2 = nl.add(Input(), p2 = nl.add(Pin()) );
+    auto inp2 = nl.add(Input(), p2 );
     REQUIRE(nl.size(Input()) == 2);
     REQUIRE( nl.pin(inp1) == p1 );
     REQUIRE( nl.pin(inp2) == p2 );
@@ -238,4 +239,31 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
     auto out = nl.add(Output(), p2 = nl.add(Pin()));
     REQUIRE(std::count(nl.begin(Input()), nl.end(Input()), inp) == 1);
     REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
+}
+
+TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")
+{
+    Netlist nl;
+    Pin inp1, inp2;
+    Pin out;
+
+    inp1 = nl.add(Pin());
+    inp2 = nl.add(Pin());
+    out = nl.add(Pin());
+
+    nl.add(Input(), inp1);
+    nl.add(Input(), inp2);
+    nl.add(Output(), out);
+
+    auto inputSlews = nl.makeProperty<double>(Input());
+    auto outputLoads = nl.makeProperty<double>(Output());
+
+    inputSlews[nl.input(inp1)] = 1.1;
+    inputSlews[nl.input(inp2)] = 2.2;
+
+    nl.erase(inp2);
+
+    REQUIRE( inputSlews.size() == 1 );
+    REQUIRE( Approx(inputSlews[nl.input(inp1)]) == 1.1 );
+
 }

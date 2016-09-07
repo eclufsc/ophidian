@@ -83,7 +83,7 @@ TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "Comp
 
 TEST_CASE_METHOD(AddPartToWhole< AddWhole<AddPart<PartAndWholeSystem> > >, "Composition: remove part from whole", "[entity_system][Property][Composition][EntitySystem]")
 {
-    composition().erasePart(whole(), part());
+    composition().eraseAssociation(whole(), part());
     REQUIRE( composition().parts(whole()).empty() );
     REQUIRE( composition().whole(part()) == WholeSystem::Entity() );
 }
@@ -128,7 +128,7 @@ TEST_CASE("Composition: self composition", "[entity_system][Property][Compositio
     Composition<WholeEntity, WholeEntity> compo(sys, sys);
     auto en1 = sys.add();
     auto en2 = sys.add();
-    compo.addPart(en1, en2);
+    compo.addAssociation(en1, en2);
     REQUIRE( std::count(compo.parts(en1).begin(), compo.parts(en1).end(), en2) == 1 );
 }
 
@@ -139,7 +139,7 @@ TEST_CASE("Composition: self composition erase parent", "[entity_system][Propert
     Composition<WholeEntity, WholeEntity> compo(sys, sys);
     auto en1 = sys.add();
     auto en2 = sys.add();
-    compo.addPart(en1, en2);
+    compo.addAssociation(en1, en2);
     sys.erase(en1);
     REQUIRE( !sys.valid(en2) );
     REQUIRE( sys.empty() );
@@ -151,7 +151,7 @@ TEST_CASE("Composition: self composition erase child", "[entity_system][Property
     Composition<WholeEntity, WholeEntity> compo(sys, sys);
     auto en1 = sys.add();
     auto en2 = sys.add();
-    compo.addPart(en1, en2);
+    compo.addAssociation(en1, en2);
     sys.erase(en2);
     REQUIRE( compo.parts(en1).empty() );
     REQUIRE( !sys.valid(en2) );
@@ -163,7 +163,7 @@ TEST_CASE("Composition: self composition clear", "[entity_system][Property][Comp
     Composition<WholeEntity, WholeEntity> compo(sys, sys);
     auto en1 = sys.add();
     auto en2 = sys.add();
-    compo.addPart(en1, en2);
+    compo.addAssociation(en1, en2);
     sys.clear();
     REQUIRE( compo.empty() );
 }

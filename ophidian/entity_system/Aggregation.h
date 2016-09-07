@@ -22,13 +22,18 @@ class Aggregation : public Association<WholeEntity_, PartEntity_>
             Parent::attach(*whole.notifier());
         }
 
+        ~Aggregation()
+        {
+            Parent::detach();
+        }
+
         void erase(const Whole& whole) override
         {
             Part current = Parent::firstPart(whole);
             while(current != Part())
             {
                 Part next = Parent::nextPart(current);
-                Parent::erasePart(whole, current);
+                Parent::eraseAssociation(whole, current);
                 current = next;
             }
             Parent::erase(whole);
@@ -36,7 +41,11 @@ class Aggregation : public Association<WholeEntity_, PartEntity_>
 
         void clear() override
         {
-
+            for(auto const & part : Parent::partSystem_)
+            {
+                Parent::eraseAssociation(Parent::whole(part), part);
+            }
+            Parent::clear();
         }
     private:
 };

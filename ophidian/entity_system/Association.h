@@ -39,10 +39,6 @@ private:
     const EntitySystem<Key>& system_;
 };
 
-
-
-
-
 template <class WholeEntity_, class PartEntity_>
 class Association :
         public EntitySystem<WholeEntity_>::NotifierType::ObserverBase
@@ -116,7 +112,7 @@ class Association :
                 {
                     if(whole(item) != Whole())
                     {
-                        association_.erasePart(whole(item), item);
+                        association_.eraseAssociation(whole(item), item);
                     }
                     nextPart_.erase(item);
                     whole_.erase(item);
@@ -227,7 +223,7 @@ class Association :
             return part2Whole_.whole(p);
         }
 
-        void addPart(const Whole& w, const Part& p)
+        void addAssociation(const Whole& w, const Part& p)
         {
             auto first = firstPart(w);
 
@@ -246,7 +242,7 @@ class Association :
 
         }
 
-        void erasePart(const Whole& w, const Part& p)
+        void eraseAssociation(const Whole& w, const Part& p)
         {
             --numParts_[w];
 

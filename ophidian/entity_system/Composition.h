@@ -29,14 +29,12 @@ namespace ophidian
                 void erase(const Whole& whole) override
                 {
                     Part current = Parent::firstPart(whole);
-
                     while (current != Part())
                     {
                         Part next = Parent::nextPart(current);
                         Parent::partSystem_.erase(current);
                         current = next;
                     }
-
                     Parent::erase(whole);
                 }
 

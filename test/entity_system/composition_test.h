@@ -72,7 +72,7 @@ public:
     AddPartToWhole() :
         T()
     {
-        T::composition().addPart(T::whole(), T::part());
+        T::composition().addAssociation(T::whole(), T::part());
     }
 };
 

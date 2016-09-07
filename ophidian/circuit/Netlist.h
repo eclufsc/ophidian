@@ -79,7 +79,7 @@ namespace ophidian
                   \brief Adds a Cell instance.
                   \return A handler for the created Cell.
                 */
-                Cell add(Cell) override;
+                Cell add(Cell) override;  
                 //! Erase Cell
                 /*!
                   \param cell A handler for the Cell to erase.
@@ -139,7 +139,7 @@ namespace ophidian
                   \param cell A handler for the Cell we want to get the Pins.
                   \return Container Wrapper for the Pins of a Cell.
                 */
-                const entity_system::Association<Cell, Pin>::Parts pins(const Cell& cell) const;
+                entity_system::Association<Cell, Pin>::Parts pins(const Cell& cell) const;
                 //! Add Pin into Cell
                 /*!
                   \brief Adds a Pin to a given Cell.
@@ -291,7 +291,7 @@ namespace ophidian
                   \param net A handler for the Net we want to get the Pins.
                   \return Container Wrapper for the Pins of a Net.
                 */
-                const entity_system::Association<Net, Pin>::Parts pins(const Net& net) const;
+                entity_system::Association<Net, Pin>::Parts pins(const Net& net) const;
                 //! Connect Pin on Net
                 /*!
                   \brief Connects a Pin

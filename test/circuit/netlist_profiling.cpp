@@ -36,13 +36,23 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
         }
     }
 
-    std::for_each(nl.begin(Cell()), nl.end(Cell()), [&cellsPins, &nl](const Cell & cell){
+    std::list<Cell> cellsWithoutTheExpectedPins;
+    std::for_each(nl.begin(Cell()), nl.end(Cell()), [&cellsPins, &nl, &cellsWithoutTheExpectedPins](const Cell & cell){
        auto const & pins = cellsPins[cell];
        auto nlCellPins = nl.pins(cell);
-       std::for_each(nlCellPins.begin(), nlCellPins.end(), [&pins](const Pin &pin){
-           REQUIRE( std::count(pins.begin(), pins.end(), pin) == 1 );
+       bool insert = false;
+       std::for_each(nlCellPins.begin(), nlCellPins.end(), [&insert, &pins](const Pin & pin){
+           insert = insert || (std::count(pins.begin(), pins.end(), pin) != 1);
        });
+       if(insert)
+       {
+           cellsWithoutTheExpectedPins.push_back(cell);
+       }
     });
 
+    REQUIRE( cellsWithoutTheExpectedPins.empty() );
     nl.shrink();
+    REQUIRE( nl.capacity(Pin()) == nl.size(Pin()) );
+    REQUIRE( nl.capacity(Net()) == nl.size(Net()) );
+    REQUIRE( nl.capacity(Cell()) == nl.size(Cell()) );
 }

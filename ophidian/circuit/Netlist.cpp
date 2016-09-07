@@ -81,7 +81,7 @@ Net Netlist::net(const Pin &p) const
 
 void Netlist::disconnect(const Pin &p)
 {
-    netPins_.erasePart(net(p), p);
+    netPins_.eraseAssociation(net(p), p);
 }
 
 Cell Netlist::cell(const Pin &p) const
@@ -116,7 +116,7 @@ entity_system::EntitySystem<Cell>::const_iterator Netlist::end(Cell) const
 
 void Netlist::add(const Cell &c, const Pin &p)
 {
-    cellPins_.addPart(c, p);
+    cellPins_.addAssociation(c, p);
 }
 
 entity_system::EntitySystem<Cell>::NotifierType *Netlist::notifier(Cell) const
@@ -134,7 +134,7 @@ uint32_t Netlist::capacity(Cell) const
     return cells_.capacity();
 }
 
-const entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
+entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
 {
     return cellPins_.parts(cell);
 }
@@ -161,7 +161,7 @@ entity_system::EntitySystem<Net>::const_iterator Netlist::end(Net) const
 
 void Netlist::connect(const Net &net, const Pin &pin)
 {
-    netPins_.addPart(net, pin);
+    netPins_.addAssociation(net, pin);
 }
 
 entity_system::EntitySystem<Net>::NotifierType *Netlist::notifier(Net) const
@@ -179,7 +179,7 @@ uint32_t Netlist::capacity(Net) const
     return nets_.capacity();
 }
 
-const entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
+entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
 {
     return netPins_.parts(net);
 }
@@ -194,7 +194,7 @@ Input Netlist::add(Input, const Pin &p)
     Input inp = input(p);
     if(inp != Input())
         return inp;
-    pinInput_.addPart(p, inp = inputs_.add());
+    pinInput_.addAssociation(p, inp = inputs_.add());
     return inp;
 }
 
@@ -233,7 +233,7 @@ Output Netlist::add(Output, const Pin &p)
     Output out = output(p);
     if(out != Output())
         return out;
-    pinOutput_.addPart(p, out = outputs_.add());
+    pinOutput_.addAssociation(p, out = outputs_.add());
     return out;
 }
 
