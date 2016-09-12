@@ -3,12 +3,17 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-    - gcc
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libboost-all-dev
 
 before_script:
   - mkdir build
   - cd build
   - cmake ..
 
-script: make && make test
+script: make -j && make test
