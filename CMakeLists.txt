@@ -16,6 +16,9 @@ endmacro()
 
 UseLemon()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
+set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
+
 enable_testing()
 add_subdirectory(ophidian)
 add_subdirectory(test)
