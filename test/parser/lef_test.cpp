@@ -24,7 +24,7 @@ bool compare(const parser::Lef::layer & a, const parser::Lef::layer & b)
 }
 
 TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
-    parser::Lef parser("input_files/parser/simple.lef");
+    parser::Lef parser("input_files/simple.lef");
 
     SECTION( "sites are parsed correctly", "[lef][lef]") {
         REQUIRE( parser.sites().size() == 1 );
