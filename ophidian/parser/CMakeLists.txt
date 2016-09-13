@@ -1,1 +1,7 @@
-add_library ( parser Def.cpp )
+INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
+
+set(PARSER_SOURCE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Def.cpp)
+add_library( parser ${PARSER_SOURCE} )
+
+target_include_directories( parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${THIRD_PARTY_PATH} )

@@ -16,6 +16,9 @@ endmacro()
 
 UseLemon()
 
+set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
+
 enable_testing()
 add_subdirectory(ophidian)
 add_subdirectory(test)
+
