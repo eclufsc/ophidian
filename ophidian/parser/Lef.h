@@ -28,7 +28,7 @@ under the License.
 
 namespace ophidian {
     namespace parser {
-        class lef {
+        class Lef {
         public:
             struct site {
                 enum symmetries {
@@ -117,8 +117,8 @@ namespace ophidian {
             std::vector<macro> m_macros;
 
         public:
-            lef(const std::string & filename);
-            virtual ~lef();
+            Lef(const std::string & filename);
+            virtual ~Lef();
 
             const std::vector<site> & sites() const
             {

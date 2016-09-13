@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#include "lef.h"
+#include "Lef.h"
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/io/wkt/wkt.hpp>
@@ -26,15 +26,15 @@ under the License.
 namespace ophidian {
 namespace parser {
 
-lef::lef(const std::string &filename)
+Lef::Lef(const std::string &filename)
 {
     lefrInit();
 
     lefrSetUnitsCbk([](lefrCallbackType_e,
                     lefiUnits* units,
                     lefiUserData ud)->int{
-        static_cast<lef*>(ud)->m_units = *units;
-        static_cast<lef*>(ud)->m_units.setDatabase(units->databaseName(), units->databaseNumber());
+        static_cast<Lef*>(ud)->m_units = *units;
+        static_cast<Lef*>(ud)->m_units.setDatabase(units->databaseName(), units->databaseNumber());
         return 0;
     });
 
@@ -52,7 +52,7 @@ lef::lef(const std::string &filename)
             s.set90symmetry();
         s.x = l->sizeX();
         s.y = l->sizeY();
-        static_cast<lef*>(ud)->m_sites.push_back(s);
+        static_cast<Lef*>(ud)->m_sites.push_back(s);
         return 0;
     });
 
@@ -74,13 +74,13 @@ lef::lef(const std::string &filename)
         }
         lay.pitch = l->pitch();
         lay.width = l->width();
-        static_cast<lef*>(ud)->m_layers.push_back(lay);
+        static_cast<Lef*>(ud)->m_layers.push_back(lay);
         return 0;
     });
     lefrSetPinCbk([](lefrCallbackType_e,
                   lefiPin* l,
                   lefiUserData ud)->int{
-        macro & m = static_cast<lef*>(ud)->m_macros.back();
+        macro & m = static_cast<Lef*>(ud)->m_macros.back();
         pin p;
         p.name = l->name();
         if(l->hasDirection())
@@ -118,7 +118,7 @@ lef::lef(const std::string &filename)
     lefrSetMacroBeginCbk([](lefrCallbackType_e,
                          const char *string,
                          lefiUserData ud)->int{
-        static_cast<lef*>(ud)->m_macros.push_back(macro{string});
+        static_cast<Lef*>(ud)->m_macros.push_back(macro{string});
         return 0;
     });
 
@@ -126,7 +126,7 @@ lef::lef(const std::string &filename)
                           lefiObstruction* l,
                           lefiUserData ud)->int{
         auto geometries = l->geometries();
-        macro & m = static_cast<lef*>(ud)->m_macros.back();
+        macro & m = static_cast<Lef*>(ud)->m_macros.back();
         std::string last_layer;
         for(int i = 0; i < geometries->numItems(); ++i)
         {
@@ -149,7 +149,7 @@ lef::lef(const std::string &filename)
                     lefiMacro* l,
                     lefiUserData ud)->int{
 
-        macro & m = static_cast<lef*>(ud)->m_macros.back();
+        macro & m = static_cast<Lef*>(ud)->m_macros.back();
         m.name = l->name();
         m.class_ = (l->hasClass()?l->macroClass():"");
         m.origin.x = l->originX();
@@ -183,22 +183,22 @@ lef::lef(const std::string &filename)
 
 }
 
-lef::~lef()
+Lef::~Lef()
 {
 
 }
 
-void lef::site::setXsymmetry()
+void Lef::site::setXsymmetry()
 {
     symmetry |= X;
 }
 
-void lef::site::setYsymmetry()
+void Lef::site::setYsymmetry()
 {
     symmetry |= Y;
 }
 
-void lef::site::set90symmetry()
+void Lef::site::set90symmetry()
 {
     symmetry |= NINETY;
 }

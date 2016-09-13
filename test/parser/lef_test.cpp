@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <catch.hpp>
 
-#include <ophidian/parser/lef.h>
+#include <ophidian/parser/Lef.h>
 
 using namespace ophidian;
 
-bool compare(const parser::lef::site & a, const parser::lef::site & b)
+bool compare(const parser::Lef::site & a, const parser::Lef::site & b)
 {
     return a.name == b.name &&
            a.class_ == b.class_ &&
@@ -14,7 +14,7 @@ bool compare(const parser::lef::site & a, const parser::lef::site & b)
            Approx(a.y) == b.y;
 }
 
-bool compare(const parser::lef::layer & a, const parser::lef::layer & b)
+bool compare(const parser::Lef::layer & a, const parser::Lef::layer & b)
 {
     return a.name == b.name &&
            a.type == b.type &&
@@ -24,12 +24,12 @@ bool compare(const parser::lef::layer & a, const parser::lef::layer & b)
 }
 
 TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
-    parser::lef parser("input_files/parser/simple.lef");
+    parser::Lef parser("input_files/parser/simple.lef");
 
     SECTION( "sites are parsed correctly", "[lef][lef]") {
         REQUIRE( parser.sites().size() == 1 );
 
-        parser::lef::site core;
+        parser::Lef::site core;
         core.name = "core";
         core.class_ = "CORE";
         core.x = 0.19;
@@ -39,17 +39,17 @@ TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
     }
 
     SECTION( "layers are parsed correctly", "[lef][lef]") {
-        std::vector<parser::lef::layer> layers{
-            {"metal1", "ROUTING", parser::lef::layer::HORIZONTAL,  0.2, 0.1},
-            {"metal2", "ROUTING", parser::lef::layer::VERTICAL,    0.2, 0.1},
-            {"metal3", "ROUTING", parser::lef::layer::HORIZONTAL,  0.2, 0.1}
+        std::vector<parser::Lef::layer> layers{
+            {"metal1", "ROUTING", parser::Lef::layer::HORIZONTAL,  0.2, 0.1},
+            {"metal2", "ROUTING", parser::Lef::layer::VERTICAL,    0.2, 0.1},
+            {"metal3", "ROUTING", parser::Lef::layer::HORIZONTAL,  0.2, 0.1}
         };
 
         REQUIRE( parser.layers().size() == layers.size() );
 
         for(auto & simple_layer : layers)
         {
-            auto comparePredicate = [simple_layer](const parser::lef::layer & layer) -> bool {
+            auto comparePredicate = [simple_layer](const parser::Lef::layer & layer) -> bool {
                 return compare(simple_layer, layer);
             };
 
