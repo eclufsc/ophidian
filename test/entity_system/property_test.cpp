@@ -139,7 +139,7 @@ TEST_CASE("Property: reserve, capacity & shrink", "[entity_system][Property]") {
     Property<MyEntity, int> prop(sys);
     prop.reserve(42);
     REQUIRE( prop.capacity() == 42 );
-    prop.shrink();
+    prop.shrinkToFit();
     REQUIRE( prop.capacity() == 3 );
 
 }
@@ -151,7 +151,7 @@ TEST_CASE("Property: property capacity", "[entity_system][Property]") {
     sys.add();
     sys.add();
     REQUIRE( prop.capacity() == 42 );
-    sys.shrink();
+    sys.shrinkToFit();
     REQUIRE( prop.capacity() == 2 );
 
 }

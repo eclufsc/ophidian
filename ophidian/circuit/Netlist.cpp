@@ -262,13 +262,13 @@ entity_system::EntitySystem<Output>::NotifierType *Netlist::notifier(Output) con
     return outputs_.notifier();
 }
 
-void Netlist::shrink()
+void Netlist::shrinkToFit()
 {
-    cells_.shrink();
-    pins_.shrink();
-    nets_.shrink();
-    inputs_.shrink();
-    outputs_.shrink();
+    cells_.shrinkToFit();
+    pins_.shrinkToFit();
+    nets_.shrinkToFit();
+    inputs_.shrinkToFit();
+    outputs_.shrinkToFit();
 }
 
 }

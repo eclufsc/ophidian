@@ -39,6 +39,11 @@ private:
     const EntitySystem<Key>& system_;
 };
 
+//! Association
+/*!
+  An abstract property to model 1-N associations between entities.
+  The "1" side is called Whole. The "N" side is called Part.
+*/
 template <class WholeEntity_, class PartEntity_>
 class Association :
         public EntitySystem<WholeEntity_>::NotifierType::ObserverBase
@@ -84,10 +89,10 @@ class Association :
 
             private:
 
-                void shrink() override
+                void shrinkToFit() override
                 {
-                    nextPart_.shrink();
-                    whole_.shrink();
+                    nextPart_.shrinkToFit();
+                    whole_.shrinkToFit();
                 }
 
                 void reserve(std::uint32_t size) override
@@ -132,6 +137,10 @@ class Association :
 
     public:
 
+        //! Parts
+        /*!
+          A wrapper class to provide a iterable interface (begin(), end()) for the Parts container of a Whole.
+        */
         class Parts {
         public:
 
@@ -208,6 +217,10 @@ class Association :
             const Whole whole_;
         };
 
+        //! Construct Association
+        /*!
+          \brief Construct an association between two EntitySystem objects
+        */
         Association(const WholeSystem& whole, PartSystem& part)  :
             EntitySystem<Whole>::NotifierType::ObserverBase(*whole.notifier()),
             firstPart_(whole),
@@ -218,11 +231,23 @@ class Association :
             EntitySystem<Whole>::NotifierType::ObserverBase::detach();
         }
 
+        //! Whole of a Part
+        /*!
+          \brief Returns the Whole of a Part.
+          \param p A handler for the part we want the Whole.
+          \return A handler for the Whole of \p part
+        */
         Whole whole(const Part& p) const
         {
             return part2Whole_.whole(p);
         }
 
+        //! Add association
+        /*!
+          \brief Makes a Part Entity part of a Whole Entity.
+          \param w A handler for the Whole Entity.
+          \param p A handler for the Part Entity.
+        */
         void addAssociation(const Whole& w, const Part& p)
         {
             auto first = firstPart(w);
@@ -242,6 +267,12 @@ class Association :
 
         }
 
+        //! Erase association
+        /*!
+          \brief Remove the association between Part and Whole entities.
+          \param w A handler for the Whole Entity.
+          \param p A handler for the Part Entity.
+        */
         void eraseAssociation(const Whole& w, const Part& p)
         {
             --numParts_[w];
@@ -270,24 +301,53 @@ class Association :
 
         }
 
+        //! Get the parts of a whole
+        /*!
+          \brief Returns a container-like object for the parts of a given whole.
+          \param w A handler for the Whole Entity.
+          \return A Parts object that contains begin(), end() and size() methods.
+        */
         const Parts parts(const Whole& w) const {
             Parts theParts(*this, w);
             return theParts;
         }
 
+        //! Empty Association
+        /*!
+          \brief Returns a boolean indicating if the Association is empty (i.e., the whole EntitySystem is empty) or not.
+          \return true if the Whole EntitySystem is empty, false otherwise.
+        */
         bool empty() const {
             return numParts_.empty();
         }
 
-
+        //! First Part of a Whole
+        /*!
+          \brief Returns the first part of a Whole.
+          \param w A handler for the Whole Entity.
+          \return A handler for the first Part of \p w.
+        */
         Part firstPart(const Whole& w) const {
             return firstPart_[w];
         }
 
+        //! Next Part in an association
+        /*!
+          \brief Returns the next part of a whole, given the current part.
+          \param p A handler for the current part of a Whole
+          \return A handler for the next Part in association, after \p w.
+          \remarks The association is implemented as a linked list. A Whole entity has a property containing the handler for its first part. Each part has a property containing the next part in association. We assume a part can only be part of one whole at a time.
+        */
         Part nextPart(const Part& p) const {
             return part2Whole_.nextPart(p);
         }
 
+        //! Number of parts of a whole
+        /*!
+          \brief Returns the number of parts of a given whole.
+          \param w A handler for the Whole
+          \return The number of parts of \p w
+        */
         uint32_t numParts(const Whole& w) const {
             return numParts_[w];
         }
@@ -300,9 +360,9 @@ class Association :
             std::fill(firstPart_.begin(), firstPart_.end(), Part());
         }
 
-        virtual void shrink() override
+        virtual void shrinkToFit() override
         {
-            firstPart_.shrink();
+            firstPart_.shrinkToFit();
         }
 
         virtual void reserve(uint32_t size) override

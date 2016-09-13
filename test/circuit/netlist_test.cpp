@@ -163,7 +163,7 @@ class DummyCellObserver : public Netlist::CellNotifier::ObserverBase
         ~DummyCellObserver() {
 
         }
-        void shrink() override
+        void shrinkToFit() override
         {
             capacity = added - erased;
         }

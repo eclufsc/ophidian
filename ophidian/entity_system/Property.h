@@ -86,7 +86,7 @@ namespace ophidian
                     properties_.reserve(size);
                 }
 
-                void shrink() override
+                void shrinkToFit() override
                 {
                     properties_.shrink_to_fit();
                 }

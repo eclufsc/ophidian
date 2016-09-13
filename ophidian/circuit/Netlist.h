@@ -1,5 +1,5 @@
-#ifndef NETLIST_H
-#define NETLIST_H
+#ifndef OPHIDIAN_CIRCUIT_NETLIST_H
+#define OPHIDIAN_CIRCUIT_NETLIST_H
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Aggregation.h>
@@ -40,21 +40,8 @@ namespace ophidian
                 using entity_system::EntityBase::EntityBase;
         };
 
-        template <class Entity_>
-        class Manager
-        {
-            public:
-                virtual ~Manager() { }
-                virtual Entity_ add(Entity_) = 0;
-                virtual void erase(const Entity_ & en) = 0;
-                virtual uint32_t size(Entity_) const = 0;
-        };
-
-
         /*! A flatten Netlist */
-        class Netlist final : public Manager<Cell>,
-            public Manager<Pin>,
-            public Manager<Net>
+        class Netlist final
         {
             public:
                 using CellNotifier = entity_system::EntitySystem<Cell>::NotifierType;
@@ -63,35 +50,36 @@ namespace ophidian
 
                 //! Construct Netlist
                 /*!
-                  Constructs an empty Netlist, with no Cells, Pins or Nets.
+                  \brief Constructs an empty Netlist, with no Cells, Pins or Nets.
                 */
                 Netlist();
 
+                //! Move Constructor
                 Netlist(Netlist&& nl);
                 //! Netlist Destructor
                 /*!
-                  This destroy all Netlist's EntitySystems.
+                  \brief This destroy all Netlist's EntitySystems.
                 */
-                ~Netlist() override;
+                ~Netlist();
 
                 //! Add Cell
                 /*!
                   \brief Adds a Cell instance.
                   \return A handler for the created Cell.
                 */
-                Cell add(Cell) override;  
+                Cell add(Cell);
                 //! Erase Cell
                 /*!
                   \param cell A handler for the Cell to erase.
                   \brief Erases a Cell instance.
                 */
-                void erase(const Cell& cell) override;
+                void erase(const Cell& cell);
                 //! Size of Cell's System
                 /*!
                   \brief Returns the number of Cells.
                   \return The number of Cells.
                 */
-                uint32_t size(Cell) const override;
+                uint32_t size(Cell) const;
                 //! Iterator to beginning
                 /*!
                   \brief Returns an iterator pointing to the first element in the Cell's EntitySystem.
@@ -152,19 +140,19 @@ namespace ophidian
                   \brief Adds a Pin instance.
                   \return A handler for the created Pin.
                 */
-                Pin add(Pin) override;
+                Pin add(Pin);
                 //! Erase Pin
                 /*!
                   \param pin A handler for the Pin to erase.
                   \brief Erases a Pin instance.
                 */
-                void erase(const Pin& pin) override;
+                void erase(const Pin& pin);
                 //! Size of Pin's System
                 /*!
                   \brief Returns the number of Pins.
                   \return The number of Pins.
                 */
-                uint32_t size(Pin) const override;
+                uint32_t size(Pin) const;
                 //! Iterator to beginning
                 /*!
                   \brief Returns an iterator pointing to the first element in the Pin's EntitySystem.
@@ -232,19 +220,19 @@ namespace ophidian
                   \brief Adds a Net instance.
                   \return A handler for the created Net.
                 */
-                Net add(Net) override;
+                Net add(Net);
                 //! Erase Net
                 /*!
                   \param net A handler for the Net to erase.
                   \brief Erases a Net instance.
                 */
-                void erase(const Net& net) override;
+                void erase(const Net& net);
                 //! Size of Net's System
                 /*!
                   \brief Returns the number of Nets.
                   \return The number of Nets.
                 */
-                uint32_t size(Net) const override;
+                uint32_t size(Net) const;
                 //! Iterator to beginning
                 /*!
                   \brief Returns an iterator pointing to the first element in the Net's EntitySystem.
@@ -420,7 +408,7 @@ namespace ophidian
                 /*!
                   \brief Shrink each EntitySystem in order to improve the memory usage.
                 */
-                void shrink();
+                void shrinkToFit();
             private:
                 Netlist(const Netlist& nl) = delete;
                 Netlist& operator =(const Netlist& nl) = delete;
@@ -438,4 +426,4 @@ namespace ophidian
     }
 }
 
-#endif // NETLIST_H
+#endif // OPHIDIAN_CIRCUIT_NETLIST_H

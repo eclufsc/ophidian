@@ -32,6 +32,9 @@ namespace ophidian
             public:
                 uint32_t id(const EntityBase& en) const;
         };
+
+
+        /*! Entity System Notifier */
         template <class EntitySystem_, class Entity_>
         class EntitySystemNotifier : public lemon::AlterationNotifier<EntitySystem_, Entity_>
         {
@@ -48,7 +51,7 @@ namespace ophidian
                 virtual void erase(const std::vector<Entity> &items) final {}
                 virtual void build() final {}
                 virtual void reserve(uint32_t size) = 0;
-                virtual void shrink() = 0;
+                virtual void shrinkToFit() = 0;
             };
             using Parent::Parent;
             void reserve(uint32_t size)
@@ -59,12 +62,12 @@ namespace ophidian
                     observer->reserve(size);
                 }
             }
-            void shrink()
+            void shrinkToFit()
             {
                 for (auto it = Parent::_observers.begin(); it != Parent::_observers.end(); ++it)
                 {
                     auto observer = static_cast<ObserverBase*>(*it);
-                    observer->shrink();
+                    observer->shrinkToFit();
                 }
             }
             void erase(const Entity & item)
@@ -82,8 +85,14 @@ namespace ophidian
             }
         };
 
+
+        //! An Entity System
+        /*!
+          Creates, holds and destroys entities in O(1) complexity.
+          Does not guarantee any kind of order between the entities.
+        */
         template <class Entity_>
-        class EntitySystem : public EntitySystemBase
+        class EntitySystem final : public EntitySystemBase
         {
             public:
                 using Entity = Entity_;
@@ -101,7 +110,7 @@ namespace ophidian
                     notifier_.setContainer(*this);
                     id_ = idCounter_++;
                 }
-                virtual ~EntitySystem()
+                ~EntitySystem()
                 {
 
                 }
@@ -240,9 +249,9 @@ namespace ophidian
                 /*!
                   \brief Reallocate the EntitySystem and it's propertys to have capacity == size. This may help to
                 */
-                void shrink() {
+                void shrinkToFit() {
                     container_.shrink_to_fit();
-                    notifier_.shrink();
+                    notifier_.shrinkToFit();
                 }
             private:
                 NotifierType notifier_;

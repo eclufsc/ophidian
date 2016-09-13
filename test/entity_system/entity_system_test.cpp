@@ -67,6 +67,6 @@ TEST_CASE("EntitySystem: shrink", "[entity_system][EntitySystem]") {
     sys.add();
     sys.add();
     sys.add();
-    sys.shrink();
+    sys.shrinkToFit();
     REQUIRE( sys.capacity() == 3 );
 }

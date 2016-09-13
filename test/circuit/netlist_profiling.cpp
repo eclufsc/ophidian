@@ -51,7 +51,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
     });
 
     REQUIRE( cellsWithoutTheExpectedPins.empty() );
-    nl.shrink();
+    nl.shrinkToFit();
     REQUIRE( nl.capacity(Pin()) == nl.size(Pin()) );
     REQUIRE( nl.capacity(Net()) == nl.size(Net()) );
     REQUIRE( nl.capacity(Cell()) == nl.size(Cell()) );
