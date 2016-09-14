@@ -17,3 +17,5 @@ install_manifest.txt
 .project
 .cproject
 /build
+/docs
+.DS_Store

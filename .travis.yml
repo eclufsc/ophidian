@@ -3,12 +3,30 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-    - gcc
-
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=g++-5
+      
 before_script:
-  - mkdir build
-  - cd build
-  - cmake ..
+  - mkdir build && cd build
+  - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
+  - tar -zxvf bison-3.0.4.tar.gz
+  - cd bison-3.0.4
+  - mkdir inst
+  - ./configure --prefix=$PWD/inst
+  - make -j && make install
+  - cd inst/bin
+  - export PATH=$PWD:$PATH
+  - cd ..
+  - cd ..
+  - cd ..
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
 
-script: make && make test
+script: make -j && make -j test
