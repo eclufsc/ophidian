@@ -9,13 +9,14 @@ INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/LEF/lib/)
 
 add_subdirectory(entity_system)
-add_subdirectory(parser)
+add_subdirectory(circuit)
+add_subdirectory(lefdefparser)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
-target_link_libraries(run_tests Catch ophidian_entitysystem parser)
+target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit verilogparser lefdefparser)
 
 include_directories(${CMAKE_SOURCE_DIR})
-add_test(NAME unit_test COMMAND run_tests)
+add_test(NAME unit_test COMMAND run_tests "~[Profiling]")
 
 add_custom_command(
         TARGET run_tests POST_BUILD

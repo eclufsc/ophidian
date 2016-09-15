@@ -23,6 +23,7 @@ under the License.
 #include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/io/wkt/wkt.hpp>
 #include <iostream>
+
 namespace ophidian {
 namespace parser {
 
@@ -180,7 +181,6 @@ Lef::Lef(const std::string &filename)
         std::cerr << "error" << std::endl;
 
     fclose(ifp);
-
 }
 
 Lef::~Lef()

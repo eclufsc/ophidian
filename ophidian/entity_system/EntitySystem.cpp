@@ -20,6 +20,11 @@ bool EntityBase::operator==(const EntityBase &entity) const
     return id_ == entity.id_ && system_ == entity.system_;
 }
 
+bool EntityBase::operator!=(const EntityBase &entity) const
+{
+    return !((*this) == entity);
+}
+
 EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
     id_(id),
     system_(system)

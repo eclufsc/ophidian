@@ -1,7 +1,6 @@
-#include <algorithm>
 #include <catch.hpp>
 
-#include <ophidian/parser/Lef.h>
+#include <ophidian/lefdefparser/Lef.h>
 
 using namespace ophidian;
 
