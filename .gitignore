@@ -16,3 +16,6 @@ install_manifest.txt
 /benchmarks
 .project
 .cproject
+/build
+/docs
+.DS_Store

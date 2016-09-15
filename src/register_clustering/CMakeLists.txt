@@ -1,5 +1,0 @@
-find_package( Boost 1.59 )
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_library (register_clustering kmeans.cpp kmeans.h clusters.cpp clusters.h register_clustering.cpp)
-target_include_directories ( register_clustering PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries( register_clustering ${Boost_LIBRARIES} emon netlist placement entity_system clock_tree_synthesis )
