@@ -82,148 +82,174 @@ TEST_CASE("Verilog::Module: instance port mapping", "[parser][VerilogParser]")
 
 }
 
-TEST_CASE("VerilogParser: read from stream", "[parser][VerilogParser]")
+TEST_CASE("VerilogParser: invalid input", "[parser][VerilogParser]")
+{
+    std::stringstream input("module simput in; output out; endmodule");
+    VerilogParser parser;
+    std::unique_ptr<Verilog> file(parser.readStream(input));
+    REQUIRE( !file );
+}
+
+TEST_CASE("VerilogParser: read module with two ports", "[parser][VerilogParser]")
 {
     std::stringstream input("module simple(in, out); input in; output out; endmodule");
     VerilogParser parser;
-    auto file = parser.readStream(input);
+    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    const Verilog::Module & simple = verilog->modules().front();
+    REQUIRE(simple.name() == "simple");
+    REQUIRE(simple.ports().size() == 2);
+    REQUIRE( std::count(simple.ports().begin(), simple.ports().end(), Verilog::Port(Verilog::PortDirection::INPUT, "in")) == 1 );
+    REQUIRE( std::count(simple.ports().begin(), simple.ports().end(), Verilog::Port(Verilog::PortDirection::OUTPUT, "out")) == 1 );
 }
 
-#include <iostream>
-TEST_CASE("Verilog::Module: simple test", "[parser][VerilogParser]")
+TEST_CASE("VerilogParser: read module with two nets", "[parser][VerilogParser]")
 {
-    Verilog simpleVerilog;
-    auto design = simpleVerilog.addModule("design");
-    Verilog::Module *simple = design->addModule("simple");
-    auto topLevelInstance = design->addInstance(simple, "design");
+    std::stringstream input("module simple();  wire netA; wire netB; endmodule");
+    VerilogParser parser;
+    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    const Verilog::Module & simple = verilog->modules().front();
+    REQUIRE(simple.nets().size() == 2);
+    REQUIRE( std::count(simple.nets().begin(), simple.nets().end(), Verilog::Net("netA")) == 1 );
+    REQUIRE( std::count(simple.nets().begin(), simple.nets().end(), Verilog::Net("netB")) == 1 );
+}
 
-    auto inp1Port = simple->addPort(Verilog::PortDirection::INPUT, "inp1");
-    auto inp2Port = simple->addPort(Verilog::PortDirection::INPUT, "inp2");
-    auto clkPort = simple->addPort(Verilog::PortDirection::INPUT, "iccad_clk");
-    auto outPort = simple->addPort(Verilog::PortDirection::OUTPUT, "out");
+TEST_CASE("VerilogParser: read module with one module instanciation", "[parser][VerilogParser]")
+{
+    std::stringstream input("module simple(inp, out); input inp; output out; wire inp; wire out; INV u1(.a(inp), .o(out)); endmodule");
+    VerilogParser parser;
+    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    REQUIRE( verilog->modules().size() == 1 );
+    const Verilog::Module & simple = verilog->modules().front();
+    REQUIRE( simple.modules().size() == 1 );
+    const Verilog::Module & INV = simple.modules().front();
+    REQUIRE( INV.name() == "INV" );
+    REQUIRE( simple.instances().size() == 1 );
+    const Verilog::Instance & u1 = simple.instances().front();
+    REQUIRE( u1.module() == &INV );
+    REQUIRE( u1.name() == "u1" );
+    const Verilog::Net & inpNet = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "inp"; });
+    const Verilog::Net & outNet = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "out"; });
+    const Verilog::Port & INVaPort = *std::find_if(INV.ports().begin(), INV.ports().end(), [](const Verilog::Port& port) ->bool{return port.name() == "a";});
+    const Verilog::Port & INVoPort = *std::find_if(INV.ports().begin(), INV.ports().end(), [](const Verilog::Port& port) ->bool{return port.name() == "o";});
+    auto portMapping = u1.portMapping();
+    REQUIRE( portMapping.size() == INV.ports().size() );
+    REQUIRE( portMapping.at(&INVaPort) == &inpNet );
+    REQUIRE( portMapping.at(&INVoPort) == &outNet );
+}
 
-    auto NAND2 = simple->addModule("NAND2");
-    auto NAND2a = NAND2->addPort(Verilog::PortDirection::INPUT, "a");
-    auto NAND2b = NAND2->addPort(Verilog::PortDirection::INPUT, "b");
-    auto NAND2o = NAND2->addPort(Verilog::PortDirection::OUTPUT, "o");
+TEST_CASE("VerilogParser: read simple.v", "[parser][VerilogParser]")
+{
+    VerilogParser parser;
+    std::stringstream input(test::simpleInput);
+    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    REQUIRE( verilog );
+    REQUIRE( verilog->modules().size() == 1 );
 
-    auto NOR2 = simple->addModule("NOR2");
-    auto NOR2a = NOR2->addPort(Verilog::PortDirection::INPUT, "a");
-    auto NOR2b = NOR2->addPort(Verilog::PortDirection::INPUT, "b");
-    auto NOR2o = NOR2->addPort(Verilog::PortDirection::OUTPUT, "o");
+    const Verilog::Module & simple = verilog->modules().front();
 
-    auto INV = simple->addModule("INV");
-    auto INVa = INV->addPort(Verilog::PortDirection::INPUT, "a");
-    auto INVo = INV->addPort(Verilog::PortDirection::OUTPUT, "o");
+    REQUIRE( simple.modules().size() == 5 );
 
-    auto DFF = simple->addModule("DFF");
-    auto DFFck = DFF->addPort(Verilog::PortDirection::INPUT, "ck");
-    auto DFFd = DFF->addPort(Verilog::PortDirection::INPUT, "d");
-    auto DFFq = DFF->addPort(Verilog::PortDirection::OUTPUT, "q");
+    // #1
+    const Verilog::Module & NAND2_X1 = *std::find_if(simple.modules().begin(), simple.modules().end(), [](const Verilog::Module & module)->bool{ return module.name() == "NAND2_X1";});
+    const Verilog::Port & NAND2_X1a = *std::find_if(NAND2_X1.ports().begin(), NAND2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "a";});
+    const Verilog::Port & NAND2_X1b = *std::find_if(NAND2_X1.ports().begin(), NAND2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "b";});
+    const Verilog::Port & NAND2_X1o = *std::find_if(NAND2_X1.ports().begin(), NAND2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "o";});
 
-    auto inp1 = simple->addNet("inp1");
-    auto inp2 = simple->addNet("inp2");
-    auto out = simple->addNet("out");
-    auto iccad_clk = simple->addNet("iccad_clk");
-    auto n1 = simple->addNet("n1");
-    auto n2 = simple->addNet("n2");
-    auto n3 = simple->addNet("n3");
-    auto n4 = simple->addNet("n4");
+    // #2
+    const Verilog::Module & NOR2_X1 = *std::find_if(simple.modules().begin(), simple.modules().end(), [](const Verilog::Module & module)->bool{ return module.name() == "NOR2_X1";});
+    const Verilog::Port & NOR2_X1a = *std::find_if(NOR2_X1.ports().begin(), NOR2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "a";});
+    const Verilog::Port & NOR2_X1b = *std::find_if(NOR2_X1.ports().begin(), NOR2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "b";});
+    const Verilog::Port & NOR2_X1o = *std::find_if(NOR2_X1.ports().begin(), NOR2_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "o";});
 
-    Verilog::Instance *u1 = simple->addInstance(NAND2, "u1");
-    u1->mapPort(NAND2a, inp1);
-    u1->mapPort(NAND2b, inp2);
-    u1->mapPort(NAND2o, n1);
+    // #3
+    const Verilog::Module & DFF_X80 = *std::find_if(simple.modules().begin(), simple.modules().end(), [](const Verilog::Module & module)->bool{ return module.name() == "DFF_X80";});
+    const Verilog::Port & DFF_X80d = *std::find_if(DFF_X80.ports().begin(), DFF_X80.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "d";});
+    const Verilog::Port & DFF_X80ck = *std::find_if(DFF_X80.ports().begin(), DFF_X80.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "ck";});
+    const Verilog::Port & DFF_X80q = *std::find_if(DFF_X80.ports().begin(), DFF_X80.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "q";});
 
-    Verilog::Instance *u2 = simple->addInstance(NAND2, "u2");
-    u2->mapPort(NOR2a, n1);
-    u2->mapPort(NOR2b, n3);
-    u2->mapPort(NOR2o, n2);
+    // #4
+    const Verilog::Module & INV_X1 = *std::find_if(simple.modules().begin(), simple.modules().end(), [](const Verilog::Module & module)->bool{ return module.name() == "INV_X1";});
+    const Verilog::Port & INV_X1a = *std::find_if(INV_X1.ports().begin(), INV_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "a";});
+    const Verilog::Port & INV_X1o = *std::find_if(INV_X1.ports().begin(), INV_X1.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "o";});
 
-    Verilog::Instance *f1 = simple->addInstance(DFF, "f1");
-    f1->mapPort(DFFck, iccad_clk);
-    f1->mapPort(DFFd, n2);
-    f1->mapPort(DFFq, n3);
+    // #5
+    const Verilog::Module & INV_Z80 = *std::find_if(simple.modules().begin(), simple.modules().end(), [](const Verilog::Module & module)->bool{ return module.name() == "INV_Z80";});
+    const Verilog::Port & INV_Z80a = *std::find_if(INV_Z80.ports().begin(), INV_Z80.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "a";});
+    const Verilog::Port & INV_Z80o = *std::find_if(INV_Z80.ports().begin(), INV_Z80.ports().end(), [](const Verilog::Port & port)->bool{ return port.name() == "o";});
 
-    Verilog::Instance *u3 = simple->addInstance(INV, "u3");
-    u3->mapPort(INVa, n3);
-    u3->mapPort(INVo, n4);
+    REQUIRE( simple.instances().size() == 6 );
+    const Verilog::Instance & u1 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "u1"; });
+    const Verilog::Instance & u2 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "u2"; });
+    const Verilog::Instance & f1 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "f1"; });
+    const Verilog::Instance & u3 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "u3"; });
+    const Verilog::Instance & u4 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "u4"; });
+    const Verilog::Instance & lcb1 = *std::find_if(simple.instances().begin(), simple.instances().end(), [](const Verilog::Instance & inst)->bool{ return inst.name() == "lcb1"; });
 
-    Verilog::Instance *u4 = simple->addInstance(INV, "u4");
-    u4->mapPort(INVa, n4);
-    u4->mapPort(INVo, out);
+    REQUIRE( u1.module() == &NAND2_X1 );
+    REQUIRE( u2.module() == &NOR2_X1 );
+    REQUIRE( f1.module() == &DFF_X80 );
+    REQUIRE( u3.module() == &INV_X1 );
+    REQUIRE( u4.module() == &INV_X1 );
+    REQUIRE( lcb1.module() == &INV_Z80 );
 
-    REQUIRE( simpleVerilog.modules().size() == 1 );
-    REQUIRE( simple->instances().size() == 5 );
-    REQUIRE( simple->nets().size() == 8 );
-    REQUIRE( simple->ports().size() == 4 );
+    REQUIRE( simple.nets().size() == 9 );
+    const Verilog::Net & inp1 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "inp1"; });
+    const Verilog::Net & inp2 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "inp2"; });
+    const Verilog::Net & n1 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "n1"; });
+    const Verilog::Net & n2 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "n2"; });
+    const Verilog::Net & n3 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "n3"; });
+    const Verilog::Net & n4 = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "n4"; });
+    const Verilog::Net & out = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "out"; });
+    const Verilog::Net & iccad_clk = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "iccad_clk"; });
+    const Verilog::Net & lcb1_fo = *std::find_if(simple.nets().begin(), simple.nets().end(), [](const Verilog::Net & net)->bool{ return net.name() == "lcb1_fo"; });
 
-    topLevelInstance->mapPort(inp1Port, inp1);
-    topLevelInstance->mapPort(inp2Port, inp2);
-    topLevelInstance->mapPort(clkPort, iccad_clk);
-    topLevelInstance->mapPort(outPort, out);
+    auto u1PortMapping = u1.portMapping();
+    REQUIRE( u1PortMapping.size() == 3 );
+    REQUIRE( u1PortMapping.at(&NAND2_X1a) == &inp1 );
+    REQUIRE( u1PortMapping.at(&NAND2_X1b) == &inp2 );
+    REQUIRE( u1PortMapping.at(&NAND2_X1o) == &n1 );
 
-    std::cout << "module " << topLevelInstance->module()->name() << "(";
+    auto u2PortMapping = u2.portMapping();
+    REQUIRE( u2PortMapping.size() == 3 );
+    REQUIRE( u2PortMapping.at(&NOR2_X1a) == &n1 );
+    REQUIRE( u2PortMapping.at(&NOR2_X1b) == &n3 );
+    REQUIRE( u2PortMapping.at(&NOR2_X1o) == &n2 );
 
-    std::size_t i = 0;
-    for(auto const & port : topLevelInstance->module()->ports())
-    {
-        std::cout << port.name();
-        if(++i == topLevelInstance->module()->ports().size())
-        {
-            std::cout << ");" << std::endl;
-        }
-        else
-        {
-            std::cout << ", ";
-        }
-    }
+    auto f1PortMapping = f1.portMapping();
+    REQUIRE( f1PortMapping.size() == 3 );
+    REQUIRE( f1PortMapping.at(&DFF_X80d) == &n2 );
+    REQUIRE( f1PortMapping.at(&DFF_X80ck) == &lcb1_fo );
+    REQUIRE( f1PortMapping.at(&DFF_X80q) == &n3 );
 
-    std::cout << "\n// Begin Ports" << std::endl;
-    for(auto const & port : topLevelInstance->portMapping())
-    {
-        std::string portTypeString;
-        switch(port.first->direction())
-        {
-        case Verilog::PortDirection::INPUT:
-            portTypeString = "input";
-            break;
-        case Verilog::PortDirection::OUTPUT:
-            portTypeString = "output";
-            break;
-        case Verilog::PortDirection::INOUT:
-            portTypeString = "inout";
-            break;
-        }
-        std::cout << portTypeString << " " << port.first->name() << ";" << std::endl;
-    }
+    auto u3PortMapping = u3.portMapping();
+    REQUIRE( u3PortMapping.size() == 2 );
+    REQUIRE( u3PortMapping.at(&INV_X1a) == &n3 );
+    REQUIRE( u3PortMapping.at(&INV_X1o) == &n4 );
 
-    std::cout << "\n// Begin Wires" << std::endl;
-    for(auto const & net : simple->nets())
-    {
-        std::cout << "wire " << net.name() << ";" << std::endl;
-    }
+    auto u4PortMapping = u4.portMapping();
+    REQUIRE( u4PortMapping.size() == 2 );
+    REQUIRE( u4PortMapping.at(&INV_X1a) == &n4 );
+    REQUIRE( u4PortMapping.at(&INV_X1o) == &out );
 
-    std::cout << "\n// Begin Cells" << std::endl;
-    for(auto const & instance : simple->instances())
-    {
-        std::cout << instance.module()->name() << " " << instance.name();
-        std::size_t i = 0;
-        for(auto const & port : instance.portMapping())
-        {
-            std::cout << " ." << port.first->name() << "( " << port.second->name() << " )";
-            if(++i == instance.portMapping().size())
-            {
-                std::cout << ";" << std::endl;
-            }
-            else
-            {
-                std::cout << ",";
-            }
-        }
-    }
+    auto lcb1PortMapping = lcb1.portMapping();
+    REQUIRE( lcb1PortMapping.size() == 2 );
+    REQUIRE( lcb1PortMapping.at(&INV_Z80a) == &iccad_clk );
+    REQUIRE( lcb1PortMapping.at(&INV_Z80o) == &lcb1_fo );
 
-    std::cout << "endmodule" << std::endl;
+}
 
-
+#include <fstream>
+TEST_CASE("VerilogParser: parse superblue18",  "[parser][VerilogParser][Profiling]")
+{
+    VerilogParser parser;
+    std::ifstream input("superblue18.v", std::ifstream::in);
+    INFO("Have you put `superblue18.v` in the tests binary directory?");
+    REQUIRE(input.good());
+    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    REQUIRE( verilog );
+    REQUIRE( verilog->modules().size() == 1 );
+    const Verilog::Module & superblue18 = verilog->modules().front();
+    REQUIRE( superblue18.name() == "superblue18" );
+    REQUIRE( superblue18.instances().size() == 767499 );
+    REQUIRE( superblue18.nets().size() == 771542 );
 }

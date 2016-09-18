@@ -17,7 +17,8 @@ public:
     {
         INPUT,
         OUTPUT,
-        INOUT
+        INOUT,
+        NONE
     };
 
     class Port
@@ -26,6 +27,7 @@ public:
         Port(PortDirection direction, const std::string &name);
         PortDirection direction() const;
         const std::string &name() const;
+        bool operator==(const Port& o) const;
     private:
         PortDirection direction_;
         std::string name_;
@@ -36,6 +38,7 @@ public:
     public:
         Net(const std::string & name);
         const std::string& name() const;
+        bool operator==(const Net& o) const;
     private:
         std::string name_;
     };
@@ -47,13 +50,13 @@ public:
         Instance(Module * module, const std::string name);
         Module * module() const;
         const std::string & name() const;
-        void mapPort(Port* port, Net * net);
-        const std::map<Port*, Net*> & portMapping() const;
+        void mapPort(const Port *port, const Net *net);
+        const std::map<const Port*, const Net*> & portMapping() const;
 
     private:
         Module * module_;
         std::string name_;
-        std::map<Port*, Net*> portMapping_;
+        std::map<const Port*, const Net*> portMapping_;
     };
 
     class Module
@@ -71,9 +74,9 @@ public:
         const std::list<Net> & nets() const;
         const std::list<Module> &modules() const;
         const std::list<Instance> & instances() const;
+
     private:
         std::string name_;
-
         std::list<Port> ports_;
         std::list<Net> nets_;
         std::list<Module> modules_;
@@ -92,8 +95,12 @@ class VerilogParser
 {
 public:
     VerilogParser();
+    ~VerilogParser();
 
     Verilog *readStream(std::istream & in);
+private:
+    struct Impl;
+    std::unique_ptr<Impl> this_;
 };
 
 }
