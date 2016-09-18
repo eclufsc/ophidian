@@ -1,6 +1,7 @@
 #ifndef VERILOGPARSER_H
 #define VERILOGPARSER_H
 
+#include <memory>
 #include <istream>
 #include <list>
 #include <map>
