@@ -19,6 +19,19 @@ link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/)
 
 UseLemon()
 
+# Build LEF parser with the included Makefile
+include(ExternalProject)
+ExternalProject_Add(
+	lef_parser
+	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/LEF
+	# Empty CONFIGURE_COMMAND as the LEF parser has no configure file
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND make
+	# LEF Makefile is not compatible with external builds
+	BUILD_IN_SOURCE 1
+)
+
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 
