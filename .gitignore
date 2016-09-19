@@ -22,8 +22,6 @@ install_manifest.txt
 3rdparty/LEF/include
 3rdparty/LEF/bin
 3rdparty/LEF/lib
-3rdparty/LEF/lef/lef.tab.cpp
-3rdparty/LEF/lef/lef.tab.h
 3rdparty/LEF/lefdiff/lefdiff
 3rdparty/LEF/lefrw/lefrw
 3rdparty/LEF/lefwrite/lefwrite
