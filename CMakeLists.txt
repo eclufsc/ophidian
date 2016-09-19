@@ -26,7 +26,7 @@ ExternalProject_Add(
 	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/LEF
 	# Empty CONFIGURE_COMMAND as the LEF parser has no configure file
 	CONFIGURE_COMMAND ""
-	BUILD_COMMAND make
+	BUILD_COMMAND make installhdrs installlib
 	# LEF Makefile is not compatible with external builds
 	BUILD_IN_SOURCE 1
 )
