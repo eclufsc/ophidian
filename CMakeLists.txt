@@ -19,7 +19,7 @@ link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/)
 
 UseLemon()
 
-# Build LEF parser with the included Makefile
+# Build LEF v5.8-p016 parser with the included Makefile
 include(ExternalProject)
 ExternalProject_Add(
 	lef_parser
