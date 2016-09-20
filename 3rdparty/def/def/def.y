@@ -570,12 +570,12 @@ property_def: K_DESIGN {defData->dumb_mode = 1; defData->no_num = 1; defData->Pr
             }
         | error ';' { yyerrok; yyclearin;}
 
-property_type_and_val: K_INTEGER { defData->real_num = 0 } opt_range opt_num_val
+property_type_and_val: K_INTEGER { defData->real_num = 0 ;} opt_range opt_num_val
             {
               if (defCallbacks->PropCbk) defData->Prop.setPropInteger();
               defData->defPropDefType = 'I';
             }
-        | K_REAL { defData->real_num = 1 } opt_range opt_num_val
+        | K_REAL { defData->real_num = 1 ;} opt_range opt_num_val
             {
               if (defCallbacks->PropCbk) defData->Prop.setPropReal();
               defData->defPropDefType = 'R';
