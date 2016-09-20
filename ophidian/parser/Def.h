@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <DEF/defrReader.hpp>
+#include <DEF/include/defrReader.hpp>
 
 namespace ophidian {
     namespace parser {
