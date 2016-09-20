@@ -15,3 +15,16 @@ install_manifest.txt
 .project
 .cproject
 /build
+
+3rdparty/def/*a
+3rdparty/def/*o
+3rdparty/def/bin/defdiff
+3rdparty/def/bin/defrw
+3rdparty/def/bin/defwrie
+3rdparty/def/def/def.output
+3rdparty/def/def/def.tab.h
+3rdparty/def/defdiff/deffdiff
+3rdparty/def/defrw/defrw
+3rdparty/def/defwrite/defwrite
+3rdparty/def/include
+3rdparty/def/lib
