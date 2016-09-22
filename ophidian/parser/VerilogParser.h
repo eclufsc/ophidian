@@ -84,7 +84,6 @@ public:
         std::list<Instance> instances_;
     };
 
-
     Module* addModule(const std::string & name);
     const std::list<Module> & modules() const;
 
@@ -98,7 +97,8 @@ public:
     VerilogParser();
     ~VerilogParser();
 
-    Verilog *readStream(std::istream & in);
+    Verilog * readStream(std::istream & in);
+    Verilog * readFile(const std::string & filename);
 private:
     struct Impl;
     std::unique_ptr<Impl> this_;
