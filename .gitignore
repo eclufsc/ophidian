@@ -3,6 +3,7 @@
 *.swo
 CMakeCache.txt
 CMakeFiles
+CMakeLists.txt.user
 CMakeScripts
 Makefile
 cmake_install.cmake
