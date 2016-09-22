@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <fstream>
 
 #ifdef __cplusplus
 extern "C" {
@@ -158,6 +159,16 @@ Verilog* VerilogParser::readStream(std::istream &in)
 
     ast_free_all();
     return inp.release();
+}
+
+Verilog *VerilogParser::readFile(const std::string &filename)
+{
+    std::ifstream input(filename.c_str(), std::ifstream::in);
+    if(!input.good())
+    {
+        return nullptr;
+    }
+    return readStream(input);
 }
 
 Verilog::Module::Module(const std::string &name)
