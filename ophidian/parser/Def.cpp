@@ -1,6 +1,6 @@
 #include "Def.h"
 
-#include <iostream>
+//#include <iostream>
 
 namespace ophidian {
 namespace parser {
@@ -54,9 +54,9 @@ Def::Def(const std::string& filename)
     });
 
     FILE* ifp = fopen(filename.c_str(), "r");
-    auto res = defrRead(ifp, filename.c_str(), this, true);
-    if(res)
-        std::cerr << "defrRead error" << std::endl;
+    /*auto res =*/ defrRead(ifp, filename.c_str(), this, true);
+    /*if(res)
+        std::cerr << "DEF lib defrRead error" << std::endl;*/
 
     fclose(ifp);
 }

@@ -6,7 +6,7 @@ add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
 INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/def/lib/ )
+LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ )
 
 add_subdirectory(entity_system)
 add_subdirectory(parser)

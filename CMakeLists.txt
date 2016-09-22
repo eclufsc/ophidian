@@ -21,7 +21,7 @@ include(ExternalProject)
 # Build DEF v5.8-p016 parser with the included Makefile
 ExternalProject_Add(
 	def_parser
-	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/def
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/DEF
 	# Empty CONFIGURE_COMMAND as the DEF parser has no configure file
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND make installhdrs installlib

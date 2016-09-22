@@ -12,7 +12,7 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def]")
         CHECK(parser.die().upper.x == 27360);
         CHECK(parser.die().upper.y == 13680);
     }
-    SECTION("Def: Checking Components vector"){
+    SECTION("Def: Checking Component vector"){
         auto components = parser.components();
         CHECK(components.size() == 6);
         
@@ -21,7 +21,7 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def]")
         CHECK(components[0].orientation == "N");
         CHECK(components[0].position.x == 3420);
         CHECK(components[0].position.y == 6840);
-        CHECK(!components[0].fixed);
+        CHECK_FALSE(components[0].fixed);
         
         CHECK(components[2].name == "f1");
         CHECK(components[2].macro == "DFF_X80");
