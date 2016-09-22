@@ -48,17 +48,23 @@ public:
 		// void addRowPattern(const char* name, int orient);
 	};
 
+	/**
+	 * A structure to represent a layer
+	 */
 	struct layer {
 		enum directions {
 			NOT_ASSIGNED, HORIZONTAL, VERTICAL
 		};
-		std::string name;
-		std::string type;
-		directions direction;
-		double pitch;
-		double width;
+		std::string name; //< Name of the layer
+		std::string type; //< Type of the layer
+		directions direction; //< Direction of the layer
+		double pitch; //< Pitch of the layer
+		double width; //< Width of the layer
 	};
 
+	/**
+	 * A structure to represent a rectangle
+	 */
 	struct rect {
 		double xl;
 		double yl;
@@ -66,44 +72,62 @@ public:
 		double yh;
 	};
 
+	/**
+	 * A structure to represent a port
+	 */
 	struct port {
-		std::vector<std::string> layers;
-		std::vector<rect> rects;
+		std::vector<std::string> layers; //< A vector with all the names of all the port layers
+		std::vector<rect> rects; //< A vector with all the rects of the port
 	};
 
+	/**
+	 * A structure to represent a pin
+	 */
 	struct pin {
 		enum directions {
 			INPUT, OUTPUT, INOUT, NA
 		};
 
-		std::string name;
-		directions direction {NA};
-		std::vector<port> ports;
+		std::string name; //< The pin name
+		directions direction {NA}; //< The pin's name
+		std::vector<port> ports; //< A vector with all the pin ports
 	};
 
+	/**
+	 * A structure to represent the size of a macro
+	 */
 	struct macro_size {
 		double x, y;
 	};
 
+	/**
+	 * A structure to represent the foreign property of a macro
+	 */
 	struct macro_foreign {
 		std::string name;
 		double x;
 		double y;
 	};
 
+	/**
+	 * A structure to represent the macro rectancle geometry
+	 */
 	struct obs {
 		std::map< std::string, std::vector<rect> > layer2rects;
 	};
 
+	/**
+	 * A structure to represent a macro
+	 */
 	struct macro {
-		std::string name;
-		std::string class_;
-		std::vector<pin> pins;
-		macro_foreign foreign;
-		macro_size size;
-		std::string site;
-		obs obses;
-		macro_size origin;
+		std::string name; //< Name of the macro
+		std::string class_; //< Class of the macro
+		std::vector<pin> pins; //< Vector with all the macro pins
+		macro_foreign foreign; //< Struct with the foreign propertiy
+		macro_size size; //< Struct with the size
+		std::string site; //< Site name
+		obs obses; //< Struct with the macro rectangle geometry
+		macro_size origin; //< Struct containing the origin property
 	};
 
 private:
@@ -113,19 +137,36 @@ private:
 	std::vector<macro> m_macros;
 
 public:
-	Lef(const std::string & filename);
+	/// Constructor.
+	/**
+	 * Parses a lef file
+	 * \param filename path to the lef file
+	 */
+	Lef(const std::string &filename);
 	virtual ~Lef();
 
+	/// Returns the lef sites
+	/**
+	 * Returns a vector containing all the sites in the lef
+	 */
 	const std::vector<site> & sites() const
 	{
 		return m_sites;
 	}
 
+	/// Returns the lef layers
+	/**
+	 * Returns a vector containing all the layers in the lef
+	 */
 	const std::vector<layer> & layers() const
 	{
 		return m_layers;
 	}
 
+	/// Returns the lef macros
+	/**
+	 * Returns a vector containing all the macros in the lef
+	 */
 	const std::vector<macro> & macros() const
 	{
 		return m_macros;
@@ -135,6 +176,7 @@ public:
 		return m_units.databaseNumber();
 	}
 };
+
 } /* namespace parser */
 } /* namespace ophidian */
 
