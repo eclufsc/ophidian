@@ -125,14 +125,14 @@ bool operator==(const parser::Lef::macro & a, const parser::Lef::macro & b)
            a.foreign == b.foreign &&
            a.size == b.size &&
            a.site == b.site &&
-           // a.obses, b.obses) &&
+           // a.obses == b.obses &&
            a.origin == b.origin;
 }
 
-TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
+TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
     parser::Lef parser("input_files/simple.lef");
 
-    SECTION( "sites are parsed correctly", "[lef][lef]") {
+    SECTION("Sites are parsed correctly", "[parser][lef]") {
         CHECK( parser.sites().size() == 1 );
 
         parser::Lef::site core;
@@ -144,7 +144,7 @@ TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
         REQUIRE(parser.sites().front() == core);
     }
 
-    SECTION( "layers are parsed correctly", "[lef][lef]") {
+    SECTION("Layers are parsed correctly", "[parser][lef]") {
         std::vector<parser::Lef::layer> layers {
             {"metal1", "ROUTING", parser::Lef::layer::HORIZONTAL,  0.2, 0.1},
             {"metal2", "ROUTING", parser::Lef::layer::VERTICAL,    0.2, 0.1},
@@ -167,7 +167,7 @@ TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
         }
     }
 
-    SECTION( "macros are parsed correctly", "[lef][lef]") {
+    SECTION("Macros are parsed correctly", "[parser][lef]") {
         CHECK( parser.macros().size() == 212 );
 
         std::vector<std::string> m1_pin_layers = {"metal1"};
@@ -196,11 +196,14 @@ TEST_CASE("lef: simple.lef parsing", "[lef][lef]") {
         m1.foreign = m1_foreign;
         m1.size = {0.760, 1.71};
         m1.site = "core";
-        // m1.obses = ?;
         m1.origin = {0.000, 0.000};
 
         REQUIRE( parser.macros().front() == m1);
 
         // TODO: Check macro obses
+    }
+
+    SECTION("Database units are correct", "[parser][lef]"){
+        CHECK(Approx(parser.database_units()) == 2000.0);
     }
 }
