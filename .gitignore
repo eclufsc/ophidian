@@ -16,6 +16,9 @@ install_manifest.txt
 .cproject
 /build
 
+/docs
+.DS_Store
+
 *a
 *o
 3rdparty/def/bin/defdiff
