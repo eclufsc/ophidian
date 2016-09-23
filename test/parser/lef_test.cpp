@@ -125,7 +125,6 @@ bool operator==(const parser::Lef::macro & a, const parser::Lef::macro & b)
            a.foreign == b.foreign &&
            a.size == b.size &&
            a.site == b.site &&
-           // a.obses == b.obses &&
            a.origin == b.origin;
 }
 
