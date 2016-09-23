@@ -79,7 +79,7 @@ namespace ophidian {
              * Returns the @c dieArea.
              */
             const dieArea& die() const {
-                return m_die;
+                return die_;
             }
 
             /**
@@ -87,27 +87,27 @@ namespace ophidian {
              * all components.
              */
             const std::vector<component>& components() const {
-                return m_components;
+                return components_;
             }
 
             /**
              * Returns a @c std::vector<row> with all rows. 
              */
             const std::vector<row>& rows() const {
-                return m_rows;
+                return rows_;
             }
 
             /**
              * Returns the DEF database units.
              */
             double database_units() const {
-                return m_units;
+                return units_;
             }
         private:
-            dieArea m_die;
-            double m_units;
-            std::vector<component> m_components;
-            std::vector<row> m_rows;
+            dieArea die_;
+            double units_;
+            std::vector<component> components_;
+            std::vector<row> rows_;
         };
 
     }

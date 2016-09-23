@@ -11,14 +11,14 @@ Def::Def(const std::string& filename)
 
     defrSetUnitsCbk([](defrCallbackType_e, double number, defiUserData ud)->int{
         Def& that = *static_cast<Def*>(ud);
-        that.m_units = number;
+        that.units_ = number;
         return 0;
     });
 
     defrSetDieAreaCbk([](defrCallbackType_e, defiBox *box, defiUserData ud)->int{
         Def& that = *static_cast<Def*>(ud);
-        that.m_die.lower = {box->xl(), box->yl()};
-        that.m_die.upper = {box->xh(), box->yh()};
+        that.die_.lower = {box->xl(), box->yl()};
+        that.die_.upper = {box->xh(), box->yh()};
         return 0;
     });
 
@@ -30,13 +30,13 @@ Def::Def(const std::string& filename)
         r.num = {defrow->xNum(), defrow->yNum()};
         r.step = {defrow->xStep(), defrow->yStep()};
         r.origin = {defrow->x(), defrow->y()};
-        that.m_rows.push_back(r);
+        that.rows_.push_back(r);
         return 0;
     });
 
     defrSetComponentStartCbk([](defrCallbackType_e, int number, defiUserData ud)->int{
         Def& that = *static_cast<Def*>(ud);
-        that.m_components.reserve(number);
+        that.components_.reserve(number);
         return 0;
     });
 
@@ -49,7 +49,7 @@ Def::Def(const std::string& filename)
         c.fixed = comp->isFixed();
         c.position = {comp->placementX(), comp->placementY()};
         c.orientation = comp->placementOrientStr();
-        that.m_components.push_back(c);
+        that.components_.push_back(c);
         return 0;
     });
 
