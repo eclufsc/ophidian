@@ -7,3 +7,6 @@
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
 	url = https://github.com/eclufsc/verilog-parser.git
+[submodule "3rdparty/LEF"]
+	path = 3rdparty/LEF
+	url = https://github.com/eclufsc/LEF
