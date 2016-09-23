@@ -153,9 +153,9 @@ public:
 
 private:
 	LefDefParser::lefiUnits m_units;
-	std::vector<site> m_sites;
-	std::vector<layer> m_layers;
-	std::vector<macro> m_macros;
+	std::vector<site> sites_;
+	std::vector<layer> layers_;
+	std::vector<macro> macros_;
 
 public:
 	/// Constructor.
@@ -173,7 +173,7 @@ public:
 	 */
 	const std::vector<site> & sites() const
 	{
-		return m_sites;
+		return sites_;
 	}
 
 	/// Returns the lef layers
@@ -182,7 +182,7 @@ public:
 	 */
 	const std::vector<layer> & layers() const
 	{
-		return m_layers;
+		return layers_;
 	}
 
 	/// Returns the lef macros
@@ -191,14 +191,14 @@ public:
 	 */
 	const std::vector<macro> & macros() const
 	{
-		return m_macros;
+		return macros_;
 	}
 
 	/// Returns the database units
 	/**
 	 * The return of this function is equivalent to one micron
 	 */
-	double database_units() const {
+	double databaseUnits() const {
 		return m_units.databaseNumber();
 	}
 };

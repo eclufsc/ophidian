@@ -53,7 +53,7 @@ Lef::Lef(const std::string &filename)
 					s.set90symmetry();
 				s.x = l->sizeX();
 				s.y = l->sizeY();
-				static_cast<Lef*>(ud)->m_sites.push_back(s);
+				static_cast<Lef*>(ud)->sites_.push_back(s);
 				return 0;
 			});
 
@@ -75,13 +75,13 @@ Lef::Lef(const std::string &filename)
 				}
 				lay.pitch = l->pitch();
 				lay.width = l->width();
-				static_cast<Lef*>(ud)->m_layers.push_back(lay);
+				static_cast<Lef*>(ud)->layers_.push_back(lay);
 				return 0;
 			});
 	lefrSetPinCbk([](lefrCallbackType_e,
 	                 lefiPin* l,
 	                 lefiUserData ud) -> int {
-				macro & m = static_cast<Lef*>(ud)->m_macros.back();
+				macro & m = static_cast<Lef*>(ud)->macros_.back();
 				pin p;
 				p.name = l->name();
 				if(l->hasDirection())
@@ -119,7 +119,7 @@ Lef::Lef(const std::string &filename)
 	lefrSetMacroBeginCbk([](lefrCallbackType_e,
 	                        const char *string,
 	                        lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->m_macros.push_back(macro {string});
+				static_cast<Lef*>(ud)->macros_.push_back(macro {string});
 				return 0;
 			});
 
@@ -127,7 +127,7 @@ Lef::Lef(const std::string &filename)
 	                         lefiObstruction* l,
 	                         lefiUserData ud) -> int {
 				auto geometries = l->geometries();
-				macro & m = static_cast<Lef*>(ud)->m_macros.back();
+				macro & m = static_cast<Lef*>(ud)->macros_.back();
 				std::string last_layer;
 				for(int i = 0; i < geometries->numItems(); ++i)
 				{
@@ -150,7 +150,7 @@ Lef::Lef(const std::string &filename)
 	                   lefiMacro* l,
 	                   lefiUserData ud) -> int {
 
-				macro & m = static_cast<Lef*>(ud)->m_macros.back();
+				macro & m = static_cast<Lef*>(ud)->macros_.back();
 				m.name = l->name();
 				m.class_ = (l->hasClass() ? l->macroClass() : "");
 				m.origin.x = l->originX();

@@ -204,6 +204,6 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
     }
 
     SECTION("Database units are correct", "[parser][lef]"){
-        CHECK(Approx(parser.database_units()) == 2000.0);
+        CHECK(Approx(parser.databaseUnits()) == 2000.0);
     }
 }
