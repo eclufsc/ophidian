@@ -27,6 +27,18 @@
 namespace ophidian {
 namespace parser {
 
+LefParser::LefParser() {
+
+}
+
+LefParser::~LefParser() {
+
+}
+
+Lef* LefParser::readFile(const std::string &filename) {
+	return new Lef(filename);
+}
+
 Lef::Lef(const std::string &filename)
 {
 	lefrInit();

@@ -129,10 +129,11 @@ bool operator==(const parser::Lef::macro & a, const parser::Lef::macro & b)
 }
 
 TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
-    parser::Lef parser("input_files/simple.lef");
+    parser::LefParser parser;
+    parser::Lef simpleLef = *(parser.readFile("input_files/simple.lef"));
 
     SECTION("Sites are parsed correctly", "[parser][lef]") {
-        CHECK( parser.sites().size() == 1 );
+        CHECK( simpleLef.sites().size() == 1 );
 
         parser::Lef::site core;
         core.name = "core";
@@ -140,7 +141,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
         core.x = 0.19;
         core.y = 1.71;
 
-        REQUIRE(parser.sites().front() == core);
+        REQUIRE(simpleLef.sites().front() == core);
     }
 
     SECTION("Layers are parsed correctly", "[parser][lef]") {
@@ -150,7 +151,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
             {"metal3", "ROUTING", parser::Lef::layer::HORIZONTAL,  0.2, 0.1}
         };
 
-        CHECK( parser.layers().size() == layers.size() );
+        CHECK( simpleLef.layers().size() == layers.size() );
 
         for(auto & simple_layer : layers)
         {
@@ -159,15 +160,15 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
                         };
 
             REQUIRE( std::find_if(
-                     parser.layers().begin(),
-                     parser.layers().end(),
+                     simpleLef.layers().begin(),
+                     simpleLef.layers().end(),
                      comparePredicate
-                     ) != parser.layers().end());
+                     ) != simpleLef.layers().end());
         }
     }
 
     SECTION("Macros are parsed correctly", "[parser][lef]") {
-        CHECK( parser.macros().size() == 212 );
+        CHECK( simpleLef.macros().size() == 212 );
 
         std::vector<std::string> m1_pin_layers = {"metal1"};
 
@@ -197,12 +198,12 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
         m1.site = "core";
         m1.origin = {0.000, 0.000};
 
-        REQUIRE( parser.macros().front() == m1);
+        REQUIRE( simpleLef.macros().front() == m1);
 
         // TODO: Check macro obses
     }
 
     SECTION("Database units are correct", "[parser][lef]"){
-        CHECK(Approx(parser.databaseUnits()) == 2000.0);
+        CHECK(Approx(simpleLef.databaseUnits()) == 2000.0);
     }
 }

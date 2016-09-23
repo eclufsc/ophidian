@@ -203,6 +203,14 @@ public:
 	}
 };
 
+class LefParser {
+public:
+	LefParser();
+    ~LefParser();
+
+    Lef * readFile(const std::string & filename);
+};
+
 } /* namespace parser */
 } /* namespace ophidian */
 
