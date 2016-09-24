@@ -6,16 +6,7 @@
 namespace ophidian {
 namespace geometry {
 
-class Distance {
-public:
-	Distance() {
-
-	}
-
-    virtual double operator()(const Point & point1, const Point & point2) = 0;
-};
-
-class ManhattanDistance : public Distance {
+class ManhattanDistance {
 public:
 	ManhattanDistance() {
 
@@ -24,7 +15,7 @@ public:
     double operator()(const Point & point1, const Point & point2);
 };
 
-class EuclideanDistance : public Distance {
+class EuclideanDistance {
 public:
 	EuclideanDistance() {
 

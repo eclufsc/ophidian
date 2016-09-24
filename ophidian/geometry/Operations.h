@@ -16,18 +16,18 @@ void translate(const Geometry & geometry, const Point & translationPoint, Geomet
 
 template<class Geometry>
 void scale(const Geometry & geometry, const Point & scalePoint, Geometry & result) {
-	boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(scalePoint.x(), scalePoint.y());
-	boost::geometry::transform(geometry, result, scale);
+    boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(scalePoint.x(), scalePoint.y());
+    boost::geometry::transform(geometry, result, scale);
 }
 
 template<class Geometry>
-void rotate(const Geometry & geometry, boost::geometry::degree degree, Geometry & result) {
+void rotate(const Geometry & geometry, double degree, Geometry & result) {
 	boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2, 2> rotate(degree);
 	boost::geometry::transform(geometry, result, rotate);
 }
 
-template<class Geometry>
-void intersection(const Geometry & geometry1, const Geometry & geometry2, Geometry & result) {
+template<class Geometry1, class Geometry2, class GeometryOut>
+void intersection(const Geometry1 & geometry1, const Geometry2 & geometry2, GeometryOut & result) {
     boost::geometry::intersection(geometry1, geometry2, result);
 }
 
