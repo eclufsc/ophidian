@@ -12,6 +12,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - libboost-all-dev
       env: COMPILER=g++-5
       
 before_script:
