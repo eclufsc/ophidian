@@ -152,7 +152,7 @@ public:
 	};
 
 private:
-	LefDefParser::lefiUnits m_units;
+	LefDefParser::lefiUnits units_;
 	std::vector<site> sites_;
 	std::vector<layer> layers_;
 	std::vector<macro> macros_;
@@ -199,7 +199,7 @@ public:
 	 * The return of this function is equivalent to one micron
 	 */
 	double databaseUnits() const {
-		return m_units.databaseNumber();
+		return units_.databaseNumber();
 	}
 };
 

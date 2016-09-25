@@ -46,8 +46,8 @@ Lef::Lef(const std::string &filename)
 	lefrSetUnitsCbk([](lefrCallbackType_e,
 	                   lefiUnits* units,
 	                   lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->m_units = *units;
-				static_cast<Lef*>(ud)->m_units.setDatabase(units->databaseName(), units->databaseNumber());
+				static_cast<Lef*>(ud)->units_ = *units;
+				static_cast<Lef*>(ud)->units_.setDatabase(units->databaseName(), units->databaseNumber());
 				return 0;
 			});
 
