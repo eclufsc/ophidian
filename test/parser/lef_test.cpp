@@ -128,11 +128,23 @@ bool operator==(const parser::Lef::macro & a, const parser::Lef::macro & b)
            a.origin == b.origin;
 }
 
-TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
+bool operator==(const parser::Lef::obs & a, const parser::Lef::obs & b)
+{
+    auto pred = [] (auto lhs, auto rhs)
+                   { return lhs.first == rhs.first; };
+
+    auto aMap = a.layer2rects;
+    auto bMap = b.layer2rects;
+
+    return aMap.size() == bMap.size()
+        && std::equal(aMap.begin(), aMap.end(), bMap.begin(), bMap.end(), pred);
+}
+
+TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
     parser::LefParser parser;
     parser::Lef simpleLef = *(parser.readFile("input_files/simple.lef"));
 
-    SECTION("Sites are parsed correctly", "[parser][lef]") {
+    SECTION("Sites are parsed correctly", "[parser][lef][simple]") {
         CHECK( simpleLef.sites().size() == 1 );
 
         parser::Lef::site core;
@@ -144,7 +156,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
         REQUIRE(simpleLef.sites().front() == core);
     }
 
-    SECTION("Layers are parsed correctly", "[parser][lef]") {
+    SECTION("Layers are parsed correctly", "[parser][lef][simple][layers]") {
         std::vector<parser::Lef::layer> layers {
             {"metal1", "ROUTING", parser::Lef::layer::HORIZONTAL,  0.2, 0.1},
             {"metal2", "ROUTING", parser::Lef::layer::VERTICAL,    0.2, 0.1},
@@ -167,7 +179,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
         }
     }
 
-    SECTION("Macros are parsed correctly", "[parser][lef]") {
+    SECTION("Macros are parsed correctly", "[parser][lef][simple][macros]") {
         CHECK( simpleLef.macros().size() == 212 );
 
         std::vector<std::string> m1_pin_layers = {"metal1"};
@@ -199,11 +211,31 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef]") {
         m1.origin = {0.000, 0.000};
 
         REQUIRE( simpleLef.macros().front() == m1);
-
-        // TODO: Check macro obses
     }
 
-    SECTION("Database units are correct", "[parser][lef]"){
+    SECTION("Database units are correct", "[parser][lef][simple][dbunits]"){
         CHECK(Approx(simpleLef.databaseUnits()) == 2000.0);
+    }
+}
+
+TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]") {
+    parser::LefParser parser;
+
+    INFO("Have you put `superblue18.lef` in the tests binary directory?");
+    parser::Lef superblue18 = *(parser.readFile("superblue18.lef"));
+
+    SECTION("Obses are correct", "[parser][lef][superblue18][obses]"){
+        parser::Lef::rect r1 = {0, 0, 3.420, 1.71};
+
+        parser::Lef::obs obs1;
+        obs1.layer2rects["metal1"] = {r1};
+        obs1.layer2rects["metal2"] = {r1};
+        obs1.layer2rects["metal3"] = {r1};
+        obs1.layer2rects["metal4"] = {r1};
+        obs1.layer2rects["via1"] = {r1};
+        obs1.layer2rects["via2"] = {r1};
+        obs1.layer2rects["via3"] = {r1};
+
+        REQUIRE(superblue18.macros()[212].obses == obs1);
     }
 }
