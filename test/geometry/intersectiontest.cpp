@@ -36,13 +36,12 @@ TEST_CASE("Geometry: intersection between two polygons", "[geometry][operations]
     };
     Polygon polygon2 = make<Polygon>(points2);
 
-    MultiPolygon intersection;
-    //intersection(polygon1, polygon2, intersection);
-    boost::geometry::intersection(polygon1, polygon2, intersection);
+    MultiPolygon intersectionResult;
+    intersection(polygon1, polygon2, intersectionResult);
 
-    REQUIRE(intersection.size() == 1);
+    REQUIRE(intersectionResult.size() == 1);
 
-    std::vector<Point> intersectionPoints(intersection.at(0).outer().begin(), intersection.at(0).outer().end());
+    std::vector<Point> intersectionPoints(intersectionResult.at(0).outer().begin(), intersectionResult.at(0).outer().end());
     REQUIRE(intersectionPoints.at(0).x() == Approx(2.0));
     REQUIRE(intersectionPoints.at(0).y() == Approx(3.0));
     REQUIRE(intersectionPoints.at(1).x() == Approx(3.0));
