@@ -8,6 +8,7 @@ using namespace ophidian::parser;
 
 TEST_CASE("Liberty: init", "[parser][LibertyParser]")
 {
-    LibertyParser libertyParser = LibertyParser();
+    auto lib = std::make_unique<LibertyParser>();
+    lib->readFile("");
 
 }
