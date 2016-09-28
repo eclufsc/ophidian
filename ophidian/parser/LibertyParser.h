@@ -12,11 +12,26 @@ namespace parser
 class Liberty{
 public:
     struct LUT{
-
+        std::vector<double> index_1;
+        std::vector<double> index_2;
+        std::vector<std::vector<double>> values;
     };
 
     struct Timing{
+        LUT m_rise_delays;
+        LUT m_fall_delays;
+        LUT m_rise_slews;
+        LUT m_fall_slews;
 
+        LUT rise_constraint;
+        LUT fall_constraint;
+
+        enum timingType{
+            combinational,
+            rising_edge,
+            setup_rising,
+            hold_rising
+        };
     };
 
     struct Pin{
@@ -25,7 +40,7 @@ public:
         double maxCapacitance;
         enum directionPin{ INPUT, OUTPUT};
         directionPin pinDirection;
-        Timing timing;
+        std::vector<Timing> timing;
     };
 
     struct Cell{
