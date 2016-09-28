@@ -24,13 +24,29 @@
 #include <boost/geometry/io/wkt/wkt.hpp>
 #include <LEF/include/lefrReader.hpp>
 #include <iostream>
+#include <vector>
 
 namespace ophidian {
 namespace parser {
 
 struct Lef::Impl {
+	std::vector<site> sites_;
+	std::vector<layer> layers_;
+	std::vector<macro> macros_;
 	LefDefParser::lefiUnits units_;
 };
+
+const std::vector<Lef::site>& Lef::sites() const {
+	return this_->sites_;
+}
+
+const std::vector<Lef::layer>& Lef::layers() const {
+	return this_->layers_;
+}
+
+const std::vector<Lef::macro>& Lef::macros() const {
+	return this_->macros_;
+}
 
 double Lef::databaseUnits() const {
 	return this_->units_.databaseNumber();
@@ -74,7 +90,7 @@ Lef::Lef(const std::string &filename) : this_(new Impl)
 					s.set90symmetry();
 				s.x = l->sizeX();
 				s.y = l->sizeY();
-				static_cast<Lef*>(ud)->sites_.push_back(s);
+				static_cast<Lef*>(ud)->this_->sites_.push_back(s);
 				return 0;
 			});
 
@@ -96,13 +112,13 @@ Lef::Lef(const std::string &filename) : this_(new Impl)
 				}
 				lay.pitch = l->pitch();
 				lay.width = l->width();
-				static_cast<Lef*>(ud)->layers_.push_back(lay);
+				static_cast<Lef*>(ud)->this_->layers_.push_back(lay);
 				return 0;
 			});
 	lefrSetPinCbk([](lefrCallbackType_e,
 	                 lefiPin* l,
 	                 lefiUserData ud) -> int {
-				macro & m = static_cast<Lef*>(ud)->macros_.back();
+				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
 				pin p;
 				p.name = l->name();
 				if(l->hasDirection())
@@ -140,7 +156,7 @@ Lef::Lef(const std::string &filename) : this_(new Impl)
 	lefrSetMacroBeginCbk([](lefrCallbackType_e,
 	                        const char *string,
 	                        lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->macros_.push_back(macro {string});
+				static_cast<Lef*>(ud)->this_->macros_.push_back(macro {string});
 				return 0;
 			});
 
@@ -148,7 +164,7 @@ Lef::Lef(const std::string &filename) : this_(new Impl)
 	                         lefiObstruction* l,
 	                         lefiUserData ud) -> int {
 				auto geometries = l->geometries();
-				macro & m = static_cast<Lef*>(ud)->macros_.back();
+				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
 				std::string last_layer;
 				for(int i = 0; i < geometries->numItems(); ++i)
 				{
@@ -171,7 +187,7 @@ Lef::Lef(const std::string &filename) : this_(new Impl)
 	                   lefiMacro* l,
 	                   lefiUserData ud) -> int {
 
-				macro & m = static_cast<Lef*>(ud)->macros_.back();
+				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
 				m.name = l->name();
 				m.class_ = (l->hasClass() ? l->macroClass() : "");
 				m.origin.x = l->originX();

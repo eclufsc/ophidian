@@ -152,9 +152,6 @@ public:
 	};
 
 private:
-	std::vector<site> sites_;
-	std::vector<layer> layers_;
-	std::vector<macro> macros_;
 	struct Impl;
 	const std::unique_ptr<Impl> this_;
 
@@ -172,28 +169,19 @@ public:
 	/**
 	 * Returns a vector containing all the sites in the lef
 	 */
-	const std::vector<site> & sites() const
-	{
-		return sites_;
-	}
+	const std::vector<site> & sites() const;
 
 	/// Returns the lef layers
 	/**
 	 * Returns a vector containing all the layers in the lef
 	 */
-	const std::vector<layer> & layers() const
-	{
-		return layers_;
-	}
+	const std::vector<layer> & layers() const;
 
 	/// Returns the lef macros
 	/**
 	 * Returns a vector containing all the macros in the lef
 	 */
-	const std::vector<macro> & macros() const
-	{
-		return macros_;
-	}
+	const std::vector<macro> & macros() const;
 
 	/// Returns the database units
 	/**
