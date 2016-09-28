@@ -11,25 +11,34 @@ namespace parser
 
 class Liberty{
 public:
-    struct pin{
-        std::string name;
-        double capacitance;
-        double max_capacitance;
-        enum directionPin{ INPUT, OUTPUT};
-        directionPin pinDirection;
+    struct LUT{
+
     };
 
-    struct cell{
+    struct Timing{
+
+    };
+
+    struct Pin{
         std::string name;
-        std::vector<pin> pins;
-        bool sequential;
+        double capacitance;
+        double maxCapacitance;
+        enum directionPin{ INPUT, OUTPUT};
+        directionPin pinDirection;
+        Timing timing;
+    };
+
+    struct Cell{
+        std::string name;
+        std::vector<Pin> pins;
+        bool sequential = false;
     };
 
 public:
-    std::string time_unit;
-    std::string capacitive_load_unit;
-    double capacitive_load_unit_value;
-    std::vector<cell> cells;
+    std::string timeUnit;
+    std::string capacitiveLoadUnit;
+    double capacitiveLoadUnitValue;
+    std::vector<Cell> cells;
 
 };
 
