@@ -22,10 +22,19 @@
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/io/wkt/wkt.hpp>
+#include <LEF/include/lefrReader.hpp>
 #include <iostream>
 
 namespace ophidian {
 namespace parser {
+
+struct Lef::Impl {
+	LefDefParser::lefiUnits units_;
+};
+
+double Lef::databaseUnits() const {
+	return this_->units_.databaseNumber();
+}
 
 LefParser::LefParser() {
 
@@ -39,15 +48,15 @@ Lef* LefParser::readFile(const std::string &filename) {
 	return new Lef(filename);
 }
 
-Lef::Lef(const std::string &filename)
+Lef::Lef(const std::string &filename) : this_(new Impl)
 {
 	lefrInit();
 
 	lefrSetUnitsCbk([](lefrCallbackType_e,
 	                   lefiUnits* units,
 	                   lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->units_ = *units;
-				static_cast<Lef*>(ud)->units_.setDatabase(units->databaseName(), units->databaseNumber());
+				static_cast<Lef*>(ud)->this_->units_ = *units;
+				static_cast<Lef*>(ud)->this_->units_.setDatabase(units->databaseName(), units->databaseNumber());
 				return 0;
 			});
 

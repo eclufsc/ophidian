@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <LEF/include/lefrReader.hpp>
+#include <memory>
 
 namespace ophidian
 {
@@ -152,10 +152,11 @@ public:
 	};
 
 private:
-	LefDefParser::lefiUnits units_;
 	std::vector<site> sites_;
 	std::vector<layer> layers_;
 	std::vector<macro> macros_;
+	struct Impl;
+	const std::unique_ptr<Impl> this_;
 
 public:
 	/// Constructor.
@@ -198,9 +199,7 @@ public:
 	/**
 	 * The return of this function is equivalent to one micron
 	 */
-	double databaseUnits() const {
-		return units_.databaseNumber();
-	}
+	double databaseUnits() const;
 };
 
 class LefParser {
