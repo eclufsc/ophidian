@@ -32,8 +32,10 @@ ExternalProject_Add(
 	BUILD_IN_SOURCE 1
 )
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
+endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 
 include_directories(.)
