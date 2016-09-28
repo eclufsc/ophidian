@@ -5,7 +5,7 @@
 
 using namespace ophidian;
 
-bool operator==(const parser::Lef::site & a, const parser::Lef::site & b)
+bool compare(const parser::Lef::site & a, const parser::Lef::site & b)
 {
     return a.name == b.name &&
            a.class_ == b.class_ &&
@@ -14,7 +14,7 @@ bool operator==(const parser::Lef::site & a, const parser::Lef::site & b)
            Approx(a.y) == b.y;
 }
 
-bool operator==(const parser::Lef::layer & a, const parser::Lef::layer & b)
+bool compare(const parser::Lef::layer & a, const parser::Lef::layer & b)
 {
     return a.name == b.name &&
            a.type == b.type &&
@@ -23,7 +23,7 @@ bool operator==(const parser::Lef::layer & a, const parser::Lef::layer & b)
            Approx(a.width) == b.width;
 }
 
-bool operator==(const parser::Lef::rect & a, const parser::Lef::rect & b)
+bool compare(const parser::Lef::rect & a, const parser::Lef::rect & b)
 {
     return Approx(a.xl) == b.xl &&
            Approx(a.yl) == b.yl &&
@@ -31,13 +31,13 @@ bool operator==(const parser::Lef::rect & a, const parser::Lef::rect & b)
            Approx(a.yh) == b.yh;
 }
 
-bool operator==(const std::vector<parser::Lef::rect> & a, const std::vector<parser::Lef::rect> & b)
+bool compare(const std::vector<parser::Lef::rect> & a, const std::vector<parser::Lef::rect> & b)
 {
     bool rectsAreEqual = true;
 
     for (auto& i : a) {
         auto comparePredicate = [i](const parser::Lef::rect & layer) -> bool {
-            return i == layer;
+            return compare(i, layer);
         };
 
         rectsAreEqual = rectsAreEqual && std::find_if(a.begin(), a.end(), comparePredicate) != a.end();
@@ -46,7 +46,7 @@ bool operator==(const std::vector<parser::Lef::rect> & a, const std::vector<pars
     return rectsAreEqual;
 }
 
-bool operator==(const std::vector<std::string> & a, const std::vector<std::string> & b)
+bool compare(const std::vector<std::string> & a, const std::vector<std::string> & b)
 {
     bool layersAreEqual = true;
 
@@ -61,19 +61,19 @@ bool operator==(const std::vector<std::string> & a, const std::vector<std::strin
     return layersAreEqual;
 }
 
-bool operator==(const parser::Lef::port & a, const parser::Lef::port & b)
+bool compare(const parser::Lef::port & a, const parser::Lef::port & b)
 {
-    return a.layers == b.layers &&
-           a.rects == b.rects;
+    return compare(a.layers, b.layers) &&
+           compare(a.rects, b.rects);
 }
 
-bool operator==(const std::vector<parser::Lef::port> & a, const std::vector<parser::Lef::port> & b)
+bool compare(const std::vector<parser::Lef::port> & a, const std::vector<parser::Lef::port> & b)
 {
     bool portsAreEqual = true;
 
     for (auto& i : a) {
         auto comparePredicate = [i](const parser::Lef::port & port) -> bool {
-            return i == port;
+            return compare(i, port);
         };
 
         portsAreEqual = portsAreEqual && std::find_if(a.begin(), a.end(), comparePredicate) != a.end();
@@ -82,33 +82,33 @@ bool operator==(const std::vector<parser::Lef::port> & a, const std::vector<pars
     return portsAreEqual;
 }
 
-bool operator==(const parser::Lef::pin & a, const parser::Lef::pin & b)
+bool compare(const parser::Lef::pin & a, const parser::Lef::pin & b)
 {
     return a.name == b.name &&
            a.direction == b.direction &&
-           a.ports == b.ports;
+           compare(a.ports, b.ports);
 }
 
-bool operator==(const parser::Lef::macro_size & a, const parser::Lef::macro_size & b)
+bool compare(const parser::Lef::macro_size & a, const parser::Lef::macro_size & b)
 {
     return Approx(a.x) == b.x &&
            Approx(a.y) == b.y;
 }
 
-bool operator==(const parser::Lef::macro_foreign & a, const parser::Lef::macro_foreign & b)
+bool compare(const parser::Lef::macro_foreign & a, const parser::Lef::macro_foreign & b)
 {
     return a.name == b.name &&
            Approx(a.x) == b.x &&
            Approx(a.y) == b.y;
 }
 
-bool operator==(const std::vector<parser::Lef::pin> & a, const std::vector<parser::Lef::pin> & b)
+bool compare(const std::vector<parser::Lef::pin> & a, const std::vector<parser::Lef::pin> & b)
 {
     bool pinsAreEqual = true;
 
     for (auto& i : a) {
         auto comparePredicate = [i](const parser::Lef::pin & pin) -> bool {
-            return i == pin;
+            return compare(i, pin);
         };
 
         pinsAreEqual = pinsAreEqual && std::find_if(a.begin(), a.end(), comparePredicate) != a.end();
@@ -117,18 +117,18 @@ bool operator==(const std::vector<parser::Lef::pin> & a, const std::vector<parse
     return pinsAreEqual;
 }
 
-bool operator==(const parser::Lef::macro & a, const parser::Lef::macro & b)
+bool compare(const parser::Lef::macro & a, const parser::Lef::macro & b)
 {
     return a.name == b.name &&
            a.class_ == b.class_ &&
-           a.pins == b.pins &&
-           a.foreign == b.foreign &&
-           a.size == b.size &&
+           compare(a.pins, b.pins) &&
+           compare(a.foreign, b.foreign) &&
+           compare(a.size, b.size) &&
            a.site == b.site &&
-           a.origin == b.origin;
+           compare(a.origin, b.origin);
 }
 
-bool operator==(const parser::Lef::obs & a, const parser::Lef::obs & b)
+bool compare(const parser::Lef::obs & a, const parser::Lef::obs & b)
 {
     auto pred = [] (auto lhs, auto rhs)
                    { return lhs.first == rhs.first; };
@@ -153,7 +153,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
         core.x = 0.19;
         core.y = 1.71;
 
-        REQUIRE(simpleLef->sites().front() == core);
+        REQUIRE(compare(simpleLef->sites().front(), core));
     }
 
     SECTION("Layers are parsed correctly", "[parser][lef][simple][layers]") {
@@ -168,7 +168,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
         for(auto & simple_layer : layers)
         {
             auto comparePredicate = [simple_layer](const parser::Lef::layer & layer) -> bool {
-                            return simple_layer == layer;
+                            return compare(simple_layer, layer);
                         };
 
             REQUIRE( std::find_if(
@@ -210,7 +210,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
         m1.site = "core";
         m1.origin = {0.000, 0.000};
 
-        REQUIRE( simpleLef->macros().front() == m1);
+        REQUIRE(compare(simpleLef->macros().front(), m1));
     }
 
     SECTION("Database units are correct", "[parser][lef][simple][dbunits]"){
@@ -236,6 +236,6 @@ TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]") {
         obs1.layer2rects["via2"] = {r1};
         obs1.layer2rects["via3"] = {r1};
 
-        REQUIRE(superblue18->macros()[212].obses == obs1);
+        REQUIRE(compare(superblue18->macros()[212].obses, obs1));
     }
 }
