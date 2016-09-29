@@ -18,20 +18,40 @@ public:
     };
 
     struct Timing{
-        LUT m_rise_delays;
-        LUT m_fall_delays;
-        LUT m_rise_slews;
-        LUT m_fall_slews;
-
-        LUT rise_constraint;
-        LUT fall_constraint;
-
-        enum timingType{
-            combinational,
-            rising_edge,
-            setup_rising,
-            hold_rising
+        enum unateness{
+            NEGATIVE_UNATE,
+            POSITIVE_UNATE,
+            NON_UNATE
         };
+
+        enum type{
+            COMBINATIONAL,
+            RISING_EDGE,
+            SETUP_RISING,
+            HOLD_RISING
+        };
+
+        enum lutInformation{
+            RISE_DELAY,
+            FALL_DELAY,
+            RISE_SLEWS,
+            FALL_SLEWS,
+            RISE_CONSTRAINT,
+            FALL_CONSTRAINT
+        };
+
+//        LUT m_rise_delays;
+//        LUT m_fall_delays;
+//        LUT m_rise_slews;
+//        LUT m_fall_slews;
+
+//        LUT rise_constraint;
+//        LUT fall_constraint;
+
+        type timing_type;
+        unateness timing_sense;
+        std::string related_pin;
+        std::vector<std::pair<lutInformation, LUT>> luts;
     };
 
     struct Pin{

@@ -46,55 +46,51 @@ Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::
 
     Liberty::Timing newTiming;
 
-//    std::string timing_sense { "negative_unate" };
-//    std::string timing_type { "combinational" };
-//    std::string related_pin { "default_related_pin" };
-//    si2drAttrsIdT attrs = si2drGroupGetAttrs(timing, &err);
-//    si2drAttrIdT attr;
-//    entity_system::entity from;
+    std::string timing_sense { "negative_unate" };
+    std::string timing_type { "combinational" };
+    std::string related_pin { "default_related_pin" };
+    si2drAttrsIdT attrs = si2drGroupGetAttrs(timing, &err);
+    si2drAttrIdT attr;
 
-//    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
-//        std::string attr_name { si2drAttrGetName(attr, &err) };
-//        if (attr_name == "timing_sense") {
-//            timing_sense = si2drSimpleAttrGetStringValue(attr, &err);
-//        } else if (attr_name == "timing_type")
-//            timing_type = si2drSimpleAttrGetStringValue(attr, &err);
-//        else if (attr_name == "related_pin") {
-//            related_pin = si2drSimpleAttrGetStringValue(attr, &err);
-//            from = library.std_cells().pin_create(library.std_cells().pin_owner(pin), related_pin);
-//        }
-//    }
-//    si2drIterQuit(attrs, &err);
+    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
+        std::string attr_name { si2drAttrGetName(attr, &err) };
+        if (attr_name == "timing_sense") {
+            timing_sense = si2drSimpleAttrGetStringValue(attr, &err);
+        } else if (attr_name == "timing_type")
+            timing_type = si2drSimpleAttrGetStringValue(attr, &err);
+        else if (attr_name == "related_pin") {
+            related_pin = si2drSimpleAttrGetStringValue(attr, &err);
+            newTiming.related_pin = related_pin;
+        }
+    }
+    si2drIterQuit(attrs, &err);
 
-//    bool setup = false;
-//    bool hold = false;
+    bool setup = false;
+    bool hold = false;
 
-//    timing_arc_types type = timing_arc_types::COMBINATIONAL;
-//    if(timing_type=="setup_rising")
-//    {
-//        type = timing_arc_types::SEQUENTIAL;
-//        setup = true;
-//    }
-//    else if(timing_type=="hold_rising")
-//    {
-//        type = timing_arc_types::SEQUENTIAL;
-//        hold = true;
-//    }
-//    else if(timing_type=="rising_edge")
-//        type = timing_arc_types::RISING_EDGE;
+    Liberty::Timing::type type = Liberty::Timing::type::COMBINATIONAL;
+    if(timing_type=="setup_rising")
+    {
+        type = Liberty::Timing::type::SETUP_RISING;
+        setup = true;
+    }
+    else if(timing_type=="hold_rising")
+    {
+        type = Liberty::Timing::type::HOLD_RISING;
+        hold = true;
+    }
+    else if(timing_type=="rising_edge")
+        type = Liberty::Timing::type::RISING_EDGE;
 
-//    auto arc = library.timing_arc_create(from, pin);
+    if (timing_sense == "negative_unate")
+        newTiming.timing_sense
+        library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
+    else if (timing_sense == "positive_unate")
+        library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
+    else if (timing_sense == "non_unate")
+        library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
 
-//    library.timing_arc_timing_type(arc, type);
-
-//    if (timing_sense == "negative_unate")
-//        library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
-//    else if (timing_sense == "positive_unate")
-//        library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
-//    else if (timing_sense == "non_unate")
-//        library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
-
-//    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit, setup, hold);
+    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit, setup, hold);
     return newTiming;
 }
 
