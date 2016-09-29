@@ -1,12 +1,11 @@
 #include "Def.h"
 
-//#include <iostream>
-
 namespace ophidian {
 namespace parser {
 
-Def::Def(const std::string& filename)
+std::shared_ptr<Def> DefParser::readFile(const std::string & filename)
 {
+    auto def = std::make_shared<Def>(); 
     defrInit();
 
     defrSetUnitsCbk([](defrCallbackType_e, double number, defiUserData ud)->int{
@@ -24,7 +23,7 @@ Def::Def(const std::string& filename)
 
     defrSetRowCbk([](defrCallbackType_e, defiRow *defrow, defiUserData ud)->int{
         Def& that = *static_cast<Def*>(ud);
-        row r;
+        Def::row r;
         r.name = defrow->name();
         r.site = defrow->macro();
         r.num = {defrow->xNum(), defrow->yNum()};
@@ -43,7 +42,7 @@ Def::Def(const std::string& filename)
     defrSetComponentCbk([](defrCallbackType_e, defiComponent *comp, defiUserData ud)->int{
         Def& that = *static_cast<Def*>(ud);
 
-        component c;
+        Def::component c;
         c.name = comp->id();
         c.macro = comp->name();
         c.fixed = comp->isFixed();
@@ -54,13 +53,28 @@ Def::Def(const std::string& filename)
     });
 
     FILE* ifp = fopen(filename.c_str(), "r");
-    /*auto res =*/ defrRead(ifp, filename.c_str(), this, true);
-    /*if(res)
-        std::cerr << "DEF lib defrRead error" << std::endl;*/
+    if(ifp){
+        auto res = defrRead(ifp, filename.c_str(), def.get(), true);
+        if(res){
+            // throw std::cerr << "DEF lib defrRead error" << std::endl;
+        } 
+    } else {
+        //throw
+    }
 
     fclose(ifp);
+    defrClear();
+    
+    return def;
 }
 
+DefParser::DefParser()
+{ }
+DefParser::~DefParser()
+{ }
+
+Def::Def()
+{ }
 Def::~Def()
 { }
 

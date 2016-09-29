@@ -3,10 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <DEF/include/defrReader.hpp>
 
 namespace ophidian {
     namespace parser {
+
         /** @brief Def reads a .def file and store necessary data.
          *
          * This is an encapsulation of the DEF library made by 
@@ -61,18 +63,15 @@ namespace ophidian {
                 std::string site; ///< This is the site to be used by the row defined by a LEF file. 
                 point<double> origin; ///< Specifies the location of the first site in the row.
                 point<double> step; ///< Specifies the spacing between sites in horizontal and vertical rows.
-                point<double> num; ////< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
+                point<double> num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
             };
 
             /** 
              * @brief Constructor.
              *
-             * Construct the object by using the DEF lib.
-             *
-             * @param filename Path to a .def file, if file does not exist the 
-             * DEF lib will try to open a null_ptr giving a segmantation fault.
+             * Empty object.
              */
-            Def(const std::string& filename);
+            Def();
             ~Def();
 
             /** 
@@ -103,13 +102,25 @@ namespace ophidian {
             double database_units() const {
                 return units_;
             }
+
         private:
             dieArea die_;
             double units_;
             std::vector<component> components_;
             std::vector<row> rows_;
-        };
 
+        public:
+            friend class DefParser;
+        };
+        
+        class DefParser
+        {
+        public:
+            DefParser();
+            ~DefParser();
+
+            std::shared_ptr<Def> readFile(const std::string & filename);
+        };
     }
 }
 

@@ -4,16 +4,17 @@
 
 TEST_CASE("Def: Loading simple.def", "[parser][Def]")
 {
-    ophidian::parser::Def parser("input_files/simple.def");
+    ophidian::parser::DefParser reader;
+    std::shared_ptr<ophidian::parser::Def> parser = reader.readFile("input_files/simple.def");
     
     SECTION("Def: Diearea lower and upper points"){
-        CHECK(parser.die().lower.x == 0);
-        CHECK(parser.die().lower.y == 0);
-        CHECK(parser.die().upper.x == 27360);
-        CHECK(parser.die().upper.y == 13680);
+        CHECK(parser->die().lower.x == 0);
+        CHECK(parser->die().lower.y == 0);
+        CHECK(parser->die().upper.x == 27360);
+        CHECK(parser->die().upper.y == 13680);
     }
     SECTION("Def: Checking Component vector"){
-        auto components = parser.components();
+        auto components = parser->components();
         CHECK(components.size() == 6);
         
         CHECK(components[0].name == "u1");
@@ -31,7 +32,7 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def]")
         CHECK(components[2].fixed);
     }
     SECTION("Def: Checking Row vector"){
-        auto rows = parser.rows();
+        auto rows = parser->rows();
         CHECK(rows.size() == 4);
 
         CHECK(rows[0].name == "core_SITE_ROW_0");
@@ -53,6 +54,6 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def]")
         CHECK(rows[3].num.y == 1.0);
     }
     SECTION("Def: Check units distance"){
-        CHECK(parser.database_units() == 2000.0);
+        CHECK(parser->database_units() == 2000.0);
     }
 }
