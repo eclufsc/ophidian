@@ -13,7 +13,7 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-   - compiler: clang
+    - compiler: clang
       addons:
         apt:
           sources:
