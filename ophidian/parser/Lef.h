@@ -195,7 +195,7 @@ public:
 	LefParser();
     ~LefParser();
 
-    Lef * readFile(const std::string & filename);
+    std::shared_ptr<Lef> readFile(const std::string & filename);
 };
 
 } /* namespace parser */

@@ -60,8 +60,8 @@ LefParser::~LefParser() {
 
 }
 
-Lef* LefParser::readFile(const std::string &filename) {
-	return new Lef(filename);
+std::shared_ptr<Lef> LefParser::readFile(const std::string &filename) {
+	return std::make_shared<Lef>(filename);
 }
 
 Lef::Lef(const std::string &filename) : this_(new Impl)
