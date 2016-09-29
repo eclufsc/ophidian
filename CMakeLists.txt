@@ -18,6 +18,7 @@ add_subdirectory(3rdparty)
 link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/)
 
 UseLemon()
+find_package(Boost 1.59 REQUIRED)
 
 include(ExternalProject)
 include_directories(.)
