@@ -88,11 +88,16 @@ SteinerTree::Segment::Segment(lemon::SmartGraph::Edge edge) :
 
 }
 
-geometry::Segment make_segment(const SteinerTree &tree, const SteinerTree::Segment &segment)
-{
-    return geometry::make<geometry::Segment>({tree.position(tree.u(segment)), tree.position(tree.v(segment))});
 }
 
+namespace geometry
+{
+template <>
+geometry::Segment make<geometry::Segment>(const interconnection::SteinerTree & tree, const interconnection::SteinerTree::Segment & segment)
+{
+    return make<geometry::Segment>({tree.position(tree.u(segment)), tree.position(tree.v(segment))});
 }
+}
+
 }
 

@@ -64,7 +64,7 @@ TEST_CASE("Steiner Tree/geometry helper", "[interconnection]")
     auto tree = std::make_unique<SteinerTree>();
     auto segment = tree->addSegment(tree->addPoint(kPositionP1), tree->addPoint(kPositionP2));
 
-    const auto geometrySegment = make_segment(*tree, segment);
+    const auto geometrySegment = make<Segment>(*tree, segment);
 
     REQUIRE( Approx(geometrySegment.first.x()) == kSegment.first.x() );
     REQUIRE( Approx(geometrySegment.first.y()) == kSegment.first.y() );

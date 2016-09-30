@@ -47,10 +47,16 @@ private:
     lemon::SmartGraph::NodeMap<geometry::Point> position_;
 };
 
+}
 
-geometry::Segment make_segment(const SteinerTree & tree, const SteinerTree::Segment & segment);
+namespace geometry
+{
+template <class T>
+T make(const interconnection::SteinerTree & tree, const interconnection::SteinerTree::Segment & segment);
+}
 
 }
-}
+
+
 
 #endif // STEINERTREE_H
