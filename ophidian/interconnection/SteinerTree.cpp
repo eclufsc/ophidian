@@ -22,10 +22,10 @@ uint32_t SteinerTree::numPoints() const
 
 
 namespace {
-lemon::SmartGraph::Node findNodeWithPositionEqualsTo(const geometry::Point &position, const lemon::SmartGraph::NodeMap<geometry::Point> & position_, const lemon::SmartGraph & graph_)
+SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point &position, const SteinerTree::GraphType::NodeMap<geometry::Point> & position_, const SteinerTree::GraphType & graph_)
 {
     geometry::ManhattanDistance distance;
-    for(lemon::SmartGraph::NodeIt i(graph_); graph_.valid(i); ++i)
+    for(SteinerTree::GraphType::NodeIt i(graph_); graph_.valid(i); ++i)
     {
         if(distance(position, position_[i]) == 0.0)
         {
@@ -38,7 +38,7 @@ lemon::SmartGraph::Node findNodeWithPositionEqualsTo(const geometry::Point &posi
 
 SteinerTree::Point SteinerTree::addPoint(const geometry::Point &position)
 {
-    lemon::SmartGraph::Node node = findNodeWithPositionEqualsTo(position, position_, graph_);
+    GraphType::Node node = findNodeWithPositionEqualsTo(position, position_, graph_);
     if(node == lemon::INVALID)
     {
         node = graph_.addNode();
@@ -49,41 +49,62 @@ SteinerTree::Point SteinerTree::addPoint(const geometry::Point &position)
 
 SteinerTree::Segment SteinerTree::addSegment(const SteinerTree::Point &p1, const SteinerTree::Point &p2)
 {
-    auto edge = graph_.addEdge(p1.node_, p2.node_);
+    auto edge = graph_.addEdge(p1.el_, p2.el_);
     return Segment(edge);
+}
+
+void SteinerTree::position(const SteinerTree::Point &p1, const geometry::Point &position)
+{
+    position_[p1.el_] = position;
 }
 
 SteinerTree::Point SteinerTree::u(const SteinerTree::Segment &segment) const
 {
-    return Point(graph_.u(segment.edge_));
+    return Point(graph_.u(segment.el_));
 }
 
 SteinerTree::Point SteinerTree::v(const SteinerTree::Segment &segment) const
 {
-    return Point(graph_.v(segment.edge_));
+    return Point(graph_.v(segment.el_));
 }
 
 geometry::Point SteinerTree::position(const SteinerTree::Point &p) const
 {
-    return position_[p.node_];
+    return position_[p.el_];
 }
 
 double SteinerTree::length(const SteinerTree::Segment &segment) const
 {
-    const auto kU = graph_.u(segment.edge_);
-    const auto kV = graph_.v(segment.edge_);
+    const auto kU = graph_.u(segment.el_);
+    const auto kV = graph_.v(segment.el_);
     geometry::ManhattanDistance distance;
     return distance(position_[kU], position_[kV]);
 }
 
-SteinerTree::Point::Point(lemon::SmartGraph::Node node) :
-    node_(node)
+std::pair<SteinerTree::PointIterator, SteinerTree::PointIterator> SteinerTree::points() const
+{
+    PointIterator first{Point{GraphType::NodeIt{graph_}}};
+    PointIterator second{Point{static_cast<GraphType::Node>(lemon::INVALID)}};
+    return std::make_pair(first, second);
+}
+
+std::pair<SteinerTree::SegmentIterator, SteinerTree::SegmentIterator> SteinerTree::segments(const SteinerTree::Point &point) const
+{
+    SegmentIterator first{{graph_, point.el_}};
+    SegmentIterator second{lemon::INVALID};
+    using GraphT = GraphType;
+    using DegItT = GraphT::IncEdgeIt;
+    return std::make_pair(first, second);
+}
+
+SteinerTree::PointIterator::PointIterator(const SteinerTree::Point &p) :
+    point_(p)
 {
 
 }
 
-SteinerTree::Segment::Segment(lemon::SmartGraph::Edge edge) :
-    edge_(edge)
+SteinerTree::SegmentIterator::SegmentIterator(GraphType::IncEdgeIt it) :
+    it_(it)
 {
 
 }

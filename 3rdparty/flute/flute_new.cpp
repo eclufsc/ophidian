@@ -74,10 +74,6 @@ void printtree(Tree t);
 
 void readLUT()
 {
-    static bool LUTread = false;
-    if(LUTread) return;
-    LUTread = true;
-
     FILE *fpwv, *fprt;
     struct csoln *p;
     int d, i, j, k, kk, ns, nn, ne;

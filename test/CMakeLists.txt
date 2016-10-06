@@ -16,3 +16,8 @@ target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit oph
 
 include_directories(${CMAKE_SOURCE_DIR})
 add_test(NAME unit_test COMMAND run_tests "~[Profiling]")
+
+
+message("Creating symlink for test files")
+execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/test/input_files ${CMAKE_BINARY_DIR}/test/.
+                RESULT_VARIABLE result )
