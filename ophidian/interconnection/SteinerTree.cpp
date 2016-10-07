@@ -1,5 +1,6 @@
 #include "SteinerTree.h"
 #include <ophidian/geometry/Distance.h>
+#include <numeric>
 
 namespace ophidian {
 namespace interconnection {
@@ -10,12 +11,12 @@ SteinerTree::SteinerTree() :
 
 }
 
-uint32_t SteinerTree::numSegments() const
+uint32_t SteinerTree::size(Segment) const
 {
     return lemon::countEdges(graph_);
 }
 
-uint32_t SteinerTree::numPoints() const
+uint32_t SteinerTree::size(Point) const
 {
     return lemon::countNodes(graph_);
 }
@@ -36,7 +37,7 @@ SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point 
 }
 }
 
-SteinerTree::Point SteinerTree::addPoint(const geometry::Point &position)
+SteinerTree::Point SteinerTree::add(const geometry::Point &position)
 {
     GraphType::Node node = findNodeWithPositionEqualsTo(position, position_, graph_);
     if(node == lemon::INVALID)
@@ -47,15 +48,12 @@ SteinerTree::Point SteinerTree::addPoint(const geometry::Point &position)
     return Point(node);
 }
 
-SteinerTree::Segment SteinerTree::addSegment(const SteinerTree::Point &p1, const SteinerTree::Point &p2)
+SteinerTree::Segment SteinerTree::add(const SteinerTree::Point &p1, const SteinerTree::Point &p2)
 {
     auto edge = graph_.addEdge(p1.el_, p2.el_);
-    return Segment(edge);
-}
-
-void SteinerTree::position(const SteinerTree::Point &p1, const geometry::Point &position)
-{
-    position_[p1.el_] = position;
+    Segment result(edge);
+    length_ += length(result);
+    return result;
 }
 
 SteinerTree::Point SteinerTree::u(const SteinerTree::Segment &segment) const
@@ -81,6 +79,11 @@ double SteinerTree::length(const SteinerTree::Segment &segment) const
     return distance(position_[kU], position_[kV]);
 }
 
+double SteinerTree::length() const
+{
+    return length_;
+}
+
 std::pair<SteinerTree::PointIterator, SteinerTree::PointIterator> SteinerTree::points() const
 {
     PointIterator first{Point{GraphType::NodeIt{graph_}}};
@@ -88,12 +91,17 @@ std::pair<SteinerTree::PointIterator, SteinerTree::PointIterator> SteinerTree::p
     return std::make_pair(first, second);
 }
 
-std::pair<SteinerTree::SegmentIterator, SteinerTree::SegmentIterator> SteinerTree::segments(const SteinerTree::Point &point) const
+std::pair<SteinerTree::PointSegmentsIterator, SteinerTree::PointSegmentsIterator> SteinerTree::segments(const SteinerTree::Point &point) const
 {
-    SegmentIterator first{{graph_, point.el_}};
+    PointSegmentsIterator first{{graph_, point.el_}};
+    PointSegmentsIterator second{lemon::INVALID};
+    return std::make_pair(first, second);
+}
+
+std::pair<SteinerTree::SegmentIterator, SteinerTree::SegmentIterator> SteinerTree::segments() const
+{
+    SegmentIterator first{GraphType::EdgeIt{graph_}};
     SegmentIterator second{lemon::INVALID};
-    using GraphT = GraphType;
-    using DegItT = GraphT::IncEdgeIt;
     return std::make_pair(first, second);
 }
 
@@ -103,7 +111,13 @@ SteinerTree::PointIterator::PointIterator(const SteinerTree::Point &p) :
 
 }
 
-SteinerTree::SegmentIterator::SegmentIterator(GraphType::IncEdgeIt it) :
+SteinerTree::PointSegmentsIterator::PointSegmentsIterator(GraphType::IncEdgeIt it) :
+    it_(it)
+{
+
+}
+
+SteinerTree::SegmentIterator::SegmentIterator(GraphType::EdgeIt it) :
     it_(it)
 {
 

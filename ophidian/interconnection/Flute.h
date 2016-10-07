@@ -25,43 +25,35 @@ public:
       ++it2;
       return singleSegment(*it, *it2);
    }
-      std::vector<unsigned> X;
-      std::vector<unsigned> Y;
-      enum PointComponent
+      std::vector<unsigned> X(container.size());
+      std::vector<unsigned> Y(container.size());
+      X.resize(0);
+      Y.resize(0);
+
+      geometry::Point offset(0.0, 0.0);
+
+      for(const auto & point : container)
       {
-        kX = 0,
-        kY
-      };
-      auto extractComponent = [](const T& container, std::vector<unsigned>& result,
-           const PointComponent component) -> const std::vector<unsigned>& {
-        result.reserve(container.size());
-        double minElement = std::numeric_limits<double>::max();
-        std::for_each(container.begin(), container.end(), [&minElement, component](auto & el){
-            const double * point = reinterpret_cast<const double*>(&el);
-            minElement = std::min(minElement, point[component]);
-        });
-        double offset = 0.0;
-        if (minElement < 0.0) {
-          offset = -minElement;
-        }
-        std::for_each(container.begin(), container.end(), [&result, offset, component](auto & el){
-            const double * point = reinterpret_cast<const double*>(&el);
-            result.push_back(point[component] + offset);
-        });
-        return result;
-      };
-      auto futureX = std::async(std::launch::async, extractComponent, container, std::ref(X), PointComponent::kX);
-      auto futureY = std::async(std::launch::async, extractComponent, container, std::ref(Y), PointComponent::kY);
-      auto tree = callFlute(futureX.get(), futureY.get());
-      return std::move(tree);
+          offset.x(std::min(offset.x(), point.x()));
+          offset.y(std::min(offset.y(), point.y()));
+      }
+
+      offset.x(-offset.x());
+      offset.y(-offset.y());
+
+      for(const auto & point : container)
+      {
+          X.push_back(static_cast<unsigned>(std::round(point.x() + offset.x())));
+          Y.push_back(static_cast<unsigned>(std::round(point.y() + offset.y())));
+      }
+
+      return callFlute(X, Y, offset);
   }
 
 private:
-  std::unique_ptr<SteinerTree> singleSegment(const geometry::Point& p1,
-                                             const geometry::Point& p2);
+  std::unique_ptr<SteinerTree> singleSegment(const geometry::Point& p1, const geometry::Point& p2);
   std::unique_ptr<SteinerTree> trivialSteinerTree(const geometry::Point& p);
-  std::unique_ptr<SteinerTree> callFlute(const std::vector<unsigned>& X,
-                                         const std::vector<unsigned>& Y);
+  std::unique_ptr<SteinerTree> callFlute(const std::vector<unsigned>& X, const std::vector<unsigned>& Y, const geometry::Point &offset);
   Flute();
   Flute(const Flute& o) = delete;
   Flute& operator=(const Flute& o) = delete;

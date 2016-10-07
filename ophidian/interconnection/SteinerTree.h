@@ -45,11 +45,11 @@ public:
         using Parent::Parent;
     };
 
-    class SegmentIterator;
+    class PointSegmentsIterator;
     class Segment final : public GraphElementWrapper<GraphType::Edge> {
     public:
         friend class SteinerTree;
-        friend class SegmentIterator;
+        friend class PointSegmentsIterator;
         using Parent = GraphElementWrapper<GraphType::Edge>;
     private:
         using Parent::Parent;
@@ -85,6 +85,36 @@ public:
         Point point_;
     };
 
+    class PointSegmentsIterator {
+    public:
+        friend class SteinerTree;
+        using difference_type = uint32_t;
+        using value_type = Segment;
+        using pointer = const Segment*;
+        using reference = Segment&;
+        using iterator_category = std::forward_iterator_tag;
+        const PointSegmentsIterator& operator++()
+        {
+            ++it_;
+            return *this;
+        }
+        bool operator==(const PointSegmentsIterator& o) const
+        {
+            return it_ == o.it_;
+        }
+        bool operator!=(const PointSegmentsIterator& o) const
+        {
+            return !((*this) == o);
+        }
+        Segment operator*() const
+        {
+            return Segment(static_cast<GraphType::Edge>(it_));
+        }
+    private:
+        PointSegmentsIterator(GraphType::IncEdgeIt it);
+        GraphType::IncEdgeIt it_;
+    };
+
     class SegmentIterator {
     public:
         friend class SteinerTree;
@@ -111,27 +141,28 @@ public:
             return Segment(static_cast<GraphType::Edge>(it_));
         }
     private:
-        SegmentIterator(GraphType::IncEdgeIt it);
-        GraphType::IncEdgeIt it_;
+        SegmentIterator(GraphType::EdgeIt it);
+        GraphType::EdgeIt it_;
     };
 
-
     SteinerTree();
-    uint32_t numSegments() const;
-    uint32_t numPoints() const;
-    Point addPoint(const geometry::Point & position);
-    Segment addSegment(const Point & p1, const Point & p2);
-    void position(const Point & p1, const geometry::Point & position);
+    Point add(const geometry::Point & position);
+    Segment add(const Point & p1, const Point & p2);
 
+    uint32_t size(Segment) const;
+    uint32_t size(Point) const;
     Point u(const Segment & segment) const;
     Point v(const Segment & segment) const;
     geometry::Point position(const Point & p) const;
     double length(const Segment& segment) const;
+    double length() const;
     std::pair<PointIterator, PointIterator> points() const;
-    std::pair<SegmentIterator, SegmentIterator> segments(const Point & point) const;
+    std::pair<PointSegmentsIterator, PointSegmentsIterator> segments(const Point & point) const;
+    std::pair<SegmentIterator, SegmentIterator> segments() const;
 private:
     GraphType graph_;
     GraphType::NodeMap<geometry::Point> position_;
+    double length_{0.0};
 };
 
 }

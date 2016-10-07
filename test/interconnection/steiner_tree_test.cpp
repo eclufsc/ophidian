@@ -12,8 +12,8 @@ using namespace ophidian::geometry;
 TEST_CASE("Steiner Tree/empty steiner tree", "[interconnection]")
 {
     auto tree = std::make_unique<SteinerTree>();
-    REQUIRE( tree->numSegments() == 0 );
-    REQUIRE( tree->numPoints() == 0 );
+    REQUIRE( tree->size(SteinerTree::Segment{}) == 0 );
+    REQUIRE( tree->size(SteinerTree::Point{}) == 0 );
 }
 
 
@@ -21,8 +21,8 @@ TEST_CASE("Steiner Tree/add point", "[interconnection]")
 {
     const Point kPosition(1.0, 2.0);
     auto tree = std::make_unique<SteinerTree>();
-    auto point = tree->addPoint(kPosition);
-    REQUIRE( tree->numPoints() == 1 );
+    auto point = tree->add(kPosition);
+    REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
     REQUIRE( Approx(tree->position(point).x()) == kPosition.x() );
     REQUIRE( Approx(tree->position(point).y()) == kPosition.y() );
 }
@@ -32,11 +32,11 @@ TEST_CASE("Steiner Tree/add segment", "[interconnection]")
     const Point kPositionP1(1.0, 2.0);
     const Point kPositionP2(100.0, 200.0);
     auto tree = std::make_unique<SteinerTree>();
-    auto p1 = tree->addPoint(kPositionP1);
-    auto p2 = tree->addPoint(kPositionP2);
-    auto seg = tree->addSegment(p1, p2);
-    REQUIRE( tree->numPoints() == 2 );
-    REQUIRE( tree->numSegments() == 1 );
+    auto p1 = tree->add(kPositionP1);
+    auto p2 = tree->add(kPositionP2);
+    auto seg = tree->add(p1, p2);
+    REQUIRE( tree->size(SteinerTree::Point{}) == 2 );
+    REQUIRE( tree->size(SteinerTree::Segment{}) == 1 );
     auto checkUV = [](const SteinerTree & tree, const SteinerTree::Segment & seg, const SteinerTree::Point & point) -> bool{
         return tree.u(seg) == point ^ tree.v(seg) == point;
     };
@@ -50,23 +50,11 @@ TEST_CASE("Steiner Tree/add same point twice", "[interconnection]")
 {
     const Point kPosition(1.0, 2.0);
     auto tree = std::make_unique<SteinerTree>();
-    auto p1 = tree->addPoint(kPosition);
-    auto p2 = tree->addPoint(kPosition);
+    auto p1 = tree->add(kPosition);
+    auto p2 = tree->add(kPosition);
     REQUIRE( p1 == p2 );
-    REQUIRE( tree->numPoints() == 1 );
+    REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
 }
-
-TEST_CASE("Steiner Tree/move point", "[interconnection]")
-{
-    const Point kPosition(1.0, 2.0);
-    const Point kPositionF(3.0, 4.0);
-    auto tree = std::make_unique<SteinerTree>();
-    auto point = tree->addPoint(kPosition);
-    tree->position(point, kPositionF);
-    REQUIRE( Approx(tree->position(point).x()) == kPositionF.x() );
-    REQUIRE( Approx(tree->position(point).y()) == kPositionF.y() );
-}
-
 
 TEST_CASE("Steiner Tree/geometry helper", "[interconnection]")
 {
@@ -74,10 +62,9 @@ TEST_CASE("Steiner Tree/geometry helper", "[interconnection]")
     const Point kPositionP2(100.0, 200.0);
     const auto kSegment = make<Segment>({kPositionP1, kPositionP2});
     auto tree = std::make_unique<SteinerTree>();
-    auto segment = tree->addSegment(tree->addPoint(kPositionP1), tree->addPoint(kPositionP2));
+    auto segment = tree->add(tree->add(kPositionP1), tree->add(kPositionP2));
 
     const auto geometrySegment = make<Segment>(*tree, segment);
-
     REQUIRE( Approx(geometrySegment.first.x()) == kSegment.first.x() );
     REQUIRE( Approx(geometrySegment.first.y()) == kSegment.first.y() );
     REQUIRE( Approx(geometrySegment.second.x()) == kSegment.second.x() );
@@ -91,7 +78,7 @@ TEST_CASE("Steiner Tree/steiner point iteration", "[interconnection]")
     const Point kPositionP2(100.0, 200.0);
     auto tree = std::make_unique<SteinerTree>();
     SteinerTree::Point p1, p2;
-    auto segment = tree->addSegment(p1 = tree->addPoint(kPositionP1), p2 = tree->addPoint(kPositionP2));
+    auto segment = tree->add(p1 = tree->add(kPositionP1), p2 = tree->add(kPositionP2));
     REQUIRE( std::count(tree->points().first, tree->points().second, p1 ) == 1 );
     REQUIRE( std::count(tree->points().first, tree->points().second, p2 ) == 1 );
 }
@@ -102,7 +89,7 @@ TEST_CASE("Steiner Tree/steiner point segments iteration", "[interconnection]")
     const Point kPositionP2(100.0, 200.0);
     auto tree = std::make_unique<SteinerTree>();
     SteinerTree::Point p1, p2;
-    auto segment = tree->addSegment(p1 = tree->addPoint(kPositionP1), p2 = tree->addPoint(kPositionP2));
+    auto segment = tree->add(p1 = tree->add(kPositionP1), p2 = tree->add(kPositionP2));
     REQUIRE( std::count(tree->segments(p1).first, tree->segments(p1).second, segment) == 1 );
 }
 
@@ -114,13 +101,13 @@ TEST_CASE("Steiner Tree/steiner point segments iteration2", "[interconnection]")
     const Point kPositionP3(500.0, 200.0);
     const Point kPositionP4(200.0, 200.0);
     auto tree = std::make_unique<SteinerTree>();
-    SteinerTree::Point p1{tree->addPoint(kPositionP1)};
-    SteinerTree::Point p2{tree->addPoint(kPositionP2)};
-    SteinerTree::Point p3{tree->addPoint(kPositionP3)};
-    SteinerTree::Point p4{tree->addPoint(kPositionP4)};
-    auto seg1 = tree->addSegment(p1, p2);
-    auto seg2 = tree->addSegment(p1, p3);
-    auto seg3 = tree->addSegment(p3, p4);
+    SteinerTree::Point p1{tree->add(kPositionP1)};
+    SteinerTree::Point p2{tree->add(kPositionP2)};
+    SteinerTree::Point p3{tree->add(kPositionP3)};
+    SteinerTree::Point p4{tree->add(kPositionP4)};
+    auto seg1 = tree->add(p1, p2);
+    auto seg2 = tree->add(p1, p3);
+    auto seg3 = tree->add(p3, p4);
     auto p1Segs = tree->segments(p1);
     auto p2Segs = tree->segments(p2);
     auto p3Segs = tree->segments(p3);
@@ -131,4 +118,26 @@ TEST_CASE("Steiner Tree/steiner point segments iteration2", "[interconnection]")
     REQUIRE( std::count(p3Segs.first, p3Segs.second, seg2) == 1 );
     REQUIRE( std::count(p3Segs.first, p3Segs.second, seg3) == 1 );
     REQUIRE( std::count(p4Segs.first, p4Segs.second, seg3) == 1 );
+}
+
+
+TEST_CASE("Steiner Tree/steiner segments iteration", "[interconnection]")
+{
+    const Point kPositionP1(1.0, 2.0);
+    const Point kPositionP2(100.0, 200.0);
+    const Point kPositionP3(500.0, 200.0);
+    const Point kPositionP4(200.0, 200.0);
+    auto tree = std::make_unique<SteinerTree>();
+    SteinerTree::Point p1{tree->add(kPositionP1)};
+    SteinerTree::Point p2{tree->add(kPositionP2)};
+    SteinerTree::Point p3{tree->add(kPositionP3)};
+    SteinerTree::Point p4{tree->add(kPositionP4)};
+    auto seg1 = tree->add(p1, p2);
+    auto seg2 = tree->add(p1, p3);
+    auto seg3 = tree->add(p3, p4);
+    auto segments = tree->segments();
+    REQUIRE( std::distance(segments.first, segments.second) == tree->size(SteinerTree::Segment{}) );
+    REQUIRE( std::count(segments.first, segments.second, seg1) == 1 );
+    REQUIRE( std::count(segments.first, segments.second, seg2) == 1 );
+    REQUIRE( std::count(segments.first, segments.second, seg3) == 1 );
 }
