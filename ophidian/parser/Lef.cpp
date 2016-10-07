@@ -19,11 +19,7 @@
  */
 
 #include "Lef.h"
-#include <boost/geometry/algorithms/append.hpp>
-#include <boost/geometry/algorithms/union.hpp>
-#include <boost/geometry/io/wkt/wkt.hpp>
 #include <LEF/include/lefrReader.hpp>
-#include <iostream>
 #include <vector>
 
 namespace ophidian {
@@ -60,165 +56,173 @@ LefParser::~LefParser() {
 
 }
 
-std::shared_ptr<Lef> LefParser::readFile(const std::string &filename) {
-	return std::make_shared<Lef>(filename);
-}
+std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
+	std::FILE* fp = std::fopen(filename.c_str(), "r");
 
-Lef::Lef(const std::string &filename) : this_(new Impl)
-{
+	if (!fp) {
+		// TODO: Change to proper exception when #41 is merged
+		throw "File could not be opened";
+	}
+
 	lefrInit();
 
-	lefrSetUnitsCbk([](lefrCallbackType_e,
-	                   lefiUnits* units,
-	                   lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->this_->units_ = *units;
-				static_cast<Lef*>(ud)->this_->units_.setDatabase(units->databaseName(), units->databaseNumber());
-				return 0;
-			});
+	std::unique_ptr<Lef> inp = std::make_unique<Lef>();
 
-	lefrSetSiteCbk([](lefrCallbackType_e,
-	                  lefiSite* l,
-	                  lefiUserData ud) -> int {
-				site s;
-				s.name = l->name();
-				s.class_ = (l->hasClass() ? l->siteClass() : "");
-				if(l->hasXSymmetry())
-					s.setXsymmetry();
-				if(l->hasYSymmetry())
-					s.setYsymmetry();
-				if(l->has90Symmetry())
-					s.set90symmetry();
-				s.x = l->sizeX();
-				s.y = l->sizeY();
-				static_cast<Lef*>(ud)->this_->sites_.push_back(s);
-				return 0;
-			});
+	lefrSetUnitsCbk(
+		[](lefrCallbackType_e, lefiUnits* units, lefiUserData ud) -> int {
+			static_cast<Lef*>(ud)->this_->units_ = *units;
+			static_cast<Lef*>(ud)->this_->units_.setDatabase(units->databaseName(), units->databaseNumber());
+			return 0;
+		}
+	);
 
-	lefrSetLayerCbk([](lefrCallbackType_e,
-	                   lefiLayer* l,
-	                   lefiUserData ud) -> int {
-				layer lay;
-				lay.name = l->name();
-				lay.type = (l->hasType() ? l->type() : "");
-				lay.direction = layer::NOT_ASSIGNED;
-				if(l->hasDirection())
-				{
-				        if(std::string(l->direction()) == "HORIZONTAL" ||
-				           std::string(l->direction()) == "horizontal")
-						lay.direction = layer::HORIZONTAL;
-				        else if(std::string(l->direction()) == "VERTICAL" ||
-				                std::string(l->direction()) == "vertical")
-						lay.direction = layer::VERTICAL;
-				}
-				lay.pitch = l->pitch();
-				lay.width = l->width();
-				static_cast<Lef*>(ud)->this_->layers_.push_back(lay);
-				return 0;
-			});
-	lefrSetPinCbk([](lefrCallbackType_e,
-	                 lefiPin* l,
-	                 lefiUserData ud) -> int {
-				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
-				pin p;
-				p.name = l->name();
-				if(l->hasDirection())
-				{
-				        if(std::string(l->direction()) == "INPUT")
-						p.direction = pin::INPUT;
-				        else if(std::string(l->direction()) == "OUTPUT")
-						p.direction  = pin::OUTPUT;
-				}
-				for(int i = 0; i < l->numPorts(); ++i)
-				{
-				        port pt;
-				        for(int j = 0; j < l->port(i)->numItems(); ++j)
-				        {
-				                switch(l->port(i)->itemType(j)) {
+	lefrSetSiteCbk(
+		[](lefrCallbackType_e, lefiSite* l, lefiUserData ud) -> int {
+			Lef::site s;
+			s.name = l->name();
+			s.class_ = (l->hasClass() ? l->siteClass() : "");
+
+			if(l->hasXSymmetry())
+				s.setXsymmetry();
+
+			if(l->hasYSymmetry())
+				s.setYsymmetry();
+
+			if(l->has90Symmetry())
+				s.set90symmetry();
+
+			s.x = l->sizeX();
+			s.y = l->sizeY();
+
+			static_cast<Lef*>(ud)->this_->sites_.push_back(s);
+			return 0;
+		}
+	);
+
+	lefrSetLayerCbk(
+		[](lefrCallbackType_e, lefiLayer* l, lefiUserData ud) -> int {
+			Lef::layer lay;
+			lay.name = l->name();
+			lay.type = (l->hasType() ? l->type() : "");
+			lay.direction = Lef::layer::NOT_ASSIGNED;
+
+			if(l->hasDirection()) {
+					if(std::string(l->direction()) == "HORIZONTAL" ||
+					   std::string(l->direction()) == "horizontal") {
+						lay.direction = Lef::layer::HORIZONTAL;
+					}
+					else if(std::string(l->direction()) == "VERTICAL" ||
+							std::string(l->direction()) == "vertical") {
+						lay.direction = Lef::layer::VERTICAL;
+					}
+			}
+
+			lay.pitch = l->pitch();
+			lay.width = l->width();
+
+			static_cast<Lef*>(ud)->this_->layers_.push_back(lay);
+			return 0;
+		}
+	);
+
+	lefrSetPinCbk(
+		[](lefrCallbackType_e, lefiPin* l, lefiUserData ud) -> int {
+			Lef::macro& m = static_cast<Lef*>(ud)->this_->macros_.back();
+			Lef::pin p;
+			p.name = l->name();
+
+			if(l->hasDirection()) {
+					if(std::string(l->direction()) == "INPUT") {
+						p.direction = Lef::pin::INPUT;
+					} else if(std::string(l->direction()) == "OUTPUT") {
+						p.direction  = Lef::pin::OUTPUT;
+					}
+			}
+
+			for(int i = 0; i < l->numPorts(); ++i) {
+				Lef::port pt;
+				for(int j = 0; j < l->port(i)->numItems(); ++j) {
+					switch(l->port(i)->itemType(j)) {
 						case lefiGeomLayerE:
 							pt.layers.push_back(l->port(i)->getLayer(j));
 							break;
 						case lefiGeomRectE:
-							rect r;
+							Lef::rect r;
 							r.xl = l->port(i)->getRect(j)->xl;
 							r.yl = l->port(i)->getRect(j)->yl;
 							r.xh = l->port(i)->getRect(j)->xh;
 							r.yh = l->port(i)->getRect(j)->yh;
 							pt.rects.push_back(r);
 							break;
-						}
 					}
-				        p.ports.push_back(pt);
 				}
-				m.pins.push_back(p);
-				return 0;
-			});
+				p.ports.push_back(pt);
+			}
 
-	lefrSetMacroBeginCbk([](lefrCallbackType_e,
-	                        const char *string,
-	                        lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->this_->macros_.push_back(macro {string});
-				return 0;
-			});
+			m.pins.push_back(p);
+			return 0;
+		}
+	);
 
-	lefrSetObstructionCbk([](lefrCallbackType_e,
-	                         lefiObstruction* l,
-	                         lefiUserData ud) -> int {
-				auto geometries = l->geometries();
-				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
-				std::string last_layer;
-				for(int i = 0; i < geometries->numItems(); ++i)
-				{
-				        switch(geometries->itemType(i))
-				        {
+	lefrSetMacroBeginCbk(
+		[](lefrCallbackType_e, const char *string, lefiUserData ud) -> int {
+			static_cast<Lef*>(ud)->this_->macros_.push_back(Lef::macro {string});
+			return 0;
+		}
+	);
+
+	lefrSetObstructionCbk(
+		[](lefrCallbackType_e, lefiObstruction* l, lefiUserData ud) -> int {
+			auto geometries = l->geometries();
+			Lef::macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
+			std::string last_layer;
+			for(int i = 0; i < geometries->numItems(); ++i) {
+				switch(geometries->itemType(i)) {
 					case lefiGeomLayerE:
 						last_layer = geometries->getLayer(i);
 						break;
 					case lefiGeomRectE:
 						auto geom_rect =  geometries->getRect(i);
-						rect r {geom_rect->xl, geom_rect->yl, geom_rect->xh, geom_rect->yh};
+						Lef::rect r {geom_rect->xl, geom_rect->yl, geom_rect->xh, geom_rect->yh};
 						m.obses.layer2rects[last_layer].push_back(r);
 						break;
-					}
 				}
-				return 0;
-			});
+			}
+			return 0;
+		}
+	);
 
-	lefrSetMacroCbk([](lefrCallbackType_e,
-	                   lefiMacro* l,
-	                   lefiUserData ud) -> int {
-
-				macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
-				m.name = l->name();
-				m.class_ = (l->hasClass() ? l->macroClass() : "");
-				m.origin.x = l->originX();
-				m.origin.y = l->originY();
-				if(l->hasForeign())
-				{
-				        m.foreign.name = l->foreignName();
-				        m.foreign.x = l->foreignX();
-				        m.foreign.y = l->foreignY();
-				}
-				m.size = macro_size {l->sizeX(), l->sizeY()};
-				m.site = (l->hasSiteName() ? l->siteName() : "");
-				return 0;
-			});
-
-
-	lefrSetMacroEndCbk([](lefrCallbackType_e,
-	                      const char *string,
-	                      lefiUserData) -> int {
-				return 0;
-			});
+	lefrSetMacroCbk(
+		[](lefrCallbackType_e, lefiMacro* l, lefiUserData ud) -> int {
+			Lef::macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
+			m.name = l->name();
+			m.class_ = (l->hasClass() ? l->macroClass() : "");
+			m.origin.x = l->originX();
+			m.origin.y = l->originY();
+			if(l->hasForeign()) {
+					m.foreign.name = l->foreignName();
+					m.foreign.x = l->foreignX();
+					m.foreign.y = l->foreignY();
+			}
+			m.size = Lef::macro_size {l->sizeX(), l->sizeY()};
+			m.site = (l->hasSiteName() ? l->siteName() : "");
+			return 0;
+		}
+	);
 
 
-	FILE* ifp = fopen(filename.c_str(), "r");
-	auto res = lefrRead(ifp, filename.c_str(), this);
+	lefrSetMacroEndCbk(
+		[](lefrCallbackType_e, const char *string, lefiUserData) -> int {
+			return 0;
+		}
+	);
 
-	if(res)
-		std::cerr << "error" << std::endl;
+	auto res = lefrRead(fp, filename.c_str(), inp.get());
 
-	fclose(ifp);
+	return inp;
 }
+
+Lef::Lef() : this_(new Impl) {}
 
 Lef::~Lef()
 {

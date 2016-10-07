@@ -140,9 +140,15 @@ bool compare(const parser::Lef::obs & a, const parser::Lef::obs & b)
         && std::equal(aMap.begin(), aMap.end(), bMap.begin(), bMap.end(), pred);
 }
 
+TEST_CASE("lef: missing file", "[parser][lef][missing_file]") {
+    parser::LefParser parser;
+    REQUIRE_THROWS(parser.readFile("input_files/thisFileDoesNotExist.lef"););
+}
+
 TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
     parser::LefParser parser;
-    std::shared_ptr<parser::Lef> simpleLef = parser.readFile("input_files/simple.lef");
+
+    std::unique_ptr<parser::Lef> simpleLef = parser.readFile("input_files/simple.lef");
 
     SECTION("Sites are parsed correctly", "[parser][lef][simple]") {
         CHECK( simpleLef->sites().size() == 1 );
@@ -222,7 +228,7 @@ TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]") {
     parser::LefParser parser;
 
     INFO("Have you put `superblue18.lef` in the tests binary directory?");
-    std::shared_ptr<parser::Lef> superblue18 = parser.readFile("superblue18.lef");
+    std::unique_ptr<parser::Lef> superblue18 = parser.readFile("superblue18.lef");
 
     SECTION("Obses are correct", "[parser][lef][superblue18][obses]"){
         parser::Lef::rect r1 = {0, 0, 3.420, 1.71};

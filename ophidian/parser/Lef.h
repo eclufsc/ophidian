@@ -162,7 +162,7 @@ public:
 	 * \param filename path to a lef file. If the file does not exist the LEF
 	 * library will generate a segmentation fault
 	 */
-	Lef(const std::string &filename);
+	Lef();
 	virtual ~Lef();
 
 	/// Returns the lef sites
@@ -188,6 +188,8 @@ public:
 	 * The return of this function is equivalent to one micron
 	 */
 	double databaseUnits() const;
+
+	friend class LefParser;
 };
 
 class LefParser {
@@ -195,7 +197,7 @@ public:
 	LefParser();
     ~LefParser();
 
-    std::shared_ptr<Lef> readFile(const std::string & filename);
+    std::unique_ptr<Lef> readFile(const std::string & filename);
 };
 
 } /* namespace parser */
