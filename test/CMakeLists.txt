@@ -24,3 +24,10 @@ execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/test/input_files ${CMAKE_BI
 execute_process(COMMAND tar -zxvf superblue18.tar.gz
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/input_files
                 RESULT_VARIABLE result )
+
+message("Creating symlink FLUTE LUTs")
+execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${CMAKE_BINARY_DIR}/test/.
+                RESULT_VARIABLE result )
+execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${CMAKE_BINARY_DIR}/test/.
+                RESULT_VARIABLE result )
+

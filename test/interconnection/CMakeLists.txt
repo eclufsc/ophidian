@@ -4,8 +4,3 @@ set(SOURCE
    ${SRC_LIST}
    PARENT_SCOPE
 )
-
-execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/flute/PORT9.dat ${CMAKE_BINARY_DIR}/test/.
-                RESULT_VARIABLE result )
-execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/flute/POWV9.dat ${CMAKE_BINARY_DIR}/test/.
-                RESULT_VARIABLE result )
