@@ -1,6 +1,6 @@
 #include "Flute.h"
 #include "SteinerTree.h"
-#include <flute/flute.h>
+#include <Flute/flute.h>
 #include <ophidian/geometry/Distance.h>
 #include <ophidian/geometry/Operations.h>
 
