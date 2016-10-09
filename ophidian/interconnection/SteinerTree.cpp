@@ -1,9 +1,20 @@
 #include "SteinerTree.h"
 #include <ophidian/geometry/Distance.h>
 #include <numeric>
+#include "ToEps.h"
+#include <lemon/graph_to_eps.h>
 
 namespace ophidian {
 namespace interconnection {
+
+namespace {
+inline geometry::Point convert(const lemon::dim2::Point<double> & p) {
+    return {p.x, p.y};
+}
+inline lemon::dim2::Point<double> convert(const geometry::Point & p) {
+    return {p.x(), p.y()};
+}
+}
 
 SteinerTree::SteinerTree() :
     position_(graph_)
@@ -21,14 +32,13 @@ uint32_t SteinerTree::size(Point) const
     return lemon::countNodes(graph_);
 }
 
-
 namespace {
-SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point &position, const SteinerTree::GraphType::NodeMap<geometry::Point> & position_, const SteinerTree::GraphType & graph_)
+SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point &position, const SteinerTree::GraphType::NodeMap<lemon::dim2::Point<double> > & position_, const SteinerTree::GraphType & graph_)
 {
     geometry::ManhattanDistance distance;
     for(SteinerTree::GraphType::NodeIt i(graph_); graph_.valid(i); ++i)
     {
-        if(distance(position, position_[i]) == 0.0)
+        if(distance(position, convert(position_[i])) == 0.0)
         {
             return i;
         }
@@ -37,13 +47,18 @@ SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point 
 }
 }
 
+std::unique_ptr<SteinerTree> SteinerTree::create()
+{
+    return std::unique_ptr<SteinerTree>{new SteinerTree};
+}
+
 SteinerTree::Point SteinerTree::add(const geometry::Point &position)
 {
     GraphType::Node node = findNodeWithPositionEqualsTo(position, position_, graph_);
     if(node == lemon::INVALID)
     {
         node = graph_.addNode();
-        position_[node] = position;
+        position_[node] = convert(position);
     }
     return Point(node);
 }
@@ -68,7 +83,7 @@ SteinerTree::Point SteinerTree::v(const SteinerTree::Segment &segment) const
 
 geometry::Point SteinerTree::position(const SteinerTree::Point &p) const
 {
-    return position_[p.el_];
+    return convert(position_[p.el_]);
 }
 
 double SteinerTree::length(const SteinerTree::Segment &segment) const
@@ -76,7 +91,7 @@ double SteinerTree::length(const SteinerTree::Segment &segment) const
     const auto kU = graph_.u(segment.el_);
     const auto kV = graph_.v(segment.el_);
     geometry::ManhattanDistance distance;
-    return distance(position_[kU], position_[kV]);
+    return distance(convert(position_[kU]), convert(position_[kV]));
 }
 
 double SteinerTree::length() const
@@ -86,22 +101,22 @@ double SteinerTree::length() const
 
 std::pair<SteinerTree::PointIterator, SteinerTree::PointIterator> SteinerTree::points() const
 {
-    PointIterator first{Point{GraphType::NodeIt{graph_}}};
-    PointIterator second{Point{static_cast<GraphType::Node>(lemon::INVALID)}};
+    PointIterator first {Point {GraphType::NodeIt {graph_}}};
+    PointIterator second {Point {static_cast<GraphType::Node>(lemon::INVALID)}};
     return std::make_pair(first, second);
 }
 
 std::pair<SteinerTree::PointSegmentsIterator, SteinerTree::PointSegmentsIterator> SteinerTree::segments(const SteinerTree::Point &point) const
 {
-    PointSegmentsIterator first{{graph_, point.el_}};
-    PointSegmentsIterator second{lemon::INVALID};
+    PointSegmentsIterator first {{graph_, point.el_}};
+    PointSegmentsIterator second {lemon::INVALID};
     return std::make_pair(first, second);
 }
 
 std::pair<SteinerTree::SegmentIterator, SteinerTree::SegmentIterator> SteinerTree::segments() const
 {
-    SegmentIterator first{GraphType::EdgeIt{graph_}};
-    SegmentIterator second{lemon::INVALID};
+    SegmentIterator first {GraphType::EdgeIt {graph_}};
+    SegmentIterator second {lemon::INVALID};
     return std::make_pair(first, second);
 }
 
@@ -121,6 +136,33 @@ SteinerTree::SegmentIterator::SegmentIterator(GraphType::EdgeIt it) :
     it_(it)
 {
 
+}
+
+namespace {
+class SteinerTreeToEps : public SteinerTree::Attorney
+{
+public:
+    static void run(const SteinerTree & tree, const std::string &filename)
+    {
+        const SteinerTree::GraphType & graph = SteinerTree::Attorney::graph(tree);
+        auto & coords = SteinerTree::Attorney::position(tree);
+        SteinerTree::GraphType::NodeMap<int> color(graph);
+        lemon::Palette palette;
+        int i = 0;
+        for(SteinerTree::GraphType::NodeIt curr(graph); curr != lemon::INVALID; ++curr)
+        {
+            color[curr] = 1 + (i % 4);
+            ++i;
+        }
+        lemon::graphToEps(graph, filename).coords(coords).nodeColors(lemon::composeMap(palette, color)).run();
+    }
+};
+}
+
+template <>
+void ToEps::run<SteinerTree>(const SteinerTree & tree, const std::string &filename)
+{
+    SteinerTreeToEps::run(tree, filename);
 }
 
 }
