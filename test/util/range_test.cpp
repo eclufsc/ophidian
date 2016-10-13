@@ -2,7 +2,7 @@
 #include <vector>
 #include <random>
 
-#include <ophidian/util/range.h>
+#include <ophidian/util/Range.h>
 
 std::default_random_engine engine;
 
