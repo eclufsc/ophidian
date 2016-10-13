@@ -7,10 +7,11 @@ namespace ophidian {
     namespace parser {
 
         class InexistentFile : public std::exception {
-            const char* what() override {
+        public:
+            const char* what() const noexcept override {
                 return "The given file was not found";
+            }
         };
-
     }
 }
 
