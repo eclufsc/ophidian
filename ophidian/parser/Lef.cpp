@@ -19,6 +19,7 @@
  */
 
 #include "Lef.h"
+#include "ParserException.h"
 #include <LEF/include/lefrReader.hpp>
 #include <vector>
 
@@ -57,11 +58,10 @@ LefParser::~LefParser() {
 }
 
 std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
-	std::FILE* fp = std::fopen(filename.c_str(), "r");
+	auto fp = std::unique_ptr<FILE, decltype(&std::fclose)>(std::fopen(filename.c_str(), "r"), &std::fclose);
 
 	if (!fp) {
-		// TODO: Change to proper exception when #41 is merged
-		throw "File could not be opened";
+		throw InexistentFile();
 	}
 
 	lefrInit();
@@ -217,7 +217,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 		}
 	);
 
-	auto res = lefrRead(fp, filename.c_str(), inp.get());
+	auto res = lefrRead(fp.get(), filename.c_str(), inp.get());
 
 	return inp;
 }

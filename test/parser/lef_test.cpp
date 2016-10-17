@@ -224,7 +224,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
     }
 }
 
-TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]") {
+TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18obs]") {
     parser::LefParser parser;
 
     INFO("Have you put `superblue18.lef` in the tests binary directory?");

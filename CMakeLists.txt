@@ -7,6 +7,7 @@ macro (UseLemon)
     include(${CMAKE_BINARY_DIR}/3rdparty/Lemon/cmake/LEMONConfig.cmake)
     include_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/)
     include_directories(${CMAKE_SOURCE_DIR}/3rdparty/Lemon/)
+    link_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/lemon)
 endmacro()
 #
 
