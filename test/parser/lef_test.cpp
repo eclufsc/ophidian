@@ -224,11 +224,11 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
     }
 }
 
-TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18obs]") {
+TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]") {
     parser::LefParser parser;
 
     INFO("Have you put `superblue18.lef` in the tests binary directory?");
-    std::unique_ptr<parser::Lef> superblue18 = parser.readFile("superblue18.lef");
+    std::unique_ptr<parser::Lef> superblue18 = parser.readFile("input_files/superblue18.lef");
 
     SECTION("Obses are correct", "[parser][lef][superblue18][obses]"){
         parser::Lef::rect r1 = {0, 0, 3.420, 1.71};
