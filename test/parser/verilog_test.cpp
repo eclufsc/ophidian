@@ -242,8 +242,8 @@ TEST_CASE("VerilogParser: read simple.v", "[parser][VerilogParser]")
 TEST_CASE("VerilogParser: parse superblue18",  "[parser][VerilogParser][Profiling]")
 {
     VerilogParser parser;
-    std::ifstream input("superblue18.v", std::ifstream::in);
-    INFO("Have you put `superblue18.v` in the tests binary directory?");
+    std::ifstream input("input_files/superblue18.v", std::ifstream::in);
+    INFO("Have you put `superblue18.v` in the tests binary `input_files/' directory?");
     REQUIRE(input.good());
     std::unique_ptr<Verilog> verilog(parser.readStream(input));
     REQUIRE( verilog );

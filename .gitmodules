@@ -10,3 +10,6 @@
 [submodule "3rdparty/DEF"]
 	path = 3rdparty/DEF
 	url = http://github.com/eclufsc/DEF.git
+[submodule "3rdparty/Flute"]
+	path = 3rdparty/Flute
+	url = https://github.com/eclufsc/Flute.git
