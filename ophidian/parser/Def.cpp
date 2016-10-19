@@ -4,9 +4,9 @@
 namespace ophidian {
 namespace parser {
 
-std::shared_ptr<Def> DefParser::readFile(const std::string & filename) const throw(InexistentFile)
+std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const throw(InexistentFile)
 {
-    auto def = std::make_shared<Def>(); 
+    auto def = std::make_unique<Def>(); 
     defrInit();
 
     defrSetUnitsCbk([](defrCallbackType_e, double number, defiUserData ud)->int{

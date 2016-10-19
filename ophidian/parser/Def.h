@@ -125,7 +125,7 @@ namespace ophidian {
             DefParser();
             ~DefParser();
             
-            std::shared_ptr<Def> readFile(const std::string & filename) const throw(InexistentFile);
+            std::unique_ptr<Def> readFile(const std::string & filename) const throw(InexistentFile);
         };
     }
 }

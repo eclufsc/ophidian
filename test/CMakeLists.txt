@@ -22,7 +22,7 @@ add_test(NAME unit_test COMMAND run_tests "~[Profiling]")
 
 add_custom_command(
         TARGET run_tests POST_BUILD
-        COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_BINARY_DIR}/test/input_files
+        COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_CURRENT_BINARY_DIR}/input_files
         )
 
 message("Creating symlink for test files")
