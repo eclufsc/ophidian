@@ -20,9 +20,20 @@ TEST_CASE("Liberty: init", "[parser][LibertyParser]")
     REQUIRE(liberty->capacitiveLoadUnitValue == 1.0);
     REQUIRE(liberty->capacitiveLoadUnit.compare("ff") == 0);
     REQUIRE(liberty->timeUnit.compare("1ps") == 0);
-    REQUIRE(liberty->cells.size() == 1);
+    REQUIRE(liberty->cells.size() == 2);
 
     Liberty::Cell cell = liberty->cells.front();
-    REQUIRE(cell.name.compare("INV_X1") == 0);
-    REQUIRE( ! cell.sequential);
+    if(cell.name.compare("INV_X1") == 0){
+        REQUIRE( ! cell.sequential);
+        for(Liberty::Pin pin : cell.pins){
+            if(pin.name == "o"){
+                REQUIRE(pin.capacitance == 0);
+                REQUIRE(pin.maxCapacitance == 12.8);
+                REQUIRE(pin.pinDirection == Liberty::Pin::directionPin::OUTPUT);
+            }else if(pin.name == "a"){
+                REQUIRE(pin.capacitance == 1);
+                REQUIRE(pin.pinDirection == Liberty::Pin::directionPin::INPUT);
+            }
+        }
+    }
 }

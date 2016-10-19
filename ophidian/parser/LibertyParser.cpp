@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cassert>
 #include <iostream>
+#include <sstream>
 
 namespace ophidian
 {
@@ -15,6 +16,10 @@ namespace parser
 class LibertyParser::Pimpl
 {
 public:
+    std::vector<double> split_string_into_values(const std::string &the_string);
+    void read_LUT(si2drGroupIdT group, Liberty::LUT & lut);
+    void read_constraint(si2drGroupIdT group, Liberty::LUT &lut);
+    void read_LUTs(si2drGroupIdT timing, Liberty::Timing &newTimming);
     Liberty::Timing readTiming(si2drGroupIdT timing, Liberty::Pin &pin);
     Liberty::Pin readPin(si2drGroupIdT pin, Liberty::Cell &cell);
     Liberty::Cell readCell(si2drGroupIdT cell);
@@ -41,6 +46,145 @@ LibertyParser::~LibertyParser()
 {
 
 }
+std::vector<double> LibertyParser::Pimpl::split_string_into_values(const std::string &the_string) {
+    std::vector<double> values;
+    std::stringstream input(the_string);
+    std::string segment;
+    while (std::getline(input, segment, ','))
+        values.push_back(std::stod(segment));
+    return values;
+}
+
+void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
+    si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
+    si2drAttrIdT attr;
+
+//    std::vector< double > loadValues(8);
+//    std::vector< double > slewValues(8);
+//    loadValues.resize(0);
+//    slewValues.resize(0);
+
+    lut.index_1.reserve(8);
+    lut.index_2.reserve(8);
+    lut.values.reserve(8);
+
+    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
+
+        std::string name { si2drAttrGetName(attr, &err) };
+        if (name == "index_1" || name == "index_2" || name == "values") {
+            si2drValuesIdT values = si2drComplexAttrGetValues(attr, &err);
+            si2drValueTypeT type;
+            si2drInt32T int_val;
+            si2drFloat64T double_val;
+            si2drStringT string_val;
+            si2drBooleanT bool_val;
+            si2drExprT *expr;
+            si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
+
+//            std::size_t i = 0;
+            do {
+                std::vector<double> values_vector = split_string_into_values(std::string { string_val });
+
+                if (name == "index_1") {
+                    for (auto v : values_vector)
+                        lut.index_1.push_back(v);
+                } else if (name == "index_2") {
+                    for (auto v : values_vector)
+                        lut.index_2.push_back(v);
+                } else if (name == "values") {
+                    lut.values.push_back(values_vector);
+//                    for (std::size_t j = 0; j < values_vector.size(); ++j)
+//                        lut.values.at(i, j, values_vector[j]);
+//                    ++i;
+                }
+                si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
+            } while (string_val);
+            si2drIterQuit(values, &err);
+        }
+    }
+
+    lut.index_1.shrink_to_fit();
+    lut.index_2.shrink_to_fit();
+    lut.values.shrink_to_fit();
+
+//    for (std::size_t i = 0; i < loadValues.size(); ++i)
+//        lut->row_value(i, loadValues[i]);
+//    for (std::size_t i = 0; i < slewValues.size(); ++i)
+//        lut->column_value(i, slewValues[i]);
+
+    si2drIterQuit(attrs, &err);
+}
+
+void LibertyParser::Pimpl::read_constraint(si2drGroupIdT group, Liberty::LUT &lut)
+{
+    si2drNamesIdT group_names{si2drGroupGetNames(group, &err)};
+    std::string group_name{si2drIterNextName(group_names, &err)};
+    si2drIterQuit(group_names, &err);
+
+    assert(group_name == "scalar");
+
+    si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
+    si2drAttrIdT attr;
+    double constraint;
+    while( !si2drObjectIsNull((attr=si2drIterNextAttr(attrs,&err)),&err) )
+    {
+        std::string name{si2drAttrGetName(attr, &err)};
+        assert(name=="values");
+        si2drValuesIdT values = si2drComplexAttrGetValues(attr, &err);
+        si2drValueTypeT type;
+        si2drInt32T     int_val;
+        si2drFloat64T   double_val;
+        si2drStringT    string_val;
+        si2drBooleanT   bool_val;
+        si2drExprT      *expr;
+        si2drIterNextComplexValue(values,
+                                  &type,
+                                  &int_val,
+                                  &double_val,
+                                  &string_val,
+                                  &bool_val,
+                                  &expr,
+                                  &err);
+        constraint = std::stod(string_val);
+        lut.values.push_back({constraint});
+        si2drIterQuit(values, &err);
+    }
+    si2drIterQuit(attrs, &err);
+}
+
+void LibertyParser::Pimpl::read_LUTs(si2drGroupIdT timing, Liberty::Timing &newTimming) {
+    si2drGroupsIdT groups = si2drGroupGetGroups(timing, &err);
+    si2drGroupIdT group;
+    while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
+        std::string group_type { si2drGroupGetGroupType(group, &err) };
+        Liberty::LUT lut;
+        if (group_type == "rise_constraint") {
+            {
+                lut._lutInformation = Liberty::LUT::lutInformation::RISE_CONSTRAINT;
+                read_constraint(group, lut);
+            }
+        } else if (group_type == "fall_constraint") {
+            {
+                lut._lutInformation = Liberty::LUT::lutInformation::FALL_CONSTRAINT;
+                read_constraint(group, lut);
+            }
+        } else {
+            if (group_type == "cell_fall") {
+               lut._lutInformation = Liberty::LUT::lutInformation::CELL_FALL;
+            } else if (group_type == "cell_rise") {
+                lut._lutInformation = Liberty::LUT::lutInformation::CELL_RISE;
+            } else if (group_type == "fall_transition") {
+                lut._lutInformation = Liberty::LUT::lutInformation::FALL_TRANSITION;
+            } else if (group_type == "rise_transition") {
+                lut._lutInformation = Liberty::LUT::lutInformation::RISE_TRANSITION;
+            } else
+                assert(false);
+            read_LUT(group, lut);
+        }
+        newTimming.luts.push_back(lut);
+    }
+    si2drIterQuit(groups, &err);
+}
 
 Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::Pin &pin) {
 
@@ -65,32 +209,28 @@ Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::
     }
     si2drIterQuit(attrs, &err);
 
-    bool setup = false;
-    bool hold = false;
-
     Liberty::Timing::type type = Liberty::Timing::type::COMBINATIONAL;
     if(timing_type=="setup_rising")
     {
         type = Liberty::Timing::type::SETUP_RISING;
-        setup = true;
     }
     else if(timing_type=="hold_rising")
     {
         type = Liberty::Timing::type::HOLD_RISING;
-        hold = true;
     }
     else if(timing_type=="rising_edge")
         type = Liberty::Timing::type::RISING_EDGE;
+    newTiming.timing_type = type;
+
 
     if (timing_sense == "negative_unate")
-        newTiming.timing_sense
-        library.timing_arc_timing_sense(arc, unateness::NEGATIVE_UNATE);
+        newTiming.timing_sense = Liberty::Timing::unateness::NEGATIVE_UNATE;
     else if (timing_sense == "positive_unate")
-        library.timing_arc_timing_sense(arc, unateness::POSITIVE_UNATE);
+        newTiming.timing_sense = Liberty::Timing::unateness::POSITIVE_UNATE;
     else if (timing_sense == "non_unate")
-        library.timing_arc_timing_sense(arc, unateness::NON_UNATE);
+        newTiming.timing_sense = Liberty::Timing::unateness::NON_UNATE;
 
-    read_LUTs(timing, arc, library, time_unit, capacitive_load_unit, setup, hold);
+    read_LUTs(timing, newTiming);
     return newTiming;
 }
 
@@ -134,7 +274,7 @@ Liberty::Pin LibertyParser::Pimpl::readPin(si2drGroupIdT pin, Liberty::Cell &cel
         std::string groupType { si2drGroupGetGroupType(group, &err) };
         if (groupType == "timing") {
             auto timing = readTiming(group, newPin);
-            newPin.timing = timing;
+            newPin.timing.push_back(timing);
         }
     }
     si2drIterQuit(groups, &err);
