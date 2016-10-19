@@ -5,14 +5,14 @@
 #include <vector>
 #include <memory>
 #include <DEF/include/defrReader.hpp>
+#include "ParserException.h"
 
 namespace ophidian {
     namespace parser {
 
-        /** @brief Def reads a .def file and store necessary data.
-         *
-         * This is an encapsulation of the DEF library made by 
-         * Cadence Design Systems to present the rows, components, 
+        /** 
+         * This is an encapsulation of a Def object described 
+         * on a DEF file to present the rows, components, 
          * die area and the units of a given circuit in a usable 
          * way.
          */
@@ -113,13 +113,19 @@ namespace ophidian {
             friend class DefParser;
         };
         
+
+        /** 
+         * DefParser uses the DEF lib to read a def file,
+         * populating a def object returning a shared_ptr
+         * for it. 
+         */
         class DefParser
         {
         public:
             DefParser();
             ~DefParser();
-
-            std::shared_ptr<Def> readFile(const std::string & filename);
+            
+            std::shared_ptr<Def> readFile(const std::string & filename) const throw(InexistentFile);
         };
     }
 }

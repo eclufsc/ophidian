@@ -1,9 +1,10 @@
 #include "Def.h"
+#include "ParserException.h"
 
 namespace ophidian {
 namespace parser {
 
-std::shared_ptr<Def> DefParser::readFile(const std::string & filename)
+std::shared_ptr<Def> DefParser::readFile(const std::string & filename) const throw(InexistentFile)
 {
     auto def = std::make_shared<Def>(); 
     defrInit();
@@ -55,11 +56,8 @@ std::shared_ptr<Def> DefParser::readFile(const std::string & filename)
     FILE* ifp = fopen(filename.c_str(), "r");
     if(ifp){
         auto res = defrRead(ifp, filename.c_str(), def.get(), true);
-        if(res){
-            // throw std::cerr << "DEF lib defrRead error" << std::endl;
-        } 
     } else {
-        //throw
+        throw InexistentFile();
     }
 
     fclose(ifp);

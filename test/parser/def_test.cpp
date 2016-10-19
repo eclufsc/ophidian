@@ -1,6 +1,14 @@
 #include <catch.hpp>
 
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ParserException.h>
+
+TEST_CASE("Def: Try to load inexistent file", "[parser][Def]")
+{
+    ophidian::parser::DefParser reader;
+    REQUIRE_THROWS_AS(reader.readFile("a_file_with_this_name_should_not_exist"), 
+            ophidian::parser::InexistentFile);
+}
 
 TEST_CASE("Def: Loading simple.def", "[parser][Def]")
 {
