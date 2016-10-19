@@ -2,8 +2,6 @@
 *.swp
 *.swo
 CMakeCache.txt
-CMakeFiles
-CMakeLists.txt.user
 CMakeScripts
 cmake_install.cmake
 install_manifest.txt
@@ -19,12 +17,4 @@ install_manifest.txt
 /build
 /docs
 .DS_Store
-3rdparty/LEF/tmp
-3rdparty/LEF/include
-3rdparty/LEF/bin
-3rdparty/LEF/lib
-3rdparty/LEF/lefdiff/lefdiff
-3rdparty/LEF/lefrw/lefrw
-3rdparty/LEF/lefwrite/lefwrite
-*.o
-*.a
+/test/input_files/superblue18.v

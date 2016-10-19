@@ -6,7 +6,10 @@
 	url = https://github.com/eclufsc/Lemon.git
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
-	url = https://github.com/eclufsc/verilog-parser.git
+    url = https://github.com/eclufsc/verilog-parser.git
+[submodule "3rdparty/DEF"]
+	path = 3rdparty/DEF
+	url = http://github.com/eclufsc/DEF.git
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
 	url = https://github.com/eclufsc/Flute.git
