@@ -204,7 +204,7 @@ Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::
             timing_type = si2drSimpleAttrGetStringValue(attr, &err);
         else if (attr_name == "related_pin") {
             related_pin = si2drSimpleAttrGetStringValue(attr, &err);
-            newTiming.related_pin = related_pin;
+            newTiming.relatedPin = related_pin;
         }
     }
     si2drIterQuit(attrs, &err);
@@ -220,15 +220,15 @@ Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::
     }
     else if(timing_type=="rising_edge")
         type = Liberty::Timing::type::RISING_EDGE;
-    newTiming.timing_type = type;
+    newTiming.timingType = type;
 
 
     if (timing_sense == "negative_unate")
-        newTiming.timing_sense = Liberty::Timing::unateness::NEGATIVE_UNATE;
+        newTiming.timingSense = Liberty::Timing::unateness::NEGATIVE_UNATE;
     else if (timing_sense == "positive_unate")
-        newTiming.timing_sense = Liberty::Timing::unateness::POSITIVE_UNATE;
+        newTiming.timingSense = Liberty::Timing::unateness::POSITIVE_UNATE;
     else if (timing_sense == "non_unate")
-        newTiming.timing_sense = Liberty::Timing::unateness::NON_UNATE;
+        newTiming.timingSense = Liberty::Timing::unateness::NON_UNATE;
 
     read_LUTs(timing, newTiming);
     return newTiming;

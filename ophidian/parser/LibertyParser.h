@@ -41,9 +41,9 @@ public:
             HOLD_RISING
         };
 
-        type timing_type;
-        unateness timing_sense;
-        std::string related_pin;
+        type timingType;
+        unateness timingSense;
+        std::string relatedPin;
         std::vector< LUT > luts;
     };
 
@@ -51,7 +51,10 @@ public:
         std::string name;
         double capacitance = 0;
         double maxCapacitance = 0;
-        enum directionPin{ INPUT, OUTPUT};
+        enum directionPin{
+            INPUT,
+            OUTPUT
+        };
         directionPin pinDirection;
         std::vector<Timing> timing;
     };
