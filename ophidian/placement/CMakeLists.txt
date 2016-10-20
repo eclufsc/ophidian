@@ -1,0 +1,7 @@
+file(GLOB ophidian_placement_SRC
+    "*.h"
+    "*.cpp"
+)
+add_library(ophidian_placement ${ophidian_placement_SRC})
+install(TARGETS ophidian_placement DESTINATION lib)
+install(FILES Placement.h DESTINATION include/ophidian/placement)

@@ -10,3 +10,6 @@
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
 	url = https://github.com/eclufsc/Flute.git
+[submodule "3rdparty/units"]
+	path = 3rdparty/units
+	url = https://github.com/nholthaus/units.git
