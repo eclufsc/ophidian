@@ -13,9 +13,21 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env: COMPILER=clang++-3.7
       
 before_script:
   - mkdir build && cd build
+  - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
+  - tar jxf download
+  - sudo cp -r boost_1_59_0/boost /usr/include/
   - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
   - tar -zxvf bison-3.0.4.tar.gz
   - cd bison-3.0.4
@@ -27,6 +39,9 @@ before_script:
   - cd ..
   - cd ..
   - cd ..
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
 
-script: make -j && make -j test
+script:
+  - make -j
+  - cd test
+  - ./run_tests

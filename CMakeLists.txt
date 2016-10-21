@@ -7,6 +7,7 @@ macro (UseLemon)
     include(${CMAKE_BINARY_DIR}/3rdparty/Lemon/cmake/LEMONConfig.cmake)
     include_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/)
     include_directories(${CMAKE_SOURCE_DIR}/3rdparty/Lemon/)
+    link_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/lemon)
 endmacro()
 #
 
@@ -18,8 +19,23 @@ add_subdirectory(3rdparty)
 link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/)
 
 UseLemon()
+find_package(Boost 1.59 REQUIRED)
 
+include(ExternalProject)
 include_directories(.)
+
+# Build DEF v5.8-p016 parser with the included Makefile
+ExternalProject_Add(
+	def_parser
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/DEF
+	# Empty CONFIGURE_COMMAND as the DEF parser has no configure file
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND make installhdrs installlib
+	# DEF Makefile is not compatible with external builds
+	BUILD_IN_SOURCE 1
+)
+
+set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 
 enable_testing()
 add_subdirectory(ophidian)
