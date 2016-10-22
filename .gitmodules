@@ -13,3 +13,6 @@
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
 	url = https://github.com/eclufsc/Flute.git
+[submodule "3rdparty/LEF"]
+	path = 3rdparty/LEF
+	url = https://github.com/eclufsc/LEF.git
