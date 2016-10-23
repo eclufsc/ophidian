@@ -3,4 +3,5 @@ add_subdirectory(circuit)
 add_subdirectory(geometry)
 add_subdirectory(parser)
 add_subdirectory(interconnection)
+add_subdirectory(timing)
 

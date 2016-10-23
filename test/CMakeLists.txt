@@ -13,6 +13,7 @@ add_subdirectory(circuit)
 add_subdirectory(geometry)
 add_subdirectory(parser)
 add_subdirectory(interconnection)
+add_subdirectory(timing)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection emon)
