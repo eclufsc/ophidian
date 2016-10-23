@@ -93,15 +93,15 @@ TEST_CASE("timing graph: rise and fall maps", "[timing]") {
     auto a = ckt.add(kPin);
     Graph<Pin> g(2*ckt.size(kPin), kPin);
     auto riseNode_ = ckt.makeProperty<Graph<Pin>::Node>(kPin);
-    g.setRiseMap(riseNode_);
     auto fallNode_ = ckt.makeProperty<Graph<Pin>::Node>(kPin);
-    g.setRiseMap(fallNode_);
+    g.setRiseMap(riseNode_);
+    g.setFallMap(fallNode_);
     g.linkRiseNode(g.node(0), a);
     g.linkFallNode(g.node(1), a);
     auto & riseNode = *riseNode_;
-    REQUIRE( riseNode[a] == g.node(0) );
     auto & fallNode = *fallNode_;
-    REQUIRE( fallNode[a] == g.node(0) );
+    REQUIRE( riseNode[a] == g.node(0) );
+    REQUIRE( fallNode[a] == g.node(1) );
 }
 
 #include <ophidian/circuit/Netlist.h>
