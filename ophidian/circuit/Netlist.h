@@ -172,9 +172,9 @@ namespace ophidian
                   \return An Pin => \p Value Map.
                 */
                 template <typename Value>
-                entity_system::Property<Pin, Value> makeProperty(Pin)
+                std::shared_ptr<entity_system::Property<Pin, Value>> makeProperty(Pin)
                 {
-                    return entity_system::Property<Pin, Value>(pins_);
+                    return std::make_shared<entity_system::Property<Pin, Value>>(pins_);
                 }
                 //! Get the Pin Notifier
                 /*!

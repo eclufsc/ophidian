@@ -126,7 +126,8 @@ TEST_CASE("Netlist: Make Pin Property (position).", "[circuit][Netlist]")
     Netlist nl;
     auto u1_a = nl.add(Pin());
     auto u1_b  = nl.add(Pin());
-    auto positions = nl.makeProperty<Point2D>(Pin());
+    auto positions_ = nl.makeProperty<Point2D>(Pin());
+    auto & positions = *positions_;
     positions[u1_a] = {0, 1};
     positions[u1_b] = {2, 3};
     REQUIRE(positions[u1_a].x == 0);
