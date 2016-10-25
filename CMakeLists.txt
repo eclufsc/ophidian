@@ -35,13 +35,33 @@ ExternalProject_Add(
 	BUILD_IN_SOURCE 1
 )
 
-# Build liberty parser
+# Build Liberty parser
+
+# - Find GPERF
+# This module looks for gperf. This module defines the
+# following values:
+#  GPERF_EXECUTABLE: the full path to the gperf tool.
+#  GPERF_FOUND: True if gperf has been found.
+include(FindCygwin)
+
+find_program(GPERF_EXECUTABLE
+    gperf
+    ${CYGWIN_INSTALL_PATH}/bin
+)
+
+# handle the QUIETLY and REQUIRED arguments and set GPERF_FOUND to TRUE if
+# all listed variables are TRUE
+include(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Gperf DEFAULT_MSG GPERF_EXECUTABLE)
+
+mark_as_advanced(GPERF_EXECUTABLE)
+
 ExternalProject_Add(
         liberty_parser
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
         CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
         PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-        BUILD_COMMAND make
+        BUILD_COMMAND make install
         BUILD_IN_SOURCE 1
 )
 
