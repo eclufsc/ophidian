@@ -1,5 +1,5 @@
 #include "LibertyParser.h"
-#include <3rdparty/liberty-parser/include/si2dr_liberty.h>
+#include <3rdparty/libertyParser/si2dr_liberty.h>
 #include <vector>
 #include <fstream>
 #include <cassert>

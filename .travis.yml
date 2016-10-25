@@ -12,6 +12,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+	    - gperf
       env: COMPILER=g++-5
     - compiler: clang
       addons:
@@ -21,6 +22,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+	    - gperf
       env: COMPILER=clang++-3.7
       
 before_script:
