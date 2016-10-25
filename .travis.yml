@@ -12,7 +12,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-	    - gperf
       env: COMPILER=g++-5
     - compiler: clang
       addons:
@@ -22,10 +21,10 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-	    - gperf
       env: COMPILER=clang++-3.7
       
 before_script:
+  - sudo apt-get install gperf
   - mkdir build && cd build
   - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
   - tar jxf download
