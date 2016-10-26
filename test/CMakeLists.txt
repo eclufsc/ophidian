@@ -7,7 +7,8 @@ target_include_directories(Catch INTERFACE .)
 
 INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
 LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ )
-LINK_DIRECTORIES( ${THIRD_PARTY_BUILD_PATH}/libertyParser/lib/ )
+#LINK_DIRECTORIES( ${THIRD_PARTY_BUILD_PATH}/libertyParser/lib/ )
+LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/libertyParser/lib/ )
 
 add_subdirectory(entity_system)
 add_subdirectory(circuit)
