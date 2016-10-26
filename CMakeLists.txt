@@ -2,6 +2,9 @@ project(ophidian)
 cmake_minimum_required(VERSION 3.2.2)
 set (CMAKE_CXX_STANDARD 14)
 
+# set CMAKE_MODULE_PATH to pick up the additionals modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
+
 # Fetch Lemon and setup project to use Lemon as 3rdparty library
 macro (UseLemon)
     include(${CMAKE_BINARY_DIR}/3rdparty/Lemon/cmake/LEMONConfig.cmake)
@@ -25,6 +28,7 @@ include(ExternalProject)
 include_directories(.)
 
 # Build DEF v5.8-p016 parser with the included Makefile
+find_package(ZLIB REQUIRED)
 ExternalProject_Add(
 	def_parser
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/DEF
@@ -36,26 +40,7 @@ ExternalProject_Add(
 )
 
 # Build Liberty parser
-
-# - Find GPERF
-# This module looks for gperf. This module defines the
-# following values:
-#  GPERF_EXECUTABLE: the full path to the gperf tool.
-#  GPERF_FOUND: True if gperf has been found.
-include(FindCygwin)
-
-find_program(GPERF_EXECUTABLE
-    gperf
-    ${CYGWIN_INSTALL_PATH}/bin
-)
-
-# handle the QUIETLY and REQUIRED arguments and set GPERF_FOUND to TRUE if
-# all listed variables are TRUE
-include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Gperf DEFAULT_MSG GPERF_EXECUTABLE)
-
-mark_as_advanced(GPERF_EXECUTABLE)
-
+find_package(GPERF REQUIRED)
 ExternalProject_Add(
         liberty_parser
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
