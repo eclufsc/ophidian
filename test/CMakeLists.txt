@@ -12,6 +12,7 @@ add_subdirectory(entity_system)
 add_subdirectory(circuit)
 add_subdirectory(geometry)
 add_subdirectory(parser)
+add_subdirectory(util)
 add_subdirectory(interconnection)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
