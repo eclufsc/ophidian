@@ -43,6 +43,7 @@ ExternalProject_Add(
 find_package(GPERF REQUIRED)
 #ExternalProject_Add(
 #        liberty_parser
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
 #        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
 #        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
 #        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
@@ -51,6 +52,7 @@ find_package(GPERF REQUIRED)
 #)
 ExternalProject_Add(
         liberty_parser
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
         CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
         PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
