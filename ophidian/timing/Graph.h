@@ -6,6 +6,7 @@
 #include <lemon/list_graph.h>
 #include <lemon/maps.h>
 #include <ophidian/entity_system/Property.h>
+#include <ophidian/util/Range.h>
 
 namespace ophidian {
 namespace timing {
@@ -139,6 +140,40 @@ public:
         GraphType::InArcIt arc_;
     };
 
+    class ArcIterator {
+    public:
+        friend class Graph;
+
+        using difference_type = uint32_t;
+        using value_type = Arc;
+        using pointer = const Arc*;
+        using reference = Arc&;
+        using iterator_category = std::forward_iterator_tag;
+
+        inline ArcIterator& operator++() {
+            ++arc_;
+            return *this;
+        }
+        inline bool operator==(const ArcIterator& o) const {
+            return arc_ == o.arc_;
+        }
+        inline bool operator!=(const ArcIterator& o) const {
+            return !((*this) == o);
+        }
+        inline Arc operator*() const {
+            return static_cast<Arc>(arc_);
+        }
+
+    private:
+        ArcIterator(const GraphType::ArcIt& arc) :
+            arc_(arc)
+        {
+
+        }
+
+        GraphType::ArcIt arc_;
+    };
+
     Graph(uint32_t N, const NodeEntityType & defaultNodeEntity) :
         nodeEntities_(graph_),
         nodeEdges_(graph_)
@@ -230,6 +265,12 @@ public:
         fallMap_ = map;
     }
 
+
+    util::Range<NodeIterator> nodes() const {
+        return util::makeRange(begin(Node{}), end(Node{}));
+    }
+
+
     NodeIterator begin(Node) const {
         return NodeIterator(GraphType::NodeIt(graph_));
     }
@@ -238,12 +279,20 @@ public:
         return NodeIterator(lemon::INVALID);
     }
 
+    util::Range<OutArcIterator> outArcs(const Node& node) const {
+        return util::makeRange(outArcsBegin(node), outArcsEnd(node));
+    }
+
     OutArcIterator outArcsBegin(const Node& node) const {
         return OutArcIterator(GraphType::OutArcIt(graph_, node));
     }
 
     OutArcIterator outArcsEnd(const Node& node) const {
         return static_cast<OutArcIterator>(lemon::INVALID);
+    }
+
+    util::Range<InArcIterator> inArcs(const Node& node) const {
+        return util::makeRange(inArcsBegin(node), inArcsEnd(node));
     }
 
     InArcIterator inArcsBegin(const Node& node) const {

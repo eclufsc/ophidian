@@ -166,6 +166,7 @@ TEST_CASE("timing graph: node arcs iterator", "[timing]") {
     using namespace ophidian::circuit;
     static Pin kPin;
 
+
     Graph<Pin> g(4, kPin);
     auto arc1 = g.connect(g.node(0), g.node(1));
     auto arc2 = g.connect(g.node(0), g.node(2));
@@ -176,5 +177,14 @@ TEST_CASE("timing graph: node arcs iterator", "[timing]") {
     REQUIRE( std::count(g.inArcsBegin(g.node(2)), g.inArcsEnd(g.node(2)), arc2) == 1 );
     REQUIRE( std::count(g.inArcsBegin(g.node(3)), g.inArcsEnd(g.node(3)), arc3) == 1 );
 
+    auto nodesRange = g.nodes();
+    REQUIRE( nodesRange.begin() == g.begin(Graph<Pin>::Node{}) );
+    REQUIRE( nodesRange.end() == g.end(Graph<Pin>::Node{}) );
+    auto inArcs = g.inArcs(g.node(0));
+    REQUIRE( inArcs.begin() == g.inArcsBegin(g.node(0)) );
+    REQUIRE( inArcs.end() == g.inArcsEnd(g.node(0)) );
+    auto outArcs = g.outArcs(g.node(0));
+    REQUIRE( outArcs.begin() == g.outArcsBegin(g.node(0)) );
+    REQUIRE( outArcs.end() == g.outArcsEnd(g.node(0)) );
 }
 
