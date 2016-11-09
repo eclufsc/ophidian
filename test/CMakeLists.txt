@@ -39,3 +39,7 @@ execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${
                 RESULT_VARIABLE result )
 execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${CMAKE_BINARY_DIR}/test/.
                 RESULT_VARIABLE result )
+
+
+add_executable(sta sta_wip.cpp)
+target_link_libraries(sta ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
