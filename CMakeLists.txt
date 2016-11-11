@@ -41,22 +41,23 @@ ExternalProject_Add(
 
 # Build Liberty parser
 find_package(GPERF REQUIRED)
-#ExternalProject_Add(
-#        liberty_parser
-#        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-#        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-#        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-#        BUILD_COMMAND make install
-#        BUILD_IN_SOURCE 1
-#)
 ExternalProject_Add(
         liberty_parser
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-        PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
+        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
+        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
         BUILD_COMMAND make
+        INSTALL_COMMAND make install
         BUILD_IN_SOURCE 1
 )
+#ExternalProject_Add(
+#        liberty_parser
+#        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
+#        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
+#        PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
+#        BUILD_COMMAND make
+#        BUILD_IN_SOURCE 1
+#)
 
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 set(THIRD_PARTY_BUILD_PATH ${CMAKE_BINARY_DIR}/3rdparty)

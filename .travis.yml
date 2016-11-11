@@ -26,6 +26,9 @@ matrix:
 before_script:
   - sudo apt-get install libhash-multivalue-perl
   - sudo apt-get install gperf
+  - cd ./3rdparty/libertyParser
+  - make distclean
+  - cd ../../
   - mkdir build && cd build
   - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
   - tar jxf download
