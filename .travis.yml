@@ -26,11 +26,6 @@ matrix:
 before_script:
   - sudo apt-get install libhash-multivalue-perl
   - sudo apt-get install gperf
-  - sudo apt-get update
-  - sudo apt-get install autotools-dev
-  - sudo apt-get install automake
-  - sudo apt-get install autoconf
-  - sudo apt-get update
   - mkdir build && cd build
   - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
   - tar jxf download
@@ -47,6 +42,11 @@ before_script:
   - cd ..
   - cd ..
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
+  - cd ../3rdparty/libertyParser/
+  - ./configure --prefix=$PWD/../../build/3rdparty/libertyParser/
+  - make
+  - make install
+  - cd ../../build
 
 script:
   - make -j
