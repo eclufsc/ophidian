@@ -16,3 +16,6 @@
 [submodule "3rdparty/LEF"]
 	path = 3rdparty/LEF
 	url = https://github.com/eclufsc/LEF.git
+[submodule "3rdparty/thread-pool-cpp"]
+	path = 3rdparty/thread-pool-cpp
+	url = https://github.com/inkooboo/thread-pool-cpp.git
