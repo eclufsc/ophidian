@@ -22,7 +22,7 @@ matrix:
           packages:
             - clang-3.7
       env: COMPILER=clang++-3.7
-      
+
 before_script:
   - sudo apt-get install libhash-multivalue-perl
   - sudo apt-get install gperf
@@ -42,11 +42,6 @@ before_script:
   - cd ..
   - cd ..
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
-  - cd ../3rdparty/libertyParser/
-  - ./configure --prefix=$PWD/../../build/3rdparty/libertyParser/
-  - make
-  - make install
-  - cd ../../build
 
 script:
   - make -j
