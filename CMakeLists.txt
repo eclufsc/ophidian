@@ -27,6 +27,18 @@ find_package(Boost 1.59 REQUIRED)
 include(ExternalProject)
 include_directories(.)
 
+# Build Liberty parser
+find_package(GPERF REQUIRED)
+ExternalProject_Add(
+        liberty_parser
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
+        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
+        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
+        BUILD_COMMAND make -j 1
+        INSTALL_COMMAND make install
+        BUILD_IN_SOURCE 1
+)
+
 # Build DEF v5.8-p016 parser with the included Makefile
 find_package(ZLIB REQUIRED)
 ExternalProject_Add(
@@ -38,29 +50,6 @@ ExternalProject_Add(
 	# DEF Makefile is not compatible with external builds
 	BUILD_IN_SOURCE 1
 )
-
-# Build Liberty parser
-find_package(GPERF REQUIRED)
-ExternalProject_Add(
-        liberty_parser
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-        BUILD_COMMAND make
-        INSTALL_COMMAND make install
-        BUILD_IN_SOURCE 1
-)
-
-add_dependencies(ophidian liberty_parser)
-
-#ExternalProject_Add(
-#        liberty_parser
-#        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-#        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-#        PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-#        BUILD_COMMAND make
-#        BUILD_IN_SOURCE 1
-#)
 
 set(THIRD_PARTY_PATH ${CMAKE_SOURCE_DIR}/3rdparty)
 set(THIRD_PARTY_BUILD_PATH ${CMAKE_BINARY_DIR}/3rdparty)
