@@ -41,5 +41,8 @@ execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${
                 RESULT_VARIABLE result )
 
 
-add_executable(sta sta_wip.cpp)
-target_link_libraries(sta ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
+add_executable(sta_dod sta_dod.cpp)
+target_link_libraries(sta_dod ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
+
+add_executable(sta_oop sta_oop.cpp)
+target_link_libraries(sta_oop ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
