@@ -2,7 +2,6 @@
 #include <ophidian/entity_system/Property.h>
 #include <array>
 #include <fstream>
-#include <iostream>
 
 struct LookUpTable {
     LookUpTable():slew_index{{0.8, 2.3, 3.6, 4.1, 6.0, 8.5, 10.0}},
@@ -41,24 +40,21 @@ int main(){
     std::array<int, 2048> ports_type;
 
     std::ifstream ifs("input_files/lut_input");
-    for(auto & input: lut_input){
+    for(auto & input: lut_input)
         ifs >> input;
-    }
     ifs.close();
 
     std::ifstream ifs2("input_files/ports_types");
-    for(auto & type: ports_type){
+    for(auto & type: ports_type)
         ifs2 >> type;
-    }
     ifs2.close();
 
     std::array<LookUpTable, 211> cell_library;
     std::array<std::pair<CircuitCell,double>, 2048> logic_cells;
 
     //set the circuit's cells type
-    for(unsigned int i = 0; i < logic_cells.size();++i){
+    for(unsigned int i = 0; i < logic_cells.size();++i)
         logic_cells.at(i).second = ports_type.at(i);
-    }
 
     //set the input slews and capacitances
     unsigned int i, j;
@@ -68,9 +64,8 @@ int main(){
     }
 
     //process ports
-    for(auto p : logic_cells){
+    for(auto p : logic_cells)
         p.first.delay = process_oo(cell_library.at(p.second), p.first.input_slew, p.first.out_capacitance);
-    }
 
     return 0;
 }
