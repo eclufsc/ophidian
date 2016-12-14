@@ -1,38 +1,62 @@
 #include <iostream>
 #include <array>
 #include <fstream>
-#include <ctime>
+#include <algorithm>
+#include <chrono>
+#include  <omp.h>
 
-template<std::size_t SIZE,
-         std::size_t SIZECELLS,
-         std::size_t SIZEINDEX>
-void find_indexes(const std::array<double, SIZE>& input_slew,
-                  const std::array<double, SIZE>& type,
-                  std::array<double, SIZE>& i_index,
-                  const std::array<std::array<double, SIZEINDEX>, SIZECELLS>& slew_index){
-    for(std::size_t i = 0; i < SIZE; ++i){
+//object oriented paradigm
+template <std::size_t CIRCUIT,
+          std::size_t LIBRARY>
+void process(const std::array<double, CIRCUIT>& input_slew,
+             const std::array<double, CIRCUIT>& out_capacitance,
+             std::array<double, CIRCUIT>& delay,
+             const std::array<double, CIRCUIT>& type,
+             const std::array<std::array<double, 7>, LIBRARY>& slew_index,
+             const std::array<std::array<double, 8>, LIBRARY>& capacitance_index,
+             const std::array<std::array<double, 56>, LIBRARY>& values){
+    for(std::size_t i = 0; i < CIRCUIT; ++i){
+        auto std_cell_slew_index = slew_index.at(type.at(i));
+        auto i_index = std::distance(std_cell_slew_index.begin(),
+                               std::lower_bound(std_cell_slew_index.begin(), std_cell_slew_index.end(), input_slew.at(i)));
+        auto std_cell_cap_index = capacitance_index.at(type.at(i));
+        auto j_index = std::distance(std_cell_cap_index.begin(),
+                               std::lower_bound(std_cell_cap_index.begin(), std_cell_cap_index.end(), out_capacitance.at(i)));
+        auto table = values.at(type.at(i));
+        delay.at(i) = table.at( i_index *8+j_index);
+    }
+}
+
+template<std::size_t CIRCUIT,
+         std::size_t LIBRARY,
+         std::size_t INDEX>
+void find_indexes(const std::array<double, CIRCUIT>& input_slew,
+                  const std::array<double, CIRCUIT>& type,
+                  std::array<double, CIRCUIT>& i_index,
+                  const std::array<std::array<double, INDEX>, LIBRARY>& slew_index){
+    for(std::size_t i = 0; i < CIRCUIT; ++i){
         auto std_cell_index = slew_index.at(type.at(i));
         i_index[i] = std::distance(std_cell_index.begin(),
                                    std::lower_bound(std_cell_index.begin(), std_cell_index.end(), input_slew.at(i)));
     }
 }
 
-template<std::size_t SIZE,
-         std::size_t SIZECELLS>
-void interpolation(const std::array<double, SIZE>& index_i,
-                   const std::array<double, SIZE>& index_j,
-                   const std::array<double, SIZE>& type,
-                   std::array<double, SIZE>& output,
-                   const std::array<std::array<double, 56>, SIZECELLS>& values){
-    for(std::size_t i = 0; i < SIZE; ++i){
+template<std::size_t CIRCUIT,
+         std::size_t LIBRARY>
+void interpolation(const std::array<double, CIRCUIT>& index_i,
+                   const std::array<double, CIRCUIT>& index_j,
+                   const std::array<double, CIRCUIT>& type,
+                   std::array<double, CIRCUIT>& output,
+                   const std::array<std::array<double, 56>, LIBRARY>& values){
+    for(std::size_t i = 0; i < CIRCUIT; ++i){
         auto table = values.at(type.at(i));
         output.at(i) = table.at( index_i.at(i) *8+index_j.at(i));
     }
 }
 
 int main(){
-    const unsigned int num_elements = 32768;
-    const unsigned int num_inputs = 65536;
+    const unsigned int num_elements = 4096;
+    const unsigned int num_inputs = 8192;
     const unsigned int num_library_cells = 211;
 
     //cell library
@@ -65,6 +89,12 @@ int main(){
         ifs2 >> type;
     ifs2.close();
 
+    //order ports by type
+    auto order_time_start = std::chrono::high_resolution_clock::now();
+    std::sort(ports_type.begin(), ports_type.end());
+    auto order_time_end = std::chrono::high_resolution_clock::now();
+    auto order_time = order_time_end - order_time_start;
+
     //circuit cells
     std::array<double, num_elements> input_slew;
     std::array<double, num_elements> out_capacitance;
@@ -74,9 +104,9 @@ int main(){
     std::array<double, num_elements> j_index;
 
     //set the circuit's cells type
-    for(unsigned int i = 0; i < num_elements;++i){
+    for(unsigned int i = 0; i < num_elements;++i)
         type[i] = ports_type.at(i);
-    }
+
     //set cell's input slew and out cap
     unsigned int i, j;
     for(i = 0, j = 0; i < num_elements; ++i, j+=2){
@@ -84,8 +114,7 @@ int main(){
         out_capacitance.at(i) = lut_input.at(j+1);
     }
 
-    std::clock_t begin = clock();
-
+    auto start_time = std::chrono::high_resolution_clock::now();
     //find slew indexes
     find_indexes(input_slew, type, i_index, slew_index);
 
@@ -95,9 +124,11 @@ int main(){
     //do interpolation
     interpolation(i_index, j_index, type, delay, values);
 
-    std::clock_t end = clock();
-    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-    std::cout<<"elapsed: "<<elapsed_secs<<std::endl;
+    //process(input_slew, out_capacitance, delay, type, slew_index, capacitance_index, values);
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto total_time = (end_time - start_time) + order_time;
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(total_time).count() << std::endl;
 
     return 0;
 }
