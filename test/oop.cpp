@@ -1,7 +1,7 @@
-#include <ophidian/entity_system/EntitySystem.h>
-#include <ophidian/entity_system/Property.h>
+#include <iostream>
 #include <array>
 #include <fstream>
+#include <ctime>
 
 struct LookUpTable {
     LookUpTable():slew_index{{0.8, 2.3, 3.6, 4.1, 6.0, 8.5, 10.0}},
@@ -35,9 +35,12 @@ double process_oo(LookUpTable & lut, double & slew_ref,double & capacitance_ref)
 }
 
 int main(){
+    const unsigned int num_elements = 32768;
+    const unsigned int num_inputs = 65536;
+    const unsigned int num_library_cells = 211;
 
-    std::array<double, 4096> lut_input;
-    std::array<int, 2048> ports_type;
+    std::array<double, num_inputs> lut_input;
+    std::array<int, num_elements> ports_type;
 
     std::ifstream ifs("input_files/lut_input");
     for(auto & input: lut_input)
@@ -49,8 +52,8 @@ int main(){
         ifs2 >> type;
     ifs2.close();
 
-    std::array<LookUpTable, 211> cell_library;
-    std::array<std::pair<CircuitCell,double>, 2048> logic_cells;
+    std::array<LookUpTable, num_library_cells> cell_library;
+    std::array<std::pair<CircuitCell,double>, num_elements> logic_cells;
 
     //set the circuit's cells type
     for(unsigned int i = 0; i < logic_cells.size();++i)
@@ -58,14 +61,18 @@ int main(){
 
     //set the input slews and capacitances
     unsigned int i, j;
-    for(i = 0, j=0; i < logic_cells.size();++i, j+=2){
+    for(i = 0, j=0; i < logic_cells.size(); ++i, j+=2){
         logic_cells.at(i).first.input_slew = lut_input.at(j);
         logic_cells.at(i).first.out_capacitance = lut_input.at(j+1);
     }
 
+
     //process ports
+    std::clock_t begin = clock();
     for(auto p : logic_cells)
         p.first.delay = process_oo(cell_library.at(p.second), p.first.input_slew, p.first.out_capacitance);
-
+    std::clock_t end = clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    std::cout<<"elapsed: "<<elapsed_secs<<std::endl;
     return 0;
 }

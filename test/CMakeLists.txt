@@ -47,5 +47,6 @@ SET(CMAKE_EXE_LINKER_FLAGS "-static")
 add_executable(sta_dod sta_dod.cpp)
 target_link_libraries(sta_dod ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
 
-add_executable(sta_oop sta_oop.cpp)
-target_link_libraries(sta_oop ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_timing emon)
+add_executable(oop oop.cpp)
+
+add_executable(dod dod.cpp)
