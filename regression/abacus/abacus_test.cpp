@@ -1,7 +1,7 @@
 //
 // Created by renan on 4/29/16.
 //
-
+/*
 #include <fstream>
 #include <sys/time.h>
 #include "../catch.hpp"
@@ -80,3 +80,4 @@ TEST_CASE("legalization/ legalizing iccad 2015 circuits after random movements",
     run_circuit("superblue5");
     run_circuit("superblue3");
 }
+*/

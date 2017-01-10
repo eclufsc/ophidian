@@ -2,6 +2,7 @@
 // Created by renan on 4/29/16.
 //
 
+/*
 #include <fstream>
 #include <sys/time.h>
 #include "../../catch.hpp"
@@ -57,3 +58,4 @@ TEST_CASE("legalization/ legalizing simple after random movements","[legalizatio
 
     REQUIRE(legalization_check.check_legality());
 }
+*/
