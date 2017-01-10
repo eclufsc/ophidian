@@ -39,11 +39,10 @@ TEST_CASE("Rows: Add origin property.", "[floorplan][Rows]")
     Rows rows;
     auto row = rows.add();
 
-    ophidian::geometry::Location origin(ophidian::util::micrometer_t(2.0), ophidian::util::micrometer_t(2.0));
+    ophidian::util::Location origin(ophidian::util::micrometer_t(2.0), ophidian::util::micrometer_t(2.0));
     rows.origin(row, origin);
     auto originReturn = rows.origin(row);
-    REQUIRE(originReturn.x() == origin.y());
-    REQUIRE(originReturn.y() == origin.y());
+    REQUIRE(originReturn == origin);
 }
 
 TEST_CASE("Rows: Add numberOfSites property.", "[floorplan][Rows]")
@@ -58,7 +57,7 @@ TEST_CASE("Rows: Add numberOfSites property.", "[floorplan][Rows]")
 }
 
 namespace {
-class SitesSystemFixture{
+class SitesSystemFixture {
 public:
     Sites sites;
     Site site1, site2, site3;
@@ -83,11 +82,11 @@ TEST_CASE_METHOD(SitesSystemFixture, "Rows: Add siteType property.", "[floorplan
 }
 
 namespace {
-class RowWithPropertiesFixture{
+class RowWithPropertiesFixture {
 public:
     Rows rows;
     Row row1, row2, row3;
-    ophidian::geometry::Location origin1, origin2, origin3;
+    ophidian::util::Location origin1, origin2, origin3;
     size_t numSites1, numSites2, numSites3;
 
     SitesSystemFixture sitesSystem;
@@ -97,9 +96,9 @@ public:
         row2 = rows.add();
         row3 = rows.add();
 
-        origin1 = ophidian::geometry::Location(ophidian::util::micrometer_t(10.0), ophidian::util::micrometer_t(10.0));
-        origin2 = ophidian::geometry::Location(ophidian::util::micrometer_t(200.0), ophidian::util::micrometer_t(200.0));
-        origin3 = ophidian::geometry::Location(ophidian::util::micrometer_t(400.0), ophidian::util::micrometer_t(400.0));
+        origin1 = ophidian::util::Location(10.0, 10.0);
+        origin2 = ophidian::util::Location(200.0, 200.0);
+        origin3 = ophidian::util::Location(400.0, 400.0);
 
         numSites1 = 100;
         numSites2 = 150;
@@ -124,16 +123,13 @@ TEST_CASE_METHOD(RowWithPropertiesFixture, "Rows: Check row origins.", "[floorpl
 {
     REQUIRE(rows.rows_range().size() == 3);
     auto loc1Ret = rows.origin(*rows.rows_range().begin());
-    REQUIRE(loc1Ret.x() == origin1.x());
-    REQUIRE(loc1Ret.y() == origin1.y());
+    REQUIRE(loc1Ret == origin1);
 
     auto loc2Ret = rows.origin(*(++rows.rows_range().begin()));
-    REQUIRE(loc2Ret.x() == origin2.x());
-    REQUIRE(loc2Ret.y() == origin2.y());
+    REQUIRE(loc2Ret == origin2);
 
     auto loc3Ret = rows.origin(*(--rows.rows_range().end()));
-    REQUIRE(loc3Ret.x() == origin3.x());
-    REQUIRE(loc3Ret.y() == origin3.y());
+    REQUIRE(loc3Ret == origin3);
 }
 
 TEST_CASE_METHOD(RowWithPropertiesFixture, "Rows: Check row sizes.", "[floorplan][Rows]")
@@ -155,8 +151,7 @@ TEST_CASE_METHOD(RowWithPropertiesFixture, "Rows: Remove and check properties.",
     rows.erase(row1);
     REQUIRE(rows.rows_range().size() == 2);
     auto loc1Ret = rows.origin(*rows.rows_range().begin());
-    REQUIRE(loc1Ret.x() == origin3.x());
-    REQUIRE(loc1Ret.y() == origin3.y());
+    REQUIRE(loc1Ret == origin3);
     auto numSitesRet1 = rows.numberOfSites(*rows.rows_range().begin());
     REQUIRE(numSitesRet1 == numSites3);
     auto siteTypeRet1 = rows.site(*rows.rows_range().begin());
@@ -165,8 +160,7 @@ TEST_CASE_METHOD(RowWithPropertiesFixture, "Rows: Remove and check properties.",
     rows.erase(row3);
     REQUIRE(rows.rows_range().size() == 1);
     loc1Ret = rows.origin(*rows.rows_range().begin());
-    REQUIRE(loc1Ret.x() == origin2.x());
-    REQUIRE(loc1Ret.y() == origin2.y());
+    REQUIRE(loc1Ret == origin2);
     numSitesRet1 = rows.numberOfSites(*rows.rows_range().begin());
     REQUIRE(numSitesRet1 == numSites2);
     siteTypeRet1 = rows.site(*rows.rows_range().begin());

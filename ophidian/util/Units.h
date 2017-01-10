@@ -3,6 +3,7 @@
 
 #include <ratio>
 #include <3rdparty/units/include/units.h>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 namespace ophidian {
 namespace util {
@@ -35,6 +36,69 @@ using farad_t      = units::capacitance::farad_t;
 using ohm_t       = units::impedance::ohm_t;
 using kiloohm_t   = units::impedance::kiloohm_t;
 
+} //namespace util
+
+} //namespace ophidian
+
+
+//Creating a new boost point to allow receiving double in the constructor and converting to micrometer_t
+namespace boost {
+namespace geometry {
+namespace model {
+namespace d2 {
+template<typename CoordinateType, typename CoordinateSystem = cs::cartesian>
+class point_xy_location : public model::point<CoordinateType, 2, CoordinateSystem>
+{
+public:
+
+#ifndef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+    /// \constructor_default_no_init
+    point_xy_location() = default;
+#else
+    /// \constructor_default_no_init
+    inline point_xy()
+    {}
+#endif
+
+    /// Constructor with x/y values as double with implicit convertion to micrometer_t
+    inline point_xy_location(double const& x, double const& y)
+        : model::point<CoordinateType, 2, CoordinateSystem>(CoordinateType(x), CoordinateType(y))
+    {}
+
+    /// Constructor with x/y values
+    inline point_xy_location(CoordinateType const& x, CoordinateType const& y)
+        : model::point<CoordinateType, 2, CoordinateSystem>(x, y)
+    {}
+
+    /// Get x-value
+    inline CoordinateType const& x() const
+    { return this->template get<0>(); }
+
+    /// Get y-value
+    inline CoordinateType const& y() const
+    { return this->template get<1>(); }
+
+    /// Set x-value
+    inline void x(CoordinateType const& v)
+    { this->template set<0>(v); }
+
+    /// Set y-value
+    inline void y(CoordinateType const& v)
+    { this->template set<1>(v); }
+
+    ///operator == overloading
+    bool operator==(const point_xy_location & point)
+    { return (this->x() == point.x()) && (this->y() == point.y());}
+};
+}
+}
+}
+}
+
+namespace ophidian {
+namespace util {
+
+using Location = boost::geometry::model::d2::point_xy_location<ophidian::util::micrometer_t>;
 
 } //namespace util
 

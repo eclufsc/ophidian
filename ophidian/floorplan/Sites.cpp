@@ -17,41 +17,25 @@ Sites::~Sites()
 
 Site Sites::add()
 {
-    return sites_.add();
+	return sites_.add();
 }
 
 void Sites::erase(Site site)
 {
-    sites_.erase(site);
+	sites_.erase(site);
 }
 
 void Sites::name(Site site, std::string name)
 {
-    names_[site] = name;
+	names_[site] = name;
 }
 
-void Sites::dimension(Site site, geometry::Location loc)
+void Sites::upperRightCorner(Site site, util::Location loc)
 {
-    dimensions_[site] = loc;
-}
-
-std::string Sites::name(Site site) const
-{
-    return names_[site];
-}
-
-geometry::Location Sites::dimension(Site site) const
-{
-    return dimensions_[site];
-}
-
-ophidian::util::Range<Sites::SitesIterator> Sites::sites_range() const
-{
-    return ophidian::util::Range<Sites::SitesIterator>(sites_.begin(), sites_.end());
+	dimensions_[site] = loc;
 }
 
 
 } //namespace floorplan
 
 } //namespace ophidian
-

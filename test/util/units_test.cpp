@@ -1,6 +1,5 @@
 #include <catch.hpp>
 #include <ophidian/util/Units.h>
-#include <ophidian/geometry/Models.h>
 
 
 using namespace ophidian::util;
@@ -30,11 +29,11 @@ TEST_CASE("Unit Test: Resistance", "[util][units]")
 
 TEST_CASE("Location Test", "[util][units]")
 {
-    ophidian::geometry::Location loc1micron(micrometer_t(10.0), micrometer_t(20.0));
-    ophidian::geometry::Location loc2nano(nanometer_t(1000.0), nanometer_t(2000.0));
+    Location loc1micron(10.0, 20.0);
+    Location loc2nano(nanometer_t(1000.0), nanometer_t(2000.0));
 
-    ophidian::geometry::Location loc3micron(loc1micron.x() + loc2nano.x(), loc1micron.y() + loc2nano.y());
-    ophidian::geometry::Location loc3micronGoldenResult(micrometer_t(11.0), micrometer_t(22.0));
+    Location loc3micron(loc1micron.x() + loc2nano.x(), loc1micron.y() + loc2nano.y());
+    Location loc3micronGoldenResult(11.0, 22.0);
     REQUIRE(loc3micron.x() == loc3micronGoldenResult.x());
     REQUIRE(loc3micron.y() == loc3micronGoldenResult.y());
 

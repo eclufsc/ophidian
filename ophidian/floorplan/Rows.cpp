@@ -23,7 +23,7 @@ void Rows::erase(Row row)
     rows_.erase(row);
 }
 
-void Rows::origin(Row row, geometry::Location loc)
+void Rows::origin(Row row, util::Location loc)
 {
     origins_[row] = loc;
 }
@@ -36,26 +36,6 @@ void Rows::numberOfSites(Row row, size_t num)
 void Rows::site(Row row, Site site)
 {
     siteTypeOfRow_[row] = site;
-}
-
-geometry::Location Rows::origin(Row row) const
-{
-    return origins_[row];
-}
-
-size_t Rows::numberOfSites(Row row) const
-{
-    return numberOfSites_[row];
-}
-
-Site Rows::site(Row row) const
-{
-    return siteTypeOfRow_[row];
-}
-
-ophidian::util::Range<Rows::RowsIterator> Rows::rows_range() const
-{
-    return util::Range<Rows::RowsIterator>(rows_.begin(), rows_.end());
 }
 
 } //namespace floorplan

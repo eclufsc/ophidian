@@ -1,5 +1,5 @@
-#ifndef AGGREGATION_H
-#define AGGREGATION_H
+#ifndef OPHIDIAN_ENTITY_SYSTEM_AGGREGATION_H
+#define OPHIDIAN_ENTITY_SYSTEM_AGGREGATION_H
 
 #include "Association.h"
 
@@ -53,4 +53,4 @@ class Aggregation : public Association<WholeEntity_, PartEntity_>
 }
 }
 
-#endif // AGGREGATION_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_AGGREGATION_H
