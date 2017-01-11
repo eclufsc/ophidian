@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
  */
-
+/*
 #include "../catch.hpp"
 
 #include "../parsing/lef.h"
@@ -78,3 +78,4 @@ TEST_CASE("density/ abu of iccad2015 ckts","[density][abu][regression][iccad2015
     REQUIRE(run_circuit("superblue3", 0.87, 0.0287357));
     REQUIRE(run_circuit("superblue5", 0.85, 0.0208419));
 }
+*/

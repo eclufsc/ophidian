@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
  */
-
+/*
 #include "../catch.hpp"
 
 #include "../parsing/lef.h"
@@ -67,4 +67,4 @@ TEST_CASE("density/ abu of simple","[density][abu]") {
     density::abu abu(&floorplan, &cells, {number_of_rows_in_each_bin * row_height, number_of_rows_in_each_bin * row_height});
     double measured_abu = abu.measure_abu(target_utilization);
     REQUIRE(Approx(measured_abu) == golden_abu);
-}
+}*/
