@@ -8,4 +8,4 @@ LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/)
 
 add_executable(ispd main.cpp)
 
-target_link_libraries(ispd parsing standard_cell netlist placement)
+target_link_libraries(ispd parsing standard_cell netlist placement interconnection)
