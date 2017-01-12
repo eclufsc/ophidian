@@ -30,6 +30,15 @@ placement::placement(netlist::netlist* netlist, library* lib) :
 placement::~placement() {
 }
 
+void placement::set_all_pin_positions(){
+    for(auto pin : m_netlist->pin_system())
+        m_netlist->set_pin_position(pin, pin_position(pin));
+}
+
+geometry::point<double> placement::get_pin_position(entity_system::entity pin){
+    return m_netlist->get_pin_position(pin);
+}
+
 void placement::cell_position(entity_system::entity cell,
                               geometry::point<double> position) {
     if (!cell_fixed(cell)) {

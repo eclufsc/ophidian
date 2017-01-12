@@ -47,6 +47,14 @@ netlist::netlist(standard_cell::standard_cells * std_cells) :
 netlist::~netlist() {
 }
 
+void netlist::set_pin_position(entity_system::entity pin, const geometry::point<double> & position){
+    m_pins.set_position(pin, position);
+}
+
+geometry::point<double> netlist::get_pin_position(entity_system::entity pin){
+    return m_pins.pin_position(pin);
+}
+
 void netlist::register_cell_property(entity_system::property* property) {
 	m_cells_system.register_property(property);
 }

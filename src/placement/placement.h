@@ -37,6 +37,11 @@ class placement {
 	library * m_library;
 	cells m_cells;
 public:
+
+    void set_all_pin_positions();
+
+    geometry::point<double> get_pin_position(entity_system::entity pin);
+
 	/// Constructor.
 	/**
 	 * Placement constructor. Initializes the placement cell properties, such as positions and geometries.

@@ -22,6 +22,7 @@ under the License.
 #define SRC_NETLIST_PINS_H_
 
 #include <vector>
+#include "../geometry/geometry.h"
 #include "../entity_system/entity_system.h"
 #include "../entity_system/vector_property.h"
 
@@ -32,6 +33,7 @@ class pins {
     entity_system::entity_system & m_system;
 
     entity_system::vector_property<std::string> m_names;
+    entity_system::vector_property<geometry::point<double>> m_positions;
     entity_system::vector_property<entity_system::entity> m_owners;
     entity_system::vector_property<entity_system::entity> m_nets;
     entity_system::vector_property<entity_system::entity> m_std_cell_pin;
@@ -46,6 +48,9 @@ public:
     entity_system::entity owner(entity_system::entity pin) const {
 		return m_owners[m_system.lookup(pin)];
 	}
+
+    geometry::point<double> pin_position(entity_system::entity pin) const;
+
     entity_system::entity net(entity_system::entity pin) const {
 		return m_nets[m_system.lookup(pin)];
 	}
@@ -65,6 +70,7 @@ public:
     void owner(entity_system::entity pin, entity_system::entity owner);
     void net(entity_system::entity pin, entity_system::entity net);
     void standard_cell_pin(entity_system::entity pin, entity_system::entity std_cell_pin);
+    void set_position(entity_system::entity pin, geometry::point<double> position);
 
 };
 

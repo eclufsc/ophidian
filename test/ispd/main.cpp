@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
     lef.reset(new parsing::lef("./benchmarks/"+circuit_name+"/"+circuit_name+".lef"));
 
 
-
     standard_cell::standard_cells m_std_cells;
     netlist::netlist m_netlist{&m_std_cells};
     netlist::verilog2netlist(*v, m_netlist);
@@ -41,17 +40,18 @@ int main(int argc, char **argv) {
 
     netlist::netlist netlist = m_placement.netlist();
 
+    m_placement.set_all_pin_positions();
+
     auto time_start = std::chrono::high_resolution_clock::now();
     for(auto net : netlist.net_system()){
-        //std::cout<<netlist.net_name(net)<<":";
+//        std::cout<<netlist.net_name(net)<<":";
         std::vector<geometry::point<double>> pin_positions;
-        auto pin_vector = netlist.net_pins(net);
-        for(auto pin : pin_vector)
-            pin_positions.push_back(m_placement.pin_position(pin));
+        for(auto pin : netlist.net_pins(net))
+            pin_positions.push_back(m_placement.get_pin_position(pin));
         interconnection::hpwl(pin_positions);
         interconnection::stwl(pin_positions);
-        //std::cout<<" hpwl= "<<interconnection::hpwl(pin_positions);
-        //std::cout<<", stwl= "<<interconnection::stwl(pin_positions)<<std::endl;
+//        std::cout<<" hpwl= "<<interconnection::hpwl(pin_positions);
+//        std::cout<<", stwl= "<<interconnection::stwl(pin_positions)<<std::endl;
     }
     auto time_end = std::chrono::high_resolution_clock::now();
     auto total_time = time_end - time_start;

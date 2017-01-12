@@ -23,6 +23,7 @@ under the License.
 
 #include "../standard_cell/standard_cells.h"
 #include "../entity_system/entity_system.h"
+#include "../geometry/geometry.h"
 #include <boost/bimap.hpp>
 #include "cells.h"
 #include "pins.h"
@@ -68,6 +69,10 @@ public:
     void cell_preallocate(std::size_t qnt);
     void pin_preallocate(std::size_t qnt);
     void net_preallocate(std::size_t qnt);
+
+    void set_pin_position(entity_system::entity pin, const geometry::point<double> & position);
+
+    geometry::point<double> get_pin_position(entity_system::entity pin);
 
 	/// Constructor.
 	/**

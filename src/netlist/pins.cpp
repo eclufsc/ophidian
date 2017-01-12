@@ -28,6 +28,7 @@ pins::pins(entity_system::entity_system & system) : m_system(system) {
 	m_system.register_property(&m_owners);
 	m_system.register_property(&m_nets);
 	m_system.register_property(&m_std_cell_pin);
+    m_system.register_property(&m_positions);
 }
 
 pins::~pins() {
@@ -49,6 +50,15 @@ void pins::standard_cell_pin(entity_system::entity pin,
         entity_system::entity std_cell_pin) {
 	m_std_cell_pin[m_system.lookup(pin)] = std_cell_pin;
 }
+
+geometry::point<double> pins::pin_position(entity_system::entity pin) const{
+    return m_positions[m_system.lookup(pin)];
+}
+
+void pins::set_position(entity_system::entity pin, geometry::point<double> position){
+    m_positions[m_system.lookup(pin)] = position;
+}
+
 } /* namespace netlist */
 } /* namespace ophidian */
 
