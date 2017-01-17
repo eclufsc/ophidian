@@ -11,7 +11,7 @@ SET(CMAKE_EXE_LINKER_FLAGS "-static")
 
 add_executable(ispd main.cpp)
 
-target_link_libraries(ispd parsing standard_cell netlist placement interconnection)
+target_link_libraries(ispd parsing standard_cell netlist placement interconnection papi)
 
 add_custom_command(
         TARGET ispd POST_BUILD

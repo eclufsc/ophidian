@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <chrono>
+#include <papi.h>
 
 #include "../src/parsing/def.h"
 #include "../src/parsing/lef.h"
@@ -17,9 +18,7 @@
 #include "../geometry/geometry.h"
 
 using namespace ophidian;
-
 //--------------------------------OOD--------------------------------
-
 class Pin;
 
 class Net{
@@ -49,6 +48,7 @@ public:
 };
 
 int main(int argc, char **argv) {
+
     std::string circuit_name = argv[1];
 
     std::unique_ptr<parsing::def> def;
@@ -84,11 +84,15 @@ int main(int argc, char **argv) {
       }
     }
 
+    long long counters[3];
+    int PAPI_events[] = {
+        PAPI_L1_TCM,
+        PAPI_L2_TCM,
+        PAPI_L3_TCM};
+    PAPI_library_init(PAPI_VER_CURRENT);
+    PAPI_start_counters( PAPI_events, 3 );
 
-
-
-
-    auto time_start = std::chrono::high_resolution_clock::now();
+    //auto time_start = std::chrono::high_resolution_clock::now();
     for(auto net : m_nets){
         //std::cout<<net.name()<<":";
         std::vector<geometry::point<double>> pin_positions;
@@ -99,14 +103,20 @@ int main(int argc, char **argv) {
         //std::cout<<" hpwl= "<<interconnection::hpwl(pin_positions);
         //std::cout<<", stwl= "<<interconnection::stwl(pin_positions)<<std::endl;
     }
-    auto time_end = std::chrono::high_resolution_clock::now();
-    auto total_time = time_end - time_start;
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+//    auto time_end = std::chrono::high_resolution_clock::now();
+//    auto total_time = time_end - time_start;
+//    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+    PAPI_read_counters( counters, 3 );
+    std::cout<<"Total misses: "<<(counters[0]+counters[1]+counters[2])<<std::endl;
     return 0;
 }
 
-//--------------------------------DOD--------------------------------
 
+
+
+
+//--------------------------------DOD--------------------------------
 /*
 int main(int argc, char **argv) {
     std::string circuit_name = argv[1];
@@ -132,7 +142,15 @@ int main(int argc, char **argv) {
 
     m_placement.set_all_pin_positions();
 
-    auto time_start = std::chrono::high_resolution_clock::now();
+    long long counters[3];
+    int PAPI_events[] = {
+        PAPI_L1_TCM,
+        PAPI_L2_TCM,
+        PAPI_L3_TCM};
+    PAPI_library_init(PAPI_VER_CURRENT);
+    PAPI_start_counters( PAPI_events, 3 );
+
+//    auto time_start = std::chrono::high_resolution_clock::now();
     for(auto net : netlist.net_system()){
 //        std::cout<<netlist.net_name(net)<<":";
         std::vector<geometry::point<double>> pin_positions;
@@ -143,9 +161,12 @@ int main(int argc, char **argv) {
 //        std::cout<<" hpwl= "<<interconnection::hpwl(pin_positions);
 //        std::cout<<", stwl= "<<interconnection::stwl(pin_positions)<<std::endl;
     }
-    auto time_end = std::chrono::high_resolution_clock::now();
-    auto total_time = time_end - time_start;
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+//    auto time_end = std::chrono::high_resolution_clock::now();
+//    auto total_time = time_end - time_start;
+//    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+    PAPI_read_counters( counters, 3 );
+    std::cout<<"Total misses: "<<(counters[0]+counters[1]+counters[2])<<std::endl;
     return 0;
 }
 */
