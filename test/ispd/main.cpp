@@ -15,10 +15,13 @@
 #include "../src/placement/library.h"
 #include "../src/interconnection/hpwl.h"
 #include "../src/interconnection/stwl.h"
-#include "../geometry/geometry.h"
+#include "../src/geometry/geometry.h"
+#include "../src/floorplan/floorplan.h"
+#include "../src/floorplan/lefdef2floorplan.h"
 
 using namespace ophidian;
-//--------------------------------OOD--------------------------------
+//--------------------------------OOD HPWL STWL--------------------------------
+/*
 class Pin;
 
 class Net{
@@ -111,12 +114,12 @@ int main(int argc, char **argv) {
     std::cout<<"Total misses: "<<(counters[0]+counters[1]+counters[2])<<std::endl;
     return 0;
 }
+*/
 
 
 
 
-
-//--------------------------------DOD--------------------------------
+//--------------------------------DOD HPWL STWL--------------------------------
 /*
 int main(int argc, char **argv) {
     std::string circuit_name = argv[1];
@@ -170,3 +173,54 @@ int main(int argc, char **argv) {
     return 0;
 }
 */
+
+
+
+
+
+//--------------------------------LEGALIZATION DOD --------------------------------
+int main(int argc, char **argv) {
+    std::string circuit_name = argv[1];
+
+    std::unique_ptr<parsing::def> def;
+    std::unique_ptr<parsing::lef> lef;
+    std::unique_ptr<parsing::verilog> v;
+    v.reset(new parsing::verilog("./benchmarks/"+circuit_name+"/"+circuit_name+".v"));
+    def.reset(new parsing::def("./benchmarks/"+circuit_name+"/"+circuit_name+".def"));
+    lef.reset(new parsing::lef("./benchmarks/"+circuit_name+"/"+circuit_name+".lef"));
+
+
+    standard_cell::standard_cells m_std_cells;
+    netlist::netlist m_netlist{&m_std_cells};
+    netlist::verilog2netlist(*v, m_netlist);
+    placement::library m_placement_lib{&m_std_cells};
+    placement::placement m_placement{&m_netlist, &m_placement_lib};
+    floorplan::floorplan m_floorplan;
+
+    placement::def2placement(*def, m_placement);
+    placement::lef2library(*lef, m_placement_lib);
+    floorplan::lefdef2floorplan(*lef, *def, m_floorplan);
+
+    netlist::netlist netlist = m_placement.netlist();
+
+    geometry::point<double> m_chip_boundaries = m_floorplan.chip_boundaries();
+
+
+    auto time_start = std::chrono::high_resolution_clock::now();
+    bool placemente_is_legal = true;
+    for(auto position : m_placement.cell_properties().positions()){
+        if(position.x() < 0 || position.y() < 0 || position.x() > m_chip_boundaries.x() || position.y() > m_chip_boundaries.y()){
+            placemente_is_legal = false;
+            break;
+        }
+    }
+    auto time_end = std::chrono::high_resolution_clock::now();
+    auto total_time = time_end - time_start;
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+//    if(placemente_is_legal)
+//        std::cout<<"The placement is legal."<<std::endl;
+//    else
+//        std::cout<<"The placement is Ilegal."<<std::endl;
+    return 0;
+}
