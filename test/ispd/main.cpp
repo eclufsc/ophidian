@@ -179,6 +179,7 @@ int main(int argc, char **argv) {
 
 
 //--------------------------------LEGALIZATION DOD --------------------------------
+/*
 int main(int argc, char **argv) {
     std::string circuit_name = argv[1];
 
@@ -224,3 +225,100 @@ int main(int argc, char **argv) {
 //        std::cout<<"The placement is Ilegal."<<std::endl;
     return 0;
 }
+*/
+
+
+
+
+//--------------------------------LEGALIZATION OOD --------------------------------
+class Pin{
+public:
+    Pin(){}
+};
+
+class StdCell{
+public:
+    StdCell(){}
+};
+
+//netlist cell
+class Cell{
+    std::string m_name;
+    StdCell * m_standard_cell;
+    std::vector<Pin*> m_pins;
+public:
+    Cell(const std::string & name, std::size_t pins_size): m_name(name){m_pins.reserve(pins_size);}
+};
+
+class PlacementCell : public Cell{
+    using point = geometry::point<double>;
+    using polygon = geometry::polygon<point>;
+    using multipolygon = geometry::multi_polygon<polygon>;
+
+    multipolygon m_geometry;
+    point m_position;
+    bool m_fixed;
+public:
+    PlacementCell(const std::string & name, const bool fixed, std::size_t pins_size):Cell(name, pins_size), m_fixed(m_fixed){}
+    void set_geometry(multipolygon geometry){m_geometry = geometry;}
+    void set_position(const point & position){m_position = position;}
+    const point & get_position(){return m_position;}
+};
+
+int main(int argc, char **argv) {
+    std::string circuit_name = argv[1];
+
+    std::unique_ptr<parsing::def> def;
+    std::unique_ptr<parsing::lef> lef;
+    std::unique_ptr<parsing::verilog> v;
+    v.reset(new parsing::verilog("./benchmarks/"+circuit_name+"/"+circuit_name+".v"));
+    def.reset(new parsing::def("./benchmarks/"+circuit_name+"/"+circuit_name+".def"));
+    lef.reset(new parsing::lef("./benchmarks/"+circuit_name+"/"+circuit_name+".lef"));
+
+
+    standard_cell::standard_cells m_std_cells;
+    netlist::netlist m_netlist{&m_std_cells};
+    netlist::verilog2netlist(*v, m_netlist);
+    placement::library m_placement_lib{&m_std_cells};
+    placement::placement m_placement{&m_netlist, &m_placement_lib};
+    floorplan::floorplan m_floorplan;
+
+    placement::def2placement(*def, m_placement);
+    placement::lef2library(*lef, m_placement_lib);
+    floorplan::lefdef2floorplan(*lef, *def, m_floorplan);
+
+    netlist::netlist netlist = m_placement.netlist();
+
+    geometry::point<double> m_chip_boundaries = m_floorplan.chip_boundaries();
+
+    std::vector<PlacementCell> m_cells;
+    m_cells.reserve(netlist.cell_system().size());
+
+    for(auto cell : netlist.cell_system()){
+        PlacementCell p_cell(netlist.cell_name(cell), m_placement.cell_fixed(cell), netlist.cell_pins(cell).size());
+        p_cell.set_geometry(m_placement.cell_geometry(cell));
+        p_cell.set_position(m_placement.cell_position(cell));
+        m_cells.push_back(p_cell);
+    }
+
+    auto time_start = std::chrono::high_resolution_clock::now();
+    bool placemente_is_legal = true;
+    for(auto cell : m_cells){
+        auto position = cell.get_position();
+        //std::cout<<position.x()<<" "<<position.y()<<std::endl;
+        if(position.x() < 0 || position.y() < 0 || position.x() > m_chip_boundaries.x() || position.y() > m_chip_boundaries.y()){
+            placemente_is_legal = false;
+            break;
+        }
+    }
+    auto time_end = std::chrono::high_resolution_clock::now();
+    auto total_time = time_end - time_start;
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+//    if(placemente_is_legal)
+//        std::cout<<"The placement is legal."<<std::endl;
+//    else
+//        std::cout<<"The placement is Ilegal."<<std::endl;
+    return 0;
+}
+
