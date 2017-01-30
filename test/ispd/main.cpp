@@ -22,7 +22,7 @@
 using namespace ophidian;
 #define ProblemA//else ProblemB
 #define DOD//else OOD
-#define Runtime//else MissRate
+//#define Runtime//else MissRate
 
 //--------------------------------Problem A --------------------------------
 #ifdef ProblemA
@@ -84,11 +84,10 @@ int main(int argc, char **argv) {
     placement::lef2library(*lef, m_placement_lib);
     floorplan::lefdef2floorplan(*lef, *def, m_floorplan);
 
-    netlist::netlist netlist = m_placement.netlist();
-
     geometry::point<double> m_chip_boundaries = m_floorplan.chip_boundaries();
 
 #ifndef DOD
+    netlist::netlist netlist = m_placement.netlist();
     std::vector<PlacementCell> m_cells;
     m_cells.reserve(netlist.cell_system().size());
 
@@ -102,13 +101,10 @@ int main(int argc, char **argv) {
     bool placemente_is_legal = true;
 
 #ifndef Runtime
-    long long counters[3];
-    int PAPI_events[] = {
-        PAPI_L1_TCM,
-        PAPI_L2_TCM,
-        PAPI_L3_TCM};
+    int PAPI_events[] = {PAPI_L1_ICM, PAPI_L1_DCM};//Please change this according with your cpu architecture.
+    long long counters[sizeof(PAPI_events)/4];
     PAPI_library_init(PAPI_VER_CURRENT);
-    PAPI_start_counters( PAPI_events, 3 );
+    PAPI_start_counters( PAPI_events, sizeof(PAPI_events)/4 );
 #else
     auto time_start = std::chrono::high_resolution_clock::now();
 #endif
@@ -136,8 +132,8 @@ int main(int argc, char **argv) {
     auto total_time = time_end - time_start;
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
 #else
-    PAPI_read_counters( counters, 3 );
-    std::cout<<"Total misses: "<<(counters[0]+counters[1]+counters[2])<<std::endl;
+    PAPI_read_counters( counters, sizeof(PAPI_events)/4 );
+    std::cout<<"Cache misses L1-I: "<<counters[0]<<" L1-D: "<<counters[1]<<std::endl;
 #endif
     return 0;
 }
@@ -219,13 +215,10 @@ int main(int argc, char **argv) {
 #endif
 
 #ifndef Runtime
-    long long counters[3];
-    int PAPI_events[] = {
-        PAPI_L1_TCM,
-        PAPI_L2_TCM,
-        PAPI_L3_TCM};
+    int PAPI_events[] = {PAPI_L1_ICM, PAPI_L1_DCM};//Please change this according with your cpu architecture.
+    long long counters[sizeof(PAPI_events)/4];
     PAPI_library_init(PAPI_VER_CURRENT);
-    PAPI_start_counters( PAPI_events, 3 );
+    PAPI_start_counters( PAPI_events, sizeof(PAPI_events)/4 );
 #else
     auto time_start = std::chrono::high_resolution_clock::now();
 #endif
@@ -253,8 +246,8 @@ int main(int argc, char **argv) {
     auto total_time = time_end - time_start;
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
 #else
-    PAPI_read_counters( counters, 3 );
-    std::cout<<"Total misses: "<<(counters[0]+counters[1]+counters[2])<<std::endl;
+    PAPI_read_counters( counters, sizeof(PAPI_events)/4 );
+    std::cout<<"Cache misses L1-I: "<<counters[0]<<" L1-D: "<<counters[1]<<std::endl;
 #endif
     return 0;
 }
