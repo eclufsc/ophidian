@@ -5,15 +5,10 @@
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
+#include <ophidian/circuit/Netlist.h>
 
 namespace ophidian {
 namespace placement {
-
-class Cell : public entity_system::EntityBase
-{
-    public:
-        using entity_system::EntityBase::EntityBase;
-};
 
 class Placement
 {
@@ -22,7 +17,7 @@ public:
 	/*!
 	   \brief Constructs a placement system with no properties
 	 */
-	Placement();
+    Placement(circuit::Netlist & netlist);
 
     //! Placement Destructor
 	/*!
@@ -30,20 +25,13 @@ public:
 	 */
 	~Placement();
 
-    //! Add cell in the placement
+    //! Places a cell
     /*!
-       \brief Adds a a new cell in the placement. A cell has a location.
+       \brief Places a cell by setting its location
+       \param cell Cell to be placed
        \param location Location of the lower left corner of the cell.
-       \return The created cell.
      */
-    Cell add(Cell, util::Location location);
-
-    //! Erase cell in the placement
-    /*!
-       \brief Erases an existing cell.
-       \param cell Cell to be erased.
-     */
-    void erase(Cell cell);
+    void place_cell(circuit::Cell cell, util::Location location);
 
     //! Location getter
     /*!
@@ -51,13 +39,13 @@ public:
        \param cell Cell entity to get the location.
        \return Location of the cell.
      */
-    util::Location location(Cell cell) {
+    util::Location location(circuit::Cell cell) {
         return locations_[cell];
     }
 
 private:
-    entity_system::EntitySystem<Cell> cells_;
-    entity_system::Property<Cell, util::Location> locations_;
+    circuit::Netlist & netlist_;
+    entity_system::Property<circuit::Cell, util::Location> locations_;
 };
 
 } //namespace placement

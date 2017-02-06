@@ -101,7 +101,7 @@ public:
     //! Name getter
     /*!
        \brief Get the name of a given site
-       \param site Site entity to set the name.
+       \param site Site entity to get the name.
        \return Name of the site.
      */
     std::string name(Site site) const

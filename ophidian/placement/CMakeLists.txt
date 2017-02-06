@@ -4,4 +4,4 @@ file(GLOB ophidian_placement_SRC
 )
 add_library(ophidian_placement ${ophidian_placement_SRC})
 install(TARGETS ophidian_placement DESTINATION lib)
-install(FILES Placement.h DESTINATION include/ophidian/placement)
+install(FILES Placement.h Library.h DESTINATION include/ophidian/placement)

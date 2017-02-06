@@ -3,8 +3,8 @@
 namespace ophidian {
 namespace placement {
 
-Placement::Placement()
-    : locations_(cells_){
+Placement::Placement(circuit::Netlist &netlist)
+    : netlist_(netlist), locations_(netlist_.makeProperty<util::Location>(circuit::Cell())){
 
 }
 
@@ -13,16 +13,9 @@ Placement::~Placement()
 
 }
 
-Cell Placement::add(Cell, util::Location location)
+void Placement::place_cell(circuit::Cell cell, util::Location location)
 {
-    auto cell = cells_.add();
     locations_[cell] = location;
-    return cell;
-}
-
-void Placement::erase(Cell cell)
-{
-    cells_.erase(cell);
 }
 
 

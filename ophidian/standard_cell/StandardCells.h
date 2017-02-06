@@ -119,7 +119,7 @@ public:
 	   \return An Cell => \p Value Map.
 	 */
 	template <typename Value>
-	entity_system::Property<Cell, Value> makeProperty(Pin)
+    entity_system::Property<Pin, Value> makeProperty(Pin)
 	{
 		return entity_system::Property<Pin, Value>(pins_);
 	}
