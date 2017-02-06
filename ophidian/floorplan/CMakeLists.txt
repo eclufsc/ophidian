@@ -4,4 +4,4 @@ file(GLOB ophidian_floorplan_SRC
 )
 add_library(ophidian_floorplan ${ophidian_floorplan_SRC})
 install(TARGETS ophidian_floorplan DESTINATION lib)
-install(FILES Sites.h Floorplan.h DESTINATION include/ophidian/floorplan)
+install(FILES Floorplan.h DESTINATION include/ophidian/floorplan)

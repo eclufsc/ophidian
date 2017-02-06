@@ -30,16 +30,10 @@ TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan][Floorplan]")
 namespace {
 class SitesWithPropertiesFixture {
 public:
-    Sites sites;
-    Site site1, site2, site3;
     std::string name1, name2, name3;
     ophidian::util::Location loc1, loc2, loc3;
 
     SitesWithPropertiesFixture() {
-        site1 = sites.add();
-        site2 = sites.add();
-        site3 = sites.add();
-
         name1 = "core1";
         name2 = "core2";
         name3 = "core3";
@@ -96,9 +90,13 @@ public:
 TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorplan][Floorplan]")
 {
     Floorplan floorplan;
-    auto rowRet1 = floorplan.add(Row(), origin1, numSites1, sitesSystem.site1);
-    auto rowRet2 = floorplan.add(Row(), origin2, numSites2, sitesSystem.site2);
-    auto rowRet3 = floorplan.add(Row(), origin3, numSites3, sitesSystem.site3);
+    auto site1 = floorplan.add(Site(), sitesSystem.name1, sitesSystem.loc1);
+    auto site2 = floorplan.add(Site(), sitesSystem.name2, sitesSystem.loc2);
+    auto site3 = floorplan.add(Site(), sitesSystem.name3, sitesSystem.loc3);
+
+    auto rowRet1 = floorplan.add(Row(), origin1, numSites1, site1);
+    auto rowRet2 = floorplan.add(Row(), origin2, numSites2, site2);
+    auto rowRet3 = floorplan.add(Row(), origin3, numSites3, site3);
 
     REQUIRE(floorplan.rows_range().size() == 3);
     REQUIRE(floorplan.origin(rowRet1) == origin1);
@@ -109,9 +107,9 @@ TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorp
     REQUIRE(floorplan.numberOfSites(rowRet2) == numSites2);
     REQUIRE(floorplan.numberOfSites(rowRet3) == numSites3);
 
-    REQUIRE(floorplan.site(rowRet1) == sitesSystem.site1);
-    REQUIRE(floorplan.site(rowRet2) == sitesSystem.site2);
-    REQUIRE(floorplan.site(rowRet3) == sitesSystem.site3);
+    REQUIRE(floorplan.site(rowRet1) == site1);
+    REQUIRE(floorplan.site(rowRet2) == site2);
+    REQUIRE(floorplan.site(rowRet3) == site3);
 
     floorplan.erase(rowRet1);
     floorplan.erase(rowRet2);

@@ -1,13 +1,28 @@
 #ifndef OPHIDIAN_FLOORPLAN_FLOORPLAN_H
 #define OPHIDIAN_FLOORPLAN_FLOORPLAN_H
 
-#include "Sites.h"
-#include "Rows.h"
+#include <ophidian/entity_system/EntitySystem.h>
+#include <ophidian/entity_system/Property.h>
+#include <ophidian/util/Range.h>
+#include <ophidian/util/Units.h>
 
 namespace ophidian {
 
 /// Namespace describing floorplan entities, properties and basic floorplan interface.
 namespace floorplan {
+
+class Row : public entity_system::EntityBase
+{
+public:
+    using entity_system::EntityBase::EntityBase;
+};
+
+class Site : public entity_system::EntityBase
+{
+public:
+    using entity_system::EntityBase::EntityBase;
+};
+
 /// Floorplan class.
 /**
  * This class provides the basic floorplan interface, such as site and rows insertion, site and rows properties and circuit dimensions.
@@ -15,6 +30,9 @@ namespace floorplan {
 class Floorplan
 {
 public:
+    using RowsIterator = entity_system::EntitySystem<Row>::const_iterator;
+    using SitesIterator = entity_system::EntitySystem<Site>::const_iterator;
+
     //! Floorplan Constructor
     /*!
        \brief Constructs a floorplan system with no properties
@@ -88,7 +106,7 @@ public:
      */
     std::string name(Site site) const
     {
-        return sites_.name(site);
+        return names_[site];
     }
 
     //! Site Upper right corner getter
@@ -99,16 +117,16 @@ public:
      */
     util::Location siteUpperRightCorner(Site site) const
     {
-        return sites_.upperRightCorner(site);
+        return dimensions_[site];
     }
 
     //! Sites iterator
     /*!
        \return Range iterator for the Sites.
      */
-    ophidian::util::Range<Sites::SitesIterator> sites_range() const
+    ophidian::util::Range<SitesIterator> sites_range() const
     {
-        return sites_.sites_range();
+        return ophidian::util::Range<SitesIterator>(sites_.begin(), sites_.end());
     }
 
 
@@ -138,7 +156,7 @@ public:
      */
     util::Location origin(Row row) const
     {
-        return rows_.origin(row);
+        return origins_[row];
     }
 
     //! Number of sites getter
@@ -149,7 +167,7 @@ public:
      */
     size_t numberOfSites(Row row) const
     {
-        return rows_.numberOfSites(row);
+        return numberOfSites_[row];
     }
 
     //! Site type getter
@@ -160,16 +178,16 @@ public:
      */
     Site site(Row row) const
     {
-        return rows_.site(row);
+        return siteTypeOfRow_[row];
     }
 
     //! Rows iterator
     /*!
        \return Range iterator for the Rows.
      */
-    ophidian::util::Range<Rows::RowsIterator> rows_range() const
+    ophidian::util::Range<RowsIterator> rows_range() const
     {
-        return rows_.rows_range();
+        return util::Range<RowsIterator>(rows_.begin(), rows_.end());
     }
 
     /// Row dimensions getter.
@@ -181,8 +199,15 @@ public:
     util::Location rowUpperRightCorner(Row row) const;
 
 private:
-    Sites sites_;
-    Rows rows_;
+    entity_system::EntitySystem<Row> rows_;
+    entity_system::Property<Row, util::Location> origins_;
+    entity_system::Property<Row, size_t> numberOfSites_;
+    entity_system::Property<Row, Site> siteTypeOfRow_;
+
+    entity_system::EntitySystem<Site> sites_;
+    entity_system::Property<Site, std::string> names_;
+    entity_system::Property<Site, util::Location> dimensions_;
+
     util::Location chipOrigin_;
     util::Location chipUpperRightCorner_;
 };
