@@ -24,9 +24,23 @@ public:
         pin2 = std_cells.add(Pin());
     }
 };
+
+bool multiBoxComparison(const MultiBox & multiBox1, const MultiBox & multiBox2) {
+    for (auto box1 : multiBox1) {
+        for (auto box2 : multiBox2) {
+            bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
+                    && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
+            if (!comparison) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 }
 
-TEST_CASE_METHOD(StandardCells, "Library: setting geometry of cells", "[placement][library]") {
+
+TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]") {
     Library library(std_cells);
 
     MultiBox cell1Geometry = {Box(Point(0, 0), Point(10, 10))};
@@ -35,21 +49,21 @@ TEST_CASE_METHOD(StandardCells, "Library: setting geometry of cells", "[placemen
     MultiBox cell2Geometry = {Box(Point(0, 0), Point(20, 10))};
     library.geometry(cell2, cell2Geometry);
 
-    REQUIRE(boost::geometry::equals(cell1Geometry, library.geometry(cell1)));
-    REQUIRE(boost::geometry::equals(cell2Geometry, library.geometry(cell2)));
-    REQUIRE(boost::geometry::equals(library.geometry(cell1), library.geometry(cell2)));
+    REQUIRE(multiBoxComparison(cell1Geometry, library.geometry(cell1)));
+    REQUIRE(multiBoxComparison(cell2Geometry, library.geometry(cell2)));
+    REQUIRE(!multiBoxComparison(library.geometry(cell1), library.geometry(cell2)));
 }
 
-TEST_CASE_METHOD(StandardCells, "Library: setting offset of pins", "[placement][library]") {
+TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]") {
     Library library(std_cells);
 
-    Point pin1Offset(5, 5);
+    ophidian::util::Location pin1Offset(5, 5);
     library.pinOffset(pin1, pin1Offset);
 
-    Point pin2Offset(3, 3);
+    ophidian::util::Location pin2Offset(3, 3);
     library.pinOffset(pin2, pin2Offset);
 
-    REQUIRE(boost::geometry::equals(pin1Offset, library.pinOffset(pin1)));
-    REQUIRE(boost::geometry::equals(pin2Offset, library.pinOffset(pin2)));
-    REQUIRE(boost::geometry::equals(library.pinOffset(pin1), library.pinOffset(pin2)));
+    REQUIRE(pin1Offset == library.pinOffset(pin1));
+    REQUIRE(pin2Offset == library.pinOffset(pin2));
+    REQUIRE(!(library.pinOffset(pin1) == library.pinOffset(pin2)));
 }

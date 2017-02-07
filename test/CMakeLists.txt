@@ -14,12 +14,11 @@ add_subdirectory(geometry)
 add_subdirectory(parser)
 add_subdirectory(util)
 add_subdirectory(interconnection)
-add_subdirectory(util)
 add_subdirectory(floorplan)
 add_subdirectory(placement)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
-target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_floorplan ophidian_placement emon)
+target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_floorplan ophidian_placement ophidian_standard_cell emon)
 
 include_directories(${CMAKE_SOURCE_DIR})
 add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
