@@ -2,10 +2,7 @@
 *.swp
 *.swo
 CMakeCache.txt
-CMakeFiles
-CMakeLists.txt.user
 CMakeScripts
-Makefile
 cmake_install.cmake
 install_manifest.txt
 /Debug/
@@ -20,3 +17,4 @@ install_manifest.txt
 /build
 /docs
 .DS_Store
+/test/input_files/superblue18.v
