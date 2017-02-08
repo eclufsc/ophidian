@@ -5,7 +5,8 @@ namespace standard_cell {
 
 
 StandardCells::StandardCells() :
-	cellPins_(cells_, pins_)
+    cellNames_(cells_), pinNames_(pins_), pinDirections_(pins_),
+    cellPins_(cells_, pins_)
 {
 
 }
@@ -13,7 +14,10 @@ StandardCells::StandardCells() :
 StandardCells::StandardCells(StandardCells && stdCell) :
 	cells_(std::move(stdCell.cells_)),
 	pins_(std::move(stdCell.pins_)),
-	cellPins_(std::move(stdCell.cellPins_))
+    cellNames_(std::move(stdCell.cellNames_)),
+    pinNames_(std::move(stdCell.pinNames_)),
+    pinDirections_(std::move(stdCell.pinDirections_)),
+    cellPins_(std::move(stdCell.cellPins_))
 {
 
 }
@@ -22,9 +26,11 @@ StandardCells::~StandardCells() = default;
 
 //--------------------------- Cells -------------------------------//
 
-Cell StandardCells::add(Cell)
+Cell StandardCells::add(Cell, std::string name)
 {
-	return cells_.add();
+    auto cell = cells_.add();
+    cellNames_[cell] = name;
+    return cell;
 }
 
 void StandardCells::erase(const Cell & cell)
@@ -47,14 +53,14 @@ uint32_t StandardCells::capacity(Cell) const
 	return cells_.capacity();
 }
 
-void StandardCells::name(const Cell & cell, const std::string & name)
-{
-	cellNames_[cell] = name;
-}
-
 std::string StandardCells::name(const Cell & cell) const
 {
-	return cellNames_[cell];
+    return cellNames_[cell];
+}
+
+entity_system::Association<Cell, Pin>::Parts StandardCells::pins(const Cell &cell) const
+{
+    return cellPins_.parts(cell);
 }
 
 ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) const
@@ -64,9 +70,12 @@ ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) c
 
 //--------------------------- Pins -------------------------------//
 
-Pin StandardCells::add(Pin)
+Pin StandardCells::add(Pin, std::string name, PinDirection direction)
 {
-	return pins_.add();
+    auto pin = pins_.add();
+    pinNames_[pin] = name;
+    pinDirections_[pin] = direction;
+    return pin;
 }
 
 void StandardCells::erase(const Pin & pin)
@@ -89,34 +98,19 @@ uint32_t StandardCells::capacity(Pin) const
 	return pins_.capacity();
 }
 
-void StandardCells::name(const Pin & pin, const std::string & name)
-{
-	pinNames_[pin] = name;
-}
-
 std::string StandardCells::name(const Pin & pin) const
 {
 	return pinNames_[pin];
 }
 
-void StandardCells::direction(const Pin & pin, const PinDirection & direction)
-{
-
-}
-
 PinDirection StandardCells::direction(const Pin & pin)
 {
-
-}
-
-void StandardCells::owner(const Pin & pin, const Cell & cell)
-{
-
+    return pinDirections_[pin];
 }
 
 Cell StandardCells::owner(const Pin & pin)
 {
-
+    return cellPins_.whole(pin);
 }
 
 ophidian::util::Range<StandardCells::PinsIterator> StandardCells::range(Pin) const
