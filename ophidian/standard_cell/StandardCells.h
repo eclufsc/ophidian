@@ -58,7 +58,7 @@ public:
       \param name Name of the cell, used to identify it.
       \return A handler for the created Cell.
     */
-    Cell add(Cell, std::__cxx11::string name);
+    Cell add(Cell, std::string name);
 
     //! Erase Cell
     /*!
@@ -129,7 +129,7 @@ public:
       \param name Name of the pin, used to identify it.
       \return A handler for the created pin.
     */
-    Pin add(Pin, std::__cxx11::string name, PinDirection direction);
+    Pin add(Pin, std::string name, PinDirection direction);
 
     //! Erase Pin
     /*!
