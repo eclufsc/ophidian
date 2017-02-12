@@ -1,0 +1,46 @@
+
+Lookup Table interpolation.
+RC tree Descriptor.
+Packed RC tree.
+Elmore Delay Algorithm.
+
+Library:
+    - Standard Cell Pins properties:
+        - aggregation of <LibraryPinTiming>
+        - capacitance (e.g., 1fF)
+        - maxCapacitance (e.g., 1024.0fF)
+        - direction (Enum: input, output)
+        - isClock (bool)
+
+entity LibraryPinTiming:
+    - type (Enum: setup_rising, hold_rising, combinational)
+    - related pin  <StandardCell::Pin>
+    - timing sense (Enum: negative_unate, positive_unate, non_unate)
+    - composition of <LUT>
+
+entity LUT
+    - name (e.g., cell_fall)
+    - index1 : array<double, 8>
+    - index2 : array<double, 8>
+    - values : array<double, 64>
+
+
+STA:
+Incremental by construction.
+List of dirty nodes.
+
+Incremental leveling.
+  - Mapping level to:
+    - RC trees;
+    - Timing arcs:
+      - Composed of several luts.
+    - Flop data Pins.
+
+
+Timing graph building.
+
+
+Algorithm:
+ - Build the levels;
+ - For each level, get the rctrees, timing arcs and flop data pins.
+   -- update everything.
