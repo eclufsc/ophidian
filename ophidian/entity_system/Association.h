@@ -1,5 +1,5 @@
-#ifndef ASSOCIATION_H
-#define ASSOCIATION_H
+#ifndef OPHIDIAN_ENTITY_SYSTEM_ASSOCIATION_H
+#define OPHIDIAN_ENTITY_SYSTEM_ASSOCIATION_H
 
 #include "Property.h"
 #include <cassert>
@@ -415,4 +415,4 @@ private:
 }
 }
 
-#endif // ASSOCIATION_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_ASSOCIATION_H

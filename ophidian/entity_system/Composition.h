@@ -1,5 +1,5 @@
-#ifndef COMPOSITION_H
-#define COMPOSITION_H
+#ifndef OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H
+#define OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H
 
 #include <cassert>
 
@@ -55,4 +55,4 @@ namespace ophidian
     }
 }
 
-#endif // COMPOSITION_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H

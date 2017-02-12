@@ -1,5 +1,5 @@
-#ifndef ENTITYSYSTEMMAP_H
-#define ENTITYSYSTEMMAP_H
+#ifndef OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H
+#define OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H
 
 #include <lemon/maps.h>
 #include "EntitySystem.h"
@@ -125,4 +125,4 @@ namespace ophidian
     }
 }
 
-#endif // ENTITYSYSTEMMAP_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H
