@@ -17,3 +17,73 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
  */
+
+#include "Library.h"
+
+namespace ophidian
+{
+
+using namespace standard_cell;
+
+namespace timing
+{
+
+Library::Library(StandardCells &stdCells) :
+    pinCapacitances_(stdCells.makeProperty<util::Capacitance>(Pin{})),
+    timing_(),
+    pinTiming_(stdCells.makeComposition<Timing>(Pin{}, timing_)),
+    relatedPin_(timing_),
+    timingSense_(timing_)
+{
+
+}
+
+Library::~Library()
+{
+
+}
+
+void Library::capacitance(const Pin &pin, util::Capacitance value)
+{
+    pinCapacitances_[pin] = value;
+}
+
+util::Capacitance Library::capacitance(const Pin &pin) const
+{
+    return pinCapacitances_[pin];
+}
+
+entity_system::Association<standard_cell::Pin, Library::Timing>::Parts Library::timing(const Pin &pin) const
+{
+    return pinTiming_.parts(pin);
+}
+
+Library::Timing Library::add(Library::Timing, const Pin &pin)
+{
+    auto timing = timing_.add();
+    pinTiming_.addAssociation(pin, timing);
+    return timing;
+}
+
+void Library::relatedPin(const Library::Timing &timing, const Pin &pin)
+{
+    relatedPin_[timing] = pin;
+}
+
+Pin Library::relatedPin(const Library::Timing &timing) const
+{
+    return relatedPin_[timing];
+}
+
+void Library::timingSense(const Library::Timing &timing, Unateness sense)
+{
+    timingSense_[timing] = sense;
+}
+
+Unateness Library::timingSense(const Library::Timing &timing) const
+{
+    return timingSense_[timing];
+}
+
+}
+}

@@ -99,6 +99,7 @@ namespace ophidian {
 namespace util {
 
 using Location = boost::geometry::model::d2::point_xy_location<ophidian::util::micrometer_t>;
+using Capacitance = ophidian::util::femtofarad_t;
 
 } //namespace util
 

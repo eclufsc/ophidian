@@ -200,6 +200,12 @@ public:
 		return entity_system::Property<Pin, Value>(pins_);
 	}
 
+    template <typename PartType>
+    entity_system::Composition<Pin, PartType> makeComposition(Pin, entity_system::EntitySystem<PartType> & partSystem)
+    {
+        return entity_system::Composition<Pin, PartType>(pins_, partSystem);
+    }
+
 	//--------------------------- Association -------------------------------//
 
 	//! Add Pin into Cell
