@@ -3,6 +3,7 @@
 *.swo
 CMakeCache.txt
 CMakeScripts
+CMakeLists.txt.user
 cmake_install.cmake
 install_manifest.txt
 /Debug/
