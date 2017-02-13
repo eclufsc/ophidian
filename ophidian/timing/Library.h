@@ -34,6 +34,10 @@ enum class Unateness {
     NEGATIVE_UNATE, POSITIVE_UNATE, NON_UNATE
 };
 
+enum class TimingType {
+    COMBINATIONAL, SETUP_RISING, HOLD_RISING
+};
+
 class Library final
 {
 public:
@@ -41,6 +45,10 @@ public:
     {
     public:
         using entity_system::EntityBase::EntityBase;
+    };
+
+    class LookupTable {
+        // TODO:
     };
 
     Library(standard_cell::StandardCells& stdCells);
@@ -110,6 +118,12 @@ public:
     */
     Unateness timingSense(const Timing& timing) const;
 
+    std::map<std::string, LookupTable>& lookupTables(const Timing& timing);
+
+    void timingType(const Timing& timing, TimingType type);
+    TimingType timingType(const Timing& timing) const;
+
+
 private:
     entity_system::Property<standard_cell::Pin, util::Capacitance> pinCapacitances_;
     entity_system::EntitySystem<Timing> timing_;
@@ -117,6 +131,9 @@ private:
     entity_system::Composition<standard_cell::Pin, Timing> pinTiming_;
     entity_system::Property<Timing, standard_cell::Pin> relatedPin_;
     entity_system::Property<Timing, Unateness> timingSense_;
+
+    entity_system::Property<Timing, std::map<std::string, LookupTable> > lookupTables_;
+    entity_system::Property<Timing, TimingType> timingType_;
 };
 
 }
