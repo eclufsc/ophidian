@@ -23,13 +23,13 @@ struct LookupTable final
      * Find nearest adjacent indexes in a ordered interval of values.
      */
     template <typename Iterator>
-    void findNearestIndexes(Iterator begin, Iterator end, const T value, std::pair<uint32_t, uint32_t>& pair) const {
-        pair.second = std::distance(begin, std::lower_bound(begin, end, value));
-        if(pair.second == 0)//before first element (left extrapolation)
-            pair.second = 1;
-        else if(pair.second == row.size())//after last element (right extrapolation)
-            pair.second = row.size()-1;
-        pair.first = pair.second-1;
+    void findNearestIndexes(Iterator begin, Iterator end, const T value, std::pair<uint32_t, uint32_t>& indexes) const {
+        indexes.second = std::distance(begin, std::lower_bound(begin, end, value));
+        if(indexes.second == 0)//before first element (left extrapolation)
+            indexes.second = 1;
+        else if(indexes.second == row.size())//after last element (right extrapolation)
+            indexes.second = row.size()-1;
+        indexes.first = indexes.second-1;
     }
     const T weight(T lower, T upper, T value) const{
         return (value-lower)/(upper-lower);
