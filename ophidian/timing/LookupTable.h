@@ -11,16 +11,30 @@ namespace timing {
 template <typename T, uint8_t kSize>
 struct LookupTable final
 {
-    //TODO: Refactor the duplicated codes.
-    constexpr uint32_t index(const uint8_t r, const uint8_t c)
+    constexpr uint32_t index(const uint8_t r, const uint8_t c) const
     {
         return r*kSize+c;
     }
-    constexpr uint8_t size()
+    constexpr uint8_t size() const
     {
         return kSize;
     }
-    T value(const T rv, const T cv)
+    /*
+     * Find nearest adjacent indexes in a ordered interval of values.
+     */
+    template <typename Iterator>
+    void findNearestIndexes(Iterator begin, Iterator end, const T value, std::pair<uint32_t, uint32_t>& pair) const {
+        pair.second = std::distance(begin, std::lower_bound(begin, end, value));
+        if(pair.second == 0)//before first element (left extrapolation)
+            pair.second = 1;
+        else if(pair.second == row.size())//after last element (right extrapolation)
+            pair.second = row.size()-1;
+        pair.first = pair.second-1;
+    }
+    const T weight(T lower, T upper, T value) const{
+        return (value-lower)/(upper-lower);
+    }
+    const T value(const T rv, const T cv)
     {
         //loads -- rows
         //transitions -- columns
@@ -32,28 +46,18 @@ struct LookupTable final
         if(cv < 0.0)//if the trasition is too much fast
             return 0.0;
 
-        uint32_t rfirst, rsecond = std::distance(row.begin(), std::lower_bound(row.begin(), row.end(), rv));
-        uint32_t cfirst, csecond = std::distance(column.begin(), std::lower_bound(column.begin(), column.end(), cv));
+        std::pair<uint32_t, uint32_t> rindexes, cindexes;
+        findNearestIndexes(row.begin(), row.end(), rv, rindexes);
+        findNearestIndexes(column.begin(), column.end(), cv, cindexes);
 
-        if(rsecond == 0)//before first element (left extrapolation)
-            rsecond = 1;
-        else if(rsecond == row.size())//after last element (right extrapolation)
-            rsecond = row.size()-1;
-        rfirst = rsecond-1;
+        T wRow = weight(row[rindexes.first], row[rindexes.second], rv);
+        T wColumn = weight(column[cindexes.first], column[cindexes.second], cv);
 
-        if(csecond == 0)//before first element (left extrapolation)
-            csecond = 1;
-        else if(csecond == column.size())//after last element (right extrapolation)
-            csecond = column.size()-1;
-        cfirst = csecond-1;
-
-        T wRow = (rv-row[rfirst])/(row[rsecond]-row[rfirst]);
-        T wColumn = (cv-column[cfirst])/(column[csecond]-column[cfirst]);
         //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
-        T result = (1.0-wRow)  * (1.0-wColumn) * values[index(rfirst, cfirst)] +
-                   (1.0-wRow)  * (wColumn)     * values[index(rfirst, csecond)] +
-                    wRow       * (1.0-wColumn) * values[index(rsecond, cfirst)] +
-                    wRow       *  wColumn      * values[index(rsecond, csecond)];
+        T result = (1.0-wRow)  * (1.0-wColumn) * values[index(rindexes.first, cindexes.first)] +
+                   (1.0-wRow)  * (wColumn)     * values[index(rindexes.first, cindexes.second)] +
+                    wRow       * (1.0-wColumn) * values[index(rindexes.second, cindexes.first)] +
+                    wRow       *  wColumn      * values[index(rindexes.second, cindexes.second)];
         return result;
     }
     std::array<T, kSize> row;
