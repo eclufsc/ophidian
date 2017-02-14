@@ -11,6 +11,7 @@ namespace timing {
 template <typename T, uint8_t kSize>
 struct LookupTable final
 {
+    //TODO: Refactor the duplicated codes.
     constexpr uint32_t index(const uint8_t r, const uint8_t c)
     {
         return r*kSize+c;
@@ -28,7 +29,7 @@ struct LookupTable final
 
         assert(rv >= 0);//there is no negative load
 
-        if(cv <= 0.0)//if the trasition is too much fast
+        if(cv < 0.0)//if the trasition is too much fast
             return 0.0;
 
         uint32_t rfirst, rsecond = std::distance(row.begin(), std::lower_bound(row.begin(), row.end(), rv));
@@ -46,8 +47,8 @@ struct LookupTable final
             csecond = column.size()-1;
         cfirst = csecond-1;
 
-        T wRow = std::abs(rv-row[rfirst])/(row[rsecond]-row[rfirst]);
-        T wColumn = std::abs(cv-column[cfirst])/(column[csecond]-column[cfirst]);
+        T wRow = (rv-row[rfirst])/(row[rsecond]-row[rfirst]);
+        T wColumn = (cv-column[cfirst])/(column[csecond]-column[cfirst]);
         //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
         T result = (1.0-wRow)  * (1.0-wColumn) * values[index(rfirst, cfirst)] +
                    (1.0-wRow)  * (wColumn)     * values[index(rfirst, csecond)] +
