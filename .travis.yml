@@ -3,6 +3,8 @@ language: cpp
 sudo: required
 dist: trusty
 
+install: if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
 matrix:
   include:
     - compiler: gcc
@@ -15,6 +17,8 @@ matrix:
       env: COMPILER=g++-5
       
 before_script:
+  - sudo apt-get update
+  - sudo apt-get install libgoogle-glog-dev
   - mkdir build && cd build
   - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
   - tar jxf download
@@ -33,6 +37,6 @@ before_script:
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
 
 script:
-  - make -j
+  - make
   - cd test
   - ./run_tests
