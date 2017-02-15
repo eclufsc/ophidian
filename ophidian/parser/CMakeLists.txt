@@ -8,9 +8,10 @@ file(GLOB ophidian_parser_SRC
 set(PARSER_SOURCE 
     ${CMAKE_CURRENT_SOURCE_DIR}/Def.cpp)
 
-LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/)
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/)
 #LINK_DIRECTORIES(${THIRD_PARTY_BUILD_PATH}/libertyParser/lib/ )
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/libertyParser/lib/ )
+
 
 add_library(ophidian_parser ${ophidian_parser_SRC})
 
@@ -18,9 +19,11 @@ add_library(ophidian_parser ${ophidian_parser_SRC})
 
 target_include_directories( ophidian_parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${THIRD_PARTY_PATH} )
 target_link_libraries(ophidian_parser PUBLIC def)
+target_link_libraries(ophidian_parser PUBLIC lef)
 target_link_libraries(ophidian_parser PUBLIC verilogparser)
 #target_link_libraries(ophidian_parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/libertyParser/lib/libsi2dr_liberty.a)
 #target_link_libraries(ophidian_parser PUBLIC si2dr_liberty)
 
 install(TARGETS ophidian_parser DESTINATION lib)
 install(FILES VerilogParser.h LibertyParser.h DESTINATION include/ophidian/parser)
+

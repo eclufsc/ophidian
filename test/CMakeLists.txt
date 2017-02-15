@@ -6,7 +6,8 @@ add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
 INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ )
+
+LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/ )
 LINK_DIRECTORIES( ${THIRD_PARTY_BUILD_PATH}/libertyParser/lib/ )
 #LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/libertyParser/lib/ )
 
@@ -14,13 +15,14 @@ add_subdirectory(entity_system)
 add_subdirectory(circuit)
 add_subdirectory(geometry)
 add_subdirectory(parser)
+add_subdirectory(util)
 add_subdirectory(interconnection)
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection emon si2dr_liberty)
 
 include_directories(${CMAKE_SOURCE_DIR})
-add_test(NAME unit_test COMMAND run_tests "~[Profiling]")
+add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
 
 add_custom_command(
         TARGET run_tests POST_BUILD
