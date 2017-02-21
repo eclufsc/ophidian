@@ -8,10 +8,7 @@ file(GLOB ophidian_parser_SRC
 set(PARSER_SOURCE 
     ${CMAKE_CURRENT_SOURCE_DIR}/Def.cpp)
 
-LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/)
-#LINK_DIRECTORIES(${THIRD_PARTY_BUILD_PATH}/libertyParser/lib/ )
-LINK_DIRECTORIES(${THIRD_PARTY_PATH}/libertyParser/lib/ )
-
+LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/ ${THIRD_PARTY_PATH}/libertyParser/lib/)
 
 add_library(ophidian_parser ${ophidian_parser_SRC})
 

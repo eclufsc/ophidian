@@ -9,9 +9,16 @@ namespace ophidian
 {
 namespace parser
 {
-
+/** @brief Liberty reads a .lib file and stores its data.
+ *
+ * This is an encapsulation of the Liberty library made by
+ * SYNOPSYS to obtain information referring to a standard cell library
+ */
 class Liberty{
 public:
+    /**
+     * A structure to represent a LUT information
+     */
     struct LUT{
         enum lutInformation{
             CELL_FALL,
@@ -27,7 +34,9 @@ public:
         std::vector<double> index_2;
         std::vector<std::vector<double>> values;
     };
-
+    /**
+     * A structure to represent a Timing information
+     */
     struct Timing{
         enum unateness{
             NEGATIVE_UNATE,
@@ -47,7 +56,9 @@ public:
         std::string relatedPin;
         std::vector< LUT > luts;
     };
-
+    /**
+     * A structure to represent a pin
+     */
     struct Pin{
         std::string name;
         double capacitance = 0;
@@ -59,20 +70,20 @@ public:
         directionPin pinDirection;
         std::vector<Timing> timing;
     };
-
+    /**
+     * A structure to represent a cell
+     */
     struct Cell{
         std::string name;
         std::vector<Pin> pins;
         bool sequential = false;
     };
 
-
 public:
     std::string timeUnit = "";
     std::string capacitiveLoadUnit = "";
     double capacitiveLoadUnitValue = 0;
     std::vector<Cell> cells;
-
 };
 
 class LibertyParser

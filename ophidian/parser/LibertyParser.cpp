@@ -1,5 +1,5 @@
 #include "LibertyParser.h"
-#include <3rdparty/libertyParser/si2dr_liberty.h>
+#include <3rdparty/libertyParser/include/si2dr_liberty.h>
 #include <vector>
 #include <fstream>
 #include <cassert>
@@ -10,9 +10,6 @@ namespace ophidian
 {
 namespace parser
 {
-
-
-
 class LibertyParser::Pimpl
 {
 public:
@@ -51,7 +48,9 @@ std::vector<double> LibertyParser::Pimpl::split_string_into_values(const std::st
     std::stringstream input(the_string);
     std::string segment;
     while (std::getline(input, segment, ','))
+    {
         values.push_back(std::stod(segment));
+    }
     return values;
 }
 
@@ -59,16 +58,12 @@ void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
     si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
     si2drAttrIdT attr;
 
-//    std::vector< double > loadValues(8);
-//    std::vector< double > slewValues(8);
-//    loadValues.resize(0);
-//    slewValues.resize(0);
-
     lut.index_1.reserve(8);
     lut.index_2.reserve(8);
     lut.values.reserve(8);
 
-    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
+    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err))
+    {
 
         std::string name { si2drAttrGetName(attr, &err) };
         if (name == "index_1" || name == "index_2" || name == "values") {
@@ -80,8 +75,6 @@ void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
             si2drBooleanT bool_val;
             si2drExprT *expr;
             si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
-
-//            std::size_t i = 0;
             do {
                 std::vector<double> values_vector = split_string_into_values(std::string { string_val });
 
@@ -93,9 +86,6 @@ void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
                         lut.index_2.push_back(v);
                 } else if (name == "values") {
                     lut.values.push_back(values_vector);
-//                    for (std::size_t j = 0; j < values_vector.size(); ++j)
-//                        lut.values.at(i, j, values_vector[j]);
-//                    ++i;
                 }
                 si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
             } while (string_val);
@@ -106,11 +96,6 @@ void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
     lut.index_1.shrink_to_fit();
     lut.index_2.shrink_to_fit();
     lut.values.shrink_to_fit();
-
-//    for (std::size_t i = 0; i < loadValues.size(); ++i)
-//        lut->row_value(i, loadValues[i]);
-//    for (std::size_t i = 0; i < slewValues.size(); ++i)
-//        lut->column_value(i, slewValues[i]);
 
     si2drIterQuit(attrs, &err);
 }
@@ -247,7 +232,8 @@ Liberty::Pin LibertyParser::Pimpl::readPin(si2drGroupIdT pin, Liberty::Cell &cel
     si2drAttrsIdT attrs = si2drGroupGetAttrs(pin, &err);
     si2drAttrIdT attr;
 
-    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err)) {
+    while (!si2drObjectIsNull((attr = si2drIterNextAttr(attrs, &err)), &err))
+    {
         std::string attrName { si2drAttrGetName(attr, &err) };
         if (attrName == "direction"){
             direction = si2drSimpleAttrGetStringValue(attr, &err);

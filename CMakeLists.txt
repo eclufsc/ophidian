@@ -12,7 +12,6 @@ macro (UseLemon)
     include_directories(${CMAKE_SOURCE_DIR}/3rdparty/Lemon/)
     link_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/lemon)
 endmacro()
-#
 
 execute_process(COMMAND git submodule update --init --recursive
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -34,18 +33,6 @@ ExternalProject_Add(
         CONFIGURE_COMMAND ""
         BUILD_COMMAND make installhdrs installlib
         # LEF Makefile is not compatible with external builds
-        BUILD_IN_SOURCE 1
-)
-
-# Build Liberty parser
-find_package(GPERF REQUIRED)
-ExternalProject_Add(
-        liberty_parser
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser
-        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libertyParser/configure --prefix=${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-        PREFIX ${CMAKE_BINARY_DIR}/3rdparty/libertyParser
-        BUILD_COMMAND make -j 1
-        INSTALL_COMMAND make install
         BUILD_IN_SOURCE 1
 )
 
