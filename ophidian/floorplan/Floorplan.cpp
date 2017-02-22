@@ -17,17 +17,17 @@ Floorplan::~Floorplan()
 
 }
 
-void Floorplan::chipOrigin(util::Location loc)
+void Floorplan::chipOrigin(const util::Location &loc)
 {
     chipOrigin_ = loc;
 }
 
-void Floorplan::chipUpperRightCorner(util::Location loc)
+void Floorplan::chipUpperRightCorner(const util::Location &loc)
 {
     chipUpperRightCorner_ = loc;
 }
 
-Site Floorplan::add(Site, std::string name, util::Location loc)
+Site Floorplan::add(Site, const std::string & name, const util::Location & loc)
 {
     auto site = sites_.add();
     names_[site] = name;
@@ -40,7 +40,7 @@ void Floorplan::erase(Site site)
     sites_.erase(site);
 }
 
-Row Floorplan::add(Row, util::Location loc, size_t num, Site site)
+Row Floorplan::add(Row, const util::Location &loc, size_t num, const Site &site)
 {
     auto row = rows_.add();
     origins_[row] = loc;
@@ -49,12 +49,12 @@ Row Floorplan::add(Row, util::Location loc, size_t num, Site site)
     return row;
 }
 
-void Floorplan::erase(Row row)
+void Floorplan::erase(const Row &row)
 {
     rows_.erase(row);
 }
 
-util::Location Floorplan::rowUpperRightCorner(Row row) const
+util::Location Floorplan::rowUpperRightCorner(const Row &row) const
 {
     auto site = siteTypeOfRow_[row];
     size_t numSites = numberOfSites_[row];

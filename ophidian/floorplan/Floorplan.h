@@ -50,7 +50,7 @@ public:
        \brief Set the chip origin location.
        \param loc Chip origin location.
      */
-    void chipOrigin(util::Location loc);
+    void chipOrigin(const util::Location & loc);
 
     //! Chip origin location getter
     /*!
@@ -67,7 +67,7 @@ public:
        \brief Set the chip upper right corner location.
        \param loc Chip upper right corner location.
      */
-    void chipUpperRightCorner(util::Location loc);
+    void chipUpperRightCorner(const util::Location & loc);
 
     //! Chip upper right corner location getter
     /*!
@@ -88,7 +88,7 @@ public:
        \param dimension Location describing the site dimension.
        \return The created site.
      */
-    Site add(Site, std::string name, util::Location loc);
+    Site add(Site, const std::string & name, const util::Location & loc);
 
     //! Erase site in the floorplan
     /*!
@@ -104,7 +104,7 @@ public:
        \param site Site entity to get the name.
        \return Name of the site.
      */
-    std::string name(Site site) const
+    std::string name(const Site & site) const
     {
         return names_[site];
     }
@@ -115,7 +115,7 @@ public:
        \param site Site entity to get the upper right corner.
        \return upper right corner of the site.
      */
-    util::Location siteUpperRightCorner(Site site) const
+    util::Location siteUpperRightCorner(const Site & site) const
     {
         return dimensions_[site];
     }
@@ -124,7 +124,7 @@ public:
     /*!
        \return Range iterator for the Sites.
      */
-    ophidian::util::Range<SitesIterator> sites_range() const
+    ophidian::util::Range<SitesIterator> sitesRange() const
     {
         return ophidian::util::Range<SitesIterator>(sites_.begin(), sites_.end());
     }
@@ -139,14 +139,14 @@ public:
        \param site Site type of the row.
        \return The created row.
      */
-    Row add(Row, util::Location loc, size_t num, Site site);
+    Row add(Row, const util::Location & loc, size_t num, const Site & site);
 
     //! Erase row in the floorplan
     /*!
        \brief Erases an existing row.
        \param row Row to be erased.
      */
-    void erase(Row row);
+    void erase(const Row & row);
 
     //! Origin location getter
     /*!
@@ -154,7 +154,7 @@ public:
        \param row Row entity to get the origin location.
        \return Origin location of the row.
      */
-    util::Location origin(Row row) const
+    util::Location origin(const Row & row) const
     {
         return origins_[row];
     }
@@ -165,7 +165,7 @@ public:
        \param row Row entity to get the origin location.
        \return Number of sites of the row.
      */
-    size_t numberOfSites(Row row) const
+    size_t numberOfSites(const Row & row) const
     {
         return numberOfSites_[row];
     }
@@ -176,7 +176,7 @@ public:
        \param row Row entity to get the origin location.
        \return Site type of the row.
      */
-    Site site(Row row) const
+    Site site(const Row & row) const
     {
         return siteTypeOfRow_[row];
     }
@@ -185,7 +185,7 @@ public:
     /*!
        \return Range iterator for the Rows.
      */
-    ophidian::util::Range<RowsIterator> rows_range() const
+    ophidian::util::Range<RowsIterator> rowsRange() const
     {
         return util::Range<RowsIterator>(rows_.begin(), rows_.end());
     }
@@ -196,7 +196,7 @@ public:
      * \param row Row entity to gets the dimensions.
      * \return Location describing the upper right corner of that row.
      */
-    util::Location rowUpperRightCorner(Row row) const;
+    util::Location rowUpperRightCorner(const Row & row) const;
 
 private:
     entity_system::EntitySystem<Row> rows_;

@@ -38,9 +38,9 @@ public:
 	 */
 	StandardCells();
 
-	//! StandardCell Copy Constructor
+    //! StandardCell Move Constructor
 	/*!
-	    \brief Copy the entity system and its properties.
+        \brief Move the entity system and its properties.
 	 */
 	StandardCells(StandardCells && stdCell);
 

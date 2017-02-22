@@ -11,8 +11,8 @@ TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan][Floorpla
     Floorplan floorplan;
     REQUIRE(floorplan.chipOrigin() == origin);
     REQUIRE(floorplan.chipUpperRightCorner() == boundaries);
-    REQUIRE(floorplan.sites_range().empty());
-    REQUIRE(floorplan.rows_range().empty());
+    REQUIRE(floorplan.sitesRange().empty());
+    REQUIRE(floorplan.rowsRange().empty());
 }
 
 TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan][Floorplan]")
@@ -52,7 +52,7 @@ TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[flo
     auto siteRet2 = floorplan.add(Site(), name2, loc2);
     auto siteRet3 = floorplan.add(Site(), name3, loc3);
 
-    REQUIRE(floorplan.sites_range().size() == 3);
+    REQUIRE(floorplan.sitesRange().size() == 3);
     REQUIRE(floorplan.name(siteRet1) == name1);
     REQUIRE(floorplan.name(siteRet2) == name2);
     REQUIRE(floorplan.name(siteRet3) == name3);
@@ -64,7 +64,7 @@ TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[flo
     floorplan.erase(siteRet1);
     floorplan.erase(siteRet2);
     floorplan.erase(siteRet3);
-    REQUIRE(floorplan.sites_range().empty());
+    REQUIRE(floorplan.sitesRange().empty());
 }
 
 namespace {
@@ -98,7 +98,7 @@ TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorp
     auto rowRet2 = floorplan.add(Row(), origin2, numSites2, site2);
     auto rowRet3 = floorplan.add(Row(), origin3, numSites3, site3);
 
-    REQUIRE(floorplan.rows_range().size() == 3);
+    REQUIRE(floorplan.rowsRange().size() == 3);
     REQUIRE(floorplan.origin(rowRet1) == origin1);
     REQUIRE(floorplan.origin(rowRet2) == origin2);
     REQUIRE(floorplan.origin(rowRet3) == origin3);
@@ -114,7 +114,7 @@ TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorp
     floorplan.erase(rowRet1);
     floorplan.erase(rowRet2);
     floorplan.erase(rowRet3);
-    REQUIRE(floorplan.rows_range().empty());
+    REQUIRE(floorplan.rowsRange().empty());
 }
 
 TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Row Upper Right Corner.", "[floorplan][Floorplan]")
