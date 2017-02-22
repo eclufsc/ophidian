@@ -36,6 +36,6 @@ before_script:
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
 
 script:
-  - make -j
+  - make -j 1
   - cd test
   - ./run_tests
