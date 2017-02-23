@@ -72,6 +72,13 @@ public:
 
     void set_pin_position(entity_system::entity pin, const geometry::point<double> & position);
 
+    void set_pin_attributes(const entity_system::entity pin,
+                            const std::string pin_name,
+                            const entity_system::entity pin_owner,
+                            const entity_system::entity net_pin,
+                            const entity_system::entity std_cell,
+                            geometry::point<double> pin_position);
+
     geometry::point<double> get_pin_position(entity_system::entity pin);
 
 	/// Constructor.

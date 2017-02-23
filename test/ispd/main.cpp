@@ -23,7 +23,7 @@
 using namespace ophidian;
 //#define ProblemA//else ProblemB
 #define DOD//else OOD
-//#define DODSortAttributes
+#define DODSortAttributes
 #define Runtime//else MissRate
 
 //--------------------------------Problem A --------------------------------
@@ -239,7 +239,12 @@ int main(int argc, char **argv) {
             unsigned int i = 0;
             for(auto net : m_netlist.net_system()){
                 for(auto pin_id : m_netlist.net_pins(net)){
-                    m_netlist.set_pin_position(static_cast<entity_system::entity>(i), pins.at(pin_id).pin_position);
+                    m_netlist.set_pin_attributes(static_cast<entity_system::entity>(i),
+                                                 pins.at(pin_id).pin_name,
+                                                 pins.at(pin_id).pin_owner,
+                                                 pins.at(pin_id).net_pin,
+                                                 pins.at(pin_id).std_cell,
+                                                 pins.at(pin_id).pin_position);
                     pins.at(pin_id).new_index = i;
                     pins.at(pin_id).old_entity = pin_id;
                     ++i;

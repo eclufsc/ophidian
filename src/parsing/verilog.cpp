@@ -235,7 +235,7 @@ void verilog::read(const std::string &filename)
 {
     boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
 
-    std::cout << "reading .v file..." << std::endl;
+    //std::cout << "reading .v file..." << std::endl;
 
     std::ifstream file(filename);
     std::stringstream in;
@@ -311,7 +311,7 @@ void verilog::read(const std::string &filename)
 
     boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration msdiff = mst2 - mst1;
-    std::cout << "verilog::verilog(): " << msdiff.total_milliseconds() << " ms" << std::endl;
+    //std::cout << "verilog::verilog(): " << msdiff.total_milliseconds() << " ms" << std::endl;
 
 }
 

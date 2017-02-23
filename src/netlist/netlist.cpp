@@ -51,6 +51,19 @@ void netlist::set_pin_position(entity_system::entity pin, const geometry::point<
     m_pins.set_position(pin, position);
 }
 
+void netlist::set_pin_attributes(const entity_system::entity pin,
+                                 const std::string pin_name,
+                                 const entity_system::entity pin_owner,
+                                 const entity_system::entity net_pin,
+                                 const entity_system::entity std_cell,
+                                 geometry::point<double> pin_position){
+    m_pins.name(pin, pin_name);
+    m_pins.owner(pin, pin_owner);
+    m_pins.net(pin, net_pin);
+    m_pins.standard_cell_pin(pin, std_cell);
+    m_pins.set_position(pin, pin_position);
+}
+
 geometry::point<double> netlist::get_pin_position(entity_system::entity pin){
     return m_pins.pin_position(pin);
 }
