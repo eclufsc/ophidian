@@ -151,6 +151,10 @@ public:
         m_live_entity_check(e_index);
         return e_index;
     }
+
+    inline void change_index(const entity e,const entity_index i){
+        m_id_to_index.at(e) = i;
+    }
 };
 
 } /* namespace entity system */

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <chrono>
+#include <vector>
 #include <papi.h>
 
 #include "../src/parsing/def.h"
@@ -20,9 +21,10 @@
 #include "../src/floorplan/lefdef2floorplan.h"
 
 using namespace ophidian;
-#define ProblemA//else ProblemB
+//#define ProblemA//else ProblemB
 #define DOD//else OOD
-//#define Runtime//else MissRate
+//#define DODSortAttributes
+#define Runtime//else MissRate
 
 //--------------------------------Problem A --------------------------------
 #ifdef ProblemA
@@ -144,7 +146,7 @@ int main(int argc, char **argv) {
 
 
 
-//--------------------------------OOD HPWL STWL--------------------------------
+//--------------------------------Problem B--------------------------------
 #ifndef ProblemA
 #ifndef DOD
 class Pin;
@@ -212,6 +214,44 @@ int main(int argc, char **argv) {
         m_nets.back().add_pin(pin_object);
       }
     }
+#else
+    m_placement.set_all_pin_positions();
+#ifdef DODSortAttributes
+    auto time_sort_start = std::chrono::high_resolution_clock::now();
+    struct pin{
+                std::string pin_name;
+                entity_system::entity pin_owner, net_pin, std_cell;
+                geometry::point<double> pin_position;
+                entity_system::entity old_entity;
+                unsigned int new_index;
+            };
+            std::vector<pin> pins;
+            pins.resize(m_netlist.pin_system().size());
+
+            for(auto pin : m_netlist.pin_system()){
+                pins.at(pin).pin_name = m_netlist.pin_name(pin);
+                pins.at(pin).pin_owner = m_netlist.pin_owner(pin);
+                pins.at(pin).pin_position = m_netlist.get_pin_position(pin);
+                pins.at(pin).net_pin = m_netlist.pin_net(pin);
+                pins.at(pin).std_cell = m_netlist.pin_std_cell(pin);
+            }
+
+            unsigned int i = 0;
+            for(auto net : m_netlist.net_system()){
+                for(auto pin_id : m_netlist.net_pins(net)){
+                    m_netlist.set_pin_position(static_cast<entity_system::entity>(i), pins.at(pin_id).pin_position);
+                    pins.at(pin_id).new_index = i;
+                    pins.at(pin_id).old_entity = pin_id;
+                    ++i;
+                }
+            }
+
+            for (auto pin : pins)
+                m_netlist.pin_sys().change_index(pin.old_entity, static_cast<entity_system::entity_index>(pin.new_index));
+            auto time_sort_end = std::chrono::high_resolution_clock::now();
+            auto total_sort = time_sort_end - time_sort_start;
+            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(total_sort).count()<<"\t";
+#endif
 #endif
 
 #ifndef Runtime

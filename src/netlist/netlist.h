@@ -289,6 +289,11 @@ public:
     const entity_system::entity_system & pin_system() const {
 		return m_pins_system;
 	}
+
+    entity_system::entity_system & pin_sys(){
+        return m_pins_system;
+    }
+
 	/// Pin properties getter.
 	/**
 	 * Returns the pins properties object.
