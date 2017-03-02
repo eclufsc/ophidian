@@ -26,7 +26,7 @@ StandardCells::~StandardCells() = default;
 
 //--------------------------- Cells -------------------------------//
 
-Cell StandardCells::add(Cell, const std::__cxx11::string &name)
+Cell StandardCells::add(Cell, const std::string &name)
 {
     auto cell = cells_.add();
     cellNames_[cell] = name;
@@ -70,7 +70,7 @@ ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) c
 
 //--------------------------- Pins -------------------------------//
 
-Pin StandardCells::add(Pin, const std::__cxx11::string &name, PinDirection direction)
+Pin StandardCells::add(Pin, const std::string &name, PinDirection direction)
 {
     auto pin = pins_.add();
     pinNames_[pin] = name;
