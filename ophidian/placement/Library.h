@@ -4,7 +4,6 @@
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/standard_cell/StandardCells.h>
-#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
 namespace ophidian {
@@ -16,7 +15,7 @@ public:
     /*!
        \brief Constructs a placement library.
      */
-    Library(standard_cell::StandardCells & std_cells);
+    Library(const standard_cell::StandardCells & std_cells);
 
     //! Cell geometry getter
     /*!
@@ -24,7 +23,7 @@ public:
        \param cell Cell entity to get the geometry.
        \return Geometry of the cell.
      */
-    geometry::MultiBox geometry(standard_cell::Cell cell) {
+    util::MultiBox geometry(const standard_cell::Cell & cell) const {
         return geometries_[cell];
     }
 
@@ -34,7 +33,7 @@ public:
        \param cell Cell entity to set the geometry.
        \param geometry Geometry to assign to cell.
      */
-    void geometry(standard_cell::Cell cell, geometry::MultiBox geometry);
+    void geometry(const standard_cell::Cell & cell, const util::MultiBox & geometry);
 
     //! Pin offset getter
     /*!
@@ -42,7 +41,7 @@ public:
        \param pin Pin entity to get the offset.
        \return Offset of the pin.
      */
-    util::Location pinOffset(standard_cell::Pin pin) {
+    util::Location pinOffset(const standard_cell::Pin & pin) const {
         return pinOffsets_[pin];
     }
 
@@ -52,12 +51,12 @@ public:
        \param pin Pin entity to set the offset.
        \param offset Offset to assign to pin.
      */
-    void pinOffset(standard_cell::Pin pin, util::Location offset);
+    void pinOffset(const standard_cell::Pin & pin, const util::Location & offset);
 
 private:
-    standard_cell::StandardCells & std_cells_;
+    const standard_cell::StandardCells & std_cells_;
 
-    entity_system::Property<standard_cell::Cell, geometry::MultiBox> geometries_;
+    entity_system::Property<standard_cell::Cell, util::MultiBox> geometries_;
     entity_system::Property<standard_cell::Pin, util::Location> pinOffsets_;
 };
 }

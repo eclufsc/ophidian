@@ -2,8 +2,12 @@
 #define OPHIDIAN_UTIL_UNITS_H
 
 #include <ratio>
+#include <vector>
 #include <3rdparty/units/include/units.h>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry.hpp>
+
+#include <ophidian/geometry/Models.h>
 
 namespace ophidian {
 namespace util {
@@ -89,6 +93,10 @@ public:
     ///operator == overloading
     bool operator==(const point_xy_location & point)
     { return (this->x() == point.x()) && (this->y() == point.y());}
+
+    ///operator == overloading
+    bool operator!=(const point_xy_location & point)
+    { return !(*this==point);}
 };
 }
 }
@@ -99,6 +107,63 @@ namespace ophidian {
 namespace util {
 
 using Location = boost::geometry::model::d2::point_xy_location<ophidian::util::micrometer_t>;
+
+class MultiBox {
+public:
+    MultiBox() {
+
+    }
+
+    MultiBox(const std::vector<geometry::Box> & boxes)
+        : boxes_(boxes) {
+
+    }
+
+    MultiBox(const MultiBox & otherBox)
+        : boxes_(otherBox.boxes_) {
+
+    }
+
+    void push_back(const geometry::Box & box) {
+        boxes_.push_back(box);
+    }
+
+    std::vector<geometry::Box>::iterator begin() {
+        return boxes_.begin();
+    }
+
+    std::vector<geometry::Box>::iterator end() {
+        return boxes_.end();
+    }
+
+    std::vector<geometry::Box>::const_iterator begin() const {
+        return boxes_.begin();
+    }
+
+    std::vector<geometry::Box>::const_iterator end() const {
+        return boxes_.end();
+    }
+
+    bool operator==(const MultiBox & other) const {
+        for (auto box1 : this->boxes_) {
+            for (auto box2 : other.boxes_) {
+                bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
+                        && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
+                if (!comparison) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool operator!=(const MultiBox & other) const {
+        return !(*this==other);
+    }
+
+private:
+    std::vector<geometry::Box> boxes_;
+};
 
 } //namespace util
 

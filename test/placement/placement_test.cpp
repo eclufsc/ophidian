@@ -25,10 +25,10 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing a cell", "[placement]") {
     Placement placement(netlist);
 
     ophidian::util::Location cell1Location(10, 20);
-    placement.place_cell(cell1, cell1Location);
+    placement.placeCell(cell1, cell1Location);
 
     ophidian::util::Location cell2Location(20, 10);
-    placement.place_cell(cell2, cell2Location);
+    placement.placeCell(cell2, cell2Location);
 
     ophidian::util::Location placedCell1Location = placement.location(cell1);
     ophidian::util::Location placedCell2Location = placement.location(cell2);

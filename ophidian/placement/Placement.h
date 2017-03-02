@@ -17,7 +17,7 @@ public:
 	/*!
 	   \brief Constructs a placement system with no properties
 	 */
-    Placement(circuit::Netlist & netlist);
+    Placement(const circuit::Netlist & netlist);
 
     //! Placement Destructor
 	/*!
@@ -31,7 +31,7 @@ public:
        \param cell Cell to be placed
        \param location Location of the lower left corner of the cell.
      */
-    void place_cell(circuit::Cell cell, util::Location location);
+    void placeCell(const circuit::Cell & cell, const util::Location & location);
 
     //! Location getter
     /*!
@@ -39,12 +39,12 @@ public:
        \param cell Cell entity to get the location.
        \return Location of the cell.
      */
-    util::Location location(circuit::Cell cell) {
+    util::Location location(const circuit::Cell & cell) const {
         return locations_[cell];
     }
 
 private:
-    circuit::Netlist & netlist_;
+    const circuit::Netlist & netlist_;
     entity_system::Property<circuit::Cell, util::Location> locations_;
 };
 

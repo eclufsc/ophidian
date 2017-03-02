@@ -16,7 +16,7 @@ using Point = boost::geometry::model::d2::point_xy<double>;
 using Segment = boost::geometry::model::segment<Point>;
 using Linestring = boost::geometry::model::linestring<Point>;
 using Box = boost::geometry::model::box<Point>;
-using MultiBox = std::vector<Box>;
+//using MultiBox = std::vector<Box>;
 using Polygon = boost::geometry::model::polygon<Point>;
 using MultiPolygon = boost::geometry::model::multi_polygon<Polygon>;
 

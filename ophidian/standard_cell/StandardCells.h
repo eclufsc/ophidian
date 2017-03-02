@@ -42,7 +42,7 @@ public:
 	/*!
         \brief Move the entity system and its properties.
 	 */
-	StandardCells(StandardCells && stdCell);
+    StandardCells(const StandardCells && stdCell);
 
 	//! StandardCell Destructor
 	/*!
@@ -58,7 +58,7 @@ public:
       \param name Name of the cell, used to identify it.
       \return A handler for the created Cell.
     */
-    Cell add(Cell, std::string name);
+    Cell add(Cell, const std::string & name);
 
     //! Erase Cell
     /*!
@@ -117,7 +117,7 @@ public:
 	 */
 	template <typename Value>
 	entity_system::Property<Cell, Value> makeProperty(Cell)
-	{
+    const {
 		return entity_system::Property<Cell, Value>(cells_);
 	}
 
@@ -129,7 +129,7 @@ public:
       \param name Name of the pin, used to identify it.
       \return A handler for the created pin.
     */
-    Pin add(Pin, std::string name, PinDirection direction);
+    Pin add(Pin, const std::string & name, PinDirection direction);
 
     //! Erase Pin
     /*!
@@ -196,7 +196,7 @@ public:
 	 */
 	template <typename Value>
     entity_system::Property<Pin, Value> makeProperty(Pin)
-	{
+    const {
 		return entity_system::Property<Pin, Value>(pins_);
 	}
 

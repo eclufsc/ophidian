@@ -1,11 +1,11 @@
 #include <catch.hpp>
 
-#include <boost/geometry.hpp>
-
+#include <ophidian/geometry/Models.h>
 #include <ophidian/placement/Library.h>
 
 using namespace ophidian::placement;
 using namespace ophidian::standard_cell;
+using namespace ophidian::util;
 using namespace ophidian::geometry;
 
 namespace {
@@ -25,33 +25,23 @@ public:
     }
 };
 
-bool multiBoxComparison(const MultiBox & multiBox1, const MultiBox & multiBox2) {
-    for (auto box1 : multiBox1) {
-        for (auto box2 : multiBox2) {
-            bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
-                    && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
-            if (!comparison) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 }
 
 
 TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]") {
     Library library(std_cells);
 
-    MultiBox cell1Geometry = {Box(Point(0, 0), Point(10, 10))};
+    std::vector<Box> cell1Boxes = {Box(Point(0, 0), Point(10, 10))};
+    MultiBox cell1Geometry(cell1Boxes);
     library.geometry(cell1, cell1Geometry);
 
-    MultiBox cell2Geometry = {Box(Point(0, 0), Point(20, 10))};
+    std::vector<Box> cell2Boxes = {Box(Point(0, 0), Point(20, 10))};
+    MultiBox cell2Geometry(cell2Boxes);
     library.geometry(cell2, cell2Geometry);
 
-    REQUIRE(multiBoxComparison(cell1Geometry, library.geometry(cell1)));
-    REQUIRE(multiBoxComparison(cell2Geometry, library.geometry(cell2)));
-    REQUIRE(!multiBoxComparison(library.geometry(cell1), library.geometry(cell2)));
+    REQUIRE(cell1Geometry == library.geometry(cell1));
+    REQUIRE(cell2Geometry == library.geometry(cell2));
+    REQUIRE(library.geometry(cell1) != library.geometry(cell2));
 }
 
 TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]") {
@@ -65,5 +55,5 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[plac
 
     REQUIRE(pin1Offset == library.pinOffset(pin1));
     REQUIRE(pin2Offset == library.pinOffset(pin2));
-    REQUIRE(!(library.pinOffset(pin1) == library.pinOffset(pin2)));
+    REQUIRE(library.pinOffset(pin1) != library.pinOffset(pin2));
 }

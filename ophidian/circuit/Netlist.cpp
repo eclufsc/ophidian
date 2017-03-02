@@ -11,7 +11,7 @@ Netlist::Netlist() :
 {
 }
 
-Netlist::Netlist(Netlist &&nl) :
+Netlist::Netlist(const Netlist &&nl) :
     cells_(std::move(nl.cells_)),
     pins_(std::move(nl.pins_)),
     nets_(std::move(nl.nets_)),

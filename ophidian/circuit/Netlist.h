@@ -55,7 +55,7 @@ namespace ophidian
                 Netlist();
 
                 //! Move Constructor
-                Netlist(Netlist&& nl);
+                Netlist(const Netlist&& nl);
                 //! Netlist Destructor
                 /*!
                   \brief This destroy all Netlist's EntitySystems.
@@ -100,7 +100,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Cell, Value> makeProperty(Cell)
-                {
+                const {
                     return entity_system::Property<Cell, Value>(cells_);
                 }
                 //! Get the Cell Notifier
@@ -173,7 +173,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Pin, Value> makeProperty(Pin)
-                {
+                const {
                     return entity_system::Property<Pin, Value>(pins_);
                 }
                 //! Get the Pin Notifier
@@ -253,7 +253,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Net, Value> makeProperty(Net)
-                {
+                const {
                     return entity_system::Property<Net, Value>(nets_);
                 }
                 //! Get the Net Notifier
@@ -336,7 +336,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Input, Value> makeProperty(Input)
-                {
+                const {
                     return entity_system::Property<Input, Value>(inputs_);
                 }
                 //! Get the Input Notifier
@@ -394,7 +394,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Output, Value> makeProperty(Output)
-                {
+                const {
                     return entity_system::Property<Output, Value>(outputs_);
                 }
                 //! Get the Output Notifier
