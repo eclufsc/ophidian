@@ -16,8 +16,8 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef OPHIDIAN_PLACEMENT_LIBRARY_H
+#define OPHIDIAN_PLACEMENT_LIBRARY_H
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
@@ -29,7 +29,7 @@ namespace placement {
 class Library
 {
 public:
-    //! Library Constructor
+    //! Library Copy Constructor
     /*!
        \brief Constructs a placement library.
      */
@@ -49,7 +49,7 @@ public:
     /*!
        \brief Set the geometry of a cell.
        \param cell Cell entity to set the geometry.
-       \param geometry Geometry to assign to cell.
+       \param geometry Gehmetry to assign to cell.
      */
     void geometry(const standard_cell::Cell & cell, const util::MultiBox & geometry);
 
@@ -72,8 +72,6 @@ public:
     void pinOffset(const standard_cell::Pin & pin, const util::Location & offset);
 
 private:
-    const standard_cell::StandardCells & std_cells_;
-
     entity_system::Property<standard_cell::Cell, util::MultiBox> geometries_;
     entity_system::Property<standard_cell::Pin, util::Location> pinOffsets_;
 };

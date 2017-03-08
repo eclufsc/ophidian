@@ -62,7 +62,6 @@ public:
     }
 
 private:
-    const circuit::Netlist & netlist_;
     entity_system::Property<circuit::Cell, util::Location> locations_;
 };
 

@@ -21,10 +21,9 @@ under the License.
 namespace ophidian {
 namespace placement {
 
-Placement::Placement(const circuit::Netlist &netlist)
-    : netlist_(netlist), locations_(netlist_.makeProperty<util::Location>(circuit::Cell())){
-
-}
+Placement::Placement(const circuit::Netlist &netlist): 
+    locations_(netlist.makeProperty<util::Location>(circuit::Cell()))
+    { }
 
 Placement::~Placement()
 {
