@@ -55,7 +55,7 @@ namespace ophidian
                 Netlist();
 
                 //! Move Constructor
-                Netlist(const Netlist&& nl);
+                Netlist(Netlist&& nl) = default;
                 //! Netlist Destructor
                 /*!
                   \brief This destroy all Netlist's EntitySystems.

@@ -11,19 +11,6 @@ Netlist::Netlist() :
 {
 }
 
-Netlist::Netlist(const Netlist &&nl) :
-    cells_(std::move(nl.cells_)),
-    pins_(std::move(nl.pins_)),
-    nets_(std::move(nl.nets_)),
-    inputs_(std::move(nl.inputs_)),
-    netPins_(std::move(nl.netPins_)),
-    cellPins_(std::move(nl.cellPins_)),
-    pinInput_(std::move(nl.pinInput_)),
-    pinOutput_(std::move(nl.pinOutput_))
-{
-
-}
-
 Netlist::~Netlist()
 {
 
