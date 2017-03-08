@@ -142,7 +142,7 @@ bool compare(const parser::Lef::obs & a, const parser::Lef::obs & b)
 
 TEST_CASE("lef: missing file", "[parser][lef][missing_file]") {
     parser::LefParser parser;
-    REQUIRE_THROWS(parser.readFile("input_files/thisFileDoesNotExist.lef"););
+    REQUIRE_THROWS(parser.readFile("input_files/thisFileDoesNotExist.lef"));
 }
 
 TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
