@@ -1,3 +1,21 @@
+/*
+ * Copyright 2017 Ophidian
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+ */
+
 #ifndef OPHIDIAN_CIRCUIT_NETLIST_H
 #define OPHIDIAN_CIRCUIT_NETLIST_H
 
@@ -55,7 +73,7 @@ namespace ophidian
                 Netlist();
 
                 //! Move Constructor
-                Netlist(Netlist&& nl);
+                Netlist(Netlist&& nl) = default;
                 //! Netlist Destructor
                 /*!
                   \brief This destroy all Netlist's EntitySystems.
@@ -100,7 +118,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Cell, Value> makeProperty(Cell)
-                {
+                const {
                     return entity_system::Property<Cell, Value>(cells_);
                 }
                 //! Get the Cell Notifier
@@ -173,7 +191,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Pin, Value> makeProperty(Pin)
-                {
+                const {
                     return entity_system::Property<Pin, Value>(pins_);
                 }
                 //! Get the Pin Notifier
@@ -253,7 +271,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Net, Value> makeProperty(Net)
-                {
+                const {
                     return entity_system::Property<Net, Value>(nets_);
                 }
                 //! Get the Net Notifier
@@ -336,7 +354,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Input, Value> makeProperty(Input)
-                {
+                const {
                     return entity_system::Property<Input, Value>(inputs_);
                 }
                 //! Get the Input Notifier
@@ -394,7 +412,7 @@ namespace ophidian
                 */
                 template <typename Value>
                 entity_system::Property<Output, Value> makeProperty(Output)
-                {
+                const {
                     return entity_system::Property<Output, Value>(outputs_);
                 }
                 //! Get the Output Notifier
