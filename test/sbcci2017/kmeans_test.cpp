@@ -1,6 +1,8 @@
 #include "../catch.hpp"
-#include "kmeansdataorienteddesign.h"
+#include "kmeans_data_oriented_design.h"
+#include "kmeans_object_oriented_design.h"
 
+#include "../../ophidian/parser/Def.h"
 #include <chrono>
 
 TEST_CASE("kmeans/ initialize random clusters","[kmeansDOD]") {
@@ -81,7 +83,7 @@ TEST_CASE("kmeans/ initialize clusters by vector","[kmeansDOD]") {
 
 }
 
-#include "../../ophidian/parser/Def.h"
+
 
 
 TEST_CASE("kmeans/ run DOD non paralel in ICCAD2015","[kmeansDODnonParalel]") {
@@ -134,15 +136,34 @@ TEST_CASE("kmeans/ run DOD non paralel in ICCAD2015","[kmeansDODnonParalel]") {
 
 
 
+TEST_CASE("kmeans/ basic test structure","[kmeansOOD]") {
+   using Point = ophidian::geometry::Point;
 
+   Point a(5,7);
+   ophidian::ClusterOOD cluster(a);
+   REQUIRE( cluster.clusterCenter().x() == 5 );
+   REQUIRE( cluster.clusterCenter().y() == 7 );
 
+   cluster.setClusterCenter(Point(8,9));
+   REQUIRE( cluster.clusterCenter().x() == 8 );
+   REQUIRE( cluster.clusterCenter().y() == 9 );
 
+   Point ff(1,2);
+   ophidian::FlipFlop element(ff);
+   REQUIRE( element.position().x() == 1);
+   REQUIRE( element.position().y() == 2);
+   element.setPosition(Point(3,4));
+   REQUIRE( element.position().x() == 3);
+   REQUIRE( element.position().y() == 4);
 
+   cluster.insertElement(element);
+   REQUIRE(cluster.size() == 1);
 
+   ophidian::FlipFlop ff_2 = cluster.clusterElements().front();
+   REQUIRE(ff_2.position().x() == 3);
+   REQUIRE(ff_2.position().y()== 4);
 
-
-
-
+}
 
 
 

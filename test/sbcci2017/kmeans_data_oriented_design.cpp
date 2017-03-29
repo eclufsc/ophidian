@@ -1,4 +1,4 @@
-#include "kmeansdataorienteddesign.h"
+#include "kmeans_data_oriented_design.h"
 #include <boost/geometry/index/rtree.hpp>
 
 namespace ophidian {
