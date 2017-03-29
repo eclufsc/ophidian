@@ -99,8 +99,6 @@ TEST_CASE("kmeans/ run DOD non paralel in ICCAD2015","[kmeansDODnonParalel]") {
     };
 
 
-
-
     for(auto circuit_name : circuits){
         ophidian::parser::DefParser reader;
         std::shared_ptr<ophidian::parser::Def> def = reader.readFile("./benchmarks/"+circuit_name+"/"+circuit_name+".def");

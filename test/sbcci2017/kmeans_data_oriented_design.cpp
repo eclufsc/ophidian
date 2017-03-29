@@ -27,7 +27,13 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
 {
     for (int i = 0; i < iterations; ++i) {
         std::cout << "iteration: " << i <<std::endl;
-        for (geometry::Point flip_flop : flip_flops) {
+
+        //paralel
+        std::vector<Cluster> flip_flop_to_cluster;
+        flip_flop_to_cluster.reserve(flip_flops.size());
+        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
+            auto flip_flop = flip_flops.at(flip_flop_index);
+
             Cluster cluster_best;
             double cost_best = std::numeric_limits<double>::max();
             for (auto & cluster : clusters_) {
@@ -42,9 +48,16 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
                     cluster_best = cluster;
                 }
             }
-            clusterElements_[cluster_best].push_back(flip_flop);
+            flip_flop_to_cluster.at(flip_flop_index) = best_cluster;
         }
 
+        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
+            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
+            auto flip_flop = flip_flops.at(flip_flop_index);
+            clusterElements_[cluster].push_back(flip_flop);
+        }
+
+        //paralel
         for (auto & cluster : clusters_) {
             double x_c = 0, y_c = 0;
             for(auto p : clusterElements_[cluster]){
