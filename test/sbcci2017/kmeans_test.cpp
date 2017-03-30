@@ -134,8 +134,103 @@ TEST_CASE("kmeans/ initialize clusters by vector parallel","[test]") {
 
 }
 
+TEST_CASE("kmeans/ OOD initialize clusters by vector","[test]") {
+    std::vector<ophidian::geometry::Point> flip_flop_positions = {
+       {1, 1},
+       {3, 2},
+       {2, 1},
+       {1, 3},
+       {7, 2},
+       {7, 1},
+       {9, 1},
+       {9, 3},
+       {1, 9},
+       {3, 7},
+       {1, 8},
+       {2, 7},
+       {7, 7},
+       {7, 9},
+       {7, 8},
+       {8, 7}
+   };
+   std::vector<ophidian::geometry::Point> initial_centers = {
+        {2, 2},
+        {8, 2},
+        {2, 8},
+        {8, 8}
+   };
+   std::vector<ophidian::geometry::Point> expected_centers = {
+        {1.75, 1.75},
+        {8, 1.75},
+        {1.75, 7.75},
+        {7.25, 7.75}
+   };
+   std::vector<std::vector<ophidian::geometry::Point>> expected_clusters = {
+        {{1, 1}, {3, 2}, {2, 1}, {1, 3}},
+        {{7, 2}, {7, 1}, {9, 1}, {9, 3}},
+        {{1, 9}, {3, 7}, {1, 8}, {2, 7}},
+        {{7, 7}, {7, 9}, {7, 8}, {8, 7}}
+   };
 
+   ophidian::KmeansObjectOrientedDesign kmeansOOD(initial_centers);
+   REQUIRE(kmeansOOD.clusters().size() == initial_centers.size());
 
+   std::vector<ophidian::FlipFlop> flip_flops;
+   flip_flops.reserve(flip_flop_positions.size());
+   for(auto p : flip_flop_positions){
+       flip_flops.push_back(ophidian::FlipFlop(p));
+   }
+   kmeansOOD.cluster_registers(flip_flops, 1);
+
+   REQUIRE(kmeansOOD.clusters().size() == expected_centers.size());
+   std::vector<ophidian::geometry::Point> clusters_positions;
+   clusters_positions.reserve(kmeansOOD.clusters().size());
+   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
+       clusters_positions.push_back(cluster.center());
+   }
+   REQUIRE(std::is_permutation(clusters_positions.begin(), clusters_positions.end(), expected_centers.begin(), point_comparison));
+
+   REQUIRE(kmeansOOD.clusters().size() == expected_clusters.size());
+   std::vector<std::vector<ophidian::geometry::Point>> cluster_return;
+   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
+       std::vector<ophidian::geometry::Point> elements_positions;
+       elements_positions.reserve(cluster.elements().size());
+       for(ophidian::FlipFlop ff : cluster.elements()){
+           elements_positions.push_back(ff.position());
+       }
+       cluster_return.push_back(elements_positions);
+   }
+   REQUIRE(std::is_permutation(cluster_return.begin(), cluster_return.end(), expected_clusters.begin(), cluster_comparison));
+}
+
+TEST_CASE("kmeans/ basic test structure","[test]") {
+   using Point = ophidian::geometry::Point;
+
+   Point a(5,7);
+   ophidian::ClusterOOD cluster(a);
+   REQUIRE( cluster.center().x() == 5 );
+   REQUIRE( cluster.center().y() == 7 );
+
+   cluster.center(Point(8,9));
+   REQUIRE( cluster.center().x() == 8 );
+   REQUIRE( cluster.center().y() == 9 );
+
+   Point ff(1,2);
+   ophidian::FlipFlop element(ff);
+   REQUIRE( element.position().x() == 1);
+   REQUIRE( element.position().y() == 2);
+   element.setPosition(Point(3,4));
+   REQUIRE( element.position().x() == 3);
+   REQUIRE( element.position().y() == 4);
+
+   cluster.insertElement(element);
+   REQUIRE(cluster.size() == 1);
+
+   ophidian::FlipFlop ff_2 = cluster.elements().front();
+   REQUIRE(ff_2.position().x() == 3);
+   REQUIRE(ff_2.position().y()== 4);
+
+}
 
 TEST_CASE("kmeans/ run DOD non paralel in ICCAD2015","[kmeans][DOD][sequential]") {
     std::vector<std::string> circuits = {
@@ -227,101 +322,107 @@ TEST_CASE("kmeans/ run DOD paralel in ICCAD2015","[kmeans][DOD][parallel]") {
 
 }
 
+TEST_CASE("kmeans/ run OOD non paralel in ICCAD2015","[kmeans][OOD][sequential]") {
+    std::vector<std::string> circuits = {
+        "superblue18",
+//        "superblue4",
+//        "superblue16",
+//        "superblue5",
+//        "superblue1",
+//        "superblue3",
+//        "superblue10",
+//        "superblue7"
+    };
 
-TEST_CASE("kmeans/ basic test structure","[test]") {
-   using Point = ophidian::geometry::Point;
 
-   Point a(5,7);
-   ophidian::ClusterOOD cluster(a);
-   REQUIRE( cluster.center().x() == 5 );
-   REQUIRE( cluster.center().y() == 7 );
+    for(auto circuit_name : circuits){
+        ophidian::parser::DefParser reader;
+        std::shared_ptr<ophidian::parser::Def> def = reader.readFile("./benchmarks/"+circuit_name+"/"+circuit_name+".def");
 
-   cluster.center(Point(8,9));
-   REQUIRE( cluster.center().x() == 8 );
-   REQUIRE( cluster.center().y() == 9 );
+        std::vector<ophidian::geometry::Point> flip_flop_positions;
 
-   Point ff(1,2);
-   ophidian::FlipFlop element(ff);
-   REQUIRE( element.position().x() == 1);
-   REQUIRE( element.position().y() == 2);
-   element.setPosition(Point(3,4));
-   REQUIRE( element.position().x() == 3);
-   REQUIRE( element.position().y() == 4);
+        std::string ff ("DFF_X80");
+        for(ophidian::parser::Def::component component : def->components()){
+            if(ff.compare(component.macro) == 0){
+                flip_flop_positions.push_back(ophidian::geometry::Point(component.position.x, component.position.y));
+            }
+        }
 
-   cluster.insertElement(element);
-   REQUIRE(cluster.size() == 1);
+        auto die = (*def).die();
+        ophidian::geometry::Point chipOrigin((double)die.lower.x, (double)die.lower.y);
+        ophidian::geometry::Point chipBondary((double)die.upper.x, (double)die.upper.y);
 
-   ophidian::FlipFlop ff_2 = cluster.elements().front();
-   REQUIRE(ff_2.position().x() == 3);
-   REQUIRE(ff_2.position().y()== 4);
+        ophidian::KmeansObjectOrientedDesign kmeansOOD (chipOrigin, chipBondary, (int)(flip_flop_positions.size()/50) );
+
+        std::vector<ophidian::FlipFlop> flip_flops;
+        flip_flops.reserve(flip_flop_positions.size());
+        for(auto p : flip_flop_positions){
+            flip_flops.push_back(ophidian::FlipFlop(p));
+        }
+
+        auto time_start = std::chrono::high_resolution_clock::now();
+        kmeansOOD.cluster_registers(flip_flops, 10);
+        auto time_end = std::chrono::high_resolution_clock::now();
+
+        auto total_time = time_end - time_start;
+        std::cout <<"Runtime kmeans: " << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+    }
+
+}
+
+TEST_CASE("kmeans/ run OOD paralel in ICCAD2015","[kmeans][OOD][parallel]") {
+    std::vector<std::string> circuits = {
+        "superblue18",
+//        "superblue4",
+//        "superblue16",
+//        "superblue5",
+//        "superblue1",
+//        "superblue3",
+//        "superblue10",
+//        "superblue7"
+    };
+
+
+    for(auto circuit_name : circuits){
+        ophidian::parser::DefParser reader;
+        std::shared_ptr<ophidian::parser::Def> def = reader.readFile("./benchmarks/"+circuit_name+"/"+circuit_name+".def");
+
+        std::vector<ophidian::geometry::Point> flip_flop_positions;
+
+        std::string ff ("DFF_X80");
+        for(ophidian::parser::Def::component component : def->components()){
+            if(ff.compare(component.macro) == 0){
+                flip_flop_positions.push_back(ophidian::geometry::Point(component.position.x, component.position.y));
+            }
+        }
+
+        auto die = (*def).die();
+        ophidian::geometry::Point chipOrigin((double)die.lower.x, (double)die.lower.y);
+        ophidian::geometry::Point chipBondary((double)die.upper.x, (double)die.upper.y);
+
+        ophidian::KmeansObjectOrientedDesign kmeansOOD (chipOrigin, chipBondary, (int)(flip_flop_positions.size()/50) );
+
+        std::vector<ophidian::FlipFlop> flip_flops;
+        flip_flops.reserve(flip_flop_positions.size());
+        for(auto p : flip_flop_positions){
+            flip_flops.push_back(ophidian::FlipFlop(p));
+        }
+
+        auto time_start = std::chrono::high_resolution_clock::now();
+        kmeansOOD.cluster_registers_paralel(flip_flops, 10);
+        auto time_end = std::chrono::high_resolution_clock::now();
+
+        auto total_time = time_end - time_start;
+        std::cout <<"Runtime kmeans: " << std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count()<<" ms"<<std::endl;
+
+    }
 
 }
 
 
-TEST_CASE("kmeans/ OOD initialize clusters by vector","[kmeansOOD]") {
-    std::vector<ophidian::geometry::Point> flip_flop_positions = {
-       {1, 1},
-       {3, 2},
-       {2, 1},
-       {1, 3},
-       {7, 2},
-       {7, 1},
-       {9, 1},
-       {9, 3},
-       {1, 9},
-       {3, 7},
-       {1, 8},
-       {2, 7},
-       {7, 7},
-       {7, 9},
-       {7, 8},
-       {8, 7}
-   };
-   std::vector<ophidian::geometry::Point> initial_centers = {
-        {2, 2},
-        {8, 2},
-        {2, 8},
-        {8, 8}
-   };
-   std::vector<ophidian::geometry::Point> expected_centers = {
-        {1.75, 1.75},
-        {8, 1.75},
-        {1.75, 7.75},
-        {7.25, 7.75}
-   };
-   std::vector<std::vector<ophidian::geometry::Point>> expected_clusters = {
-        {{1, 1}, {3, 2}, {2, 1}, {1, 3}},
-        {{7, 2}, {7, 1}, {9, 1}, {9, 3}},
-        {{1, 9}, {3, 7}, {1, 8}, {2, 7}},
-        {{7, 7}, {7, 9}, {7, 8}, {8, 7}}
-   };
 
-   ophidian::KmeansObjectOrientedDesign kmeansOOD(initial_centers);
-   REQUIRE(kmeansOOD.clusters().size() == initial_centers.size());
 
-   kmeansOOD.cluster_registers(flip_flop_positions, 1);
-
-   REQUIRE(kmeansOOD.clusters().size() == expected_centers.size());
-   std::vector<ophidian::geometry::Point> clusters_positions;
-   clusters_positions.reserve(kmeansOOD.clusters().size());
-   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
-       clusters_positions.push_back(cluster.center());
-   }
-   REQUIRE(std::is_permutation(clusters_positions.begin(), clusters_positions.end(), expected_centers.begin(), point_comparison));
-
-   REQUIRE(kmeansOOD.clusters().size() == expected_clusters.size());
-   std::vector<std::vector<ophidian::geometry::Point>> cluster_return;
-   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
-       std::vector<ophidian::geometry::Point> elements_positions;
-       elements_positions.reserve(cluster.elements().size());
-       for(ophidian::FlipFlop ff : cluster.elements()){
-           elements_positions.push_back(ff.position());
-       }
-       cluster_return.push_back(elements_positions);
-   }
-   REQUIRE(std::is_permutation(cluster_return.begin(), cluster_return.end(), expected_clusters.begin(), cluster_comparison));
-
-}
 
 
 

@@ -4,17 +4,24 @@
 #include "ophidian/geometry/Models.h"
 
 namespace ophidian {
-
+class ClusterOOD;
 
 class FlipFlop
 {
 private:
     geometry::Point position_;
+    ClusterOOD * clusterBest_;
+
+    std::string name_ = "DFF_X80";
+    geometry::Point size_;
+    int net_;
 public:
     FlipFlop(geometry::Point & p): position_(p) {}
 
     geometry::Point position() const;
     void setPosition(const geometry::Point &position);
+    ClusterOOD *clusterBest() const;
+    void setClusterBest(ClusterOOD *clusterBest);
 };
 
 class ClusterOOD
@@ -55,11 +62,11 @@ public:
     std::vector<ClusterOOD> clusters() const;
     void setClusters(const std::vector<ClusterOOD> &clusters);
 
-    void cluster_registers(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
-    void cluster_registers_with_rtree(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
+    void cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations = 10);
+    void cluster_registers_with_rtree(std::vector<FlipFlop> &flip_flops, unsigned iterations = 10);
 
-    void cluster_registers_paralel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
-    void cluster_registers_with_rtree_paralel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
+    void cluster_registers_paralel(std::vector<FlipFlop> &flip_flops, unsigned iterations = 10);
+    void cluster_registers_with_rtree_paralel(std::vector<FlipFlop> & flip_flops, unsigned iterations = 10);
 };
 
 

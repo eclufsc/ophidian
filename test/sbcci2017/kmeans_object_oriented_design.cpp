@@ -4,6 +4,16 @@ namespace ophidian {
 
 
 //-------------------------  Class ClusterElement -------------------------
+ClusterOOD *FlipFlop::clusterBest() const
+{
+    return clusterBest_;
+}
+
+void FlipFlop::setClusterBest(ClusterOOD *clusterBest)
+{
+    clusterBest_ = clusterBest;
+}
+
 geometry::Point FlipFlop::position() const
 {
     return position_;
@@ -88,22 +98,21 @@ void KmeansObjectOrientedDesign::setClusters(const std::vector<ClusterOOD> &clus
     clusters_ = clusters;
 }
 
-void KmeansObjectOrientedDesign::cluster_registers(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
+void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
-        std::vector<ClusterOOD*> flip_flop_to_cluster;
-        flip_flop_to_cluster.resize(flip_flops.size());
+
 
         for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
-            auto flip_flop = flip_flops.at(flip_flop_index);
+            FlipFlop &flip_flop = flip_flops.at(flip_flop_index);
 
             ClusterOOD * cluster_best;
             double cost_best = std::numeric_limits<double>::max();
             for (auto & cluster : clusters_) {
                 geometry::Point center = cluster.center();
 
-                double distanceX = (flip_flop.x() - center.x()) * (flip_flop.x() - center.x());
-                double distanceY = (flip_flop.y() - center.y()) * (flip_flop.y() - center.y());
+                double distanceX = (flip_flop.position().x() - center.x()) * (flip_flop.position().x() - center.x());
+                double distanceY = (flip_flop.position().y() - center.y()) * (flip_flop.position().y() - center.y());
                 double cost = std::sqrt(distanceX + distanceY);
 
                 if(cost < cost_best){
@@ -111,12 +120,12 @@ void KmeansObjectOrientedDesign::cluster_registers(const std::vector<geometry::P
                     cluster_best = &cluster;
                 }
             }
-            flip_flop_to_cluster.at(flip_flop_index) = cluster_best;
+           flip_flop.setClusterBest(cluster_best);
         }
 
         for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
-            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
-            auto flip_flop = flip_flops.at(flip_flop_index);
+            auto &flip_flop = flip_flops.at(flip_flop_index);
+            auto cluster = flip_flop.clusterBest();
             cluster->insertElement(flip_flop);
         }
 
@@ -133,17 +142,57 @@ void KmeansObjectOrientedDesign::cluster_registers(const std::vector<geometry::P
     }
 }
 
-void KmeansObjectOrientedDesign::cluster_registers_with_rtree(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
+void KmeansObjectOrientedDesign::cluster_registers_with_rtree( std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
 
 }
 
-void KmeansObjectOrientedDesign::cluster_registers_paralel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
+void KmeansObjectOrientedDesign::cluster_registers_paralel(std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
+    for (int i = 0; i < iterations; ++i) {
 
+#pragma omp parallel for
+        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
+            FlipFlop &flip_flop = flip_flops.at(flip_flop_index);
+
+            ClusterOOD * cluster_best;
+            double cost_best = std::numeric_limits<double>::max();
+            for (auto & cluster : clusters_) {
+                geometry::Point center = cluster.center();
+
+                double distanceX = (flip_flop.position().x() - center.x()) * (flip_flop.position().x() - center.x());
+                double distanceY = (flip_flop.position().y() - center.y()) * (flip_flop.position().y() - center.y());
+                double cost = std::sqrt(distanceX + distanceY);
+
+                if(cost < cost_best){
+                    cost_best = cost;
+                    cluster_best = &cluster;
+                }
+            }
+           flip_flop.setClusterBest(cluster_best);
+        }
+
+        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
+            auto &flip_flop = flip_flops.at(flip_flop_index);
+            auto cluster = flip_flop.clusterBest();
+            cluster->insertElement(flip_flop);
+        }
+
+#pragma omp parallel for
+        for (auto cluster = clusters_.begin(); cluster < clusters_.end(); ++cluster) {
+            double x_c = 0, y_c = 0;
+            for(auto p : cluster->elements()){
+                x_c += p.position().x();
+                y_c += p.position().y();
+            }
+            x_c = x_c / (double)cluster->elements().size();
+            y_c = y_c / (double)cluster->elements().size();
+            cluster->center(geometry::Point(x_c, y_c));
+        }
+    }
 }
 
-void KmeansObjectOrientedDesign::cluster_registers_with_rtree_paralel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
+void KmeansObjectOrientedDesign::cluster_registers_with_rtree_paralel( std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
 
 }
