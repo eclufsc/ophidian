@@ -1,6 +1,8 @@
 #ifndef KMEANSDATAORIENTEDDESIGN_H
 #define KMEANSDATAORIENTEDDESIGN_H
 
+#include <omp.h>
+
 #include "ophidian/entity_system/EntitySystem.h"
 #include "ophidian/entity_system/Property.h"
 #include "ophidian/geometry/Models.h"
@@ -35,6 +37,7 @@ public:
     entity_system::Property<Cluster, std::vector<geometry::Point>> clusterElements_;
 
     void cluster_registers(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
+    void cluster_registers_parallel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
     void cluster_registers_with_rtree(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
 };
 

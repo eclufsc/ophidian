@@ -26,11 +26,8 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(const std::vector<geometry::P
 void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
-        std::cout << "iteration: " << i <<std::endl;
-
-        //paralel
         std::vector<Cluster> flip_flop_to_cluster;
-        flip_flop_to_cluster.reserve(flip_flops.size());
+        flip_flop_to_cluster.resize(flip_flops.size());
         for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
             auto flip_flop = flip_flops.at(flip_flop_index);
 
@@ -57,7 +54,6 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
             clusterElements_[cluster].push_back(flip_flop);
         }
 
-        //paralel
         for (auto & cluster : clusters_) {
             double x_c = 0, y_c = 0;
             for(auto p : clusterElements_[cluster]){
@@ -67,6 +63,52 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
             x_c = x_c / (double)clusterElements_[cluster].size();
             y_c = y_c / (double)clusterElements_[cluster].size();
             clusterCenters_[cluster] = geometry::Point(x_c, y_c);
+        }
+    }
+}
+
+void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
+{
+    for (int i = 0; i < iterations; ++i) {
+        std::vector<Cluster> flip_flop_to_cluster;
+        flip_flop_to_cluster.resize(flip_flops.size());
+#pragma omp parallel for
+        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
+            auto flip_flop = flip_flops.at(flip_flop_index);
+
+            Cluster cluster_best;
+            double cost_best = std::numeric_limits<double>::max();
+            for (auto & cluster : clusters_) {
+                geometry::Point center = clusterCenters_[cluster];
+
+                double distanceX = (flip_flop.x() - center.x()) * (flip_flop.x() - center.x());
+                double distanceY = (flip_flop.y() - center.y()) * (flip_flop.y() - center.y());
+                double cost = std::sqrt(distanceX + distanceY);
+
+                if(cost < cost_best){
+                    cost_best = cost;
+                    cluster_best = cluster;
+                }
+            }
+            flip_flop_to_cluster.at(flip_flop_index) = cluster_best;
+        }
+
+        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
+            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
+            auto flip_flop = flip_flops.at(flip_flop_index);
+            clusterElements_[cluster].push_back(flip_flop);
+        }
+
+#pragma omp parallel for
+        for (auto cluster = clusters_.begin(); cluster < clusters_.end(); ++cluster) {
+            double x_c = 0, y_c = 0;
+            for(auto p : clusterElements_[*cluster]){
+                x_c += p.x();
+                y_c += p.y();
+            }
+            x_c = x_c / (double)clusterElements_[*cluster].size();
+            y_c = y_c / (double)clusterElements_[*cluster].size();
+            clusterCenters_[*cluster] = geometry::Point(x_c, y_c);
         }
     }
 }
