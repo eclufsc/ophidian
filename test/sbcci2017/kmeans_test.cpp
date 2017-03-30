@@ -139,12 +139,12 @@ TEST_CASE("kmeans/ basic test structure","[kmeansOOD]") {
 
    Point a(5,7);
    ophidian::ClusterOOD cluster(a);
-   REQUIRE( cluster.clusterCenter().x() == 5 );
-   REQUIRE( cluster.clusterCenter().y() == 7 );
+   REQUIRE( cluster.center().x() == 5 );
+   REQUIRE( cluster.center().y() == 7 );
 
-   cluster.setClusterCenter(Point(8,9));
-   REQUIRE( cluster.clusterCenter().x() == 8 );
-   REQUIRE( cluster.clusterCenter().y() == 9 );
+   cluster.center(Point(8,9));
+   REQUIRE( cluster.center().x() == 8 );
+   REQUIRE( cluster.center().y() == 9 );
 
    Point ff(1,2);
    ophidian::FlipFlop element(ff);
@@ -157,13 +157,77 @@ TEST_CASE("kmeans/ basic test structure","[kmeansOOD]") {
    cluster.insertElement(element);
    REQUIRE(cluster.size() == 1);
 
-   ophidian::FlipFlop ff_2 = cluster.clusterElements().front();
+   ophidian::FlipFlop ff_2 = cluster.elements().front();
    REQUIRE(ff_2.position().x() == 3);
    REQUIRE(ff_2.position().y()== 4);
 
 }
 
 
+TEST_CASE("kmeans/ OOD initialize clusters by vector","[kmeansOOD]") {
+    std::vector<ophidian::geometry::Point> flip_flop_positions = {
+       {1, 1},
+       {3, 2},
+       {2, 1},
+       {1, 3},
+       {7, 2},
+       {7, 1},
+       {9, 1},
+       {9, 3},
+       {1, 9},
+       {3, 7},
+       {1, 8},
+       {2, 7},
+       {7, 7},
+       {7, 9},
+       {7, 8},
+       {8, 7}
+   };
+   std::vector<ophidian::geometry::Point> initial_centers = {
+        {2, 2},
+        {8, 2},
+        {2, 8},
+        {8, 8}
+   };
+   std::vector<ophidian::geometry::Point> expected_centers = {
+        {1.75, 1.75},
+        {8, 1.75},
+        {1.75, 7.75},
+        {7.25, 7.75}
+   };
+   std::vector<std::vector<ophidian::geometry::Point>> expected_clusters = {
+        {{1, 1}, {3, 2}, {2, 1}, {1, 3}},
+        {{7, 2}, {7, 1}, {9, 1}, {9, 3}},
+        {{1, 9}, {3, 7}, {1, 8}, {2, 7}},
+        {{7, 7}, {7, 9}, {7, 8}, {8, 7}}
+   };
+
+   ophidian::KmeansObjectOrientedDesign kmeansOOD(initial_centers);
+   REQUIRE(kmeansOOD.clusters().size() == initial_centers.size());
+
+   kmeansOOD.cluster_registers(flip_flop_positions, 1);
+
+   REQUIRE(kmeansOOD.clusters().size() == expected_centers.size());
+   std::vector<ophidian::geometry::Point> clusters_positions;
+   clusters_positions.reserve(kmeansOOD.clusters().size());
+   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
+       clusters_positions.push_back(cluster.center());
+   }
+   REQUIRE(std::is_permutation(clusters_positions.begin(), clusters_positions.end(), expected_centers.begin(), point_comparison));
+
+   REQUIRE(kmeansOOD.clusters().size() == expected_clusters.size());
+   std::vector<std::vector<ophidian::geometry::Point>> cluster_return;
+   for(ophidian::ClusterOOD cluster : kmeansOOD.clusters()){
+       std::vector<ophidian::geometry::Point> elements_positions;
+       elements_positions.reserve(cluster.elements().size());
+       for(ophidian::FlipFlop ff : cluster.elements()){
+           elements_positions.push_back(ff.position());
+       }
+       cluster_return.push_back(elements_positions);
+   }
+   REQUIRE(std::is_permutation(cluster_return.begin(), cluster_return.end(), expected_clusters.begin(), cluster_comparison));
+
+}
 
 
 

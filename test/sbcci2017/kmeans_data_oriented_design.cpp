@@ -48,7 +48,7 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
                     cluster_best = cluster;
                 }
             }
-            flip_flop_to_cluster.at(flip_flop_index) = best_cluster;
+            flip_flop_to_cluster.at(flip_flop_index) = cluster_best;
         }
 
         for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){

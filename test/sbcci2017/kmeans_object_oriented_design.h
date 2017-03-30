@@ -20,15 +20,16 @@ public:
 class ClusterOOD
 {
 private:
-    geometry::Point clusterCenter_;
-    std::vector<FlipFlop> clusterElements_;
+    geometry::Point center_;
+    std::vector<FlipFlop> elements_;
 public:
-    ClusterOOD(geometry::Point & center);
+    ClusterOOD() {};
+    ClusterOOD(const geometry::Point &center);
 
-    std::vector<FlipFlop> clusterElements() const;
-    void setClusterElements(const std::vector<FlipFlop> &clusterElements);
-    geometry::Point clusterCenter() const;
-    void setClusterCenter(const geometry::Point &clusterCenter);
+    std::vector<FlipFlop> elements() const;
+    void elements(const std::vector<FlipFlop> &elements);
+    geometry::Point center() const;
+    void center(const geometry::Point &center);
 
     void insertElement(const FlipFlop &element);
     void clear();
@@ -38,11 +39,27 @@ public:
 
 class KmeansObjectOrientedDesign
 {
+private:
+    std::default_random_engine m_generator;
+    std::uniform_real_distribution<double> m_distribution_x;
+    std::uniform_real_distribution<double> m_distribution_y;
+
+    std::vector<ClusterOOD> clusters_;
+
+    using rtree_node = std::pair<geometry::Point, ClusterOOD>;
+    using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 public:
-    KmeansObjectOrientedDesign();
+    KmeansObjectOrientedDesign(geometry::Point chipOrigin, geometry::Point chipBondary, unsigned k = 50);
+    KmeansObjectOrientedDesign(const std::vector<geometry::Point> &centers);
+
+    std::vector<ClusterOOD> clusters() const;
+    void setClusters(const std::vector<ClusterOOD> &clusters);
 
     void cluster_registers(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
     void cluster_registers_with_rtree(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
+
+    void cluster_registers_paralel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
+    void cluster_registers_with_rtree_paralel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
 };
 
 
