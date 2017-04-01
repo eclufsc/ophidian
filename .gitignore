@@ -2,6 +2,7 @@
 *.swp
 *.swo
 CMakeCache.txt
+CMakeLists.txt.user
 CMakeScripts
 cmake_install.cmake
 install_manifest.txt

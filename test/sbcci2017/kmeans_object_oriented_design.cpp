@@ -101,11 +101,7 @@ void KmeansObjectOrientedDesign::setClusters(const std::vector<ClusterOOD> &clus
 void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
-
-
-        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
-            FlipFlop &flip_flop = flip_flops.at(flip_flop_index);
-
+        for (auto & flip_flop : flip_flops) {
             ClusterOOD * cluster_best;
             double cost_best = std::numeric_limits<double>::max();
             for (auto & cluster : clusters_) {
@@ -121,12 +117,7 @@ void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_f
                 }
             }
            flip_flop.setClusterBest(cluster_best);
-        }
-
-        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
-            auto &flip_flop = flip_flops.at(flip_flop_index);
-            auto cluster = flip_flop.clusterBest();
-            cluster->insertElement(flip_flop);
+           cluster_best->insertElement(flip_flop);
         }
 
         for (ClusterOOD & cluster : clusters_) {

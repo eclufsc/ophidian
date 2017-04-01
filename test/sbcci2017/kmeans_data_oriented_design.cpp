@@ -26,8 +26,6 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(const std::vector<geometry::P
 void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
-        std::vector<Cluster> flip_flop_to_cluster;
-        flip_flop_to_cluster.resize(flip_flops.size());
         for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
             auto flip_flop = flip_flops.at(flip_flop_index);
 
@@ -45,13 +43,7 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
                     cluster_best = cluster;
                 }
             }
-            flip_flop_to_cluster.at(flip_flop_index) = cluster_best;
-        }
-
-        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
-            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
-            auto flip_flop = flip_flops.at(flip_flop_index);
-            clusterElements_[cluster].push_back(flip_flop);
+            clusterElements_[cluster_best].push_back(flip_flop);
         }
 
         for (auto & cluster : clusters_) {
@@ -94,8 +86,8 @@ void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geom
         }
 
         for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
-            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
             auto flip_flop = flip_flops.at(flip_flop_index);
+            auto cluster = flip_flop_to_cluster.at(flip_flop_index);
             clusterElements_[cluster].push_back(flip_flop);
         }
 
