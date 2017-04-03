@@ -303,7 +303,7 @@ TEST_CASE("kmeans/ initialize clusters by vector (OOD-parallel)","[test]") {
    REQUIRE(std::is_permutation(cluster_return.begin(), cluster_return.end(), expected_clusters.begin(), cluster_comparison));
 }
 
-TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[DOD][sequential][dodsequential]") {
+TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[kmeans][DOD][sequential][dodsequential]") {
     std::vector<std::string> circuits = {
         "superblue18",
         "superblue4",
@@ -354,7 +354,7 @@ TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[DOD][sequential][dodsequen
 
 }
 
-TEST_CASE("kmeans/ run DOD parallel in ICCAD2015","[te][kmeans][DOD][parallel][dodparallel]") {
+TEST_CASE("kmeans/ run DOD parallel in ICCAD2015","[kmeans][DOD][parallel][dodparallel]") {
     std::vector<std::string> circuits = {
         "superblue18",
         "superblue4",

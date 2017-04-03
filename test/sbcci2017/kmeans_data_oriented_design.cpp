@@ -26,9 +26,12 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(const std::vector<geometry::P
 void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
-        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
-            auto flip_flop = flip_flops.at(flip_flop_index);
 
+        for (auto & elements_to_cluster : clusterElements_) {
+            elements_to_cluster.clear();
+        }
+
+        for (auto & flip_flop : flip_flops) {
             Cluster cluster_best;
             double cost_best = std::numeric_limits<double>::max();
             for (auto & cluster : clusters_) {
@@ -62,6 +65,12 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
 void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
 {
     for (int i = 0; i < iterations; ++i) {
+
+#pragma omp parallel for
+        for (auto elements_to_cluster = clusterElements_.begin(); cluster < clusterElements_.end(); ++elements_to_cluster) {
+            elements_to_cluster.clear();
+        }
+
         std::vector<Cluster> flip_flop_to_cluster;
         flip_flop_to_cluster.resize(flip_flops.size());
 #pragma omp parallel for
