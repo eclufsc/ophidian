@@ -67,8 +67,8 @@ void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geom
     for (int i = 0; i < iterations; ++i) {
 
 #pragma omp parallel for
-        for (auto elements_to_cluster = clusterElements_.begin(); cluster < clusterElements_.end(); ++elements_to_cluster) {
-            elements_to_cluster.clear();
+        for (auto elements_to_cluster = clusterElements_.begin(); elements_to_cluster < clusterElements_.end(); ++elements_to_cluster) {
+            elements_to_cluster->clear();
         }
 
         std::vector<Cluster> flip_flop_to_cluster;

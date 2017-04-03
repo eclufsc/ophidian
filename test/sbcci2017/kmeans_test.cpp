@@ -306,13 +306,13 @@ TEST_CASE("kmeans/ initialize clusters by vector (OOD-parallel)","[test]") {
 TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[kmeans][DOD][sequential][dodsequential]") {
     std::vector<std::string> circuits = {
         "superblue18",
-        "superblue4",
-        "superblue16",
-        "superblue5",
-        "superblue1",
-        "superblue3",
-        "superblue10",
-        "superblue7"
+//        "superblue4",
+//        "superblue16",
+//        "superblue5",
+//        "superblue1",
+//        "superblue3",
+//        "superblue10",
+//        "superblue7"
     };
 
 
@@ -409,13 +409,13 @@ TEST_CASE("kmeans/ run DOD parallel in ICCAD2015","[kmeans][DOD][parallel][dodpa
 TEST_CASE("kmeans/ run OOD sequential in ICCAD2015","[kmeans][OOD][sequential][oodsequential]") {
     std::vector<std::string> circuits = {
         "superblue18",
-        "superblue4",
-        "superblue16",
-        "superblue5",
-        "superblue1",
-        "superblue3",
-        "superblue10",
-        "superblue7"
+//        "superblue4",
+//        "superblue16",
+//        "superblue5",
+//        "superblue1",
+//        "superblue3",
+//        "superblue10",
+//        "superblue7"
     };
 
 
