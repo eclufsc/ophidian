@@ -27,15 +27,8 @@ KmeansDataOrientedDesign2::KmeansDataOrientedDesign2(entity_system::EntitySystem
 
 void KmeansDataOrientedDesign2::cluster_registers(const entity_system::EntitySystem<FlipFlopDOD> &flip_flops, entity_system::Property<FlipFlopDOD, geometry::Point> & flip_flop_positions, unsigned iterations)
 {
-//    std::chrono::high_resolution_clock::time_point time_start, time_end;
-//    std::chrono::high_resolution_clock::duration d1, d2;
     for (int i = 0; i < iterations; ++i) {
 
-//        for (auto & elements_to_cluster : clusterElements_) {
-//            elements_to_cluster.clear();
-//        }
-
-//        time_start = std::chrono::high_resolution_clock::now();
         for (auto & flip_flop : flip_flops) {
             auto flip_flop_point = flip_flop_positions[flip_flop];
             Cluster2 cluster_best;
@@ -52,34 +45,23 @@ void KmeansDataOrientedDesign2::cluster_registers(const entity_system::EntitySys
                     cluster_best = cluster;
                 }
             }
-//            clusterElements_[cluster_best].push_back(flip_flop);
             cluster2FlipFlops_.addAssociation(cluster_best, flip_flop);
         }
-//        time_end = std::chrono::high_resolution_clock::now();
-//        d1 += time_end - time_start;
 
-//        time_start = std::chrono::high_resolution_clock::now();
         for (auto & cluster : clusters_) {
             double x_c = 0, y_c = 0;
-//            for(auto p : clusterElements_[cluster]){
             for (auto flip_flop : cluster2FlipFlops_.parts(cluster)) {
                 auto p = flip_flop_positions[flip_flop];
                 x_c += p.x();
                 y_c += p.y();
             }
-//            x_c = x_c / (double)clusterElements_[cluster].size();
-//            y_c = y_c / (double)clusterElements_[cluster].size();
             x_c = x_c / (double)cluster2FlipFlops_.numParts(cluster);
             y_c = y_c / (double)cluster2FlipFlops_.numParts(cluster);
             clusterCenters_[cluster] = geometry::Point(x_c, y_c);
         }
-//        time_end = std::chrono::high_resolution_clock::now();
-//        d2 += time_end - time_start;
 
         cluster2FlipFlops_.clear();
     }
-//    std::cout<<"for 1: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d1).count()<<" ms."<<std::endl;
-//    std::cout<<"for 2: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d2).count()<<" ms."<<std::endl;
 }
 
 void KmeansDataOrientedDesign2::cluster_registers_parallel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
