@@ -1,24 +1,38 @@
-#ifndef KMEANSDATAORIENTEDDESIGN_H
-#define KMEANSDATAORIENTEDDESIGN_H
+#ifndef KMEANSHYBRID_H
+#define KMEANSHYBRID_H
+
+
 
 #include <omp.h>
 
 #include "ophidian/entity_system/EntitySystem.h"
 #include "ophidian/entity_system/Property.h"
 #include "ophidian/geometry/Models.h"
-#include "ophidian/entity_system/Aggregation.h"
 
 namespace ophidian {
 
 
 
-class Cluster : public entity_system::EntityBase
+class ClusterHybrid
 {
+private:
+    geometry::Point center_;
+    std::vector<geometry::Point> elements_;
 public:
-    using entity_system::EntityBase::EntityBase;
+    ClusterHybrid(const geometry::Point &center);
+
+    geometry::Point & center();
+    void setCenter(const geometry::Point &center);
+    std::vector<geometry::Point> elements() const;
+    void setElements(const std::vector<geometry::Point> &elements);
+
+
+    void insertElement(const geometry::Point &element);
+    void clear();
+    int size();
 };
 
-class KmeansDataOrientedDesign
+class KmeansHybrid
 {
 
 private:
@@ -26,16 +40,14 @@ private:
     std::uniform_real_distribution<double> m_distribution_x;
     std::uniform_real_distribution<double> m_distribution_y;
 
-    using rtree_node = std::pair<geometry::Point, Cluster>;
+    using rtree_node = std::pair<geometry::Point, ClusterHybrid*>;
     using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 
 public:
-    KmeansDataOrientedDesign(geometry::Point chipOrigin, geometry::Point chipBondary, unsigned k = 50);
-    KmeansDataOrientedDesign(const std::vector<geometry::Point> &centers);
+    KmeansHybrid(geometry::Point chipOrigin, geometry::Point chipBondary, unsigned k = 50);
+    KmeansHybrid(const std::vector<geometry::Point> &centers);
 
-    entity_system::EntitySystem<Cluster> clusters_;
-    entity_system::Property<Cluster, geometry::Point> clusterCenters_;
-    entity_system::Property<Cluster, std::vector<geometry::Point>> clusterElements_;
+    std::vector<ClusterHybrid> clusters_;
 
     void cluster_registers(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
     void cluster_registers_parallel(const std::vector<geometry::Point> & flip_flops, unsigned iterations = 10);
@@ -45,4 +57,4 @@ public:
 
 }
 
-#endif // KMEANSDATAORIENTEDDESIGN_H
+#endif // KMEANSHYBRID_H

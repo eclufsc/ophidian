@@ -30,7 +30,6 @@ private:
     geometry::Point center_;
     std::vector<FlipFlop> elements_;
 public:
-    ClusterOOD() {};
     ClusterOOD(const geometry::Point &center);
 
     std::vector<FlipFlop> elements() const;
@@ -51,16 +50,14 @@ private:
     std::uniform_real_distribution<double> m_distribution_x;
     std::uniform_real_distribution<double> m_distribution_y;
 
-    std::vector<ClusterOOD> clusters_;
 
-    using rtree_node = std::pair<geometry::Point, ClusterOOD>;
+    using rtree_node = std::pair<geometry::Point, ClusterOOD*>;
     using rtree = boost::geometry::index::rtree<rtree_node, boost::geometry::index::rstar<16>>;
 public:
+    std::vector<ClusterOOD> clusters_;
+
     KmeansObjectOrientedDesign(geometry::Point chipOrigin, geometry::Point chipBondary, unsigned k = 50);
     KmeansObjectOrientedDesign(const std::vector<geometry::Point> &centers);
-
-    std::vector<ClusterOOD> clusters() const;
-    void setClusters(const std::vector<ClusterOOD> &clusters);
 
     void cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations = 10);
     void cluster_registers_with_rtree(std::vector<FlipFlop> &flip_flops, unsigned iterations = 10);

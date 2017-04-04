@@ -1,5 +1,5 @@
 #include "kmeans_object_oriented_design.h"
-#include <chrono>
+#include <boost/geometry/index/rtree.hpp>
 
 namespace ophidian {
 
@@ -62,7 +62,7 @@ void ClusterOOD::insertElement(const FlipFlop &element)
 
 void ClusterOOD::clear()
 {
-    elements().clear();
+    elements_.clear();
 }
 
 int ClusterOOD::size()
@@ -89,29 +89,16 @@ KmeansObjectOrientedDesign::KmeansObjectOrientedDesign(const std::vector<geometr
     }
 }
 
-std::vector<ClusterOOD> KmeansObjectOrientedDesign::clusters() const
-{
-    return clusters_;
-}
-
-void KmeansObjectOrientedDesign::setClusters(const std::vector<ClusterOOD> &clusters)
-{
-    clusters_ = clusters;
-}
-
 void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
-//    std::chrono::high_resolution_clock::time_point time_start, time_end;
-//    std::chrono::high_resolution_clock::duration d1, d2;
     for (int i = 0; i < iterations; ++i) {
 
-        for(auto & cluster : clusters()){
+        for(auto & cluster : clusters_){
             cluster.clear();
         }
 
 
 
-//        time_start = std::chrono::high_resolution_clock::now();
         for (auto & flip_flop : flip_flops) {
             ClusterOOD * cluster_best;
             double cost_best = std::numeric_limits<double>::max();
@@ -129,30 +116,51 @@ void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_f
             }
            cluster_best->insertElement(flip_flop);
         }
-//        time_end = std::chrono::high_resolution_clock::now();
-//        d1 += time_end - time_start;
 
-//        time_start = std::chrono::high_resolution_clock::now();
         for (ClusterOOD & cluster : clusters_) {
-            double x_c = 0, y_c = 0;
-            for(auto p : cluster.elements()){
-                x_c += p.position().x();
-                y_c += p.position().y();
+            if(cluster.elements().size() != 0){
+                double x_c = 0, y_c = 0;
+                for(auto p : cluster.elements()){
+                    x_c += p.position().x();
+                    y_c += p.position().y();
+                }
+                x_c = x_c / (double)cluster.elements().size();
+                y_c = y_c / (double)cluster.elements().size();
+                cluster.center(geometry::Point(x_c, y_c));
             }
-            x_c = x_c / (double)cluster.elements().size();
-            y_c = y_c / (double)cluster.elements().size();
-            cluster.center(geometry::Point(x_c, y_c));
         }
-//        time_end = std::chrono::high_resolution_clock::now();
-//        d2 += time_end - time_start;
     }
-//    std::cout<<"for 1: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d1).count()<<" ms."<<std::endl;
-//    std::cout<<"for 2: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d2).count()<<" ms."<<std::endl;
 }
 
 void KmeansObjectOrientedDesign::cluster_registers_with_rtree( std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
+    for (int i = 0; i < iterations; ++i) {
+        rtree clusters_rtree;
+        for (ClusterOOD & cluster : clusters_) {
+            clusters_rtree.insert(rtree_node(cluster.center(), &cluster));
+            cluster.clear();
+        }
 
+        for (FlipFlop & flip_flop : flip_flops) {
+            std::vector<rtree_node> closest_nodes;
+            clusters_rtree.query(boost::geometry::index::nearest(flip_flop.position(), 1), std::back_inserter(closest_nodes));
+            ClusterOOD * closest_cluster = closest_nodes.front().second;
+            closest_cluster->insertElement(flip_flop);
+        }
+
+        for (ClusterOOD & cluster : clusters_) {
+            if(cluster.elements().size() != 0){
+                double x_c = 0, y_c = 0;
+                for(FlipFlop p : cluster.elements()){
+                    x_c += p.position().x();
+                    y_c += p.position().y();
+                }
+                x_c = x_c / (double)cluster.elements().size();
+                y_c = y_c / (double)cluster.elements().size();
+                cluster.center(geometry::Point(x_c, y_c));
+            }
+        }
+    }
 }
 
 void KmeansObjectOrientedDesign::cluster_registers_paralel(std::vector<FlipFlop> &flip_flops, unsigned iterations)
@@ -193,21 +201,61 @@ void KmeansObjectOrientedDesign::cluster_registers_paralel(std::vector<FlipFlop>
 
 #pragma omp parallel for
         for (auto cluster = clusters_.begin(); cluster < clusters_.end(); ++cluster) {
-            double x_c = 0, y_c = 0;
-            for(auto p : cluster->elements()){
-                x_c += p.position().x();
-                y_c += p.position().y();
+            if(cluster->elements().size() != 0 ){
+                double x_c = 0, y_c = 0;
+                for(auto p : cluster->elements()){
+                    x_c += p.position().x();
+                    y_c += p.position().y();
+                }
+                x_c = x_c / (double)cluster->elements().size();
+                y_c = y_c / (double)cluster->elements().size();
+                cluster->center(geometry::Point(x_c, y_c));
             }
-            x_c = x_c / (double)cluster->elements().size();
-            y_c = y_c / (double)cluster->elements().size();
-            cluster->center(geometry::Point(x_c, y_c));
         }
     }
 }
 
 void KmeansObjectOrientedDesign::cluster_registers_with_rtree_paralel( std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
+    for (int i = 0; i < iterations; ++i) {
+        rtree clusters_rtree;
+        for (ClusterOOD & cluster : clusters_) {
+            clusters_rtree.insert(rtree_node(cluster.center(), &cluster));
+            cluster.clear();
+        }
 
+        std::vector<ClusterOOD*> flip_flop_to_cluster;
+        flip_flop_to_cluster.resize(flip_flops.size());
+#pragma omp parallel for
+        for (unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index) {
+            FlipFlop &flip_flop = flip_flops.at(flip_flop_index);
+            std::vector<rtree_node> closest_nodes;
+            clusters_rtree.query(boost::geometry::index::nearest(flip_flop.position(), 1), std::back_inserter(closest_nodes));
+            ClusterOOD * closest_cluster = closest_nodes.front().second;
+            flip_flop_to_cluster.at(flip_flop_index) = closest_cluster;
+//            closest_cluster->insertElement(flip_flop);
+        }
+
+        for(unsigned flip_flop_index = 0; flip_flop_index < flip_flops.size(); ++flip_flop_index){
+            auto flip_flop = flip_flops.at(flip_flop_index);
+            ClusterOOD * cluster = flip_flop_to_cluster.at(flip_flop_index);
+            cluster->insertElement(flip_flop);
+        }
+
+#pragma omp parallel for
+        for (auto cluster = clusters_.begin(); cluster < clusters_.end(); ++cluster) {
+            if(cluster->elements().size() != 0){
+                double x_c = 0, y_c = 0;
+                for(FlipFlop p : cluster->elements()){
+                    x_c += p.position().x();
+                    y_c += p.position().y();
+                }
+                x_c = x_c / (double)cluster->elements().size();
+                y_c = y_c / (double)cluster->elements().size();
+                cluster->center(geometry::Point(x_c, y_c));
+            }
+        }
+    }
 }
 
 
