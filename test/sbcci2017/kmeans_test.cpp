@@ -1,5 +1,6 @@
 #include "../catch.hpp"
 #include "kmeans_data_oriented_design.h"
+#include "kmeansdataorienteddesign2.h"
 #include "kmeans_object_oriented_design.h"
 #include "metrics.h"
 #include "../../ophidian/parser/Def.h"
@@ -322,10 +323,16 @@ TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[kmeans][DOD][sequential][d
 
         std::vector<ophidian::geometry::Point> flip_flop_positions;
 
+        ophidian::entity_system::EntitySystem<ophidian::FlipFlopDOD> flip_flops;
+        ophidian::entity_system::Property<ophidian::FlipFlopDOD, ophidian::geometry::Point> flip_flop_points(flip_flops);
+
         std::string ff ("DFF_X80");
         for(ophidian::parser::Def::component component : def->components()){
             if(ff.compare(component.macro) == 0){
                 flip_flop_positions.push_back(ophidian::geometry::Point(component.position.x, component.position.y));
+
+                auto flip_flop = flip_flops.add();
+                flip_flop_points[flip_flop] = ophidian::geometry::Point(component.position.x, component.position.y);
             }
         }
 
@@ -334,7 +341,8 @@ TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[kmeans][DOD][sequential][d
         ophidian::geometry::Point chipBondary((double)die.upper.x, (double)die.upper.y);
 
 
-        ophidian::KmeansDataOrientedDesign kmeansDOD (chipOrigin, chipBondary, (int)(flip_flop_positions.size()/50) );
+//        ophidian::KmeansDataOrientedDesign kmeansDOD (chipOrigin, chipBondary, (int)(flip_flop_positions.size()/50) );
+        ophidian::KmeansDataOrientedDesign2 kmeansDOD (flip_flops, chipOrigin, chipBondary, (int)(flip_flop_positions.size()/50) );
 
         std::cout<<circuit_name<<" ";
         std::unique_ptr<Runtime> runtime = std::unique_ptr<Runtime>(new Runtime());
@@ -342,7 +350,8 @@ TEST_CASE("kmeans/ run DOD sequential in ICCAD2015","[kmeans][DOD][sequential][d
         std::unique_ptr<Miss> miss = std::unique_ptr<Miss>(new Miss(PAPI_events, 3));
         runtime->start();
         miss->start();
-        kmeansDOD.cluster_registers(flip_flop_positions, 10);
+//        kmeansDOD.cluster_registers(flip_flop_positions, 10);
+        kmeansDOD.cluster_registers_with_rtree(flip_flops, flip_flop_points, 10);
         miss->end();
         runtime->end();
         runtime->print_result();

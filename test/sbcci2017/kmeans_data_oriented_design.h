@@ -6,6 +6,7 @@
 #include "ophidian/entity_system/EntitySystem.h"
 #include "ophidian/entity_system/Property.h"
 #include "ophidian/geometry/Models.h"
+#include "ophidian/entity_system/Aggregation.h"
 
 namespace ophidian {
 

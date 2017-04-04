@@ -1,4 +1,5 @@
 #include "kmeans_object_oriented_design.h"
+#include <chrono>
 
 namespace ophidian {
 
@@ -100,12 +101,17 @@ void KmeansObjectOrientedDesign::setClusters(const std::vector<ClusterOOD> &clus
 
 void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_flops, unsigned iterations)
 {
+//    std::chrono::high_resolution_clock::time_point time_start, time_end;
+//    std::chrono::high_resolution_clock::duration d1, d2;
     for (int i = 0; i < iterations; ++i) {
 
         for(auto & cluster : clusters()){
             cluster.clear();
         }
 
+
+
+//        time_start = std::chrono::high_resolution_clock::now();
         for (auto & flip_flop : flip_flops) {
             ClusterOOD * cluster_best;
             double cost_best = std::numeric_limits<double>::max();
@@ -121,10 +127,12 @@ void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_f
                     cluster_best = &cluster;
                 }
             }
-           flip_flop.setClusterBest(cluster_best);
            cluster_best->insertElement(flip_flop);
         }
+//        time_end = std::chrono::high_resolution_clock::now();
+//        d1 += time_end - time_start;
 
+//        time_start = std::chrono::high_resolution_clock::now();
         for (ClusterOOD & cluster : clusters_) {
             double x_c = 0, y_c = 0;
             for(auto p : cluster.elements()){
@@ -135,7 +143,11 @@ void KmeansObjectOrientedDesign::cluster_registers(std::vector<FlipFlop> &flip_f
             y_c = y_c / (double)cluster.elements().size();
             cluster.center(geometry::Point(x_c, y_c));
         }
+//        time_end = std::chrono::high_resolution_clock::now();
+//        d2 += time_end - time_start;
     }
+//    std::cout<<"for 1: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d1).count()<<" ms."<<std::endl;
+//    std::cout<<"for 2: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d2).count()<<" ms."<<std::endl;
 }
 
 void KmeansObjectOrientedDesign::cluster_registers_with_rtree( std::vector<FlipFlop> &flip_flops, unsigned iterations)

@@ -1,11 +1,13 @@
 #include "kmeans_data_oriented_design.h"
 #include <boost/geometry/index/rtree.hpp>
+#include <chrono>
 
 namespace ophidian {
 
 KmeansDataOrientedDesign::KmeansDataOrientedDesign(geometry::Point chipOrigin, geometry::Point chipBondary, unsigned k) :
     clusterCenters_(clusters_), clusterElements_(clusters_), m_distribution_x(chipOrigin.x(),chipBondary.x()), m_distribution_y(chipOrigin.y(),chipBondary.y())
 {
+    clusters_.reserve(k);
     for (int i = 0; i < k; ++i) {
         auto cluster = clusters_.add();
         clusterCenters_[cluster] = geometry::Point(m_distribution_x(m_generator), m_distribution_y(m_generator));
@@ -25,12 +27,15 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(const std::vector<geometry::P
 
 void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
 {
+    std::chrono::high_resolution_clock::time_point time_start, time_end;
+    std::chrono::high_resolution_clock::duration d1, d2;
     for (int i = 0; i < iterations; ++i) {
 
         for (auto & elements_to_cluster : clusterElements_) {
             elements_to_cluster.clear();
         }
 
+        time_start = std::chrono::high_resolution_clock::now();
         for (auto & flip_flop : flip_flops) {
             Cluster cluster_best;
             double cost_best = std::numeric_limits<double>::max();
@@ -48,7 +53,10 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
             }
             clusterElements_[cluster_best].push_back(flip_flop);
         }
+        time_end = std::chrono::high_resolution_clock::now();
+        d1 += time_end - time_start;
 
+        time_start = std::chrono::high_resolution_clock::now();
         for (auto & cluster : clusters_) {
             double x_c = 0, y_c = 0;
             for(auto p : clusterElements_[cluster]){
@@ -59,7 +67,11 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
             y_c = y_c / (double)clusterElements_[cluster].size();
             clusterCenters_[cluster] = geometry::Point(x_c, y_c);
         }
+        time_end = std::chrono::high_resolution_clock::now();
+        d2 += time_end - time_start;
     }
+    std::cout<<"for 1: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d1).count()<<" ms."<<std::endl;
+    std::cout<<"for 2: "<<std::chrono::duration_cast<std::chrono::milliseconds>(d2).count()<<" ms."<<std::endl;
 }
 
 void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geometry::Point> &flip_flops, unsigned iterations)
