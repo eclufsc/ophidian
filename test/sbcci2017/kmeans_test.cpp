@@ -504,3 +504,173 @@ TEST_CASE("kmeans/ initialize clusters by vector (Hybrid) using rtree","[test][k
 }
 
 
+TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][kmeans][correctness]") {
+    std::vector<std::string> circuits = {
+        "superblue18",
+//        "superblue4",
+//        "superblue16",
+//        "superblue5",
+//        "superblue1",
+//        "superblue3",
+//        "superblue10",
+//        "superblue7"
+    };
+
+    for(auto circuit_name : circuits){
+        ophidian::parser::DefParser reader;
+        std::shared_ptr<ophidian::parser::Def> def = reader.readFile("./benchmarks/"+circuit_name+"/"+circuit_name+".def");
+
+        std::vector<ophidian::geometry::Point> flip_flop_positions;
+
+        std::string ff ("DFF_X80");
+        for(ophidian::parser::Def::component component : def->components()){
+            if(ff.compare(component.macro) == 0){
+                flip_flop_positions.push_back(ophidian::geometry::Point(component.position.x, component.position.y));
+            }
+        }
+
+        auto die = (*def).die();
+        ophidian::geometry::Point chipOrigin((double)die.lower.x, (double)die.lower.y);
+        ophidian::geometry::Point chipBondary((double)die.upper.x, (double)die.upper.y);
+
+        int number_of_clusters = (int)(flip_flop_positions.size()/50);
+        std::vector<ophidian::geometry::Point> initial_centers;
+        initial_centers.reserve(number_of_clusters);
+
+        std::default_random_engine m_generator;
+        std::uniform_real_distribution<double> m_distribution_x(chipOrigin.x(),chipBondary.x());
+        std::uniform_real_distribution<double> m_distribution_y(chipOrigin.y(),chipBondary.y());
+        for (int i = 0; i < number_of_clusters; ++i) {
+            initial_centers.push_back(ophidian::geometry::Point(m_distribution_x(m_generator), m_distribution_y(m_generator)));
+        }
+
+
+        //DOD Sequential
+        ophidian::KmeansDataOrientedDesign kmeansDOD (initial_centers);
+        kmeansDOD.cluster_registers(flip_flop_positions, 10);
+
+        //DOD Parallel
+        ophidian::KmeansDataOrientedDesign kmeansDOD_parallel (initial_centers);
+        kmeansDOD_parallel.cluster_registers(flip_flop_positions, 10);
+
+        REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_parallel.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_parallel.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_parallel.clusterElements_.begin(), cluster_comparison));
+
+        //DOD Sequential Rtree
+        ophidian::KmeansDataOrientedDesign kmeansDOD_sequential_rtree (initial_centers);
+        kmeansDOD_sequential_rtree.cluster_registers(flip_flop_positions, 10);
+
+        REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_sequential_rtree.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_sequential_rtree.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_sequential_rtree.clusterElements_.begin(), cluster_comparison));
+
+        //DOD Parallel Rtree
+        ophidian::KmeansDataOrientedDesign kmeansDOD_parallel_rtree (initial_centers);
+        kmeansDOD_parallel_rtree.cluster_registers(flip_flop_positions, 10);
+
+        REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_parallel_rtree.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_parallel_rtree.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_parallel_rtree.clusterElements_.begin(), cluster_comparison));
+
+        //OOD Sequential
+        std::vector<ophidian::FlipFlop> flip_flops;
+        flip_flops.reserve(flip_flop_positions.size());
+        for(auto p : flip_flop_positions){
+            flip_flops.push_back(ophidian::FlipFlop(p));
+        }
+
+        ophidian::KmeansObjectOrientedDesign kmeansOOD (initial_centers);
+        kmeansOOD.cluster_registers(flip_flops, 10);
+
+        std::vector<ophidian::geometry::Point> cluster_centers_OOD;
+        cluster_centers_OOD.reserve(kmeansOOD.clusters_.size());
+
+        std::vector<std::vector<ophidian::geometry::Point>> cluster_elements_OOD;
+        cluster_elements_OOD.reserve(kmeansOOD.clusters_.size());
+
+        for(ophidian::ClusterOOD cluster : kmeansOOD.clusters_){
+            cluster_centers_OOD.push_back(cluster.center());
+
+            std::vector<ophidian::geometry::Point> elements_positions;
+            elements_positions.reserve(cluster.elements().size());
+            for(ophidian::FlipFlop ff : cluster.elements()){
+                elements_positions.push_back(ff.position());
+            }
+            cluster_elements_OOD.push_back(elements_positions);
+        }
+        REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
+
+        //OOD Parallel
+        ophidian::KmeansObjectOrientedDesign kmeansOOD_parallel (initial_centers);
+        kmeansOOD_parallel.cluster_registers_paralel(flip_flops, 10);
+        cluster_centers_OOD.clear();
+        cluster_centers_OOD.reserve(kmeansOOD_parallel.clusters_.size());
+
+        cluster_elements_OOD.clear();
+        cluster_elements_OOD.reserve(kmeansOOD_parallel.clusters_.size());
+
+        for(ophidian::ClusterOOD cluster : kmeansOOD_parallel.clusters_){
+            cluster_centers_OOD.push_back(cluster.center());
+
+            std::vector<ophidian::geometry::Point> elements_positions;
+            elements_positions.reserve(cluster.elements().size());
+            for(ophidian::FlipFlop ff : cluster.elements()){
+                elements_positions.push_back(ff.position());
+            }
+            cluster_elements_OOD.push_back(elements_positions);
+        }
+        REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
+
+        //OOD Sequential Rtree
+        ophidian::KmeansObjectOrientedDesign kmeansOOD_sequential_rtree (initial_centers);
+        kmeansOOD_sequential_rtree.cluster_registers_with_rtree(flip_flops, 10);
+        cluster_centers_OOD.clear();
+        cluster_centers_OOD.reserve(kmeansOOD_sequential_rtree.clusters_.size());
+
+        cluster_elements_OOD.clear();
+        cluster_elements_OOD.reserve(kmeansOOD_sequential_rtree.clusters_.size());
+
+        for(ophidian::ClusterOOD cluster : kmeansOOD_sequential_rtree.clusters_){
+            cluster_centers_OOD.push_back(cluster.center());
+
+            std::vector<ophidian::geometry::Point> elements_positions;
+            elements_positions.reserve(cluster.elements().size());
+            for(ophidian::FlipFlop ff : cluster.elements()){
+                elements_positions.push_back(ff.position());
+            }
+            cluster_elements_OOD.push_back(elements_positions);
+        }
+        REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
+
+        //OOD Parallel Rtree
+        ophidian::KmeansObjectOrientedDesign kmeansOOD_parallel_rtree (initial_centers);
+        kmeansOOD_parallel_rtree.cluster_registers_with_rtree_paralel(flip_flops, 10);
+        cluster_centers_OOD.clear();
+        cluster_centers_OOD.reserve(kmeansOOD_parallel_rtree.clusters_.size());
+
+        cluster_elements_OOD.clear();
+        cluster_elements_OOD.reserve(kmeansOOD_parallel_rtree.clusters_.size());
+
+        for(ophidian::ClusterOOD cluster : kmeansOOD_parallel_rtree.clusters_){
+            cluster_centers_OOD.push_back(cluster.center());
+
+            std::vector<ophidian::geometry::Point> elements_positions;
+            elements_positions.reserve(cluster.elements().size());
+            for(ophidian::FlipFlop ff : cluster.elements()){
+                elements_positions.push_back(ff.position());
+            }
+            cluster_elements_OOD.push_back(elements_positions);
+        }
+        REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
+        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
+    }
+}
+
