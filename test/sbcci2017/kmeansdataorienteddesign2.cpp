@@ -1,6 +1,5 @@
 #include "kmeansdataorienteddesign2.h"
 #include <boost/geometry/index/rtree.hpp>
-#include <chrono>
 
 namespace ophidian {
 

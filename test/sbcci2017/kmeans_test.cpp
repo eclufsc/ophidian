@@ -5,7 +5,6 @@
 #include "metrics.h"
 #include "../../ophidian/parser/Def.h"
 
-#include <chrono>
 #include <memory>
 
 bool point_comparison(const ophidian::geometry::Point & point1, const ophidian::geometry::Point & point2){
