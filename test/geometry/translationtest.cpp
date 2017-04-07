@@ -12,7 +12,7 @@ TEST_CASE("Geometry: translating a Point", "[geometry][operations]") {
     PointFixture pointFixture;
 
     Point translatedPoint;
-    translate(pointFixture.point, translationPoint, translatedPoint);
+    translate(pointFixture.point, translationPoint.x(), translationPoint.y(), translatedPoint);
 
     REQUIRE(translatedPoint.x() == pointFixture.x + translationPoint.x());
     REQUIRE(translatedPoint.y() == pointFixture.y + translationPoint.y());
@@ -24,7 +24,7 @@ TEST_CASE("Geometry: translating a Segment", "[geometry][operations]") {
     SegmentFixture segmentFixture;
 
     Segment translatedSegment;
-    translate(segmentFixture.segment, translationPoint, translatedSegment);
+    translate(segmentFixture.segment, translationPoint.x(), translationPoint.y(), translatedSegment);
 
     REQUIRE(translatedSegment.first.x() == segmentFixture.x1 + translationPoint.x());
     REQUIRE(translatedSegment.first.y() == segmentFixture.y1 + translationPoint.y());
@@ -38,7 +38,7 @@ TEST_CASE("Geometry: translating a Linestring", "[geometry][operations]") {
     LinestringFixture linestringFixture;
 
     Linestring translatedLinestring;
-    translate(linestringFixture.linestring, translationPoint, translatedLinestring);
+    translate(linestringFixture.linestring, translationPoint.x(), translationPoint.y(), translatedLinestring);
 
     std::vector<Point> linestringPoints(translatedLinestring.begin(), translatedLinestring.end());
     REQUIRE(linestringPoints.size() == 3);
@@ -56,7 +56,7 @@ TEST_CASE("Geometry: translating a Box", "[geometry][operations]") {
     BoxFixture boxFixture;
 
     Box translatedBox;
-    translate(boxFixture.box, translationPoint, translatedBox);
+    translate(boxFixture.box, translationPoint.x(), translationPoint.y(), translatedBox);
 
     REQUIRE(translatedBox.min_corner().x() == boxFixture.xMin + translationPoint.x());
     REQUIRE(translatedBox.min_corner().y() == boxFixture.yMin + translationPoint.y());
@@ -70,7 +70,7 @@ TEST_CASE("Geometry: translating a Polygon", "[geometry][operations]") {
     PolygonFixture polygonFixture;
 
     Polygon translatedPolygon;
-    translate(polygonFixture.polygon, translationPoint, translatedPolygon);
+    translate(polygonFixture.polygon, translationPoint.x(), translationPoint.y(), translatedPolygon);
 
     std::vector<Point> polygonPoints(translatedPolygon.outer().begin(), translatedPolygon.outer().end());
     REQUIRE(polygonPoints.size() == 5);
@@ -92,7 +92,7 @@ TEST_CASE("Geometry: translating a MultiPolygon", "[geometry][operations]") {
     MultiPolygonFixture multiPolygonFixture;
 
     MultiPolygon translatedMultiPolygon;
-    translate(multiPolygonFixture.multiPolygon, translationPoint, translatedMultiPolygon);
+    translate(multiPolygonFixture.multiPolygon, translationPoint.x(), translationPoint.y(), translatedMultiPolygon);
 
     std::vector<Point> polygon1Points(translatedMultiPolygon.at(0).outer().begin(), translatedMultiPolygon.at(0).outer().end());
     REQUIRE(polygon1Points.size() == 5);

@@ -26,6 +26,7 @@ under the License.
 #include <boost/geometry.hpp>
 
 #include <ophidian/geometry/Models.h>
+#include <ophidian/geometry/Operations.h>
 
 namespace ophidian {
 namespace util {
@@ -177,6 +178,17 @@ public:
 
     bool operator!=(const MultiBox & other) const {
         return !(*this==other);
+    }
+
+    MultiBox translate(double xTranslation, double yTranslation) {
+        std::vector<geometry::Box> translatedBoxes;
+        translatedBoxes.reserve(boxes_.size());
+        for (auto box : boxes_) {
+            geometry::Box translatedBox;
+            geometry::translate(box, xTranslation, yTranslation, translatedBox);
+            translatedBoxes.push_back(translatedBox);
+        }
+        return MultiBox(translatedBoxes);
     }
 
 private:

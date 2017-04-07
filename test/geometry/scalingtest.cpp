@@ -12,7 +12,7 @@ TEST_CASE("Geometry: scaling a Point", "[geometry][operations]") {
     PointFixture pointFixture;
 
     Point scaledPoint;
-    scale(pointFixture.point, scalingPoint, scaledPoint);
+    scale(pointFixture.point, scalingPoint.x(), scalingPoint.y(), scaledPoint);
 
     REQUIRE(scaledPoint.x() == pointFixture.x * scalingPoint.x());
     REQUIRE(scaledPoint.y() == pointFixture.y * scalingPoint.y());
@@ -24,7 +24,7 @@ TEST_CASE("Geometry: scaling a Segment", "[geometry][operations]") {
     SegmentFixture segmentFixture;
 
     Segment scaledSegment;
-    scale(segmentFixture.segment, scalingPoint, scaledSegment);
+    scale(segmentFixture.segment, scalingPoint.x(), scalingPoint.y(), scaledSegment);
 
     REQUIRE(scaledSegment.first.x() == segmentFixture.x1 * scalingPoint.x());
     REQUIRE(scaledSegment.first.y() == segmentFixture.y1 * scalingPoint.y());
@@ -38,7 +38,7 @@ TEST_CASE("Geometry: scaling a Linestring", "[geometry][operations]") {
     LinestringFixture linestringFixture;
 
     Linestring scaledLinestring;
-    scale(linestringFixture.linestring, scalingPoint, scaledLinestring);
+    scale(linestringFixture.linestring, scalingPoint.x(), scalingPoint.y(), scaledLinestring);
 
     std::vector<Point> linestringPoints(scaledLinestring.begin(), scaledLinestring.end());
     REQUIRE(linestringPoints.size() == 3);
@@ -56,7 +56,7 @@ TEST_CASE("Geometry: scaling a Box", "[geometry][operations]") {
     BoxFixture boxFixture;
 
     Box scaledBox;
-    scale(boxFixture.box, scalingPoint, scaledBox);
+    scale(boxFixture.box, scalingPoint.x(), scalingPoint.y(), scaledBox);
 
     REQUIRE(scaledBox.min_corner().x() == boxFixture.xMin * scalingPoint.x());
     REQUIRE(scaledBox.min_corner().y() == boxFixture.yMin * scalingPoint.y());
@@ -70,7 +70,7 @@ TEST_CASE("Geometry: scaling a Polygon", "[geometry][operations]") {
     PolygonFixture polygonFixture;
 
     Polygon scaledPolygon;
-    scale(polygonFixture.polygon, scalingPoint, scaledPolygon);
+    scale(polygonFixture.polygon, scalingPoint.x(), scalingPoint.y(), scaledPolygon);
 
     std::vector<Point> polygonPoints(scaledPolygon.outer().begin(), scaledPolygon.outer().end());
     REQUIRE(polygonPoints.size() == 5);
@@ -92,7 +92,7 @@ TEST_CASE("Geometry: scaling a MultiPolygon", "[geometry][operations]") {
     MultiPolygonFixture multiPolygonFixture;
 
     MultiPolygon scaledMultiPolygon;
-    scale(multiPolygonFixture.multiPolygon, scalingPoint, scaledMultiPolygon);
+    scale(multiPolygonFixture.multiPolygon, scalingPoint.x(), scalingPoint.y(), scaledMultiPolygon);
 
     std::vector<Point> polygon1Points(scaledMultiPolygon.at(0).outer().begin(), scaledMultiPolygon.at(0).outer().end());
     REQUIRE(polygon1Points.size() == 5);
