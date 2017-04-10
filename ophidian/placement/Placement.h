@@ -49,7 +49,7 @@ public:
        \param cell Cell to be placed
        \param location Location of the lower left corner of the cell.
      */
-    void placeCell(const circuit::Cell & cell, const util::Location & location);
+    void placeCell(const circuit::Cell & cell, const util::Location & cellLocation);
 
     //! Location getter
     /*!
@@ -57,12 +57,24 @@ public:
        \param cell Cell entity to get the location.
        \return Location of the cell.
      */
-    util::Location location(const circuit::Cell & cell) const {
-        return locations_[cell];
+    util::Location cellLocation(const circuit::Cell & cell) const {
+        return cellLocations_[cell];
     }
 
+    void placeInputPad(const circuit::Input & input, const util::Location & location);
+
+    util::Location inputPadLocation(const circuit::Input & input) const;
+
+    void placeOutputPad(const circuit::Output & output, const util::Location & location);
+
+    util::Location outputPadLocation(const circuit::Output & output) const;
+
+
+
 private:
-    entity_system::Property<circuit::Cell, util::Location> locations_;
+    entity_system::Property<circuit::Cell, util::Location> cellLocations_;
+    entity_system::Property<circuit::Input, util::Location> inputLocations_;
+    entity_system::Property<circuit::Output, util::Location> outputLocations_;
 };
 
 } //namespace placement
