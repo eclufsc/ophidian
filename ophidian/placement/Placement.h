@@ -33,7 +33,8 @@ class Placement
 public:
 	//! Placement Constructor
 	/*!
-	   \brief Constructs a placement system with no properties
+       \brief Constructs a placement system with no properties.
+       \param netlist Circuit netlist.
 	 */
     Placement(const circuit::Netlist & netlist);
 
