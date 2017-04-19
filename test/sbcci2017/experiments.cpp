@@ -1,7 +1,6 @@
 #include "../catch.hpp"
 #include "kmeans_data_oriented_design.h"
 #include "kmeans_object_oriented_design.h"
-#include "kmeans_hybrid.h"
 #include "metrics.h"
 #include "../../ophidian/parser/Def.h"
 
