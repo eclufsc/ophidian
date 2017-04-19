@@ -9,7 +9,8 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(geometry::Point chipOrigin, g
     clusters_.reserve(k);
     for (int i = 0; i < k; ++i) {
         auto cluster = clusters_.add();
-        clusterCenters_[cluster] = geometry::Point(m_distribution_x(m_generator), m_distribution_y(m_generator));
+        clusterCenters_[cluster].first = geometry::Point(m_distribution_x(m_generator), m_distribution_y(m_generator));
+        clusterCenters_[cluster].second = cluster;
     }
 }
 
@@ -18,7 +19,8 @@ KmeansDataOrientedDesign::KmeansDataOrientedDesign(const std::vector<geometry::P
 {
     for(auto p : centers){
         auto cluster = clusters_.add();
-        clusterCenters_[cluster] = p;
+        clusterCenters_[cluster].first = p;
+        clusterCenters_[cluster].second = cluster;
     }
 
 }
@@ -28,15 +30,15 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
 {
     for (int i = 0; i < iterations; ++i) {
 
-        for (auto & elements_to_cluster : clusterElements_) {
-            elements_to_cluster.clear();
+        for (auto & cluster : clusters_) {
+            clusterElements_[cluster].clear();
         }
 
         for (auto & flip_flop : flip_flops) {
             Cluster cluster_best;
             double cost_best = std::numeric_limits<double>::max();
-            for (auto & cluster : clusters_) {
-                geometry::Point center = clusterCenters_[cluster];
+            for (auto & cluster_center : clusterCenters_) {
+                geometry::Point center = cluster_center.first;
 
                 double distanceX = (flip_flop.x() - center.x()) * (flip_flop.x() - center.x());
                 double distanceY = (flip_flop.y() - center.y()) * (flip_flop.y() - center.y());
@@ -44,13 +46,14 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
 
                 if(cost < cost_best){
                     cost_best = cost;
-                    cluster_best = cluster;
+                    cluster_best = cluster_center.second;
                 }
             }
             clusterElements_[cluster_best].push_back(flip_flop);
         }
 
-        for (auto & cluster : clusters_) {
+        for (auto & cluster_center : clusterCenters_) {
+            auto cluster = cluster_center.second;
             if(clusterElements_[cluster].size() != 0){
                 double x_c = 0, y_c = 0;
                 for(auto p : clusterElements_[cluster]){
@@ -59,7 +62,7 @@ void KmeansDataOrientedDesign::cluster_registers(const std::vector<geometry::Poi
                 }
                 x_c = x_c / (double)clusterElements_[cluster].size();
                 y_c = y_c / (double)clusterElements_[cluster].size();
-                clusterCenters_[cluster] = geometry::Point(x_c, y_c);
+                cluster_center.first = geometry::Point(x_c, y_c);
             }
         }
     }
@@ -82,8 +85,8 @@ void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geom
 
             Cluster cluster_best;
             double cost_best = std::numeric_limits<double>::max();
-            for (auto & cluster : clusters_) {
-                geometry::Point center = clusterCenters_[cluster];
+            for (auto & cluster_center : clusterCenters_) {
+                geometry::Point center = cluster_center.first;
 
                 double distanceX = (flip_flop.x() - center.x()) * (flip_flop.x() - center.x());
                 double distanceY = (flip_flop.y() - center.y()) * (flip_flop.y() - center.y());
@@ -91,7 +94,7 @@ void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geom
 
                 if(cost < cost_best){
                     cost_best = cost;
-                    cluster_best = cluster;
+                    cluster_best = cluster_center.second;
                 }
             }
             flip_flop_to_cluster.at(flip_flop_index) = cluster_best;
@@ -113,7 +116,7 @@ void KmeansDataOrientedDesign::cluster_registers_parallel(const std::vector<geom
                 }
                 x_c = x_c / (double)clusterElements_[*cluster].size();
                 y_c = y_c / (double)clusterElements_[*cluster].size();
-                clusterCenters_[*cluster] = geometry::Point(x_c, y_c);
+                clusterCenters_[*cluster].first = geometry::Point(x_c, y_c);
             }
         }
     }
@@ -124,7 +127,7 @@ void KmeansDataOrientedDesign::cluster_registers_with_rtree(const std::vector<ge
     for (int i = 0; i < iterations; ++i) {
         rtree clusters_rtree;
         for (auto & cluster : clusters_) {
-            clusters_rtree.insert(rtree_node(clusterCenters_[cluster], cluster));
+            clusters_rtree.insert(rtree_node(clusterCenters_[cluster].first, cluster));
             clusterElements_[cluster].clear();
         }
 
@@ -143,7 +146,7 @@ void KmeansDataOrientedDesign::cluster_registers_with_rtree(const std::vector<ge
                 }
                 x_c = x_c / (double)clusterElements_[cluster].size();
                 y_c = y_c / (double)clusterElements_[cluster].size();
-                clusterCenters_[cluster] = geometry::Point(x_c, y_c);
+                clusterCenters_[cluster].first = geometry::Point(x_c, y_c);
             }
         }
     }
@@ -154,7 +157,7 @@ void KmeansDataOrientedDesign::cluster_registers_with_rtree_parallel(const std::
     for (int i = 0; i < iterations; ++i) {
         rtree clusters_rtree;
         for (auto & cluster : clusters_) {
-            clusters_rtree.insert(rtree_node(clusterCenters_[cluster], cluster));
+            clusters_rtree.insert(rtree_node(clusterCenters_[cluster].first, cluster));
             clusterElements_[cluster].clear();
         }
 
@@ -185,7 +188,7 @@ void KmeansDataOrientedDesign::cluster_registers_with_rtree_parallel(const std::
                 }
                 x_c = x_c / (double)clusterElements_[*cluster].size();
                 y_c = y_c / (double)clusterElements_[*cluster].size();
-                clusterCenters_[*cluster] = geometry::Point(x_c, y_c);
+                clusterCenters_[*cluster].first = geometry::Point(x_c, y_c);
             }
         }
     }

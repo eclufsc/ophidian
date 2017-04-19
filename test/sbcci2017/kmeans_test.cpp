@@ -27,10 +27,11 @@ TEST_CASE("kmeans/ initialize random clusters","[test][kmeans]") {
     REQUIRE(kmeansDOD.clusterCenters_.size() == 25);
 
     for(auto p : kmeansDOD.clusterCenters_){
-        REQUIRE(p.x() >= chipOrigin.x());
-        REQUIRE(p.y() >= chipOrigin.y());
-        REQUIRE(p.x() <= chipBondary.x());
-        REQUIRE(p.y() <= chipBondary.y());
+        auto cluster_center = p.first;
+        REQUIRE(cluster_center.x() >= chipOrigin.x());
+        REQUIRE(cluster_center.y() >= chipOrigin.y());
+        REQUIRE(cluster_center.x() <= chipBondary.x());
+        REQUIRE(cluster_center.y() <= chipBondary.y());
     }
 }
 
@@ -89,10 +90,10 @@ TEST_CASE("kmeans/ initialize clusters by vector (DOD-sequential)","[test][kmean
         {8, 8}
    };
    std::vector<ophidian::geometry::Point> expected_centers = {
-        {1.75, 1.75},
-        {8, 1.75},
-        {1.75, 7.75},
-        {7.25, 7.75}
+       {1.75, 1.75},
+       {8, 1.75},
+       {1.75, 7.75},
+       {7.25, 7.75}
    };
    std::vector<std::vector<ophidian::geometry::Point>> expected_clusters = {
         {{1, 1}, {3, 2}, {2, 1}, {1, 3}},
@@ -107,7 +108,13 @@ TEST_CASE("kmeans/ initialize clusters by vector (DOD-sequential)","[test][kmean
    kmeansDOD.cluster_registers(flip_flop_positions, 1);
 
    REQUIRE(kmeansDOD.clusterCenters_.size() == expected_centers.size());
-   REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), expected_centers.begin(), point_comparison));
+
+   std::vector<ophidian::geometry::Point> clusters_centers;
+   clusters_centers.reserve(kmeansDOD.clusterCenters_.size());
+   for(auto center_point : kmeansDOD.clusterCenters_)
+       clusters_centers.push_back(center_point.first);
+
+   REQUIRE(std::is_permutation(clusters_centers.begin(), clusters_centers.end(), expected_centers.begin(), point_comparison));
 
    REQUIRE(kmeansDOD.clusterElements_.size() == expected_clusters.size());
    REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), expected_clusters.begin(), cluster_comparison));
@@ -140,10 +147,10 @@ TEST_CASE("kmeans/ initialize clusters by vector (DOD-parallel)","[test][kmeans]
         {8, 8}
    };
    std::vector<ophidian::geometry::Point> expected_centers = {
-        {1.75, 1.75},
-        {8, 1.75},
-        {1.75, 7.75},
-        {7.25, 7.75}
+       {1.75, 1.75},
+       {8, 1.75},
+       {1.75, 7.75},
+       {7.25, 7.75}
    };
    std::vector<std::vector<ophidian::geometry::Point>> expected_clusters = {
         {{1, 1}, {3, 2}, {2, 1}, {1, 3}},
@@ -158,11 +165,15 @@ TEST_CASE("kmeans/ initialize clusters by vector (DOD-parallel)","[test][kmeans]
    kmeansDOD.cluster_registers_parallel(flip_flop_positions, 1);
 
    REQUIRE(kmeansDOD.clusterCenters_.size() == expected_centers.size());
-   REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), expected_centers.begin(), point_comparison));
+
+   std::vector<ophidian::geometry::Point> clusters_centers;
+   clusters_centers.reserve(kmeansDOD.clusterCenters_.size());
+   for(auto center_point : kmeansDOD.clusterCenters_)
+       clusters_centers.push_back(center_point.first);
+   REQUIRE(std::is_permutation(clusters_centers.begin(), clusters_centers.end(), expected_centers.begin(), point_comparison));
 
    REQUIRE(kmeansDOD.clusterElements_.size() == expected_clusters.size());
    REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), expected_clusters.begin(), cluster_comparison));
-
 }
 
 TEST_CASE("kmeans/ initialize clusters by vector (OOD-sequential)","[test][kmeans]") {
@@ -548,28 +559,49 @@ TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][k
         ophidian::KmeansDataOrientedDesign kmeansDOD (initial_centers);
         kmeansDOD.cluster_registers(flip_flop_positions, 10);
 
+        std::vector<ophidian::geometry::Point> kmeansDODSequential_centers;
+        kmeansDODSequential_centers.reserve(kmeansDOD.clusterCenters_.size());
+        for(auto center_point : kmeansDOD.clusterCenters_)
+            kmeansDODSequential_centers.push_back(center_point.first);
+
         //DOD Parallel
         ophidian::KmeansDataOrientedDesign kmeansDOD_parallel (initial_centers);
         kmeansDOD_parallel.cluster_registers(flip_flop_positions, 10);
 
+
+        std::vector<ophidian::geometry::Point> kmeansDODParallel_centers;
+        kmeansDODParallel_centers.reserve(kmeansDOD_parallel.clusterCenters_.size());
+        for(auto center_point : kmeansDOD_parallel.clusterCenters_)
+            kmeansDODParallel_centers.push_back(center_point.first);
+
         REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_parallel.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_parallel.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODSequential_centers.begin(), kmeansDODSequential_centers.end(), kmeansDODParallel_centers.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_parallel.clusterElements_.begin(), cluster_comparison));
 
         //DOD Sequential Rtree
         ophidian::KmeansDataOrientedDesign kmeansDOD_sequential_rtree (initial_centers);
         kmeansDOD_sequential_rtree.cluster_registers(flip_flop_positions, 10);
 
+        std::vector<ophidian::geometry::Point> kmeansDODSequential_rtree_centers;
+        kmeansDODSequential_rtree_centers.reserve(kmeansDOD_sequential_rtree.clusterCenters_.size());
+        for(auto center_point : kmeansDOD_sequential_rtree.clusterCenters_)
+            kmeansDODSequential_rtree_centers.push_back(center_point.first);
+
         REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_sequential_rtree.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_sequential_rtree.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODSequential_rtree_centers.begin(), kmeansDODSequential_rtree_centers.end(), kmeansDODSequential_centers.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_sequential_rtree.clusterElements_.begin(), cluster_comparison));
 
         //DOD Parallel Rtree
         ophidian::KmeansDataOrientedDesign kmeansDOD_parallel_rtree (initial_centers);
         kmeansDOD_parallel_rtree.cluster_registers(flip_flop_positions, 10);
 
+        std::vector<ophidian::geometry::Point> kmeansDODParallel_rtree_centers;
+        kmeansDODParallel_rtree_centers.reserve(kmeansDOD_parallel_rtree.clusterCenters_.size());
+        for(auto center_point : kmeansDOD_parallel_rtree.clusterCenters_)
+            kmeansDODParallel_rtree_centers.push_back(center_point.first);
+
         REQUIRE(kmeansDOD.clusters_.size() == kmeansDOD_parallel_rtree.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), kmeansDOD_parallel_rtree.clusterCenters_.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODParallel_rtree_centers.begin(), kmeansDODParallel_rtree_centers.end(), kmeansDODSequential_rtree_centers.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), kmeansDOD_parallel_rtree.clusterElements_.begin(), cluster_comparison));
 
         //OOD Sequential
@@ -599,7 +631,14 @@ TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][k
             cluster_elements_OOD.push_back(elements_positions);
         }
         REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+
+
+        std::vector<ophidian::geometry::Point> clusters_centers;
+        clusters_centers.reserve(kmeansDOD.clusterCenters_.size());
+        for(auto center_point : kmeansDOD.clusterCenters_)
+            clusters_centers.push_back(center_point.first);
+
+        REQUIRE(std::is_permutation(clusters_centers.begin(), clusters_centers.end(), cluster_centers_OOD.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
 
         //OOD Parallel
@@ -622,7 +661,7 @@ TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][k
             cluster_elements_OOD.push_back(elements_positions);
         }
         REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODSequential_centers.begin(), kmeansDODSequential_centers.end(), cluster_centers_OOD.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
 
         //OOD Sequential Rtree
@@ -645,7 +684,7 @@ TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][k
             cluster_elements_OOD.push_back(elements_positions);
         }
         REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODSequential_centers.begin(), kmeansDODSequential_centers.end(), cluster_centers_OOD.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
 
         //OOD Parallel Rtree
@@ -668,7 +707,7 @@ TEST_CASE("kmeans/ test correctness between implementations of kmeans","[test][k
             cluster_elements_OOD.push_back(elements_positions);
         }
         REQUIRE(cluster_centers_OOD.size() == kmeansDOD.clusters_.size());
-        REQUIRE(std::is_permutation(kmeansDOD.clusterCenters_.begin(), kmeansDOD.clusterCenters_.end(), cluster_centers_OOD.begin(), point_comparison));
+        REQUIRE(std::is_permutation(kmeansDODSequential_centers.begin(), kmeansDODSequential_centers.end(), cluster_centers_OOD.begin(), point_comparison));
         REQUIRE(std::is_permutation(kmeansDOD.clusterElements_.begin(), kmeansDOD.clusterElements_.end(), cluster_elements_OOD.begin(), cluster_comparison));
     }
 }
