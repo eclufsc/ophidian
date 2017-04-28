@@ -1,8 +1,60 @@
 #include <catch.hpp>
 #include <ophidian/util/Units.h>
 
-
 using namespace ophidian::util;
+
+
+TEST_CASE("Units Test: Length", "[util][units]")
+{
+  micrometer_t mm1(0.015);
+  micrometer_t mm2(0.025);
+  dbumeter_t result_1 = mm1 + mm2;
+  dbumeter_t golden_result_1(80);
+  REQUIRE(result_1 == golden_result_1);
+}
+
+TEST_CASE("Units Test: DBU", "[util][units]")
+{
+  double x = 200;
+  double y = 150;
+
+  dbu_factor unit_x = DbuSelector::getDbuFactor(1000, x);
+  dbu_factor unit_y = DbuSelector::getDbuFactor(1000, y);
+
+  dbumeter_t x_dbu = boost::apply_visitor( DbuVisitor(), unit_x);
+  dbumeter_t y_dbu = boost::apply_visitor( DbuVisitor(), unit_y);
+
+  dbumeter_t x_dbu_golden_1(400);
+  dbumeter_t y_dbu_golden_1(300);
+  REQUIRE(x_dbu == x_dbu_golden_1);
+  REQUIRE(y_dbu == y_dbu_golden_1);
+
+  unit_x = DbuSelector::getDbuFactor(2000, x);
+  unit_y = DbuSelector::getDbuFactor(2000, y);
+
+  x_dbu = boost::apply_visitor( DbuVisitor(), unit_x);
+  y_dbu = boost::apply_visitor( DbuVisitor(), unit_y);
+
+  dbumeter_t x_dbu_golden_2(200);
+  dbumeter_t y_dbu_golden_2(150);
+  REQUIRE(x_dbu == x_dbu_golden_2);
+  REQUIRE(y_dbu == y_dbu_golden_2);
+}
+
+TEST_CASE("Units Test: Area", "[util][units]")
+{
+  square_meter_t m1(1.5);
+  square_millimeter_t mm1(1e+6);
+  square_meter_t result_1 = m1 + mm1;
+  square_meter_t golden_result_1(2.5);
+  REQUIRE(result_1 == golden_result_1);
+
+  square_millimeter_t mm2(1000.0);
+  square_millimeter_t mm3(5000.0);
+  square_meter_t result_2 = mm2 + mm3;
+  square_meter_t golden_result_2(6e-3);
+  REQUIRE(result_2 == golden_result_2);
+}
 
 TEST_CASE("Units Test: Second", "[util][units]")
 {
