@@ -5,7 +5,6 @@
 
 using namespace ophidian::placement;
 using namespace ophidian::standard_cell;
-using namespace ophidian::util;
 using namespace ophidian::geometry;
 
 namespace {
@@ -47,10 +46,10 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[p
 TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]") {
     Library library(std_cells);
 
-    ophidian::util::Location pin1Offset(5, 5);
+    ophidian::util::LocationMicron pin1Offset(5, 5);
     library.pinOffset(pin1, pin1Offset);
 
-    ophidian::util::Location pin2Offset(3, 3);
+    ophidian::util::LocationMicron pin2Offset(3, 3);
     library.pinOffset(pin2, pin2Offset);
 
     REQUIRE(pin1Offset == library.pinOffset(pin1));

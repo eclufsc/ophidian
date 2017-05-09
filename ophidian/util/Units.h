@@ -28,6 +28,9 @@ under the License.
 
 #include <ophidian/geometry/Models.h>
 
+//!Enable the use of literals like 10_m
+using namespace units::literals;
+
 //! Declaration of basic units metrics types from 'units' third-party library. These units are typesafe and have automatic conversion for units belonging to the same family.
 //! For example, the multiplication of capacitance and resistance unit gives a time unit.
 namespace ophidian {
@@ -40,50 +43,10 @@ using micrometer_t  = units::length::micrometer_t;
 using millimeter_t  = units::length::millimeter_t;
 using meter_t       = units::length::meter_t;
 
-//!Lenght Unit derived from micrometer to be used as internal unit length unit (as commonly used in LEF/DEF library)
-//!The base dbu/micron ratio is assumed to be 1/2000. Other ratios can be derived during runtime
-using dbu_base = units::unit<std::ratio<1, 2000>, units::length::micrometers>;
-using dbumeter_t = units::unit_t<dbu_base, double, units::linear_scale>;
-
-using dbu_option_1 = units::unit<std::ratio<1, 1000>, units::length::micrometers>;
-using dbu_option_2 = units::unit<std::ratio<1, 2000>, units::length::micrometers>;
-using dbu_option_1_t = units::unit_t<dbu_option_1, double, units::linear_scale>;
-using dbu_option_2_t = units::unit_t<dbu_option_2, double, units::linear_scale>;
-
-using dbu_factor = boost::variant<dbu_option_1_t, dbu_option_2_t>;
-
-class DbuSelector
-{
-public:
-  static dbu_factor getDbuFactor(int factor, double value)
-  {
-    if(factor == 1000)
-    {
-      dbu_option_1_t val(value);
-      return dbu_factor(val);
-    }
-    else
-    {
-      dbu_option_2_t val(value);
-      return dbu_factor(val);
-    }
-  }
-};
-
-class DbuVisitor : public boost::static_visitor<dbumeter_t>
-{
-public:
-    dbumeter_t operator()(dbu_option_1_t i) const
-    {
-      return dbumeter_t(i);
-    }
-    
-    dbumeter_t operator()(dbu_option_2_t i) const
-    {
-      return dbumeter_t(i);
-    }
-};
-
+//!Lenght Unit derived from micrometer to be used as internal length unit length (as commonly used in LEF/DEF library)
+//!To convert to/from micron, please use the DbuConverter Utility class
+using dbu_base = units::unit<std::ratio<1>, units::length::micrometers>;
+using dbumeter_t = units::unit_t<dbu_base, int, units::linear_scale>;
 
 //!Area Units
 //!New unit tag derived from area_unit to allow for creation of square_millimiter_t
@@ -178,74 +141,51 @@ public:
 namespace ophidian {
 namespace util {
 
-using Location = boost::geometry::model::d2::point_xy_location<ophidian::util::micrometer_t>;
+//! boost bidimensional point for the unit micrometer_t
+using LocationMicron = boost::geometry::model::d2::point_xy_location<ophidian::util::micrometer_t>;
+//! boost bidimensional point for the unit dbumeter_t
+using LocationDbu = boost::geometry::model::d2::point_xy_location<ophidian::util::dbumeter_t>;
 
-//!Class multibox using geometry::Box 
-class MultiBox {
+//!Class to handle the conversion from micron <-> DBU. It has to be instantiated by a def/lef library, which defines the DBU to micron factor
+class DbuConverter
+{
+  const int m_dbu_factor;
+
 public:
-    //!Standard constructor
-    MultiBox() {
+  //!Constructor receiving the factor of dbu to microns (from LEF/DEF libraries), i.e., how many DBUs correspond to a micron
+  explicit DbuConverter(int dbu_factor): m_dbu_factor(dbu_factor)
+  {
+  }
 
-    }
+  //!Converts a value from micrometer_t to dbumeter_t
+  dbumeter_t convert(micrometer_t value)
+  {
+    int conv_value = units::unit_cast<double>(value)*m_dbu_factor;
+    return dbumeter_t(conv_value);
+  }
 
-    //!Constructor receiving a vector of geometry::Box
-    MultiBox(const std::vector<geometry::Box> & boxes)
-        : boxes_(boxes) {
+  //!Converts a value from dbumeter_t to micrometer_t
+  micrometer_t convert(dbumeter_t value)
+  {
+    double conv_value = units::unit_cast<double>(value)/static_cast<double>(m_dbu_factor);
+    return micrometer_t(conv_value);
+  }
 
-    }
+  //!Converts a LocationMicron to LocationDbu
+  LocationDbu convert(LocationMicron value)
+  {
+    int conv_value_x = units::unit_cast<double>(value.x())*m_dbu_factor;
+    int conv_value_y = units::unit_cast<double>(value.y())*m_dbu_factor;
+    return LocationDbu(conv_value_x, conv_value_y);
+  }
 
-    //!Copy constructor
-    MultiBox(const MultiBox & otherBox)
-        : boxes_(otherBox.boxes_) {
-
-    }
-
-    //!Push back a geometry::Box
-    void push_back(const geometry::Box & box) {
-        boxes_.push_back(box);
-    }
-
-    //!Non-const iterator begin
-    std::vector<geometry::Box>::iterator begin() {
-        return boxes_.begin();
-    }
-
-    //!Non-const iterator end
-    std::vector<geometry::Box>::iterator end() {
-        return boxes_.end();
-    }
-
-    //!Const iterator begin
-    std::vector<geometry::Box>::const_iterator begin() const {
-        return boxes_.begin();
-    }
-
-    //!Const iterator end
-    std::vector<geometry::Box>::const_iterator end() const {
-        return boxes_.end();
-    }
-
-    //!Operator overloading for comparison of two multibox objects
-    bool operator==(const MultiBox & other) const {
-        for (auto box1 : this->boxes_) {
-            for (auto box2 : other.boxes_) {
-                bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
-                        && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
-                if (!comparison) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    //!Operator overload for difference between two multibox objects
-    bool operator!=(const MultiBox & other) const {
-        return !(*this==other);
-    }
-
-private:
-    std::vector<geometry::Box> boxes_;
+  //!Converts a LocationDbu to LocationMicron
+  LocationMicron convert(LocationDbu value)
+  {
+    int conv_value_x = units::unit_cast<double>(value.x())/static_cast<double>(m_dbu_factor);
+    int conv_value_y = units::unit_cast<double>(value.y())/static_cast<double>(m_dbu_factor);
+    return LocationMicron(conv_value_x, conv_value_y);
+  }
 };
 
 } //namespace util
