@@ -21,6 +21,7 @@ under the License.
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
+#include <ophidian/geometry/Models.h>
 #include <ophidian/standard_cell/StandardCells.h>
 #include <ophidian/util/Units.h>
 
@@ -41,7 +42,7 @@ public:
        \param cell Cell entity to get the geometry.
        \return Geometry of the cell.
      */
-    util::MultiBox geometry(const standard_cell::Cell & cell) const {
+    geometry::MultiBox geometry(const standard_cell::Cell & cell) const {
         return geometries_[cell];
     }
 
@@ -51,7 +52,7 @@ public:
        \param cell Cell entity to set the geometry.
        \param geometry Gehmetry to assign to cell.
      */
-    void geometry(const standard_cell::Cell & cell, const util::MultiBox & geometry);
+    void geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry);
 
     //! Pin offset getter
     /*!
@@ -59,7 +60,7 @@ public:
        \param pin Pin entity to get the offset.
        \return Offset of the pin.
      */
-    util::Location pinOffset(const standard_cell::Pin & pin) const {
+    util::LocationMicron pinOffset(const standard_cell::Pin & pin) const {
         return pinOffsets_[pin];
     }
 
@@ -69,11 +70,11 @@ public:
        \param pin Pin entity to set the offset.
        \param offset Offset to assign to pin.
      */
-    void pinOffset(const standard_cell::Pin & pin, const util::Location & offset);
+    void pinOffset(const standard_cell::Pin & pin, const util::LocationMicron & offset);
 
 private:
-    entity_system::Property<standard_cell::Cell, util::MultiBox> geometries_;
-    entity_system::Property<standard_cell::Pin, util::Location> pinOffsets_;
+    entity_system::Property<standard_cell::Cell, geometry::MultiBox> geometries_;
+    entity_system::Property<standard_cell::Pin, util::LocationMicron> pinOffsets_;
 };
 }
 }

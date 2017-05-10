@@ -22,16 +22,16 @@ namespace ophidian {
 namespace placement {
 
 Library::Library(const standard_cell::StandardCells &std_cells): 
-    geometries_(std_cells.makeProperty<util::MultiBox>(standard_cell::Cell())),
-    pinOffsets_(std_cells.makeProperty<util::Location>(standard_cell::Pin())) 
+    geometries_(std_cells.makeProperty<geometry::MultiBox>(standard_cell::Cell())),
+    pinOffsets_(std_cells.makeProperty<util::LocationMicron>(standard_cell::Pin())) 
     { }
 
-void Library::geometry(const standard_cell::Cell &cell, const util::MultiBox &geometry)
+void Library::geometry(const standard_cell::Cell &cell, const geometry::MultiBox &geometry)
 {
     geometries_[cell] = geometry;
 }
 
-void Library::pinOffset(const standard_cell::Pin &pin, const util::Location &offset)
+void Library::pinOffset(const standard_cell::Pin &pin, const util::LocationMicron &offset)
 {
     pinOffsets_[pin] = offset;
 }

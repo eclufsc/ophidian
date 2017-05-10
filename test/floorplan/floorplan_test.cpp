@@ -5,8 +5,8 @@ using namespace ophidian::floorplan;
 
 TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan][Floorplan]")
 {
-    ophidian::util::Location origin(0.0, 0.0);
-    ophidian::util::Location boundaries(0.0, 0.0);
+    ophidian::util::LocationMicron origin(0.0, 0.0);
+    ophidian::util::LocationMicron boundaries(0.0, 0.0);
 
     Floorplan floorplan;
     REQUIRE(floorplan.chipOrigin() == origin);
@@ -17,8 +17,8 @@ TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan][Floorpla
 
 TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan][Floorplan]")
 {
-    ophidian::util::Location origin(2.0, 3.0);
-    ophidian::util::Location boundaries(4000.0, 3000.0);
+    ophidian::util::LocationMicron origin(2.0, 3.0);
+    ophidian::util::LocationMicron boundaries(4000.0, 3000.0);
 
     Floorplan floorplan;
     floorplan.chipOrigin(origin);
@@ -31,16 +31,16 @@ namespace {
 class SitesWithPropertiesFixture {
 public:
     std::string name1, name2, name3;
-    ophidian::util::Location loc1, loc2, loc3;
+    ophidian::util::LocationMicron loc1, loc2, loc3;
 
     SitesWithPropertiesFixture() {
         name1 = "core1";
         name2 = "core2";
         name3 = "core3";
 
-        loc1 = ophidian::util::Location(0.19, 1.71);
-        loc2 = ophidian::util::Location(0.20, 1.72);
-        loc3 = ophidian::util::Location(0.21, 1.73);
+        loc1 = ophidian::util::LocationMicron(0.19, 1.71);
+        loc2 = ophidian::util::LocationMicron(0.20, 1.72);
+        loc3 = ophidian::util::LocationMicron(0.21, 1.73);
     }
 };
 }
@@ -70,15 +70,15 @@ TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[flo
 namespace {
 class RowWithPropertiesFixture {
 public:
-    ophidian::util::Location origin1, origin2, origin3;
+    ophidian::util::LocationMicron origin1, origin2, origin3;
     size_t numSites1, numSites2, numSites3;
 
     SitesWithPropertiesFixture sitesSystem;
 
     RowWithPropertiesFixture() {
-        origin1 = ophidian::util::Location(10.0, 10.0);
-        origin2 = ophidian::util::Location(200.0, 200.0);
-        origin3 = ophidian::util::Location(400.0, 400.0);
+        origin1 = ophidian::util::LocationMicron(10.0, 10.0);
+        origin2 = ophidian::util::LocationMicron(200.0, 200.0);
+        origin3 = ophidian::util::LocationMicron(400.0, 400.0);
 
         numSites1 = 100;
         numSites2 = 150;
@@ -125,9 +125,9 @@ TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Row Upper Right Corner.", 
     auto rowRet1 = floorplan.add(Row(), origin1, numSites1, siteRet1);
     auto rowRet2 = floorplan.add(Row(), origin2, numSites2, siteRet2);
 
-    ophidian::util::Location urCorner1(0.19*100, 1.71);
+    ophidian::util::LocationMicron urCorner1(0.19*100, 1.71);
     REQUIRE(floorplan.rowUpperRightCorner(rowRet1) == urCorner1);
 
-    ophidian::util::Location urCorner2(0.20*150, 1.72);
+    ophidian::util::LocationMicron urCorner2(0.20*150, 1.72);
     REQUIRE(floorplan.rowUpperRightCorner(rowRet2) == urCorner2);
 }
