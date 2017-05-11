@@ -15,8 +15,8 @@ public:
     Netlist netlist;
 
     NetlistFixture() {
-        cell1 = netlist.add(Cell());
-        cell2 = netlist.add(Cell());
+        cell1 = netlist.add(Cell(), "cell1");
+        cell2 = netlist.add(Cell(), "cell2");
     }
 };
 }

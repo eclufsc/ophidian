@@ -22,6 +22,7 @@ under the License.
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Aggregation.h>
 #include <ophidian/entity_system/Composition.h>
+#include <unordered_map>
 
 namespace ophidian
 {
@@ -82,10 +83,11 @@ namespace ophidian
 
                 //! Add Cell
                 /*!
+                  \param A cell name;
                   \brief Adds a Cell instance.
                   \return A handler for the created Cell.
                 */
-                Cell add(Cell);
+                Cell add(Cell, std::string cellName);
                 //! Erase Cell
                 /*!
                   \param cell A handler for the Cell to erase.
@@ -139,6 +141,23 @@ namespace ophidian
                   \return The capacity of the Cell EntitySystem.
                 */
                 uint32_t capacity(Cell) const;
+
+                //! Find a cell
+                /*!
+                  \brief Using the mapping, return a cell handler by cell's name.
+                  \param The cell name.
+                  \return Return a cell handler by cell's name.
+                */
+                Cell find(Cell, std::string cellName);
+
+                //! Returns the name of the cell
+                /*!
+                  \brief Returns the name of the cell.
+                  \param A handler for the cell.
+                  \return Return the cell's name.
+                */
+                std::string name(const Cell& cell) const;
+
                 //! Pins of a Cell
                 /*!
                   \brief Returns a Container Wrapper for the Pins of a Cell.
@@ -155,10 +174,11 @@ namespace ophidian
                 void add(const Cell& cell, const Pin& pin);
                 //! Add Pin
                 /*!
+                  \param A pin name.
                   \brief Adds a Pin instance.
                   \return A handler for the created Pin.
                 */
-                Pin add(Pin);
+                Pin add(Pin, std::string pinName);
                 //! Erase Pin
                 /*!
                   \param pin A handler for the Pin to erase.
@@ -211,6 +231,23 @@ namespace ophidian
                   \return The capacity of the Pin EntitySystem.
                 */
                 uint32_t capacity(Pin) const;
+
+                //! Find a pin
+                /*!
+                  \brief Using the mapping, return a pin handler by pin's name.
+                  \param The pin name.
+                  \return Return a pin handler by pin's name.
+                */
+                Pin find(Pin, std::string pinName);
+
+                //! Returns the name of the pin
+                /*!
+                  \brief Returns the name of the pin.
+                  \param A handler for the pin.
+                  \return Return the pin's name.
+                */
+                std::string name(const Pin& pin) const;
+
                 //! Net of a Pin
                 /*!
                   \brief Returns the Net of a given Pin.
@@ -235,10 +272,11 @@ namespace ophidian
 
                 //! Add Net
                 /*!
+                  \param A pin name.
                   \brief Adds a Net instance.
                   \return A handler for the created Net.
                 */
-                Net add(Net);
+                Net add(Net, std::string netName);
                 //! Erase Net
                 /*!
                   \param net A handler for the Net to erase.
@@ -291,6 +329,23 @@ namespace ophidian
                   \return The capacity of the Net EntitySystem.
                 */
                 uint32_t capacity(Net) const;
+
+                //! Find a net
+                /*!
+                  \brief Using the mapping, return a net handler by net's name.
+                  \param The net name.
+                  \return Return a net handler by net's name.
+                */
+                Net find(Net, std::string netName);
+
+                //! Returns the name of the net
+                /*!
+                  \brief Returns the name of the net.
+                  \param A handler for the net.
+                  \return Return the net's name.
+                */
+                std::string name(const Net& net) const;
+
                 //! Pins of a Net
                 /*!
                   \brief Returns a Container Wrapper for the Pins of a Net.
@@ -435,6 +490,12 @@ namespace ophidian
                 entity_system::EntitySystem<Net> nets_;
                 entity_system::EntitySystem<Input> inputs_;
                 entity_system::EntitySystem<Output> outputs_;
+                entity_system::Property<Cell, std::string> cellNames_;
+                entity_system::Property<Pin, std::string> pinNames_;
+                entity_system::Property<Net, std::string> netNames_;
+                std::unordered_map<std::string, Cell> name2Cell_;
+                std::unordered_map<std::string, Pin> name2Pin_;
+                std::unordered_map<std::string, Net> name2Net_;
                 entity_system::Aggregation<Net, Pin> netPins_;
                 entity_system::Composition<Cell, Pin> cellPins_;
                 entity_system::Composition<Pin, Input> pinInput_;

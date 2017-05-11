@@ -4,6 +4,7 @@
 #include <ophidian/circuit/Netlist.h>
 #include <array>
 #include <random>
+#include <string>
 
 using namespace ophidian::circuit;
 
@@ -18,7 +19,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
     auto cellNames = nl.makeProperty<std::string>(Cell());
     for(uint32_t i = 0; i < cells.size(); ++i)
     {
-        cells[i] = nl.add(Cell());
+        cells[i] = nl.add(Cell(), "cell_" + std::to_string(i));
         cellNames[cells[i]] = "cell_" + std::to_string(i);
     }
     std::default_random_engine engine;
@@ -30,7 +31,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 //        std::cout << "cell " << cellNames[cell] << " will have " << cellPins << " pins" << std::endl;
         for(uint32_t i = 0; i < cellPins; ++i)
         {
-            auto pin = nl.add(Pin());
+            auto pin = nl.add(Pin(), cellNames[cell]+":"+std::to_string(i));
             nl.add(cell, pin);
             cellsPins[cell].push_back(pin);
         }

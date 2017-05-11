@@ -25,7 +25,10 @@ Netlist::Netlist() :
     netPins_(nets_, pins_),
     cellPins_(cells_, pins_),
     pinInput_(pins_, inputs_),
-    pinOutput_(pins_, outputs_)
+    pinOutput_(pins_, outputs_),
+    cellNames_(makeProperty<std::string>(Cell())),
+    pinNames_(makeProperty<std::string>(Pin())),
+    netNames_(makeProperty<std::string>(Net()))
 {
 }
 
@@ -34,13 +37,17 @@ Netlist::~Netlist()
 
 }
 
-Cell Netlist::add(Cell)
+Cell Netlist::add(Cell, std::string cellName)
 {
-    return cells_.add();
+    auto cell = cells_.add();
+    cellNames_[cell] = cellName;
+    name2Cell_[cellName] = cell;
+    return cell;
 }
 
 void Netlist::erase(const Cell &c)
 {
+    name2Cell_.erase(cellNames_[c]);
     cells_.erase(c);
 }
 
@@ -49,13 +56,17 @@ uint32_t Netlist::size(Cell) const
     return cells_.size();
 }
 
-Pin Netlist::add(Pin)
+Pin Netlist::add(Pin, std::string pinName)
 {
-    return pins_.add();
+    auto pin = pins_.add();
+    pinNames_[pin] = pinName;
+    name2Pin_[pinName] = pin;
+    return pin;
 }
 
 void Netlist::erase(const Pin &en)
 {
+    name2Pin_.erase(pinNames_[en]);
     pins_.erase(en);
 }
 
@@ -64,13 +75,17 @@ uint32_t Netlist::size(Pin) const
     return pins_.size();
 }
 
-Net Netlist::add(Net)
+Net Netlist::add(Net, std::string netName)
 {
-    return nets_.add();
+    auto net = nets_.add();
+    netNames_[net] = netName;
+    name2Net_[netName] = net;
+    return net;
 }
 
 void Netlist::erase(const Net &en)
 {
+    name2Net_.erase(netNames_[en]);
     nets_.erase(en);
 }
 
@@ -102,11 +117,22 @@ entity_system::EntitySystem<Pin>::NotifierType *Netlist::notifier(Pin) const
 void Netlist::reserve(Pin, uint32_t size)
 {
     pins_.reserve(size);
+    name2Pin_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Pin) const
 {
     return pins_.capacity();
+}
+
+Pin Netlist::find(Pin, std::string pinName)
+{
+    return name2Pin_[pinName];
+}
+
+std::string Netlist::name(const Pin& pin) const
+{
+    return pinNames_[pin];
 }
 
 entity_system::EntitySystem<Cell>::const_iterator Netlist::begin(Cell) const
@@ -132,11 +158,22 @@ entity_system::EntitySystem<Cell>::NotifierType *Netlist::notifier(Cell) const
 void Netlist::reserve(Cell, uint32_t size)
 {
     cells_.reserve(size);
+    name2Cell_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Cell) const
 {
     return cells_.capacity();
+}
+
+Cell Netlist::find(Cell, std::string cellName)
+{
+    return name2Cell_[cellName];
+}
+
+std::string Netlist::name(const Cell& cell) const
+{
+    return cellNames_[cell];
 }
 
 entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
@@ -177,11 +214,22 @@ entity_system::EntitySystem<Net>::NotifierType *Netlist::notifier(Net) const
 void Netlist::reserve(Net, uint32_t size)
 {
     nets_.reserve(size);
+    name2Net_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Net) const
 {
     return nets_.capacity();
+}
+
+Net Netlist::find(Net, std::string netName)
+{
+    return name2Net_[netName];
+}
+
+std::string Netlist::name(const Net& net) const
+{
+    return netNames_[net];
 }
 
 entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
