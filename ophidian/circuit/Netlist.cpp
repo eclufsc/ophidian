@@ -39,10 +39,14 @@ Netlist::~Netlist()
 
 Cell Netlist::add(Cell, std::string cellName)
 {
-    auto cell = cells_.add();
-    cellNames_[cell] = cellName;
-    name2Cell_[cellName] = cell;
-    return cell;
+    if(name2Cell_.find(cellName) == name2Cell_.end()){
+        auto cell = cells_.add();
+        cellNames_[cell] = cellName;
+        name2Cell_[cellName] = cell;
+        return cell;
+    }else{
+        return name2Cell_[cellName];
+    }
 }
 
 void Netlist::erase(const Cell &c)
@@ -58,10 +62,14 @@ uint32_t Netlist::size(Cell) const
 
 Pin Netlist::add(Pin, std::string pinName)
 {
-    auto pin = pins_.add();
-    pinNames_[pin] = pinName;
-    name2Pin_[pinName] = pin;
-    return pin;
+    if(name2Pin_.find(pinName) == name2Pin_.end()){
+        auto pin = pins_.add();
+        pinNames_[pin] = pinName;
+        name2Pin_[pinName] = pin;
+        return pin;
+    }else{
+        return name2Pin_[pinName];
+    }
 }
 
 void Netlist::erase(const Pin &en)
@@ -77,10 +85,14 @@ uint32_t Netlist::size(Pin) const
 
 Net Netlist::add(Net, std::string netName)
 {
-    auto net = nets_.add();
-    netNames_[net] = netName;
-    name2Net_[netName] = net;
-    return net;
+    if(name2Net_.find(netName) == name2Net_.end()){
+        auto net = nets_.add();
+        netNames_[net] = netName;
+        name2Net_[netName] = net;
+        return net;
+    }else{
+        return name2Net_[netName];
+    }
 }
 
 void Netlist::erase(const Net &en)
