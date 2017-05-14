@@ -5,9 +5,6 @@ file(GLOB ophidian_parser_SRC
     "*.cpp"
 )
 
-set(PARSER_SOURCE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/Def.cpp)
-
 LINK_DIRECTORIES(${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/)
 
 add_library(ophidian_parser ${ophidian_parser_SRC})
@@ -18,4 +15,4 @@ target_link_libraries(ophidian_parser PUBLIC lef)
 target_link_libraries(ophidian_parser PUBLIC verilogparser)
 
 install(TARGETS ophidian_parser DESTINATION lib)
-install(FILES VerilogParser.h DESTINATION include/ophidian/parser)
+install(FILES VerilogParser.h SdcParser.h DESTINATION include/ophidian/parser)
