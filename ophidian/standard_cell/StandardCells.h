@@ -20,6 +20,7 @@ under the License.
 #define OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_H
 
 #include <memory>
+#include <unordered_map>
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/entity_system/Composition.h>
@@ -41,7 +42,7 @@ public:
 };
 
 enum class PinDirection {
-    NOT_ASSIGNED, INPUT, OUTPUT, INOUT
+    INPUT, OUTPUT, INOUT, NA
 };
 
 class StandardCells
@@ -72,9 +73,9 @@ public:
 
     //! Add Cell
     /*!
-      \brief Adds a cell instance. A cell has a name associated to it.
+      \brief Adds a cell instance. A cell has a name associated to it. If the cell already exist then just return the existing cell.
       \param name Name of the cell, used to identify it.
-      \return A handler for the created Cell.
+      \return A handler for the created/existing Cell.
     */
     Cell add(Cell, const std::string & name);
 
@@ -104,6 +105,14 @@ public:
       \return The capacity of the Cell EntitySystem.
     */
     uint32_t capacity(Cell) const;
+
+    //! Find a cell
+    /*!
+      \brief Using the mapping, return a cell handler by cell's name.
+      \param The cell name.
+      \return Return a cell handler by cell's name.
+    */
+    Cell find(Cell, std::string cellName);
 
     //! Cells iterator
     /*!
@@ -143,9 +152,9 @@ public:
 
     //! Add Pin
     /*!
-      \brief Adds a pin instance. A pin has a name and a direction associated to it.
+      \brief Adds a pin instance. A pin has a name and a direction associated to it.  If the pin already exist then just return the existing pin.
       \param name Name of the pin, used to identify it.
-      \return A handler for the created pin.
+      \return A handler for the created/existing pin.
     */
     Pin add(Pin, const std::string & name, PinDirection direction);
 
@@ -175,6 +184,14 @@ public:
       \return The capacity of the Pin EntitySystem.
     */
     uint32_t capacity(Pin) const;
+
+    //! Find a pin
+    /*!
+      \brief Using the mapping, return a pin handler by pin's name.
+      \param The pin name.
+      \return Return a pin handler by pin's name.
+    */
+    Pin find(Pin, std::string pinName);
 
     //! Pin name getter
     /*!
@@ -241,6 +258,10 @@ private:
 
     //composition and aggregation relations
     entity_system::Composition<Cell, Pin> cellPins_;
+
+    //std_cell and pin mapping
+    std::unordered_map<std::string, Cell> name2Cell_;
+    std::unordered_map<std::string, Pin> name2Pin_;
 };
 
 } //namespace ophidian

@@ -20,8 +20,8 @@ public:
         cell1 = std_cells.add(ophidian::standard_cell::Cell(), "cell1");
         cell2 = std_cells.add(ophidian::standard_cell::Cell(), "cell2");
 
-        pin1 = std_cells.add(Pin(), "pin1", PinDirection::NOT_ASSIGNED);
-        pin2 = std_cells.add(Pin(), "pin2", PinDirection::NOT_ASSIGNED);
+        pin1 = std_cells.add(Pin(), "pin1", PinDirection::NA);
+        pin2 = std_cells.add(Pin(), "pin2", PinDirection::NA);
     }
 };
 

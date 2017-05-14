@@ -46,9 +46,14 @@ StandardCells::~StandardCells() = default;
 
 Cell StandardCells::add(Cell, const std::string &name)
 {
-    auto cell = cells_.add();
-    cellNames_[cell] = name;
-    return cell;
+    if(name2Cell_.find(name) == name2Cell_.end()){
+        auto cell = cells_.add();
+        cellNames_[cell] = name;
+        name2Cell_[name] = cell;
+        return cell;
+    }else{
+        return name2Cell_[name];
+    }
 }
 
 void StandardCells::erase(const Cell & cell)
@@ -71,6 +76,11 @@ uint32_t StandardCells::capacity(Cell) const
     return cells_.capacity();
 }
 
+Cell StandardCells::find(Cell, std::string cellName)
+{
+    return name2Cell_[cellName];
+}
+
 std::string StandardCells::name(const Cell & cell) const
 {
     return cellNames_[cell];
@@ -90,10 +100,15 @@ ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) c
 
 Pin StandardCells::add(Pin, const std::string &name, PinDirection direction)
 {
-    auto pin = pins_.add();
-    pinNames_[pin] = name;
-    pinDirections_[pin] = direction;
-    return pin;
+    if(name2Pin_.find(name) == name2Pin_.end()){
+        auto pin = pins_.add();
+        pinNames_[pin] = name;
+        pinDirections_[pin] = direction;
+        name2Pin_[name] = pin;
+        return pin;
+    }else{
+        return name2Pin_[name];
+    }
 }
 
 void StandardCells::erase(const Pin & pin)
@@ -114,6 +129,11 @@ uint32_t StandardCells::size(Pin) const
 uint32_t StandardCells::capacity(Pin) const
 {
     return pins_.capacity();
+}
+
+Pin StandardCells::find(Pin, std::string pinName)
+{
+    return name2Pin_[pinName];
 }
 
 std::string StandardCells::name(const Pin & pin) const

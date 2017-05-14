@@ -31,6 +31,25 @@ TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: creating cells", "[stand
     REQUIRE(stdCells.name(cell1) != stdCells.name(cell2));
 }
 
+TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: try to add same cell twice", "[standard_cell]") {
+    StandardCells stdCells;
+
+    auto cell1 = stdCells.add(Cell(), cell1Name);
+    auto cell2 = stdCells.add(Cell(), cell1Name);
+
+    REQUIRE(stdCells.name(cell1) == stdCells.name(cell2));
+    REQUIRE (stdCells.size(Cell()) == 1);
+}
+
+TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: cell mapping", "[standard_cell]") {
+    StandardCells stdCells;
+
+    stdCells.add(Cell(), cell1Name);
+    auto cell1 = stdCells.find(Cell(), cell1Name);
+    stdCells.erase(cell1);
+    REQUIRE (stdCells.size(Cell()) == 0);
+}
+
 TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: creating pins", "[standard_cell]") {
     StandardCells stdCells;
 
@@ -44,6 +63,26 @@ TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: creating pins", "[standa
     REQUIRE(stdCells.direction(pin1) == pin1Direction);
     REQUIRE(stdCells.direction(pin2) == pin2Direction);
     REQUIRE(stdCells.direction(pin1) != stdCells.direction(pin2));
+}
+
+TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: try to add same pin twice", "[standard_cell]") {
+    StandardCells stdCells;
+
+    auto pin1 = stdCells.add(Pin(), pin1Name, pin1Direction);
+    auto pin2 = stdCells.add(Pin(), pin1Name, pin1Direction);
+
+    REQUIRE(stdCells.name(pin1) == stdCells.name(pin2));
+    REQUIRE(stdCells.size(Pin()) == 1);
+}
+
+TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: pin mapping", "[standard_cell]") {
+    StandardCells stdCells;
+
+    stdCells.add(Pin(), pin1Name, pin1Direction);
+    auto pin1 = stdCells.find(Pin(), pin1Name);
+    stdCells.erase(pin1);
+
+    REQUIRE(stdCells.size(Pin()) == 0);
 }
 
 TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: associating pin to net", "[standard_cell]") {
