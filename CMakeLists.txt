@@ -13,13 +13,14 @@ macro (UseLemon)
     link_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/lemon)
 endmacro()
 
-execute_process(COMMAND git submodule update --init --recursive
+execute_process(COMMAND git submodule update --init --recursive --remote
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 RESULT_VARIABLE submodule_init_exit_code)
 
 add_subdirectory(3rdparty)
 link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/
-                 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/)
+                 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/
+		 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/include)
 
 UseLemon()
 find_package(Boost 1.59 REQUIRED)
