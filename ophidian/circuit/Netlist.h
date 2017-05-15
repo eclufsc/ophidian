@@ -84,8 +84,8 @@ namespace ophidian
                 //! Add Cell
                 /*!
                   \param A cell name;
-                  \brief Adds a Cell instance.
-                  \return A handler for the created Cell.
+                  \brief Adds a Cell instance, if the cell already exist then just return the existing cell.
+                  \return A handler for the created/existing Cell.
                 */
                 Cell add(Cell, std::string cellName);
                 //! Erase Cell
@@ -175,8 +175,8 @@ namespace ophidian
                 //! Add Pin
                 /*!
                   \param A pin name.
-                  \brief Adds a Pin instance.
-                  \return A handler for the created Pin.
+                  \brief Adds a Pin instance, if the pin already exist then just return the existing pin.
+                  \return A handler for the created/existing Pin.
                 */
                 Pin add(Pin, std::string pinName);
                 //! Erase Pin
@@ -273,8 +273,8 @@ namespace ophidian
                 //! Add Net
                 /*!
                   \param A pin name.
-                  \brief Adds a Net instance.
-                  \return A handler for the created Net.
+                  \brief Adds a Net instance, if the net already exist then just return the existing net.
+                  \return A handler for the created/existing Net.
                 */
                 Net add(Net, std::string netName);
                 //! Erase Net

@@ -47,6 +47,16 @@ TEST_CASE("Netlist: Cell mapping.", "[circuit][Netlist]")
     REQUIRE(nl.size(Net()) == 0);
 }
 
+TEST_CASE("Netlist: Try add the same cell twice.", "[circuit][Netlist]")
+{
+    Netlist nl;
+    nl.add(Cell(), "cell");
+    nl.add(Cell(), "cell");
+    REQUIRE(nl.size(Cell()) == 1);
+    REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(Net()) == 0);
+}
+
 TEST_CASE("Netlist: Add Pin.", "[circuit][Netlist]")
 {
     Netlist nl;
@@ -75,6 +85,16 @@ TEST_CASE("Netlist: Pin mapping.", "[circuit][Netlist]")
     nl.erase(pin);
     REQUIRE(nl.size(Cell()) == 0);
     REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(Net()) == 0);
+}
+
+TEST_CASE("Netlist: Try add the same pin twice.", "[circuit][Netlist]")
+{
+    Netlist nl;
+    nl.add(Pin(), "pin");
+    nl.add(Pin(), "pin");
+    REQUIRE(nl.size(Cell()) == 0);
+    REQUIRE(nl.size(Pin()) == 1);
     REQUIRE(nl.size(Net()) == 0);
 }
 
@@ -108,6 +128,16 @@ TEST_CASE("Netlist: Net mapping.", "[circuit][Netlist]")
     REQUIRE(nl.size(Cell()) == 0);
     REQUIRE(nl.size(Pin()) == 0);
     REQUIRE(nl.size(Net()) == 0);
+}
+
+TEST_CASE("Netlist: Try add the same net twice.", "[circuit][Netlist]")
+{
+    Netlist nl;
+    nl.add(Net(), "net");
+    nl.add(Net(), "net");
+    REQUIRE(nl.size(Cell()) == 0);
+    REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(Net()) == 1);
 }
 
 TEST_CASE("Netlist: Connect/Disconnect Net and Pin.", "[circuit][Netlist]")
