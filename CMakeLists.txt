@@ -19,8 +19,8 @@ execute_process(COMMAND git submodule update --init --recursive --remote
 
 add_subdirectory(3rdparty)
 link_directories(${CMAKE_BINARY_DIR}/3rdparty/verilog-parser/src/
-                 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/
-		 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/include)
+                 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/lib/
+                 ${CMAKE_BINARY_DIR}/3rdparty/libertyParser/include/)
 
 UseLemon()
 find_package(Boost 1.59 REQUIRED)
