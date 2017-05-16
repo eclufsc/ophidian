@@ -23,6 +23,7 @@ under the License.
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
+#include <unordered_map>
 
 namespace ophidian {
 
@@ -127,6 +128,17 @@ public:
         return names_[site];
     }
 
+    //! Site getter
+    /*!
+       \brief Get the site of a given site name
+       \param A name of a site.
+       \return Site entity of the given name.
+     */
+    Site find(std::string site_name)
+    {
+        return name2Site_[site_name];
+    }
+
     //! Site Upper right corner getter
     /*!
        \brief get the upper right corner of a given site
@@ -228,6 +240,8 @@ private:
 
     util::Location chipOrigin_;
     util::Location chipUpperRightCorner_;
+
+    std::unordered_map<std::string, Site> name2Site_;
 };
 
 } //namespace floorplan

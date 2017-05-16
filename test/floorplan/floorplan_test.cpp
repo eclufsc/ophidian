@@ -3,7 +3,7 @@
 
 using namespace ophidian::floorplan;
 
-TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan][Floorplan]")
+TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan]")
 {
     ophidian::util::Location origin(0.0, 0.0);
     ophidian::util::Location boundaries(0.0, 0.0);
@@ -15,7 +15,7 @@ TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan][Floorpla
     REQUIRE(floorplan.rowsRange().empty());
 }
 
-TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan][Floorplan]")
+TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan]")
 {
     ophidian::util::Location origin(2.0, 3.0);
     ophidian::util::Location boundaries(4000.0, 3000.0);
@@ -45,7 +45,7 @@ public:
 };
 }
 
-TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[floorplan][Floorplan]")
+TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[floorplan]")
 {
     Floorplan floorplan;
     auto siteRet1 = floorplan.add(Site(), name1, loc1);
@@ -65,6 +65,16 @@ TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Add/Erase Sites.", "[flo
     floorplan.erase(siteRet2);
     floorplan.erase(siteRet3);
     REQUIRE(floorplan.sitesRange().empty());
+}
+
+TEST_CASE_METHOD(SitesWithPropertiesFixture,"Floorplan: Test site mapping.", "[floorplan]")
+{
+    Floorplan floorplan;
+    floorplan.add(Site(), name1, loc1);
+    auto site1 = floorplan.find(name1);
+    REQUIRE(floorplan.sitesRange().size() == 1);
+    floorplan.erase(site1);
+    REQUIRE(floorplan.sitesRange().size() == 0);
 }
 
 namespace {
@@ -87,7 +97,7 @@ public:
 };
 }
 
-TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorplan][Floorplan]")
+TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorplan]")
 {
     Floorplan floorplan;
     auto site1 = floorplan.add(Site(), sitesSystem.name1, sitesSystem.loc1);
@@ -117,7 +127,7 @@ TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Add/Erase Rows.", "[floorp
     REQUIRE(floorplan.rowsRange().empty());
 }
 
-TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Row Upper Right Corner.", "[floorplan][Floorplan]")
+TEST_CASE_METHOD(RowWithPropertiesFixture,"Floorplan: Row Upper Right Corner.", "[floorplan]")
 {
     Floorplan floorplan;
     auto siteRet1 = floorplan.add(Site(), sitesSystem.name1, sitesSystem.loc1);

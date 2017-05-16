@@ -49,12 +49,14 @@ Site Floorplan::add(Site, const std::string & name, const util::Location & loc)
 {
     auto site = sites_.add();
     names_[site] = name;
+    name2Site_[name] = site;
     dimensions_[site] = loc;
     return site;
 }
 
 void Floorplan::erase(Site site)
 {
+    name2Site_.erase(name(site));
     sites_.erase(site);
 }
 

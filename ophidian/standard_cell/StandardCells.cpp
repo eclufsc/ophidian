@@ -58,6 +58,7 @@ Cell StandardCells::add(Cell, const std::string &name)
 
 void StandardCells::erase(const Cell & cell)
 {
+    name2Cell_.erase(name(cell));
     cells_.erase(cell);
 }
 
@@ -113,6 +114,7 @@ Pin StandardCells::add(Pin, const std::string &name, PinDirection direction)
 
 void StandardCells::erase(const Pin & pin)
 {
+    name2Pin_.erase(name(pin));
     pins_.erase(pin);
 }
 
