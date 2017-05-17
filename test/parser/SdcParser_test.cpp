@@ -61,7 +61,7 @@ TEST_CASE("Sdc Parser: stringValue", "[parser][SdcParser]")
 
 TEST_CASE("Sdc Parser: getPorts", "[parser][SdcParser]")
 {
-  std::string input = "[get_ports iccad_clk]";
+  std::string input = " [get_ports iccad_clk]";
   auto first = input.begin();
   auto last = input.end();
   ast::GetPorts result;
@@ -111,3 +111,42 @@ TEST_CASE("Sdc Parser: pinCell", "[parser][SdcParser]")
   REQUIRE(result.name == "o");
 }
 
+TEST_CASE("Sdc Parser: period", "[parser][SdcParser]")
+{
+  std::string input = "-period 7000.0";
+  auto first = input.begin();
+  auto last = input.end();
+  ast::AttrValue result;
+  CHECK(parsePhrase(first, last, period, space, result));
+  REQUIRE(result.value == 7000.0);
+}
+
+TEST_CASE("Sdc Parser: pinLoad", "[parser][SdcParser]")
+{
+  std::string input = "-pin_load 4.0";
+  auto first = input.begin();
+  auto last = input.end();
+  ast::AttrValue result;
+  CHECK(parsePhrase(first, last, pinLoad, space, result));
+  REQUIRE(result.value == 4.0);
+}
+
+TEST_CASE("Sdc Parser: fallTransition", "[parser][SdcParser]")
+{
+  std::string input = "-input_transition_fall 10.0";
+  auto first = input.begin();
+  auto last = input.end();
+  ast::AttrValue result;
+  CHECK(parsePhrase(first, last, fallTransition, space, result));
+  REQUIRE(result.value == 10.0);
+}
+
+TEST_CASE("Sdc Parser: riseTransition", "[parser][SdcParser]")
+{
+  std::string input = "-input_transition_rise 20.0";
+  auto first = input.begin();
+  auto last = input.end();
+  ast::AttrValue result;
+  CHECK(parsePhrase(first, last, riseTransition, space, result));
+  REQUIRE(result.value == 20.0);
+}
