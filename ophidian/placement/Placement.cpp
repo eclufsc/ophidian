@@ -22,7 +22,7 @@ namespace ophidian {
 namespace placement {
 
 Placement::Placement(const circuit::Netlist &netlist): 
-    locations_(netlist.makeProperty<util::Location>(circuit::Cell()))
+    locations_(netlist.makeProperty<util::LocationMicron>(circuit::Cell()))
     { }
 
 Placement::~Placement()
@@ -30,7 +30,7 @@ Placement::~Placement()
 
 }
 
-void Placement::placeCell(const circuit::Cell & cell, const util::Location & location)
+void Placement::placeCell(const circuit::Cell & cell, const util::LocationMicron & location)
 {
     locations_[cell] = location;
 }

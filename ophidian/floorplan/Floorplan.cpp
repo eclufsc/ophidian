@@ -35,17 +35,17 @@ Floorplan::~Floorplan()
 
 }
 
-void Floorplan::chipOrigin(const util::Location &loc)
+void Floorplan::chipOrigin(const util::LocationMicron &loc)
 {
     chipOrigin_ = loc;
 }
 
-void Floorplan::chipUpperRightCorner(const util::Location &loc)
+void Floorplan::chipUpperRightCorner(const util::LocationMicron &loc)
 {
     chipUpperRightCorner_ = loc;
 }
 
-Site Floorplan::add(Site, const std::string & name, const util::Location & loc)
+Site Floorplan::add(Site, const std::string & name, const util::LocationMicron & loc)
 {
     auto site = sites_.add();
     names_[site] = name;
@@ -58,7 +58,7 @@ void Floorplan::erase(Site site)
     sites_.erase(site);
 }
 
-Row Floorplan::add(Row, const util::Location &loc, size_t num, const Site &site)
+Row Floorplan::add(Row, const util::LocationMicron &loc, size_t num, const Site &site)
 {
     auto row = rows_.add();
     origins_[row] = loc;
@@ -72,12 +72,12 @@ void Floorplan::erase(const Row &row)
     rows_.erase(row);
 }
 
-util::Location Floorplan::rowUpperRightCorner(const Row &row) const
+util::LocationMicron Floorplan::rowUpperRightCorner(const Row &row) const
 {
     auto site = siteTypeOfRow_[row];
     size_t numSites = numberOfSites_[row];
-    util::Location uRCorner = dimensions_[site];
-    return util::Location(uRCorner.x() * numSites, uRCorner.y());
+    util::LocationMicron uRCorner = dimensions_[site];
+    return util::LocationMicron(uRCorner.x() * numSites, uRCorner.y());
 }
 
 } //namespace floorplan
