@@ -154,16 +154,17 @@ public:
 	   \param entity A handler for the Entity to erase.
 	   \brief Erases an Entity instance as well as its atached Properties.
 	 */
-	void erase(const Entity& entity)
-	{
-		notifier_.erase(entity);
-		auto index = id(entity);
-		auto lastEntityId = id(container_.back());
-		std::swap(container_[index], container_.back());
-		container_.pop_back();
-		id2Index_[lastEntityId] = index;
-		id2Index_[index] = std::numeric_limits<uint32_t>::max();
-	}
+    void erase(const Entity& entity)
+    {
+        notifier_.erase(entity);
+        auto entityId = EntitySystemBase::id(entity);
+        auto index = id(entity);
+        auto lastEntityId = EntitySystemBase::id(container_.back());
+        std::swap(container_[index], container_.back());
+        container_.pop_back();
+        id2Index_[lastEntityId] = index;
+        id2Index_[entityId] = std::numeric_limits<uint32_t>::max();
+    }
 	//! Clear Entities
 	/*!
 	   \brief Erases all Entities as well as its atached Properties.
