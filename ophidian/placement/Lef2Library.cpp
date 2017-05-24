@@ -41,6 +41,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
 
         for(auto pin : macro.pins){
             auto stdPin = std_cells.add(standard_cell::Pin(), macro.name+":"+pin.name, standard_cell::PinDirection(pin.direction));
+            std_cells.add(stdCell, stdPin);
             for(auto port : pin.ports)
                 for(auto rect : port.rects)
                     library.pinOffset(stdPin, util::Location(0.5*(rect.xl+rect.xh)*lef.databaseUnits(), 0.5*(rect.yl+rect.yh)*lef.databaseUnits()));
