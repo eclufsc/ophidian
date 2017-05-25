@@ -1,19 +1,19 @@
 /*
  * Copyright 2017 Ophidian
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
  */
 
 #ifndef OPHIDIAN_GEOMETRY_OPERATIONS_H
@@ -23,8 +23,10 @@ under the License.
 
 #include "Models.h"
 
-namespace ophidian {
-namespace geometry {
+namespace ophidian
+{
+namespace geometry
+{
 
 //! Translation operation
 /*!
@@ -48,8 +50,8 @@ void translate(const Geometry & geometry, const Point & translationPoint, Geomet
  */
 template<class Geometry>
 void scale(const Geometry & geometry, const Point & scalingPoint, Geometry & result) {
-    boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(scalingPoint.x(), scalingPoint.y());
-    boost::geometry::transform(geometry, result, scale);
+	boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(scalingPoint.x(), scalingPoint.y());
+	boost::geometry::transform(geometry, result, scale);
 }
 
 //! Rotate operation
@@ -74,10 +76,10 @@ void rotate(const Geometry & geometry, double degree, Geometry & result) {
  */
 template<class Geometry1, class Geometry2, class GeometryOut>
 void intersection(const Geometry1 & geometry1, const Geometry2 & geometry2, GeometryOut & result) {
-    boost::geometry::intersection(geometry1, geometry2, result);
+	boost::geometry::intersection(geometry1, geometry2, result);
 }
 
-}
-}
+} // namespace geometry
+} // namespace ophidian
 
 #endif // OPHIDIAN_GEOMETRY_OPERATIONS_H

@@ -21,10 +21,8 @@ under the License.
 namespace ophidian{
 namespace placement{
 void def2placement(const parser::Def & def, placement::Placement & placement, circuit::Netlist & netlist){
-    for(auto & component : def.components()){
-        util::Location cellPosition(component.position.x, component.position.y);
-        placement.placeCell(netlist.add(circuit::Cell(), component.name), cellPosition);
-    }
+    for(auto & component : def.components())
+        placement.placeCell(netlist.add(circuit::Cell(), component.name), util::LocationMicron(component.position.x, component.position.y));
 }
 }
 }

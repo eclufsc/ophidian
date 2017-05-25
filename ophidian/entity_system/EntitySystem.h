@@ -1,19 +1,19 @@
 /*
  * Copyright 2017 Ophidian
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
  */
 
 #ifndef OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEM_H
@@ -157,12 +157,13 @@ public:
 	void erase(const Entity& entity)
 	{
 		notifier_.erase(entity);
+		auto entityId = EntitySystemBase::id(entity);
 		auto index = id(entity);
-		auto lastEntityId = id(container_.back());
+		auto lastEntityId = EntitySystemBase::id(container_.back());
 		std::swap(container_[index], container_.back());
 		container_.pop_back();
 		id2Index_[lastEntityId] = index;
-		id2Index_[index] = std::numeric_limits<uint32_t>::max();
+		id2Index_[entityId] = std::numeric_limits<uint32_t>::max();
 	}
 	//! Clear Entities
 	/*!
@@ -285,7 +286,7 @@ template <class T>
 uint32_t EntitySystem<T>::idCounter_ = 0;
 
 
-}
-}
+} // namespace entity_system
+} // namespace ophidian
 
 #endif // OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEM_H

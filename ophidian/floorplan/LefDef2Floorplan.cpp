@@ -21,12 +21,12 @@ under the License.
 namespace ophidian{
 namespace floorplan{
 void lefDef2Floorplan(const parser::Lef &lef, const parser::Def &def, Floorplan &floorplan){
-    floorplan.chipOrigin(util::Location(def.die().lower.x, def.die().lower.y));
-    floorplan.chipUpperRightCorner(util::Location(def.die().upper.x, def.die().upper.y));
+    floorplan.chipOrigin(util::LocationMicron(def.die().lower.x, def.die().lower.y));
+    floorplan.chipUpperRightCorner(util::LocationMicron(def.die().upper.x, def.die().upper.y));
     for(auto & site : lef.sites())
-        floorplan.add(Site(), site.name, util::Location(site.x*lef.databaseUnits(), site.y*lef.databaseUnits()));
+        floorplan.add(Site(), site.name, util::LocationMicron(site.x*lef.databaseUnits(), site.y*lef.databaseUnits()));
     for(auto & row : def.rows())
-        floorplan.add(Row(), util::Location(row.origin.x, row.origin.y), row.num.x, floorplan.find(row.site));
+        floorplan.add(Row(), util::LocationMicron(row.origin.x, row.origin.y), row.num.x, floorplan.find(row.site));
 }
 }
 }

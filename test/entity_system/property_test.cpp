@@ -156,5 +156,31 @@ TEST_CASE("Property: property capacity", "[entity_system][Property]") {
 
 }
 
+TEST_CASE("Property: accessing property after erasing entity", "[entity_system][Property]") {
+    EntitySystem<MyEntity> sys;
+    auto en1 = sys.add();
+    auto en2 = sys.add();
+
+    Property<MyEntity, int> prop(sys);
+    prop[en1] = 1;
+    prop[en2] = 2;
+
+    REQUIRE(prop[en1] == 1);
+    REQUIRE(prop[en2] == 2);
+
+    sys.erase(en1);
+
+    auto en3 = sys.add();
+
+    prop[en3] = 3;
+
+    REQUIRE(prop[en2] == 2);
+    REQUIRE(prop[en3] == 3);
+
+    sys.erase(en2);
+
+    REQUIRE(prop[en3] == 3);
+}
+
 
 

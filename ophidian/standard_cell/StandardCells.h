@@ -1,19 +1,19 @@
 /*
  * Copyright 2017 Ophidian
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
  */
 
 #ifndef OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_H
@@ -26,19 +26,21 @@ under the License.
 #include <ophidian/entity_system/Composition.h>
 #include <ophidian/util/Range.h>
 
-namespace ophidian {
-namespace standard_cell {
+namespace ophidian
+{
+namespace standard_cell
+{
 
 class Pin : public entity_system::EntityBase
 {
 public:
-    using entity_system::EntityBase::EntityBase;
+	using entity_system::EntityBase::EntityBase;
 };
 
 class Cell : public entity_system::EntityBase
 {
 public:
-    using entity_system::EntityBase::EntityBase;
+	using entity_system::EntityBase::EntityBase;
 };
 
 enum class PinDirection {
@@ -48,26 +50,26 @@ enum class PinDirection {
 class StandardCells
 {
 public:
-    using CellsIterator = entity_system::EntitySystem<Cell>::const_iterator;
-    using PinsIterator = entity_system::EntitySystem<Pin>::const_iterator;
+	using CellsIterator = entity_system::EntitySystem<Cell>::const_iterator;
+	using PinsIterator = entity_system::EntitySystem<Pin>::const_iterator;
 
-    //! StandardCell Constructor
-    /*!
-       \brief Constructs an empty system with no Cells and Pins.
-     */
-    StandardCells();
+	//! StandardCell Constructor
+	/*!
+	   \brief Constructs an empty system with no Cells and Pins.
+	 */
+	StandardCells();
 
-    //! StandardCell Move Constructor
-    /*!
-        \brief Move the entity system and its properties.
-     */
-    StandardCells(const StandardCells && stdCell);
+	//! StandardCell Move Constructor
+	/*!
+	    \brief Move the entity system and its properties.
+	 */
+	StandardCells(const StandardCells && stdCell);
 
-    //! StandardCell Destructor
-    /*!
-       \brief Destroys the Cells and Pins EntitySystem, including its properties.
-     */
-    ~StandardCells();
+	//! StandardCell Destructor
+	/*!
+	   \brief Destroys the Cells and Pins EntitySystem, including its properties.
+	 */
+	~StandardCells();
 
 //--------------------------- Cells -------------------------------//
 
@@ -234,27 +236,26 @@ public:
     const {
         return entity_system::Property<Pin, Value>(pins_);
     }
-
 //--------------------------- Association -------------------------------//
 
-    //! Add Pin into Cell
-    /*!
-       \brief Adds a Pin to a given Cell.
-       \param cell A handler for the Cell we want to add a Pin.
-       \param pin A handler for the Pin we want to add in \p cell.
-     */
-    //Maybe rename to create_association or associate...
-    void add(const Cell& cell, const Pin& pin);
+	//! Add Pin into Cell
+	/*!
+	   \brief Adds a Pin to a given Cell.
+	   \param cell A handler for the Cell we want to add a Pin.
+	   \param pin A handler for the Pin we want to add in \p cell.
+	 */
+	//Maybe rename to create_association or associate...
+	void add(const Cell& cell, const Pin& pin);
 
 private:
-    //cells entity system and properties
-    entity_system::EntitySystem<Cell> cells_;
-    entity_system::Property<Cell, std::string> cellNames_;
+	//cells entity system and properties
+	entity_system::EntitySystem<Cell> cells_;
+	entity_system::Property<Cell, std::string> cellNames_;
 
-    //pins entity system and properties
-    entity_system::EntitySystem<Pin> pins_;
-    entity_system::Property<Pin, std::string> pinNames_;
-    entity_system::Property<Pin, PinDirection> pinDirections_;
+	//pins entity system and properties
+	entity_system::EntitySystem<Pin> pins_;
+	entity_system::Property<Pin, std::string> pinNames_;
+	entity_system::Property<Pin, PinDirection> pinDirections_;
 
     //composition and aggregation relations
     entity_system::Composition<Cell, Pin> cellPins_;

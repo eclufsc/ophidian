@@ -1,19 +1,19 @@
 /*
  * Copyright 2017 Ophidian
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
  */
 
 #include "VerilogParser.h"
@@ -23,6 +23,7 @@ under the License.
 #include <fstream>
 
 #ifdef __cplusplus
+
 extern "C" {
 #endif
 #include <3rdparty/verilog-parser/src/verilog_parser.h>
@@ -50,7 +51,7 @@ using Expression = ast_expression;
 using NetDeclaration = ast_net_declaration;
 using PortDirection = ast_port_direction;
 
-}
+} // namespace
 
 Verilog::Module* Verilog::addModule(const std::string &name)
 {
@@ -102,7 +103,7 @@ Verilog* VerilogParser::readStream(std::istream &in)
     auto inp = std::make_unique<Verilog>();
     Verilog* verilog = inp.get();
     auto source = yy_verilog_source_tree;
-    ModuleDeclaration* vModule = static_cast<ModuleDeclaration*>(ast_list_get(source -> modules, 0));
+    ModuleDeclaration* vModule = static_cast<ModuleDeclaration*>(ast_list_get(source->modules, 0));
     auto module = verilog->addModule(vModule->identifier->identifier);
 
     std::unordered_map<std::string, Verilog::Net*> netMapping;
@@ -285,7 +286,7 @@ bool Verilog::Net::operator==(const Verilog::Net &o) const
     return name_ == o.name_;
 }
 
-Verilog::Instance::Instance(Verilog::Module *module, const std::string name):
+Verilog::Instance::Instance(Verilog::Module *module, const std::string name) :
     module_(module),
     name_(name)
 {
@@ -312,6 +313,6 @@ const std::map<const Verilog::Port *, const Verilog::Net *> &Verilog::Instance::
     return portMapping_;
 }
 
-}
-}
+} // namespace parser
+} // namespace ophidian
 

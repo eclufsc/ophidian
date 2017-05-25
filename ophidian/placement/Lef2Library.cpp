@@ -26,7 +26,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
         auto stdCell = stdCells.add(standard_cell::Cell(), macro.name);
         auto layer2RectsM1 = macro.obses.layer2rects.find("metal1");
         if(layer2RectsM1 != macro.obses.layer2rects.end()){
-            util::MultiBox geometry;
+            geometry::MultiBox geometry;
             for(auto & rect : layer2RectsM1->second){
                 ophidian::geometry::Point pmin = {rect.xl*lef.databaseUnits(), rect.yl*lef.databaseUnits()};
                 ophidian::geometry::Point pmax = {rect.xh*lef.databaseUnits(), rect.yh*lef.databaseUnits()};
@@ -36,7 +36,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
         }else{
             ophidian::geometry::Point pmin = {macro.origin.x*lef.databaseUnits(), macro.origin.y*lef.databaseUnits()};
             ophidian::geometry::Point pmax = {macro.size.x*lef.databaseUnits(), macro.size.y*lef.databaseUnits()};
-            library.geometry(stdCell, util::MultiBox({ophidian::geometry::Box(pmin, pmax)}));
+            library.geometry(stdCell, geometry::MultiBox({ophidian::geometry::Box(pmin, pmax)}));
         }
 
         for(auto pin : macro.pins){
@@ -44,7 +44,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
             stdCells.add(stdCell, stdPin);
             for(auto port : pin.ports)
                 for(auto rect : port.rects)
-                    library.pinOffset(stdPin, util::Location(0.5*(rect.xl+rect.xh)*lef.databaseUnits(), 0.5*(rect.yl+rect.yh)*lef.databaseUnits()));
+                    library.pinOffset(stdPin, util::LocationMicron(0.5*(rect.xl+rect.xh)*lef.databaseUnits(), 0.5*(rect.yl+rect.yh)*lef.databaseUnits()));
         }
     }
 }
