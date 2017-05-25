@@ -24,7 +24,7 @@ under the License.
 
 namespace ophidian{
 namespace placement{
-void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & std_cells);
+void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & stdCells);
 }
 }
 

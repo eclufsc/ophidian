@@ -58,11 +58,11 @@ TEST_CASE_METHOD(Verilog2NetlistFixture, "Verilog2Netlist: The Verilog object an
     REQUIRE(simple.ports().size() == (netlist.size(circuit::Input()) + netlist.size(circuit::Output())));
     REQUIRE(simple.instances().size() == netlist.size(circuit::Cell()));
 
-    std::size_t module_size_pins = 0;
+    std::size_t moduleSizePins = 0;
     for(auto instance : simple.instances())
-        module_size_pins += instance.portMapping().size();
-    module_size_pins += simple.ports().size();
-    REQUIRE(module_size_pins == netlist.size(circuit::Pin()));
+        moduleSizePins += instance.portMapping().size();
+    moduleSizePins += simple.ports().size();
+    REQUIRE(moduleSizePins == netlist.size(circuit::Pin()));
 }
 
 TEST_CASE_METHOD(Verilog2NetlistFixture, "Verilog2Netlist: Fetching some entities by their names and check their names.", "[circuit][Netlist][Verilog]")

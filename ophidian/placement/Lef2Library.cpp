@@ -21,9 +21,9 @@ under the License.
 namespace ophidian{
 namespace placement{
 
-void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & std_cells){
+void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & stdCells){
     for(auto & macro : lef.macros()){
-        auto stdCell = std_cells.add(standard_cell::Cell(), macro.name);
+        auto stdCell = stdCells.add(standard_cell::Cell(), macro.name);
         auto layer2RectsM1 = macro.obses.layer2rects.find("metal1");
         if(layer2RectsM1 != macro.obses.layer2rects.end()){
             util::MultiBox geometry;
@@ -40,8 +40,8 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
         }
 
         for(auto pin : macro.pins){
-            auto stdPin = std_cells.add(standard_cell::Pin(), macro.name+":"+pin.name, standard_cell::PinDirection(pin.direction));
-            std_cells.add(stdCell, stdPin);
+            auto stdPin = stdCells.add(standard_cell::Pin(), macro.name+":"+pin.name, standard_cell::PinDirection(pin.direction));
+            stdCells.add(stdCell, stdPin);
             for(auto port : pin.ports)
                 for(auto rect : port.rects)
                     library.pinOffset(stdPin, util::Location(0.5*(rect.xl+rect.xh)*lef.databaseUnits(), 0.5*(rect.yl+rect.yh)*lef.databaseUnits()));

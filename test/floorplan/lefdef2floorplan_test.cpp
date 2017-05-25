@@ -7,10 +7,10 @@ namespace {
 class LefDef2FloorplanFixture {
 public:
     LefDef2FloorplanFixture() {
-        ophidian::parser::DefParser def_parser;
-        def = std::move(def_parser.readFile("./input_files/simple.def"));
-        ophidian::parser::LefParser lef_parser;
-        lef = std::move(lef_parser.readFile("./input_files/simple.lef"));
+        ophidian::parser::DefParser defParser;
+        def = std::move(defParser.readFile("./input_files/simple.def"));
+        ophidian::parser::LefParser lefParser;
+        lef = std::move(lefParser.readFile("./input_files/simple.lef"));
     }
 
     std::unique_ptr<ophidian::parser::Def> def;

@@ -24,12 +24,12 @@ namespace circuit{
 void verilog2Netlist(const parser::Verilog &verilog, Netlist &netlist){
     const parser::Verilog::Module & module = verilog.modules().front();
 
-    std::size_t size_pins = 0;
+    std::size_t sizePins = 0;
     for(auto instance : module.instances())
-        size_pins += instance.portMapping().size();
-    size_pins += module.ports().size();
+        sizePins += instance.portMapping().size();
+    sizePins += module.ports().size();
 
-    netlist.reserve(Pin(), size_pins);
+    netlist.reserve(Pin(), sizePins);
     netlist.reserve(Net(), module.nets().size());
     netlist.reserve(Cell(), module.instances().size());
 
@@ -48,10 +48,10 @@ void verilog2Netlist(const parser::Verilog &verilog, Netlist &netlist){
 
     for(auto instance : module.instances()){
         auto cell = netlist.add(Cell(), instance.name());
-        for(auto port_map : instance.portMapping()){
-            auto pin = netlist.add(Pin(), instance.name()+":"+port_map.first->name());
+        for(auto portMap : instance.portMapping()){
+            auto pin = netlist.add(Pin(), instance.name()+":"+portMap.first->name());
             netlist.add(cell, pin);
-            netlist.connect(netlist.find(Net(), port_map.second->name()), pin);
+            netlist.connect(netlist.find(Net(), portMap.second->name()), pin);
         }
     }
 }
