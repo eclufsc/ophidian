@@ -45,7 +45,7 @@ public:
 	   \return Geometry of the cell.
 	 */
 	geometry::MultiBox geometry(const standard_cell::Cell & cell) const {
-		return geometries_[cell];
+		return mGeometries[cell];
 	}
 
 	//! Cell geometry setter
@@ -63,7 +63,7 @@ public:
 	   \return Offset of the pin.
 	 */
 	util::LocationMicron pinOffset(const standard_cell::Pin & pin) const {
-		return pinOffsets_[pin];
+		return mPinOffsets[pin];
 	}
 
 	//! Pin offset setter
@@ -75,8 +75,8 @@ public:
 	void pinOffset(const standard_cell::Pin & pin, const util::LocationMicron & offset);
 
 private:
-	entity_system::Property<standard_cell::Cell, geometry::MultiBox> geometries_;
-	entity_system::Property<standard_cell::Pin, util::LocationMicron> pinOffsets_;
+	entity_system::Property<standard_cell::Cell, geometry::MultiBox> mGeometries;
+	entity_system::Property<standard_cell::Pin, util::LocationMicron> mPinOffsets;
 };
 } // namespace placement
 } // namespace ophidian

@@ -24,19 +24,19 @@ namespace placement
 {
 
 Library::Library(const standard_cell::StandardCells &std_cells) :
-	geometries_(std_cells.makeProperty<geometry::MultiBox>(standard_cell::Cell())),
-	pinOffsets_(std_cells.makeProperty<util::LocationMicron>(standard_cell::Pin()))
+    mGeometries(std_cells.makeProperty<geometry::MultiBox>(standard_cell::Cell())),
+    mPinOffsets(std_cells.makeProperty<util::LocationMicron>(standard_cell::Pin()))
 {
 }
 
 void Library::geometry(const standard_cell::Cell &cell, const geometry::MultiBox &geometry)
 {
-	geometries_[cell] = geometry;
+    mGeometries[cell] = geometry;
 }
 
 void Library::pinOffset(const standard_cell::Pin &pin, const util::LocationMicron &offset)
 {
-	pinOffsets_[pin] = offset;
+    mPinOffsets[pin] = offset;
 }
 
 } // namespace placement

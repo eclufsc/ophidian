@@ -30,26 +30,26 @@ namespace parser
 
 struct Lef::Impl
 {
-	std::vector<site> sites_;
-	std::vector<layer> layers_;
-	std::vector<macro> macros_;
-	LefDefParser::lefiUnits units_;
+    std::vector<site> sites_;
+    std::vector<layer> layers_;
+    std::vector<macro> macros_;
+    LefDefParser::lefiUnits units_;
 };
 
 const std::vector<Lef::site>& Lef::sites() const {
-	return this_->sites_;
+    return mThis->sites_;
 }
 
 const std::vector<Lef::layer>& Lef::layers() const {
-	return this_->layers_;
+    return mThis->layers_;
 }
 
 const std::vector<Lef::macro>& Lef::macros() const {
-	return this_->macros_;
+    return mThis->macros_;
 }
 
 double Lef::databaseUnits() const {
-	return this_->units_.databaseNumber();
+    return mThis->units_.databaseNumber();
 }
 
 LefParser::LefParser() {
@@ -74,8 +74,8 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 	lefrSetUnitsCbk(
 		[](lefrCallbackType_e, lefiUnits* units, lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->this_->units_ = *units;
-				static_cast<Lef*>(ud)->this_->units_.setDatabase(units->databaseName(), units->databaseNumber());
+                static_cast<Lef*>(ud)->mThis->units_ = *units;
+                static_cast<Lef*>(ud)->mThis->units_.setDatabase(units->databaseName(), units->databaseNumber());
 				return 0;
 			}
 		);
@@ -84,7 +84,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 		[](lefrCallbackType_e, lefiSite* l, lefiUserData ud) -> int {
 				Lef::site s;
 				s.name = l->name();
-				s.class_ = (l->hasClass() ? l->siteClass() : "");
+                s.mClass = (l->hasClass() ? l->siteClass() : "");
 
 				if(l->hasXSymmetry())
 					s.setXsymmetry();
@@ -98,7 +98,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 				s.x = l->sizeX();
 				s.y = l->sizeY();
 
-				static_cast<Lef*>(ud)->this_->sites_.push_back(s);
+                static_cast<Lef*>(ud)->mThis->sites_.push_back(s);
 				return 0;
 			}
 		);
@@ -127,14 +127,14 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 				lay.pitch = l->pitch();
 				lay.width = l->width();
 
-				static_cast<Lef*>(ud)->this_->layers_.push_back(lay);
+                static_cast<Lef*>(ud)->mThis->layers_.push_back(lay);
 				return 0;
 			}
 		);
 
 	lefrSetPinCbk(
 		[](lefrCallbackType_e, lefiPin* l, lefiUserData ud) -> int {
-				Lef::macro& m = static_cast<Lef*>(ud)->this_->macros_.back();
+                Lef::macro& m = static_cast<Lef*>(ud)->mThis->macros_.back();
 				Lef::pin p;
 				p.name = l->name();
 
@@ -180,7 +180,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 	lefrSetMacroBeginCbk(
 		[](lefrCallbackType_e, const char *string, lefiUserData ud) -> int {
-				static_cast<Lef*>(ud)->this_->macros_.push_back(Lef::macro {string});
+                static_cast<Lef*>(ud)->mThis->macros_.push_back(Lef::macro {string});
 				return 0;
 			}
 		);
@@ -188,7 +188,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 	lefrSetObstructionCbk(
 		[](lefrCallbackType_e, lefiObstruction* l, lefiUserData ud) -> int {
 				auto geometries = l->geometries();
-				Lef::macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
+                Lef::macro & m = static_cast<Lef*>(ud)->mThis->macros_.back();
 				std::string last_layer;
 				for(int i = 0; i < geometries->numItems(); ++i)
 				{
@@ -210,9 +210,9 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 	lefrSetMacroCbk(
 		[](lefrCallbackType_e, lefiMacro* l, lefiUserData ud) -> int {
-				Lef::macro & m = static_cast<Lef*>(ud)->this_->macros_.back();
+                Lef::macro & m = static_cast<Lef*>(ud)->mThis->macros_.back();
 				m.name = l->name();
-				m.class_ = (l->hasClass() ? l->macroClass() : "");
+                m.mClass = (l->hasClass() ? l->macroClass() : "");
 				m.origin.x = l->originX();
 				m.origin.y = l->originY();
 				if(l->hasForeign())
@@ -239,7 +239,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 	return inp;
 }
 
-Lef::Lef() : this_(new Impl) {
+Lef::Lef() : mThis(new Impl) {
 }
 
 Lef::~Lef()

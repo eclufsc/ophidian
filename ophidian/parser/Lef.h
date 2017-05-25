@@ -55,7 +55,7 @@ public:
 		};
 
 		std::string name; ///< Name of the site
-		std::string class_; ///< Class of the site
+        std::string mClass; ///< Class of the site
 		double x; ///< Width of the site
 		double y; ///< Height of the site
 
@@ -154,7 +154,7 @@ public:
 	struct macro
 	{
 		std::string name; ///< Name of the macro
-		std::string class_; ///< Class of the macro
+        std::string mClass; ///< Class of the macro
 		std::vector<pin> pins; ///< Vector with all the macro pins
 		macro_foreign foreign; ///< Struct with the foreign propertiy
 		macro_size size; ///< Struct with the size
@@ -165,7 +165,7 @@ public:
 
 private:
 	struct Impl;
-	const std::unique_ptr<Impl> this_;
+    const std::unique_ptr<Impl> mThis;
 
 public:
 	/// Constructor.

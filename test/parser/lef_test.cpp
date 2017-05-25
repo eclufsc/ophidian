@@ -8,7 +8,7 @@ using namespace ophidian;
 bool compare(const parser::Lef::site & a, const parser::Lef::site & b)
 {
     return a.name == b.name &&
-           a.class_ == b.class_ &&
+           a.mClass == b.mClass &&
            a.symmetry == b.symmetry &&
            Approx(a.x) == b.x &&
            Approx(a.y) == b.y;
@@ -120,7 +120,7 @@ bool compare(const std::vector<parser::Lef::pin> & a, const std::vector<parser::
 bool compare(const parser::Lef::macro & a, const parser::Lef::macro & b)
 {
     return a.name == b.name &&
-           a.class_ == b.class_ &&
+           a.mClass == b.mClass &&
            compare(a.pins, b.pins) &&
            compare(a.foreign, b.foreign) &&
            compare(a.size, b.size) &&
@@ -155,7 +155,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
 
         parser::Lef::site core;
         core.name = "core";
-        core.class_ = "CORE";
+        core.mClass = "CORE";
         core.x = 0.19;
         core.y = 1.71;
 
@@ -209,7 +209,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]") {
 
         parser::Lef::macro m1;
         m1.name = "INV_X1";
-        m1.class_ = "CORE";
+        m1.mClass = "CORE";
         m1.pins = {o, a};
         m1.foreign = m1_foreign;
         m1.size = {0.760, 1.71};
