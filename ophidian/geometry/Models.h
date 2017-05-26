@@ -82,46 +82,46 @@ public:
 
 	//!Constructor receiving a vector of geometry::Box
 	MultiBox(const std::vector<geometry::Box> & boxes)
-		: boxes_(boxes) {
+        : mBoxes(boxes) {
 
 	}
 
 	//!Copy constructor
 	MultiBox(const MultiBox & otherBox)
-		: boxes_(otherBox.boxes_) {
+        : mBoxes(otherBox.mBoxes) {
 
 	}
 
 	//!Push back a geometry::Box
 	void push_back(const geometry::Box & box) {
-		boxes_.push_back(box);
+        mBoxes.push_back(box);
 	}
 
 	//!Non-const iterator begin
 	std::vector<geometry::Box>::iterator begin() {
-		return boxes_.begin();
+        return mBoxes.begin();
 	}
 
 	//!Non-const iterator end
 	std::vector<geometry::Box>::iterator end() {
-		return boxes_.end();
+        return mBoxes.end();
 	}
 
 	//!Const iterator begin
 	std::vector<geometry::Box>::const_iterator begin() const {
-		return boxes_.begin();
+        return mBoxes.begin();
 	}
 
 	//!Const iterator end
 	std::vector<geometry::Box>::const_iterator end() const {
-		return boxes_.end();
+        return mBoxes.end();
 	}
 
 	//!Operator overloading for comparison of two multibox objects
 	bool operator==(const MultiBox & other) const {
-		for (auto box1 : this->boxes_)
+        for (auto box1 : this->mBoxes)
 		{
-			for (auto box2 : other.boxes_)
+            for (auto box2 : other.mBoxes)
 			{
 				bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
 				                  && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
@@ -140,7 +140,7 @@ public:
 	}
 
 private:
-	std::vector<geometry::Box> boxes_;
+    std::vector<geometry::Box> mBoxes;
 };
 
 

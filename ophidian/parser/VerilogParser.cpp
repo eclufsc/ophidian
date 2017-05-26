@@ -56,13 +56,13 @@ using PortDirection = ast_port_direction;
 Verilog::Module* Verilog::addModule(const std::string &name)
 {
     Module module(name);
-    modules_.push_back(module);
-    return &modules_.back();
+    mModules.push_back(module);
+    return &mModules.back();
 }
 
 const std::list<Verilog::Module> &Verilog::modules() const
 {
-    return modules_;
+    return mModules;
 }
 
 struct VerilogParser::Impl
@@ -79,7 +79,7 @@ struct VerilogParser::Impl
 };
 
 VerilogParser::VerilogParser() :
-    this_(new Impl)
+    mThis(new Impl)
 {
 
 }
@@ -120,7 +120,7 @@ Verilog* VerilogParser::readStream(std::istream &in)
     for( ListElement* i = vModule->module_ports->head; i; i = i->next)
     {
         PortDeclaration* vPort = static_cast<PortDeclaration*>(i->data);
-        auto direction = this_->directionMapping.at(vPort->direction);
+        auto direction = mThis->directionMapping.at(vPort->direction);
         for(ListElement* portNameWalker = vPort->port_names->head; portNameWalker; portNameWalker = portNameWalker->next)
         {
             Identifier identifier = static_cast<Identifier>(portNameWalker->data);
@@ -192,125 +192,125 @@ Verilog *VerilogParser::readFile(const std::string &filename)
 
 Verilog::Module::Module(const std::string &name)
 {
-    name_ = name;
+    mName = name;
 }
 
 Verilog::Port* Verilog::Module::addPort(Verilog::PortDirection direction, const std::string name)
 {
     Port p(direction, name);
-    ports_.push_back(p);
-    return &ports_.back();
+    mPorts.push_back(p);
+    return &mPorts.back();
 }
 
 Verilog::Net *Verilog::Module::addNet(const std::string &name)
 {
     Net n(name);
-    nets_.push_back(n);
-    return &nets_.back();
+    mNets.push_back(n);
+    return &mNets.back();
 }
 
 Verilog::Module *Verilog::Module::addModule(const std::string &name)
 {
     Module m(name);
-    modules_.push_back(m);
-    return &modules_.back();
+    mModules.push_back(m);
+    return &mModules.back();
 }
 
 Verilog::Instance *Verilog::Module::addInstance(Verilog::Module *module, const std::string &name)
 {
     Instance inst(module, name);
-    instances_.push_back(inst);
-    return &instances_.back();
+    mInstances.push_back(inst);
+    return &mInstances.back();
 }
 
 const std::string &Verilog::Module::name() const
 {
-    return name_;
+    return mName;
 
 }
 
 const std::list<Verilog::Port> &Verilog::Module::ports() const
 {
-    return ports_;
+    return mPorts;
 }
 
 const std::list<Verilog::Net> &Verilog::Module::nets() const
 {
-    return nets_;
+    return mNets;
 }
 
 const std::list<Verilog::Module> &Verilog::Module::modules() const
 {
-    return modules_;
+    return mModules;
 }
 
 const std::list<Verilog::Instance> &Verilog::Module::instances() const
 {
-    return instances_;
+    return mInstances;
 }
 
 Verilog::Port::Port(Verilog::PortDirection direction, const std::string &name) :
-    direction_(direction),
-    name_(name)
+    mDirection(direction),
+    mName(name)
 {
 }
 
 Verilog::PortDirection Verilog::Port::direction() const
 {
-    return direction_;
+    return mDirection;
 }
 
 const std::string &Verilog::Port::name() const
 {
-    return name_;
+    return mName;
 }
 
 bool Verilog::Port::operator==(const Verilog::Port &o) const
 {
-    return name_ == o.name_ && direction_ == o.direction_;
+    return mName == o.mName && mDirection == o.mDirection;
 }
 
 Verilog::Net::Net(const std::string &name) :
-    name_(name)
+    mName(name)
 {
 
 }
 
 const std::string &Verilog::Net::name() const
 {
-    return name_;
+    return mName;
 }
 
 bool Verilog::Net::operator==(const Verilog::Net &o) const
 {
-    return name_ == o.name_;
+    return mName == o.mName;
 }
 
 Verilog::Instance::Instance(Verilog::Module *module, const std::string name) :
-    module_(module),
-    name_(name)
+    mModule(module),
+    mName(name)
 {
 
 }
 
 Verilog::Module *Verilog::Instance::module() const
 {
-    return module_;
+    return mModule;
 }
 
 const std::string &Verilog::Instance::name() const
 {
-    return name_;
+    return mName;
 }
 
 void Verilog::Instance::mapPort(const Verilog::Port *port, const Verilog::Net *net)
 {
-    portMapping_[port] = net;
+    mPortMapping[port] = net;
 }
 
 const std::map<const Verilog::Port *, const Verilog::Net *> &Verilog::Instance::portMapping() const
 {
-    return portMapping_;
+    return mPortMapping;
 }
 
 } // namespace parser

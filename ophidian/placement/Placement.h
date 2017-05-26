@@ -60,11 +60,11 @@ public:
 	   \return LocationMicron of the cell.
 	 */
 	util::LocationMicron location(const circuit::Cell & cell) const {
-		return locations_[cell];
+		return mLocations[cell];
 	}
 
 private:
-	entity_system::Property<circuit::Cell, util::LocationMicron> locations_;
+	entity_system::Property<circuit::Cell, util::LocationMicron> mLocations;
 };
 
 } //namespace placement

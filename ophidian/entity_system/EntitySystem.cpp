@@ -24,8 +24,8 @@ namespace entity_system
 {
 
 EntityBase::EntityBase() :
-	id_(std::numeric_limits<uint32_t>::max()),
-	system_(nullptr)
+    mId(std::numeric_limits<uint32_t>::max()),
+    mSystem(nullptr)
 {
 
 }
@@ -37,7 +37,7 @@ EntityBase::~EntityBase()
 
 bool EntityBase::operator==(const EntityBase &entity) const
 {
-	return id_ == entity.id_ && system_ == entity.system_;
+    return mId == entity.mId && mSystem == entity.mSystem;
 }
 
 bool EntityBase::operator!=(const EntityBase &entity) const
@@ -46,15 +46,15 @@ bool EntityBase::operator!=(const EntityBase &entity) const
 }
 
 EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
-	id_(id),
-	system_(system)
+    mId(id),
+    mSystem(system)
 {
 
 }
 
 uint32_t EntitySystemBase::id(const EntityBase &en) const
 {
-	return en.id_;
+    return en.mId;
 }
 
 } // namespace entity_system

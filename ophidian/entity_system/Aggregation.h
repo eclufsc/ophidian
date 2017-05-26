@@ -61,7 +61,7 @@ public:
 
 	void clear() override
 	{
-		for(auto const & part : Parent::partSystem_)
+		for(auto const & part : Parent::mPartSystem)
 		{
 			Parent::eraseAssociation(Parent::whole(part), part);
 		}
