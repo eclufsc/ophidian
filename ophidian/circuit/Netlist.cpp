@@ -41,20 +41,22 @@ Netlist::~Netlist()
 
 Cell Netlist::add(Cell, std::string cellName)
 {
-    if(name2Cell_.find(cellName) == name2Cell_.end()){
-        auto cell = cells_.add();
-        cellNames_[cell] = cellName;
-        name2Cell_[cellName] = cell;
-        return cell;
-    }else{
-        return name2Cell_[cellName];
-    }
+	if(name2Cell_.find(cellName) == name2Cell_.end())
+	{
+		auto cell = cells_.add();
+		cellNames_[cell] = cellName;
+		name2Cell_[cellName] = cell;
+		return cell;
+	}
+	else {
+		return name2Cell_[cellName];
+	}
 }
 
 void Netlist::erase(const Cell &c)
 {
-    name2Cell_.erase(cellNames_[c]);
-    cells_.erase(c);
+	name2Cell_.erase(cellNames_[c]);
+	cells_.erase(c);
 }
 
 uint32_t Netlist::size(Cell) const
@@ -64,20 +66,22 @@ uint32_t Netlist::size(Cell) const
 
 Pin Netlist::add(Pin, std::string pinName)
 {
-    if(name2Pin_.find(pinName) == name2Pin_.end()){
-        auto pin = pins_.add();
-        pinNames_[pin] = pinName;
-        name2Pin_[pinName] = pin;
-        return pin;
-    }else{
-        return name2Pin_[pinName];
-    }
+	if(name2Pin_.find(pinName) == name2Pin_.end())
+	{
+		auto pin = pins_.add();
+		pinNames_[pin] = pinName;
+		name2Pin_[pinName] = pin;
+		return pin;
+	}
+	else {
+		return name2Pin_[pinName];
+	}
 }
 
 void Netlist::erase(const Pin &en)
 {
-    name2Pin_.erase(pinNames_[en]);
-    pins_.erase(en);
+	name2Pin_.erase(pinNames_[en]);
+	pins_.erase(en);
 }
 
 uint32_t Netlist::size(Pin) const
@@ -87,20 +91,22 @@ uint32_t Netlist::size(Pin) const
 
 Net Netlist::add(Net, std::string netName)
 {
-    if(name2Net_.find(netName) == name2Net_.end()){
-        auto net = nets_.add();
-        netNames_[net] = netName;
-        name2Net_[netName] = net;
-        return net;
-    }else{
-        return name2Net_[netName];
-    }
+	if(name2Net_.find(netName) == name2Net_.end())
+	{
+		auto net = nets_.add();
+		netNames_[net] = netName;
+		name2Net_[netName] = net;
+		return net;
+	}
+	else {
+		return name2Net_[netName];
+	}
 }
 
 void Netlist::erase(const Net &en)
 {
-    name2Net_.erase(netNames_[en]);
-    nets_.erase(en);
+	name2Net_.erase(netNames_[en]);
+	nets_.erase(en);
 }
 
 uint32_t Netlist::size(Net) const
@@ -130,8 +136,8 @@ entity_system::EntitySystem<Pin>::NotifierType *Netlist::notifier(Pin) const
 
 void Netlist::reserve(Pin, uint32_t size)
 {
-    pins_.reserve(size);
-    name2Pin_.reserve(size);
+	pins_.reserve(size);
+	name2Pin_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Pin) const
@@ -141,12 +147,12 @@ uint32_t Netlist::capacity(Pin) const
 
 Pin Netlist::find(Pin, std::string pinName)
 {
-    return name2Pin_[pinName];
+	return name2Pin_[pinName];
 }
 
 std::string Netlist::name(const Pin& pin) const
 {
-    return pinNames_[pin];
+	return pinNames_[pin];
 }
 
 entity_system::EntitySystem<Cell>::const_iterator Netlist::begin(Cell) const
@@ -171,8 +177,8 @@ entity_system::EntitySystem<Cell>::NotifierType *Netlist::notifier(Cell) const
 
 void Netlist::reserve(Cell, uint32_t size)
 {
-    cells_.reserve(size);
-    name2Cell_.reserve(size);
+	cells_.reserve(size);
+	name2Cell_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Cell) const
@@ -182,12 +188,12 @@ uint32_t Netlist::capacity(Cell) const
 
 Cell Netlist::find(Cell, std::string cellName)
 {
-    return name2Cell_[cellName];
+	return name2Cell_[cellName];
 }
 
 std::string Netlist::name(const Cell& cell) const
 {
-    return cellNames_[cell];
+	return cellNames_[cell];
 }
 
 entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
@@ -227,8 +233,8 @@ entity_system::EntitySystem<Net>::NotifierType *Netlist::notifier(Net) const
 
 void Netlist::reserve(Net, uint32_t size)
 {
-    nets_.reserve(size);
-    name2Net_.reserve(size);
+	nets_.reserve(size);
+	name2Net_.reserve(size);
 }
 
 uint32_t Netlist::capacity(Net) const
@@ -238,12 +244,12 @@ uint32_t Netlist::capacity(Net) const
 
 Net Netlist::find(Net, std::string netName)
 {
-    return name2Net_[netName];
+	return name2Net_[netName];
 }
 
 std::string Netlist::name(const Net& net) const
 {
-    return netNames_[net];
+	return netNames_[net];
 }
 
 entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
@@ -340,4 +346,3 @@ void Netlist::shrinkToFit()
 
 } // namespace circuit
 } // namespace ophidian
-

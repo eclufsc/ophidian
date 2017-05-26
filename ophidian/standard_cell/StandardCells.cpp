@@ -48,20 +48,22 @@ StandardCells::~StandardCells() = default;
 
 Cell StandardCells::add(Cell, const std::string &name)
 {
-    if(name2Cell_.find(name) == name2Cell_.end()){
-        auto cell = cells_.add();
-        cellNames_[cell] = name;
-        name2Cell_[name] = cell;
-        return cell;
-    }else{
-        return name2Cell_[name];
-    }
+	if(name2Cell_.find(name) == name2Cell_.end())
+	{
+		auto cell = cells_.add();
+		cellNames_[cell] = name;
+		name2Cell_[name] = cell;
+		return cell;
+	}
+	else {
+		return name2Cell_[name];
+	}
 }
 
 void StandardCells::erase(const Cell & cell)
 {
-    name2Cell_.erase(name(cell));
-    cells_.erase(cell);
+	name2Cell_.erase(name(cell));
+	cells_.erase(cell);
 }
 
 void StandardCells::reserve(Cell, uint32_t size)
@@ -81,7 +83,7 @@ uint32_t StandardCells::capacity(Cell) const
 
 Cell StandardCells::find(Cell, std::string cellName)
 {
-    return name2Cell_[cellName];
+	return name2Cell_[cellName];
 }
 
 std::string StandardCells::name(const Cell & cell) const
@@ -103,21 +105,23 @@ ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) c
 
 Pin StandardCells::add(Pin, const std::string &name, PinDirection direction)
 {
-    if(name2Pin_.find(name) == name2Pin_.end()){
-        auto pin = pins_.add();
-        pinNames_[pin] = name;
-        pinDirections_[pin] = direction;
-        name2Pin_[name] = pin;
-        return pin;
-    }else{
-        return name2Pin_[name];
-    }
+	if(name2Pin_.find(name) == name2Pin_.end())
+	{
+		auto pin = pins_.add();
+		pinNames_[pin] = name;
+		pinDirections_[pin] = direction;
+		name2Pin_[name] = pin;
+		return pin;
+	}
+	else {
+		return name2Pin_[name];
+	}
 }
 
 void StandardCells::erase(const Pin & pin)
 {
-    name2Pin_.erase(name(pin));
-    pins_.erase(pin);
+	name2Pin_.erase(name(pin));
+	pins_.erase(pin);
 }
 
 void StandardCells::reserve(Pin, uint32_t size)
@@ -137,7 +141,7 @@ uint32_t StandardCells::capacity(Pin) const
 
 Pin StandardCells::find(Pin, std::string pinName)
 {
-    return name2Pin_[pinName];
+	return name2Pin_[pinName];
 }
 
 std::string StandardCells::name(const Pin & pin) const
