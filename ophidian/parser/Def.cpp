@@ -31,14 +31,14 @@ std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const thr
 
 	defrSetUnitsCbk([](defrCallbackType_e, double number, defiUserData ud) -> int {
 				Def& that = *static_cast<Def*>(ud);
-                that.mUnits = number;
+				that.mUnits = number;
 				return 0;
 			});
 
 	defrSetDieAreaCbk([](defrCallbackType_e, defiBox *box, defiUserData ud) -> int {
 				Def& that = *static_cast<Def*>(ud);
-                that.mDie.lower = {box->xl(), box->yl()};
-                that.mDie.upper = {box->xh(), box->yh()};
+				that.mDie.lower = {box->xl(), box->yl()};
+				that.mDie.upper = {box->xh(), box->yh()};
 				return 0;
 			});
 
@@ -50,13 +50,13 @@ std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const thr
 				r.num = {defrow->xNum(), defrow->yNum()};
 				r.step = {defrow->xStep(), defrow->yStep()};
 				r.origin = {defrow->x(), defrow->y()};
-                that.mRows.push_back(r);
+				that.mRows.push_back(r);
 				return 0;
 			});
 
 	defrSetComponentStartCbk([](defrCallbackType_e, int number, defiUserData ud) -> int {
 				Def& that = *static_cast<Def*>(ud);
-                that.mComponents.reserve(number);
+				that.mComponents.reserve(number);
 				return 0;
 			});
 
@@ -69,7 +69,7 @@ std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const thr
 				c.fixed = comp->isFixed();
 				c.position = {comp->placementX(), comp->placementY()};
 				c.orientation = comp->placementOrientStr();
-                that.mComponents.push_back(c);
+				that.mComponents.push_back(c);
 				return 0;
 			});
 

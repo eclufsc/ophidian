@@ -16,46 +16,19 @@
    under the License.
  */
 
-#include "EntitySystem.h"
+#include "LefDef2Floorplan.h"
 
 namespace ophidian
 {
-namespace entity_system
+namespace floorplan
 {
-
-EntityBase::EntityBase() :
-	mId(std::numeric_limits<uint32_t>::max()),
-	mSystem(nullptr)
-{
-
+void lefDef2Floorplan(const parser::Lef &lef, const parser::Def &def, Floorplan &floorplan){
+	floorplan.chipOrigin(util::LocationMicron(def.die().lower.x, def.die().lower.y));
+	floorplan.chipUpperRightCorner(util::LocationMicron(def.die().upper.x, def.die().upper.y));
+	for(auto & site : lef.sites())
+		floorplan.add(Site(), site.name, util::LocationMicron(site.x*lef.databaseUnits(), site.y*lef.databaseUnits()));
+	for(auto & row : def.rows())
+		floorplan.add(Row(), util::LocationMicron(row.origin.x, row.origin.y), row.num.x, floorplan.find(row.site));
 }
-
-EntityBase::~EntityBase()
-{
-
-}
-
-bool EntityBase::operator==(const EntityBase &entity) const
-{
-	return mId == entity.mId && mSystem == entity.mSystem;
-}
-
-bool EntityBase::operator!=(const EntityBase &entity) const
-{
-	return !((*this) == entity);
-}
-
-EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
-	mId(id),
-	mSystem(system)
-{
-
-}
-
-uint32_t EntitySystemBase::id(const EntityBase &en) const
-{
-	return en.mId;
-}
-
-} // namespace entity_system
+} // namespace floorplan
 } // namespace ophidian

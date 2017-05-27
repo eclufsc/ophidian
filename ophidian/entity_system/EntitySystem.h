@@ -127,8 +127,8 @@ public:
 	 */
 	EntitySystem()
 	{
-        mNotifier.setContainer(*this);
-        mId = mIdCounter++;
+		mNotifier.setContainer(*this);
+		mId = mIdCounter++;
 	}
 	~EntitySystem()
 	{
@@ -142,11 +142,11 @@ public:
 	 */
 	Entity add()
 	{
-        uint32_t id = mId2Index.size();
+		uint32_t id = mId2Index.size();
 		Entity entity(id, this);
-        mId2Index.push_back(mContainer.size());
-        mContainer.push_back(entity);
-        mNotifier.add(mContainer.back());
+		mId2Index.push_back(mContainer.size());
+		mContainer.push_back(entity);
+		mNotifier.add(mContainer.back());
 		return entity;
 	}
 	//! Erase Entity
@@ -156,14 +156,14 @@ public:
 	 */
 	void erase(const Entity& entity)
 	{
-        mNotifier.erase(entity);
+		mNotifier.erase(entity);
 		auto entityId = EntitySystemBase::id(entity);
 		auto index = id(entity);
-        auto lastEntityId = EntitySystemBase::id(mContainer.back());
-        std::swap(mContainer[index], mContainer.back());
-        mContainer.pop_back();
-        mId2Index[lastEntityId] = index;
-        mId2Index[entityId] = std::numeric_limits<uint32_t>::max();
+		auto lastEntityId = EntitySystemBase::id(mContainer.back());
+		std::swap(mContainer[index], mContainer.back());
+		mContainer.pop_back();
+		mId2Index[lastEntityId] = index;
+		mId2Index[entityId] = std::numeric_limits<uint32_t>::max();
 	}
 	//! Clear Entities
 	/*!
@@ -171,8 +171,8 @@ public:
 	 */
 	void clear()
 	{
-        mNotifier.clear();
-        mContainer.clear();
+		mNotifier.clear();
+		mContainer.clear();
 	}
 	//! Allocate space for storing Entities
 	/*!
@@ -181,8 +181,8 @@ public:
 	 */
 	void reserve(size_type size)
 	{
-        mContainer.reserve(size);
-        mNotifier.reserve(size);
+		mContainer.reserve(size);
+		mNotifier.reserve(size);
 	}
 	//! Allocate space for storing Entities
 	/*!
@@ -191,7 +191,7 @@ public:
 	 */
 	size_type capacity() const
 	{
-        return mContainer.capacity();
+		return mContainer.capacity();
 	}
 	//! Size of the EntitySystem
 	/*!
@@ -200,7 +200,7 @@ public:
 	 */
 	size_type size() const
 	{
-        return mContainer.size();
+		return mContainer.size();
 	}
 	//! Empty EntitySystem
 	/*!
@@ -209,7 +209,7 @@ public:
 	 */
 	bool empty() const
 	{
-        return mContainer.empty();
+		return mContainer.empty();
 	}
 	//! Iterator to beginning
 	/*!
@@ -218,7 +218,7 @@ public:
 	 */
 	const_iterator begin() const
 	{
-        return mContainer.begin();
+		return mContainer.begin();
 	}
 	//! Iterator to end
 	/*!
@@ -227,7 +227,7 @@ public:
 	 */
 	const_iterator end() const
 	{
-        return mContainer.end();
+		return mContainer.end();
 	}
 	//! Valid Entity
 	/*!
@@ -238,7 +238,7 @@ public:
 	bool valid(const Entity& entity) const
 	{
 		return EntitySystemBase::id(entity) != std::numeric_limits<uint32_t>::max() &&
-               mId2Index[EntitySystemBase::id(entity)] < mContainer.size();
+		       mId2Index[EntitySystemBase::id(entity)] < mContainer.size();
 	}
 	//! Get the Notifier
 	/*!
@@ -247,7 +247,7 @@ public:
 	 */
 	NotifierType* notifier() const
 	{
-        return const_cast<EntitySystem::NotifierType*>(&mNotifier);
+		return const_cast<EntitySystem::NotifierType*>(&mNotifier);
 	}
 	//! Entity id
 	/*!
@@ -257,29 +257,29 @@ public:
 	 */
 	size_type id(const Entity& entity) const
 	{
-        return mId2Index.at(EntitySystemBase::id(entity));
+		return mId2Index.at(EntitySystemBase::id(entity));
 	}
 	//! EntitySystem id
 	/*!
 	   \return The unique identifier of the EntitySystem.
 	 */
 	uint32_t id() const {
-        return mId;
+		return mId;
 	}
 	//! Shrink EntitySystem
 	/*!
 	   \brief Reallocate the EntitySystem and it's propertys to have capacity == size. This may help to
 	 */
 	void shrinkToFit() {
-        mContainer.shrink_to_fit();
-        mNotifier.shrinkToFit();
+		mContainer.shrink_to_fit();
+		mNotifier.shrinkToFit();
 	}
 private:
-    NotifierType mNotifier;
-    ContainerType mContainer;
-    std::vector<size_type> mId2Index;
-    uint32_t mId;
-    static uint32_t mIdCounter;
+	NotifierType mNotifier;
+	ContainerType mContainer;
+	std::vector<size_type> mId2Index;
+	uint32_t mId;
+	static uint32_t mIdCounter;
 };
 
 template <class T>

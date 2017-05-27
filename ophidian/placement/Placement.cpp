@@ -24,7 +24,7 @@ namespace placement
 {
 
 Placement::Placement(const circuit::Netlist &netlist) :
-    mLocations(netlist.makeProperty<util::LocationMicron>(circuit::Cell()))
+	mLocations(netlist.makeProperty<util::LocationMicron>(circuit::Cell()))
 {
 }
 
@@ -35,7 +35,7 @@ Placement::~Placement()
 
 void Placement::placeCell(const circuit::Cell & cell, const util::LocationMicron & location)
 {
-    mLocations[cell] = location;
+	mLocations[cell] = location;
 }
 
 

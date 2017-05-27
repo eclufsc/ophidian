@@ -34,7 +34,7 @@ public:
 	using Parent = Property<Key, Value >;
 	DetachedProperty(const EntitySystem<Key>& system) :
 		Parent(system),
-        mSystem(system)
+		mSystem(system)
 	{
 		Parent::detach();
 	}
@@ -45,19 +45,19 @@ public:
 
 	virtual void erase(const Key& item) override
 	{
-        std::swap(Parent::mProperties.back(), Parent::mProperties[mSystem.id(item)]);
-        Parent::mProperties.pop_back();
+		std::swap(Parent::mProperties.back(), Parent::mProperties[mSystem.id(item)]);
+		Parent::mProperties.pop_back();
 	}
 
 	const Value& operator [](const Key & k) const {
-        return Parent::mProperties[mSystem.id(k)];
+		return Parent::mProperties[mSystem.id(k)];
 	}
 
 	Value& operator [](const Key & k) {
-        return Parent::mProperties[mSystem.id(k)];
+		return Parent::mProperties[mSystem.id(k)];
 	}
 private:
-    const EntitySystem<Key>& mSystem;
+	const EntitySystem<Key>& mSystem;
 };
 
 //! Association
@@ -81,30 +81,30 @@ public:
 public:
 		PartOfComposition(const EntitySystem<Part>& partSystem, Association& composition) :
 			EntitySystem<Part>::NotifierType::ObserverBase(*partSystem.notifier()),
-            mNextPart(partSystem),
-            mWhole(partSystem),
-            mAssociation(composition)
+			mNextPart(partSystem),
+			mWhole(partSystem),
+			mAssociation(composition)
 		{
 		}
 
 		Whole whole(const Part & p) const
 		{
-            return mWhole[p];
+			return mWhole[p];
 		}
 
 		void whole(const Part & p, const Whole & w)
 		{
-            mWhole[p] = w;
+			mWhole[p] = w;
 		}
 
 		Part nextPart(const Part &p) const
 		{
-            return mNextPart[p];
+			return mNextPart[p];
 		}
 
 		void nextPart(const Part& p1, const Part& p2)
 		{
-            mNextPart[p1] = p2;
+			mNextPart[p1] = p2;
 		}
 
 
@@ -112,48 +112,48 @@ private:
 
 		void shrinkToFit() override
 		{
-            mNextPart.shrinkToFit();
-            mWhole.shrinkToFit();
+			mNextPart.shrinkToFit();
+			mWhole.shrinkToFit();
 		}
 
 		void reserve(std::uint32_t size) override
 		{
-            mNextPart.reserve(size);
-            mWhole.reserve(size);
+			mNextPart.reserve(size);
+			mWhole.reserve(size);
 		}
 
 		void add(const Part & item ) override
 		{
-            mNextPart.add(item);
-            mWhole.add(item);
+			mNextPart.add(item);
+			mWhole.add(item);
 		}
 
 		void add(const std::vector<Part> & items) override
 		{
-            mNextPart.add(items);
-            mWhole.add(items);
+			mNextPart.add(items);
+			mWhole.add(items);
 		}
 
 		void erase(const Part& item) override
 		{
 			if(whole(item) != Whole())
 			{
-                mAssociation.eraseAssociation(whole(item), item);
+				mAssociation.eraseAssociation(whole(item), item);
 			}
-            mNextPart.erase(item);
-            mWhole.erase(item);
+			mNextPart.erase(item);
+			mWhole.erase(item);
 		}
 
 		void clear() override
 		{
-            mAssociation.detachAllParts();
-            mNextPart.clear();
-            mWhole.clear();
+			mAssociation.detachAllParts();
+			mNextPart.clear();
+			mWhole.clear();
 		}
 
-        Association& mAssociation;
-        DetachedProperty<Part, Part> mNextPart;
-        DetachedProperty<Part, Whole> mWhole;
+		Association& mAssociation;
+		DetachedProperty<Part, Part> mNextPart;
+		DetachedProperty<Part, Whole> mWhole;
 	};
 
 public:
@@ -170,58 +170,58 @@ public:
 		{
 public:
 			PartIterator(const Association * association, const Whole& w) :
-                mAssociation(association),
-                mWhole(w),
-                mPart(association->firstPart(w))
+				mAssociation(association),
+				mWhole(w),
+				mPart(association->firstPart(w))
 			{
 
 			}
 
 			PartIterator() :
-                mAssociation(nullptr),
-                mWhole(Whole()),
-                mPart(Part())
+				mAssociation(nullptr),
+				mWhole(Whole()),
+				mPart(Part())
 			{
 
 			}
 
 			const Part& operator*() {
-                return mPart;
+				return mPart;
 			}
 			PartIterator & operator++(void) {
-                mPart = mAssociation->nextPart(mPart);
+				mPart = mAssociation->nextPart(mPart);
 				return *this;
 			}
 			PartIterator & operator=(const PartIterator & p)
 			{
-                mAssociation = p.mAssociation;
-                mWhole = p.mWhole;
+				mAssociation = p.mAssociation;
+				mWhole = p.mWhole;
 				return *this;
 			}
 			bool operator!=(const PartIterator & p) const
 			{
-                return mPart != p.mPart;
+				return mPart != p.mPart;
 			}
 			bool operator==(const PartIterator & p) const
 			{
 				return !((*this) != p);
 			}
 private:
-            const Association * mAssociation;
-            Whole mWhole;
-            Part mPart;
+			const Association * mAssociation;
+			Whole mWhole;
+			Part mPart;
 		};
 
 		Parts(const Association & association, const Whole & whole) :
-            mAssociation(association),
-            mWhole(whole)
+			mAssociation(association),
+			mWhole(whole)
 		{
 
 		}
 
 		PartIterator begin() const
 		{
-            return PartIterator(&mAssociation, mWhole);
+			return PartIterator(&mAssociation, mWhole);
 		}
 		PartIterator end() const
 		{
@@ -229,15 +229,15 @@ private:
 		}
 		uint32_t size() const
 		{
-            return mAssociation.numParts(mWhole);
+			return mAssociation.numParts(mWhole);
 		}
 		bool empty() const
 		{
 			return size() == 0;
 		}
 private:
-        const Association & mAssociation;
-        const Whole mWhole;
+		const Association & mAssociation;
+		const Whole mWhole;
 	};
 
 	//! Construct Association
@@ -246,10 +246,10 @@ private:
 	 */
 	Association(const WholeSystem& whole, PartSystem& part)  :
 		EntitySystem<Whole>::NotifierType::ObserverBase(*whole.notifier()),
-        mFirstPart(whole),
-        mPart2Whole(part, *this),
-        mPartSystem(part),
-        mNumParts(whole, 0)
+		mFirstPart(whole),
+		mPart2Whole(part, *this),
+		mPartSystem(part),
+		mNumParts(whole, 0)
 	{
 		EntitySystem<Whole>::NotifierType::ObserverBase::detach();
 	}
@@ -262,7 +262,7 @@ private:
 	 */
 	Whole whole(const Part& p) const
 	{
-        return mPart2Whole.whole(p);
+		return mPart2Whole.whole(p);
 	}
 
 	//! Add association
@@ -275,18 +275,18 @@ private:
 	{
 		auto first = firstPart(w);
 
-        mPart2Whole.whole(p, w);
+		mPart2Whole.whole(p, w);
 
 		if(first == Whole())
 		{
-            mFirstPart[w] = p;
-            mNumParts[w] = 1;
+			mFirstPart[w] = p;
+			mNumParts[w] = 1;
 			return;
 		}
 
-        mFirstPart[w] = p;
-        mPart2Whole.nextPart(p, first);
-        ++mNumParts[w];
+		mFirstPart[w] = p;
+		mPart2Whole.nextPart(p, first);
+		++mNumParts[w];
 
 	}
 
@@ -298,7 +298,7 @@ private:
 	 */
 	void eraseAssociation(const Whole& w, const Part& p)
 	{
-        --mNumParts[w];
+		--mNumParts[w];
 
 		whole(p, Whole());
 
@@ -341,7 +341,7 @@ private:
 	   \return true if the Whole EntitySystem is empty, false otherwise.
 	 */
 	bool empty() const {
-        return mNumParts.empty();
+		return mNumParts.empty();
 	}
 
 	//! First Part of a Whole
@@ -351,7 +351,7 @@ private:
 	   \return A handler for the first Part of \p w.
 	 */
 	Part firstPart(const Whole& w) const {
-        return mFirstPart[w];
+		return mFirstPart[w];
 	}
 
 	//! Next Part in an association
@@ -362,7 +362,7 @@ private:
 	   \remarks The association is implemented as a linked list. A Whole entity has a property containing the handler for its first part. Each part has a property containing the next part in association. We assume a part can only be part of one whole at a time.
 	 */
 	Part nextPart(const Part& p) const {
-        return mPart2Whole.nextPart(p);
+		return mPart2Whole.nextPart(p);
 	}
 
 	//! Number of parts of a whole
@@ -372,64 +372,64 @@ private:
 	   \return The number of parts of \p w
 	 */
 	uint32_t numParts(const Whole& w) const {
-        return mNumParts[w];
+		return mNumParts[w];
 	}
 
 protected:
 
 	void detachAllParts()
 	{
-        std::fill(mNumParts.begin(), mNumParts.end(), 0);
-        std::fill(mFirstPart.begin(), mFirstPart.end(), Part());
+		std::fill(mNumParts.begin(), mNumParts.end(), 0);
+		std::fill(mFirstPart.begin(), mFirstPart.end(), Part());
 	}
 
 	virtual void shrinkToFit() override
 	{
-        mFirstPart.shrinkToFit();
+		mFirstPart.shrinkToFit();
 	}
 
 	virtual void reserve(uint32_t size) override
 	{
-        mFirstPart.reserve(size);
+		mFirstPart.reserve(size);
 	}
 
 	virtual void add(const Whole & item ) override
 	{
-        mFirstPart.add(item);
+		mFirstPart.add(item);
 	}
 
 	virtual void add(const std::vector<Whole> & items) override
 	{
-        mFirstPart.add(items);
+		mFirstPart.add(items);
 	}
 
 	virtual void erase(const Whole& item) override
 	{
-        mFirstPart.erase(item);
+		mFirstPart.erase(item);
 	}
 
 	virtual void clear() override
 	{
-        mFirstPart.clear();
+		mFirstPart.clear();
 	}
 
-    PartOfComposition mPart2Whole;
-    DetachedProperty<Whole, Part> mFirstPart;
-    Property<Whole, uint32_t> mNumParts;
-    PartSystem& mPartSystem;
+	PartOfComposition mPart2Whole;
+	DetachedProperty<Whole, Part> mFirstPart;
+	Property<Whole, uint32_t> mNumParts;
+	PartSystem& mPartSystem;
 
 private:
 	void whole(const Part& p, const Whole& w)
 	{
-        mPart2Whole.whole(p, w);
+		mPart2Whole.whole(p, w);
 	}
 
 	void firstPart(const Whole & w, const Part & p) {
-        mFirstPart[w] = p;
+		mFirstPart[w] = p;
 	}
 
 	void nextPart(const Part& p1, const Part &p2) {
-        mPart2Whole.nextPart(p1, p2);
+		mPart2Whole.nextPart(p1, p2);
 	}
 
 

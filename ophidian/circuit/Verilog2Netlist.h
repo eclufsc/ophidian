@@ -16,46 +16,19 @@
    under the License.
  */
 
-#include "EntitySystem.h"
+#ifndef OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
+#define OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
+
+#include <ophidian/parser/VerilogParser.h>
+#include <ophidian/circuit/Netlist.h>
+#include <unordered_map>
 
 namespace ophidian
 {
-namespace entity_system
+namespace circuit
 {
-
-EntityBase::EntityBase() :
-	mId(std::numeric_limits<uint32_t>::max()),
-	mSystem(nullptr)
-{
-
-}
-
-EntityBase::~EntityBase()
-{
-
-}
-
-bool EntityBase::operator==(const EntityBase &entity) const
-{
-	return mId == entity.mId && mSystem == entity.mSystem;
-}
-
-bool EntityBase::operator!=(const EntityBase &entity) const
-{
-	return !((*this) == entity);
-}
-
-EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
-	mId(id),
-	mSystem(system)
-{
-
-}
-
-uint32_t EntitySystemBase::id(const EntityBase &en) const
-{
-	return en.mId;
-}
-
-} // namespace entity_system
+void verilog2Netlist(const parser::Verilog & verilog, circuit::Netlist & netlist);
+} // namespace circuit
 } // namespace ophidian
+
+#endif // OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H

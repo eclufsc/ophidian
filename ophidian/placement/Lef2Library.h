@@ -16,46 +16,18 @@
    under the License.
  */
 
-#include "EntitySystem.h"
+#ifndef OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
+#define OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
+
+#include <ophidian/parser/Lef.h>
+#include <ophidian/placement/Library.h>
 
 namespace ophidian
 {
-namespace entity_system
+namespace placement
 {
-
-EntityBase::EntityBase() :
-	mId(std::numeric_limits<uint32_t>::max()),
-	mSystem(nullptr)
-{
-
-}
-
-EntityBase::~EntityBase()
-{
-
-}
-
-bool EntityBase::operator==(const EntityBase &entity) const
-{
-	return mId == entity.mId && mSystem == entity.mSystem;
-}
-
-bool EntityBase::operator!=(const EntityBase &entity) const
-{
-	return !((*this) == entity);
-}
-
-EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
-	mId(id),
-	mSystem(system)
-{
-
-}
-
-uint32_t EntitySystemBase::id(const EntityBase &en) const
-{
-	return en.mId;
-}
-
-} // namespace entity_system
+void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & stdCells);
+} // namespace placement
 } // namespace ophidian
+
+#endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

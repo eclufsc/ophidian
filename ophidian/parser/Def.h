@@ -118,7 +118,7 @@ public:
 	 * Returns a @c std::vector<row> with all rows.
 	 */
 	const std::vector<row>& rows() const {
-        return mRows;
+		return mRows;
 	}
 
 	/**
@@ -132,7 +132,7 @@ private:
 	dieArea mDie;
 	double mUnits;
 	std::vector<component> mComponents;
-    std::vector<row> mRows;
+	std::vector<row> mRows;
 
 public:
 	friend class DefParser;

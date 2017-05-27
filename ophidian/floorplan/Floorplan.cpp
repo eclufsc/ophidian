@@ -51,12 +51,14 @@ Site Floorplan::add(Site, const std::string & name, const util::LocationMicron &
 {
 	auto site = mSites.add();
 	mNames[site] = name;
+	mName2Site[name] = site;
 	mDimensions[site] = loc;
 	return site;
 }
 
 void Floorplan::erase(Site site)
 {
+    mName2Site.erase(name(site));
 	mSites.erase(site);
 }
 

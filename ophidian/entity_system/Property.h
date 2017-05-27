@@ -39,11 +39,11 @@ public:
 
 	Property(const EntitySystem<Entity_>& system, Value defaultValue = Value()) :
 		Parent(*system.notifier()),
-        mDefaultValue(defaultValue)
+		mDefaultValue(defaultValue)
 	{
 		mProperties.reserve(system.capacity());
 		mProperties.resize(system.size());
-        mProperties.assign(mProperties.size(), mDefaultValue);
+		mProperties.assign(mProperties.size(), mDefaultValue);
 	}
 
 	Property() :
@@ -118,11 +118,11 @@ protected:
 
 	virtual void add(const Entity& item) override
 	{
-        mProperties.push_back(mDefaultValue);
+		mProperties.push_back(mDefaultValue);
 	}
 	virtual void add(const std::vector<Entity>& items) override
 	{
-        mProperties.resize(mProperties.size() + items.size(), mDefaultValue);
+		mProperties.resize(mProperties.size() + items.size(), mDefaultValue);
 	}
 	virtual void erase(const Entity& item) override
 	{
@@ -138,7 +138,7 @@ protected:
 protected:
 	ContainerType mProperties;
 private:
-    const Value mDefaultValue;
+	const Value mDefaultValue;
 };
 } // namespace entity_system
 } // namespace ophidian

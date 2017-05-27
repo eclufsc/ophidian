@@ -39,19 +39,19 @@ inline lemon::dim2::Point<double> convert(const geometry::Point & p) {
   //
 
 SteinerTree::SteinerTree() :
-    mPosition(mGraph)
+	mPosition(mGraph)
 {
 
 }
 
 uint32_t SteinerTree::size(Segment) const
 {
-    return lemon::countEdges(mGraph);
+	return lemon::countEdges(mGraph);
 }
 
 uint32_t SteinerTree::size(Point) const
 {
-    return lemon::countNodes(mGraph);
+	return lemon::countNodes(mGraph);
 }
 
 namespace
@@ -59,9 +59,9 @@ namespace
 SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(const geometry::Point &position, const SteinerTree::GraphType::NodeMap<lemon::dim2::Point<double> > & mPosition, const SteinerTree::GraphType & mGraph)
 {
 	geometry::ManhattanDistance distance;
-    for(SteinerTree::GraphType::NodeIt i(mGraph); mGraph.valid(i); ++i)
+	for(SteinerTree::GraphType::NodeIt i(mGraph); mGraph.valid(i); ++i)
 	{
-        if(distance(position, convert(mPosition[i])) == 0.0)
+		if(distance(position, convert(mPosition[i])) == 0.0)
 		{
 			return i;
 		}
@@ -78,86 +78,86 @@ std::unique_ptr<SteinerTree> SteinerTree::create()
 
 SteinerTree::Point SteinerTree::add(const geometry::Point &position)
 {
-    GraphType::Node node = findNodeWithPositionEqualsTo(position, mPosition, mGraph);
+	GraphType::Node node = findNodeWithPositionEqualsTo(position, mPosition, mGraph);
 	if(node == lemon::INVALID)
 	{
-        node = mGraph.addNode();
-        mPosition[node] = convert(position);
+		node = mGraph.addNode();
+		mPosition[node] = convert(position);
 	}
 	return Point(node);
 }
 
 SteinerTree::Segment SteinerTree::add(const SteinerTree::Point &p1, const SteinerTree::Point &p2)
 {
-    auto edge = mGraph.addEdge(p1.mEl, p2.mEl);
+	auto edge = mGraph.addEdge(p1.mEl, p2.mEl);
 	Segment result(edge);
-    mLength += length(result);
+	mLength += length(result);
 	return result;
 }
 
 SteinerTree::Point SteinerTree::u(const SteinerTree::Segment &segment) const
 {
-    return Point(mGraph.u(segment.mEl));
+	return Point(mGraph.u(segment.mEl));
 }
 
 SteinerTree::Point SteinerTree::v(const SteinerTree::Segment &segment) const
 {
-    return Point(mGraph.v(segment.mEl));
+	return Point(mGraph.v(segment.mEl));
 }
 
 geometry::Point SteinerTree::position(const SteinerTree::Point &p) const
 {
-    return convert(mPosition[p.mEl]);
+	return convert(mPosition[p.mEl]);
 }
 
 double SteinerTree::length(const SteinerTree::Segment &segment) const
 {
-    const auto kU = mGraph.u(segment.mEl);
-    const auto kV = mGraph.v(segment.mEl);
+	const auto kU = mGraph.u(segment.mEl);
+	const auto kV = mGraph.v(segment.mEl);
 	geometry::ManhattanDistance distance;
-    return distance(convert(mPosition[kU]), convert(mPosition[kV]));
+	return distance(convert(mPosition[kU]), convert(mPosition[kV]));
 }
 
 double SteinerTree::length() const
 {
-    return mLength;
+	return mLength;
 }
 
 std::pair<SteinerTree::PointIterator, SteinerTree::PointIterator> SteinerTree::points() const
 {
-    PointIterator first {Point {GraphType::NodeIt {mGraph}}};
+	PointIterator first {Point {GraphType::NodeIt {mGraph}}};
 	PointIterator second {Point {static_cast<GraphType::Node>(lemon::INVALID)}};
 	return std::make_pair(first, second);
 }
 
 std::pair<SteinerTree::PointSegmentsIterator, SteinerTree::PointSegmentsIterator> SteinerTree::segments(const SteinerTree::Point &point) const
 {
-    PointSegmentsIterator first {{mGraph, point.mEl}};
+	PointSegmentsIterator first {{mGraph, point.mEl}};
 	PointSegmentsIterator second {lemon::INVALID};
 	return std::make_pair(first, second);
 }
 
 std::pair<SteinerTree::SegmentIterator, SteinerTree::SegmentIterator> SteinerTree::segments() const
 {
-    SegmentIterator first {GraphType::EdgeIt {mGraph}};
+	SegmentIterator first {GraphType::EdgeIt {mGraph}};
 	SegmentIterator second {lemon::INVALID};
 	return std::make_pair(first, second);
 }
 
 SteinerTree::PointIterator::PointIterator(const SteinerTree::Point &p) :
-    mPoint(p)
+	mPoint(p)
 {
 
 }
 
 SteinerTree::PointSegmentsIterator::PointSegmentsIterator(GraphType::IncEdgeIt it) :
-    mIt(it)
+	mIt(it)
 {
 
 }
 
 SteinerTree::SegmentIterator::SegmentIterator(GraphType::EdgeIt it) :
-    mIt(it)
+	mIt(it)
 {
 
 }

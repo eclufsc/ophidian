@@ -16,46 +16,19 @@
    under the License.
  */
 
-#include "EntitySystem.h"
+#ifndef OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
+#define OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
+
+#include <ophidian/floorplan/Floorplan.h>
+#include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Def.h>
 
 namespace ophidian
 {
-namespace entity_system
+namespace floorplan
 {
-
-EntityBase::EntityBase() :
-	mId(std::numeric_limits<uint32_t>::max()),
-	mSystem(nullptr)
-{
-
-}
-
-EntityBase::~EntityBase()
-{
-
-}
-
-bool EntityBase::operator==(const EntityBase &entity) const
-{
-	return mId == entity.mId && mSystem == entity.mSystem;
-}
-
-bool EntityBase::operator!=(const EntityBase &entity) const
-{
-	return !((*this) == entity);
-}
-
-EntityBase::EntityBase(uint32_t id, EntitySystemBase * system) :
-	mId(id),
-	mSystem(system)
-{
-
-}
-
-uint32_t EntitySystemBase::id(const EntityBase &en) const
-{
-	return en.mId;
-}
-
-} // namespace entity_system
+void lefDef2Floorplan(const parser::Lef &lef, const parser::Def &def, Floorplan &floorplan);
+} // namespace floorplan
 } // namespace ophidian
+
+#endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
