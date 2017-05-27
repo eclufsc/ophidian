@@ -80,7 +80,7 @@ public:
 	 */
 	util::LocationMicron chipOrigin()
 	{
-		return chipOrigin_;
+		return mChipOrigin;
 	}
 
 	//! Chip upper right corner location setter
@@ -97,7 +97,7 @@ public:
 	 */
 	util::LocationMicron chipUpperRightCorner()
 	{
-		return chipUpperRightCorner_;
+		return mChipUpperRightCorner;
 	}
 
 
@@ -127,18 +127,18 @@ public:
 	 */
 	std::string name(const Site & site) const
 	{
-		return names_[site];
+		return mNames[site];
 	}
 
 	//! Site getter
 	/*!
-	\brief Get the site of a given site name
-	\param A name of a site.
-	\return Site entity of the given name.
-	*/
-	Site find(std::string site_name)
+	   \brief Get the site of a given site name
+	   \param A name of a site.
+	   \return Site entity of the given name.
+	 */
+	Site find(std::string siteName)
 	{
-		return name2Site_[site_name];
+		return mName2Site[siteName];
 	}
 
 	//! Site Upper right corner getter
@@ -149,7 +149,7 @@ public:
 	 */
 	util::LocationMicron siteUpperRightCorner(const Site & site) const
 	{
-		return dimensions_[site];
+		return mDimensions[site];
 	}
 
 	//! Sites iterator
@@ -158,7 +158,7 @@ public:
 	 */
 	ophidian::util::Range<SitesIterator> sitesRange() const
 	{
-		return ophidian::util::Range<SitesIterator>(sites_.begin(), sites_.end());
+		return ophidian::util::Range<SitesIterator>(mSites.begin(), mSites.end());
 	}
 
 
@@ -188,7 +188,7 @@ public:
 	 */
 	util::LocationMicron origin(const Row & row) const
 	{
-		return origins_[row];
+		return mOrigins[row];
 	}
 
 	//! Number of sites getter
@@ -199,7 +199,7 @@ public:
 	 */
 	size_t numberOfSites(const Row & row) const
 	{
-		return numberOfSites_[row];
+		return mNumberOfSites[row];
 	}
 
 	//! Site type getter
@@ -210,7 +210,7 @@ public:
 	 */
 	Site site(const Row & row) const
 	{
-		return siteTypeOfRow_[row];
+		return mSiteTypeOfRow[row];
 	}
 
 	//! Rows iterator
@@ -219,7 +219,7 @@ public:
 	 */
 	ophidian::util::Range<RowsIterator> rowsRange() const
 	{
-		return util::Range<RowsIterator>(rows_.begin(), rows_.end());
+		return util::Range<RowsIterator>(mRows.begin(), mRows.end());
 	}
 
 	/// Row dimensions getter.
@@ -231,19 +231,19 @@ public:
 	util::LocationMicron rowUpperRightCorner(const Row & row) const;
 
 private:
-	entity_system::EntitySystem<Row> rows_;
-	entity_system::Property<Row, util::LocationMicron> origins_;
-	entity_system::Property<Row, size_t> numberOfSites_;
-	entity_system::Property<Row, Site> siteTypeOfRow_;
+	entity_system::EntitySystem<Row> mRows;
+	entity_system::Property<Row, util::LocationMicron> mOrigins;
+	entity_system::Property<Row, size_t> mNumberOfSites;
+	entity_system::Property<Row, Site> mSiteTypeOfRow;
 
-	entity_system::EntitySystem<Site> sites_;
-	entity_system::Property<Site, std::string> names_;
-	entity_system::Property<Site, util::LocationMicron> dimensions_;
+	entity_system::EntitySystem<Site> mSites;
+	entity_system::Property<Site, std::string> mNames;
+	entity_system::Property<Site, util::LocationMicron> mDimensions;
 
-	util::LocationMicron chipOrigin_;
-	util::LocationMicron chipUpperRightCorner_;
+	util::LocationMicron mChipOrigin;
+	util::LocationMicron mChipUpperRightCorner;
 
-	std::unordered_map<std::string, Site> name2Site_;
+	std::unordered_map<std::string, Site> mName2Site;
 };
 
 } //namespace floorplan

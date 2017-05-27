@@ -103,7 +103,7 @@ public:
 	 * Returns the @c dieArea.
 	 */
 	const dieArea& die() const {
-		return die_;
+		return mDie;
 	}
 
 	/**
@@ -111,28 +111,28 @@ public:
 	 * all components.
 	 */
 	const std::vector<component>& components() const {
-		return components_;
+		return mComponents;
 	}
 
 	/**
 	 * Returns a @c std::vector<row> with all rows.
 	 */
 	const std::vector<row>& rows() const {
-		return rows_;
+		return mRows;
 	}
 
 	/**
 	 * Returns the DEF database units.
 	 */
 	double database_units() const {
-		return units_;
+		return mUnits;
 	}
 
 private:
-	dieArea die_;
-	double units_;
-	std::vector<component> components_;
-	std::vector<row> rows_;
+	dieArea mDie;
+	double mUnits;
+	std::vector<component> mComponents;
+	std::vector<row> mRows;
 
 public:
 	friend class DefParser;

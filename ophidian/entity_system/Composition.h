@@ -16,8 +16,8 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H
-#define OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H
+#ifndef OPHIDIAN_ENTITY_SYSTEM_COMmPositionH
+#define OPHIDIAN_ENTITY_SYSTEM_COMmPositionH
 
 #include <cassert>
 
@@ -50,7 +50,7 @@ public:
 		while (current != Part())
 		{
 			Part next = Parent::nextPart(current);
-			Parent::partSystem_.erase(current);
+			Parent::mPartSystem.erase(current);
 			current = next;
 		}
 		Parent::erase(whole);
@@ -59,13 +59,13 @@ public:
 	void clear() override
 	{
 		std::vector<Part> toErase;
-		std::copy_if(Parent::partSystem_.begin(), Parent::partSystem_.end(),
+		std::copy_if(Parent::mPartSystem.begin(), Parent::mPartSystem.end(),
 		             std::back_inserter(toErase), [this](const Part & p) -> bool {
 					return (Parent::whole(p) != Whole());
 				});
 		for(auto const & part : toErase)
 		{
-			Parent::partSystem_.erase(part);
+			Parent::mPartSystem.erase(part);
 		}
 		Parent::clear();
 	}
@@ -75,4 +75,4 @@ private:
 } // namespace entity_system
 } // namespace ophidian
 
-#endif // OPHIDIAN_ENTITY_SYSTEM_COMPOSITION_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_COMmPositionH

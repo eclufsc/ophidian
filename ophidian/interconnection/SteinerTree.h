@@ -58,17 +58,17 @@ public:
 
 		}
 		inline bool operator==(const GraphElementWrapper<T> & o) const {
-			return el_ == o.el_;
+			return mEl == o.mEl;
 		}
 
 protected:
 		inline GraphElementWrapper(T element) :
-			el_(element)
+			mEl(element)
 		{
 
 		}
 
-		T el_;
+		T mEl;
 	};
 
 	//! Steiner Tree Attorney
@@ -88,14 +88,14 @@ protected:
 		   Returns a const reference to the Steiner Tree's graph object.
 		 */
 		inline static const SteinerTree::GraphType& graph(const SteinerTree& tree) {
-			return tree.graph_;
+			return tree.mGraph;
 		}
 		//! Getter for the position property
 		/*!
 		   Returns a const reference to the Steiner Tree's position map.
 		 */
 		inline static const GraphType::NodeMap<lemon::dim2::Point<double> >& position(const SteinerTree& tree) {
-			return tree.position_;
+			return tree.mPosition;
 		}
 		inline Attorney() {
 
@@ -155,22 +155,22 @@ public:
 		using iterator_category = std::forward_iterator_tag;
 
 		inline PointIterator& operator++() {
-			GraphType::next(point_.el_);
+			GraphType::next(mPoint.mEl);
 			return *this;
 		}
 		inline bool operator==(const PointIterator& o) const {
-			return point_.el_ == o.point_.el_;
+			return mPoint.mEl == o.mPoint.mEl;
 		}
 		inline bool operator!=(const PointIterator& o) const {
 			return !((*this) == o);
 		}
 		inline const Point& operator*() const {
-			return point_;
+			return mPoint;
 		}
 
 private:
 		PointIterator(const Point& p);
-		Point point_;
+		Point mPoint;
 	};
 
 	//! Point Segments Iterator
@@ -189,22 +189,22 @@ public:
 		using iterator_category = std::forward_iterator_tag;
 
 		inline const PointSegmentsIterator& operator++() {
-			++it_;
+			++mIt;
 			return *this;
 		}
 		inline bool operator==(const PointSegmentsIterator& o) const {
-			return it_ == o.it_;
+			return mIt == o.mIt;
 		}
 		inline bool operator!=(const PointSegmentsIterator& o) const {
 			return !((*this) == o);
 		}
 		inline Segment operator*() const {
-			return Segment(static_cast<GraphType::Edge>(it_));
+			return Segment(static_cast<GraphType::Edge>(mIt));
 		}
 
 private:
 		PointSegmentsIterator(GraphType::IncEdgeIt it);
-		GraphType::IncEdgeIt it_;
+		GraphType::IncEdgeIt mIt;
 	};
 
 	//! Segment Iterator
@@ -223,22 +223,22 @@ public:
 		using iterator_category = std::forward_iterator_tag;
 
 		inline const SegmentIterator& operator++() {
-			++it_;
+			++mIt;
 			return *this;
 		}
 		inline bool operator==(const SegmentIterator& o) const {
-			return it_ == o.it_;
+			return mIt == o.mIt;
 		}
 		inline bool operator!=(const SegmentIterator& o) const {
 			return !((*this) == o);
 		}
 		inline Segment operator*() const {
-			return Segment(static_cast<GraphType::Edge>(it_));
+			return Segment(static_cast<GraphType::Edge>(mIt));
 		}
 
 private:
 		SegmentIterator(GraphType::EdgeIt it);
-		GraphType::EdgeIt it_;
+		GraphType::EdgeIt mIt;
 	};
 
 	//! Create Steiner Tree
@@ -326,9 +326,9 @@ private:
 	   \brief Constructs an empty Steiner Tree.
 	 */
 	SteinerTree();
-	GraphType graph_;
-	GraphType::NodeMap<lemon::dim2::Point<double> > position_;
-	double length_ {0.0};
+	GraphType mGraph;
+	GraphType::NodeMap<lemon::dim2::Point<double> > mPosition;
+	double mLength {0.0};
 };
 } // namespace interconnection
 

@@ -121,7 +121,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Cell, Value> makeProperty(Cell)
 	const {
-		return entity_system::Property<Cell, Value>(cells_);
+		return entity_system::Property<Cell, Value>(mCells);
 	}
 //! Get the Cell Notifier
 /*!
@@ -212,7 +212,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Pin, Value> makeProperty(Pin)
 	const {
-		return entity_system::Property<Pin, Value>(pins_);
+		return entity_system::Property<Pin, Value>(mPins);
 	}
 //! Get the Pin Notifier
 /*!
@@ -310,7 +310,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Net, Value> makeProperty(Net)
 	const {
-		return entity_system::Property<Net, Value>(nets_);
+		return entity_system::Property<Net, Value>(mNets);
 	}
 //! Get the Net Notifier
 /*!
@@ -410,7 +410,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Input, Value> makeProperty(Input)
 	const {
-		return entity_system::Property<Input, Value>(inputs_);
+		return entity_system::Property<Input, Value>(mInputs);
 	}
 	//! Get the Input Notifier
 	/*!
@@ -468,7 +468,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Output, Value> makeProperty(Output)
 	const {
-		return entity_system::Property<Output, Value>(outputs_);
+		return entity_system::Property<Output, Value>(mOutputs);
 	}
 	//! Get the Output Notifier
 	/*!
@@ -485,21 +485,21 @@ public:
 private:
 	Netlist(const Netlist& nl) = delete;
 	Netlist& operator =(const Netlist& nl) = delete;
-	entity_system::EntitySystem<Cell> cells_;
-	entity_system::EntitySystem<Pin> pins_;
-	entity_system::EntitySystem<Net> nets_;
-	entity_system::EntitySystem<Input> inputs_;
-	entity_system::EntitySystem<Output> outputs_;
-	entity_system::Property<Cell, std::string> cellNames_;
-	entity_system::Property<Pin, std::string> pinNames_;
-	entity_system::Property<Net, std::string> netNames_;
-	std::unordered_map<std::string, Cell> name2Cell_;
-	std::unordered_map<std::string, Pin> name2Pin_;
-	std::unordered_map<std::string, Net> name2Net_;
-	entity_system::Aggregation<Net, Pin> netPins_;
-	entity_system::Composition<Cell, Pin> cellPins_;
-	entity_system::Composition<Pin, Input> pinInput_;
-	entity_system::Composition<Pin, Output> pinOutput_;
+	entity_system::EntitySystem<Cell> mCells;
+	entity_system::EntitySystem<Pin> mPins;
+	entity_system::EntitySystem<Net> mNets;
+	entity_system::EntitySystem<Input> mInputs;
+	entity_system::EntitySystem<Output> mOutputs;
+	entity_system::Property<Cell, std::string> mCellNames;
+	entity_system::Property<Pin, std::string> mPinNames;
+	entity_system::Property<Net, std::string> mNetNames;
+	std::unordered_map<std::string, Cell> mName2Cell;
+	std::unordered_map<std::string, Pin> mName2Pin;
+	std::unordered_map<std::string, Net> mName2Net;
+	entity_system::Aggregation<Net, Pin> mNetPins;
+	entity_system::Composition<Cell, Pin> mCellPins;
+	entity_system::Composition<Pin, Input> mPinInput;
+	entity_system::Composition<Pin, Output> mPinOutput;
 };
 
 } // namespace circuit

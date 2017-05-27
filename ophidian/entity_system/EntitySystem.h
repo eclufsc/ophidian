@@ -42,8 +42,8 @@ public:
 	bool operator==(const EntityBase& entity) const;
 	bool operator!=(const EntityBase& entity) const;
 private:
-	uint32_t id_;
-	EntitySystemBase* system_;
+	uint32_t mId;
+	EntitySystemBase* mSystem;
 };
 class EntitySystemBase
 {
@@ -127,8 +127,8 @@ public:
 	 */
 	EntitySystem()
 	{
-		notifier_.setContainer(*this);
-		id_ = idCounter_++;
+		mNotifier.setContainer(*this);
+		mId = mIdCounter++;
 	}
 	~EntitySystem()
 	{
@@ -142,11 +142,11 @@ public:
 	 */
 	Entity add()
 	{
-		uint32_t id = id2Index_.size();
+		uint32_t id = mId2Index.size();
 		Entity entity(id, this);
-		id2Index_.push_back(container_.size());
-		container_.push_back(entity);
-		notifier_.add(container_.back());
+		mId2Index.push_back(mContainer.size());
+		mContainer.push_back(entity);
+		mNotifier.add(mContainer.back());
 		return entity;
 	}
 	//! Erase Entity
@@ -156,14 +156,14 @@ public:
 	 */
 	void erase(const Entity& entity)
 	{
-		notifier_.erase(entity);
+		mNotifier.erase(entity);
 		auto entityId = EntitySystemBase::id(entity);
 		auto index = id(entity);
-		auto lastEntityId = EntitySystemBase::id(container_.back());
-		std::swap(container_[index], container_.back());
-		container_.pop_back();
-		id2Index_[lastEntityId] = index;
-		id2Index_[entityId] = std::numeric_limits<uint32_t>::max();
+		auto lastEntityId = EntitySystemBase::id(mContainer.back());
+		std::swap(mContainer[index], mContainer.back());
+		mContainer.pop_back();
+		mId2Index[lastEntityId] = index;
+		mId2Index[entityId] = std::numeric_limits<uint32_t>::max();
 	}
 	//! Clear Entities
 	/*!
@@ -171,8 +171,8 @@ public:
 	 */
 	void clear()
 	{
-		notifier_.clear();
-		container_.clear();
+		mNotifier.clear();
+		mContainer.clear();
 	}
 	//! Allocate space for storing Entities
 	/*!
@@ -181,8 +181,8 @@ public:
 	 */
 	void reserve(size_type size)
 	{
-		container_.reserve(size);
-		notifier_.reserve(size);
+		mContainer.reserve(size);
+		mNotifier.reserve(size);
 	}
 	//! Allocate space for storing Entities
 	/*!
@@ -191,7 +191,7 @@ public:
 	 */
 	size_type capacity() const
 	{
-		return container_.capacity();
+		return mContainer.capacity();
 	}
 	//! Size of the EntitySystem
 	/*!
@@ -200,7 +200,7 @@ public:
 	 */
 	size_type size() const
 	{
-		return container_.size();
+		return mContainer.size();
 	}
 	//! Empty EntitySystem
 	/*!
@@ -209,7 +209,7 @@ public:
 	 */
 	bool empty() const
 	{
-		return container_.empty();
+		return mContainer.empty();
 	}
 	//! Iterator to beginning
 	/*!
@@ -218,7 +218,7 @@ public:
 	 */
 	const_iterator begin() const
 	{
-		return container_.begin();
+		return mContainer.begin();
 	}
 	//! Iterator to end
 	/*!
@@ -227,7 +227,7 @@ public:
 	 */
 	const_iterator end() const
 	{
-		return container_.end();
+		return mContainer.end();
 	}
 	//! Valid Entity
 	/*!
@@ -238,7 +238,7 @@ public:
 	bool valid(const Entity& entity) const
 	{
 		return EntitySystemBase::id(entity) != std::numeric_limits<uint32_t>::max() &&
-		       id2Index_[EntitySystemBase::id(entity)] < container_.size();
+		       mId2Index[EntitySystemBase::id(entity)] < mContainer.size();
 	}
 	//! Get the Notifier
 	/*!
@@ -247,7 +247,7 @@ public:
 	 */
 	NotifierType* notifier() const
 	{
-		return const_cast<EntitySystem::NotifierType*>(&notifier_);
+		return const_cast<EntitySystem::NotifierType*>(&mNotifier);
 	}
 	//! Entity id
 	/*!
@@ -257,33 +257,33 @@ public:
 	 */
 	size_type id(const Entity& entity) const
 	{
-		return id2Index_.at(EntitySystemBase::id(entity));
+		return mId2Index.at(EntitySystemBase::id(entity));
 	}
 	//! EntitySystem id
 	/*!
 	   \return The unique identifier of the EntitySystem.
 	 */
 	uint32_t id() const {
-		return id_;
+		return mId;
 	}
 	//! Shrink EntitySystem
 	/*!
 	   \brief Reallocate the EntitySystem and it's propertys to have capacity == size. This may help to
 	 */
 	void shrinkToFit() {
-		container_.shrink_to_fit();
-		notifier_.shrinkToFit();
+		mContainer.shrink_to_fit();
+		mNotifier.shrinkToFit();
 	}
 private:
-	NotifierType notifier_;
-	ContainerType container_;
-	std::vector<size_type> id2Index_;
-	uint32_t id_;
-	static uint32_t idCounter_;
+	NotifierType mNotifier;
+	ContainerType mContainer;
+	std::vector<size_type> mId2Index;
+	uint32_t mId;
+	static uint32_t mIdCounter;
 };
 
 template <class T>
-uint32_t EntitySystem<T>::idCounter_ = 0;
+uint32_t EntitySystem<T>::mIdCounter = 0;
 
 
 } // namespace entity_system

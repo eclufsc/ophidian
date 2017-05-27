@@ -148,7 +148,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Cell, Value> makeProperty(Cell)
 	const {
-		return entity_system::Property<Cell, Value>(cells_);
+		return entity_system::Property<Cell, Value>(mCells);
 	}
 
 //--------------------------- Pins -------------------------------//
@@ -235,7 +235,7 @@ public:
 	template <typename Value>
 	entity_system::Property<Pin, Value> makeProperty(Pin)
 	const {
-		return entity_system::Property<Pin, Value>(pins_);
+		return entity_system::Property<Pin, Value>(mPins);
 	}
 //--------------------------- Association -------------------------------//
 
@@ -250,20 +250,20 @@ public:
 
 private:
 	//cells entity system and properties
-	entity_system::EntitySystem<Cell> cells_;
-	entity_system::Property<Cell, std::string> cellNames_;
+	entity_system::EntitySystem<Cell> mCells;
+	entity_system::Property<Cell, std::string> mCellNames;
 
 	//pins entity system and properties
-	entity_system::EntitySystem<Pin> pins_;
-	entity_system::Property<Pin, std::string> pinNames_;
-	entity_system::Property<Pin, PinDirection> pinDirections_;
+	entity_system::EntitySystem<Pin> mPins;
+	entity_system::Property<Pin, std::string> mPinNames;
+	entity_system::Property<Pin, PinDirection> mPinDirections;
 
 	//composition and aggregation relations
-	entity_system::Composition<Cell, Pin> cellPins_;
+	entity_system::Composition<Cell, Pin> mCellPins;
 
 	//std_cell and pin mapping
-	std::unordered_map<std::string, Cell> name2Cell_;
-	std::unordered_map<std::string, Pin> name2Pin_;
+	std::unordered_map<std::string, Cell> mName2Cell;
+	std::unordered_map<std::string, Pin> mName2Pin;
 };
 
 } //namespace ophidian
