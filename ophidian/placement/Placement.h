@@ -49,22 +49,22 @@ public:
 	/*!
 	   \brief Places a cell by setting its location
 	   \param cell Cell to be placed
-	   \param location LocationMicron of the lower left corner of the cell.
+       \param location LocationDbu of the lower left corner of the cell.
 	 */
-	void placeCell(const circuit::Cell & cell, const util::LocationMicron & location);
+    void placeCell(const circuit::Cell & cell, const util::LocationDbu & location);
 
-	//! LocationMicron getter
+    //! LocationDbu getter
 	/*!
 	   \brief Get the location of a given cell.
 	   \param cell Cell entity to get the location.
-	   \return LocationMicron of the cell.
+       \return LocationDbu of the cell.
 	 */
-	util::LocationMicron location(const circuit::Cell & cell) const {
+    util::LocationDbu location(const circuit::Cell & cell) const {
 		return mLocations[cell];
 	}
 
 private:
-	entity_system::Property<circuit::Cell, util::LocationMicron> mLocations;
+    entity_system::Property<circuit::Cell, util::LocationDbu> mLocations;
 };
 
 } //namespace placement

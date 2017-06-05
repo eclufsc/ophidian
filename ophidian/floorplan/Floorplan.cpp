@@ -37,17 +37,17 @@ Floorplan::~Floorplan()
 
 }
 
-void Floorplan::chipOrigin(const util::LocationMicron &loc)
+void Floorplan::chipOrigin(const util::LocationDbu &loc)
 {
-	mChipOrigin = loc;
+    mChipOrigin = loc;
 }
 
-void Floorplan::chipUpperRightCorner(const util::LocationMicron &loc)
+void Floorplan::chipUpperRightCorner(const util::LocationDbu &loc)
 {
 	mChipUpperRightCorner = loc;
 }
 
-Site Floorplan::add(Site, const std::string & name, const util::LocationMicron & loc)
+Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
 {
 	auto site = mSites.add();
 	mNames[site] = name;
@@ -62,13 +62,13 @@ void Floorplan::erase(Site site)
 	mSites.erase(site);
 }
 
-Row Floorplan::add(Row, const util::LocationMicron &loc, size_t num, const Site &site)
+Row Floorplan::add(Row, const util::LocationDbu &loc, size_t num, const Site &site)
 {
 	auto row = mRows.add();
 	mOrigins[row] = loc;
 	mNumberOfSites[row] = num;
-	mSiteTypeOfRow[row] = site;
-	return row;
+    mSiteTypeOfRow[row] = site;
+    return row;
 }
 
 void Floorplan::erase(const Row &row)
@@ -76,12 +76,12 @@ void Floorplan::erase(const Row &row)
 	mRows.erase(row);
 }
 
-util::LocationMicron Floorplan::rowUpperRightCorner(const Row &row) const
+util::LocationDbu Floorplan::rowUpperRightCorner(const Row &row) const
 {
 	auto site = mSiteTypeOfRow[row];
 	size_t numSites = mNumberOfSites[row];
-	util::LocationMicron uRCorner = mDimensions[site];
-	return util::LocationMicron(uRCorner.x() * numSites, uRCorner.y());
+    util::LocationDbu uRCorner = mDimensions[site];
+    return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
 }
 
 } //namespace floorplan

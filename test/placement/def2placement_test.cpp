@@ -22,10 +22,10 @@ TEST_CASE_METHOD(Def2PlacementFixture, "Def2Placement: Test if def2placement map
 {
 	ophidian::placement::def2placement(*def, placement, netlist);
 
-	REQUIRE(placement.location(netlist.find(circuit::Cell(), "u1")) == util::LocationMicron(3420, 6840));
-	REQUIRE(placement.location(netlist.find(circuit::Cell(), "u2")) == util::LocationMicron(3420, 3420));
-	REQUIRE(placement.location(netlist.find(circuit::Cell(), "u3")) == util::LocationMicron(6840, 3420));
-	REQUIRE(placement.location(netlist.find(circuit::Cell(), "u4")) == util::LocationMicron(12160, 6840));
-	REQUIRE(placement.location(netlist.find(circuit::Cell(), "lcb1")) == util::LocationMicron(0, 10260));
+    REQUIRE(placement.location(netlist.find(circuit::Cell(), "u1")) == util::LocationDbu(3420, 6840));
+    REQUIRE(placement.location(netlist.find(circuit::Cell(), "u2")) == util::LocationDbu(3420, 3420));
+    REQUIRE(placement.location(netlist.find(circuit::Cell(), "u3")) == util::LocationDbu(6840, 3420));
+    REQUIRE(placement.location(netlist.find(circuit::Cell(), "u4")) == util::LocationDbu(12160, 6840));
+    REQUIRE(placement.location(netlist.find(circuit::Cell(), "lcb1")) == util::LocationDbu(0, 10260));
 }
 

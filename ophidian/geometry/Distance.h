@@ -44,7 +44,7 @@ public:
 	 * \param point2 Second point to calculate the distance
 	 * \return Manhattan distance between point1 and point2
 	 */
-	double operator()(const Point & point1, const Point & point2);
+    double operator()(const Point & point1, const Point & point2);
 };
 
 class EuclideanDistance
@@ -65,7 +65,7 @@ public:
 	 * \param point2 Second point to calculate the distance
 	 * \return Euclidean distance between point1 and point2
 	 */
-	double operator()(const Point &point1, const Point &point2);
+    double operator()(const Point &point1, const Point &point2);
 };
 
 } // namespace geometry
