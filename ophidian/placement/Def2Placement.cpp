@@ -27,7 +27,7 @@ void def2placement(const parser::Def & def, placement::Placement & placement, ci
 
 
 	for(auto & component : def.components())
-        placement.placeCell(netlist.add(circuit::Cell(), component.name), util::LocationDbu(component.position.x, component.position.y));
+		placement.placeCell(netlist.add(circuit::Cell(), component.name), util::LocationDbu(component.position.x, component.position.y));
 }
 } // namespace placement
 } // namespace ophidian

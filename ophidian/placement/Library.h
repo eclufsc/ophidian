@@ -62,7 +62,7 @@ public:
 	   \param pin Pin entity to get the offset.
 	   \return Offset of the pin.
 	 */
-    util::LocationDbu pinOffset(const standard_cell::Pin & pin) const {
+	util::LocationDbu pinOffset(const standard_cell::Pin & pin) const {
 		return mPinOffsets[pin];
 	}
 
@@ -72,11 +72,11 @@ public:
 	   \param pin Pin entity to set the offset.
 	   \param offset Offset to assign to pin.
 	 */
-    void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
+	void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
 
 private:
 	entity_system::Property<standard_cell::Cell, geometry::MultiBox> mGeometries;
-    entity_system::Property<standard_cell::Pin, util::LocationDbu> mPinOffsets;
+	entity_system::Property<standard_cell::Pin, util::LocationDbu> mPinOffsets;
 };
 } // namespace placement
 } // namespace ophidian

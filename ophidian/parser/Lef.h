@@ -90,8 +90,8 @@ public:
 	 */
 	struct rect
 	{
-        util::LocationMicron firstPoint; ///< coordinates of the first point
-        util::LocationMicron secondPoint; ///< coordinates of the second point
+		util::LocationMicron firstPoint; ///< coordinates of the first point
+		util::LocationMicron secondPoint; ///< coordinates of the second point
 	};
 
 	/**

@@ -162,8 +162,8 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 								break;
 							case lefiGeomRectE:
 								Lef::rect r;
-                                r.firstPoint = util::LocationMicron(l->port(i)->getRect(j)->xl, l->port(i)->getRect(j)->yl);
-                                r.secondPoint = util::LocationMicron(l->port(i)->getRect(j)->xh, l->port(i)->getRect(j)->yh);
+								r.firstPoint = util::LocationMicron(l->port(i)->getRect(j)->xl, l->port(i)->getRect(j)->yl);
+								r.secondPoint = util::LocationMicron(l->port(i)->getRect(j)->xh, l->port(i)->getRect(j)->yh);
 								pt.rects.push_back(r);
 								break;
 						}
@@ -197,7 +197,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 							break;
 						case lefiGeomRectE:
 							auto geom_rect =  geometries->getRect(i);
-                            Lef::rect r {util::LocationMicron(geom_rect->xl, geom_rect->yl), util::LocationMicron(geom_rect->xh, geom_rect->yh)};
+							Lef::rect r {util::LocationMicron(geom_rect->xl, geom_rect->yl), util::LocationMicron(geom_rect->xh, geom_rect->yh)};
 							m.obses.layer2rects[last_layer].push_back(r);
 							break;
 					}

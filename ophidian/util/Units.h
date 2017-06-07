@@ -101,7 +101,7 @@ public:
 	/// \constructor_default_no_init
 	inline point_xy()
 	{
-        }
+	}
 #endif
 
 	/// Constructor with x/y values as double with implicit convertion to micrometer_t
@@ -195,7 +195,7 @@ public:
 	}
 
 	//!Converts a LocationMicron to LocationDbu
-        LocationDbu convert(LocationMicron value)
+	LocationDbu convert(LocationMicron value)
 	{
 		int conv_value_x = units::unit_cast<double>(value.x())*m_dbu_factor;
 		int conv_value_y = units::unit_cast<double>(value.y())*m_dbu_factor;
@@ -203,11 +203,11 @@ public:
 	}
 
 	//!Converts a LocationDbu to LocationMicron
-        LocationMicron convert(LocationDbu value)
+	LocationMicron convert(LocationDbu value)
 	{
 		int conv_value_x = units::unit_cast<double>(value.x())/static_cast<double>(m_dbu_factor);
 		int conv_value_y = units::unit_cast<double>(value.y())/static_cast<double>(m_dbu_factor);
-                return LocationMicron(conv_value_x, conv_value_y);
+		return LocationMicron(conv_value_x, conv_value_y);
 	}
 };
 

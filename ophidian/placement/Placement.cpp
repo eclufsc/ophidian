@@ -24,7 +24,7 @@ namespace placement
 {
 
 Placement::Placement(const circuit::Netlist &netlist) :
-    mLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell()))
+	mLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell()))
 {
 }
 

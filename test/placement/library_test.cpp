@@ -26,8 +26,8 @@ public:
 	}
 };
 
-} // namespace 
-  // 
+} // namespace
+  //
 
 
 TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]")
@@ -51,10 +51,10 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[plac
 {
 	Library library(std_cells);
 
-    ophidian::util::LocationDbu pin1Offset(5, 5);
+	ophidian::util::LocationDbu pin1Offset(5, 5);
 	library.pinOffset(pin1, pin1Offset);
 
-    ophidian::util::LocationDbu pin2Offset(3, 3);
+	ophidian::util::LocationDbu pin2Offset(3, 3);
 	library.pinOffset(pin2, pin2Offset);
 
 	REQUIRE(pin1Offset == library.pinOffset(pin1));

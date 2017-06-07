@@ -39,7 +39,7 @@ Floorplan::~Floorplan()
 
 void Floorplan::chipOrigin(const util::LocationDbu &loc)
 {
-    mChipOrigin = loc;
+	mChipOrigin = loc;
 }
 
 void Floorplan::chipUpperRightCorner(const util::LocationDbu &loc)
@@ -58,7 +58,7 @@ Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & lo
 
 void Floorplan::erase(Site site)
 {
-    mName2Site.erase(name(site));
+	mName2Site.erase(name(site));
 	mSites.erase(site);
 }
 
@@ -67,8 +67,8 @@ Row Floorplan::add(Row, const util::LocationDbu &loc, size_t num, const Site &si
 	auto row = mRows.add();
 	mOrigins[row] = loc;
 	mNumberOfSites[row] = num;
-    mSiteTypeOfRow[row] = site;
-    return row;
+	mSiteTypeOfRow[row] = site;
+	return row;
 }
 
 void Floorplan::erase(const Row &row)
@@ -80,8 +80,8 @@ util::LocationDbu Floorplan::rowUpperRightCorner(const Row &row) const
 {
 	auto site = mSiteTypeOfRow[row];
 	size_t numSites = mNumberOfSites[row];
-    util::LocationDbu uRCorner = mDimensions[site];
-    return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
+	util::LocationDbu uRCorner = mDimensions[site];
+	return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
 }
 
 } //namespace floorplan
