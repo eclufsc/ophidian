@@ -71,14 +71,14 @@ public:
 	   \brief Set the chip origin location.
 	   \param loc Chip origin location.
 	 */
-	void chipOrigin(const util::LocationMicron & loc);
+	void chipOrigin(const util::LocationDbu & loc);
 
 	//! Chip origin location getter
 	/*!
 	   \brief Get the chip origin location.
 	   \return Chip origin location.
 	 */
-	util::LocationMicron chipOrigin()
+	util::LocationDbu chipOrigin()
 	{
 		return mChipOrigin;
 	}
@@ -88,14 +88,14 @@ public:
 	   \brief Set the chip upper right corner location.
 	   \param loc Chip upper right corner location.
 	 */
-	void chipUpperRightCorner(const util::LocationMicron & loc);
+	void chipUpperRightCorner(const util::LocationDbu & loc);
 
 	//! Chip upper right corner location getter
 	/*!
 	   \brief Get the chip upper right corner location.
 	   \param Chip upper right corner location.
 	 */
-	util::LocationMicron chipUpperRightCorner()
+	util::LocationDbu chipUpperRightCorner()
 	{
 		return mChipUpperRightCorner;
 	}
@@ -106,10 +106,10 @@ public:
 	/*!
 	   \brief Adds a a new site in the floorplan. A site has a name and a dimension associated to it.
 	   \param name Name of the site, used to identify it.
-	   \param dimension LocationMicron describing the site dimension.
+	   \param dimension LocationDbu describing the site dimension.
 	   \return The created site.
 	 */
-	Site add(Site, const std::string & name, const util::LocationMicron & loc);
+	Site add(Site, const std::string & name, const util::LocationDbu & loc);
 
 	//! Erase site in the floorplan
 	/*!
@@ -147,7 +147,7 @@ public:
 	   \param site Site entity to get the upper right corner.
 	   \return upper right corner of the site.
 	 */
-	util::LocationMicron siteUpperRightCorner(const Site & site) const
+	util::LocationDbu siteUpperRightCorner(const Site & site) const
 	{
 		return mDimensions[site];
 	}
@@ -171,7 +171,7 @@ public:
 	   \param site Site type of the row.
 	   \return The created row.
 	 */
-	Row add(Row, const util::LocationMicron & loc, size_t num, const Site &site);
+	Row add(Row, const util::LocationDbu & loc, size_t num, const Site &site);
 
 	//! Erase row in the floorplan
 	/*!
@@ -186,7 +186,7 @@ public:
 	   \param row Row entity to get the origin location.
 	   \return Origin location of the row.
 	 */
-	util::LocationMicron origin(const Row & row) const
+	util::LocationDbu origin(const Row & row) const
 	{
 		return mOrigins[row];
 	}
@@ -226,22 +226,22 @@ public:
 	/**
 	 * Returns the upper right corner of a row, calculated using the number of sites and site dimensions in that row.
 	 * \param row Row entity to gets the dimensions.
-	 * \return LocationMicron describing the upper right corner of that row.
+	 * \return LocationDbu describing the upper right corner of that row.
 	 */
-	util::LocationMicron rowUpperRightCorner(const Row & row) const;
+	util::LocationDbu rowUpperRightCorner(const Row & row) const;
 
 private:
 	entity_system::EntitySystem<Row> mRows;
-	entity_system::Property<Row, util::LocationMicron> mOrigins;
+	entity_system::Property<Row, util::LocationDbu> mOrigins;
 	entity_system::Property<Row, size_t> mNumberOfSites;
 	entity_system::Property<Row, Site> mSiteTypeOfRow;
 
 	entity_system::EntitySystem<Site> mSites;
 	entity_system::Property<Site, std::string> mNames;
-	entity_system::Property<Site, util::LocationMicron> mDimensions;
+	entity_system::Property<Site, util::LocationDbu> mDimensions;
 
-	util::LocationMicron mChipOrigin;
-	util::LocationMicron mChipUpperRightCorner;
+	util::LocationDbu mChipOrigin;
+	util::LocationDbu mChipUpperRightCorner;
 
 	std::unordered_map<std::string, Site> mName2Site;
 };

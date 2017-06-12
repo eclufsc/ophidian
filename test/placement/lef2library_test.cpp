@@ -26,7 +26,7 @@ TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test library cell geometries.
 
 TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test library pin offset.", "[standard_cell][library][placement][lef][dbunits]")
 {
-	REQUIRE(library->pinOffset(stdCells.find(standard_cell::Pin(), "INV_X1:a")) == util::LocationMicron(0.5*(0.210+0.340)*lef->databaseUnits(), 0.5*(0.34+0.405)*lef->databaseUnits()));
+	REQUIRE(library->pinOffset(stdCells.find(standard_cell::Pin(), "INV_X1:a")) == util::LocationDbu(0.5*(0.210+0.340)*lef->databaseUnits(), 0.5*(0.34+0.405)*lef->databaseUnits()));
 }
 
 TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test of association between standard_cell::Pin and standard_cell::Cell.", "[circuit][standard_cell][lef][EntitySystem]")

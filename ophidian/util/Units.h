@@ -48,7 +48,7 @@ using meter_t       = units::length::meter_t;
 //!Lenght Unit derived from micrometer to be used as internal length unit length (as commonly used in LEF/DEF library)
 //!To convert to/from micron, please use the DbuConverter Utility class
 using dbu_base = units::unit<std::ratio<1>, units::length::micrometers>;
-using dbumeter_t = units::unit_t<dbu_base, int, units::linear_scale>;
+using dbumeter_t = units::unit_t<dbu_base, double, units::linear_scale>;
 
 //!Area Units
 //!New unit tag derived from area_unit to allow for creation of square_millimiter_t

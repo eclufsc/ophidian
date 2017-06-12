@@ -25,10 +25,10 @@ bool compare(const parser::Lef::layer & a, const parser::Lef::layer & b)
 
 bool compare(const parser::Lef::rect & a, const parser::Lef::rect & b)
 {
-	return Approx(a.xl) == b.xl &&
-	       Approx(a.yl) == b.yl &&
-	       Approx(a.xh) == b.xh &&
-	       Approx(a.yh) == b.yh;
+	return Approx(units::unit_cast<double>(a.firstPoint.x())) == units::unit_cast<double>(b.firstPoint.x()) &&
+		   Approx(units::unit_cast<double>(a.firstPoint.y())) == units::unit_cast<double>(b.firstPoint.y()) &&
+		   Approx(units::unit_cast<double>(a.secondPoint.x())) == units::unit_cast<double>(b.secondPoint.x()) &&
+		   Approx(units::unit_cast<double>(a.secondPoint.y())) == units::unit_cast<double>(b.secondPoint.y());
 }
 
 bool compare(const std::vector<parser::Lef::rect> & a, const std::vector<parser::Lef::rect> & b)
@@ -202,12 +202,12 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
 		std::vector<std::string> m1_pin_layers = {"metal1"};
 
 		std::vector<parser::Lef::rect> m1_o_rects = {
-			{0.465, 0.150, 0.53, 1.255},
-			{0.415, 0.150, 0.61, 0.28}
+			{util::LocationMicron(0.465, 0.150), util::LocationMicron(0.53, 1.255)},
+			{util::LocationMicron(0.415, 0.150), util::LocationMicron(0.61, 0.28)}
 		};
 
 		std::vector<parser::Lef::rect> m1_a_rects = {
-			{0.210, 0.340, 0.34, 0.405}
+			{util::LocationMicron(0.210, 0.340), util::LocationMicron(0.34, 0.405)}
 		};
 
 		parser::Lef::port m1_o_port = {m1_pin_layers, m1_o_rects};
@@ -245,7 +245,7 @@ TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]")
 
 	SECTION("Obses are correct", "[parser][lef][superblue18][obses]")
 	{
-		parser::Lef::rect r1 = {0, 0, 3.420, 1.71};
+		parser::Lef::rect r1 = {util::LocationMicron(0, 0), util::LocationMicron(3.420, 1.71)};
 
 		parser::Lef::obs obs1;
 		obs1.layer2rects["metal1"] = {r1};
