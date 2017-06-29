@@ -19,15 +19,15 @@ public:
 	std::unique_ptr<ophidian::parser::Lef> lef;
 	Floorplan floorplan;
 };
-} // namespace 
-  // 
+} // namespace
+  //
 
 TEST_CASE_METHOD(LefDef2FloorplanFixture,"LefDef2Floorplan: Test for some simple features.", "[floorplan][lef][def][floorplan]")
 {
 	lefDef2Floorplan(*lef, *def, floorplan);
-	REQUIRE(floorplan.chipOrigin() == ophidian::util::LocationMicron(0, 0));
-	REQUIRE(floorplan.chipUpperRightCorner() == ophidian::util::LocationMicron(27360, 13680));
-	REQUIRE(floorplan.siteUpperRightCorner(floorplan.find("core")) == ophidian::util::LocationMicron(0.19*lef->databaseUnits(), 1.71*lef->databaseUnits()));
+	REQUIRE(floorplan.chipOrigin() == ophidian::util::LocationDbu(0, 0));
+	REQUIRE(floorplan.chipUpperRightCorner() == ophidian::util::LocationDbu(27360, 13680));
+	REQUIRE(floorplan.siteUpperRightCorner(floorplan.find("core")) == ophidian::util::LocationDbu(0.19*lef->databaseUnits(), 1.71*lef->databaseUnits()));
 	REQUIRE(floorplan.sitesRange().size() == 1);
 	REQUIRE(floorplan.rowsRange().size() == 4);
 }

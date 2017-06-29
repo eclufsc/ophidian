@@ -33,8 +33,8 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
 			geometry::MultiBox geometry;
 			for(auto & rect : layer2RectsM1->second)
 			{
-				ophidian::geometry::Point pmin = {rect.xl*lef.databaseUnits(), rect.yl*lef.databaseUnits()};
-				ophidian::geometry::Point pmax = {rect.xh*lef.databaseUnits(), rect.yh*lef.databaseUnits()};
+				ophidian::geometry::Point pmin = {units::unit_cast<double>(rect.firstPoint.x())*lef.databaseUnits(), units::unit_cast<double>(rect.firstPoint.y())*lef.databaseUnits()};
+				ophidian::geometry::Point pmax = {units::unit_cast<double>(rect.secondPoint.x())*lef.databaseUnits(), units::unit_cast<double>(rect.secondPoint.y())*lef.databaseUnits()};
 				geometry.push_back(ophidian::geometry::Box(pmin, pmax));
 			}
 			library.geometry(stdCell, geometry);
@@ -44,6 +44,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
 			ophidian::geometry::Point pmax = {macro.size.x*lef.databaseUnits(), macro.size.y*lef.databaseUnits()};
 			library.geometry(stdCell, geometry::MultiBox({ophidian::geometry::Box(pmin, pmax)}));
 		}
+		util::DbuConverter dbuConverter(lef.databaseUnits());
 
 		for(auto pin : macro.pins)
 		{
@@ -51,7 +52,7 @@ void lef2Library(const parser::Lef & lef, Library & library, standard_cell::Stan
 			stdCells.add(stdCell, stdPin);
 			for(auto port : pin.ports)
 				for(auto rect : port.rects)
-					library.pinOffset(stdPin, util::LocationMicron(0.5*(rect.xl+rect.xh)*lef.databaseUnits(), 0.5*(rect.yl+rect.yh)*lef.databaseUnits()));
+					library.pinOffset(stdPin, util::LocationDbu(0.5*(dbuConverter.convert(rect.firstPoint.x())+dbuConverter.convert(rect.secondPoint.x())), 0.5*(dbuConverter.convert(rect.firstPoint.y())+dbuConverter.convert(rect.secondPoint.y()))));
 		}
 	}
 }

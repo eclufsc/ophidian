@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <ophidian/util/Units.h>
 
 namespace ophidian
 {
@@ -89,10 +90,8 @@ public:
 	 */
 	struct rect
 	{
-		double xl; ///< x coordinate of the first point
-		double yl; ///< y coordinate of the first point
-		double xh; ///< x coordinate of the second point
-		double yh; ///< y coordinate of the second point
+		util::LocationMicron firstPoint; ///< coordinates of the first point
+		util::LocationMicron secondPoint; ///< coordinates of the second point
 	};
 
 	/**

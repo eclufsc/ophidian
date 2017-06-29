@@ -25,7 +25,7 @@ namespace placement
 
 Library::Library(const standard_cell::StandardCells &std_cells) :
 	mGeometries(std_cells.makeProperty<geometry::MultiBox>(standard_cell::Cell())),
-	mPinOffsets(std_cells.makeProperty<util::LocationMicron>(standard_cell::Pin()))
+	mPinOffsets(std_cells.makeProperty<util::LocationDbu>(standard_cell::Pin()))
 {
 }
 
@@ -34,7 +34,7 @@ void Library::geometry(const standard_cell::Cell &cell, const geometry::MultiBox
 	mGeometries[cell] = geometry;
 }
 
-void Library::pinOffset(const standard_cell::Pin &pin, const util::LocationMicron &offset)
+void Library::pinOffset(const standard_cell::Pin &pin, const util::LocationDbu &offset)
 {
 	mPinOffsets[pin] = offset;
 }
