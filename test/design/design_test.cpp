@@ -22,16 +22,16 @@ TEST_CASE("Design: testing netlist.", "[design]")
 
 TEST_CASE("Design: testing floorplan.", "[design]")
 {
-	ophidian::util::LocationMicron origin(0.0, 0.0);
-	ophidian::util::LocationMicron boundaries(0.0, 0.0);
+	ophidian::util::LocationDbu origin(0.0, 0.0);
+	ophidian::util::LocationDbu boundaries(0.0, 0.0);
 
 	REQUIRE(design.floorplan().chipOrigin() == origin);
 	REQUIRE(design.floorplan().chipUpperRightCorner() == boundaries);
 	REQUIRE(design.floorplan().sitesRange().empty());
 	REQUIRE(design.floorplan().rowsRange().empty());
 
-	origin = ophidian::util::LocationMicron(2.0, 3.0);
-	boundaries = ophidian::util::LocationMicron(4000.0, 3000.0);
+	origin = ophidian::util::LocationDbu(2.0, 3.0);
+	boundaries = ophidian::util::LocationDbu(4000.0, 3000.0);
 	design.floorplan().chipOrigin(origin);
 	design.floorplan().chipUpperRightCorner(boundaries);
 	REQUIRE(design.floorplan().chipOrigin() == origin);
@@ -43,8 +43,8 @@ TEST_CASE("Design: testing placement.", "[design]")
 {
 	auto cell1 = design.netlist().add(ophidian::circuit::Cell(), "cell1");
 	auto cell2 = design.netlist().add(ophidian::circuit::Cell(), "cell2");
-	ophidian::util::LocationMicron cell1Location(10,20);
-	ophidian::util::LocationMicron cell2Location(20,10);
+	ophidian::util::LocationDbu cell1Location(10,20);
+	ophidian::util::LocationDbu cell2Location(20,10);
 	design.placement().placeCell(cell1, cell1Location);
 	design.placement().placeCell(cell2, cell2Location);
 
