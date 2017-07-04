@@ -1,3 +1,5 @@
+INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
+
 file(GLOB ophidian_floorplan_SRC
     "*.h"
     "*.cpp"

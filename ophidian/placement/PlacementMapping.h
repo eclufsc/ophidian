@@ -27,7 +27,7 @@ public:
        \param cell Cell entity to get the geometry.
        \return Geometry of the cell.
      */
-    util::MultiBox geometry(const circuit::Cell & cell) const;
+    geometry::MultiBox geometry(const circuit::Cell & cell) const;
 
     //! Pin location getter
     /*!
@@ -35,13 +35,13 @@ public:
        \param cell Pin entity to get the location.
        \return Location of the cell.
      */
-    util::Location location(const circuit::Pin & pin) const;
+    util::LocationDbu location(const circuit::Pin & pin) const;
 
 private:
-    const Placement & placement_;
-    const Library & library_;
-    const circuit::Netlist & netlist_;
-    const circuit::LibraryMapping & libraryMapping_;
+    const Placement & mPlacement;
+    const Library & mLibrary;
+    const circuit::Netlist & mNetlist;
+    const circuit::LibraryMapping & mLibraryMapping;
 };
 }
 }

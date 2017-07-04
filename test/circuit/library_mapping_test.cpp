@@ -14,11 +14,11 @@ public:
     ophidian::standard_cell::StandardCells stdCells;
 
     NetlistAndStdCellFixture() {
-        cell1 = netlist.add(ophidian::circuit::Cell());
-        cell2 = netlist.add(ophidian::circuit::Cell());
+        cell1 = netlist.add(ophidian::circuit::Cell(), "cell1");
+        cell2 = netlist.add(ophidian::circuit::Cell(), "cell2");
 
-        pin1 = netlist.add(ophidian::circuit::Pin());
-        pin2 = netlist.add(ophidian::circuit::Pin());
+        pin1 = netlist.add(ophidian::circuit::Pin(), "pin1");
+        pin2 = netlist.add(ophidian::circuit::Pin(), "pin2");
 
         stdCell1 = stdCells.add(ophidian::standard_cell::Cell(), "INVX1");
         stdCell2 = stdCells.add(ophidian::standard_cell::Cell(), "INVX2");
