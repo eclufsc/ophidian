@@ -12,7 +12,7 @@ util::MultiBox PlacementMapping::geometry(const circuit::Cell &cell) const
     auto stdCell = libraryMapping_.cellStdCell(cell);
     auto stdCellGeometry = library_.geometry(stdCell);
     auto cellLocation = placement_.cellLocation(cell);
-    util::MultiBox cellGeometry = stdCellGeometry.translate(units::unit_cast<double>(cellLocation.x()), units::unit_cast<double>(cellLocation.y()));
+    util::MultiBox cellGeometry = stdCellGeometry.translate(cellLocation.toPoint());
     return cellGeometry;
 }
 

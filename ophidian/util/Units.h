@@ -116,6 +116,10 @@ public:
     ///operator == overloading
     bool operator!=(const point_xy_location & point)
     { return !(*this==point);}
+
+    ophidian::geometry::Point toPoint() {
+        return ophidian::geometry::Point(units::unit_cast<double>(this->x()), units::unit_cast<double>(this->y()));
+    }
 };
 }
 }
@@ -180,12 +184,11 @@ public:
         return !(*this==other);
     }
 
-    MultiBox translate(double xTranslation, double yTranslation) {
+    MultiBox translate(geometry::Point translationPoint) {
         std::vector<geometry::Box> translatedBoxes;
         translatedBoxes.reserve(boxes_.size());
         for (auto box : boxes_) {
-            geometry::Box translatedBox;
-            geometry::translate(box, xTranslation, yTranslation, translatedBox);
+            geometry::Box translatedBox = geometry::translate(box, translationPoint);
             translatedBoxes.push_back(translatedBox);
         }
         return MultiBox(translatedBoxes);

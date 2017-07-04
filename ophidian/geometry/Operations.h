@@ -34,9 +34,11 @@ namespace geometry {
  * \param result Geometry representing the translated geometry
  */
 template<class Geometry>
-void translate(const Geometry & geometry, double xTranslation, double yTranslation, Geometry & result) {
-    boost::geometry::strategy::transform::translate_transformer<double, 2, 2> translate(xTranslation, yTranslation);
-	boost::geometry::transform(geometry, result, translate);
+Geometry translate(const Geometry & geometry, Point & translationPoint) {
+    Geometry result;
+    boost::geometry::strategy::transform::translate_transformer<double, 2, 2> translate(translationPoint.x(), translationPoint.y());
+    boost::geometry::transform(geometry, result, translate);
+    return result;
 }
 
 //! Scaling operation
@@ -47,9 +49,11 @@ void translate(const Geometry & geometry, double xTranslation, double yTranslati
  * \param result Geometry representing the scaled geometry
  */
 template<class Geometry>
-void scale(const Geometry & geometry, double xScaling, double yScaling, Geometry & result) {
-    boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(xScaling, yScaling);
+Geometry scale(const Geometry & geometry, Point & scalingPoint) {
+    Geometry result;
+    boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(scalingPoint.x(), scalingPoint.y());
     boost::geometry::transform(geometry, result, scale);
+    return result;
 }
 
 //! Rotate operation
