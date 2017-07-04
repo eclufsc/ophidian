@@ -48,8 +48,8 @@ TEST_CASE("Design: testing placement.", "[design]")
 	design.placement().placeCell(cell1, cell1Location);
 	design.placement().placeCell(cell2, cell2Location);
 
-	REQUIRE(cell1Location == design.placement().location((cell1)));
-	REQUIRE(cell2Location == design.placement().location((cell2)));
+	REQUIRE(cell1Location == design.placement().cellLocation((cell1)));
+	REQUIRE(cell2Location == design.placement().cellLocation((cell2)));
 }
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")

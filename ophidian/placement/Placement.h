@@ -35,7 +35,8 @@ class Placement
 public:
 	//! Placement Constructor
 	/*!
-	   \brief Constructs a placement system with no properties
+       \brief Constructs a placement system with no properties.
+       \param netlist Circuit netlist.
 	 */
 	Placement(const circuit::Netlist & netlist);
 
@@ -59,12 +60,22 @@ public:
 	   \param cell Cell entity to get the location.
 	   \return LocationDbu of the cell.
 	 */
-	util::LocationDbu location(const circuit::Cell & cell) const {
-		return mLocations[cell];
+    util::LocationDbu cellLocation(const circuit::Cell & cell) const {
+        return mCellLocations[cell];
 	}
 
+void placeInputPad(const circuit::Input & input, const util::LocationDbu & location);
+
+    util::LocationDbu inputPadLocation(const circuit::Input & input) const;
+
+    void placeOutputPad(const circuit::Output & output, const util::LocationDbu &location);
+
+    util::LocationDbu outputPadLocation(const circuit::Output & output) const;
+
 private:
-	entity_system::Property<circuit::Cell, util::LocationDbu> mLocations;
+    entity_system::Property<circuit::Cell, util::LocationDbu> mCellLocations;
+    entity_system::Property<circuit::Input, util::LocationDbu> mInputLocations;
+    entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
 };
 
 } //namespace placement
