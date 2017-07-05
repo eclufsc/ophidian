@@ -27,6 +27,7 @@
 #include <ophidian/floorplan/LefDef2Floorplan.h>
 #include <ophidian/placement/Def2Placement.h>
 #include <ophidian/placement/Lef2Library.h>
+#include <ophidian/circuit/Def2LibraryMapping.h>
 #include <ophidian/circuit/Verilog2Netlist.h>
 
 namespace ophidian

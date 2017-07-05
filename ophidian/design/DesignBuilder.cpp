@@ -28,7 +28,8 @@ DesignBuilder::DesignBuilder() :
 
 	mDesign(),
 	mLef(),
-	mDef()
+	mDef(),
+	mVerilog()
 {
 
 }
@@ -49,9 +50,12 @@ void DesignBuilder::build2017(const std::string & cellLefFile, const std::string
 
 	mDef = defParser.readFile(placedDefFile);
 
-	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
-	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
 	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
+	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
+	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
+	circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+
+
 }
 
 void DesignBuilder::build2015(const std::string & lefFile, const std::string & defFile, const std::string & verilogFile)

@@ -29,8 +29,6 @@ void def2placement(const parser::Def & def, placement::Placement & placement, ci
 		util::LocationDbu cellPosition(component.position.x, component.position.y);
 		auto cell = netlist.add(circuit::Cell(), component.name);
 		placement.placeCell(cell, cellPosition);
-		//placement.fixLocation(cell, component.fixed);
-		//placement.cellOrientation(cell, component.orientation);
 	}
 }
 
