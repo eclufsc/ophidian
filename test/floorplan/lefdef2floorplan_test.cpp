@@ -9,10 +9,11 @@ class LefDef2FloorplanFixture
 {
 public:
 	LefDef2FloorplanFixture() {
-		ophidian::parser::DefParser defParser;
-		def = std::move(defParser.readFile("./input_files/simple.def"));
-		ophidian::parser::LefParser lefParser;
-		lef = std::move(lefParser.readFile("./input_files/simple.lef"));
+		ophidian::parser::DefParser def_parser;
+		def = std::move(def_parser.readFile("./input_files/simple.def"));
+		ophidian::parser::LefParser lef_parser;
+		lef = std::make_unique<ophidian::parser::Lef>();
+		lef_parser.readFile("./input_files/simple.lef", lef);
 	}
 
 	std::unique_ptr<ophidian::parser::Def> def;
@@ -20,7 +21,6 @@ public:
 	Floorplan floorplan;
 };
 } // namespace
-  //
 
 TEST_CASE_METHOD(LefDef2FloorplanFixture,"LefDef2Floorplan: Test for some simple features.", "[floorplan][lef][def][floorplan]")
 {
