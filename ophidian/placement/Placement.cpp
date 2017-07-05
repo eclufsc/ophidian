@@ -23,10 +23,11 @@ namespace ophidian
 namespace placement
 {
 
-Placement::Placement(const circuit::Netlist &netlist) :
-	mLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell()))
-{
-}
+Placement::Placement(const circuit::Netlist &netlist): 
+    mCellLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell())),
+    mInputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
+    mOutputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
+    { }
 
 Placement::~Placement()
 {
@@ -35,7 +36,27 @@ Placement::~Placement()
 
 void Placement::placeCell(const circuit::Cell & cell, const util::LocationDbu & location)
 {
-	mLocations[cell] = location;
+    mCellLocations[cell] = location;
+}
+
+void Placement::placeInputPad(const circuit::Input &input, const util::LocationDbu &location)
+{
+    mInputLocations[input] = location;
+}
+
+util::LocationDbu Placement::inputPadLocation(const circuit::Input &input) const
+{
+    return mInputLocations[input];
+}
+
+void Placement::placeOutputPad(const circuit::Output &output, const util::LocationDbu &location)
+{
+    mOutputLocations[output] = location;
+}
+
+util::LocationDbu Placement::outputPadLocation(const circuit::Output &output) const
+{
+    return mOutputLocations[output];
 }
 
 

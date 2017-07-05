@@ -39,6 +39,9 @@ using Box = boost::geometry::model::box<Point>;
 using Polygon = boost::geometry::model::polygon<Point>;
 using MultiPolygon = boost::geometry::model::multi_polygon<Polygon>;
 
+template<class Geometry>
+Geometry translate(const Geometry & geometry, Point & translationPoint);
+
 //! Create new geometry
 /*!
  *  \brief Creates a new geometry from a vector of points. Can be used for Linestring and Polygon. Should not be used for Segment and Box.
@@ -47,12 +50,12 @@ using MultiPolygon = boost::geometry::model::multi_polygon<Polygon>;
  */
 template<class Geometry>
 Geometry make(const std::vector<Point> & points) {
-	Geometry geometry;
-	for (auto point : points)
-	{
-		boost::geometry::append(geometry, point);
-	}
-	return geometry;
+    Geometry geometry;
+    for (auto point : points)
+    {
+        boost::geometry::append(geometry, point);
+    }
+    return geometry;
 }
 
 //! Create new multi geometry
@@ -63,84 +66,94 @@ Geometry make(const std::vector<Point> & points) {
  */
 template<class MultiGeometry, class PartGeometry>
 MultiGeometry makeMulti(const std::vector<PartGeometry> & parts) {
-	MultiGeometry multiGeometry;
-	for (auto part : parts)
-	{
-		multiGeometry.push_back(part);
-	}
-	return multiGeometry;
+    MultiGeometry multiGeometry;
+    for (auto part : parts)
+    {
+        multiGeometry.push_back(part);
+    }
+    return multiGeometry;
 }
 
 //!Class multibox using geometry::Box
 class MultiBox
 {
 public:
-	//!Standard constructor
-	MultiBox() {
+    //!Standard constructor
+    MultiBox() {
 
-	}
+    }
 
-	//!Constructor receiving a vector of geometry::Box
-	MultiBox(const std::vector<geometry::Box> & boxes)
-		: mBoxes(boxes) {
+    //!Constructor receiving a vector of geometry::Box
+    MultiBox(const std::vector<geometry::Box> & boxes)
+        : mBoxes(boxes) {
 
-	}
+    }
 
-	//!Copy constructor
-	MultiBox(const MultiBox & otherBox)
-		: mBoxes(otherBox.mBoxes) {
+    //!Copy constructor
+    MultiBox(const MultiBox & otherBox)
+        : mBoxes(otherBox.mBoxes) {
 
-	}
+    }
 
-	//!Push back a geometry::Box
-	void push_back(const geometry::Box & box) {
-		mBoxes.push_back(box);
-	}
+    //!Push back a geometry::Box
+    void push_back(const geometry::Box & box) {
+        mBoxes.push_back(box);
+    }
 
-	//!Non-const iterator begin
-	std::vector<geometry::Box>::iterator begin() {
-		return mBoxes.begin();
-	}
+    //!Non-const iterator begin
+    std::vector<geometry::Box>::iterator begin() {
+        return mBoxes.begin();
+    }
 
-	//!Non-const iterator end
-	std::vector<geometry::Box>::iterator end() {
-		return mBoxes.end();
-	}
+    //!Non-const iterator end
+    std::vector<geometry::Box>::iterator end() {
+        return mBoxes.end();
+    }
 
-	//!Const iterator begin
-	std::vector<geometry::Box>::const_iterator begin() const {
-		return mBoxes.begin();
-	}
+    //!Const iterator begin
+    std::vector<geometry::Box>::const_iterator begin() const {
+        return mBoxes.begin();
+    }
 
-	//!Const iterator end
-	std::vector<geometry::Box>::const_iterator end() const {
-		return mBoxes.end();
-	}
+    //!Const iterator end
+    std::vector<geometry::Box>::const_iterator end() const {
+        return mBoxes.end();
+    }
 
-	//!Operator overloading for comparison of two multibox objects
-	bool operator==(const MultiBox & other) const {
-		for (auto box1 : this->mBoxes)
-		{
-			for (auto box2 : other.mBoxes)
-			{
-				bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
-				                  && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
-				if (!comparison)
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+    //!Operator overloading for comparison of two multibox objects
+    bool operator==(const MultiBox & other) const {
+        for (auto box1 : this->mBoxes)
+        {
+            for (auto box2 : other.mBoxes)
+            {
+                bool comparison = (box1.min_corner().x() == box2.min_corner().x()) && (box1.min_corner().y() == box2.min_corner().y())
+                        && (box1.max_corner().x() == box2.max_corner().x()) && (box1.max_corner().y() == box2.max_corner().y());
+                if (!comparison)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-	//!Operator overload for difference between two multibox objects
-	bool operator!=(const MultiBox & other) const {
-		return !(*this==other);
-	}
+    //!Operator overload for difference between two multibox objects
+    bool operator!=(const MultiBox & other) const {
+        return !(*this==other);
+    }
+
+    MultiBox translate(geometry::Point translationPoint) {
+        std::vector<geometry::Box> translatedBoxes;
+        translatedBoxes.reserve(mBoxes.size());
+        for (auto box : mBoxes) {
+            geometry::Box translatedBox = geometry::translate(box, translationPoint);
+            translatedBoxes.push_back(translatedBox);
+        }
+        return MultiBox(translatedBoxes);
+    }
 
 private:
-	std::vector<geometry::Box> mBoxes;
+    std::vector<geometry::Box> mBoxes;
 };
 
 

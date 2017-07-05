@@ -151,6 +151,10 @@ public:
 	{
 		return !(*this==point);
 	}
+
+    ophidian::geometry::Point toPoint() {
+        return ophidian::geometry::Point(units::unit_cast<double>(this->x()), units::unit_cast<double>(this->y()));
+    }
 };
 
 } //namespace d2
