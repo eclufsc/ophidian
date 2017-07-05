@@ -57,13 +57,13 @@ public:
 	/*!
 	   \brief build a system using 2 Lef and one Def as parameters
 	 */
-	void build2017(const std::__cxx11::string &cellLefFile, const std::__cxx11::string &techLefFile, const std::__cxx11::string &placedDefFile);
+	void build2017(const std::string &cellLefFile, const std::string &techLefFile, const std::string &placedDefFile);
 
 	//! build a system with ICCAD2015 files
 	/*!
 	   \brief build a system using 2 Lef and one Def as parameters
 	 */
-	void build2015(const std::__cxx11::string &lefFile, const std::__cxx11::string &defFile, const std::__cxx11::string &verilogFile);
+	void build2015(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile);
 
 	//! Design getter
 	/*!
