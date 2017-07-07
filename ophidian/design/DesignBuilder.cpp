@@ -24,31 +24,33 @@ namespace ophidian
 namespace designBuilder
 {
 
-DesignBuilder::DesignBuilder() :
+ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile) :
 
 	mDesign(),
 	mLef(),
 	mDef(),
-	mVerilog()
+	mCellLefFile(cellLefFile),
+	mTechLefFile(techLefFile),
+	mPlacedDefFile(placedDefFile)
 {
 
 }
 
-DesignBuilder::~DesignBuilder()
+ICCAD2017ContestDesignBuilder::~ICCAD2017ContestDesignBuilder()
 {
 
 }
 
-void DesignBuilder::build2017(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile)
+void ICCAD2017ContestDesignBuilder::build()
 {
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
 
 	mLef =  std::make_unique<ophidian::parser::Lef>();
-	lefParser.readFile(cellLefFile, mLef);
-	lefParser.readFile(techLefFile, mLef);
+	lefParser.readFile(mCellLefFile, mLef);
+	lefParser.readFile(mTechLefFile, mLef);
 
-	mDef = defParser.readFile(placedDefFile);
+	mDef = defParser.readFile(mPlacedDefFile);
 
 	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
 	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
@@ -58,18 +60,37 @@ void DesignBuilder::build2017(const std::string & cellLefFile, const std::string
 
 }
 
-void DesignBuilder::build2015(const std::string & lefFile, const std::string & defFile, const std::string & verilogFile)
+
+ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile) :
+
+	mDesign(),
+	mLef(),
+	mDef(),
+	mVerilog(),
+	mLefFile(lefFile),
+	mDefFile(defFile),
+	mVerilogFile(verilogFile)
+{
+
+}
+
+ICCAD2015ContestDesignBuilder::~ICCAD2015ContestDesignBuilder()
+{
+
+}
+
+void ICCAD2015ContestDesignBuilder::build()
 {
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
 	parser::VerilogParser vParser;
 
 	mLef =  std::make_unique<ophidian::parser::Lef>();
-	lefParser.readFile(lefFile, mLef);
+	lefParser.readFile(mLefFile, mLef);
 
-	mDef = defParser.readFile(defFile);
+	mDef = defParser.readFile(mDefFile);
 
-	mVerilog.reset(vParser.readFile(verilogFile));
+	mVerilog.reset(vParser.readFile(mVerilogFile));
 
 
 	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());

@@ -20,7 +20,6 @@
 #define OPHIDIAN_DESIGN_DESIGNBUILDER_H
 
 #include <fstream>
-#include <sstream>
 #include <ophidian/design/Design.h>
 #include <ophidian/parser/ParserException.h>
 #include <ophidian/parser/VerilogParser.h>
@@ -40,30 +39,76 @@ namespace designBuilder
 class DesignBuilder
 {
 public:
+	virtual void build() = 0;
+};
+
+
+class ICCAD2017ContestDesignBuilder : public DesignBuilder
+{
+public:
 
 	//! DesignBuilder Constructor
 	/*!
 	   \brief Constructs a designBuilder
 	 */
-	DesignBuilder();
+	ICCAD2017ContestDesignBuilder(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile);
 
 	//! DesignBuilder Destructor
 	/*!
 	   \brief Destroys the designBuilder, including its properties.
 	 */
-	~DesignBuilder();
+	~ICCAD2017ContestDesignBuilder();
 
 	//! build a system with ICCAD2017 files
 	/*!
 	   \brief build a system using 2 Lef and one Def as parameters
 	 */
-	void build2017(const std::string &cellLefFile, const std::string &techLefFile, const std::string &placedDefFile);
+	void build();
+
+	//! Design getter
+	/*!
+	   \brief Get the Design.
+	   \return Design.
+	 */
+
+	design::Design & design()
+	{
+		return mDesign;
+	}
+
+
+private:
+	design::Design mDesign;
+	std::unique_ptr<parser::Lef> mLef;
+	std::unique_ptr<parser::Def> mDef;
+	std::string mCellLefFile;
+	std::string mTechLefFile;
+	std::string mPlacedDefFile;
+
+};
+
+
+class ICCAD2015ContestDesignBuilder : public DesignBuilder
+{
+public:
+
+	//! DesignBuilder Constructor
+	/*!
+	   \brief Constructs a designBuilder
+	 */
+	ICCAD2015ContestDesignBuilder(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile);
+
+	//! DesignBuilder Destructor
+	/*!
+	   \brief Destroys the designBuilder, including its properties.
+	 */
+	~ICCAD2015ContestDesignBuilder();
 
 	//! build a system with ICCAD2015 files
 	/*!
-	   \brief build a system using 2 Lef and one Def as parameters
+	   \brief build a system using one verilog,one Lef and one Def as parameters
 	 */
-	void build2015(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile);
+	void build();
 
 	//! Design getter
 	/*!
@@ -82,7 +127,9 @@ private:
 	std::unique_ptr<parser::Lef> mLef;
 	std::unique_ptr<parser::Def> mDef;
 	std::unique_ptr<parser::Verilog> mVerilog;
-
+	std::string mLefFile;
+	std::string mDefFile;
+	std::string mVerilogFile;
 };
 
 } //namespace designBuilder
