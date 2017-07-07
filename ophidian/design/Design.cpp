@@ -30,7 +30,8 @@ Design::Design() :
 	mFloorplan(),
 	mPlacement(mNetlist),
 	mStandardCells(),
-	mLibrary(mStandardCells)
+	mLibrary(mStandardCells),
+	mLibraryMapping(mNetlist)
 {
 
 }

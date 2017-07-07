@@ -8,7 +8,9 @@ using namespace ophidian;
 class Lef2LibraryFixture
 {
 public:
-	Lef2LibraryFixture() : lef(parser.readFile("./input_files/simple.lef")){
+	Lef2LibraryFixture(){
+		lef = std::make_unique<ophidian::parser::Lef>();
+		parser.readFile("./input_files/simple.lef", lef);
 		library.reset(new placement::Library(stdCells));
 		placement::lef2Library(*lef, *library, stdCells);
 	}
@@ -21,7 +23,7 @@ public:
 TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test library cell geometries.", "[standard_cell][library][placement][lef][dbunits]")
 {
 	REQUIRE(library->geometry(stdCells.find(standard_cell::Cell(), "INV_X1")) == geometry::MultiBox({geometry::Box(geometry::Point(0.0*lef->databaseUnits(), 0.0*lef->databaseUnits()),
-	                                                                                                               geometry::Point(0.760*lef->databaseUnits(), 1.71*lef->databaseUnits()))}));
+																											   geometry::Point(0.760*lef->databaseUnits(), 1.71*lef->databaseUnits()))}));
 }
 
 TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test library pin offset.", "[standard_cell][library][placement][lef][dbunits]")

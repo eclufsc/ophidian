@@ -209,7 +209,7 @@ public:
 	LefParser();
 	~LefParser();
 
-	std::unique_ptr<Lef> readFile(const std::string & filename);
+	void readFile(const std::string & filename, std::unique_ptr<Lef> &inp);
 };
 
 } /* namespace parser */

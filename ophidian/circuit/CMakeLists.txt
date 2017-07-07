@@ -1,3 +1,4 @@
+INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
 file(GLOB ophidian_circuit_SRC
     "*.h"
     "*.cpp"

@@ -60,7 +60,7 @@ LefParser::~LefParser() {
 
 }
 
-std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
+void LefParser::readFile(const std::string &filename, std::unique_ptr<ophidian::parser::Lef> & inp) {
 	auto fp = std::unique_ptr<FILE, decltype(&std::fclose)>(std::fopen(filename.c_str(), "r"), &std::fclose);
 
 	if (!fp)
@@ -70,7 +70,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 	lefrInit();
 
-	std::unique_ptr<Lef> inp = std::make_unique<Lef>();
+//	std::unique_ptr<Lef> inp = std::make_unique<Lef>();
 
 	lefrSetUnitsCbk(
 		[](lefrCallbackType_e, lefiUnits* units, lefiUserData ud) -> int {
@@ -112,15 +112,15 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 				if(l->hasDirection())
 				{
-				    if(std::string(l->direction()) == "HORIZONTAL" ||
-				       std::string(l->direction()) == "horizontal")
-				    {
-				        lay.direction = Lef::layer::HORIZONTAL;
+					if(std::string(l->direction()) == "HORIZONTAL" ||
+					   std::string(l->direction()) == "horizontal")
+					{
+						lay.direction = Lef::layer::HORIZONTAL;
 					}
-				    else if(std::string(l->direction()) == "VERTICAL" ||
-				            std::string(l->direction()) == "vertical")
-				    {
-				        lay.direction = Lef::layer::VERTICAL;
+					else if(std::string(l->direction()) == "VERTICAL" ||
+							std::string(l->direction()) == "vertical")
+					{
+						lay.direction = Lef::layer::VERTICAL;
 					}
 				}
 
@@ -140,23 +140,23 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 				if(l->hasDirection())
 				{
-				    if(std::string(l->direction()) == "INPUT")
-				    {
-				        p.direction = Lef::pin::INPUT;
+					if(std::string(l->direction()) == "INPUT")
+					{
+						p.direction = Lef::pin::INPUT;
 					}
-				    else if(std::string(l->direction()) == "OUTPUT")
-				    {
-				        p.direction  = Lef::pin::OUTPUT;
+					else if(std::string(l->direction()) == "OUTPUT")
+					{
+						p.direction  = Lef::pin::OUTPUT;
 					}
 				}
 
 				for(int i = 0; i < l->numPorts(); ++i)
 				{
-				    Lef::port pt;
-				    for(int j = 0; j < l->port(i)->numItems(); ++j)
-				    {
-				        switch(l->port(i)->itemType(j))
-				        {
+					Lef::port pt;
+					for(int j = 0; j < l->port(i)->numItems(); ++j)
+					{
+						switch(l->port(i)->itemType(j))
+						{
 							case lefiGeomLayerE:
 								pt.layers.push_back(l->port(i)->getLayer(j));
 								break;
@@ -168,7 +168,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 								break;
 						}
 					}
-				    p.ports.push_back(pt);
+					p.ports.push_back(pt);
 				}
 
 				m.pins.push_back(p);
@@ -190,8 +190,8 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 				std::string last_layer;
 				for(int i = 0; i < geometries->numItems(); ++i)
 				{
-				    switch(geometries->itemType(i))
-				    {
+					switch(geometries->itemType(i))
+					{
 						case lefiGeomLayerE:
 							last_layer = geometries->getLayer(i);
 							break;
@@ -215,9 +215,9 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 				m.origin.y = l->originY();
 				if(l->hasForeign())
 				{
-				    m.foreign.name = l->foreignName();
-				    m.foreign.x = l->foreignX();
-				    m.foreign.y = l->foreignY();
+					m.foreign.name = l->foreignName();
+					m.foreign.x = l->foreignX();
+					m.foreign.y = l->foreignY();
 				}
 				m.size = Lef::macro_size {l->sizeX(), l->sizeY()};
 				m.site = (l->hasSiteName() ? l->siteName() : "");
@@ -234,7 +234,7 @@ std::unique_ptr<Lef> LefParser::readFile(const std::string &filename) {
 
 	auto res = lefrRead(fp.get(), filename.c_str(), inp.get());
 
-	return inp;
+//	return inp;
 }
 
 Lef::Lef() : mThis(new Impl) {

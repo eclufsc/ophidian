@@ -23,6 +23,7 @@
 #include <ophidian/floorplan/Floorplan.h>
 #include <ophidian/placement/Placement.h>
 #include <ophidian/placement/Library.h>
+#include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/standard_cell/StandardCells.h>
 
 namespace ophidian
@@ -98,6 +99,16 @@ public:
 		return mLibrary;
 	}
 
+	//! libraryMapping getter
+	/*!
+	   \brief Get the libraryMapping.
+	   \return LibraryMapping.
+	 */
+	circuit::LibraryMapping & libraryMapping()
+	{
+		return mLibraryMapping;
+	}
+
 
 private:
 
@@ -106,6 +117,7 @@ private:
 	placement::Placement mPlacement;
 	standard_cell::StandardCells mStandardCells;
 	placement::Library mLibrary;
+	circuit::LibraryMapping mLibraryMapping;
 
 };
 
