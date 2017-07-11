@@ -8,7 +8,11 @@ link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
 
 add_library(ophidian_parser ${ophidian_parser_SRC})
 target_include_directories( ophidian_parser PUBLIC ${THIRD_PARTY_SOURCE_DIR} )
-target_link_libraries(ophidian_parser PUBLIC def lef verilogparser)
+target_link_libraries(ophidian_parser PUBLIC 
+    def 
+    lef 
+    verilogparser
+)
 
 install(TARGETS ophidian_parser DESTINATION lib)
 install(FILES VerilogParser.h DESTINATION include/ophidian/parser)

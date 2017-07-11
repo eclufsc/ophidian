@@ -9,7 +9,19 @@ link_directories(${THIRD_PARTY_SOURCE_DIR}/DEF/lib)
 link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
 
 add_executable(run_tests ${ophidian_run_tests_SRC})
-target_link_libraries(run_tests Catch ophidian_circuit ophidian_design ophidian_entitysystem ophidian_floorplan ophidian_geometry ophidian_interconnection ophidian_parser ophidian_placement ophidian_standard_cell ophidian_timing emon)
+target_link_libraries(run_tests PUBLIC 
+    Catch 
+    ophidian_circuit 
+    ophidian_design 
+    ophidian_entitysystem 
+    ophidian_floorplan 
+    ophidian_geometry 
+    ophidian_interconnection 
+    ophidian_parser 
+    ophidian_placement 
+    ophidian_standard_cell 
+    ophidian_timing 
+)
 
 message("Creating symlink for test files")
 execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/test/input_files ${CMAKE_BINARY_DIR}/test/.
