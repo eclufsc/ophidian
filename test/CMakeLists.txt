@@ -1,30 +1,15 @@
-set(SOURCE
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-        )
+file(GLOB_RECURSE ophidian_run_tests_SRC  
+    "*.cpp"
+)
 
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
-INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/ )
+link_directories(${THIRD_PARTY_SOURCE_DIR}/DEF/lib)
+link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
 
-add_subdirectory(entity_system)
-add_subdirectory(circuit)
-add_subdirectory(geometry)
-add_subdirectory(parser)
-add_subdirectory(util)
-add_subdirectory(interconnection)
-add_subdirectory(timing)
-add_subdirectory(floorplan)
-add_subdirectory(placement)
-add_subdirectory(standard_cell)
-add_subdirectory(design)
-
-add_executable( run_tests ${SOURCE} ${HEADERS} )
-target_link_libraries(run_tests Catch ophidian_design ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_floorplan ophidian_placement ophidian_standard_cell ophidian_timing emon)
-
-include_directories(${CMAKE_SOURCE_DIR})
-add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
+add_executable(run_tests ${ophidian_run_tests_SRC})
+target_link_libraries(run_tests Catch ophidian_circuit ophidian_design ophidian_entitysystem ophidian_floorplan ophidian_geometry ophidian_interconnection ophidian_parser ophidian_placement ophidian_standard_cell ophidian_timing emon)
 
 message("Creating symlink for test files")
 execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/test/input_files ${CMAKE_BINARY_DIR}/test/.
@@ -38,3 +23,5 @@ execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${
                 RESULT_VARIABLE result )
 execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${CMAKE_BINARY_DIR}/test/.
                 RESULT_VARIABLE result )
+
+add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
