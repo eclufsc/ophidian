@@ -5,9 +5,6 @@ file(GLOB_RECURSE ophidian_run_tests_SRC
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
-link_directories(${THIRD_PARTY_SOURCE_DIR}/DEF/lib)
-link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
-
 add_executable(run_tests ${ophidian_run_tests_SRC})
 target_link_libraries(run_tests PUBLIC 
     Catch 
