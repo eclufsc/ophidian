@@ -1,9 +1,10 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-
 add_subdirectory(Lemon)
 add_subdirectory(verilog-parser)
-add_subdirectory(Flute)
 add_subdirectory(OpenTimer)
+
+# This is needed since Flute is statcly built
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+add_subdirectory(Flute)
 
 include(ExternalProject)
 

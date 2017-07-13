@@ -7,7 +7,7 @@ target_include_directories(ophidian_interconnection PUBLIC ${Boost_INCLUDE_DIRS}
 target_link_libraries(ophidian_interconnection PUBLIC 
     flute 
     pthread 
-    emon
+    lemon
     ophidian_geometry
 )
 

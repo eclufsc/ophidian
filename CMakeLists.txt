@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.2.2)
 set(PROJECT_NAME "ophidian")
 project(${PROJECT_NAME})
 
-set(THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
-
 set(CMAKE_CXX_STANDARD 14)
 
 execute_process(
@@ -26,16 +24,20 @@ endif()
 
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
 
-include_directories(${PROJECT_SOURCE_DIR})
+set(THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
+set(OPHIDIAN_INCLUDE_DIRECTORIES 
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
+    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
+    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
+)
+
+include_directories(${OPHIDIAN_INCLUDE_DIRECTORIES})
 
 enable_testing()
 add_subdirectory(3rdparty)
 
-# Fetch Lemon and setup project to use Lemon as 3rdparty library
-include(${CMAKE_BINARY_DIR}/3rdparty/Lemon/cmake/LEMONConfig.cmake)
-include_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/)
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty/Lemon/)
-link_directories(${CMAKE_BINARY_DIR}/3rdparty/Lemon/lemon)
+include(${PROJECT_BINARY_DIR}/3rdparty/Lemon/cmake/LEMONConfig.cmake)
 
 add_subdirectory(ophidian)
 add_subdirectory(test)
