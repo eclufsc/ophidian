@@ -3,7 +3,7 @@
 #include <ophidian/parser/ParserException.h>
 
 namespace test {
-    void throwsInexistentFile() throw(ophidian::parser::InexistentFile) {
+    void throwsInexistentFile() {
         throw ophidian::parser::InexistentFile();
     }
 }
