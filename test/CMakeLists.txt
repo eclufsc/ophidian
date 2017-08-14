@@ -20,9 +20,9 @@ LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/ )
 #add_subdirectory(standard_cell)
 add_subdirectory(sbcci2017)
 
-SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-SET(BUILD_SHARED_LIBRARIES OFF)
-SET(CMAKE_EXE_LINKER_FLAGS "-static")
+#SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+#SET(BUILD_SHARED_LIBRARIES OFF)
+#SET(CMAKE_EXE_LINKER_FLAGS "-static")
 
 add_executable( run_tests ${SOURCE} ${HEADERS} )
 target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection ophidian_floorplan ophidian_placement ophidian_standard_cell ophidian_timing emon papi)
