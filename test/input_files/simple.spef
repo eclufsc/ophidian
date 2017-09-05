@@ -1,0 +1,111 @@
+*SPEF "IEEE 1481-1998"
+*DESIGN "simple"
+*DATE "Tue Sep  5 13:14:24 2017"
+*VENDOR "ICCAD 2015 Contest"
+*PROGRAM "ICCAD 2015 Contest Spef Generator"
+*VERSION "0.0"
+*DIVIDER /
+*DELIMITER :
+*BUS_DELIMITER [ ]
+*T_UNIT 1 PS
+*C_UNIT 1 FF
+*R_UNIT 1 KOHM
+*L_UNIT 1 UH
+
+*D_NET inp1 0.4832
+*CONN
+*P inp1 I
+*I u1:a I
+*CAP
+1 inp1 0.2416
+2 u1:a 0.2416
+*RES
+1 inp1 u1:a 0.0076557
+*END
+
+*D_NET inp2 0.608
+*CONN
+*P inp2 I
+*I u1:b I
+*CAP
+1 inp2 0.304
+2 u1:b 0.304
+*RES
+1 inp2 u1:b 0.009633
+*END
+
+*D_NET iccad_clk 0
+*CONN
+*P iccad_clk I
+*I lcb1:a I
+*END
+
+*D_NET out 4.2192
+*CONN
+*I u4:o O
+*P out O
+*CAP
+1 u4:o 0.1096
+2 out 4.1096
+*RES
+1 u4:o out 0.003473
+*END
+
+*D_NET n1 0.3784
+*CONN
+*I u1:o O
+*I u2:a I
+*CAP
+1 u1:o 0.1892
+2 u2:a 0.1892
+*RES
+1 u1:o u2:a 0.0059953
+*END
+
+*D_NET n2 1.3464
+*CONN
+*I u2:o O
+*I f1:d I
+*CAP
+1 u2:o 0.6732
+2 f1:d 0.6732
+*RES
+1 u2:o f1:d 0.021332
+*END
+
+*D_NET n3 0.5804
+*CONN
+*I f1:q O
+*I u2:b I
+*I u3:a I
+*CAP
+1 f1:q 0.1964
+2 u2:b 0.2902
+3 u3:a 0.0938
+*RES
+1 f1:q u2:b 0.0062234
+2 u3:a u2:b 0.0029723
+*END
+
+*D_NET n4 0.6084
+*CONN
+*I u3:o O
+*I u4:a I
+*CAP
+1 u3:o 0.3042
+2 u4:a 0.3042
+*RES
+1 u3:o u4:a 0.0096393
+*END
+
+*D_NET lcb1_fo 0.8952
+*CONN
+*I lcb1:o O
+*I f1:ck I
+*CAP
+1 lcb1:o 0.4476
+2 f1:ck 0.4476
+*RES
+1 lcb1:o f1:ck 0.014183
+*END
+
