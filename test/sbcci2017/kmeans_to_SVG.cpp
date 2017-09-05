@@ -33,12 +33,13 @@ void write_svg(std::string file_name, ophidian::geometry::Point dimensions, ophi
 
             auto cluster_center = kmeansDOD.clusterCenters_[cluster].first;
 
-            myfile << "<line x1=\"" << ((cluster_center.x()/1000)-3) << "\" y1=\"" << ((cluster_center.y()/1000)+3) << "\" x2=\"" << ((cluster_center.x()/1000) +3) << "\" y2=\"" << ((cluster_center.y()/1000)-3) << "\" style=\"fill-opacity:1;fill:rgb" << color_string << ";stroke:rgb" << color_string << ";stroke-width:2\"/>\n";
+
             myfile << "<line x1=\"" << ((cluster_center.x()/1000)-3) << "\" y1=\"" << ((cluster_center.y()/1000)-3) << "\" x2=\"" << ((cluster_center.x()/1000) +3) << "\" y2=\"" << ((cluster_center.y()/1000)+3) << "\" style=\"fill-opacity:1;fill:rgb" << color_string << ";stroke:rgb" << color_string << ";stroke-width:2\"/>\n";
 
             for (auto flip_flop : kmeansDOD.clusterElements_[cluster])
             {
                 myfile << "<circle cx=\""<< flip_flop.x()/1000 << "\" cy=\""<< flip_flop.y()/1000 << "\" r=\"2\"" << " style=\"fill-opacity:1;fill:rgb" << color_string << ";stroke:rgb" << color_string << ";stroke-width:2\"/>\n";
+//                myfile << "<line x1=\"" << flip_flop.x()/1000  << "\" y1=\"" << flip_flop.y()/1000 << "\" x2=\"" << (cluster_center.x()/1000) << "\" y2=\"" << (cluster_center.y()/1000) << "\" style=\"fill-opacity:1;fill:rgb" << color_string << ";stroke:rgb" << color_string << ";stroke-width:0.5\"/>\n";
             }
 
             cluster_index++;
@@ -70,7 +71,7 @@ TEST_CASE("kmeans to svg in ICCAD2015","[svg]")
 
         std::vector<ophidian::geometry::Point> flip_flop_positions;
 
-        int chipSlice = 2;
+        int chipSlice = 1;
 
         auto die = (*def).die();
         ophidian::geometry::Point chipOrigin((double)die.lower.x, (double)die.lower.y);
