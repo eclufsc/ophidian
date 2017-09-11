@@ -21,7 +21,7 @@
 namespace ophidian
 {
 
-namespace designBuilder
+namespace design
 {
 
 ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile) :
@@ -41,7 +41,7 @@ ICCAD2017ContestDesignBuilder::~ICCAD2017ContestDesignBuilder()
 
 }
 
-void ICCAD2017ContestDesignBuilder::build()
+Design & ICCAD2017ContestDesignBuilder::build()
 {
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
@@ -57,7 +57,7 @@ void ICCAD2017ContestDesignBuilder::build()
 	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
 	circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
 
-
+    return mDesign;
 }
 
 
@@ -79,7 +79,7 @@ ICCAD2015ContestDesignBuilder::~ICCAD2015ContestDesignBuilder()
 
 }
 
-void ICCAD2015ContestDesignBuilder::build()
+Design & ICCAD2015ContestDesignBuilder::build()
 {
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
@@ -97,8 +97,10 @@ void ICCAD2015ContestDesignBuilder::build()
 	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
 	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
 	circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
+
+    return mDesign;
 }
 
-} //namespace designBuilder
+} //namespace design
 
 } //namespace ophidian
