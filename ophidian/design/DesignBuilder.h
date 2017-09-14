@@ -61,7 +61,7 @@ public:
 
 	//! build a system with ICCAD2017 files
 	/*!
-       \brief build a system using 2 Lef and one Def as parameters and return the Design.
+       \brief build a system using 2 Lef and one Def as parameters.
        \return Design.
 	 */
     Design & build();
@@ -95,7 +95,7 @@ public:
 
 	//! build a system with ICCAD2015 files
 	/*!
-       \brief build a system using one verilog,one Lef and one Def as parameters and return the Design.
+       \brief build a system using one verilog,one Lef and one Def as parameters.
        \return Design.
 	 */
     Design & build();
