@@ -1,5 +1,6 @@
 ################################################################################
 # This is the main CMakeLists file for the Ophidian library. 
+#
 # Its main goals are:
 #   - set up global variables.
 #   - configure Ophidian compilation requirements (find_packege)
@@ -24,15 +25,24 @@ project(${PROJECT_NAME})
 # Set c++14 globaly 
 set(CMAKE_CXX_STANDARD 14)
 
-# Set the dependencies directory
-set(THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
+# Set Ophidian source dir
+set(OPHIDIAN_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 
-# Set the global include directories variable
-set(OPHIDIAN_INCLUDE_DIRECTORIES 
-    ${PROJECT_SOURCE_DIR}
+# Set the dependencies directory
+set(THIRD_PARTY_SOURCE_DIR ${OPHIDIAN_SOURCE_DIR}/3rdparty)
+
+# Set include dirs for the Lemon library
+set(LEMON_INCLUDE_DIR 
     ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
+)
+
+# Set the global include directories variable
+set(OPHIDIAN_INCLUDE_DIRECTORIES 
+    ${OPHIDIAN_SOURCE_DIR}
+    ${THIRD_PARTY_SOURCE_DIR}
+    ${LEMON_INCLUDE_DIR}
 )
 
 ################################################################################

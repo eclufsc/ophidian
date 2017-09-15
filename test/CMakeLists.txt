@@ -1,16 +1,32 @@
+################################################################################
+# This is the CMakeLists file for the Ophidian library Test binary. 
+#
+# Its main goals are:
+#   - Fetch test files.
+#   - Configure Catch test library.
+#   - Add test target.
+#   - Link test target.
+#   - Prepare test input environment.
+################################################################################
+
+# Fetch test files recursevely
 file(GLOB_RECURSE ophidian_run_tests_SRC  
     "*.cpp"
 )
 
+# Add Catch lib interface
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
-add_executable(run_tests ${ophidian_run_tests_SRC})
-target_link_libraries(run_tests PUBLIC 
+# Add test target
+add_executable(ophidian_tests ${ophidian_run_tests_SRC})
+
+# Link target dependencies
+target_link_libraries(ophidian_tests PUBLIC 
     Catch 
     ophidian_circuit 
     ophidian_design 
-    ophidian_entitysystem 
+    ophidian_entity_system 
     ophidian_floorplan 
     ophidian_geometry 
     ophidian_interconnection 
@@ -19,6 +35,10 @@ target_link_libraries(run_tests PUBLIC
     ophidian_standard_cell 
     ophidian_timing 
 )
+
+################################################################################
+# Prepare test input environment. 
+################################################################################
 
 message("Creating symlink for test files")
 execute_process(
@@ -41,5 +61,9 @@ execute_process(
     RESULT_VARIABLE result
 )
 
+################################################################################
+# Add test to ctest
+################################################################################
+
 enable_testing()
-add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
+add_test(NAME unit_test COMMAND ophidian_tests "~[Profiling] ~[superblue18obs]")
