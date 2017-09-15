@@ -1,3 +1,9 @@
+execute_process(
+    COMMAND git submodule update --init --recursive
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    RESULT_VARIABLE submodule_init_exit_code
+)
+
 add_subdirectory(Lemon)
 add_subdirectory(verilog-parser)
 add_subdirectory(OpenTimer)

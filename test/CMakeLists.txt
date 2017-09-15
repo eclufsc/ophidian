@@ -41,4 +41,5 @@ execute_process(
     RESULT_VARIABLE result
 )
 
+enable_testing()
 add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
