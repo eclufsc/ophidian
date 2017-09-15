@@ -33,13 +33,13 @@ namespace ophidian
 {
 
 /// Creates a design using an input file
-namespace designBuilder
+namespace design
 {
 
 class DesignBuilder
 {
 public:
-	virtual void build() = 0;
+    virtual Design & build() = 0;
 };
 
 
@@ -61,21 +61,10 @@ public:
 
 	//! build a system with ICCAD2017 files
 	/*!
-	   \brief build a system using 2 Lef and one Def as parameters
+       \brief build a system using 2 Lef and one Def as parameters.
+       \return Design.
 	 */
-	void build();
-
-	//! Design getter
-	/*!
-	   \brief Get the Design.
-	   \return Design.
-	 */
-
-	design::Design & design()
-	{
-		return mDesign;
-	}
-
+    Design & build();
 
 private:
 	design::Design mDesign;
@@ -106,21 +95,10 @@ public:
 
 	//! build a system with ICCAD2015 files
 	/*!
-	   \brief build a system using one verilog,one Lef and one Def as parameters
+       \brief build a system using one verilog,one Lef and one Def as parameters.
+       \return Design.
 	 */
-	void build();
-
-	//! Design getter
-	/*!
-	   \brief Get the Design.
-	   \return Design.
-	 */
-
-	design::Design & design()
-	{
-		return mDesign;
-	}
-
+    Design & build();
 
 private:
 	design::Design mDesign;
@@ -132,7 +110,7 @@ private:
 	std::string mVerilogFile;
 };
 
-} //namespace designBuilder
+} //namespace design
 
 } //namespace ophidian
 
