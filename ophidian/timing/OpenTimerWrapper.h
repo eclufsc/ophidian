@@ -37,7 +37,7 @@ public:
                      mCell2OTGate(netlist.makeProperty<opentimer::Gate*>(circuit::Cell())),
                      mPin2OTPin(netlist.makeProperty<opentimer::Pin*>(circuit::Pin())),
                      mNet2OTNet(netlist.makeProperty<opentimer::Net*>(circuit::Net())){
-
+        opentimer::Timer::init_logging("", false);
         auto earlyCellLib = mTimer.celllib_ptr(0);
         earlyCellLib->read(earlyLibPath);
         auto lateCellLib = mTimer.celllib_ptr(1);
@@ -60,11 +60,89 @@ public:
 
         for(auto netIt = netlist.begin(circuit::Net()); netIt != netlist.end(circuit::Net()); netIt++)
             for(auto pinIt = netlist.pins(*netIt).begin(); pinIt != netlist.pins(*netIt).end(); ++pinIt)
-                mTimer.connect_pin(netlist.name(*pinIt), netlist.name(*netIt));
+                if(netlist.cell(*pinIt) != circuit::Cell())
+                    mTimer.connect_pin(netlist.name(*pinIt), netlist.name(*netIt));
 
         mTimer._init_io_timing(timingPath);
 
-        mTimer.read_spef(spefPath);
+        //mTimer.read_spef(spefPath);
+
+        opentimer::spef_pt spef_ptr = new opentimer::spef_t();
+
+        //net inp1
+        auto spef_inp1 = spef_ptr->insert_spefnet("inp1", 0.4832);
+        spef_inp1->insert_spefpin("inp1");
+        spef_inp1->insert_spefpin("u1:a");
+        spef_inp1->insert_spefcap("inp1", 0.2416);
+        spef_inp1->insert_spefcap("u1:a", 0.2416);
+        spef_inp1->insert_spefres("inp1", "u1:a", 0.0076557);
+
+        //net inp2
+        auto spef_inp2 = spef_ptr->insert_spefnet("inp2", 0.608);
+        spef_inp2->insert_spefpin("inp2");
+        spef_inp2->insert_spefpin("u1:b");
+        spef_inp2->insert_spefcap("inp2", 0.304);
+        spef_inp2->insert_spefcap("u1:b", 0.304);
+        spef_inp2->insert_spefres("inp2", "u1:b", 0.009633);
+
+        //net iccad_clk
+        auto spef_iccad_clk = spef_ptr->insert_spefnet("iccad_clk", 0.0);
+        spef_iccad_clk->insert_spefpin("iccad_clk");
+        spef_iccad_clk->insert_spefpin("lcb1:a");
+        spef_iccad_clk->insert_spefres("iccad_clk", "lcb1:a", 0.0);
+
+        //net out
+        auto spef_out = spef_ptr->insert_spefnet("out", 4.2192);
+        spef_out->insert_spefpin("u4:o");
+        spef_out->insert_spefpin("out");
+        spef_out->insert_spefcap("u4:o", 0.1096);
+        spef_out->insert_spefcap("out", 4.1096);
+        spef_out->insert_spefres("u4:o", "out", 0.003473);
+
+        //net n1
+        auto spef_n1 = spef_ptr->insert_spefnet("n1", 0.3784);
+        spef_n1->insert_spefpin("u1:o");
+        spef_n1->insert_spefpin("u2:a");
+        spef_n1->insert_spefcap("u1:o", 0.1892);
+        spef_n1->insert_spefcap("u2:a", 0.1892);
+        spef_n1->insert_spefres("u1:o", "u2:a", 0.0059953);
+
+        //net n2
+        auto spef_n2 = spef_ptr->insert_spefnet("n2", 1.3464);
+        spef_n2->insert_spefpin("u2:o");
+        spef_n2->insert_spefpin("f1:d");
+        spef_n2->insert_spefcap("u2:o", 0.6732);
+        spef_n2->insert_spefcap("f1:d", 0.6732);
+        spef_n2->insert_spefres("u2:o", "f1:d", 0.021332);
+
+        //net n3
+        auto spef_n3 = spef_ptr->insert_spefnet("n3", 0.5804);
+        spef_n3->insert_spefpin("f1:q");
+        spef_n3->insert_spefpin("u2:b");
+        spef_n3->insert_spefpin("u3:a");
+        spef_n3->insert_spefcap("f1:q", 0.1964);
+        spef_n3->insert_spefcap("u2:b", 0.2902);
+        spef_n3->insert_spefcap("u3:a", 0.0938);
+        spef_n3->insert_spefres("f1:q", "u2:b", 0.0062234);
+        spef_n3->insert_spefres("u3:a", "u2:b", 0.0029723);
+
+        //net n4
+        auto spef_n4 = spef_ptr->insert_spefnet("n4", 0.6084);
+        spef_n4->insert_spefpin("u3:o");
+        spef_n4->insert_spefpin("u4:a");
+        spef_n4->insert_spefcap("u3:o", 0.3042);
+        spef_n4->insert_spefcap("u4:a", 0.3042);
+        spef_n4->insert_spefres("u3:o", "u4:a", 0.0096393);
+
+        //net lcb1_fo
+        auto spef_lcb1_fo = spef_ptr->insert_spefnet("lcb1_fo", 0.8952);
+        spef_lcb1_fo->insert_spefpin("lcb1:o");
+        spef_lcb1_fo->insert_spefpin("f1:ck");
+        spef_lcb1_fo->insert_spefcap("lcb1:o", 0.4476);
+        spef_lcb1_fo->insert_spefcap("f1:ck", 0.4476);
+        spef_lcb1_fo->insert_spefres("lcb1:o", "f1:ck", 0.014183);
+
+        mTimer._update_spef(spef_ptr);
 
         mTimer.update_timing(false);
     }
