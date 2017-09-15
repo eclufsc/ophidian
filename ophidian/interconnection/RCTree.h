@@ -19,8 +19,7 @@
 #ifndef OPHIDIAN_RCTREE_H
 #define OPHIDIAN_RCTREE_H
 
-#include <boost/units/systems/si.hpp>
-#include <boost/units/io.hpp>
+#include <ophidian/util/Units.h>
 
 #include <lemon/list_graph.h>
 #include <lemon/maps.h>
@@ -31,31 +30,29 @@ namespace ophidian {
 /// The Interonnection namespace.
 namespace interconnection {
 
-using namespace boost::units;
-
 /// Packed RC Tree Class.
 class PackedRCTree {
     std::vector< std::size_t > mPred;
-    std::vector< quantity<si::resistance> > mResistances;
-    std::vector< quantity<si::capacitance> > mCapacitances;
+    std::vector< util::kiloohm_t > mResistances;
+    std::vector< util::femtofarad_t > mCapacitances;
     std::unordered_map<std::string, std::size_t> mTaps;
 
 public:
     PackedRCTree(std::size_t nodeCount=0);
     virtual ~PackedRCTree();
     void pred(std::size_t i, std::size_t pred);
-    void capacitance(std::size_t i, quantity<si::capacitance> cap);
-    void resistance(std::size_t i, quantity<si::resistance> res);
+    void capacitance(std::size_t i, util::femtofarad_t cap);
+    void resistance(std::size_t i, util::kiloohm_t res);
     std::size_t nodeCount() const {
         return mPred.size();
     }
     std::size_t pred(std::size_t i) const {
         return mPred[i];
     }
-    quantity<si::resistance> resistance(std::size_t i) const {
+    util::kiloohm_t resistance(std::size_t i) const {
         return mResistances[i];
     }
-    quantity<si::capacitance> capacitance(std::size_t i) const {
+    util::femtofarad_t capacitance(std::size_t i) const {
         return mCapacitances[i];
     }
 
@@ -79,9 +76,9 @@ public:
 private:
     graph_t mGraph;
     graph_t::NodeMap<std::string> mNames;
-    graph_t::NodeMap<quantity<si::capacitance> > mCapacitances;
-    graph_t::EdgeMap<quantity<si::resistance> > mResistances;
-    quantity<si::capacitance> mLumpedCapacitance;
+    graph_t::NodeMap<util::femtofarad_t > mCapacitances;
+    graph_t::EdgeMap<util::kiloohm_t > mResistances;
+    util::femtofarad_t mLumpedCapacitance;
     std::vector< graph_t::Node > mTaps;
 
     std::unordered_map<std::string, lemon::ListGraph::Node> mName2Node;
@@ -111,7 +108,7 @@ public:
     \brief Returns the sum of the capacitance of all capacitors in the RC Tree
     \return The RC Tree's lumped capacitance.
     */
-	quantity<si::capacitance> lumped() const {
+    util::femtofarad_t lumped() const {
         return mLumpedCapacitance;
 	}
     /// Set a capacitor as a tap node of the RC Tree.
@@ -153,7 +150,7 @@ public:
     * \return The handler to the resistor.
     **/
     resistorID resistorInsert(capacitorID u, capacitorID v,
-			quantity<si::resistance> res);
+            util::kiloohm_t res);
 
     /// Capacitance assignment.
     /**
@@ -161,7 +158,7 @@ public:
     * \param u handler to a capacitor.
     * \param cap The capacitance value.
     */
-    void capacitance(capacitorID u, quantity<si::capacitance> cap);
+    void capacitance(capacitorID u, util::femtofarad_t cap);
 
     /// Capacitor search.
     /**
@@ -174,11 +171,11 @@ public:
 	}
 
 
-    quantity<si::capacitance> capacitance(capacitorID u) const {
+    util::femtofarad_t capacitance(capacitorID u) const {
         return mCapacitances[u];
 	}
 
-    quantity<si::resistance> resistance(resistorID uv) const {
+    util::kiloohm_t resistance(resistorID uv) const {
         return mResistances[uv];
 	}
 

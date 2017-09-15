@@ -24,7 +24,7 @@ namespace ophidian {
 namespace interconnection {
 
 RCTree::RCTree() :
-    mNames(mGraph), mCapacitances(mGraph), mResistances(mGraph), mLumpedCapacitance( 0.0 * si::farad) {
+    mNames(mGraph), mCapacitances(mGraph), mResistances(mGraph), mLumpedCapacitance(0.0) {
 
 }
 
@@ -32,7 +32,7 @@ RCTree::RCTree(const RCTree &other):
     mNames(mGraph),
     mCapacitances(mGraph),
     mResistances(mGraph),
-    mLumpedCapacitance(0.0 * si::farad)
+    mLumpedCapacitance(0.0)
 {
     *this = other;
 }
@@ -133,22 +133,21 @@ lemon::ListGraph::Node RCTree::capacitorInsert(std::string name) {
     auto node = mGraph.addNode();
     mNames[node] = name;
     mName2Node[name] = node;
-    mCapacitances[node] = 0.0*si::farad;
+    mCapacitances[node] = util::femtofarad_t(0.0);
     return node;
 }
 
 lemon::ListGraph::Edge RCTree::resistorInsert(lemon::ListGraph::Node u,
-                                                lemon::ListGraph::Node v, quantity<si::resistance> res) {
+                                                lemon::ListGraph::Node v, util::kiloohm_t res) {
     auto resistor = mGraph.addEdge(u, v);
     mResistances[resistor] = res;
     return resistor;
 }
 
-void RCTree::capacitance(lemon::ListGraph::Node u,
-                          quantity<si::capacitance> cap) {
-    mLumpedCapacitance -= mCapacitances[u];
+void RCTree::capacitance(lemon::ListGraph::Node u, util::femtofarad_t cap) {
+    mLumpedCapacitance = mLumpedCapacitance - mCapacitances[u];
     mCapacitances[u] = cap;
-    mLumpedCapacitance += mCapacitances[u];
+    mLumpedCapacitance = mLumpedCapacitance + mCapacitances[u];
 }
 
 PackedRCTree::PackedRCTree(std::size_t nodeCount) :
@@ -169,12 +168,12 @@ void PackedRCTree::pred(std::size_t i, std::size_t pred)
     mPred[i] = pred;
 }
 
-void PackedRCTree::capacitance(std::size_t i, quantity<si::capacitance> cap)
+void PackedRCTree::capacitance(std::size_t i, util::femtofarad_t cap)
 {
     mCapacitances[i] = cap;
 }
 
-void PackedRCTree::resistance(std::size_t i, quantity<si::resistance> res)
+void PackedRCTree::resistance(std::size_t i, util::kiloohm_t res)
 {
     mResistances[i] = res;
 }
