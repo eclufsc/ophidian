@@ -1,14 +1,34 @@
-add_subdirectory(Lemon)
-add_subdirectory(verilog-parser)
-add_subdirectory(OpenTimer)
+################################################################################
+# This is the CMakeLists file for the Ophidian Dependencies. 
+# Its main goals are:
+#   - Fetch dependencies 
+#   - Configure dependencies
+#   - Add dependencies subdirectories
+################################################################################
+
+# Init submodules and fetch dependences from git
+execute_process(
+    COMMAND git submodule update --init --recursive
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    RESULT_VARIABLE submodule_init_exit_code
+)
 
 # This is needed since Flute is statcly built
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 add_subdirectory(Flute)
 
+# Add Lemon graph library
+add_subdirectory(Lemon)
+
+# Add OpenTimer
+add_subdirectory(OpenTimer)
+
+# Add verilog-parser
+add_subdirectory(verilog-parser)
+
+# Load ExternalProject cmake module
 include(ExternalProject)
 
-# Build LEF v5.8-p016 parser with the included Makefile
+# Build LEF parser with the included Makefile
 ExternalProject_Add(
 	lef_parser
     SOURCE_DIR ${THIRD_PARTY_SOURCE_DIR}/LEF
@@ -19,7 +39,7 @@ ExternalProject_Add(
 	BUILD_IN_SOURCE 1
 )
 
-# Build DEF v5.8-p016 parser with the included Makefile
+# Build DEF parser with the included Makefile
 ExternalProject_Add(
 	def_parser
     SOURCE_DIR ${THIRD_PARTY_SOURCE_DIR}/DEF
