@@ -28,6 +28,8 @@ private slots:
 
     void on_actionQuit_triggered();
 
+    void on_circuit_labelsChanged(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+
 private:
     Ui::MainWindow *ui;
 };

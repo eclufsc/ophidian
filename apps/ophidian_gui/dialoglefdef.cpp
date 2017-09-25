@@ -61,8 +61,7 @@ void DialogLefDef::on_okButton_clicked()
 
     if (lef || def || verilog)
     {
-        QString erro = "Informe o local dos arquivos em vermelho!";
-        ui->erro->setText(erro);
+        ui->erro->setText("Informe o local dos arquivos em vermelho!");
         if (lef)
         {
             color = "color: rgb(255, 0, 0);";
