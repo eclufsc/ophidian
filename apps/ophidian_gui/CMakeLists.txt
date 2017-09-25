@@ -1,5 +1,6 @@
 file(GLOB_RECURSE ophidian_gui_SRC
     "*.cpp"
+    "*.ui"
 )
 
 INCLUDE_DIRECTORIES( ${THIRD_PARTY_SOURCE_DIR} )

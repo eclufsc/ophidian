@@ -5,6 +5,8 @@
 #include <QString>
 #include <iostream>
 
+#include "application.h"
+
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
@@ -18,8 +20,11 @@ class DialogLefDef : public QDialog
 {
     Q_OBJECT
 
+    control::Application *mApp{nullptr};
+
 public:
     explicit DialogLefDef(QWidget *parent = 0);
+    DialogLefDef(QWidget *parent, control::Application *app);
     ~DialogLefDef();
 
 private slots:
@@ -31,8 +36,11 @@ private slots:
 
     void on_cancelButton_clicked();
 
+    void on_chooseVerilog_clicked();
+
 private:
     Ui::DialogLefDef *ui;
+
 };
 
 #endif // DIALOGLEFDEF_H

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+#include "ui_mainwindow.h"
 #include "dialoglefdef.h"
 #include "application.h"
 
@@ -14,7 +15,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    Application mApp;
+    control::Application mApp;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

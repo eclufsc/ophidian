@@ -50,7 +50,6 @@
      <addaction name="actionICCAD_2015"/>
     </widget>
     <addaction name="menuOpen_LEF_DEF"/>
-    <addaction name="actionOpen_placement_solution_DEF"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">

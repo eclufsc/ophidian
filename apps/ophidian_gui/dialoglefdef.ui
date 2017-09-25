@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>132</height>
+    <height>168</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QLineEdit" name="lefLine">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>90</x>
      <y>20</y>
-     <width>381</width>
+     <width>351</width>
      <height>25</height>
     </rect>
    </property>
@@ -26,9 +26,9 @@
   <widget class="QLineEdit" name="defLine">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>90</x>
      <y>55</y>
-     <width>381</width>
+     <width>351</width>
      <height>25</height>
     </rect>
    </property>
@@ -89,7 +89,7 @@
    <property name="geometry">
     <rect>
      <x>450</x>
-     <y>90</y>
+     <y>130</y>
      <width>80</width>
      <height>25</height>
     </rect>
@@ -102,13 +102,62 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>90</y>
+     <y>130</y>
      <width>80</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
     <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="verilogLine">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>90</y>
+     <width>351</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="chooseVerilog">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>90</y>
+     <width>80</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Choose...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="verilog">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Verilog:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="erro">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#cc0000;&quot;&gt;&lt;br/&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
  </widget>

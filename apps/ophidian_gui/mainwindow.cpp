@@ -1,5 +1,4 @@
 #include "./mainwindow.h"
-#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,13 +15,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionICCAD_2017_triggered()
 {
-    DialogLefDef dialog(this);
+    DialogLefDef dialog(this, &mApp);
     dialog.exec();
 }
 
 void MainWindow::on_actionICCAD_2015_triggered()
 {
-    printf("2015");
+    DialogLefDef dialog(this, &mApp);
+    dialog.exec();
 }
 
 void MainWindow::on_actionQuit_triggered()
