@@ -19,11 +19,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Canvas</string>
-      </property>
-     </widget>
+     <widget class="QSFMLWidget" name="canvas" native="true"/>
     </item>
     <item>
      <widget class="QGroupBox" name="InfoBox">
@@ -59,6 +55,18 @@
         <widget class="QGroupBox" name="circuit">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
+          </size>
          </property>
          <property name="title">
           <string>Circuit</string>
@@ -149,6 +157,7 @@
          <property name="title">
           <string>Netlist</string>
          </property>
+         <zorder>graphicsView</zorder>
         </widget>
        </item>
       </layout>
@@ -224,6 +233,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QSFMLWidget</class>
+   <extends>QWidget</extends>
+   <header>qsfmlwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

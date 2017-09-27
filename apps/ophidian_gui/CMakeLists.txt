@@ -3,16 +3,16 @@ file(GLOB_RECURSE ophidian_gui_SRC
     "*.ui"
 )
 
-INCLUDE_DIRECTORIES( ${THIRD_PARTY_SOURCE_DIR} )
-LINK_DIRECTORIES( ${THIRD_PARTY_SOURCE_DIR}/DEF/lib/ ${THIRD_PARTY_SOURCE_DIR}/LEF/lib/ )
-
 # Detect and add SFML
-#set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 
 #Find any version 2.X of SFML
 #See the FindSFML.cmake file for additional details and instructions
-#find_package(SFML 2 REQUIRED network audio graphics window system)
-#include_directories(${SFML_INCLUDE_DIR} ${THIRD_PARTY_SOURCE_DIR} CMAKE_MODULE_PATH)
+find_package(SFML 2 REQUIRED network audio graphics window system)
+include_directories(${SFML_INCLUDE_DIR})
+
+INCLUDE_DIRECTORIES( ${THIRD_PARTY_SOURCE_DIR})
+LINK_DIRECTORIES( ${THIRD_PARTY_SOURCE_DIR}/DEF/lib/ ${THIRD_PARTY_SOURCE_DIR}/LEF/lib/ )
 
 # Widgets finds its own dependencies (QtGui and QtCore).
 find_package(Qt5Widgets REQUIRED)
@@ -39,6 +39,7 @@ add_executable( ophidian_gui ${ophidian_gui_SRC} )
 
 target_link_libraries(ophidian_gui PUBLIC
     ${Qt5Widgets_LIBRARIES}
+    ${SFML_LIBRARIES}
     ophidian_circuit
     ophidian_design
     ophidian_entity_system
