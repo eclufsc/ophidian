@@ -24,6 +24,7 @@
 #include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/util/TimingTypes.h>
 #include <unordered_map>
 
 namespace ophidian
@@ -38,9 +39,9 @@ public:
                      mPin2OTPin(netlist.makeProperty<opentimer::Pin*>(circuit::Pin())),
                      mNet2OTNet(netlist.makeProperty<opentimer::Net*>(circuit::Net())){
         opentimer::Timer::init_logging("", false);
-        auto earlyCellLib = mTimer.celllib_ptr(0);
+        auto earlyCellLib = mTimer.celllib_ptr(mode::EARLY_MODE);
         earlyCellLib->read(earlyLibPath);
-        auto lateCellLib = mTimer.celllib_ptr(1);
+        auto lateCellLib = mTimer.celllib_ptr(mode::LATE_MODE);
         lateCellLib->read(lateLibPath);
 
         for(auto inputIt = netlist.begin(circuit::Input()); inputIt != netlist.end(circuit::Input()); inputIt++)
