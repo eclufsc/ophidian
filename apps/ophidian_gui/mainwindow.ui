@@ -10,6 +10,12 @@
     <height>687</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>750</width>
+    <height>500</height>
+   </size>
+  </property>
   <property name="focusPolicy">
    <enum>Qt::NoFocus</enum>
   </property>
@@ -157,7 +163,6 @@
          <property name="title">
           <string>Netlist</string>
          </property>
-         <zorder>graphicsView</zorder>
         </widget>
        </item>
       </layout>

@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mApp()
 {
     ui->setupUi(this);
+    ui->canvas->setApplication(mApp);
+    QObject::connect(&mApp, SIGNAL(update()), ui->canvas, SLOT(update()));
 }
 
 MainWindow::~MainWindow()

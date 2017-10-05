@@ -24,6 +24,7 @@
 #include <ophidian/placement/Placement.h>
 #include <ophidian/placement/Library.h>
 #include <ophidian/circuit/LibraryMapping.h>
+#include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/standard_cell/StandardCells.h>
 
 namespace ophidian
@@ -109,6 +110,15 @@ public:
 		return mLibraryMapping;
 	}
 
+    //! placementMapping getter
+    /*!
+       \brief Get the placementMapping.
+       \return PlacementMapping.
+     */
+    placement::PlacementMapping & placementMapping()
+    {
+        return mPlacementMapping;
+    }
 
 private:
 
@@ -118,6 +128,7 @@ private:
 	standard_cell::StandardCells mStandardCells;
 	placement::Library mLibrary;
 	circuit::LibraryMapping mLibraryMapping;
+    placement::PlacementMapping mPlacementMapping;
 
 };
 

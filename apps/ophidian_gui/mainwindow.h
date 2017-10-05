@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    control::Application mApp;
+    apps::Application mApp;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -29,6 +29,9 @@ private slots:
     void on_actionQuit_triggered();
 
     void on_circuit_labelsChanged(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+
+signals:
+    void update();
 
 private:
     Ui::MainWindow *ui;

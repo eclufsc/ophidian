@@ -20,11 +20,11 @@ class DialogLefDef : public QDialog
 {
     Q_OBJECT
 
-    control::Application *mApp{nullptr};
+    apps::Application *mApp{nullptr};
 
 public:
     explicit DialogLefDef(QWidget *parent = 0);
-    DialogLefDef(QWidget *parent, control::Application *app);
+    DialogLefDef(QWidget *parent, apps::Application *app);
     ~DialogLefDef();
 
 private slots:

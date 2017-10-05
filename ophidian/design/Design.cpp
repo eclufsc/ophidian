@@ -31,7 +31,8 @@ Design::Design() :
 	mPlacement(mNetlist),
 	mStandardCells(),
 	mLibrary(mStandardCells),
-	mLibraryMapping(mNetlist)
+    mLibraryMapping(mNetlist),
+    mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping)
 {
 
 }

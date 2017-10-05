@@ -15,6 +15,7 @@
 #define QSFMLWIDGET_H
 
 #include "qsfmlcanvas.h"
+#include "application.h"
 
 using namespace qsfml;
 
@@ -24,12 +25,26 @@ public:
     QSFMLWidget(QWidget* parent, const QPoint& position=QPoint(0,0), const QSize& size=QSize(200,200));
     ~QSFMLWidget();
 
-private:
+    void setApplication(apps::Application & app);
 
+private:
     void OnInit();
     void OnUpdate();
-    void mousePressEvent(QMouseEvent* e);
-    void keyPressEvent(QKeyEvent * event);
+    void wheelEvent(QWheelEvent * e);
+    void resizeEvent(QResizeEvent *e);
+    void keyPressEvent(QKeyEvent *e);
+    void mousePressEvent(QMouseEvent * e);
+    void mouseMoveEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent * e);
+
+    sf::View view;
+    apps::Application * mApp;
+    std::vector<sf::RectangleShape> * boxes{nullptr};
+
+public slots:
+    void update();
+
+signals:
 };
 
 #endif // QSFMLWIDGET_H
