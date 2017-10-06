@@ -1,5 +1,4 @@
 #include "dialoglefdef.h"
-#include "ui_dialoglefdef.h"
 
 DialogLefDef::DialogLefDef(QWidget *parent) :
     QDialog(parent),

@@ -1,5 +1,5 @@
-#include "./mainwindow.h"
-
+#include "mainwindow.h"
+  
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->canvas->setApplication(mApp);
-    QObject::connect(&mApp, SIGNAL(update()), ui->canvas, SLOT(update()));
+    connect(&mApp, SIGNAL(update()), ui->canvas, SLOT(update()));
+    connect(this, SIGNAL(update()), ui->canvas, SLOT(update()));
 }
 
 MainWindow::~MainWindow()
@@ -41,4 +42,6 @@ void MainWindow::on_circuit_labelsChanged(QString name, size_t die, size_t cells
     ui->circuitCells_2->setText(QString::number(cells));
     ui->circuitPins_2->setText(QString::number(pins));
     ui->circuitNets_2->setText(QString::number(nets));
+    emit update();
 }
+

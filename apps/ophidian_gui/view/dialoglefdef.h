@@ -5,7 +5,8 @@
 #include <QString>
 #include <iostream>
 
-#include "application.h"
+#include "ui_dialoglefdef.h"
+#include "control/application.h"
 
 #include <QFileDialog>
 #include <QFile>

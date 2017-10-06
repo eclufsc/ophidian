@@ -41,21 +41,22 @@ void QSFMLWidget::OnUpdate()
     setView(view);
 
     if (boxes != nullptr) {
+        std::cout << "Contruindo Boooooooxes" << std:: endl;
         for (auto box : *boxes) {
             draw(box);
         }
     }
 
-    sf::RectangleShape shape(sf::Vector2f(100, 50));
-    shape.setFillColor(sf::Color(100, 250, 50));
-    shape.setPosition(30, 30);
-    draw(shape);
+    sf::VertexArray quad(sf::Quads, 4);
+    quad[0].position = sf::Vector2f(10, 10);
+    quad[1].position = sf::Vector2f(110, 10);
+    quad[2].position = sf::Vector2f(110, 110);
+    quad[3].position = sf::Vector2f(10, 110);
+    draw(quad);
 
     setView(getDefaultView());
     display();
 }
-
-
 
 void QSFMLWidget::wheelEvent(QWheelEvent * e)
 {
@@ -67,7 +68,9 @@ void QSFMLWidget::wheelEvent(QWheelEvent * e)
 
 void QSFMLWidget::resizeEvent(QResizeEvent *e)
 {
-
+    //view.setSize(e->size().width(), e->size().height());
+    //view.setCenter(e->size().width()/2, e->size().height()/2);
+    //view.setSize(sf::Vector2f(e->size().width(), e->size().height()));
     std::cout << view.getViewport().width << " - " << view.getViewport().height << std::endl;
     std::cout << view.getSize().x << " - " << view.getSize().y << std::endl;
     std::cout << e->size().width() << " - " << e->size().height() << std::endl;
@@ -93,6 +96,9 @@ void QSFMLWidget::keyPressEvent(QKeyEvent *e)
         case Qt::Key::Key_Left:
             view.move(sf::Vector2f(view.getSize().x*.1, 0.0f));
             break;
+        case Qt::Key::Key_T:
+            update();
+            break;
         }
 }
 
@@ -114,7 +120,6 @@ void QSFMLWidget::mouseReleaseEvent(QMouseEvent * e)
 void QSFMLWidget::update()
 {
     ophidian::geometry::Point windowSize(view.getSize().x, view.getSize().y);
-    std::vector<sf::RectangleShape> * boxes = mApp->cellsContruct(windowSize);
+    boxes = mApp->cellsContruct(windowSize);
+    std::cout << "Quant boxes:" << boxes->size() << std::endl;
 }
-
-

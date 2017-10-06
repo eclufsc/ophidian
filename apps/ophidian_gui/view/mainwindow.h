@@ -5,17 +5,19 @@
 
 #include "ui_mainwindow.h"
 #include "dialoglefdef.h"
-#include "application.h"
+#include "control/application.h"
+
+using namespace apps;
 
 namespace Ui {
 class MainWindow;
-}
+} // namespace Ui
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    apps::Application mApp;
+    Application mApp;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

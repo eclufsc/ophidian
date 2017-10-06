@@ -242,7 +242,7 @@
   <customwidget>
    <class>QSFMLWidget</class>
    <extends>QWidget</extends>
-   <header>qsfmlwidget.h</header>
+   <header>view/qsfmlwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

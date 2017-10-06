@@ -15,10 +15,10 @@
 #define QSFMLWIDGET_H
 
 #include "qsfmlcanvas.h"
-#include "application.h"
+#include "control/application.h"
 
 using namespace qsfml;
-
+  
 class QSFMLWidget : public QSFMLCanvas
 {
 public:
