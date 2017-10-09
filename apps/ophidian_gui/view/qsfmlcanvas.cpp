@@ -17,6 +17,29 @@
 
 using namespace qsfml;
 
+QSFMLCanvas::QSFMLCanvas(QWidget* parent) :
+QWidget       (parent)
+{
+    // Setup some states to allow direct rendering into the widget
+    setAttribute(Qt::WA_PaintOnScreen);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_NoSystemBackground);
+
+    // Strong focus for events in SFML
+    setFocusPolicy(Qt::StrongFocus);
+
+    // Setup the widget geometry
+    //move(position);
+    //resize(size);
+
+    // Add Vertical sync to SFML
+    //this->setVerticalSyncEnabled(true);
+    //this->setFramerateLimit(60);
+
+    // Setup the timer
+    myTimer.setInterval(0);
+}
+
 QSFMLCanvas::QSFMLCanvas(QWidget* parent, const QPoint& position, const QSize& size, unsigned int frameTime) :
 QWidget       (parent),
 myInitialized (false)

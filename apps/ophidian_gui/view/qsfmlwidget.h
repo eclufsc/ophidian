@@ -39,7 +39,6 @@ private:
 
     sf::View view;
     apps::Application * mApp;
-    std::vector<sf::RectangleShape> * boxes{nullptr};
 
 public slots:
     void update();

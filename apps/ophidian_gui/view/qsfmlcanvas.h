@@ -39,6 +39,12 @@ namespace qsfml {
     public :
 
         /**
+         * Explicit construct the QSFMLCanvas
+         * @param parent Parent of the widget
+         */
+        explicit QSFMLCanvas(QWidget *parent = 0);
+
+        /**
          * Construct the QSFMLCanvas
          * @param parent Parent of the widget
          * @param position Position of the widget

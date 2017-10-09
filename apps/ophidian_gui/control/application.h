@@ -24,7 +24,7 @@ public:
 
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);
     void buildICCAD2015(std::string lef, std::string def, std::string verilog);
-    std::vector<sf::RectangleShape> * cellsContruct(ophidian::geometry::Point windowSize);
+    ophidian::geometry::Point chipSize();
 
 public slots:
 

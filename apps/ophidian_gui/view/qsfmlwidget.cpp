@@ -40,13 +40,6 @@ void QSFMLWidget::OnUpdate()
     clear(sf::Color::Black);
     setView(view);
 
-    if (boxes != nullptr) {
-        std::cout << "Contruindo Boooooooxes" << std:: endl;
-        for (auto box : *boxes) {
-            draw(box);
-        }
-    }
-
     sf::VertexArray quad(sf::Quads, 4);
     quad[0].position = sf::Vector2f(10, 10);
     quad[1].position = sf::Vector2f(110, 10);
@@ -119,7 +112,6 @@ void QSFMLWidget::mouseReleaseEvent(QMouseEvent * e)
 
 void QSFMLWidget::update()
 {
-    ophidian::geometry::Point windowSize(view.getSize().x, view.getSize().y);
-    boxes = mApp->cellsContruct(windowSize);
-    std::cout << "Quant boxes:" << boxes->size() << std::endl;
+    ophidian::geometry::Point chip = mApp->chipSize();
+    std::cout << "Chip size: " << chip.x() << " x " << chip.y() << std::endl;
 }

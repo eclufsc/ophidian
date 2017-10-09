@@ -9,6 +9,12 @@ DrawableBatch<NumberOfVertices>::DrawableBatch(ophidian::circuit::Netlist & netl
 }
 
 template<std::size_t NumberOfVertices>
+const sf::Vertex DrawableBatch<NumberOfVertices>::operator[](const std::size_t i) const
+{
+    return reinterpret_cast<const sf::Vertex*>(mVertices.ContainerType)[i];
+}
+
+template<std::size_t NumberOfVertices>
 void DrawableBatch<NumberOfVertices>::transform(ophidian::circuit::Cell & cell, const sf::Transform & trans)
 {
     auto & cellVertices = mVertices[cell];
@@ -53,6 +59,11 @@ const std::array<sf::Vertex, NumberOfVertices> & DrawableBatch<NumberOfVertices>
     return mVertices[cell];
 }
 
+template<std::size_t NumberOfVertices>
+void DrawableBatch<NumberOfVertices>::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(reinterpret_cast<const sf::Vertex*>(mVertices.ContainerType), mVertices.size()*NumberOfVertices, mPrimitive, states);
+}
+
 /*DrawableBatch::DrawableBatch(sf::PrimitiveType primitive) :
     m_primitive(primitive),
     m_animation(nullptr){
@@ -75,9 +86,6 @@ void DrawableBatch::update()
         m_animation = m_animation->update(reinterpret_cast<sf::Vertex*>(m_vertices.data()));
 }
 
-void DrawableBatch::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(reinterpret_cast<const sf::Vertex*>(m_vertices.data()), m_system.size()*NumberOfVertices, m_primitive, states);
-}
 
 void DrawableBatch::clear() {
     for(auto entity : m_system)
