@@ -39,4 +39,4 @@ before_script:
 script:
   - make
   - cd test
-  - ./run_tests
+  - ./ophidian_tests
