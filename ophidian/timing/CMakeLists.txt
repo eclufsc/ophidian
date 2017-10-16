@@ -12,19 +12,44 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_timing_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_timing_source
     "*.cpp"
 )
 
+# Fetch .h files for library creation
+file(GLOB ophidian_timing_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
 # Add library target
-add_library(ophidian_timing ${ophidian_timing_SRC})
+add_library(ophidian_timing ${ophidian_timing_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_timing PUBLIC 
     OpenTimer
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_timing DESTINATION lib)
-install(FILES OpenTimer.h DESTINATION include/ophidian/timer)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_timing 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_timing_headers} 
+    DESTINATION ${ophidian_install_include_dir}/timer
+)

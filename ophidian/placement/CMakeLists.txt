@@ -12,13 +12,26 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_placement_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_placement_source
     "*.cpp"
 )
 
+# Fetch .h files for library creation
+file(GLOB ophidian_placement_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
 # Add library target
-add_library(ophidian_placement ${ophidian_placement_SRC})
+add_library(ophidian_placement ${ophidian_placement_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_placement PUBLIC
@@ -29,6 +42,18 @@ target_link_libraries(ophidian_placement PUBLIC
     ophidian_geometry
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_placement DESTINATION lib)
-install(FILES Placement.h Library.h DESTINATION include/ophidian/placement)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_placement 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_placement_headers} 
+    DESTINATION ${ophidian_install_include_dir}/placement
+)

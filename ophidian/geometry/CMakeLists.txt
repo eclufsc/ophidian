@@ -12,14 +12,39 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_geometry_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_geometry_source
     "*.cpp"
 )
 
-# Add library target
-add_library(ophidian_geometry ${ophidian_geometry_SRC})
+# Fetch .h files for library creation
+file(GLOB ophidian_geometry_headers
+    "*.h"
+)
 
-# Instal parameters for make install
-install(TARGETS ophidian_geometry DESTINATION lib)
-install(FILES Distance.h Models.h Operations.h DESTINATION include/ophidian/geometry)
+################################################################################
+# Library target
+################################################################################
+
+# Add library target
+add_library(ophidian_geometry ${ophidian_geometry_source})
+
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_geometry 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_geometry_headers} 
+    DESTINATION ${ophidian_install_include_dir}/geometry
+)

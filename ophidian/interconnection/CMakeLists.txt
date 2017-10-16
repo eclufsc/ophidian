@@ -12,13 +12,26 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_interconnection_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_interconnection_source
     "*.cpp"
 )
 
+# Fetch .h files for library creation
+file(GLOB ophidian_interconnection_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
 # Add library target
-add_library(ophidian_interconnection ${ophidian_interconnection_SRC})
+add_library(ophidian_interconnection ${ophidian_interconnection_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_interconnection PUBLIC 
@@ -28,6 +41,18 @@ target_link_libraries(ophidian_interconnection PUBLIC
     ophidian_geometry
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_interconnection DESTINATION lib)
-install(FILES Flute.h DESTINATION include/ophidian/interconnection)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_interconnection 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_interconnection_headers} 
+    DESTINATION ${ophidian_install_include_dir}/interconnection
+)

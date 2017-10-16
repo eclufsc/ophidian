@@ -12,13 +12,26 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_design_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_design_source
     "*.cpp"
 )
 
+# Fetch .h files for library creation
+file(GLOB ophidian_design_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
 # Add library target
-add_library(ophidian_design ${ophidian_design_SRC})
+add_library(ophidian_design ${ophidian_design_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_design PUBLIC 
@@ -29,6 +42,18 @@ target_link_libraries(ophidian_design PUBLIC
     ophidian_parser
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_design DESTINATION lib)
-install(FILES Design.h DesignBuilder.h DESTINATION include/ophidian/design)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_design 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_design_headers} 
+    DESTINATION ${ophidian_install_include_dir}/design
+)

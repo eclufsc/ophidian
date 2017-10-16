@@ -12,13 +12,26 @@
 #   - Define installation parameters.
 ################################################################################
 
-# Fetch .ccp files for library creation
-file(GLOB ophidian_circuit_SRC
+################################################################################
+# Fetch files
+################################################################################
+
+# Fetch .cpp files for library creation
+file(GLOB ophidian_circuit_source
     "*.cpp"
 )
 
+# Fetch .h files for library creation
+file(GLOB ophidian_circuit_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
 # Add library target
-add_library(ophidian_circuit ${ophidian_circuit_SRC})
+add_library(ophidian_circuit ${ophidian_circuit_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_circuit PUBLIC 
@@ -27,6 +40,18 @@ target_link_libraries(ophidian_circuit PUBLIC
     ophidian_standard_cell
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_circuit DESTINATION lib)
-install(FILES Netlist.h DESTINATION include/ophidian/circuit)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_circuit 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_circuit_headers} 
+    DESTINATION ${ophidian_install_include_dir}/circuit
+)

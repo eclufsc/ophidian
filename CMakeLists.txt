@@ -16,34 +16,50 @@
 # Set up minimal cmake version
 cmake_minimum_required(VERSION 3.2.2)
 
-# Set PROJECT_NAME global variable
-set(PROJECT_NAME "ophidian")
+# Set project_name global variable
+set(project_name "ophidian")
 
-# Set projec name 
-project(${PROJECT_NAME})
+# Set project name 
+project(${project_name})
 
 # Set c++14 globaly 
 set(CMAKE_CXX_STANDARD 14)
 
 # Set Ophidian source dir
-set(OPHIDIAN_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
 # Set the dependencies directory
-set(THIRD_PARTY_SOURCE_DIR ${OPHIDIAN_SOURCE_DIR}/3rdparty)
+set(third_party_source_dir ${ophidian_source_dir}/3rdparty)
 
 # Set include dirs for the Lemon library
-set(LEMON_INCLUDE_DIR 
+set(lemon_include_dir 
     ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
 )
 
 # Set the global include directories variable
-set(OPHIDIAN_INCLUDE_DIRECTORIES 
-    ${OPHIDIAN_SOURCE_DIR}
-    ${THIRD_PARTY_SOURCE_DIR}
-    ${LEMON_INCLUDE_DIR}
+set(ophidian_include_dir
+    ${ophidian_source_dir}
+    ${third_party_source_dir}
+    ${lemon_include_dir}
 )
+
+################################################################################
+# Set up installation variables
+################################################################################
+
+# Set Cmake install prefix 
+set(CMAKE_INSTALL_PREFIX /usr/local)
+
+# Set ophidian shared libraries install path
+set(ophidian_install_lib_dir lib/${project_name})
+
+# Set ophidian binary install path
+set(ophidian_install_bin_dir bin)
+
+# Set ophidian include install path
+set(ophidian_install_include_dir include/${project_name})
 
 ################################################################################
 # Handle raquirements
@@ -52,7 +68,7 @@ set(OPHIDIAN_INCLUDE_DIRECTORIES
 # Find Boost
 find_package(Boost 1.59 REQUIRED)
 
-# Find OpenMp if aplicable
+# Find OpenMP if aplicable
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -63,14 +79,14 @@ endif()
 # Project logic 
 ################################################################################
 
-# Set globla compiler flags
+# Set global compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 
 # Set option build shared libs
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
 
 # Set the global include directories
-include_directories(${OPHIDIAN_INCLUDE_DIRECTORIES})
+include_directories(${ophidian_include_dir})
 
 # First add 3rdparty software to build
 add_subdirectory(3rdparty)

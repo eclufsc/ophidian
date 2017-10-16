@@ -12,16 +12,29 @@
 #   - Define installation parameters.
 ################################################################################
 
+################################################################################
+# Fetch files
+################################################################################
+
 # Fetch .ccp files for library creation
-file(GLOB ophidian_parser_SRC
+file(GLOB ophidian_parser_source
     "*.cpp"
 )
 
-link_directories(${THIRD_PARTY_SOURCE_DIR}/DEF/lib)
-link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
+# Fetch .h files for library creation
+file(GLOB ophidian_parser_headers
+    "*.h"
+)
+
+################################################################################
+# Library target
+################################################################################
+
+link_directories(${third_party_source_dir}/DEF/lib)
+link_directories(${third_party_source_dir}/LEF/lib)
 
 # Add library target
-add_library(ophidian_parser ${ophidian_parser_SRC})
+add_library(ophidian_parser ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
 add_dependencies(ophidian_parser def_parser lef_parser)
@@ -29,6 +42,18 @@ target_link_libraries(ophidian_parser PUBLIC
     verilogparser
 )
 
-# Instal parameters for make install
-install(TARGETS ophidian_parser DESTINATION lib)
-install(FILES VerilogParser.h DESTINATION include/ophidian/parser)
+################################################################################
+# Installation rules
+################################################################################
+
+# Install rule for target
+install(
+    TARGETS ophidian_parser 
+    DESTINATION ${ophidian_install_lib_dir}
+)
+
+# Install rule for headers
+install(
+    FILES ${ophidian_parser_headers} 
+    DESTINATION ${ophidian_install_include_dir}/parser
+)

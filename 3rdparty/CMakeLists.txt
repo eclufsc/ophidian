@@ -31,7 +31,7 @@ include(ExternalProject)
 # Build LEF parser with the included Makefile
 ExternalProject_Add(
 	lef_parser
-    SOURCE_DIR ${THIRD_PARTY_SOURCE_DIR}/LEF
+    SOURCE_DIR ${third_party_source_dir}/LEF
 	# Empty CONFIGURE_COMMAND as the LEF parser has no configure file
 	CONFIGURE_COMMAND ""
     BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
@@ -42,7 +42,7 @@ ExternalProject_Add(
 # Build DEF parser with the included Makefile
 ExternalProject_Add(
 	def_parser
-    SOURCE_DIR ${THIRD_PARTY_SOURCE_DIR}/DEF
+    SOURCE_DIR ${third_party_source_dir}/DEF
 	# Empty CONFIGURE_COMMAND as the DEF parser has no configure file
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
