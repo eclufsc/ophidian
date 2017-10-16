@@ -51,5 +51,5 @@ install(
 # Install rule for headers
 install(
     FILES ${ophidian_timing_headers} 
-    DESTINATION ${ophidian_install_include_dir}/timer
+    DESTINATION ${ophidian_install_include_dir}/timing
 )
