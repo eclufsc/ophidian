@@ -11,7 +11,8 @@
 #include <ophidian/geometry/Models.h>
 #include "qsfmlcanvas.h"
 #include "canvas.h"
-#include "../control/canvascontroller.h"
+#include "control/canvascontroller.h"
+#include "control/application.h"
 
 using namespace qsfml;
 
@@ -20,6 +21,8 @@ class MySFMLCanvas : public QSFMLCanvas
 public:
     MySFMLCanvas(QWidget *parent = 0);
     virtual ~MySFMLCanvas();
+
+    void setApplication(Application & app);
 
     CanvasController * controller();
     Canvas * canvas();
@@ -36,25 +39,8 @@ public:
     void centerViewOn(const ophidian::geometry::Point & p1);
     void viewSize(const ophidian::geometry::Point & size);
 
-    /*Quad quadCreate(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
-
-    // ..DrawableBatch<4> & quads();
-    const std::array<sf::Vertex, 4> & quadPoints(Quad quad) const;
-    void quadUpdate(Quad quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
-
-    // void quadsAnimate(ophidian::gui::batch_animation *animation);
-
-    template <class T>
-    void destroy(T element);
-
-    template <class T>
-    void transform(T element, const sf::Transform & transformation);
-
-    template <class T>
-    void paint(T element, sf::Color color);
-    */
-
 private:
+    Application * mApp;
     CanvasController mController;
     Canvas mCanvas;
     sf::View mCameraView;

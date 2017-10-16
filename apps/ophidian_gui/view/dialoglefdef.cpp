@@ -7,7 +7,7 @@ DialogLefDef::DialogLefDef(QWidget *parent) :
     ui->setupUi(this);
 }
 
-DialogLefDef::DialogLefDef(QWidget *parent, apps::Application *app) :
+DialogLefDef::DialogLefDef(QWidget *parent, Application *app) :
     DialogLefDef(parent)
 {
     mApp = app;

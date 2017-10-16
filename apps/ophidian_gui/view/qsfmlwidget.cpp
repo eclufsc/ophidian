@@ -25,7 +25,7 @@ QSFMLWidget::~QSFMLWidget()
 
 }
 
-void QSFMLWidget::setApplication(apps::Application & app)
+void QSFMLWidget::setApplication(Application & app)
 {
     mApp = &app;
 }

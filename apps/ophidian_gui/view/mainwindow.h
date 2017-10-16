@@ -7,8 +7,6 @@
 #include "dialoglefdef.h"
 #include "control/application.h"
 
-using namespace apps;
-
 namespace Ui {
 class MainWindow;
 } // namespace Ui

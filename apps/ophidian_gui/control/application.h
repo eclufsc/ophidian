@@ -12,8 +12,6 @@
 
 using namespace ophidian::design;
 
-namespace apps {
-
 class Application : public QObject
 {
     Q_OBJECT
@@ -30,13 +28,10 @@ public slots:
 
 signals:
     void changeCircuitBox(QString name, size_t die, size_t cells, size_t pins, size_t nets);
-    void update();
 
 private:
     DesignBuilder * mBuilder{nullptr};
     Design * mDesign{nullptr};
 };
-
-}
 
 #endif // APPLICATION_H

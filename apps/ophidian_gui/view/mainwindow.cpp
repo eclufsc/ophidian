@@ -6,9 +6,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mApp()
 {
     ui->setupUi(this);
-    ui->canvas->setApplication(mApp);
-    connect(&mApp, SIGNAL(update()), ui->canvas, SLOT(update()));
-    connect(this, SIGNAL(update()), ui->canvas, SLOT(update()));
+    ui->MyCanvas->setApplication(mApp);
+    //connect(&mApp, SIGNAL(update()), ui->MyCanvas, SLOT(update()));
+    //connect(this, SIGNAL(update()), ui->MyCanvas, SLOT(update()));
 }
 
 MainWindow::~MainWindow()

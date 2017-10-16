@@ -25,7 +25,7 @@ public:
     QSFMLWidget(QWidget* parent, const QPoint& position=QPoint(0,0), const QSize& size=QSize(200,200));
     ~QSFMLWidget();
 
-    void setApplication(apps::Application & app);
+    void setApplication(Application & app);
 
 private:
     void OnInit();
@@ -38,7 +38,7 @@ private:
     void mouseReleaseEvent(QMouseEvent * e);
 
     sf::View view;
-    apps::Application * mApp;
+   Application * mApp;
 
 public slots:
     void update();

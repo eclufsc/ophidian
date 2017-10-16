@@ -2,24 +2,20 @@
 #define CANVAS_H
 
 #include <ophidian/circuit/Netlist.h>
-#include "drawablebatch.h"
+#include "./drawablebatch.h"
+#include "./Model/forms.h"
 
-struct Quad {
-    ophidian::circuit::Cell cell;
-    bool operator==(const Quad & o) const {
-        return cell == o.cell;
-    }
-};
+#include "drawpieces.h"
 
 class Canvas : public sf::Drawable
 {
 public:
     Canvas();
-
+    virtual ~Canvas();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    /*virtual ~Canvas();
 
 
+    /*
     Quad quad_create(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
     void destroy(Quad quad);
     void transform(Quad quad, const sf::Transform & transformation);
@@ -40,6 +36,7 @@ public:
 
 private:
     //DrawableBatch<4> mQuads{sf::Quads};
+    DrawPieces mQuads{sf::Quads};
 };
 
 #endif // CANVAS_H

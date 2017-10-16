@@ -1,7 +1,5 @@
 #include "application.h"
 
-namespace apps {
-
 Application::Application()
 {
 
@@ -26,7 +24,6 @@ void Application::buildICCAD2015(std::string lef, std::string def, std::string v
     size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
 
     emit changeCircuitBox("test", 1, cells, pins, nets);
-    emit update();
     std::cout << "Emit update" << std::endl;
 
 }
@@ -35,5 +32,3 @@ ophidian::geometry::Point Application::chipSize()
 {
     return mDesign->floorplan().chipUpperRightCorner().toPoint();
 }
-
-} // namespace apps

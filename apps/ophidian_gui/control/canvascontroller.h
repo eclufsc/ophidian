@@ -1,7 +1,12 @@
 #ifndef CANVASCONTROLLER_H
 #define CANVASCONTROLLER_H
 
+#include <unordered_map>
+
 #include <ophidian/geometry/Models.h>
+#include <ophidian/entity_system/Property.h>
+#include <ophidian/design/Design.h>
+#include "./Model/forms.h"
 
 class MySFMLCanvas;
 
@@ -46,6 +51,9 @@ private:
     // quads?
     // state?
     MySFMLCanvas * mMySFMLCanvas;
+    ophidian::design::Design * mDesign;
+    //ophidian::entity_system::Property<ophidian::circuit::Cell, Quad> mQuads;
+
 };
 
 #endif // CANVASCONTROLLER_H

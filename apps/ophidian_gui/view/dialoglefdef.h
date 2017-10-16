@@ -21,11 +21,9 @@ class DialogLefDef : public QDialog
 {
     Q_OBJECT
 
-    apps::Application *mApp{nullptr};
-
 public:
     explicit DialogLefDef(QWidget *parent = 0);
-    DialogLefDef(QWidget *parent, apps::Application *app);
+    DialogLefDef(QWidget *parent, Application *app);
     ~DialogLefDef();
 
 private slots:
@@ -41,6 +39,7 @@ private slots:
 
 private:
     Ui::DialogLefDef *ui;
+    Application *mApp{nullptr};
 
 };
 
