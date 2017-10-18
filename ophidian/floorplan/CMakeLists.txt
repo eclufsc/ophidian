@@ -46,11 +46,11 @@ target_link_libraries(ophidian_floorplan PUBLIC
 # Install rule for target
 install(
     TARGETS ophidian_floorplan 
-    DESTINATION lib
+    DESTINATION ${ophidian_install_lib_dir}
 )
 
 # Install rule for headers
 install(
     FILES ${ophidian_floorplan_headers} 
-    DESTINATION include/ophidian/floorplan
+    DESTINATION ${ophidian_install_include_dir}/floorplan
 )

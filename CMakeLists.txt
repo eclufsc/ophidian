@@ -53,13 +53,13 @@ set(ophidian_include_dir
 set(CMAKE_INSTALL_PREFIX /usr/local)
 
 # Set ophidian shared libraries install path
-set(ophidian_install_lib_dir lib/${project_name})
+set(ophidian_install_lib_dir lib)
 
 # Set ophidian binary install path
 set(ophidian_install_bin_dir bin)
 
 # Set ophidian include install path
-set(ophidian_install_include_dir include/${project_name})
+set(ophidian_install_include_dir include/ophidian)
 
 ################################################################################
 # Handle raquirements
@@ -71,8 +71,8 @@ find_package(Boost 1.59 REQUIRED)
 # Find OpenMP if aplicable
 find_package(OpenMP)
 if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 ################################################################################
