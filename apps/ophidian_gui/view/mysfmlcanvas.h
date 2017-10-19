@@ -22,9 +22,8 @@ public:
     MySFMLCanvas(QWidget *parent = 0);
     virtual ~MySFMLCanvas();
 
-    void setApplication(Application & app);
+    void setController(CanvasController & controller);
 
-    CanvasController * controller();
     Canvas * canvas();
 
     void OnInit();
@@ -39,9 +38,11 @@ public:
     void centerViewOn(const ophidian::geometry::Point & p1);
     void viewSize(const ophidian::geometry::Point & size);
 
+private slots:
+    void update();
+
 private:
-    Application * mApp;
-    CanvasController mController;
+    CanvasController * mController;
     Canvas mCanvas;
     sf::View mCameraView;
 };

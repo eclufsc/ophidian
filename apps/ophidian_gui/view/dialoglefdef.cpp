@@ -7,12 +7,6 @@ DialogLefDef::DialogLefDef(QWidget *parent) :
     ui->setupUi(this);
 }
 
-DialogLefDef::DialogLefDef(QWidget *parent, Application *app) :
-    DialogLefDef(parent)
-{
-    mApp = app;
-}
-
 DialogLefDef::~DialogLefDef()
 {
     delete ui;
@@ -89,7 +83,7 @@ void DialogLefDef::on_okButton_clicked()
         ui->verilog->setStyleSheet(color);
 
     } else {
-        mApp->buildICCAD2015(ui->lefLine->text().toStdString(), ui->defLine->text().toStdString(), ui->verilogLine->text().toStdString());
+        emit buildICCAD2015(ui->lefLine->text().toStdString(), ui->defLine->text().toStdString(), ui->verilogLine->text().toStdString());
         this->close();
     }
 }

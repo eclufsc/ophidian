@@ -5,14 +5,15 @@
 #include "./drawablebatch.h"
 #include "./Model/forms.h"
 
-#include "drawpieces.h"
-
 class Canvas : public sf::Drawable
 {
 public:
     Canvas();
     virtual ~Canvas();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+    Quad quadCreate(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
+    void quadUpdate(Quad quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
 
 
     /*
@@ -35,8 +36,8 @@ public:
     void clear();*/
 
 private:
-    //DrawableBatch<4> mQuads{sf::Quads};
-    DrawPieces mQuads{sf::Quads};
+    DrawableBatch mQuads{sf::Quads, 4};
+    //DrawPieces mQuads{sf::Quads, 4};
 };
 
 #endif // CANVAS_H

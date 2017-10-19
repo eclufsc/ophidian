@@ -2,13 +2,14 @@
   
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    mApp()
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->MyCanvas->setApplication(mApp);
-    //connect(&mApp, SIGNAL(update()), ui->MyCanvas, SLOT(update()));
-    //connect(this, SIGNAL(update()), ui->MyCanvas, SLOT(update()));
+    ui->MyCanvas->setController(mCanvasController);
+
+    /* Connecting signals */
+    QObject::connect(&mCanvasController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
+                     this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
 }
 
 MainWindow::~MainWindow()
@@ -18,15 +19,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionICCAD_2017_triggered()
 {
-    DialogLefDef dialog(this, &mApp);
-    dialog.exec();
+
 }
 
 void MainWindow::on_actionICCAD_2015_triggered()
 {
-    QObject::connect(&mApp, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
-                      this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
-    DialogLefDef dialog(this, &mApp);
+    DialogLefDef dialog(this);
+    QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string)),
+                     &mCanvasController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
     dialog.exec();
 }
 

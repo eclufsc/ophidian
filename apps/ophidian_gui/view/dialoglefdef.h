@@ -23,7 +23,6 @@ class DialogLefDef : public QDialog
 
 public:
     explicit DialogLefDef(QWidget *parent = 0);
-    DialogLefDef(QWidget *parent, Application *app);
     ~DialogLefDef();
 
 private slots:
@@ -37,9 +36,11 @@ private slots:
 
     void on_chooseVerilog_clicked();
 
+signals:
+    void buildICCAD2015(std::string lef, std::string def, std::string verilog);
+
 private:
     Ui::DialogLefDef *ui;
-    Application *mApp{nullptr};
 
 };
 
