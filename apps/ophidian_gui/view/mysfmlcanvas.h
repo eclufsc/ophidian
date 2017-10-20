@@ -11,8 +11,7 @@
 #include <ophidian/geometry/Models.h>
 #include "qsfmlcanvas.h"
 #include "canvas.h"
-#include "control/canvascontroller.h"
-#include "control/application.h"
+#include "control/maincontroller.h"
 
 using namespace qsfml;
 
@@ -22,7 +21,7 @@ public:
     MySFMLCanvas(QWidget *parent = 0);
     virtual ~MySFMLCanvas();
 
-    void setController(CanvasController & controller);
+    void setController(MainController & controller);
 
     Canvas * canvas();
 
@@ -38,11 +37,14 @@ public:
     void centerViewOn(const ophidian::geometry::Point & p1);
     void viewSize(const ophidian::geometry::Point & size);
 
+public slots:
+    void reserveMinimumOfQuads(std::size_t minimumOfQuads);
+
 private slots:
-    void update();
+    void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
 
 private:
-    CanvasController * mController;
+    MainController * mMainController;
     Canvas mCanvas;
     sf::View mCameraView;
 };

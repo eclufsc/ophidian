@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "ui_dialoglefdef.h"
-#include "control/application.h"
 
 #include <QFileDialog>
 #include <QFile>

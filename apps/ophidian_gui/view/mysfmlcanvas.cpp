@@ -7,9 +7,9 @@ MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
     mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
 }
 
-void MySFMLCanvas::setController(CanvasController & controller)
+void MySFMLCanvas::setController(MainController & controller)
 {
-    mController = &controller;
+    mMainController = &controller;
 }
 
 void MySFMLCanvas::resizeEvent(QResizeEvent *e)
@@ -93,19 +93,19 @@ void MySFMLCanvas::mousePressEvent(QMouseEvent *e)
 {
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
-    mController->mousePress(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
+    mMainController->mousePress(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
 }
 
 void MySFMLCanvas::mouseMoveEvent(QMouseEvent *e)
 {
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
-    mController->mouseMove(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
+    mMainController->mouseMove(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
 }
 
 void MySFMLCanvas::mouseReleaseEvent(QMouseEvent *e)
 {
-    mController->mouseRelease();
+    mMainController->mouseRelease();
 }
 
 void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point &p1)
@@ -118,7 +118,8 @@ void MySFMLCanvas::viewSize(const ophidian::geometry::Point &size)
     mCameraView.setSize(sf::Vector2f(size.x(), size.y()));
 }
 
-void MySFMLCanvas::update()
+void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
+    mCanvas.reserveMinimumOfQuads(minimumOfQuads);
 }
 

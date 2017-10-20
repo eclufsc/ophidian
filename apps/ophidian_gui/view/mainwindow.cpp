@@ -5,10 +5,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->MyCanvas->setController(mCanvasController);
+    ui->MyCanvas->setController(mMainController);
 
     /* Connecting signals */
-    QObject::connect(&mCanvasController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
+    QObject::connect(&mMainController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
                      this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
 }
 
@@ -26,7 +26,7 @@ void MainWindow::on_actionICCAD_2015_triggered()
 {
     DialogLefDef dialog(this);
     QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string)),
-                     &mCanvasController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
+                     &mMainController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
     dialog.exec();
 }
 
@@ -42,6 +42,8 @@ void MainWindow::on_circuit_labelsChanged(QString name, size_t die, size_t cells
     ui->circuitCells_2->setText(QString::number(cells));
     ui->circuitPins_2->setText(QString::number(pins));
     ui->circuitNets_2->setText(QString::number(nets));
+
+    ui->MyCanvas->reserveMinimumOfQuads(cells);
     emit update();
 }
 

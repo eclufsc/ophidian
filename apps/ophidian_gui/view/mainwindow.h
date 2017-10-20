@@ -5,7 +5,7 @@
 
 #include "ui_mainwindow.h"
 #include "dialoglefdef.h"
-#include "control/canvascontroller.h"
+#include "control/maincontroller.h"
 
 namespace Ui {
 class MainWindow;
@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    CanvasController mCanvasController;
+    MainController mMainController;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

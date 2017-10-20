@@ -12,9 +12,10 @@ public:
     virtual ~Canvas();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+    void reserveMinimumOfQuads(std::size_t minimumOfQuads);
+
     Quad quadCreate(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
     void quadUpdate(Quad quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
-
 
     /*
     Quad quad_create(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);

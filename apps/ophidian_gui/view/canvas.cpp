@@ -10,6 +10,11 @@ Canvas::~Canvas()
 
 }
 
+void Canvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
+{
+    mQuads.reserveMinimumOfQuads(minimumOfQuads);
+}
+
 void Canvas::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(mQuads, states);

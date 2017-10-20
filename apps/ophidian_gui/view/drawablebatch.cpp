@@ -29,6 +29,12 @@ DrawableBatch::~DrawableBatch()
 
 }
 
+void DrawableBatch::reserveMinimumOfQuads(std::size_t minimumOfQuads)
+{
+    mVertices.reserve(minimumOfQuads);
+    std::cout << mVertices.capacity() << std::endl;
+}
+
 void DrawableBatch::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(reinterpret_cast<const sf::Vertex*>(mVertices.data()), mVertices.size()*mNumberOfVertices, mPrimitive, states);
 }

@@ -1,6 +1,8 @@
-#ifndef CANVASCONTROLLER_H
-#define CANVASCONTROLLER_H
+#ifndef MAINCONTROLLER_H
+#define MAINCONTROLLER_H
 
+#include <vector>
+#include <memory>
 #include <unordered_map>
 #include <QObject>
 
@@ -14,14 +16,14 @@
 
 class MySFMLCanvas;
 
-class CanvasController : public QObject
+class MainController : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit CanvasController();
-    ~CanvasController();
+    explicit MainController();
+    ~MainController();
 
     void mousePress(const ophidian::geometry::Point & p);
     void mouseMove(const ophidian::geometry::Point & p);
@@ -61,8 +63,11 @@ public slots:
 
 signals:
     void changeCircuitBox(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+    void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
 
 private:
+    void createQuads();
+
     // MainController mMainController;
     // quadToEntity e entityToQuad
     // quads?
@@ -72,7 +77,8 @@ private:
     ophidian::design::Design * mDesign{nullptr};
 
     //std::unique_ptr<ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>>> * mQuads;
+    ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mQuads;
 
 };
 
-#endif // CANVASCONTROLLER_H
+#endif // MAINCONTROLLER_H

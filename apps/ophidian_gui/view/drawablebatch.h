@@ -1,8 +1,10 @@
 #ifndef DRAWABLEBATCH_H
 #define DRAWABLEBATCH_H
 
-#include <SFML/Graphics.hpp>
+#include <iostream>
+
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/circuit/Netlist.h>
@@ -16,6 +18,8 @@ public:
     ~DrawableBatch();
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+    void reserveMinimumOfQuads(std::size_t minimumOfQuads);
 
     const sf::Vertex operator[](const std::size_t i) const;
 
