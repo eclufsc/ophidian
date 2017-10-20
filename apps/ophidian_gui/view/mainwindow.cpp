@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->MyCanvas->setController(mMainController);
+    mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
     QObject::connect(&mMainController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),

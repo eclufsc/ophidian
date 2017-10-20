@@ -14,8 +14,10 @@ public:
 
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
 
-    Quad quadCreate(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
-    void quadUpdate(Quad quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
+    void allocQuad(Quad & quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
+    void quadUpdate(Quad & quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
+
+    DrawableBatch * drawableQuads();
 
     /*
     Quad quad_create(const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
@@ -37,7 +39,7 @@ public:
     void clear();*/
 
 private:
-    DrawableBatch mQuads{sf::Quads, 4};
+    DrawableBatch mQuads;
     //DrawPieces mQuads{sf::Quads, 4};
 };
 

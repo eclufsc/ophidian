@@ -10,18 +10,6 @@ DrawableBatch::DrawableBatch(sf::PrimitiveType primitive, std::size_t numberOfVe
     quad[2].position = sf::Vector2f(250, 250);
     quad[3].position = sf::Vector2f(10, 250);
     mVertices.push_back(quad);
-
-    std::cout << mVertices.size() << std::endl;
-
-//    std::array<sf::Vertex, 4> quad2;
-//    quad2[0].position = sf::Vector2f(1110, 1110);
-//    quad2[1].position = sf::Vector2f(1350, 1110);
-//    quad2[2].position = sf::Vector2f(1350, 1350);
-//    quad2[3].position = sf::Vector2f(1110, 1350);
-//    mVertices.push_back(quad2);
-
-//    std::cout << mVertices.size() << std::endl;
-
 }
 
 DrawableBatch::~DrawableBatch()
@@ -32,11 +20,10 @@ DrawableBatch::~DrawableBatch()
 void DrawableBatch::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
     mVertices.reserve(minimumOfQuads);
-    std::cout << mVertices.capacity() << std::endl;
 }
 
-void DrawableBatch::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(reinterpret_cast<const sf::Vertex*>(mVertices.data()), mVertices.size()*mNumberOfVertices, mPrimitive, states);
+void DrawableBatch::draw(sf::RenderTarget & target, sf::RenderStates states) const {
+    target.draw(reinterpret_cast<const sf::Vertex*>(mVertices.data()), mVertices.size() * mNumberOfVertices, mPrimitive, states);
 }
 
 const sf::Vertex DrawableBatch::operator[](const std::size_t i) const
@@ -44,21 +31,40 @@ const sf::Vertex DrawableBatch::operator[](const std::size_t i) const
     return reinterpret_cast<const sf::Vertex*>(mVertices.data())[i];
 }
 
-Quad DrawableBatch::create(const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
+void DrawableBatch::alloc(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
 {
-    Quad newQuad;
+    quad.mId = mVertices.size();
+
     std::array<sf::Vertex, 4> newVertices;
-
-    newQuad.mId = mVertices.size();
-
     newVertices[0].position = sf::Vector2f(p1.x(), p1.y());
     newVertices[1].position = sf::Vector2f(p2.x(), p2.y());
     newVertices[2].position = sf::Vector2f(p3.x(), p3.y());
     newVertices[3].position = sf::Vector2f(p4.x(), p4.y());
 
-    mVertices.push_back(newVertices);
+    sf::Color color;
+    switch (quad.mId % 4) {
+    case 0:
+        color = sf::Color::Red;
+        break;
+    case 1:
+        color = sf::Color::Yellow;
+        break;
+    case 2:
+        color = sf::Color::Green;
+        break;
+    case 3:
+        color = sf::Color::Blue;
+        break;
+    default:
+        break;
+    }
 
-    return newQuad;
+    newVertices[0].color = color;
+    newVertices[1].color = color;
+    newVertices[2].color = color;
+    newVertices[3].color = color;
+
+    mVertices.push_back(newVertices);
 }
 
 void DrawableBatch::transform(const std::vector<Quad> &quads, const sf::Transform & trans)

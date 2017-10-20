@@ -2,9 +2,10 @@
 #define MAINCONTROLLER_H
 
 #include <vector>
-#include <memory>
 #include <unordered_map>
 #include <QObject>
+
+#include <iostream>
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/design/Design.h>
@@ -12,9 +13,8 @@
 #include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/entity_system/Property.h>
 
+#include "view/canvas.h"
 #include "./Model/forms.h"
-
-class MySFMLCanvas;
 
 class MainController : public QObject
 {
@@ -24,6 +24,8 @@ public:
 
     explicit MainController();
     ~MainController();
+
+    void setCanvas(Canvas * canvas);
 
     void mousePress(const ophidian::geometry::Point & p);
     void mouseMove(const ophidian::geometry::Point & p);
@@ -67,18 +69,12 @@ signals:
 
 private:
     void createQuads();
-
-    // MainController mMainController;
-    // quadToEntity e entityToQuad
-    // quads?
     // state?
+    Canvas * mCanvas;
 
-    ophidian::design::DesignBuilder * mBuilder{nullptr};
     ophidian::design::Design * mDesign{nullptr};
-
-    //std::unique_ptr<ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>>> * mQuads;
+    ophidian::design::DesignBuilder * mBuilder{nullptr};
     ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mQuads;
-
 };
 
 #endif // MAINCONTROLLER_H

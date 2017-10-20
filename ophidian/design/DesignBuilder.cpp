@@ -97,6 +97,7 @@ Design & ICCAD2015ContestDesignBuilder::build()
 	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
 	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
 	circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
+    circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
 
     return mDesign;
 }
