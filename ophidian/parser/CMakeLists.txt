@@ -30,8 +30,8 @@ file(GLOB ophidian_parser_headers
 # Library target
 ################################################################################
 
-link_directories(${third_party_source_dir}/DEF/lib)
-link_directories(${third_party_source_dir}/LEF/lib)
+#link_directories(${third_party_source_dir}/DEF/lib)
+#link_directories(${third_party_source_dir}/LEF/lib)
 
 # Add library target
 add_library(ophidian_parser ${ophidian_parser_source})
