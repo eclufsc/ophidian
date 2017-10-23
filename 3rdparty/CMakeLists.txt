@@ -1,17 +1,18 @@
 ################################################################################
 # This is the CMakeLists file for the Ophidian Dependencies. 
 # Its main goals are:
+#   - Check for dependencies 
 #   - Fetch dependencies 
 #   - Configure dependencies
 #   - Add dependencies subdirectories
 ################################################################################
 
 # Init submodules and fetch dependences from git
-execute_process(
-    COMMAND git submodule update --init --recursive
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    RESULT_VARIABLE submodule_init_exit_code
-)
+#execute_process(
+#    COMMAND git submodule update --init --recursive
+#    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+#    RESULT_VARIABLE submodule_init_exit_code
+#)
 
 # This is needed since Flute is statcly built
 add_subdirectory(Flute)
@@ -29,23 +30,26 @@ add_subdirectory(verilog-parser)
 include(ExternalProject)
 
 # Build LEF parser with the included Makefile
-ExternalProject_Add(
-	lef_parser
-    SOURCE_DIR ${third_party_source_dir}/LEF
-	# Empty CONFIGURE_COMMAND as the LEF parser has no configure file
-	CONFIGURE_COMMAND ""
-    BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
-	# LEF Makefile is not compatible with external builds
-	BUILD_IN_SOURCE 1
+execute_process(
+    COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
+    WORKING_DIRECTORY ${third_party_source_dir}/LEF
 )
 
+add_library(LEF STATIC IMPORTED)
+set_property(TARGET LEF PROPERTY IMPORTED_LOCATION LEF/lib/liblef.a)
+set_property(TARGET LEF PROPERTY INTERFACE_INCLUDE_DIRECTORIES  
+    $<BUILD_INTERFACE:      .>
+    $<INSTALL_INTERFACE:    include/LEF>
+)
 # Build DEF parser with the included Makefile
-ExternalProject_Add(
-	def_parser
-    SOURCE_DIR ${third_party_source_dir}/DEF
-	# Empty CONFIGURE_COMMAND as the DEF parser has no configure file
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
-	# DEF Makefile is not compatible with external builds
-	BUILD_IN_SOURCE 1
+execute_process(
+    COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
+    WORKING_DIRECTORY ${third_party_source_dir}/DEF
+)
+
+add_library(DEF STATIC IMPORTED)
+set_property(TARGET DEF PROPERTY IMPORTED_LOCATION DEF/lib/libdef.a)
+set_property(TARGET DEF PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+    $<BUILD_INTERFACE:      .>
+    $<INSTALL_INTERFACE:    include/DEF>
 )

@@ -13,6 +13,15 @@
 ################################################################################
 
 ################################################################################
+# Set variables
+################################################################################
+
+# Set the include path for installed target
+set(ophidian_parser_install_include_dir 
+    ${ophidian_install_include_dir}/parser
+)
+
+################################################################################
 # Fetch files
 ################################################################################
 
@@ -37,9 +46,18 @@ file(GLOB ophidian_parser_headers
 add_library(ophidian_parser ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
-add_dependencies(ophidian_parser def_parser lef_parser)
 target_link_libraries(ophidian_parser PUBLIC 
+    LEF
+    DEF
     verilogparser
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_parser PUBLIC
+    $<BUILD_INTERFACE:      ${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:    include>
 )
 
 ################################################################################
@@ -55,5 +73,5 @@ install(
 # Install rule for headers
 install(
     FILES ${ophidian_parser_headers} 
-    DESTINATION ${ophidian_install_include_dir}/parser
+    DESTINATION ${ophidian_parser_install_include_dir}
 )

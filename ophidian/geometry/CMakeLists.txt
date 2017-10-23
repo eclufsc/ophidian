@@ -13,6 +13,15 @@
 ################################################################################
 
 ################################################################################
+# Set variables
+################################################################################
+
+# Set the include path for installed target
+set(ophidian_geometry_install_include_dir 
+    ${ophidian_install_include_dir}/geometry
+)
+
+################################################################################
 # Fetch files
 ################################################################################
 
@@ -33,6 +42,14 @@ file(GLOB ophidian_geometry_headers
 # Add library target
 add_library(ophidian_geometry ${ophidian_geometry_source})
 
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_geometry PUBLIC
+    $<BUILD_INTERFACE:      ${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:    include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
@@ -46,5 +63,5 @@ install(
 # Install rule for headers
 install(
     FILES ${ophidian_geometry_headers} 
-    DESTINATION ${ophidian_install_include_dir}/geometry
+    DESTINATION ${ophidian_geometry_install_include_dir}
 )

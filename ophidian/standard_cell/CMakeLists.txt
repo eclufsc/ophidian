@@ -13,6 +13,15 @@
 ################################################################################
 
 ################################################################################
+# Set variables
+################################################################################
+
+# Set the include path for installed target
+set(ophidian_standard_cell_install_include_dir 
+    ${ophidian_install_include_dir}/standard_cell
+)
+
+################################################################################
 # Fetch files
 ################################################################################
 
@@ -37,6 +46,17 @@ add_library(ophidian_standard_cell ${ophidian_standard_cell_source})
 target_link_libraries(ophidian_standard_cell PUBLIC
     ophidian_entity_system
 )
+target_link_libraries(ophidian_standard_cell INTERFACE
+    ophidian_util
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_standard_cell PUBLIC
+    $<BUILD_INTERFACE:      ${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:    include>
+)
 
 ################################################################################
 # Installation rules
@@ -51,5 +71,5 @@ install(
 # Install rule for headers
 install(
     FILES ${ophidian_standard_cell_headers} 
-    DESTINATION ${ophidian_install_include_dir}/standard_cell
+    DESTINATION ${ophidian_standard_cell_install_include_dir}
 )

@@ -32,17 +32,11 @@ set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 set(third_party_source_dir ${ophidian_source_dir}/3rdparty)
 
 # Set include dirs for the Lemon library
+# That's due to lemmon not using target_include_directory
 set(lemon_include_dir 
     ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
-)
-
-# Set the global include directories variable
-set(ophidian_include_dir
-    ${ophidian_source_dir}
-    ${third_party_source_dir}
-    ${lemon_include_dir}
 )
 
 ################################################################################

@@ -13,6 +13,15 @@
 ################################################################################
 
 ################################################################################
+# Set variables
+################################################################################
+
+# Set the include path for installed target
+set(ophidian_entity_system_install_include_dir 
+    ${ophidian_install_include_dir}/entity_system
+)
+
+################################################################################
 # Fetch files
 ################################################################################
 
@@ -38,6 +47,14 @@ target_link_libraries(ophidian_entity_system PUBLIC
     lemon
 )
 
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_entity_system PUBLIC
+    $<BUILD_INTERFACE:      ${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:    include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
@@ -51,5 +68,5 @@ install(
 # Install rule for headers
 install(
     FILES ${ophidian_entity_system_headers} 
-    DESTINATION ${ophidian_install_include_dir}/entity_system
+    DESTINATION ${ophidian_entity_system_install_include_dir}
 )
