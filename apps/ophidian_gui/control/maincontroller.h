@@ -5,16 +5,22 @@
 #include <unordered_map>
 #include <QObject>
 
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 #include <ophidian/geometry/Models.h>
+#include <ophidian/util/Range.h>
+#include <ophidian/util/Units.h>
 #include <ophidian/design/Design.h>
 #include <ophidian/design/DesignBuilder.h>
 #include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/entity_system/Property.h>
 
+#include "Model/forms.h"
 #include "view/canvas.h"
-#include "./Model/forms.h"
+#include "control/spatialindex.h"
+#include "view/drawablebatch.h"
 
 class MainController : public QObject
 {
@@ -65,12 +71,15 @@ public slots:
 
 signals:
     void changeCircuitBox(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+    void selectedCell(QString name, QString type, double x, double y, int worstSlack);
     void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
 
 private:
     void createQuads();
     // state?
     Canvas * mCanvas;
+    DrawableBatch  * mDrawable;
+    SpatialIndex mIndex;
 
     ophidian::design::Design * mDesign{nullptr};
     ophidian::design::DesignBuilder * mBuilder{nullptr};

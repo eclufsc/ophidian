@@ -17,13 +17,15 @@ public:
     DrawableBatch(sf::PrimitiveType primitive, std::size_t numberOfVertices);
     ~DrawableBatch();
 
+    void clear();
+
     const sf::Vertex operator[](const std::size_t i) const;
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     void alloc(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
     void transform(const std::vector<Quad> & quads, const sf::Transform & trans);
-    void paint(const std::vector<Quad> & quads, const sf::Color & color);
+    void paint(const std::vector<Quad> & quads, const sf::Color color);
     void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);
 
     std::size_t vertexAmount() const;
@@ -36,7 +38,7 @@ public:
     // ??? entity_system::entity create();
     // ??? void destroy(entity_system::entity the_entity);
     // ??? void update();
-    // ??? void clear();
+
 
 private:
     std::size_t mNumberOfVertices{4};

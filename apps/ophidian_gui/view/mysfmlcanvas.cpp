@@ -5,6 +5,7 @@ MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
     mCameraView(sf::FloatRect(0, 0, 51599.25, 34200.0))
 {
     mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
+    mCameraView.setSize(mCameraView.getSize().x, -mCameraView.getSize().y);
 }
 
 void MySFMLCanvas::setController(MainController & controller)
@@ -19,6 +20,11 @@ void MySFMLCanvas::resizeEvent(QResizeEvent *e)
 
 MySFMLCanvas::~MySFMLCanvas()
 {
+}
+
+void MySFMLCanvas::setSize(ophidian::geometry::Point size)
+{
+    mCameraView.setSize(size.x(), size.y());
 }
 
 Canvas * MySFMLCanvas::canvas()

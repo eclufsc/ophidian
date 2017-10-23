@@ -25,6 +25,8 @@ public:
 
     Canvas * canvas();
 
+    void setSize(ophidian::geometry::Point size);
+
     void OnInit();
     void OnUpdate();
     void wheelEvent(QWheelEvent * e);

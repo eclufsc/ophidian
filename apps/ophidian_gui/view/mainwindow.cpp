@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Connecting signals */
     QObject::connect(&mMainController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
                      this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
+    QObject::connect(&mMainController, SIGNAL(selectedCell(QString, QString, double, double, int)),
+                     this, SLOT(on_selected_cellChanged(QString, QString, double, double, int)));
 }
 
 MainWindow::~MainWindow()
@@ -45,6 +47,13 @@ void MainWindow::on_circuit_labelsChanged(QString name, size_t die, size_t cells
     ui->circuitNets_2->setText(QString::number(nets));
 
     ui->MyCanvas->reserveMinimumOfQuads(cells);
-    emit update();
 }
 
+void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack)
+{
+    ui->selectedCellName_2->setText(name);
+    ui->selectedCellType_2->setText(type);
+    ui->selectedCell_x_2->setText(QString::number(x));
+    ui->selectedCell_y_2->setText(QString::number(y));
+    ui->selectedCellWSlack_2->setText(QString::number(worstSlack));
+}

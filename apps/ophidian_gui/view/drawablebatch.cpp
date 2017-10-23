@@ -17,6 +17,11 @@ DrawableBatch::~DrawableBatch()
 
 }
 
+void DrawableBatch::clear()
+{
+    mVertices.clear();
+}
+
 void DrawableBatch::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
     mVertices.reserve(minimumOfQuads);
@@ -41,6 +46,7 @@ void DrawableBatch::alloc(Quad & quad, const ophidian::geometry::Point p1, const
     newVertices[2].position = sf::Vector2f(p3.x(), p3.y());
     newVertices[3].position = sf::Vector2f(p4.x(), p4.y());
 
+    /*
     sf::Color color;
     switch (quad.mId % 4) {
     case 0:
@@ -63,6 +69,7 @@ void DrawableBatch::alloc(Quad & quad, const ophidian::geometry::Point p1, const
     newVertices[1].color = color;
     newVertices[2].color = color;
     newVertices[3].color = color;
+    */
 
     mVertices.push_back(newVertices);
 }
@@ -80,11 +87,11 @@ void DrawableBatch::transform(const std::vector<Quad> &quads, const sf::Transfor
 }
 
 
-void DrawableBatch::paint(const std::vector<Quad> &quads, const sf::Color & color)
+void DrawableBatch::paint(const std::vector<Quad> & quads, const sf::Color color)
 {
     for (const Quad & q : quads)
     {
-        auto box = mVertices[q.mId];
+        std::array<sf::Vertex, 4> & box = mVertices[q.mId];
         for (sf::Vertex & v : box)
         {
             v.color = color;

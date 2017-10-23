@@ -6,6 +6,7 @@
 class Quad {
 public:
     Quad();
+    explicit Quad(ophidian::circuit::Cell &cell);
 
     ophidian::circuit::Cell mCell;
     uint32_t mId;
