@@ -11,6 +11,11 @@ Canvas::~Canvas()
 
 }
 
+void Canvas::clear()
+{
+    mQuads.clear();
+}
+
 void Canvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
     mQuads.reserveMinimumOfQuads(minimumOfQuads);

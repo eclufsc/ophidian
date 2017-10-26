@@ -78,7 +78,6 @@ private:
     void createQuads();
     // state?
     Canvas * mCanvas;
-    DrawableBatch  * mDrawable;
     SpatialIndex mIndex;
 
     ophidian::design::Design * mDesign{nullptr};

@@ -13,7 +13,6 @@ MainController::~MainController()
 void MainController::setCanvas(Canvas * canvas)
 {
     mCanvas = canvas;
-    mDrawable = mCanvas->drawableQuads();
 }
 
 void MainController::buildICCAD2017(std::string lef, std::string def, std::string verilog)
@@ -26,7 +25,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     if (mBuilder != nullptr)
     {
         delete mBuilder;
-        mDrawable->clear();
+        mCanvas->clear();
     }
 
     /* Building */
@@ -75,6 +74,8 @@ void MainController::createQuads()
 {
     //const double rowHeight = units::unit_cast<double>(mDesign->floorplan().rowUpperRightCorner(*mDesign->floorplan().rowsRange().begin()).y());
 
+    DrawableBatch * drawable = mCanvas->drawableQuads();
+
 
     sf::Transform mirror;
     mirror.scale(1.0, -1.0);
@@ -95,19 +96,19 @@ void MainController::createQuads()
             ophidian::geometry::Point p3((*cellBoxIt).max_corner().x(), (*cellBoxIt).max_corner().y());
             ophidian::geometry::Point p4((*cellBoxIt).min_corner().x(), (*cellBoxIt).max_corner().y());
 
-            mDrawable->alloc(quad, p1, p2, p3, p4);
+            drawable->alloc(quad, p1, p2, p3, p4);
             mIndex.quadCreate(quad, *cellBoxIt);
 
             boxs.push_back(quad);
         }
 
         mQuads[*cellIt] = boxs;
-        mDrawable->transform(boxs, mirror);
+        drawable->transform(boxs, mirror);
 
         if (boxs.size() > 1) {
-            mDrawable->paint(boxs, sf::Color::Blue);
+            drawable->paint(boxs, sf::Color::Blue);
         } else {
-            mDrawable->paint(boxs, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
+            drawable->paint(boxs, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
         }
 
     }

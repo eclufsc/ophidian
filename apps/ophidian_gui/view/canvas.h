@@ -10,6 +10,8 @@ class Canvas : public sf::Drawable
 public:
     Canvas();
     virtual ~Canvas();
+
+    void clear();
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
