@@ -129,8 +129,8 @@ void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
     mCanvas.reserveMinimumOfQuads(minimumOfQuads);
 }
 
-void MySFMLCanvas::allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
-{
-    mCanvas.allocQuad(quad, p1, p2, p3, p4);
-}
+//void MySFMLCanvas::allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
+//{
+//    mCanvas.allocQuad(quad, p1, p2, p3, p4);
+//}
 

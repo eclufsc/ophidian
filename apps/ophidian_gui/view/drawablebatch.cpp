@@ -36,15 +36,16 @@ const sf::Vertex DrawableBatch::operator[](const std::size_t i) const
     return reinterpret_cast<const sf::Vertex*>(mVertices.data())[i];
 }
 
-void DrawableBatch::alloc(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
+void DrawableBatch::alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points)
 {
     quad.mId = mVertices.size();
 
     std::array<sf::Vertex, 4> newVertices;
-    newVertices[0].position = sf::Vector2f(p1.x(), p1.y());
-    newVertices[1].position = sf::Vector2f(p2.x(), p2.y());
-    newVertices[2].position = sf::Vector2f(p3.x(), p3.y());
-    newVertices[3].position = sf::Vector2f(p4.x(), p4.y());
+
+    for (auto i = 0; i < 4; ++i)
+    {
+        newVertices[i].position = sf::Vector2f(points[i].x(), points[i].y());
+    }
 
     /*
     sf::Color color;

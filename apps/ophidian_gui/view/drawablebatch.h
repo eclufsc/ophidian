@@ -11,6 +11,7 @@
 
 #include "./Model/forms.h"
 
+
 class DrawableBatch : public sf::Drawable
 {
 public:
@@ -23,7 +24,7 @@ public:
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    void alloc(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
+    void alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points);
     void transform(const std::vector<Quad> & quads, const sf::Transform & trans);
     void paint(const std::vector<Quad> & quads, const sf::Color color);
     void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);

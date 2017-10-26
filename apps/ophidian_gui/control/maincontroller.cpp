@@ -41,7 +41,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
 
     /* Saying to MainWindow display the information */
-    emit changeCircuitBox("test", 1, cells, pins, nets);
+    emit on_circuit_labelsChanged("test", 1, cells, pins, nets);
 
     createQuads();
 }
@@ -53,10 +53,10 @@ void MainController::mousePress(const ophidian::geometry::Point &p)
     if (mIndex.hasQuad(p))
     {
         Quad quad = mIndex.quadContaining(p);
-        std::string name = mDesign->netlist().name(quad.mCell);
-        //std::string type_maybe = mDesign->standardCells().name(quad.mCell);
-        ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mCell).toPoint();
-        emit selectedCell(QString::fromStdString(name), QString::fromStdString(name), origin.x(), origin.y(), 0);
+        std::string name = mDesign->netlist().name(quad.mEntity);
+        //std::string type_maybe = mDesign->standardCells().name(quad.mEntity);
+        ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mEntity).toPoint();
+        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(name), origin.x(), origin.y(), 0);
     }
 }
 
@@ -89,14 +89,16 @@ void MainController::createQuads()
         for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++)
         {
             Quad quad;
-            quad.mCell = *cellIt;
+            std::vector<ophidian::geometry::Point> points;
 
-            ophidian::geometry::Point p1((*cellBoxIt).min_corner().x(), (*cellBoxIt).min_corner().y());
-            ophidian::geometry::Point p2((*cellBoxIt).max_corner().x(), (*cellBoxIt).min_corner().y());
-            ophidian::geometry::Point p3((*cellBoxIt).max_corner().x(), (*cellBoxIt).max_corner().y());
-            ophidian::geometry::Point p4((*cellBoxIt).min_corner().x(), (*cellBoxIt).max_corner().y());
+            quad.mEntity = *cellIt;
 
-            drawable->alloc(quad, p1, p2, p3, p4);
+            points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).min_corner().y()) );
+            points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).min_corner().y()) );
+            points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).max_corner().y()) );
+            points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).max_corner().y()) );
+
+            drawable->alloc(quad, points);
             mIndex.quadCreate(quad, *cellBoxIt);
 
             boxs.push_back(quad);

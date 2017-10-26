@@ -42,8 +42,8 @@ public:
 public slots:
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
 
-private slots:
-    void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
+//private slots:
+//    void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
 
 private:
     MainController * mMainController;

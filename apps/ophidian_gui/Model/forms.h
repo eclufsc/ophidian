@@ -3,15 +3,33 @@
 
 #include <ophidian/circuit/Netlist.h>
 
-class Quad {
+template<typename T>
+class Form
+{
+public:
+    Form(T & entity) :
+        mEntity(entity)
+    {
+
+    }
+    explicit Form()
+    {
+
+    }
+
+    bool operator==(const Form<T> & o) const
+    {
+        mEntity == o.mEntity;
+    }
+
+    T mEntity;
+    uint32_t mId;
+};
+
+class Quad : public Form<ophidian::circuit::Cell> {
 public:
     Quad();
     explicit Quad(ophidian::circuit::Cell &cell);
-
-    ophidian::circuit::Cell mCell;
-    uint32_t mId;
-
-    bool operator==(const Quad & o) const;
 };
 
 #endif // FORMS_H

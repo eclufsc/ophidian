@@ -9,9 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
-    QObject::connect(&mMainController, SIGNAL(changeCircuitBox(QString, size_t, size_t, size_t, size_t)),
+    QObject::connect(&mMainController, SIGNAL(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)),
                      this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
-    QObject::connect(&mMainController, SIGNAL(selectedCell(QString, QString, double, double, int)),
+    QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, int)),
                      this, SLOT(on_selected_cellChanged(QString, QString, double, double, int)));
 }
 
