@@ -1,7 +1,7 @@
 #include "canvas.h"
 
 Canvas::Canvas() :
-    mQuads(sf::Quads, 4)
+    mQuads(sf::Quads)
 {
 
 }
@@ -21,7 +21,7 @@ void Canvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
     mQuads.reserveMinimumOfQuads(minimumOfQuads);
 }
 
-DrawableBatch * Canvas::drawableQuads()
+DrawableBatch<4> * Canvas::drawableQuads()
 {
     return &mQuads;
 }

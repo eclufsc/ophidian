@@ -74,7 +74,7 @@ void MainController::createQuads()
 {
     //const double rowHeight = units::unit_cast<double>(mDesign->floorplan().rowUpperRightCorner(*mDesign->floorplan().rowsRange().begin()).y());
 
-    DrawableBatch * drawable = mCanvas->drawableQuads();
+    DrawableBatch<4> * drawable = mCanvas->drawableQuads();
 
 
     sf::Transform mirror;
