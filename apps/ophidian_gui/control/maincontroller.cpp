@@ -40,8 +40,14 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     size_t pins = mDesign->netlist().size(ophidian::circuit::Pin());
     size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
 
+    ophidian::geometry::Point chipUpper = mDesign->floorplan().chipUpperRightCorner().toPoint();
+
+    std::stringstream concat;
+    concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
+    std::string dieArea = concat.str();
+
     /* Saying to MainWindow display the information */
-    emit on_circuit_labelsChanged("test", 1, cells, pins, nets);
+    emit on_circuit_labelsChanged("test", QString::fromStdString(dieArea), cells, pins, nets);
 
     createQuads();
 }
@@ -50,13 +56,19 @@ void MainController::mousePress(const ophidian::geometry::Point &p)
 {
     //mState->mouse_press(p);
     //std::cout << mIndex.hasQuad(p) << std::endl;
+    std::string name = "";
+    std::string type = "";
+
     if (mIndex.hasQuad(p))
     {
         Quad quad = mIndex.quadContaining(p);
-        std::string name = mDesign->netlist().name(quad.mEntity);
-        //std::string type_maybe = mDesign->standardCells().name(quad.mEntity);
-        ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mEntity).toPoint();
-        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(name), origin.x(), origin.y(), 0);
+        name = mDesign->netlist().name(quad.mCell);
+        type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(quad.mCell) );
+        ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mCell).toPoint();
+        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), origin.x(), origin.y(), 0);
+    } else
+    {
+        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), p.x(), p.y(), 0);
     }
 }
 
@@ -82,7 +94,9 @@ void MainController::createQuads()
 
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
     {
-        std::vector<Quad> boxs;
+
+        std::vector<Quad> quads;
+        std::vector<Form> forms;
 
         ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(*cellIt);
 
@@ -91,7 +105,7 @@ void MainController::createQuads()
             Quad quad;
             std::vector<ophidian::geometry::Point> points;
 
-            quad.mEntity = *cellIt;
+            quad.mCell = *cellIt;
 
             points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).min_corner().y()) );
             points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).min_corner().y()) );
@@ -101,16 +115,17 @@ void MainController::createQuads()
             drawable->alloc(quad, points);
             mIndex.quadCreate(quad, *cellBoxIt);
 
-            boxs.push_back(quad);
+            forms.push_back(quad);
+            quads.push_back(quad);
         }
 
-        mQuads[*cellIt] = boxs;
-        drawable->transform(boxs, mirror);
+        mQuads[*cellIt] = quads;
+        drawable->transform(forms, mirror);
 
-        if (boxs.size() > 1) {
-            drawable->paint(boxs, sf::Color::Blue);
+        if (forms.size() > 1) {
+            drawable->paint(forms, sf::Color::Blue);
         } else {
-            drawable->paint(boxs, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
+            drawable->paint(forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
         }
 
     }

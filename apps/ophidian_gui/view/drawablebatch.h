@@ -24,15 +24,15 @@ public:
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    void alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points);
-    void transform(const std::vector<Quad> & quads, const sf::Transform & trans);
-    void paint(const std::vector<Quad> & quads, const sf::Color color);
-    void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);
+    void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
+    void transform(const std::vector<Form> & forms, const sf::Transform & trans);
+    void paint(const std::vector<Form> & forms, const sf::Color color);
+    void setPoint(const Form & form, std::size_t i, ophidian::geometry::Point & p);
 
     std::size_t vertexAmount() const;
 
-    ophidian::geometry::Point point(const Quad & quad, std::size_t i) const;
-    const std::array<sf::Vertex, NumberOfVertices> & points(const Quad & quad) const;
+    ophidian::geometry::Point point(const Form & form, std::size_t i) const;
+    const std::array<sf::Vertex, NumberOfVertices> & points(const Form & form) const;
 
     // ??? bool has_animation() const;
     // ... void animate(batch_animation * animation);
@@ -91,9 +91,9 @@ const sf::Vertex DrawableBatch<NumberOfVertices>::operator[](const std::size_t i
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points)
+void DrawableBatch<NumberOfVertices>::alloc(Form & form, const std::vector<ophidian::geometry::Point> & points)
 {
-    quad.mId = mVertices.size();
+    form.mId = mVertices.size();
 
     std::array<sf::Vertex, NumberOfVertices> newVertices;
 
@@ -131,9 +131,9 @@ void DrawableBatch<NumberOfVertices>::alloc(Quad & quad, const std::vector<ophid
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::transform(const std::vector<Quad> &quads, const sf::Transform & trans)
+void DrawableBatch<NumberOfVertices>::transform(const std::vector<Form> &forms, const sf::Transform & trans)
 {
-    for (const Quad & q : quads)
+    for (const Form & q : forms)
     {
         auto box = mVertices[q.mId];
         for (sf::Vertex & v : box)
@@ -144,9 +144,9 @@ void DrawableBatch<NumberOfVertices>::transform(const std::vector<Quad> &quads, 
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::paint(const std::vector<Quad> & quads, const sf::Color color)
+void DrawableBatch<NumberOfVertices>::paint(const std::vector<Form> & forms, const sf::Color color)
 {
-    for (const Quad & q : quads)
+    for (const Form & q : forms)
     {
         std::array<sf::Vertex, NumberOfVertices> & box = mVertices[q.mId];
         for (sf::Vertex & v : box)
@@ -157,15 +157,15 @@ void DrawableBatch<NumberOfVertices>::paint(const std::vector<Quad> & quads, con
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p)
+void DrawableBatch<NumberOfVertices>::setPoint(const Form & form, std::size_t i, ophidian::geometry::Point & p)
 {
-    mVertices[quad.mId][i].position = sf::Vector2f(p.x(), p.y());
+    mVertices[form.mId][i].position = sf::Vector2f(p.x(), p.y());
 }
 
 template<std::size_t NumberOfVertices>
-ophidian::geometry::Point DrawableBatch<NumberOfVertices>::point(const Quad & quad, std::size_t i) const
+ophidian::geometry::Point DrawableBatch<NumberOfVertices>::point(const Form & form, std::size_t i) const
 {
-    auto & verticesQuad = mVertices[quad.mId];
+    auto & verticesQuad = mVertices[form.mId];
     return ophidian::geometry::Point(verticesQuad[i].position.x, verticesQuad[i].position.y);
 }
 
@@ -176,9 +176,9 @@ std::size_t DrawableBatch<NumberOfVertices>::vertexAmount() const
 }
 
 template<std::size_t NumberOfVertices>
-const std::array<sf::Vertex, NumberOfVertices> & DrawableBatch<NumberOfVertices>::points(const Quad & quad) const
+const std::array<sf::Vertex, NumberOfVertices> & DrawableBatch<NumberOfVertices>::points(const Form & form) const
 {
-    return mVertices[quad.mId];
+    return mVertices[form.mId];
 }
 
 /*

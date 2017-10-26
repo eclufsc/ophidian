@@ -28,7 +28,7 @@ private slots:
 
     void on_actionQuit_triggered();
 
-    void on_circuit_labelsChanged(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+    void on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
 
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
 

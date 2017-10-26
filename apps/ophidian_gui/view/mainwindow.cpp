@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
-    QObject::connect(&mMainController, SIGNAL(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)),
-                     this, SLOT(on_circuit_labelsChanged(QString, size_t, size_t, size_t, size_t)));
+    QObject::connect(&mMainController, SIGNAL(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)),
+                     this, SLOT(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)));
     QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, int)),
                      this, SLOT(on_selected_cellChanged(QString, QString, double, double, int)));
 }
@@ -38,10 +38,10 @@ void MainWindow::on_actionQuit_triggered()
     QCoreApplication::quit();
 }
 
-void MainWindow::on_circuit_labelsChanged(QString name, size_t die, size_t cells, size_t pins, size_t nets)
+void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets)
 {
     ui->circuitName_2->setText(name);
-    ui->circuitDieArea_2->setText(QString::number(die));
+    ui->circuitDieArea_2->setText(die);
     ui->circuitCells_2->setText(QString::number(cells));
     ui->circuitPins_2->setText(QString::number(pins));
     ui->circuitNets_2->setText(QString::number(nets));
@@ -55,5 +55,5 @@ void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, 
     ui->selectedCellType_2->setText(type);
     ui->selectedCell_x_2->setText(QString::number(x));
     ui->selectedCell_y_2->setText(QString::number(y));
-    ui->selectedCellWSlack_2->setText(QString::number(worstSlack));
+    // ui->selectedCellWSlack_2->setText(QString::number(worstSlack)); //!< Not displaying
 }

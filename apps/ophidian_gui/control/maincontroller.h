@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <QObject>
 
+#include <sstream>
+#include <string>
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -70,7 +73,7 @@ public slots:
      */
 
 signals:
-    void on_circuit_labelsChanged(QString name, size_t die, size_t cells, size_t pins, size_t nets);
+    void on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
     void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
 
