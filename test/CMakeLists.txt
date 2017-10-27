@@ -14,10 +14,6 @@ file(GLOB_RECURSE ophidian_run_tests_source
     "*.cpp"
 )
 
-# Add Catch lib interface
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE .)
-
 # Add test target
 add_executable(ophidian_tests ${ophidian_run_tests_source})
 

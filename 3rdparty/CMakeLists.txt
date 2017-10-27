@@ -14,6 +14,9 @@ execute_process(
     RESULT_VARIABLE submodule_init_exit_code
 )
 
+# Add Catch
+add_subdirectory(catch)
+
 # This is needed since Flute is statcly built
 add_subdirectory(Flute)
 
