@@ -2,11 +2,11 @@
 # This is the main CMakeLists file for the Ophidian library. 
 #
 # Its main goals are:
-#   - set up global variables.
-#   - configure Ophidian compilation requirements (find_packege)
-#   - handle Ophidian compilation logic 
-#   - set up the global include directories
-#   - add subdirectories
+#   - Set up global variables.
+#   - Configure Ophidian dependencies (find_packege).
+#   - Handle Ophidian compilation logic. 
+#   - Add subdirectories.
+#
 ################################################################################
 
 ################################################################################
@@ -39,6 +39,9 @@ set(lemon_include_dir
     ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
 )
 
+# Set the global include directories
+include_directories(${lemon_include_dir})
+
 ################################################################################
 # Set up installation variables
 ################################################################################
@@ -53,7 +56,7 @@ set(ophidian_install_lib_dir lib)
 set(ophidian_install_bin_dir bin)
 
 # Set ophidian include install path
-set(ophidian_install_include_dir include/ophidian)
+set(ophidian_install_include_dir include)
 
 ################################################################################
 # Handle raquirements
@@ -78,9 +81,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 
 # Set option build shared libs
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
-
-# Set the global include directories
-include_directories(${ophidian_include_dir})
 
 # First add 3rdparty software to build
 add_subdirectory(3rdparty)

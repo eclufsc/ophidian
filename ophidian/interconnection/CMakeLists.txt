@@ -5,11 +5,14 @@
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_interconnection_install_include_dir 
-    ${ophidian_install_include_dir}/interconnection
+    ${ophidian_install_include_dir}/ophidian/interconnection
 )
 
 ################################################################################
@@ -43,11 +46,11 @@ file(GLOB ophidian_interconnection_headers
 add_library(ophidian_interconnection ${ophidian_interconnection_source})
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_interconnection PUBLIC 
-    flute 
-    pthread 
-    lemon
-    ophidian_geometry
+target_link_libraries(ophidian_interconnection
+    PUBLIC ophidian_geometry
+    PUBLIC flute 
+    PUBLIC pthread 
+    PUBLIC lemon
 )
 
 # Tell cmake the path to look for include files for this target
@@ -66,6 +69,7 @@ target_include_directories(ophidian_interconnection PUBLIC
 install(
     TARGETS ophidian_interconnection 
     DESTINATION ${ophidian_install_lib_dir}
+    EXPORT ophidian
 )
 
 # Install rule for headers

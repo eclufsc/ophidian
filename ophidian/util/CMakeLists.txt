@@ -1,15 +1,18 @@
 ################################################################################
 # This is the CMakeLists file for the:
 #
-#   namespace ophidian::util 
+#   namespace ophidian::util
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_util_install_include_dir 
-    ${ophidian_install_include_dir}/util
+    ${ophidian_install_include_dir}/ophidian/util
 )
 
 ################################################################################
@@ -26,7 +29,7 @@ set(ophidian_util_install_include_dir
 ################################################################################
 
 # Fetch .h files for library creation
-file(GLOB ophidian_timing_headers
+file(GLOB ophidian_util_headers
     "*.h"
 )
 
@@ -35,12 +38,17 @@ file(GLOB ophidian_timing_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_util INTERFACE ophidian_timing_headers)
+add_library(ophidian_util INTERFACE)
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_util
+    INTERFACE units
+)
 
 # Tell cmake the path to look for include files for this target
 # This is transitive, so any targets linked with this one will
 # search for headers in the respective paths
-target_include_directories(ophidian_util PUBLIC
+target_include_directories(ophidian_util INTERFACE
     $<BUILD_INTERFACE:      ${ophidian_source_dir}>
     $<INSTALL_INTERFACE:    include>
 )
@@ -51,6 +59,6 @@ target_include_directories(ophidian_util PUBLIC
 
 # Install rule for headers
 install(
-    FILES ${ophidian_timing_headers} 
+    FILES ${ophidian_util_headers} 
     DESTINATION ${ophidian_util_install_include_dir}
 )

@@ -5,11 +5,14 @@
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_design_install_include_dir 
-    ${ophidian_install_include_dir}/design
+    ${ophidian_install_include_dir}/ophidian/design
 )
 
 ################################################################################
@@ -43,12 +46,12 @@ file(GLOB ophidian_design_headers
 add_library(ophidian_design ${ophidian_design_source})
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_design PUBLIC 
-    ophidian_circuit 
-    ophidian_floorplan 
-    ophidian_standard_cell 
-    ophidian_placement 
-    ophidian_parser
+target_link_libraries(ophidian_design
+    PUBLIC ophidian_circuit 
+    PUBLIC ophidian_floorplan 
+    PUBLIC ophidian_standard_cell 
+    PUBLIC ophidian_placement 
+    PUBLIC ophidian_parser
 )
 
 # Tell cmake the path to look for include files for this target
@@ -67,6 +70,7 @@ target_include_directories(ophidian_design PUBLIC
 install(
     TARGETS ophidian_design 
     DESTINATION ${ophidian_install_lib_dir}
+    EXPORT ophidian
 )
 
 # Install rule for headers

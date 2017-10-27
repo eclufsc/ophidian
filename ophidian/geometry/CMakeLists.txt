@@ -5,11 +5,14 @@
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_geometry_install_include_dir 
-    ${ophidian_install_include_dir}/geometry
+    ${ophidian_install_include_dir}/ophidian/geometry
 )
 
 ################################################################################
@@ -58,7 +61,8 @@ target_include_directories(ophidian_geometry PUBLIC
 install(
     TARGETS ophidian_geometry 
     DESTINATION ${ophidian_install_lib_dir}
-)
+    EXPORT ophidian
+) 
 
 # Install rule for headers
 install(

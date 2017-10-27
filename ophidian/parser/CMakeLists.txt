@@ -5,11 +5,14 @@
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_parser_install_include_dir 
-    ${ophidian_install_include_dir}/parser
+    ${ophidian_install_include_dir}/ophidian/parser
 )
 
 ################################################################################
@@ -39,17 +42,15 @@ file(GLOB ophidian_parser_headers
 # Library target
 ################################################################################
 
-#link_directories(${third_party_source_dir}/DEF/lib)
-#link_directories(${third_party_source_dir}/LEF/lib)
-
 # Add library target
 add_library(ophidian_parser ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_parser PUBLIC 
-    LEF
-    DEF
-    verilogparser
+target_link_libraries(ophidian_parser
+    PUBLIC ophidian_util
+    PUBLIC verilogparser
+    PRIVATE DEF
+    PRIVATE LEF
 )
 
 # Tell cmake the path to look for include files for this target
@@ -68,6 +69,7 @@ target_include_directories(ophidian_parser PUBLIC
 install(
     TARGETS ophidian_parser 
     DESTINATION ${ophidian_install_lib_dir}
+    EXPORT ophidian
 )
 
 # Install rule for headers

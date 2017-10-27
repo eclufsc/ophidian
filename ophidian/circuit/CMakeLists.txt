@@ -5,11 +5,14 @@
 #
 # Its main goals are:
 #   - Fetch library files.
-#   - Add compilation target.
-#   - Add target specific include paths.
-#   - Add compilation target dependencies. 
-#       `-(this is a must due to telling cmake what should it compile fisrt).
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
 #   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
 ################################################################################
 
 ################################################################################
@@ -18,7 +21,7 @@
 
 # Set the include path for installed target
 set(ophidian_circuit_install_include_dir 
-    ${ophidian_install_include_dir}/circuit
+    ${ophidian_install_include_dir}/ophidian/circuit
 )
 
 ################################################################################
@@ -43,10 +46,10 @@ file(GLOB ophidian_circuit_headers
 add_library(ophidian_circuit ${ophidian_circuit_source})
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_circuit PUBLIC 
-    ophidian_entity_system 
-    ophidian_parser 
-    ophidian_standard_cell
+target_link_libraries(ophidian_circuit
+    PUBLIC ophidian_entity_system 
+    PUBLIC ophidian_parser 
+    PUBLIC ophidian_standard_cell
 )
 
 # Tell cmake the path to look for include files for this target
@@ -65,6 +68,7 @@ target_include_directories(ophidian_circuit PUBLIC
 install(
     TARGETS ophidian_circuit 
     DESTINATION ${ophidian_install_lib_dir}
+    EXPORT ophidian
 )
 
 # Install rule for headers
