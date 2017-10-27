@@ -32,8 +32,6 @@ target_link_libraries(ophidian_tests PUBLIC
     ophidian_timing 
 )
 
-install(TARGETS ophidian_tests DESTINATION ${ophidian_install_bin_dir})
-
 ################################################################################
 # Prepare test input environment. 
 ################################################################################
