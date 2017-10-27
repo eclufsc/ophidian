@@ -20,7 +20,7 @@
 #ifndef OPHIDIAN_TIMING_OPENTIMER_H
 #define OPHIDIAN_TIMING_OPENTIMER_H
 
-#include <OpenTimer/ot_timer.h>
+#include <ot_timer.h>
 
 namespace ophidian
 {
