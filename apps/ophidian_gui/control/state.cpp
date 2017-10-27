@@ -62,18 +62,16 @@ Idle::Idle(MySFMLCanvas * SFMLCanvas, MainController * controller) :
 
 void Idle::mousePressEvent(QMouseEvent * e)
 {
-    /*ophidian::geometry::Point pixelCoord(e->pos().x(), e->pos().y());
+    ophidian::geometry::Point pixelCoord(e->pos().x(), e->pos().y());
     // ??? ophidian::geometry::Point viewCoord{m_canvas->mapPixelToCamera(pixelCoord)};
-    bool hasQuad{m_canvas->hasQuad(viewCoord)};
-    qDebug() << "canvas_states::idle::mousePressEvent() " << viewCoord.x << ", " << viewCoord.y;
-    if(hasQuad)
+    if(mMainController->hasQuad(pixelCoord))
     {
-        if(m_canvas->isFixed(m_canvas->quadAt(viewCoord)))
-            m_canvas->state(new selected(m_canvas, m_canvas->quadAt(viewCoord)));
-        else
-            m_canvas->state(new dragging(m_canvas, viewCoord));
-        delete this;
-    }*/
+        //if(m_canvas->isFixed(m_canvas->quadAt(viewCoord)))
+            //mSFMLCanvas->state(new selected(mSFMLCanvas, mMainController, mMainController->quadAt(pixelCoord)));
+        //else
+        //    m_canvas->state(new dragging(m_canvas, viewCoord));
+        //delete this;
+    }
 }
 
 Selected::Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad) :

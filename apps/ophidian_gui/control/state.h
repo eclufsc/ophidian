@@ -45,7 +45,7 @@ public:
 
 class Selected : public State
 {
-    //wire_quad m_wirequad;
+    WireQuad mWireQuad;
     Quad mQuad;
 public:
     Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad);

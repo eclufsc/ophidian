@@ -16,9 +16,26 @@ public:
 
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
 
-
     DrawableBatch<4> * drawableQuads();
-    // DrawableBatch<2> * drawableLines();
+    DrawableBatch<2> * drawableLines();
+
+    /* Quads */
+    void alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points);
+    void transform(Quad, const std::vector<Form> & quads, const sf::Transform & trans);
+    void paint(Quad, const std::vector<Form> & quads, const sf::Color color);
+    void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);
+
+    /* Lines */
+    void alloc(Line & line, const std::vector<ophidian::geometry::Point> & points);
+    void transform(Line, const std::vector<Form> & lines, const sf::Transform & trans);
+    void paint(Line, const std::vector<Form> & lines, const sf::Color color);
+    void setPoint(const Line & line, std::size_t i, ophidian::geometry::Point & p);
+
+    /* WireQuads */
+    WireQuad createWireQuad(const std::vector<Quad> & quads);
+
+
+
 
     /*
     void allocQuad(Quad & quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);

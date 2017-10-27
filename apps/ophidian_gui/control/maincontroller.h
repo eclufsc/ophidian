@@ -40,7 +40,10 @@ public:
     void mouseMove(const ophidian::geometry::Point & p);
     void mouseRelease();
 
-    //bool hasQuad(const ophidian::geometry::Point & p);
+    bool hasQuad(const ophidian::geometry::Point & p);
+    Quad quadAt(const ophidian::geometry::Point & p);
+
+    std::vector<Quad> quadsCell(const ophidian::circuit::Cell & cell);
 
 public slots:
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);
@@ -87,7 +90,7 @@ private:
 
     ophidian::design::Design * mDesign{nullptr};
     ophidian::design::DesignBuilder * mBuilder{nullptr};
-    ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mQuads;
+    ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mCellToQuads;
 };
 
 #endif // MAINCONTROLLER_H

@@ -13,6 +13,11 @@ void MySFMLCanvas::setController(MainController & controller)
     mMainController = &controller;
 }
 
+void MySFMLCanvas::setState(State * state)
+{
+    mState = state;
+}
+
 void MySFMLCanvas::resizeEvent(QResizeEvent *e)
 {
     sf::RenderWindow::create((sf::WindowHandle) winId());

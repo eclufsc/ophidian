@@ -33,7 +33,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     mDesign = &mBuilder->build();
 
     /* Creating property Cells to Quads */
-    mQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(ophidian::circuit::Cell());
+    mCellToQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(ophidian::circuit::Cell());
 
     /* Getting information of netlist */
     size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
@@ -86,8 +86,7 @@ void MainController::createQuads()
 {
     //const double rowHeight = units::unit_cast<double>(mDesign->floorplan().rowUpperRightCorner(*mDesign->floorplan().rowsRange().begin()).y());
 
-    DrawableBatch<4> * drawable = mCanvas->drawableQuads();
-
+    //DrawableBatch<4> * drawable = mCanvas->drawableQuads();
 
     sf::Transform mirror;
     mirror.scale(1.0, -1.0);
@@ -112,21 +111,36 @@ void MainController::createQuads()
             points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).max_corner().y()) );
             points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).max_corner().y()) );
 
-            drawable->alloc(quad, points);
+            mCanvas->alloc(quad, points);
             mIndex.quadCreate(quad, *cellBoxIt);
 
             forms.push_back(quad);
             quads.push_back(quad);
         }
 
-        mQuads[*cellIt] = quads;
-        //drawable->transform(forms, mirror);
+        mCellToQuads[*cellIt] = quads;
+        mCanvas->transform(Quad(), forms, mirror);
 
         if (forms.size() > 1) {
-            drawable->paint(forms, sf::Color::Blue);
+            mCanvas->paint(Quad(), forms, sf::Color::Blue);
         } else {
-            drawable->paint(forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
+            mCanvas->paint(Quad(), forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
         }
 
     }
+}
+
+bool MainController::hasQuad(const ophidian::geometry::Point & p)
+{
+    return mIndex.hasQuad(p);
+}
+
+Quad MainController::quadAt(const ophidian::geometry::Point & p)
+{
+    return mIndex.quadContaining(p);
+}
+
+std::vector<Quad> MainController::quadsCell(const ophidian::circuit::Cell & cell)
+{
+    return mCellToQuads[cell];
 }

@@ -12,6 +12,7 @@
 #include "qsfmlcanvas.h"
 #include "canvas.h"
 #include "control/maincontroller.h"
+#include "control/state.h"
 
 using namespace qsfml;
 
@@ -26,6 +27,7 @@ public:
     Canvas * canvas();
 
     void setSize(ophidian::geometry::Point size);
+    void setState(State * state);
 
     void OnInit();
     void OnUpdate();
@@ -48,6 +50,7 @@ public slots:
 private:
     MainController * mMainController;
     Canvas mCanvas;
+    State * mState;
     sf::View mCameraView;
 };
 

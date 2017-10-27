@@ -32,7 +32,7 @@ public:
     std::size_t vertexAmount() const;
 
     ophidian::geometry::Point point(const Form & form, std::size_t i) const;
-    const std::array<sf::Vertex, NumberOfVertices> & points(const Form & form) const;
+    std::array<sf::Vertex, NumberOfVertices> points(const Form & form) const;
 
     // ??? bool has_animation() const;
     // ... void animate(batch_animation * animation);
@@ -186,7 +186,7 @@ std::size_t DrawableBatch<NumberOfVertices>::vertexAmount() const
 }
 
 template<std::size_t NumberOfVertices>
-const std::array<sf::Vertex, NumberOfVertices> & DrawableBatch<NumberOfVertices>::points(const Form & form) const
+std::array<sf::Vertex, NumberOfVertices> DrawableBatch<NumberOfVertices>::points(const Form & form) const
 {
     return mVertices[form.mId];
 }
