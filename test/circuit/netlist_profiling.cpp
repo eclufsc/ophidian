@@ -1,4 +1,3 @@
-#include "netlist_profiling.h"
 #include <catch.hpp>
 
 #include <ophidian/circuit/Netlist.h>

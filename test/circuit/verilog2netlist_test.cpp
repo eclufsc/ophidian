@@ -1,4 +1,3 @@
-#include "verilog2netlist_test.h"
 #include <catch.hpp>
 
 #include <ophidian/circuit/Verilog2Netlist.h>

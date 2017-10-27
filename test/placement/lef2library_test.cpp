@@ -1,4 +1,3 @@
-#include "lef2library_test.h"
 #include <catch.hpp>
 
 #include <ophidian/placement/Lef2Library.h>

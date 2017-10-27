@@ -1,4 +1,3 @@
-#include "def2placement_test.h"
 #include <catch.hpp>
 
 #include <ophidian/placement/Def2Placement.h>

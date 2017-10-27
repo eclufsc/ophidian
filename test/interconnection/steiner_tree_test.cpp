@@ -1,4 +1,3 @@
-#include "steiner_tree_test.h"
 #include <catch.hpp>
 #include <ophidian/interconnection/SteinerTree.h>
 #include <ophidian/geometry/Distance.h>
