@@ -120,7 +120,7 @@ void MainController::createQuads()
         }
 
         mQuads[*cellIt] = quads;
-        drawable->transform(forms, mirror);
+        //drawable->transform(forms, mirror);
 
         if (forms.size() > 1) {
             drawable->paint(forms, sf::Color::Blue);

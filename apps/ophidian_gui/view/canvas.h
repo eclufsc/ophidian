@@ -18,6 +18,7 @@ public:
 
 
     DrawableBatch<4> * drawableQuads();
+    // DrawableBatch<2> * drawableLines();
 
     /*
     void allocQuad(Quad & quad, const ophidian::geometry::Point & p1, const ophidian::geometry::Point & p2, const ophidian::geometry::Point & p3, const ophidian::geometry::Point & p4);
@@ -44,7 +45,7 @@ public:
 
 private:
     DrawableBatch<4> mQuads;
-    //DrawPieces mQuads{sf::Quads, 4};
+    DrawableBatch<2> mLines;
 };
 
 #endif // CANVAS_H

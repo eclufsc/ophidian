@@ -53,12 +53,22 @@ template<std::size_t NumberOfVertices>
 DrawableBatch<NumberOfVertices>::DrawableBatch(sf::PrimitiveType primitive) :
     mPrimitive(primitive)
 {
-    std::array<sf::Vertex, NumberOfVertices> quad;
-    quad[0].position = sf::Vector2f(10, 10);
-    quad[1].position = sf::Vector2f(250, 10);
-    quad[2].position = sf::Vector2f(250, 250);
-    quad[3].position = sf::Vector2f(10, 250);
-    mVertices.push_back(quad);
+    std::array<sf::Vertex, NumberOfVertices> form;
+
+    if (mPrimitive == sf::Quads)
+    {
+        form[0].position = sf::Vector2f(10, 10);
+        form[1].position = sf::Vector2f(250, 10);
+        form[2].position = sf::Vector2f(250, 250);
+        form[3].position = sf::Vector2f(10, 250);
+    }
+    else
+    {
+        form[0].position = sf::Vector2f(10, 500);
+        form[1].position = sf::Vector2f(500, 500);
+    }
+
+    mVertices.push_back(form);
 }
 
 template<std::size_t NumberOfVertices>

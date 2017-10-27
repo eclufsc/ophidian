@@ -40,6 +40,8 @@ public:
     void mouseMove(const ophidian::geometry::Point & p);
     void mouseRelease();
 
+    //bool hasQuad(const ophidian::geometry::Point & p);
+
 public slots:
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);
     void buildICCAD2015(std::string lef, std::string def, std::string verilog);
