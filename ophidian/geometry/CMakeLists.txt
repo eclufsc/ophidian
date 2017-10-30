@@ -47,7 +47,7 @@ add_library(ophidian_geometry ${ophidian_geometry_source})
 
 # Add target dependencies
 target_link_libraries(ophidian_geometry
-    PUBLIC Boost::boost
+    PUBLIC boost
 )
 
 # Tell cmake the path to look for include files for this target
