@@ -38,7 +38,7 @@ include(ExternalProject)
 # Build LEF parser with the included Makefile
 ExternalProject_Add(
 	lef_parser
-    SOURCE_DIR ${third_party_source_dir}/LEF
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/LEF
 	# Empty CONFIGURE_COMMAND as the LEF parser has no configure file
 	CONFIGURE_COMMAND ""
     BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
@@ -47,13 +47,13 @@ ExternalProject_Add(
 )
 
 add_library(LEF INTERFACE)
-target_include_directories(LEF INTERFACE ${third_party_source_dir}/LEF/include)
-target_link_libraries(LEF INTERFACE ${third_party_source_dir}/LEF/lib/liblef.a)
+target_include_directories(LEF INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/LEF/include)
+target_link_libraries(LEF INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/LEF/lib/liblef.a)
 
 # Build DEF parser with the included Makefile
 ExternalProject_Add(
 	def_parser
-    SOURCE_DIR ${third_party_source_dir}/DEF
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/DEF
 	# Empty CONFIGURE_COMMAND as the DEF parser has no configure file
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND make CXXFLAGS="-fPIC" installhdrs installlib
@@ -62,5 +62,5 @@ ExternalProject_Add(
 )
 
 add_library(DEF INTERFACE)
-target_include_directories(DEF INTERFACE ${third_party_source_dir}/DEF/include)
-target_link_libraries(LEF INTERFACE ${third_party_source_dir}/DEF/lib/libdef.a)
+target_include_directories(DEF INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/DEF/include)
+target_link_libraries(LEF INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/DEF/lib/libdef.a)

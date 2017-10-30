@@ -28,9 +28,6 @@ set(CMAKE_CXX_STANDARD 14)
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
-# Set the dependencies directory
-set(third_party_source_dir ${ophidian_source_dir}/3rdparty)
-
 # Set include dirs for the Lemon library
 # That's due to lemmon not using target_include_directory
 set(lemon_include_dir 
@@ -50,7 +47,7 @@ include_directories(${lemon_include_dir})
 set(CMAKE_INSTALL_PREFIX /usr/local)
 
 # Set ophidian shared libraries install path
-set(ophidian_install_lib_dir lib)
+set(ophidian_install_lib_dir lib/ophidian)
 
 # Set ophidian binary install path
 set(ophidian_install_bin_dir bin)
@@ -69,17 +66,10 @@ find_package(Boost 1.59 REQUIRED)
 # Project logic 
 ################################################################################
 
-# Set global compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
-
 # Set option build shared libs
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
 
-# Add 3rdparty subdir
+# Add subdirectories
 add_subdirectory(3rdparty)
-
-# Then add Ophidian
 add_subdirectory(ophidian)
-
-# Then add test
 add_subdirectory(test)

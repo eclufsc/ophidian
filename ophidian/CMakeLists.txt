@@ -6,7 +6,7 @@
 # make it a dinamic lib.
 ################################################################################
 
-# Add namespace directories for lib generation 
+# Add all subdirectories
 add_subdirectory(circuit)
 add_subdirectory(design)
 add_subdirectory(entity_system)
@@ -18,3 +18,10 @@ add_subdirectory(placement)
 add_subdirectory(standard_cell)
 add_subdirectory(timing)
 add_subdirectory(util)
+
+# Install export
+install(
+    EXPORT ophidian-targets
+    NAMESPACE Ophidian::
+    DESTINATION ${ophidian_install_lib_dir}
+)

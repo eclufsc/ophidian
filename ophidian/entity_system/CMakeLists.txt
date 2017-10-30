@@ -54,8 +54,8 @@ target_link_libraries(ophidian_entity_system
 # This is transitive, so any targets linked with this one will
 # search for headers in the respective paths
 target_include_directories(ophidian_entity_system PUBLIC
-    $<BUILD_INTERFACE:      ${ophidian_source_dir}>
-    $<INSTALL_INTERFACE:    include>
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
 )
 
 ################################################################################
