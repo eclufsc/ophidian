@@ -57,6 +57,12 @@ target_include_directories(ophidian_util INTERFACE
 # Installation rules
 ################################################################################
 
+# Install rule for target
+install(
+    TARGETS ophidian_util
+    EXPORT ophidian-targets
+)
+
 # Install rule for headers
 install(
     FILES ${ophidian_util_headers} 

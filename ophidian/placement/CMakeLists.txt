@@ -70,7 +70,7 @@ target_include_directories(ophidian_placement PUBLIC
 install(
     TARGETS ophidian_placement 
     DESTINATION ${ophidian_install_lib_dir}
-    EXPORT ophidian
+    EXPORT ophidian-targets
 )
 
 # Install rule for headers

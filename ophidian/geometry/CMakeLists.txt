@@ -47,7 +47,7 @@ add_library(ophidian_geometry ${ophidian_geometry_source})
 
 # Add target dependencies
 target_link_libraries(ophidian_geometry
-    PUBLIC boost
+    PUBLIC Boost::boost
 )
 
 # Tell cmake the path to look for include files for this target
@@ -66,7 +66,7 @@ target_include_directories(ophidian_geometry PUBLIC
 install(
     TARGETS ophidian_geometry 
     DESTINATION ${ophidian_install_lib_dir}
-    EXPORT ophidian
+    EXPORT ophidian-targets
 ) 
 
 # Install rule for headers
