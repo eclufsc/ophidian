@@ -11,11 +11,7 @@ MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
 void MySFMLCanvas::setController(MainController & controller)
 {
     mMainController = &controller;
-}
-
-void MySFMLCanvas::setState(State * state)
-{
-    mState = state;
+    mState = new Idle(mMainController);
 }
 
 void MySFMLCanvas::resizeEvent(QResizeEvent *e)
@@ -25,11 +21,17 @@ void MySFMLCanvas::resizeEvent(QResizeEvent *e)
 
 MySFMLCanvas::~MySFMLCanvas()
 {
+
 }
 
 void MySFMLCanvas::setSize(ophidian::geometry::Point size)
 {
     mCameraView.setSize(size.x(), size.y());
+}
+
+void MySFMLCanvas::setState(State * state)
+{
+    mState = state;
 }
 
 Canvas * MySFMLCanvas::canvas()
@@ -40,8 +42,8 @@ Canvas * MySFMLCanvas::canvas()
 
 void MySFMLCanvas::OnInit()
 {
-}
 
+}
 
 void MySFMLCanvas::OnUpdate()
 {
@@ -102,16 +104,12 @@ void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
 
 void MySFMLCanvas::mousePressEvent(QMouseEvent *e)
 {
-    sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
-    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
-    mMainController->mousePress(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
+    mState->mousePressEvent(mouseEventToPoint(e), mState);
 }
 
 void MySFMLCanvas::mouseMoveEvent(QMouseEvent *e)
 {
-    sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
-    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
-    mMainController->mouseMove(ophidian::geometry::Point(viewCoord.x, viewCoord.y));
+    mState->mouseMoveEvent(mouseEventToPoint(e), mState);
 }
 
 void MySFMLCanvas::mouseReleaseEvent(QMouseEvent *e)
@@ -132,6 +130,13 @@ void MySFMLCanvas::viewSize(const ophidian::geometry::Point &size)
 void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
     mCanvas.reserveMinimumOfQuads(minimumOfQuads);
+}
+
+ophidian::geometry::Point MySFMLCanvas::mouseEventToPoint(QMouseEvent * e)
+{
+    sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
+    sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
+    return ophidian::geometry::Point(viewCoord.x, viewCoord.y);
 }
 
 //void MySFMLCanvas::allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)

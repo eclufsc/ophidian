@@ -35,15 +35,22 @@ public:
     ~MainController();
 
     void setCanvas(Canvas * canvas);
+    Canvas * getCanvas();
 
     void mousePress(const ophidian::geometry::Point & p);
     void mouseMove(const ophidian::geometry::Point & p);
     void mouseRelease();
 
+    bool isFixed(const ophidian::circuit::Cell & cell);
     bool hasQuad(const ophidian::geometry::Point & p);
     Quad quadAt(const ophidian::geometry::Point & p);
 
     std::vector<Quad> quadsCell(const ophidian::circuit::Cell & cell);
+    WireQuad wireQuadOfCell(const ophidian::circuit::Cell & cell);
+
+    void transform(Quad quad, const sf::Transform & trans);
+
+    void clear(WireQuad & wire);
 
 public slots:
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);

@@ -12,6 +12,7 @@ public:
     virtual ~Canvas();
 
     void clear();
+    void clear(WireQuad & wire);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);

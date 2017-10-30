@@ -56,7 +56,7 @@ void Canvas::paint(Quad, const std::vector<Form> & quads, const sf::Color color)
 
 void Canvas::setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p)
 {
-    mQuads.setPoint(quads, i, p);
+    mQuads.setPoint(quad, i, p);
 }
 
 void Canvas::alloc(Line & line, const std::vector<ophidian::geometry::Point> & points)
@@ -89,28 +89,40 @@ WireQuad Canvas::createWireQuad(const std::vector<Quad> & quads)
         pointsOfQuads.push_back(mQuads.points(q));
     }
 
+    ophidian::geometry::Point lowerLeft(pointsOfQuads.begin()->at(0).position.x, pointsOfQuads.begin()->at(0).position.y);
+    ophidian::geometry::Point lowerRight(pointsOfQuads.begin()->at(1).position.x, pointsOfQuads.begin()->at(1).position.y);
+    ophidian::geometry::Point upperRight(pointsOfQuads.back().at(2).position.x, pointsOfQuads.back().at(2).position.y);
+    ophidian::geometry::Point upperLeft(pointsOfQuads.back().at(3).position.x, pointsOfQuads.back().at(3).position.y);
+
     lines[0] = Line();
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.begin()->at(0).position.x));
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.begin()->at(0).position.y));
+    points.push_back(lowerLeft);
+    points.push_back(lowerRight);
     mLines.alloc(lines[0], points);
+    points.clear();
 
     lines[1] = Line();
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.back()->at(1).position.x));
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.begin()->at(0).position.y));
+    points.push_back(lowerRight);
+    points.push_back(upperRight);
     mLines.alloc(lines[1], points);
+    points.clear();
 
     lines[2] = Line();
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.back()->at(2).position.x));
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.back()->at(2).position.y));
+    points.push_back(upperRight);
+    points.push_back(upperLeft);
     mLines.alloc(lines[2], points);
+    points.clear();
 
     lines[3] = Line();
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.begin()->at(0).position.x));
-    points.push_back(ophidian::geometry::Point(pointsOfQuads.back()->at(3).position.y));
+    points.push_back(upperLeft);
+    points.push_back(lowerLeft);
     mLines.alloc(lines[3], points);
 
     WireQuad wire(quads.begin()->mCell);
     wire.mLines = lines;
     return wire;
+}
 
+void Canvas::clear(WireQuad & wire)
+{
+    mLines.clear();
 }

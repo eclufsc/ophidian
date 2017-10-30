@@ -15,6 +15,11 @@ void MainController::setCanvas(Canvas * canvas)
     mCanvas = canvas;
 }
 
+Canvas * MainController::getCanvas()
+{
+    return mCanvas;
+}
+
 void MainController::buildICCAD2017(std::string lef, std::string def, std::string verilog)
 {
 
@@ -54,8 +59,6 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
 
 void MainController::mousePress(const ophidian::geometry::Point &p)
 {
-    //mState->mouse_press(p);
-    //std::cout << mIndex.hasQuad(p) << std::endl;
     std::string name = "";
     std::string type = "";
 
@@ -66,7 +69,8 @@ void MainController::mousePress(const ophidian::geometry::Point &p)
         type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(quad.mCell) );
         ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mCell).toPoint();
         emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), origin.x(), origin.y(), 0);
-    } else
+    }
+    else
     {
         emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), p.x(), p.y(), 0);
     }
@@ -130,6 +134,11 @@ void MainController::createQuads()
     }
 }
 
+bool MainController::isFixed(const ophidian::circuit::Cell & cell)
+{
+    return (mCellToQuads[cell].size() > 1);
+}
+
 bool MainController::hasQuad(const ophidian::geometry::Point & p)
 {
     return mIndex.hasQuad(p);
@@ -143,4 +152,23 @@ Quad MainController::quadAt(const ophidian::geometry::Point & p)
 std::vector<Quad> MainController::quadsCell(const ophidian::circuit::Cell & cell)
 {
     return mCellToQuads[cell];
+}
+
+WireQuad MainController::wireQuadOfCell(const ophidian::circuit::Cell & cell)
+{
+    return mCanvas->createWireQuad(mCellToQuads[cell]);
+}
+
+void MainController::clear(WireQuad & wire)
+{
+    mCanvas->clear(wire);
+}
+
+void MainController::transform(Quad quad, const sf::Transform & trans)
+{
+    std::vector<Form> forms;
+    for (const auto & q : mCellToQuads[quad.mCell])
+        forms.push_back(q);
+
+    mCanvas->transform(quad, forms, trans);
 }
