@@ -48,7 +48,7 @@ add_library(ophidian_standard_cell ${ophidian_standard_cell_source})
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_standard_cell 
     PUBLIC ophidian_entity_system
-    INTERFACE ophidian_util
+    PUBLIC ophidian_util
 )
 
 # Tell cmake the path to look for include files for this target

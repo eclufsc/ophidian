@@ -65,24 +65,14 @@ set(ophidian_install_include_dir include)
 # Find Boost
 find_package(Boost 1.59 REQUIRED)
 
-# Find OpenMP if aplicable
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
 ################################################################################
 # Project logic 
 ################################################################################
 
-# Set global compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
-
 # Set option build shared libs
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
 
-# First add 3rdparty software to build
+# Add 3rdparty subdir
 add_subdirectory(3rdparty)
 
 # Then add Ophidian

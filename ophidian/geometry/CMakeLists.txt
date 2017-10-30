@@ -45,6 +45,11 @@ file(GLOB ophidian_geometry_headers
 # Add library target
 add_library(ophidian_geometry ${ophidian_geometry_source})
 
+# Add target dependencies
+target_link_libraries(ophidian_geometry
+    PUBLIC Boost::boost
+)
+
 # Tell cmake the path to look for include files for this target
 # This is transitive, so any targets linked with this one will
 # search for headers in the respective paths
