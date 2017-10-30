@@ -22,7 +22,7 @@ set(project_name "ophidian")
 # Set project name 
 project(${project_name})
 
-# Set c++14 globaly 
+# Set c++14 globally 
 set(CMAKE_CXX_STANDARD 14)
 
 # Set Ophidian source dir
@@ -68,6 +68,9 @@ find_package(Boost 1.59 REQUIRED)
 ################################################################################
 # Project logic 
 ################################################################################
+
+# Set global compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 
 # Set option build shared libs
 option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
