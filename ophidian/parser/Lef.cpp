@@ -65,7 +65,7 @@ void LefParser::readFile(const std::string &filename, std::unique_ptr<ophidian::
 
 	if (!fp)
 	{
-		throw InexistentFile();
+		throw InexistentFile(filename);
 	}
 
 	lefrInit();

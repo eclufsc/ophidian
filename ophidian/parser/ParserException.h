@@ -19,19 +19,17 @@
 #ifndef PARSER_EXCEPTION_H
 #define PARSER_EXCEPTION_H
 
-#include <exception>
+#include <stdexcept>
 
 namespace ophidian
 {
 namespace parser
 {
 
-class InexistentFile : public std::exception
-{
+class InexistentFile : public std::runtime_error {
 public:
-	const char* what() const noexcept override {
-		return "The given file was not found";
-	}
+	InexistentFile() : std::runtime_error("The given file was not found") { }
+	InexistentFile(std::string file) : std::runtime_error("The file \"" + file + "\" was not found") { }
 };
 } // namespace parser
 } // namespace ophidian

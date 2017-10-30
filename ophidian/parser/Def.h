@@ -150,7 +150,7 @@ public:
 	DefParser();
 	~DefParser();
 
-	std::unique_ptr<Def> readFile(const std::string & filename) const throw(InexistentFile);
+	std::unique_ptr<Def> readFile(const std::string & filename) const;
 };
 } // namespace parser
 } // namespace ophidian
