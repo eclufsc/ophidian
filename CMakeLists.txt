@@ -14,13 +14,10 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.2.2)
-
-# Set project_name global variable
-set(project_name "ophidian")
+cmake_minimum_required(VERSION 3.5.2)
 
 # Set project name 
-project(${project_name})
+project(ophidian)
 
 # Set c++14 globally 
 set(CMAKE_CXX_STANDARD 14)
@@ -47,7 +44,7 @@ include_directories(${lemon_include_dir})
 set(CMAKE_INSTALL_PREFIX /usr/local)
 
 # Set ophidian shared libraries install path
-set(ophidian_install_lib_dir lib/ophidian)
+set(ophidian_install_lib_dir lib)
 
 # Set ophidian binary install path
 set(ophidian_install_bin_dir bin)

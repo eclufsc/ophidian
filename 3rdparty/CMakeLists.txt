@@ -1,10 +1,10 @@
 ################################################################################
 # This is the CMakeLists file for the Ophidian Dependencies. 
 # Its main goals are:
-#   - Check for dependencies 
-#   - Fetch dependencies 
-#   - Configure dependencies
-#   - Add dependencies subdirectories
+#   - Check for dependencies.
+#   - Fetch dependencies.
+#   - Configure dependencies.
+#   - Add dependencies subdirectories.
 ################################################################################
 
 # Init submodules and fetch dependences from git
