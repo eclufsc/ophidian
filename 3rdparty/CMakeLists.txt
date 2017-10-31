@@ -1,10 +1,9 @@
 ################################################################################
-# This is the CMakeLists file for the Ophidian Dependencies. 
-# Its main goals are:
-#   - Check for dependencies.
+# This is the CMakeLists file for the Ophidian Build Dependencies directory.
+# 
 #   - Fetch dependencies.
 #   - Configure dependencies.
-#   - Add dependencies subdirectories.
+#
 ################################################################################
 
 # Init submodules and fetch dependences from git
@@ -17,11 +16,8 @@ execute_process(
 # Add Catch
 add_subdirectory(catch)
 
-# This is needed since Flute is statcly built
+# Add Flute
 add_subdirectory(Flute)
-
-# Add Lemon graph library
-add_subdirectory(Lemon)
 
 # Add OpenTimer
 add_subdirectory(OpenTimer)

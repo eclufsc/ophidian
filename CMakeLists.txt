@@ -25,17 +25,6 @@ set(CMAKE_CXX_STANDARD 14)
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
-# Set include dirs for the Lemon library
-# That's due to lemmon not using target_include_directory
-set(lemon_include_dir 
-    ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
-    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
-    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
-)
-
-# Set the global include directories
-include_directories(${lemon_include_dir})
-
 ################################################################################
 # Set up installation variables
 ################################################################################
@@ -58,6 +47,9 @@ set(ophidian_install_include_dir include)
 
 # Find Boost
 find_package(Boost 1.59 REQUIRED)
+
+# Find Lemon
+find_package(Lemon REQUIRED)
 
 ################################################################################
 # Project logic 
