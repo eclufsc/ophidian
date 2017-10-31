@@ -20,11 +20,11 @@ add_subdirectory(timing)
 add_subdirectory(util)
 
 # Install export
-#install(
-#    EXPORT ophidian-targets
-#    NAMESPACE ophidian::
-#    DESTINATION ${ophidian_install_lib_dir}/cmake
-#)
+install(
+    EXPORT ophidian-targets
+    NAMESPACE ophidian::
+    DESTINATION ${ophidian_install_lib_dir}/cmake
+)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
