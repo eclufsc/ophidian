@@ -114,7 +114,7 @@ void MySFMLCanvas::mouseMoveEvent(QMouseEvent *e)
 
 void MySFMLCanvas::mouseReleaseEvent(QMouseEvent *e)
 {
-    mMainController->mouseRelease();
+    mState->mouseReleaseEvent(mouseEventToPoint(e), mState);
 }
 
 void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point &p1)

@@ -47,8 +47,8 @@ public:
     void keyPressEvent(QKeyEvent * e, State * & state);
 
 protected:
-    WireQuad mWireQuad;
     Quad mQuad;
+    WireQuad mWireQuad;
 };
 
 class Dragging : public State
@@ -60,6 +60,7 @@ public:
 
 protected:
     Quad mQuad;
+    WireQuad mWireQuad;
     ophidian::geometry::Point mInitialPos;
     bool mMoved;
 };

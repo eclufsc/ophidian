@@ -25,12 +25,14 @@ public:
     void transform(Quad, const std::vector<Form> & quads, const sf::Transform & trans);
     void paint(Quad, const std::vector<Form> & quads, const sf::Color color);
     void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);
+    std::array<sf::Vertex, 4> points(const Quad & quad);
 
     /* Lines */
     void alloc(Line & line, const std::vector<ophidian::geometry::Point> & points);
     void transform(Line, const std::vector<Form> & lines, const sf::Transform & trans);
     void paint(Line, const std::vector<Form> & lines, const sf::Color color);
     void setPoint(const Line & line, std::size_t i, ophidian::geometry::Point & p);
+    std::array<sf::Vertex, 2> points(const Line & line);
 
     /* WireQuads */
     WireQuad createWireQuad(const std::vector<Quad> & quads);

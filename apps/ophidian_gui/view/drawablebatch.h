@@ -145,8 +145,7 @@ void DrawableBatch<NumberOfVertices>::transform(const std::vector<Form> &forms, 
 {
     for (const Form & q : forms)
     {
-        auto box = mVertices[q.mId];
-        for (sf::Vertex & v : box)
+        for (sf::Vertex & v : mVertices[q.mId])
         {
             v.position = trans.transformPoint(v.position);
         }

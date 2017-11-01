@@ -49,6 +49,9 @@ public:
     WireQuad wireQuadOfCell(const ophidian::circuit::Cell & cell);
 
     void transform(Quad quad, const sf::Transform & trans);
+    void transform(WireQuad wire, const sf::Transform & trans);
+
+    void update(Quad quad);
 
     void clear(WireQuad & wire);
 

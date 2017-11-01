@@ -93,7 +93,7 @@ void MainController::createQuads()
     //DrawableBatch<4> * drawable = mCanvas->drawableQuads();
 
     sf::Transform mirror;
-    mirror.scale(1.0, -1.0);
+    //mirror.scale(1.0, -1.0);
 
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
     {
@@ -123,7 +123,7 @@ void MainController::createQuads()
         }
 
         mCellToQuads[*cellIt] = quads;
-        mCanvas->transform(Quad(), forms, mirror);
+        //mCanvas->transform(Quad(), forms, mirror);
 
         if (forms.size() > 1) {
             mCanvas->paint(Quad(), forms, sf::Color::Blue);
@@ -166,9 +166,37 @@ void MainController::clear(WireQuad & wire)
 
 void MainController::transform(Quad quad, const sf::Transform & trans)
 {
+    Quad first = mCellToQuads[quad.mCell].front();
+
     std::vector<Form> forms;
-    for (const auto & q : mCellToQuads[quad.mCell])
+    for (const auto & q : mCellToQuads[first.mCell])
         forms.push_back(q);
 
-    mCanvas->transform(quad, forms, trans);
+    mCanvas->transform(first, forms, trans);
+}
+
+void MainController::transform(WireQuad wire, const sf::Transform & trans)
+{
+    std::vector<Form> forms;
+    for (const auto & q : wire.mLines)
+        forms.push_back(q);
+
+    mCanvas->transform(Line(), forms, trans);
+}
+
+void MainController::update(Quad quad)
+{
+    Quad first = mCellToQuads[quad.mCell].front();
+    auto newOrigin = mCanvas->points(first).front();
+
+    mDesign->placement().placeCell(first.mCell, ophidian::util::LocationDbu(newOrigin.position.x, newOrigin.position.y));
+
+    ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(first.mCell);
+
+    auto quadOfBox = mCellToQuads[first.mCell].begin();
+    for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++, quadOfBox++)
+    {
+        mIndex.quadRemove(*quadOfBox);
+        mIndex.quadCreate(*quadOfBox, *cellBoxIt);
+    }
 }

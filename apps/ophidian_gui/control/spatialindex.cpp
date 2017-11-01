@@ -25,7 +25,7 @@ void SpatialIndex::quadRemove(const Quad & quad)
 {
     std::vector<RTreeNode> toRemove;
 
-    mIndex.query( boost::geometry::index::covered_by(mIndex.bounds()), std::back_inserter(toRemove));
+    mIndex.query(boost::geometry::index::covered_by(mIndex.bounds()), std::back_inserter(toRemove));
 
     auto begin = std::remove_if(toRemove.begin(), toRemove.end(), [quad](const RTreeNode & node)->bool
     {

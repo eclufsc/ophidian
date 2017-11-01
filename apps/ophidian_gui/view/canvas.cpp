@@ -59,6 +59,11 @@ void Canvas::setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Poin
     mQuads.setPoint(quad, i, p);
 }
 
+std::array<sf::Vertex, 4> Canvas::points(const Quad & quad)
+{
+    return mQuads.points(quad);
+}
+
 void Canvas::alloc(Line & line, const std::vector<ophidian::geometry::Point> & points)
 {
     mLines.alloc(line, points);
@@ -77,6 +82,11 @@ void Canvas::paint(Line, const std::vector<Form> & lines, const sf::Color color)
 void Canvas::setPoint(const Line & line, std::size_t i, ophidian::geometry::Point & p)
 {
     mLines.setPoint(line, i, p);
+}
+
+std::array<sf::Vertex, 2> Canvas::points(const Line & line)
+{
+    return mLines.points(line);
 }
 
 WireQuad Canvas::createWireQuad(const std::vector<Quad> & quads)
