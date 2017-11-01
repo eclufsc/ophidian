@@ -47,7 +47,7 @@ add_library(ophidian_entity_system ${ophidian_entity_system_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_entity_system
-    PUBLIC lemon
+    PUBLIC Lemon::lemon
 )
 
 # Tell cmake the path to look for include files for this target

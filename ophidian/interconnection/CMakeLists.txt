@@ -48,7 +48,7 @@ add_library(ophidian_interconnection ${ophidian_interconnection_source})
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_interconnection
     PUBLIC ophidian_geometry
-    PUBLIC lemon
+    PUBLIC Lemon::lemon
     PRIVATE flute 
 )
 
