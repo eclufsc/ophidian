@@ -49,7 +49,10 @@ set(ophidian_install_include_dir include)
 find_package(Boost 1.59 REQUIRED)
 
 # Find Lemon
-find_package(LEMON REQUIRED)
+find_package(LEMON REQUIRED CONFIG)
+
+# Find Units
+find_package(units REQUIRED CONFIG)
 
 ################################################################################
 # Project logic 

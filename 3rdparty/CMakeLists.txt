@@ -25,9 +25,6 @@ add_subdirectory(OpenTimer)
 # Add verilog-parser
 add_subdirectory(verilog-parser)
 
-# Add Units
-add_subdirectory(units)
-
 # Load ExternalProject cmake module
 include(ExternalProject)
 
