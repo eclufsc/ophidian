@@ -43,7 +43,7 @@ file(GLOB ophidian_design_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_design ${ophidian_design_source})
+add_library(ophidian_design SHARED ${ophidian_design_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_design

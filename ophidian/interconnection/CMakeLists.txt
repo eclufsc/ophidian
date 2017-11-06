@@ -43,7 +43,7 @@ file(GLOB ophidian_interconnection_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_interconnection ${ophidian_interconnection_source})
+add_library(ophidian_interconnection SHARED ${ophidian_interconnection_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_interconnection

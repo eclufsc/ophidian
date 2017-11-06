@@ -14,7 +14,7 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.5.2)
+cmake_minimum_required(VERSION 3.9.2)
 
 # Set project name 
 project(ophidian)
@@ -57,9 +57,6 @@ find_package(units REQUIRED CONFIG)
 ################################################################################
 # Project logic 
 ################################################################################
-
-# Set option build shared libs
-option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
 
 # Add subdirectories
 add_subdirectory(3rdparty)

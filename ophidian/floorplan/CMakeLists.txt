@@ -43,7 +43,7 @@ file(GLOB ophidian_floorplan_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_floorplan ${ophidian_floorplan_source})
+add_library(ophidian_floorplan SHARED  ${ophidian_floorplan_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_floorplan
