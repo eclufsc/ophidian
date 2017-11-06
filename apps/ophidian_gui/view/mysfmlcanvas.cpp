@@ -11,7 +11,7 @@ MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
 void MySFMLCanvas::setController(MainController & controller)
 {
     mMainController = &controller;
-    mState = new Idle(mMainController);
+    mState = new Idle(this, mMainController);
 }
 
 void MySFMLCanvas::resizeEvent(QResizeEvent *e)
@@ -49,9 +49,9 @@ void MySFMLCanvas::OnUpdate()
 {
     // ... mCanvas.update();
 
-    //static boost::posix_time::ptime last;
-    //boost::posix_time::ptime current = boost::posix_time::microsec_clock::local_time();
-    //boost::posix_time::time_duration diff = current - last;
+    /*static boost::posix_time::ptime last;
+    boost::posix_time::ptime current = boost::posix_time::microsec_clock::local_time();
+    boost::posix_time::time_duration diff = current - last;*/
 
     clear(sf::Color::Black);
     setView(mCameraView);
@@ -79,6 +79,7 @@ void MySFMLCanvas::wheelEvent(QWheelEvent *e)
     else if(e->delta() < 0)
         mCameraView.zoom(1.1f);
 }
+
 void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
@@ -104,17 +105,17 @@ void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
 
 void MySFMLCanvas::mousePressEvent(QMouseEvent *e)
 {
-    mState->mousePressEvent(mouseEventToPoint(e), mState);
+    mState->mousePressEvent(mouseEventToPoint(e));
 }
 
 void MySFMLCanvas::mouseMoveEvent(QMouseEvent *e)
 {
-    mState->mouseMoveEvent(mouseEventToPoint(e), mState);
+    mState->mouseMoveEvent(mouseEventToPoint(e));
 }
 
 void MySFMLCanvas::mouseReleaseEvent(QMouseEvent *e)
 {
-    mState->mouseReleaseEvent(mouseEventToPoint(e), mState);
+    mState->mouseReleaseEvent(mouseEventToPoint(e));
 }
 
 void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point &p1)
@@ -138,9 +139,4 @@ ophidian::geometry::Point MySFMLCanvas::mouseEventToPoint(QMouseEvent * e)
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
     return ophidian::geometry::Point(viewCoord.x, viewCoord.y);
 }
-
-//void MySFMLCanvas::allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4)
-//{
-//    mCanvas.allocQuad(quad, p1, p2, p3, p4);
-//}
 

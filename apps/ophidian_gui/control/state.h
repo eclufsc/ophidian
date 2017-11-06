@@ -8,43 +8,48 @@
 #include "control/maincontroller.h"
 #include "Model/forms.h"
 
+//#include "view/mysfmlcanvas.h"
+
+class MySFMLCanvas;
+
 class State
 {
 public:
-    State(MainController * controller);
+    State(MySFMLCanvas * SFMLCanvas, MainController * controller);
     ~State();
-    virtual void update(State * & state);
-    virtual void wheelEvent(QWheelEvent * e, State * & state);
-    virtual void keyPressEvent(QKeyEvent * e, State * & state);
-    virtual void mousePressEvent(ophidian::geometry::Point pos, State * & state);
-    virtual void mouseMoveEvent(ophidian::geometry::Point pos, State * & state);
-    virtual void mouseReleaseEvent(ophidian::geometry::Point pos, State * & state);
+    virtual void update();
+    virtual void wheelEvent(QWheelEvent * e);
+    virtual void keyPressEvent(QKeyEvent * e);
+    virtual void mousePressEvent(ophidian::geometry::Point pos);
+    virtual void mouseMoveEvent(ophidian::geometry::Point pos);
+    virtual void mouseReleaseEvent(ophidian::geometry::Point pos);
 
 protected:
+    MySFMLCanvas * mSFMLCanvas;
     MainController * mMainController;
 };
 
 class Blocked : public State
 {
 public:
-    Blocked(MainController * controller);
+    Blocked(MySFMLCanvas * SFMLCanvas, MainController * controller);
     ~Blocked();
 };
 
 class Idle : public State
 {
 public:
-    Idle(MainController * controller);
-    void mousePressEvent(ophidian::geometry::Point pos, State * & state);
+    Idle(MySFMLCanvas * SFMLCanvas, MainController * controller);
+    void mousePressEvent(ophidian::geometry::Point pos);
 };
 
 class Selected : public State
 {
 public:
-    Selected(MainController * controller, Quad quad);
+    Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad);
     ~Selected();
-    void mousePressEvent(ophidian::geometry::Point pos, State * & state);
-    void keyPressEvent(QKeyEvent * e, State * & state);
+    void mousePressEvent(ophidian::geometry::Point pos);
+    void keyPressEvent(QKeyEvent * e);
 
 protected:
     Quad mQuad;
@@ -54,9 +59,9 @@ protected:
 class Dragging : public State
 {
 public:
-    Dragging(MainController * controller, Quad quad, const ophidian::geometry::Point & pos);
-    void mouseMoveEvent(ophidian::geometry::Point pos, State * & state);
-    void mouseReleaseEvent(ophidian::geometry::Point pos, State * & state);
+    Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos);
+    void mouseMoveEvent(ophidian::geometry::Point pos);
+    void mouseReleaseEvent(ophidian::geometry::Point pos);
 
 protected:
     Quad mQuad;

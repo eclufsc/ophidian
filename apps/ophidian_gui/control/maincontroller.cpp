@@ -78,7 +78,7 @@ void MainController::mousePress(const ophidian::geometry::Point &p)
 
 void MainController::mouseMove(const ophidian::geometry::Point &p)
 {
-    //mSstate->mouse_move(p);
+    emit on_selected_cellChanged("moving", "moving", p.x(), p.y(), 0);
 }
 
 void MainController::mouseRelease()

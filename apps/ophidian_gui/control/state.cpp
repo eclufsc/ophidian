@@ -1,7 +1,7 @@
 #include "state.h"
 
-
-State::State(MainController * controller) :
+State::State(MySFMLCanvas * SFMLCanvas, MainController * controller) :
+    mSFMLCanvas(SFMLCanvas),
     mMainController(controller)
 {
 
@@ -12,64 +12,38 @@ State::~State()
 
 }
 
-void State::wheelEvent(QWheelEvent * e, State * & state)
-{
-    /* Should I perform this operation here or in MySFMLCanvas?
-    if(e->delta() > 0)
-        m_canvas->zoom(1.f/1.1f);
-    else if(e->delta() < 0)
-        m_canvas->zoom(1.1f);
-    */
-}
-
-void State::keyPressEvent(QKeyEvent * e, State * & state)
-{
-    /* Should I perform this operation here or in MySFMLCanvas?
-    switch(e->key())
-    {
-    case Qt::Key::Key_W:
-    case Qt::Key::Key_Up:
-        m_canvas->moveCamera(sf::Vector2f(0.0f, -m_canvas->cameraSize().y*.1));
-        break;
-    case Qt::Key::Key_S:
-    case Qt::Key::Key_Down:
-        m_canvas->moveCamera(sf::Vector2f(0.0f, m_canvas->cameraSize().y*.1));
-        break;
-    case Qt::Key::Key_D:
-    case Qt::Key::Key_Right:
-        m_canvas->moveCamera(sf::Vector2f(m_canvas->cameraSize().x*.1, 0.0f));
-        break;
-    case Qt::Key::Key_A:
-    case Qt::Key::Key_Left:
-        m_canvas->moveCamera(sf::Vector2f(-m_canvas->cameraSize().x*.1, 0.0f));
-        break;
-    }
-    */
-}
-
-
-void State::update(State * & state)
+void State::update()
 {
 
 }
 
-void State::mousePressEvent(ophidian::geometry::Point pos, State * & state)
+void State::State::wheelEvent(QWheelEvent * e)
 {
 
 }
 
-void State::mouseMoveEvent(ophidian::geometry::Point pos, State * & state)
+void State::keyPressEvent(QKeyEvent * e)
 {
 
 }
 
-void State::mouseReleaseEvent(ophidian::geometry::Point pos, State * & state)
+void State::mousePressEvent(ophidian::geometry::Point pos)
 {
 
 }
 
-Blocked::Blocked(MainController * controller) :
-    State(controller)
+void State::mouseMoveEvent(ophidian::geometry::Point pos)
+{
+
+}
+
+void State::mouseReleaseEvent(ophidian::geometry::Point pos)
+{
+
+}
+
+Blocked::Blocked(MySFMLCanvas * SFMLCanvas, MainController * controller) :
+    State(SFMLCanvas, controller)
 {
 
 }
@@ -79,13 +53,15 @@ Blocked::~Blocked()
 
 }
 
-Idle::Idle(MainController * controller) :
-    State(controller)
+Idle::Idle(MySFMLCanvas * SFMLCanvas, MainController * controller) :
+    State(SFMLCanvas, controller)
 {
 
 }
 
-void Idle::mousePressEvent(ophidian::geometry::Point pos, State * & state)
+#include "view/mysfmlcanvas.h" //< Include needed here for MySFMLCanvas see the idle constructor without circular including
+
+void Idle::mousePressEvent(ophidian::geometry::Point pos)
 {
     mMainController->mousePress(pos);
 
@@ -94,16 +70,16 @@ void Idle::mousePressEvent(ophidian::geometry::Point pos, State * & state)
         Quad selected = mMainController->quadAt(pos);
 
         if(mMainController->isFixed(selected.mCell))
-            state = new Selected(mMainController, selected);
+            mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
         else
-            state = new Dragging(mMainController, selected, pos);
+            mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
 
         delete this;
     }
 }
 
-Selected::Selected(MainController * controller, Quad quad) :
-    State(controller),
+Selected::Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad) :
+    State(SFMLCanvas, controller),
     mQuad(quad),
     mWireQuad(controller->wireQuadOfCell(quad.mCell))
 {
@@ -115,7 +91,7 @@ Selected::~Selected()
 
 }
 
-void Selected::mousePressEvent(ophidian::geometry::Point pos, State * & state)
+void Selected::mousePressEvent(ophidian::geometry::Point pos)
 {
     if(mMainController->hasQuad(pos))
     {
@@ -127,32 +103,32 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos, State * & state)
             mMainController->mousePress(pos);
 
             if(mMainController->isFixed(selected.mCell))
-                state = new Selected(mMainController, selected);
+                mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
             else
-                state = new Dragging(mMainController, selected, pos);
+                mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
         }
         else
         {
             mMainController->clear(mWireQuad);
-            state = new Dragging(mMainController, selected, pos);
+            mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
         }
 
     } else {
         mMainController->clear(mWireQuad);
         mMainController->mousePress(pos);
-        state = new Idle(mMainController);
+        mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
     }
 
     delete this;
 }
 
-void Selected::keyPressEvent(QKeyEvent * e, State * & state)
+void Selected::keyPressEvent(QKeyEvent * e)
 {
 
 }
 
-Dragging::Dragging(MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
-    State(controller),
+Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
+    State(SFMLCanvas, controller),
     mQuad(quad),
     mWireQuad(controller->wireQuadOfCell(quad.mCell)),
     mInitialPos(pos),
@@ -161,7 +137,7 @@ Dragging::Dragging(MainController * controller, Quad quad, const ophidian::geome
 
 }
 
-void Dragging::mouseMoveEvent(ophidian::geometry::Point pos, State * & state)
+void Dragging::mouseMoveEvent(ophidian::geometry::Point pos)
 {
     sf::Vector2f delta(pos.x() - mInitialPos.x(), pos.y() - mInitialPos.y());
     sf::Transform translation;
@@ -175,13 +151,14 @@ void Dragging::mouseMoveEvent(ophidian::geometry::Point pos, State * & state)
 
     Quad first = mMainController->quadsCell(mQuad.mCell).front();
     auto newOrigin = mMainController->getCanvas()->points(first).front();
-    mMainController->mousePress(ophidian::geometry::Point(newOrigin.position.x, newOrigin.position.y));
+    mMainController->mouseMove(ophidian::geometry::Point(newOrigin.position.x, newOrigin.position.y));
 }
 
-void Dragging::mouseReleaseEvent(ophidian::geometry::Point pos, State * & state)
+void Dragging::mouseReleaseEvent(ophidian::geometry::Point pos)
 {
+    //mouseMoveEvent(pos); maybe need update the position?
     mMainController->clear(mWireQuad);
     mMainController->update(mQuad);
-    state = state = new Selected(mMainController, mQuad);
+    mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, mQuad));
     delete this;
 }

@@ -51,8 +51,10 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
 
 void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack)
 {
-    ui->selectedCellName_2->setText(name);
-    ui->selectedCellType_2->setText(type);
+    if (name.compare("moving")) {
+        ui->selectedCellName_2->setText(name);
+        ui->selectedCellType_2->setText(type);
+    }
     ui->selectedCell_x_2->setText(QString::number(x));
     ui->selectedCell_y_2->setText(QString::number(y));
     // ui->selectedCellWSlack_2->setText(QString::number(worstSlack)); //!< Not displaying

@@ -45,15 +45,12 @@ public slots:
     void setSize(ophidian::geometry::Point size);
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
 
-//private slots:
-//    void allocQuad(Quad & quad, const ophidian::geometry::Point p1, const ophidian::geometry::Point p2, const ophidian::geometry::Point p3, const ophidian::geometry::Point p4);
-
 private:
     ophidian::geometry::Point mouseEventToPoint(QMouseEvent * e);
 
     MainController * mMainController;
-    Canvas mCanvas;
     State * mState;
+    Canvas mCanvas;
     sf::View mCameraView;
 };
 
