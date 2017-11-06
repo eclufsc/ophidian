@@ -109,8 +109,10 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
         }
         else
         {
-            mMainController->clear(mWireQuad);
-            mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
+            if (!mMainController->isFixed(selected.mCell)) {
+                mMainController->clear(mWireQuad);
+                mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
+            }
         }
 
     } else {
@@ -127,18 +129,21 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
     Quad first = mMainController->quadsCell(mQuad.mCell).front();
     auto origin = mMainController->getCanvas()->points(first).front();
 
-    sf::Vector2f delta(pos.x() - origin.position.x, pos.y() - origin.position.y);
-    sf::Transform translation;
+    if (!mMainController->isFixed(first.mCell))
+    {
+        sf::Vector2f delta(pos.x() - origin.position.x, pos.y() - origin.position.y);
+        sf::Transform translation;
 
-    translation.translate(delta.x, delta.y);
+        translation.translate(delta.x, delta.y);
 
-    mMainController->transform(mQuad, translation);
-    mMainController->transform(mWireQuad, translation);
+        mMainController->transform(mQuad, translation);
+        mMainController->transform(mWireQuad, translation);
 
-    origin = mMainController->getCanvas()->points(first).front();
-    //mMainController->clear(mWireQuad);
-    mMainController->update(mQuad);
-    mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
+        origin = mMainController->getCanvas()->points(first).front();
+        //mMainController->clear(mWireQuad);
+        mMainController->update(mQuad);
+        mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
+    }
 }
 
 void Selected::keyPressEvent(QKeyEvent * e)

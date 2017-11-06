@@ -88,13 +88,10 @@ void MainController::mouseRelease()
 
 void MainController::createQuads()
 {
-    //const double rowHeight = units::unit_cast<double>(mDesign->floorplan().rowUpperRightCorner(*mDesign->floorplan().rowsRange().begin()).y());
+    // Chip Area
+    mCanvas->createBoundaries(mDesign->floorplan().chipUpperRightCorner().toPoint());
 
-    //DrawableBatch<4> * drawable = mCanvas->drawableQuads();
-
-    sf::Transform mirror;
-    //mirror.scale(1.0, -1.0);
-
+    // Cells
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
     {
 
@@ -123,14 +120,12 @@ void MainController::createQuads()
         }
 
         mCellToQuads[*cellIt] = quads;
-        //mCanvas->transform(Quad(), forms, mirror);
 
         if (forms.size() > 1) {
             mCanvas->paint(Quad(), forms, sf::Color::Blue);
         } else {
             mCanvas->paint(Quad(), forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
         }
-
     }
 }
 
@@ -199,4 +194,9 @@ void MainController::update(Quad quad)
         mIndex.quadRemove(*quadOfBox);
         mIndex.quadCreate(*quadOfBox, *cellBoxIt);
     }
+}
+
+ophidian::geometry::Point MainController::chipBoundaries()
+{
+    return mDesign->floorplan().chipUpperRightCorner().toPoint();
 }

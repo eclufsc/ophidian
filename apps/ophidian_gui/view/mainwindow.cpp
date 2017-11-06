@@ -39,7 +39,7 @@ void MainWindow::on_actionQuit_triggered()
 }
 
 void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets)
-{
+{   
     ui->circuitName_2->setText(name);
     ui->circuitDieArea_2->setText(die);
     ui->circuitCells_2->setText(QString::number(cells));
@@ -47,6 +47,13 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
     ui->circuitNets_2->setText(QString::number(nets));
 
     ui->MyCanvas->reserveMinimumOfQuads(cells);
+
+    ophidian::geometry::Point boundaries = mMainController.chipBoundaries();
+    ophidian::geometry::Point centerView(boundaries.x()/2.0, boundaries.y()/2.0);
+    //ophidian::geometry::Point cameraSize();
+
+    ui->MyCanvas->centerViewOn(centerView);
+    ui->MyCanvas->viewSize(boundaries);
 }
 
 void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack)

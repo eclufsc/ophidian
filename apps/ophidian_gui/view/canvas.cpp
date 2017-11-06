@@ -2,7 +2,8 @@
 
 Canvas::Canvas() :
     mQuads(sf::Quads),
-    mLines(sf::Lines)
+    mLines(sf::Lines),
+    mBoundaries(sf::Lines)
 {
 
 }
@@ -37,6 +38,7 @@ void Canvas::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(mQuads, states);
     target.draw(mLines, states);
+    target.draw(mBoundaries, states);
 }
 
 void Canvas::alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points)
@@ -87,6 +89,37 @@ void Canvas::setPoint(const Line & line, std::size_t i, ophidian::geometry::Poin
 std::array<sf::Vertex, 2> Canvas::points(const Line & line)
 {
     return mLines.points(line);
+}
+
+void Canvas::createBoundaries(const ophidian::geometry::Point chipUpperRightCorner)
+{
+    Line line;
+    std::vector<ophidian::geometry::Point> points;
+
+    ophidian::geometry::Point lowerLeft(0, 0);
+    ophidian::geometry::Point lowerRight(chipUpperRightCorner.x(), 0);
+    ophidian::geometry::Point upperRight(chipUpperRightCorner.x(), chipUpperRightCorner.y());
+    ophidian::geometry::Point upperLeft(0, chipUpperRightCorner.y());
+
+    points.push_back(lowerLeft);
+    points.push_back(lowerRight);
+    mBoundaries.alloc(line, points);
+    points.clear();
+
+    points.push_back(lowerRight);
+    points.push_back(upperRight);
+    mBoundaries.alloc(line, points);
+    points.clear();
+
+    points.push_back(upperRight);
+    points.push_back(upperLeft);
+    mBoundaries.alloc(line, points);
+    points.clear();
+
+    points.push_back(upperLeft);
+    points.push_back(lowerLeft);
+    mBoundaries.alloc(line, points);
+
 }
 
 WireQuad Canvas::createWireQuad(const std::vector<Quad> & quads)

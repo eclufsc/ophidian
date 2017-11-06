@@ -52,8 +52,9 @@ public:
     void transform(WireQuad wire, const sf::Transform & trans);
 
     void update(Quad quad);
-
     void clear(WireQuad & wire);
+
+    ophidian::geometry::Point chipBoundaries();
 
 public slots:
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);

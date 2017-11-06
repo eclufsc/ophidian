@@ -35,6 +35,7 @@ public:
     std::array<sf::Vertex, 2> points(const Line & line);
 
     /* WireQuads */
+    void createBoundaries(const ophidian::geometry::Point chipUpperRightCorner);
     WireQuad createWireQuad(const std::vector<Quad> & quads);
 
 
@@ -66,6 +67,7 @@ public:
 private:
     DrawableBatch<4> mQuads;
     DrawableBatch<2> mLines;
+    DrawableBatch<2> mBoundaries;
 };
 
 #endif // CANVAS_H

@@ -4,7 +4,7 @@ MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
     QSFMLCanvas(parent),
     mCameraView(sf::FloatRect(0, 0, 51599.25, 34200.0))
 {
-    mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
+    //mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
     mCameraView.setSize(mCameraView.getSize().x, -mCameraView.getSize().y);
 }
 
@@ -125,7 +125,7 @@ void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point &p1)
 
 void MySFMLCanvas::viewSize(const ophidian::geometry::Point &size)
 {
-    mCameraView.setSize(sf::Vector2f(size.x(), size.y()));
+    mCameraView.setSize(sf::Vector2f(size.x(), -size.y()));
 }
 
 void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
