@@ -140,3 +140,8 @@ ophidian::geometry::Point MySFMLCanvas::mouseEventToPoint(QMouseEvent * e)
     return ophidian::geometry::Point(viewCoord.x, viewCoord.y);
 }
 
+void MySFMLCanvas::updatePositionQuad(const ophidian::geometry::Point & p)
+{
+    mState->mouseReleaseEvent(p);
+}
+

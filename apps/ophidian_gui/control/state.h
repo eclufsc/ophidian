@@ -49,6 +49,7 @@ public:
     Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad);
     ~Selected();
     void mousePressEvent(ophidian::geometry::Point pos);
+    void mouseReleaseEvent(ophidian::geometry::Point pos);
     void keyPressEvent(QKeyEvent * e);
 
 protected:

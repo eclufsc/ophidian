@@ -44,6 +44,7 @@ public slots:
     void setState(State * state);
     void setSize(ophidian::geometry::Point size);
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
+    void updatePositionQuad(const ophidian::geometry::Point & p);
 
 private:
     ophidian::geometry::Point mouseEventToPoint(QMouseEvent * e);

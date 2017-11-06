@@ -196,8 +196,8 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>142</y>
-            <width>83</width>
+            <y>170</y>
+            <width>71</width>
             <height>19</height>
            </rect>
           </property>
@@ -248,7 +248,7 @@
           <property name="geometry">
            <rect>
             <x>62</x>
-            <y>105</y>
+            <y>108</y>
             <width>16</width>
             <height>26</height>
            </rect>
@@ -270,43 +270,62 @@
            <string>x:</string>
           </property>
          </widget>
-         <widget class="QLabel" name="selectedCell_x_2">
-          <property name="geometry">
-           <rect>
-            <x>80</x>
-            <y>83</y>
-            <width>141</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QLabel" name="selectedCell_y_2">
-          <property name="geometry">
-           <rect>
-            <x>80</x>
-            <y>108</y>
-            <width>141</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
          <widget class="QLabel" name="selectedCellWSlack_2">
           <property name="geometry">
            <rect>
             <x>88</x>
-            <y>140</y>
+            <y>170</y>
             <width>131</width>
             <height>21</height>
            </rect>
           </property>
           <property name="text">
-           <string>-------------------------------</string>
+           <string>...</string>
+          </property>
+         </widget>
+         <widget class="QDoubleSpinBox" name="selectedCell_y_2">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>111</y>
+            <width>136</width>
+            <height>26</height>
+           </rect>
+          </property>
+          <property name="minimum">
+           <double>-10000000000000000564754110205208414148406263819830583747005651641554565639675781971892197615894599829797681693475363620965659806446069238773051601456032797794197839403040623198185642380825912769195995883053017532724018486962951290880.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10000000000000000564754110205208414148406263819830583747005651641554565639675781971892197615894599829797681693475363620965659806446069238773051601456032797794197839403040623198185642380825912769195995883053017532724018486962951290880.000000000000000</double>
+          </property>
+         </widget>
+         <widget class="QDoubleSpinBox" name="selectedCell_x_2">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>81</y>
+            <width>136</width>
+            <height>26</height>
+           </rect>
+          </property>
+          <property name="minimum">
+           <double>-10000000000000000564754110205208414148406263819830583747005651641554565639675781971892197615894599829797681693475363620965659806446069238773051601456032797794197839403040623198185642380825912769195995883053017532724018486962951290880.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10000000000000000564754110205208414148406263819830583747005651641554565639675781971892197615894599829797681693475363620965659806446069238773051601456032797794197839403040623198185642380825912769195995883053017532724018486962951290880.000000000000000</double>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton">
+          <property name="geometry">
+           <rect>
+            <x>79</x>
+            <y>141</y>
+            <width>135</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Update Position</string>
           </property>
          </widget>
         </widget>

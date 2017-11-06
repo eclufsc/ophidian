@@ -55,7 +55,14 @@ void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, 
         ui->selectedCellName_2->setText(name);
         ui->selectedCellType_2->setText(type);
     }
-    ui->selectedCell_x_2->setText(QString::number(x));
-    ui->selectedCell_y_2->setText(QString::number(y));
+    ui->selectedCell_x_2->setValue(x);
+    ui->selectedCell_y_2->setValue(y);
     // ui->selectedCellWSlack_2->setText(QString::number(worstSlack)); //!< Not displaying
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    double x = ui->selectedCell_x_2->value();
+    double y = ui->selectedCell_y_2->value();
+    ui->MyCanvas->updatePositionQuad(ophidian::geometry::Point(x, y));
 }

@@ -32,6 +32,8 @@ private slots:
 
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
 
+    void on_pushButton_clicked();
+
 signals:
     void update();
 
