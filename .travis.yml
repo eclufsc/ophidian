@@ -21,6 +21,10 @@ before_script:
   - sudo apt-get install libgoogle-glog-dev
   - mkdir build && cd build
   - mkdir download && cd download
+  - wget http://launchpadlibrarian.net/251096863/libjsoncpp1_1.7.2-1_amd64.deb
+  - sudo dpkg -i libjsoncpp1_1.7.2-1_amd64.deb
+  - wget http://launchpadlibrarian.net/286832760/cmake-data_3.5.1-1ubuntu3_all.deb
+  - sudo dpkg -i cmake-data_3.5.1-1ubuntu3_all.deb
   - wget http://launchpadlibrarian.net/286832767/cmake_3.5.1-1ubuntu3_amd64.deb 
   - sudo dpkg -i cmake_3.5.1-1ubuntu3_amd64.deb
   - wget http://launchpadlibrarian.net/293879907/libboost-all-dev_1.62.0.1_amd64.deb
