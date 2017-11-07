@@ -2,11 +2,11 @@
 # This is the main CMakeLists file for the Ophidian library. 
 #
 # Its main goals are:
-#   - set up global variables.
-#   - configure Ophidian compilation requirements (find_packege)
-#   - handle Ophidian compilation logic 
-#   - set up the global include directories
-#   - add subdirectories
+#   - Set up global variables.
+#   - Configure Ophidian dependencies (find_packege).
+#   - Handle Ophidian compilation logic. 
+#   - Add subdirectories.
+#
 ################################################################################
 
 ################################################################################
@@ -14,36 +14,32 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.2.2)
-
-# Set PROJECT_NAME global variable
-set(PROJECT_NAME "ophidian")
+cmake_minimum_required(VERSION 3.5.2)
 
 # Set project name 
-project(${PROJECT_NAME})
+project(ophidian)
 
 # Set c++14 globally 
 set(CMAKE_CXX_STANDARD 14)
 
 # Set Ophidian source dir
-set(OPHIDIAN_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
-# Set the dependencies directory
-set(THIRD_PARTY_SOURCE_DIR ${OPHIDIAN_SOURCE_DIR}/3rdparty)
+################################################################################
+# Set up installation variables
+################################################################################
 
-# Set include dirs for the Lemon library
-set(LEMON_INCLUDE_DIR 
-    ${PROJECT_SOURCE_DIR}/3rdparty/Lemon/
-    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/
-    ${PROJECT_BINARY_DIR}/3rdparty/Lemon/lemon
-)
+# Set Cmake install prefix 
+set(CMAKE_INSTALL_PREFIX /usr/local)
 
-# Set the global include directories variable
-set(OPHIDIAN_INCLUDE_DIRECTORIES 
-    ${OPHIDIAN_SOURCE_DIR}
-    ${THIRD_PARTY_SOURCE_DIR}
-    ${LEMON_INCLUDE_DIR}
-)
+# Set ophidian shared libraries install path
+set(ophidian_install_lib_dir lib)
+
+# Set ophidian binary install path
+set(ophidian_install_bin_dir bin)
+
+# Set ophidian include install path
+set(ophidian_install_include_dir include)
 
 ################################################################################
 # Handle raquirements
@@ -52,31 +48,17 @@ set(OPHIDIAN_INCLUDE_DIRECTORIES
 # Find Boost
 find_package(Boost 1.59 REQUIRED)
 
-# Find OpenMp if aplicable
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+# Find Lemon
+find_package(LEMON REQUIRED CONFIG)
+
+# Find Units
+find_package(units REQUIRED CONFIG)
 
 ################################################################################
 # Project logic 
 ################################################################################
 
-# Set global compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
-
-# Set option build shared libs
-option(BUILD_SHARED_LIBS "on/off -> (build every non statc lib shared)/(build everything static)" ON)
-
-# Set the global include directories
-include_directories(${OPHIDIAN_INCLUDE_DIRECTORIES})
-
-# First add 3rdparty software to build
+# Add subdirectories
 add_subdirectory(3rdparty)
-
-# Then add Ophidian
 add_subdirectory(ophidian)
-
-# Then add test
 add_subdirectory(test)

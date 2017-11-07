@@ -1,4 +1,3 @@
-#include "flute_test.h"
 #include <catch.hpp>
 #include <ophidian/interconnection/SteinerTree.h>
 #include <ophidian/interconnection/Flute.h>

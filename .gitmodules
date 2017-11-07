@@ -1,9 +1,6 @@
 [submodule "3rdparty/QtPropertyBrowser"]
 	path = 3rdparty/QtPropertyBrowser
 	url = https://github.com/commontk/QtPropertyBrowser
-[submodule "3rdparty/Lemon"]
-	path = 3rdparty/Lemon
-	url = https://github.com/eclufsc/Lemon.git
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
     url = https://github.com/eclufsc/verilog-parser.git
@@ -13,12 +10,6 @@
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
 	url = https://github.com/eclufsc/Flute.git
-[submodule "3rdparty/units"]
-	path = 3rdparty/units
-	url = https://github.com/nholthaus/units.git
 [submodule "3rdparty/LEF"]
 	path = 3rdparty/LEF
 	url = https://github.com/eclufsc/LEF.git
-[submodule "3rdparty/OpenTimer"]
-	path = 3rdparty/OpenTimer
-	url = https://github.com/eclufsc/OpenTimer.git

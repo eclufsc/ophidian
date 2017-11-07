@@ -3,7 +3,7 @@ language: cpp
 sudo: required
 dist: trusty
 
-install: if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+install: if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
 
 matrix:
   include:
@@ -13,26 +13,25 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
-      env: COMPILER=g++-5
+            - g++-6
+            - libstdc++6
+      env: COMPILER=g++-6
       
 before_script:
   - sudo apt-get update
   - sudo apt-get install libgoogle-glog-dev
   - mkdir build && cd build
-  - wget https://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download
-  - tar jxf download
-  - sudo cp -r boost_1_59_0/boost /usr/include/
-  - wget http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
-  - tar -zxvf bison-3.0.4.tar.gz
-  - cd bison-3.0.4
-  - mkdir inst
-  - ./configure --prefix=$PWD/inst
-  - make -j && make install
-  - cd inst/bin
-  - export PATH=$PWD:$PATH
-  - cd ..
-  - cd ..
+  - mkdir download && cd download
+  - wget http://launchpadlibrarian.net/251096863/libjsoncpp1_1.7.2-1_amd64.deb
+  - sudo dpkg -i libjsoncpp1_1.7.2-1_amd64.deb
+  - wget http://launchpadlibrarian.net/286832760/cmake-data_3.5.1-1ubuntu3_all.deb
+  - sudo dpkg -i cmake-data_3.5.1-1ubuntu3_all.deb
+  - wget http://launchpadlibrarian.net/286832767/cmake_3.5.1-1ubuntu3_amd64.deb 
+  - sudo dpkg -i cmake_3.5.1-1ubuntu3_amd64.deb
+  - wget http://launchpadlibrarian.net/293885054/libboost1.62-dev_1.62.0+dfsg-4_amd64.deb
+  - sudo dpkg -i libboost1.62-dev_1.62.0+dfsg-4_amd64.deb
+  - wget http://launchpadlibrarian.net/315398098/libbison-dev_3.0.4.dfsg-1build1_amd64.deb
+  - sudo dpkg -i libbison-dev_3.0.4.dfsg-1build1_amd64.deb
   - cd ..
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release ..
 

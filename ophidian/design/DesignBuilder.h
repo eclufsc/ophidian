@@ -20,7 +20,6 @@
 #define OPHIDIAN_DESIGN_DESIGNBUILDER_H
 
 #include <fstream>
-#include <ophidian/design/Design.h>
 #include <ophidian/parser/ParserException.h>
 #include <ophidian/parser/VerilogParser.h>
 #include <ophidian/floorplan/LefDef2Floorplan.h>
@@ -28,6 +27,8 @@
 #include <ophidian/placement/Lef2Library.h>
 #include <ophidian/circuit/Def2LibraryMapping.h>
 #include <ophidian/circuit/Verilog2Netlist.h>
+
+#include "Design.h"
 
 namespace ophidian
 {

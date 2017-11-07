@@ -2,10 +2,11 @@
 #define DEF2LIBRARYMAPPING_H
 
 #include <ophidian/parser/Def.h>
-#include <ophidian/circuit/Netlist.h>
-#include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/standard_cell/StandardCells.h>
 #include <unordered_map>
+
+#include "Netlist.h"
+#include "LibraryMapping.h"
 
 namespace ophidian
 {

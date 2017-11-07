@@ -10,30 +10,25 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_run_tests_SRC  
+file(GLOB_RECURSE ophidian_run_tests_source
     "*.cpp"
 )
 
-# Add Catch lib interface
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE .)
-
 # Add test target
-add_executable(ophidian_tests ${ophidian_run_tests_SRC})
+add_executable(ophidian_tests ${ophidian_run_tests_source})
 
 # Link target dependencies
-target_link_libraries(ophidian_tests PUBLIC 
-    Catch 
-    ophidian_circuit 
-    ophidian_design 
-    ophidian_entity_system 
-    ophidian_floorplan 
-    ophidian_geometry 
-    ophidian_interconnection 
-    ophidian_parser 
-    ophidian_placement 
-    ophidian_standard_cell 
-    ophidian_timing 
+target_link_libraries(ophidian_tests
+    PRIVATE Catch
+    PRIVATE ophidian_circuit
+    PRIVATE ophidian_design
+    PRIVATE ophidian_entity_system
+    PRIVATE ophidian_floorplan
+    PRIVATE ophidian_geometry
+    PRIVATE ophidian_interconnection
+    PRIVATE ophidian_parser
+    PRIVATE ophidian_placement
+    PRIVATE ophidian_standard_cell
 )
 
 ################################################################################

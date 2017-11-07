@@ -19,6 +19,8 @@
 #include "Def.h"
 #include "ParserException.h"
 
+#include <defrReader.hpp>
+
 namespace ophidian
 {
 namespace parser

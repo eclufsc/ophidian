@@ -20,9 +20,9 @@
 #define OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
 
 #include <ophidian/parser/Def.h>
-#include <ophidian/placement/Placement.h>
 #include <ophidian/circuit/Netlist.h>
 
+#include "Placement.h"
 
 namespace ophidian
 {

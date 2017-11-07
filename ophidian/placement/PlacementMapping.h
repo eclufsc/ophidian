@@ -1,10 +1,11 @@
 #ifndef PLACEMENTMAPPING_H
 #define PLACEMENTMAPPING_H
 
-#include <ophidian/placement/Placement.h>
-#include <ophidian/placement/Library.h>
 #include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/geometry/Operations.h>
+
+#include "Placement.h"
+#include "Library.h"
 
 namespace ophidian {
 namespace placement {

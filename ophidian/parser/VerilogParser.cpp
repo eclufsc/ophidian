@@ -23,11 +23,10 @@
 #include <fstream>
 
 #ifdef __cplusplus
-
 extern "C" {
 #endif
-#include <3rdparty/verilog-parser/src/verilog_parser.h>
-#include <3rdparty/verilog-parser/src/verilog_ast_util.h>
+#include <verilog_parser.h>
+#include <verilog_ast_util.h>
 #ifdef __cplusplus
 }
 #endif
