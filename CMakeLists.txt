@@ -14,7 +14,7 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.9.2)
+cmake_minimum_required(VERSION 3.5.2)
 
 # Set project name 
 project(ophidian)

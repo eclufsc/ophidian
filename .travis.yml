@@ -12,8 +12,11 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - ppsspp
           packages:
             - g++-5
+            - cmake
+            - cmake-data
       env: COMPILER=g++-5
       
 before_script:
