@@ -19,13 +19,12 @@ matrix:
 before_script:
   - sudo apt-get update
   - sudo apt-get install libgoogle-glog-dev
-  - sudo add-apt-repository ppa:ppsspp/cmake
-  - sudo apt-get upgrade cmake
   - mkdir build && cd build
   - mkdir download && cd download
-  - wget -O boost https://sourceforge.net/projects/boost/files/latest/download?source=directory
-  - tar -jxf boost 
-  - sudo cp -r boost/boost /usr/include/
+  - wget http://launchpadlibrarian.net/286832767/cmake_3.5.1-1ubuntu3_amd64.deb 
+  - sudo dpkg -i cmake_3.5.1-1ubuntu3_amd64.deb
+  - wget http://launchpadlibrarian.net/293879907/libboost-all-dev_1.62.0.1_amd64.deb
+  - sudo dpkg -i libboost-all-dev_1.62.0.1_amd64.deb
   - wget http://launchpadlibrarian.net/315398098/libbison-dev_3.0.4.dfsg-1build1_amd64.deb
   - sudo dpkg -i libbison-dev_3.0.4.dfsg-1build1_amd64.deb
   - cd ..
