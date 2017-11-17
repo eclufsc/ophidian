@@ -52,6 +52,7 @@ public:
     void transform(WireQuad wire, const sf::Transform & trans);
 
     void update(Quad quad);
+    void remove(Quad quad, WireQuad wire);
     void clear(WireQuad & wire);
 
     ophidian::geometry::Point chipBoundaries();

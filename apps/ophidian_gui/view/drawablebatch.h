@@ -25,6 +25,7 @@ public:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
+    void desalloc(const Form & out);
     void transform(const std::vector<Form> & forms, const sf::Transform & trans);
     void paint(const std::vector<Form> & forms, const sf::Color color);
     void setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p);
@@ -112,32 +113,20 @@ void DrawableBatch<NumberOfVertices>::alloc(Form & form, const std::vector<ophid
         newVertices[i].position = sf::Vector2f(points[i].x(), points[i].y());
     }
 
-    /*
-    sf::Color color;
-    switch (quad.mId % NumberOfVertices) {
-    case 0:
-        color = sf::Color::Red;
-        break;
-    case 1:
-        color = sf::Color::Yellow;
-        break;
-    case 2:
-        color = sf::Color::Green;
-        break;
-    case 3:
-        color = sf::Color::Blue;
-        break;
-    default:
-        break;
+    mVertices.push_back(newVertices);
+}
+
+template<std::size_t NumberOfVertices>
+void DrawableBatch<NumberOfVertices>::desalloc(const Form & out)
+{
+    std::array<sf::Vertex, NumberOfVertices> newVertices;
+
+    for (auto i = 0; i < NumberOfVertices; ++i)
+    {
+        newVertices[i].position = sf::Vector2f(0, 0);
     }
 
-    newVertices[0].color = color;
-    newVertices[1].color = color;
-    newVertices[2].color = color;
-    newVertices[3].color = color;
-    */
-
-    mVertices.push_back(newVertices);
+    mVertices[out.mId] = (newVertices);
 }
 
 template<std::size_t NumberOfVertices>

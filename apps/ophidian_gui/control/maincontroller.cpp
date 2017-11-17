@@ -92,7 +92,9 @@ void MainController::createQuads()
     mCanvas->createBoundaries(mDesign->floorplan().chipUpperRightCorner().toPoint());
 
     // Row information
-    //ophidian::geometry::Point rowSize = mDesign->floorplan().rowUpperRightCorner(mDesign->floorplan().RowsIterator).toPoint();
+    ophidian::geometry::Point rowSize = mDesign->floorplan().rowUpperRightCorner(*(mDesign->floorplan().rowsRange().begin())).toPoint();
+    std::cout << "Row: " << rowSize.x() << "x" << rowSize.y() << std::endl;
+    unsigned int height = 0, width = 0;
 
     // Cells
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
@@ -118,19 +120,28 @@ void MainController::createQuads()
             mCanvas->alloc(quad, points);
             mIndex.quadCreate(quad, *cellBoxIt);
 
+            if (height < (*cellBoxIt).max_corner().y() - (*cellBoxIt).min_corner().y())
+                height = (*cellBoxIt).max_corner().y() - (*cellBoxIt).min_corner().y();
+
+            if (width < (*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x())
+                width = (*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x();
+
             forms.push_back(quad);
             quads.push_back(quad);
         }
 
 
 
-        if (forms.size() > 1) {
+        if (forms.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
             mCellToQuads[*cellIt] = std::make_pair(quads, true);
             mCanvas->paint(Quad(), forms, sf::Color::Blue);
         } else {
             mCellToQuads[*cellIt] = std::make_pair(quads, false);
-            mCanvas->paint(Quad(), forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
+            unsigned int random = rand();
+            mCanvas->paint(Quad(), forms, sf::Color(200, (random % 50), (random % 130 + 125)));
         }
+
+        height = width = 0;
     }
 }
 
@@ -199,6 +210,28 @@ void MainController::update(Quad quad)
         mIndex.quadRemove(*quadOfBox);
         mIndex.quadCreate(*quadOfBox, *cellBoxIt);
     }
+}
+
+void MainController::remove(Quad quad, WireQuad wire)
+{
+    auto quads = mCellToQuads[quad.mCell].first;
+    mCanvas->desalloc(quads);
+
+    std::vector<Line> lines;
+    for (const auto & l : wire.mLines)
+        lines.push_back(l);
+    mCanvas->desalloc(lines);
+
+    auto quadsOfBox = mCellToQuads[quad.mCell].first;
+    for (auto quadIt = quadsOfBox.begin(); quadIt != quadsOfBox.end(); quadIt++)
+    {
+        mIndex.quadRemove(*quadIt);
+    }
+
+    mDesign->netlist().erase(quad.mCell);
+    /* Just hedge the points to the origin, not to need to
+     * find a cell to put in place (quantities of different quads).
+     */
 }
 
 ophidian::geometry::Point MainController::chipBoundaries()

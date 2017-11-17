@@ -86,20 +86,22 @@ void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
     {
     case Qt::Key::Key_W:
     case Qt::Key::Key_Up:
-        mCameraView.move(sf::Vector2f(0.0f, mCameraView.getSize().y*.1));
+        mCameraView.move(sf::Vector2f(0.0f, -mCameraView.getSize().y*.1));
         break;
     case Qt::Key::Key_S:
     case Qt::Key::Key_Down:
-        mCameraView.move(sf::Vector2f(0.0f, -mCameraView.getSize().y*.1));
+        mCameraView.move(sf::Vector2f(0.0f, mCameraView.getSize().y*.1));
         break;
     case Qt::Key::Key_D:
     case Qt::Key::Key_Right:
-        mCameraView.move(sf::Vector2f(-mCameraView.getSize().x*.1, 0.0f));
+        mCameraView.move(sf::Vector2f(mCameraView.getSize().x*.1, 0.0f));
         break;
     case Qt::Key::Key_A:
     case Qt::Key::Key_Left:
-        mCameraView.move(sf::Vector2f(mCameraView.getSize().x*.1, 0.0f));
+        mCameraView.move(sf::Vector2f(-mCameraView.getSize().x*.1, 0.0f));
         break;
+    case Qt::Key::Key_Delete:
+        mState->keyPressEvent(e);
     }
 }
 

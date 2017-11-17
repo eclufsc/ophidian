@@ -47,6 +47,12 @@ void Canvas::alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & p
     mQuads.alloc(quad, points);
 }
 
+void Canvas::desalloc(const std::vector<Quad> & quads)
+{
+    for (const auto & q : quads)
+        mQuads.desalloc(q);
+}
+
 void Canvas::transform(Quad, const std::vector<Form> & quads, const sf::Transform & trans)
 {
     mQuads.transform(quads, trans);
@@ -70,6 +76,12 @@ std::array<sf::Vertex, 4> Canvas::points(const Quad & quad)
 void Canvas::alloc(Line & line, const std::vector<ophidian::geometry::Point> & points)
 {
     mLines.alloc(line, points);
+}
+
+void Canvas::desalloc(const std::vector<Line> & lines)
+{
+    for (const auto & l : lines)
+        mLines.desalloc(l);
 }
 
 void Canvas::transform(Line, const std::vector<Form> & lines, const sf::Transform & trans)
