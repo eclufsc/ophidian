@@ -151,9 +151,13 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
 
 void Selected::keyPressEvent(QKeyEvent * e)
 {
-    mMainController->remove(mQuad, mWireQuad);
-    mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
-    delete this;
+    if (e->key() == Qt::Key_Delete) {
+        if(!mMainController->isFixed(mQuad.mCell)) {
+            mMainController->remove(mQuad, mWireQuad);
+            mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
+            delete this;
+        }
+    }
 }
 
 Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
