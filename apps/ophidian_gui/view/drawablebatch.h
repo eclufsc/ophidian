@@ -22,12 +22,12 @@ public:
 
     const sf::Vertex operator[](const std::size_t i) const;
     void reserveMinimumOfQuads(std::size_t minimumOfQuads);
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    void draw(sf::RenderTarget & target, sf::RenderStates states) const;
 
     void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
     void desalloc(const Form & out);
-    void transform(const std::vector<Form> & forms, const sf::Transform & trans);
-    void paint(const std::vector<Form> & forms, const sf::Color color);
+    void transform(const Form & form, const sf::Transform & trans);
+    void paint(const Form & form, const sf::Color color);
     void setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p);
 
     std::size_t vertexAmount() const;
@@ -130,27 +130,20 @@ void DrawableBatch<NumberOfVertices>::desalloc(const Form & out)
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::transform(const std::vector<Form> &forms, const sf::Transform & trans)
+void DrawableBatch<NumberOfVertices>::transform(const Form & form, const sf::Transform & trans)
 {
-    for (const Form & q : forms)
+    for (sf::Vertex & v : mVertices[form.mId])
     {
-        for (sf::Vertex & v : mVertices[q.mId])
-        {
-            v.position = trans.transformPoint(v.position);
-        }
+        v.position = trans.transformPoint(v.position);
     }
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::paint(const std::vector<Form> & forms, const sf::Color color)
+void DrawableBatch<NumberOfVertices>::paint(const Form & form, const sf::Color color)
 {
-    for (const Form & q : forms)
+    for (sf::Vertex & v : mVertices[form.mId])
     {
-        std::array<sf::Vertex, NumberOfVertices> & box = mVertices[q.mId];
-        for (sf::Vertex & v : box)
-        {
-            v.color = color;
-        }
+        v.color = color;
     }
 }
 

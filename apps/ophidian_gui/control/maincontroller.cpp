@@ -101,7 +101,6 @@ void MainController::createQuads()
     {
 
         std::vector<Quad> quads;
-        std::vector<Form> forms;
 
         ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(*cellIt);
 
@@ -126,19 +125,18 @@ void MainController::createQuads()
             if (width < (*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x())
                 width = (*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x();
 
-            forms.push_back(quad);
             quads.push_back(quad);
         }
 
 
 
-        if (forms.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
+        if (quads.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
             mCellToQuads[*cellIt] = std::make_pair(quads, true);
-            mCanvas->paint(Quad(), forms, sf::Color::Blue);
+            mCanvas->paint(quads, sf::Color::Blue);
         } else {
             mCellToQuads[*cellIt] = std::make_pair(quads, false);
             unsigned int random = rand();
-            mCanvas->paint(Quad(), forms, sf::Color(200, (random % 50), (random % 130 + 125)));
+            mCanvas->paint(quads, sf::Color(200, (random % 50), (random % 130 + 125)));
         }
 
         height = width = 0;
@@ -177,22 +175,16 @@ void MainController::clear(WireQuad & wire)
 
 void MainController::transform(Quad quad, const sf::Transform & trans)
 {
-    Quad first = mCellToQuads[quad.mCell].first.front();
-
-    std::vector<Form> forms;
-    for (const auto & q : mCellToQuads[first.mCell].first)
-        forms.push_back(q);
-
-    mCanvas->transform(first, forms, trans);
+    mCanvas->transform(mCellToQuads[quad.mCell].first, trans);
 }
 
 void MainController::transform(WireQuad wire, const sf::Transform & trans)
 {
-    std::vector<Form> forms;
-    for (const auto & q : wire.mLines)
-        forms.push_back(q);
+    std::vector<Line> lines;
+    for (const auto & l : wire.mLines)
+        lines.push_back(l);
 
-    mCanvas->transform(Line(), forms, trans);
+    mCanvas->transform(lines, trans);
 }
 
 void MainController::update(Quad quad)

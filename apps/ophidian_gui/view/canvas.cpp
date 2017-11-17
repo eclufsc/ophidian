@@ -53,14 +53,16 @@ void Canvas::desalloc(const std::vector<Quad> & quads)
         mQuads.desalloc(q);
 }
 
-void Canvas::transform(Quad, const std::vector<Form> & quads, const sf::Transform & trans)
+void Canvas::transform(const std::vector<Quad> & quads, const sf::Transform & trans)
 {
-    mQuads.transform(quads, trans);
+    for (const auto & q : quads)
+        mQuads.transform(q, trans);
 }
 
-void Canvas::paint(Quad, const std::vector<Form> & quads, const sf::Color color)
+void Canvas::paint(const std::vector<Quad> & quads, const sf::Color color)
 {
-    mQuads.paint(quads, color);
+    for (const auto & q : quads)
+        mQuads.paint(q, color);
 }
 
 void Canvas::setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p)
@@ -84,14 +86,16 @@ void Canvas::desalloc(const std::vector<Line> & lines)
         mLines.desalloc(l);
 }
 
-void Canvas::transform(Line, const std::vector<Form> & lines, const sf::Transform & trans)
+void Canvas::transform(const std::vector<Line> & lines, const sf::Transform & trans)
 {
-    mLines.transform(lines, trans);
+    for (const auto & l : lines)
+        mLines.transform(l, trans);
 }
 
-void Canvas::paint(Line, const std::vector<Form> & lines, const sf::Color color)
+void Canvas::paint(const std::vector<Line> & lines, const sf::Color color)
 {
-    mLines.paint(lines, color);
+    for (const auto & l : lines)
+        mLines.paint(l, color);
 }
 
 void Canvas::setPoint(const Line & line, std::size_t i, const ophidian::geometry::Point p)
