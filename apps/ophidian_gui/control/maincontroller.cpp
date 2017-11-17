@@ -38,7 +38,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     mDesign = &mBuilder->build();
 
     /* Creating property Cells to Quads */
-    mCellToQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(ophidian::circuit::Cell());
+    mCellToQuads = mDesign->netlist().makeProperty<std::pair<std::vector<Quad>, fixed_t>>(ophidian::circuit::Cell());
 
     /* Getting information of netlist */
     size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
@@ -91,6 +91,9 @@ void MainController::createQuads()
     // Chip Area
     mCanvas->createBoundaries(mDesign->floorplan().chipUpperRightCorner().toPoint());
 
+    // Row information
+    //ophidian::geometry::Point rowSize = mDesign->floorplan().rowUpperRightCorner(mDesign->floorplan().RowsIterator).toPoint();
+
     // Cells
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
     {
@@ -119,11 +122,13 @@ void MainController::createQuads()
             quads.push_back(quad);
         }
 
-        mCellToQuads[*cellIt] = quads;
+
 
         if (forms.size() > 1) {
+            mCellToQuads[*cellIt] = std::make_pair(quads, true);
             mCanvas->paint(Quad(), forms, sf::Color::Blue);
         } else {
+            mCellToQuads[*cellIt] = std::make_pair(quads, false);
             mCanvas->paint(Quad(), forms, sf::Color(200, (rand() % 50), (rand() % 130 + 125)));
         }
     }
@@ -131,7 +136,7 @@ void MainController::createQuads()
 
 bool MainController::isFixed(const ophidian::circuit::Cell & cell)
 {
-    return (mCellToQuads[cell].size() > 1);
+    return mCellToQuads[cell].second;
 }
 
 bool MainController::hasQuad(const ophidian::geometry::Point & p)
@@ -146,12 +151,12 @@ Quad MainController::quadAt(const ophidian::geometry::Point & p)
 
 std::vector<Quad> MainController::quadsCell(const ophidian::circuit::Cell & cell)
 {
-    return mCellToQuads[cell];
+    return mCellToQuads[cell].first;
 }
 
 WireQuad MainController::wireQuadOfCell(const ophidian::circuit::Cell & cell)
 {
-    return mCanvas->createWireQuad(mCellToQuads[cell]);
+    return mCanvas->createWireQuad(mCellToQuads[cell].first);
 }
 
 void MainController::clear(WireQuad & wire)
@@ -161,10 +166,10 @@ void MainController::clear(WireQuad & wire)
 
 void MainController::transform(Quad quad, const sf::Transform & trans)
 {
-    Quad first = mCellToQuads[quad.mCell].front();
+    Quad first = mCellToQuads[quad.mCell].first.front();
 
     std::vector<Form> forms;
-    for (const auto & q : mCellToQuads[first.mCell])
+    for (const auto & q : mCellToQuads[first.mCell].first)
         forms.push_back(q);
 
     mCanvas->transform(first, forms, trans);
@@ -181,14 +186,14 @@ void MainController::transform(WireQuad wire, const sf::Transform & trans)
 
 void MainController::update(Quad quad)
 {
-    Quad first = mCellToQuads[quad.mCell].front();
+    Quad first = mCellToQuads[quad.mCell].first.front();
     auto newOrigin = mCanvas->points(first).front();
 
     mDesign->placement().placeCell(first.mCell, ophidian::util::LocationDbu(newOrigin.position.x, newOrigin.position.y));
 
     ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(first.mCell);
 
-    auto quadOfBox = mCellToQuads[first.mCell].begin();
+    auto quadOfBox = mCellToQuads[first.mCell].first.begin();
     for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++, quadOfBox++)
     {
         mIndex.quadRemove(*quadOfBox);

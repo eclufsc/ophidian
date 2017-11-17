@@ -34,6 +34,12 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_actionSlot_1_triggered();
+
+    void on_actionSlot_2_triggered();
+
+    void on_actionSlot_3_triggered();
+
 signals:
     void update();
 

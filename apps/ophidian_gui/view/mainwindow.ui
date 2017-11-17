@@ -161,7 +161,7 @@
            <rect>
             <x>0</x>
             <y>20</y>
-            <width>51</width>
+            <width>61</width>
             <height>61</height>
            </rect>
           </property>
@@ -221,9 +221,9 @@
          <widget class="QWidget" name="NameType_2" native="true">
           <property name="geometry">
            <rect>
-            <x>50</x>
+            <x>60</x>
             <y>20</y>
-            <width>171</width>
+            <width>161</width>
             <height>61</height>
            </rect>
           </property>
@@ -380,8 +380,17 @@
     </property>
     <addaction name="actionPreferences"/>
    </widget>
+   <widget class="QMenu" name="menuActions">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+    <addaction name="actionSlot_1"/>
+    <addaction name="actionSlot_2"/>
+    <addaction name="actionSlot_3"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuActions"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionICCAD_2017">
@@ -407,6 +416,21 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionSlot_1">
+   <property name="text">
+    <string>Slot 1</string>
+   </property>
+  </action>
+  <action name="actionSlot_2">
+   <property name="text">
+    <string>Slot 2</string>
+   </property>
+  </action>
+  <action name="actionSlot_3">
+   <property name="text">
+    <string>Slot 3</string>
    </property>
   </action>
  </widget>

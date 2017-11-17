@@ -69,10 +69,11 @@ void Idle::mousePressEvent(ophidian::geometry::Point pos)
     {
         Quad selected = mMainController->quadAt(pos);
 
-        if(mMainController->isFixed(selected.mCell))
+        if(mMainController->isFixed(selected.mCell)) {
             mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
-        else
+        } else {
             mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
+        }
 
         delete this;
     }
@@ -102,16 +103,19 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
             mMainController->clear(mWireQuad);
             mMainController->mousePress(pos);
 
-            if(mMainController->isFixed(selected.mCell))
+            if(mMainController->isFixed(selected.mCell)) {
                 mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
-            else
+            } else {
                 mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
+            }
+            delete this;
         }
         else
         {
             if (!mMainController->isFixed(selected.mCell)) {
                 mMainController->clear(mWireQuad);
                 mSFMLCanvas->setState(new Dragging(mSFMLCanvas, mMainController, selected, pos));
+                delete this;
             }
         }
 
@@ -119,9 +123,8 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
         mMainController->clear(mWireQuad);
         mMainController->mousePress(pos);
         mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
+        delete this;
     }
-
-    delete this;
 }
 
 void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)

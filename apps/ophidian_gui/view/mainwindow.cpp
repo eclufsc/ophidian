@@ -13,6 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)));
     QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, int)),
                      this, SLOT(on_selected_cellChanged(QString, QString, double, double, int)));
+
+    /* Name of Actions */
+    ui->actionSlot_1->setText("Slot 1");
+    ui->actionSlot_1->setText("Slot 2");
+    ui->actionSlot_1->setText("Slot 3");
 }
 
 MainWindow::~MainWindow()
@@ -50,7 +55,6 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
 
     ophidian::geometry::Point boundaries = mMainController.chipBoundaries();
     ophidian::geometry::Point centerView(boundaries.x()/2.0, boundaries.y()/2.0);
-    //ophidian::geometry::Point cameraSize();
 
     ui->MyCanvas->centerViewOn(centerView);
     ui->MyCanvas->viewSize(boundaries);
@@ -58,10 +62,12 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
 
 void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack)
 {
-    if (name.compare("moving")) {
+    if (name.compare("moving"))
+    {
         ui->selectedCellName_2->setText(name);
         ui->selectedCellType_2->setText(type);
     }
+
     ui->selectedCell_x_2->setValue(x);
     ui->selectedCell_y_2->setValue(y);
     // ui->selectedCellWSlack_2->setText(QString::number(worstSlack)); //!< Not displaying
@@ -72,4 +78,31 @@ void MainWindow::on_pushButton_clicked()
     double x = ui->selectedCell_x_2->value();
     double y = ui->selectedCell_y_2->value();
     ui->MyCanvas->updatePositionQuad(ophidian::geometry::Point(x, y));
+}
+
+void MainWindow::on_actionSlot_1_triggered()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
+}
+
+void MainWindow::on_actionSlot_2_triggered()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
+}
+
+void MainWindow::on_actionSlot_3_triggered()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
 }

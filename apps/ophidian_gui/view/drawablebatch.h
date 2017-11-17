@@ -27,7 +27,7 @@ public:
     void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
     void transform(const std::vector<Form> & forms, const sf::Transform & trans);
     void paint(const std::vector<Form> & forms, const sf::Color color);
-    void setPoint(const Form & form, std::size_t i, ophidian::geometry::Point & p);
+    void setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p);
 
     std::size_t vertexAmount() const;
 
@@ -166,7 +166,7 @@ void DrawableBatch<NumberOfVertices>::paint(const std::vector<Form> & forms, con
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::setPoint(const Form & form, std::size_t i, ophidian::geometry::Point & p)
+void DrawableBatch<NumberOfVertices>::setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p)
 {
     mVertices[form.mId][i].position = sf::Vector2f(p.x(), p.y());
 }

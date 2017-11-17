@@ -17,6 +17,7 @@ void Canvas::clear()
 {
     mQuads.clear();
     mLines.clear();
+    mBoundaries.clear();
 }
 
 void Canvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
@@ -81,7 +82,7 @@ void Canvas::paint(Line, const std::vector<Form> & lines, const sf::Color color)
     mLines.paint(lines, color);
 }
 
-void Canvas::setPoint(const Line & line, std::size_t i, ophidian::geometry::Point & p)
+void Canvas::setPoint(const Line & line, std::size_t i, const ophidian::geometry::Point p)
 {
     mLines.setPoint(line, i, p);
 }
