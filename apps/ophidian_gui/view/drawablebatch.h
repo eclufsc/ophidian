@@ -15,40 +15,117 @@ template<std::size_t NumberOfVertices>
 class DrawableBatch : public sf::Drawable
 {
 public:
+    //! DrawableBatch Constructor
+    /*!
+       \brief Constructs a DrawableBatch with no canvas
+       \param Primitive drawing (Quad, Line etc).
+     */
     DrawableBatch(sf::PrimitiveType primitive);
+
+    //! DrawableBatch Destructor
+    /*!
+       \brief Destroys the DrawableBatch, including its properties
+     */
     ~DrawableBatch();
 
+    //! Clean container
+    /*!
+       \brief Removes all vertices from the container.
+     */
     void clear();
 
+    //! [] operator
+    /*!
+       \brief Take the vertex in position i.
+       \param i Position on container.
+       \return A vertex.
+     */
     const sf::Vertex operator[](const std::size_t i) const;
-    void reserveMinimumOfQuads(std::size_t minimumOfQuads);
+
+    //! Allocates space in container
+    /*!
+       \brief Reserves memory to allocate all possible amount of forms.
+       \param minimumOfForms Amount of space to reserve.
+     */
+    void reserveminimumOfForms(std::size_t minimumOfForms);
+
+    //! Draw vertices
+    /*!
+       \brief Draw all vertices of the container.
+       \param target Render target
+       \param states Render states
+     */
     void draw(sf::RenderTarget & target, sf::RenderStates states) const;
 
+    //! Allocate a form
+    /*!
+       \brief Inserts vertices of the form into the container.
+       \param form A form to store your index in the container.
+       \param points Vector with points of a form.
+     */
     void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
+
+    //! Desalloc a form
+    /*!
+       \brief Set the vertices of the form to the origin (0,0).
+       \param form A form to "erase".
+     */
     void desalloc(const Form & out);
+
+    //! Transform a form
+    /*!
+       \brief Transforms the vertices of a form.
+       \param form A form to transform.
+       \param trans Transformation to be performed.
+     */
     void transform(const Form & form, const sf::Transform & trans);
+
+    //! Paints a form
+    /*!
+       \brief Paints the vertices of a form.
+       \param form A form to paint.
+       \param color Painting color.
+     */
     void paint(const Form & form, const sf::Color color);
+
+    //! Set a vertex of a form
+    /*!
+       \brief Set a vertex of a form in a absolute position.
+       \param form The form to get index
+       \param i Index of the vertex.
+       \param p New position of the vertex.
+     */
     void setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p);
 
+    //! Amount of vertices
+    /*!
+       \brief Returns the amount of vertices.
+       \return Amount of vertices.
+     */
     std::size_t vertexAmount() const;
 
+    //! Point of a vertex of a form
+    /*!
+       \brief A point of one of the vertices of the form.
+       \param form The form to get index.
+       \return Point of the vertex.
+     */
     ophidian::geometry::Point point(const Form & form, std::size_t i) const;
+
+    //! Vertices of a form
+    /*!
+       \brief Returns the vertices of a form.
+       \param form The form to get index.
+       \return Array containing all vertices of the form.
+     */
     std::array<sf::Vertex, NumberOfVertices> points(const Form & form) const;
-
-    // ??? bool has_animation() const;
-    // ... void animate(batch_animation * animation);
-    // ??? entity_system::entity create();
-    // ??? void destroy(entity_system::entity the_entity);
-    // ??? void update();
-
 
 private:
     sf::PrimitiveType mPrimitive;
     std::vector<std::array<sf::Vertex, NumberOfVertices>> mVertices;
-    // ... batch_animation * m_animation;
 };
 
-/* Implementation in .h because of the template. */
+/* Implementation in .h because of the template<...> */
 
 template<std::size_t NumberOfVertices>
 DrawableBatch<NumberOfVertices>::DrawableBatch(sf::PrimitiveType primitive) :
@@ -56,6 +133,7 @@ DrawableBatch<NumberOfVertices>::DrawableBatch(sf::PrimitiveType primitive) :
 {
     std::array<sf::Vertex, NumberOfVertices> form;
 
+    // Water mark
     if (mPrimitive == sf::Quads)
     {
         form[0].position = sf::Vector2f(10, 10);
@@ -85,9 +163,9 @@ void DrawableBatch<NumberOfVertices>::clear()
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::reserveMinimumOfQuads(std::size_t minimumOfQuads)
+void DrawableBatch<NumberOfVertices>::reserveminimumOfForms(std::size_t minimumOfForms)
 {
-    mVertices.reserve(minimumOfQuads);
+    mVertices.reserve(minimumOfForms);
 }
 
 template<std::size_t NumberOfVertices>
@@ -171,32 +249,5 @@ std::array<sf::Vertex, NumberOfVertices> DrawableBatch<NumberOfVertices>::points
 {
     return mVertices[form.mId];
 }
-
-/*
-
-DrawableBatch<NumberOfVertices>::DrawableBatch(sf::PrimitiveType primitive) :
-    m_primitive(primitive),
-    m_animation(nullptr){
-    m_system.register_property(&m_vertices);
-    m_system.preallocate(10000000);
-}
-
-bool DrawableBatch<NumberOfVertices>::has_animation() const {
-    return m_animation != nullptr;
-}
-
-void DrawableBatch<NumberOfVertices>::update()
-{
-    if(m_animation)
-        m_animation = m_animation->update(reinterpret_cast<sf::Vertex*>(m_vertices.data()));
-}
-
-
-void DrawableBatch<NumberOfVertices>::clear() {
-    for(auto entity : m_system)
-        m_system.destroy(entity);
-}
-
-*/
 
 #endif // DRAWABLEBATCH_H

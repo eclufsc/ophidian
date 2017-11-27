@@ -30,7 +30,6 @@ class MainController : public QObject
     Q_OBJECT
 
 public:
-
     //! MainController Constructor
     /*!
        \brief Constructs a MainController with no canvas
@@ -137,7 +136,7 @@ public:
 
     //! Removes the contour of a cell
     /*!
-       \brief Removes the corresponding contour of the cell.
+       \brief Removes the corresponding contour of a cell.
        \param wire WireQuad of a cell.
      */
     void clear(WireQuad & wire);

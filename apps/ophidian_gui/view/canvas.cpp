@@ -22,17 +22,7 @@ void Canvas::clear()
 
 void Canvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
 {
-    mQuads.reserveMinimumOfQuads(minimumOfQuads);
-}
-
-DrawableBatch<4> * Canvas::drawableQuads()
-{
-    return & mQuads;
-}
-
-DrawableBatch<2> * Canvas::drawableLines()
-{
-    return & mLines;
+    mQuads.reserveminimumOfForms(minimumOfQuads);
 }
 
 void Canvas::draw(sf::RenderTarget& target, sf::RenderStates states) const
