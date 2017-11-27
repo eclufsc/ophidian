@@ -51,8 +51,17 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
     std::string dieArea = concat.str();
 
+    /* Getting name of file */
+    size_t pos = 0;
+    std::string name;
+    while ((pos = lef.find("/")) != std::string::npos) {
+        name = lef.substr(0, pos);
+        lef.erase(0, pos + 1);
+    }
+    name = lef.substr(0, lef.find("."));
+
     /* Saying to MainWindow display the information */
-    emit on_circuit_labelsChanged("test", QString::fromStdString(dieArea), cells, pins, nets);
+    emit on_circuit_labelsChanged(QString::fromStdString(name), QString::fromStdString(dieArea), cells, pins, nets);
 
     createQuads();
 }
@@ -224,9 +233,41 @@ void MainController::remove(Quad quad, WireQuad wire)
     /* Just hedge the points to the origin, not to need to
      * find a cell to put in place (quantities of different quads).
      */
+
+    size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
+    size_t pins = mDesign->netlist().size(ophidian::circuit::Pin());
+    size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
+    emit on_circuit_labelsChanged("removing", "removing", cells, pins, nets);
 }
 
 ophidian::geometry::Point MainController::chipBoundaries()
 {
     return mDesign->floorplan().chipUpperRightCorner().toPoint();
+}
+
+void MainController::slot1()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
+}
+
+void MainController::slot2()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
+}
+
+void MainController::slot3()
+{
+    /* - Implement your algorithm or functionality here but need to
+     * change the MainController to be able to call the design.
+     * - If you want tbm you can change the slot name in the
+     * constructor of this class.
+     */
 }

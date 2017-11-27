@@ -42,7 +42,6 @@ public:
 
     /*
     void update();
-    void clear();
     */
 
 private:

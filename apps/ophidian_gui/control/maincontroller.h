@@ -57,6 +57,11 @@ public:
 
     ophidian::geometry::Point chipBoundaries();
 
+    /* Funções auxiliares */
+    void slot1();
+    void slot2();
+    void slot3();
+
 public slots:
     void buildICCAD2017(std::string lef, std::string def, std::string verilog);
     void buildICCAD2015(std::string lef, std::string def, std::string verilog);
