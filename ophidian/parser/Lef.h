@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+
 #include <ophidian/util/Units.h>
 
 namespace ophidian

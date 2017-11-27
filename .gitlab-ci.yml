@@ -1,0 +1,38 @@
+image: ubuntu:artful
+
+variables: 
+  DEPENDENCIES: "build-essential zlib1g-dev cmake flex libbison-dev libboost1.63-dev liblemon-dev units=2.3.2"
+  GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+  - apt-get update -qq
+  - apt-get install -y curl
+  - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
+  - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_ophidian:
+  stage: build
+  script:
+    - mkdir build && cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+    - make -j2
+  artifacts:
+    paths:
+      - build/
+
+test_ophidian:
+  stage: test
+  script:
+    - cd build
+    - cd test
+    - ./ophidian_tests
+  dependencies:
+    - build_ophidian
+  artifacts:
+    paths:
+      - build/

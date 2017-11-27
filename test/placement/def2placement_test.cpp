@@ -1,4 +1,3 @@
-#include "def2placement_test.h"
 #include <catch.hpp>
 
 #include <ophidian/placement/Def2Placement.h>
@@ -10,7 +9,7 @@ class Def2PlacementFixture
 public:
 	Def2PlacementFixture() : placement(netlist){
 		parser::DefParser parser;
-		def = std::move(parser.readFile("./input_files/simple.def"));
+		def = std::move(parser.readFile("./input_files/simple/simple.def"));
 	}
 
 	std::unique_ptr<parser::Def> def;

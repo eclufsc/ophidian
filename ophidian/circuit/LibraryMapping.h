@@ -1,8 +1,9 @@
 #ifndef LIBRARYMAPPING_H
 #define LIBRARYMAPPING_H
 
-#include <ophidian/circuit/Netlist.h>
 #include <ophidian/standard_cell/StandardCells.h>
+
+#include "Netlist.h"
 
 namespace ophidian {
 namespace circuit {

@@ -1,4 +1,3 @@
-#include "design_test.h"
 #include <catch.hpp>
 
 #include <ophidian/design/Design.h>

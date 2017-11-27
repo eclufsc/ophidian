@@ -10,30 +10,25 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_run_tests_SRC  
+file(GLOB_RECURSE ophidian_run_tests_source
     "*.cpp"
 )
 
-# Add Catch lib interface
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE .)
-
 # Add test target
-add_executable(ophidian_tests ${ophidian_run_tests_SRC})
+add_executable(ophidian_tests ${ophidian_run_tests_source})
 
 # Link target dependencies
-target_link_libraries(ophidian_tests PUBLIC 
-    Catch 
-    ophidian_circuit 
-    ophidian_design 
-    ophidian_entity_system 
-    ophidian_floorplan 
-    ophidian_geometry 
-    ophidian_interconnection 
-    ophidian_parser 
-    ophidian_placement 
-    ophidian_standard_cell 
-    ophidian_timing 
+target_link_libraries(ophidian_tests
+    PRIVATE Catch
+    PRIVATE ophidian_circuit
+    PRIVATE ophidian_design
+    PRIVATE ophidian_entity_system
+    PRIVATE ophidian_floorplan
+    PRIVATE ophidian_geometry
+    PRIVATE ophidian_interconnection
+    PRIVATE ophidian_parser
+    PRIVATE ophidian_placement
+    PRIVATE ophidian_standard_cell
 )
 
 ################################################################################
@@ -43,11 +38,6 @@ target_link_libraries(ophidian_tests PUBLIC
 message("Creating symlink for test files")
 execute_process(
     COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/test/.
-    RESULT_VARIABLE result
-)
-execute_process(
-    COMMAND tar -zxvf superblue18.tar.gz
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/test/input_files
     RESULT_VARIABLE result
 )
 
@@ -66,4 +56,4 @@ execute_process(
 ################################################################################
 
 enable_testing()
-add_test(NAME unit_test COMMAND ophidian_tests "~[Profiling] ~[superblue18obs]")
+add_test(NAME unit_test COMMAND ophidian_tests)

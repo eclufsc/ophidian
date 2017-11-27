@@ -25,7 +25,6 @@ namespace design
 {
 
 Design::Design() :
-
 	mNetlist(),
 	mFloorplan(),
 	mPlacement(mNetlist),

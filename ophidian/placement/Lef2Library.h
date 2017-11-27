@@ -20,7 +20,8 @@
 #define OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
 
 #include <ophidian/parser/Lef.h>
-#include <ophidian/placement/Library.h>
+
+#include "Library.h"
 
 namespace ophidian
 {

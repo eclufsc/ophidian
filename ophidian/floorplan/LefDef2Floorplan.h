@@ -19,9 +19,10 @@
 #ifndef OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
 #define OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
 
-#include <ophidian/floorplan/Floorplan.h>
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
+
+#include "Floorplan.h"
 
 namespace ophidian
 {

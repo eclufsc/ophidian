@@ -140,8 +140,7 @@ TEST_CASE("VerilogParser: read module with one module instanciation", "[parser][
 TEST_CASE("VerilogParser: read simple.v", "[parser][VerilogParser]")
 {
     VerilogParser parser;
-    std::stringstream input(test::simpleInput);
-    std::unique_ptr<Verilog> verilog(parser.readStream(input));
+    std::unique_ptr<Verilog> verilog(parser.readFile("./input_files/simple/simple.v"));
     REQUIRE( verilog );
     REQUIRE( verilog->modules().size() == 1 );
 
@@ -236,20 +235,4 @@ TEST_CASE("VerilogParser: read simple.v", "[parser][VerilogParser]")
     REQUIRE( lcb1PortMapping.at(&INV_Z80a) == &iccad_clk );
     REQUIRE( lcb1PortMapping.at(&INV_Z80o) == &lcb1_fo );
 
-}
-
-#include <fstream>
-TEST_CASE("VerilogParser: parse superblue18",  "[parser][VerilogParser][Profiling]")
-{
-    VerilogParser parser;
-    std::ifstream input("input_files/superblue18.v", std::ifstream::in);
-    INFO("Have you put `superblue18.v` in the tests binary `input_files/' directory?");
-    REQUIRE(input.good());
-    std::unique_ptr<Verilog> verilog(parser.readStream(input));
-    REQUIRE( verilog );
-    REQUIRE( verilog->modules().size() == 1 );
-    const Verilog::Module & superblue18 = verilog->modules().front();
-    REQUIRE( superblue18.name() == "superblue18" );
-    REQUIRE( superblue18.instances().size() == 767499 );
-    REQUIRE( superblue18.nets().size() == 771542 );
 }

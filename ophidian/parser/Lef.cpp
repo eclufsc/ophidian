@@ -20,8 +20,8 @@
 
 #include "Lef.h"
 #include "ParserException.h"
-#include <LEF/include/lefrReader.hpp>
-#include <vector>
+
+#include <lefrReader.hpp>
 
 namespace ophidian
 {
