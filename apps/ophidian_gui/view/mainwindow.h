@@ -5,6 +5,7 @@
 
 #include "ui_mainwindow.h"
 #include "dialoglefdef.h"
+#include "dialogiccad2017.h"
 #include "control/maincontroller.h"
 
 namespace Ui {

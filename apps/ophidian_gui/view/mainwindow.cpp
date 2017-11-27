@@ -27,6 +27,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionICCAD_2017_triggered()
 {
+    DialogICCAD2017 dialog(this);
+    QObject::connect(&dialog, SIGNAL(buildICCAD2017(std::string, std::string , std::string)),
+                     &mMainController, SLOT(buildICCAD2017(std::string, std::string , std::string)));
+    dialog.exec();
 
 }
 

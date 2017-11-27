@@ -170,11 +170,11 @@ public slots:
     //! Build circuit ICCAD 2017
     /*!
        \brief Using the parameters, find the files and build the circuit.
-       \param lef Lef file location.
-       \param def Def file location.
-       \param verilog Verilog file location.
+       \param cells_lef Lef file location.
+       \param tech_lef Lef file location.
+       \param placed_def Def file location.
      */
-    void buildICCAD2017(std::string lef, std::string def, std::string verilog);
+    void buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def);
 
     //! Build circuit ICCAD 2015
     /*!
@@ -209,6 +209,8 @@ signals:
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
 
 private:
+    void init();
+
     //! Creates the quad cells.
     /*!
        \brief Creates all quads of cells and has them draw on canvas.

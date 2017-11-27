@@ -15,9 +15,17 @@ void MainController::setCanvas(Canvas * canvas)
     mCanvas = canvas;
 }
 
-void MainController::buildICCAD2017(std::string lef, std::string def, std::string verilog)
+void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def)
 {
+    if (mBuilder != nullptr)
+    {
+        delete mBuilder;
+        mCanvas->clear();
+    }
 
+    /* Building */
+    mBuilder = new ophidian::design::ICCAD2017ContestDesignBuilder(cells_lef, tech_lef, placed_def);
+    init();
 }
 
 void MainController::buildICCAD2015(std::string lef, std::string def, std::string verilog)
@@ -30,7 +38,12 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
 
     /* Building */
     mBuilder = new ophidian::design::ICCAD2015ContestDesignBuilder(lef, def, verilog);
-    mDesign = &mBuilder->build();
+    init();
+}
+
+void MainController::init()
+{
+    mDesign = & mBuilder->build();
 
     /* Creating property Cells to Quads */
     mCellToQuads = mDesign->netlist().makeProperty<std::pair<std::vector<Quad>, fixed_t>>(ophidian::circuit::Cell());
@@ -46,7 +59,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
     concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
     std::string dieArea = concat.str();
 
-    /* Getting name of file */
+    /* Getting name of file
     size_t pos = 0;
     std::string name;
     while ((pos = lef.find("/")) != std::string::npos) {
@@ -54,9 +67,10 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
         lef.erase(0, pos + 1);
     }
     name = lef.substr(0, lef.find("."));
+    */
 
     /* Saying to MainWindow display the information */
-    emit on_circuit_labelsChanged(QString::fromStdString(name), QString::fromStdString(dieArea), cells, pins, nets);
+    emit on_circuit_labelsChanged("Circuit", QString::fromStdString(dieArea), cells, pins, nets);
 
     createQuads();
 }
