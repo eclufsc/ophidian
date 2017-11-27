@@ -51,7 +51,7 @@ WireQuad::WireQuad()
 
 }
 
-WireQuad::WireQuad(const ophidian::circuit::Cell &cell) :
+WireQuad::WireQuad(const ophidian::circuit::Cell & cell) :
     mCell(cell)
 {
 
