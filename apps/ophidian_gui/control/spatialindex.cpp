@@ -54,18 +54,7 @@ std::vector<Quad> SpatialIndex::quadsContaining(const ophidian::geometry::Point 
 
 Quad SpatialIndex::quadContaining(const ophidian::geometry::Point & point) const
 {
-    std::vector<RTreeNode> result;
-
-    mIndex.query(boost::geometry::index::contains(point), std::back_inserter(result));
-
-    std::vector<Quad> quads(result.size());
-
-    for(std::size_t i = 0; i < result.size(); ++i)
-    {
-        quads[i] = result[i].second;
-    }
-
-    return quads.front();
+    return quadsContaining(point).front();
 }
 
 bool SpatialIndex::hasQuad(const ophidian::geometry::Point & point) const

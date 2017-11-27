@@ -7,17 +7,12 @@ MainController::MainController()
 
 MainController::~MainController()
 {
-
+    delete mBuilder;
 }
 
 void MainController::setCanvas(Canvas * canvas)
 {
     mCanvas = canvas;
-}
-
-Canvas * MainController::getCanvas()
-{
-    return mCanvas;
 }
 
 void MainController::buildICCAD2017(std::string lef, std::string def, std::string verilog)
@@ -90,11 +85,6 @@ void MainController::mouseMove(const ophidian::geometry::Point &p)
     emit on_selected_cellChanged("moving", "moving", p.x(), p.y(), 0);
 }
 
-void MainController::mouseRelease()
-{
-    //mSstate->mouse_release();
-}
-
 void MainController::createQuads()
 {
     // Chip Area
@@ -102,7 +92,6 @@ void MainController::createQuads()
 
     // Row information
     ophidian::geometry::Point rowSize = mDesign->floorplan().rowUpperRightCorner(*(mDesign->floorplan().rowsRange().begin())).toPoint();
-    std::cout << "Row: " << rowSize.x() << "x" << rowSize.y() << std::endl;
     unsigned int height = 0, width = 0;
 
     // Cells

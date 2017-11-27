@@ -92,6 +92,17 @@ Selected::~Selected()
 
 }
 
+void Selected::keyPressEvent(QKeyEvent * e)
+{
+    if (e->key() == Qt::Key_Delete) {
+        if(!mMainController->isFixed(mQuad.mCell)) {
+            mMainController->remove(mQuad, mWireQuad);
+            mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
+            delete this;
+        }
+    }
+}
+
 void Selected::mousePressEvent(ophidian::geometry::Point pos)
 {
     if(mMainController->hasQuad(pos))
@@ -129,7 +140,7 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
 
 void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
 {
-    Quad first = mMainController->quadsCell(mQuad.mCell).front();
+    /*Quad first = mMainController->quadsCell(mQuad.mCell).front();
     auto origin = mSFMLCanvas->canvas()->points(first).front();
 
     if (!mMainController->isFixed(first.mCell))
@@ -146,18 +157,7 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
         //mMainController->clear(mWireQuad);
         mMainController->update(mQuad);
         mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
-    }
-}
-
-void Selected::keyPressEvent(QKeyEvent * e)
-{
-    if (e->key() == Qt::Key_Delete) {
-        if(!mMainController->isFixed(mQuad.mCell)) {
-            mMainController->remove(mQuad, mWireQuad);
-            mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
-            delete this;
-        }
-    }
+    }*/
 }
 
 Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
@@ -191,7 +191,8 @@ void Dragging::mouseReleaseEvent(ophidian::geometry::Point pos)
 {
     //mouseMoveEvent(pos); maybe need update the position?
     mMainController->clear(mWireQuad);
-    mMainController->update(mQuad);
+    if (mMoved)
+        mMainController->update(mQuad);
     mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, mQuad));
     delete this;
 }
