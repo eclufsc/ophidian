@@ -1,4 +1,4 @@
-# <center><img src="https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png" width=80> Ophidian [![Build Status](https://travis-ci.org/eclufsc/ophidian.svg?branch=development)](https://travis-ci.org/eclufsc/ophidian)
+# <center><img src="https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png" width=80> Ophidian [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master) 
 <center><span style="color:green"><b>O<b></span>pen-Source Library for <span style="color:green"><b>Ph</span>ys<span style="color:green"><b>i</span>cal <span style="color:green"><b>D</span>es<span style="color:green"><b>i</span>gn Rese<span style="color:green"><b>a</span>rch and Teachi<span style="color:green"><b>n</span>g </center>
 
 -----------
