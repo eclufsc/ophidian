@@ -146,4 +146,3 @@ void MySFMLCanvas::updatePositionQuad(const ophidian::geometry::Point & p)
 {
     mState->mouseReleaseEvent(p);
 }
-

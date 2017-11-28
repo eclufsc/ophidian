@@ -145,13 +145,6 @@ public:
      */
     void mousePressEvent(ophidian::geometry::Point pos);
 
-    //! Mouse release event
-    /*!
-       \brief Does not take any action.
-       \param pos Position where the mouse was released.
-     */
-    void mouseReleaseEvent(ophidian::geometry::Point pos);
-
 protected:
     Quad mQuad;
     WireQuad mWireQuad;

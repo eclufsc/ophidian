@@ -140,12 +140,13 @@ void MainController::createQuads()
             quads.push_back(quad);
         }
 
-        // placement of dev ... does not have isFixed ()
-        // if (quads.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
-        if (mDesign->placement().isFixed(*cellIt)) {
+        if (mDesign->placement().isFixed(*cellIt))
+        {
             mCellToQuads[*cellIt] = std::make_pair(quads, true);
             mCanvas->paint(quads, sf::Color::Blue);
-        } else {
+        }
+        else
+        {
             mCellToQuads[*cellIt] = std::make_pair(quads, false);
             unsigned int random = rand();
             mCanvas->paint(quads, sf::Color((random % 10 + 195), (random % 75), (random % 120 + 135)));

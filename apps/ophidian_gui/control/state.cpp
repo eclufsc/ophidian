@@ -138,28 +138,6 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
     }
 }
 
-void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
-{
-    /*Quad first = mMainController->quadsCell(mQuad.mCell).front();
-    auto origin = mSFMLCanvas->canvas()->points(first).front();
-
-    if (!mMainController->isFixed(first.mCell))
-    {
-        sf::Vector2f delta(pos.x() - origin.position.x, pos.y() - origin.position.y);
-        sf::Transform translation;
-
-        translation.translate(delta.x, delta.y);
-
-        mMainController->transform(mQuad, translation);
-        mMainController->transform(mWireQuad, translation);
-
-        origin = mSFMLCanvas->canvas()->points(first).front();
-        //mMainController->clear(mWireQuad);
-        mMainController->update(mQuad);
-        mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
-    }*/
-}
-
 Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
     State(SFMLCanvas, controller),
     mQuad(quad),

@@ -32,13 +32,13 @@ class MainController : public QObject
 public:
     //! MainController Constructor
     /*!
-       \brief Constructs a MainController with no canvas
+       \brief Constructs a MainController with no canvas.
      */
     explicit MainController();
 
     //! MainController Destructor
     /*!
-       \brief Destroys the MainController, including its properties
+       \brief Destroys the MainController, including its properties.
      */
     ~MainController();
 
@@ -202,8 +202,8 @@ signals:
        \brief Sending information from a cell to update the main window.
        \param name Cell name.
        \param type Cell type.
-       \param x Position on the abscissa axis.
-       \param y Position on the ordinate axis.
+       \param x Position of the origin on the abscissa axis.
+       \param y Position of the origin on the ordinate axis.
        \param worstSlack not implemented
      */
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
