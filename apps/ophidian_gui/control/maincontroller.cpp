@@ -148,7 +148,7 @@ void MainController::createQuads()
         } else {
             mCellToQuads[*cellIt] = std::make_pair(quads, false);
             unsigned int random = rand();
-            mCanvas->paint(quads, sf::Color(200, (random % 50), (random % 130 + 125)));
+            mCanvas->paint(quads, sf::Color(200, (random % 75), (random % 120 + 135)));
         }
 
         height = width = 0;
@@ -250,10 +250,7 @@ ophidian::geometry::Point MainController::chipBoundaries()
 
 void MainController::slot1()
 {
-    /* - Implement your algorithm or functionality here but need to
-     * change the MainController to be able to call the design.
-     * - If you want tbm you can change the slot name in the
-     * constructor of this class.
+    /* - Implement your algorithm or functionality here.
      */
 
     if (mBuilder != nullptr)
@@ -262,10 +259,7 @@ void MainController::slot1()
 
 void MainController::slot2()
 {
-    /* - Implement your algorithm or functionality here but need to
-     * change the MainController to be able to call the design.
-     * - If you want tbm you can change the slot name in the
-     * constructor of this class.
+    /* - Implement your algorithm or functionality here.
      */
 
     if (mBuilder != nullptr)
@@ -274,10 +268,7 @@ void MainController::slot2()
 
 void MainController::slot3()
 {
-    /* - Implement your algorithm or functionality here but need to
-     * change the MainController to be able to call the design.
-     * - If you want tbm you can change the slot name in the
-     * constructor of this class.
+    /* - Implement your algorithm or functionality here.
      */
 
     if (mBuilder != nullptr)
