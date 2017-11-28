@@ -26,7 +26,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="chooseLef">
+  <widget class="QPushButton" name="cells_choose">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -39,7 +39,7 @@
     <string>Choose...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lef">
+  <widget class="QLabel" name="cells_lef">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -65,7 +65,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="verilog">
+  <widget class="QLabel" name="placed_def">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -78,7 +78,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Placed def:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lefLine">
+  <widget class="QLineEdit" name="cells_lef_2">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -88,7 +88,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="defLine">
+  <widget class="QLineEdit" name="tech_lef_2">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -98,7 +98,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="chooseDef">
+  <widget class="QPushButton" name="tech_choose">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -124,7 +124,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#cc0000;&quot;&gt;&lt;br/&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="def">
+  <widget class="QLabel" name="tech_lef">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -137,7 +137,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Tech Lef:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="verilogLine">
+  <widget class="QLineEdit" name="placed_def_2">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -147,7 +147,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="chooseVerilog">
+  <widget class="QPushButton" name="placed_choose">
    <property name="geometry">
     <rect>
      <x>440</x>

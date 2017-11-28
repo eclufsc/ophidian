@@ -210,6 +210,7 @@ signals:
 
 private:
     void init();
+    void updateAfterSlots();
 
     //! Creates the quad cells.
     /*!

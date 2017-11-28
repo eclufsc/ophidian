@@ -83,8 +83,8 @@ void MainController::mousePress(const ophidian::geometry::Point &p)
     if (mIndex.hasQuad(p))
     {
         Quad quad = mIndex.quadContaining(p);
-        name = mDesign->netlist().name(quad.mCell);
-        type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(quad.mCell) );
+        type = mDesign->netlist().name(quad.mCell);
+        name = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(quad.mCell) );
         ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mCell).toPoint();
         emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), origin.x(), origin.y(), 0);
     }
@@ -140,9 +140,9 @@ void MainController::createQuads()
             quads.push_back(quad);
         }
 
-
-
-        if (quads.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
+        // placement of dev ... does not have isFixed ()
+        // if (quads.size() > 1 || width > rowSize.x() || height > rowSize.y()) {
+        if (false) {
             mCellToQuads[*cellIt] = std::make_pair(quads, true);
             mCanvas->paint(quads, sf::Color::Blue);
         } else {
@@ -255,6 +255,9 @@ void MainController::slot1()
      * - If you want tbm you can change the slot name in the
      * constructor of this class.
      */
+
+    if (mBuilder != nullptr)
+        updateAfterSlots();
 }
 
 void MainController::slot2()
@@ -264,6 +267,9 @@ void MainController::slot2()
      * - If you want tbm you can change the slot name in the
      * constructor of this class.
      */
+
+    if (mBuilder != nullptr)
+        updateAfterSlots();
 }
 
 void MainController::slot3()
@@ -273,4 +279,14 @@ void MainController::slot3()
      * - If you want tbm you can change the slot name in the
      * constructor of this class.
      */
+
+    if (mBuilder != nullptr)
+        updateAfterSlots();
+}
+
+void MainController::updateAfterSlots()
+{
+    mCanvas->clear();
+    mIndex.clear();
+    createQuads();
 }
