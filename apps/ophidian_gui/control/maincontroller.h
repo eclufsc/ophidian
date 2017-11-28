@@ -209,7 +209,16 @@ signals:
     void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
 
 private:
+    //! Initializes design and cell property to quad.
+    /*!
+       \brief Helps in abstracting which type of design builder is instantiated for design construction.
+     */
     void init();
+
+    //! Canvas upgrade
+    /*!
+       \brief Redraws circuit cells after executing a slot function.
+     */
     void updateAfterSlots();
 
     //! Creates the quad cells.
