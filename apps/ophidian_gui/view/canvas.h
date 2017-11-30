@@ -157,10 +157,12 @@ public:
     //! Create the contour of a cell
     /*!
        \brief Returns the contour of a cell.
-       \param quads Vector with quads of a cell.
+       \param cell Circuit cell.
+       \param origin Origin point.
+       \param size Cell size.
        \return WireQuad where contains the contour of a cell.
      */
-    WireQuad createWireQuad(const std::vector<Quad> & quads);
+    WireQuad createWireQuad(const ophidian::circuit::Cell & cell, const ophidian::geometry::Point & origin, const ophidian::geometry::Point & size);
 
 private:
     DrawableBatch<4> mQuads;

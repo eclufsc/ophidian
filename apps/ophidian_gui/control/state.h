@@ -71,6 +71,14 @@ public:
      */
     virtual void mouseReleaseEvent(ophidian::geometry::Point pos);
 
+    //! Find cell event
+    /*!
+       \brief Performs a cell search by name.
+       \param e Mouse event object.
+       \return True if it encounters a cell, otherwise false.
+     */
+    virtual bool findCellEvent(QString name);
+
 protected:
     MySFMLCanvas * mSFMLCanvas;
     MainController * mMainController;
@@ -111,6 +119,14 @@ public:
        \param pos Click position.
      */
     void mousePressEvent(ophidian::geometry::Point pos);
+
+    //! Find cell event
+    /*!
+       \brief Performs a cell search by name.
+       \param e Mouse event object.
+       \return True if it encounters a cell, otherwise false.
+     */
+    bool findCellEvent(QString name);
 };
 
 class Selected : public State
@@ -144,6 +160,21 @@ public:
        \param pos Click position.
      */
     void mousePressEvent(ophidian::geometry::Point pos);
+
+    //! Mouse release event
+    /*!
+       \brief Used to move the cell to an absolute position.
+       \param pos Position where the mouse was released.
+     */
+    virtual void mouseReleaseEvent(ophidian::geometry::Point pos);
+
+    //! Find cell event
+    /*!
+       \brief Performs a cell search by name.
+       \param e Mouse event object.
+       \return True if it encounters a cell, otherwise false.
+     */
+    bool findCellEvent(QString name);
 
 protected:
     Quad mQuad;

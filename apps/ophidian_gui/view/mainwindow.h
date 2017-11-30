@@ -70,7 +70,7 @@ private slots:
        \param y Position of the origin on the ordinate axis.
        \param worstSlack not implemented
      */
-    void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
+    void on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y);
 
     //! Changes the position of a cell
     /*!
@@ -95,6 +95,8 @@ private slots:
        \brief Auxiliary function to implement behavior different from design.
      */
     void on_actionSlot_3_triggered();
+
+    void on_findNameButton_clicked();
 
 signals:
     //! Deployment helper function

@@ -71,13 +71,21 @@ public:
      */
     bool isFixed(const ophidian::circuit::Cell & cell);
 
+    //! Is there a cell with this name?
+    /*!
+       \brief Verify if a cell with this name exists.
+       \param name Cell name.
+       \return True if the cell exists, otherwise false.
+     */
+    bool hasQuad(const ophidian::geometry::Point & p);
+
     //! Is there a cell in this coordinate?
     /*!
        \brief Verify whether there is a cell in the coordinate.
        \param p A circuit coordinate.
        \return True if the cell is fixed, otherwise false.
      */
-    bool hasQuad(const ophidian::geometry::Point & p);
+    bool hasCell(std::string name);
 
     //! Quad of a coordinate
     /*!
@@ -94,6 +102,14 @@ public:
        \return Vector containing all cell quads.
      */
     std::vector<Quad> quadsCell(const ophidian::circuit::Cell & cell);
+
+    //! Quads of a cell
+    /*!
+       \brief Returns the quads of a cell.
+       \param name Cell name.
+       \return Vector containing all cell quads.
+     */
+    std::vector<Quad> quadsCell(std::string name);
 
     //! Contour of a cell
     /*!
@@ -206,7 +222,7 @@ signals:
        \param y Position of the origin on the ordinate axis.
        \param worstSlack not implemented
      */
-    void on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack);
+    void on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y);
 
 private:
     //! Initializes design and cell property to quad.
@@ -227,13 +243,19 @@ private:
      */
     void createQuads();
 
-    typedef bool fixed_t;
+    //! Cell size
+    /*!
+       \brief Calculates the size of a cell based on all its boxes.
+       \param cell Circuit cell.
+       \return Point containing the width (x) and height (y).
+     */
+    ophidian::geometry::Point cellSize(const ophidian::circuit::Cell & cell);
 
     Canvas * mCanvas;
     SpatialIndex mIndex;
     ophidian::design::Design * mDesign{nullptr};
     ophidian::design::DesignBuilder * mBuilder{nullptr};
-    ophidian::entity_system::Property<ophidian::circuit::Cell, std::pair<std::vector<Quad>, fixed_t>> mCellToQuads;
+    ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mCellToQuads;
 };
 
 #endif // MAINCONTROLLER_H

@@ -6,13 +6,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->MyCanvas->setController(mMainController);
+    ui->findName->setPlaceholderText("Find cell by name");
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
     QObject::connect(&mMainController, SIGNAL(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)),
                      this, SLOT(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)));
-    QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, int)),
-                     this, SLOT(on_selected_cellChanged(QString, QString, double, double, int)));
+    QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, double, double)),
+                     this, SLOT(on_selected_cellChanged(QString, QString, double, double, double, double)));
 
     /* Name of Actions */
     ui->actionSlot_1->setText("Slot 1");
@@ -67,17 +68,21 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
     ui->circuitNets_2->setText(QString::number(nets));
 }
 
-void MainWindow::on_selected_cellChanged(QString name, QString type,  double x, double y, int worstSlack)
+void MainWindow::on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y)
 {
+    QString w = width ? QString::number(width) + "μ" : width == -1? ui->selectedCell_w_2->text() : "";
+    QString h = height ? QString::number(height) + "μ" : height == -1? ui->selectedCell_h_2->text() : "";
+
     if (name.compare("moving"))
     {
         ui->selectedCellName_2->setText(name);
         ui->selectedCellType_2->setText(type);
+        ui->selectedCell_w_2->setText(w);
+        ui->selectedCell_h_2->setText(h);
     }
 
     ui->selectedCell_x_2->setValue(x);
     ui->selectedCell_y_2->setValue(y);
-    // ui->selectedCellWSlack_2->setText(QString::number(worstSlack)); //!< Not displaying
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -100,4 +105,14 @@ void MainWindow::on_actionSlot_2_triggered()
 void MainWindow::on_actionSlot_3_triggered()
 {
     mMainController.slot3();
+}
+
+void MainWindow::on_findNameButton_clicked()
+{
+    bool find = ui->MyCanvas->findCellEvent(ui->findName->text());
+
+    if (find)
+        ui->findErro->setText("Cell found");
+    else
+        ui->findErro->setText("Cell not found");
 }

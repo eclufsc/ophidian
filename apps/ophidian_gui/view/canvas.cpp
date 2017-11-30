@@ -129,20 +129,15 @@ void Canvas::createBoundaries(const ophidian::geometry::Point chipUpperRightCorn
 
 }
 
-WireQuad Canvas::createWireQuad(const std::vector<Quad> & quads)
+WireQuad Canvas::createWireQuad(const ophidian::circuit::Cell & cell, const ophidian::geometry::Point & origin, const ophidian::geometry::Point & size)
 {
     std::vector<ophidian::geometry::Point> points;
-    std::vector<std::array<sf::Vertex, 4>> pointsOfQuads;
     std::array<Line, 4> lines;
-    for (const auto & q : quads)
-    {
-        pointsOfQuads.push_back(mQuads.points(q));
-    }
 
-    ophidian::geometry::Point lowerLeft(pointsOfQuads.begin()->at(0).position.x, pointsOfQuads.begin()->at(0).position.y);
-    ophidian::geometry::Point lowerRight(pointsOfQuads.begin()->at(1).position.x, pointsOfQuads.begin()->at(1).position.y);
-    ophidian::geometry::Point upperRight(pointsOfQuads.back().at(2).position.x, pointsOfQuads.back().at(2).position.y);
-    ophidian::geometry::Point upperLeft(pointsOfQuads.back().at(3).position.x, pointsOfQuads.back().at(3).position.y);
+    ophidian::geometry::Point lowerLeft (origin.x()         , origin.y()         );
+    ophidian::geometry::Point lowerRight(origin.x()+size.x(), origin.y()         );
+    ophidian::geometry::Point upperRight(origin.x()+size.x(), origin.y()+size.y());
+    ophidian::geometry::Point upperLeft (origin.x()         , origin.y()+size.y());
 
     lines[0] = Line();
     points.push_back(lowerLeft);
@@ -167,7 +162,7 @@ WireQuad Canvas::createWireQuad(const std::vector<Quad> & quads)
     points.push_back(lowerLeft);
     mLines.alloc(lines[3], points);
 
-    WireQuad wire(quads.begin()->mCell);
+    WireQuad wire(cell);
     wire.mLines = lines;
     return wire;
 }

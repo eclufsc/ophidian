@@ -25,7 +25,7 @@ public:
     /*!
        \brief Constructs a MySFMLCanvas.
      */
-    MySFMLCanvas(QWidget *parent = 0);
+    MySFMLCanvas(QWidget * parent = 0);
 
     //! MySFMLCanvas Destructor
     /*!
@@ -100,6 +100,14 @@ public:
        \param e Mouse event object.
      */
     void mouseReleaseEvent(QMouseEvent * e);
+
+    //! Find cell event
+    /*!
+       \brief Performs a cell search by name.
+       \param e Mouse event object.
+       \return True if it encounters a cell, otherwise false.
+     */
+    bool findCellEvent(QString name);
 
     //! Updates camera view center
     /*!

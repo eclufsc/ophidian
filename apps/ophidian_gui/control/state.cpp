@@ -42,6 +42,12 @@ void State::mouseReleaseEvent(ophidian::geometry::Point pos)
 
 }
 
+bool State::findCellEvent(QString name)
+{
+    return false;
+}
+
+
 Blocked::Blocked(MySFMLCanvas * SFMLCanvas, MainController * controller) :
     State(SFMLCanvas, controller)
 {
@@ -59,7 +65,8 @@ Idle::Idle(MySFMLCanvas * SFMLCanvas, MainController * controller) :
 
 }
 
-#include "view/mysfmlcanvas.h" //< Include needed here for MySFMLCanvas see the idle constructor without circular including
+#include "view/mysfmlcanvas.h"
+//< Include needed here for MySFMLCanvas see the idle constructor without circular including
 
 void Idle::mousePressEvent(ophidian::geometry::Point pos)
 {
@@ -77,6 +84,20 @@ void Idle::mousePressEvent(ophidian::geometry::Point pos)
 
         delete this;
     }
+}
+
+bool Idle::findCellEvent(QString name)
+{
+    if(mMainController->hasCell(name.toStdString()))
+    {
+        Quad selected = mMainController->quadsCell(name.toStdString()).front();
+        mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
+        delete this;
+
+        return true;
+    }
+
+    return false;
 }
 
 Selected::Selected(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad) :
@@ -136,6 +157,33 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
         mSFMLCanvas->setState(new Idle(mSFMLCanvas, mMainController));
         delete this;
     }
+}
+
+void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
+{
+    Quad first = mMainController->quadsCell(mQuad.mCell).front();
+    auto origin = mSFMLCanvas->canvas()->points(first).front();
+
+    if (!mMainController->isFixed(first.mCell))
+    {
+        sf::Vector2f delta(pos.x() - origin.position.x, pos.y() - origin.position.y);
+        sf::Transform translation;
+
+        translation.translate(delta.x, delta.y);
+
+        mMainController->transform(mQuad, translation);
+        mMainController->transform(mWireQuad, translation);
+
+        origin = mSFMLCanvas->canvas()->points(first).front();
+        //mMainController->clear(mWireQuad);
+        mMainController->update(mQuad);
+        mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
+    }
+}
+
+bool Selected::findCellEvent(QString name)
+{
+    return true;
 }
 
 Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :

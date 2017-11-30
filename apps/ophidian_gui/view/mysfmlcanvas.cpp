@@ -1,11 +1,16 @@
 #include "mysfmlcanvas.h"
 
-MySFMLCanvas::MySFMLCanvas(QWidget *parent) :
+MySFMLCanvas::MySFMLCanvas(QWidget * parent) :
     QSFMLCanvas(parent),
     mCameraView(sf::FloatRect(0, 0, 51599.25, 34200.0))
 {
     //mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
     mCameraView.setSize(mCameraView.getSize().x, -mCameraView.getSize().y);
+}
+
+MySFMLCanvas::~MySFMLCanvas()
+{
+    delete mState;
 }
 
 void MySFMLCanvas::setController(MainController & controller)
@@ -14,14 +19,9 @@ void MySFMLCanvas::setController(MainController & controller)
     mState = new Idle(this, mMainController);
 }
 
-void MySFMLCanvas::resizeEvent(QResizeEvent *e)
+void MySFMLCanvas::resizeEvent(QResizeEvent * e)
 {
     sf::RenderWindow::create((sf::WindowHandle) winId());
-}
-
-MySFMLCanvas::~MySFMLCanvas()
-{
-
 }
 
 void MySFMLCanvas::setSize(ophidian::geometry::Point size)
@@ -47,11 +47,7 @@ void MySFMLCanvas::OnInit()
 
 void MySFMLCanvas::OnUpdate()
 {
-    // ... mCanvas.update();
-
-    /*static boost::posix_time::ptime last;
-    boost::posix_time::ptime current = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration diff = current - last;*/
+    // mCanvas.update(); ???
 
     clear(sf::Color::Black);
     setView(mCameraView);
@@ -60,19 +56,9 @@ void MySFMLCanvas::OnUpdate()
 
     setView(getDefaultView());
     display();
-
-    /*std::string stdstring{std::to_string(1000./diff.total_milliseconds())};
-    stdstring = "FPS: " + stdstring;
-    sf::Text fps_text;
-    fps_text.setString(sf::String(stdstring));
-    fps_text.setPosition(30, 30);
-    fps_text.setColor(sf::Color::Red);
-    fps_text.setFont(m_opensans);
-    draw(fps_text);
-    last = current;*/
 }
 
-void MySFMLCanvas::wheelEvent(QWheelEvent *e)
+void MySFMLCanvas::wheelEvent(QWheelEvent * e)
 {
     if(e->delta() > 0)
         mCameraView.zoom(1.f/1.1f);
@@ -80,7 +66,7 @@ void MySFMLCanvas::wheelEvent(QWheelEvent *e)
         mCameraView.zoom(1.1f);
 }
 
-void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
+void MySFMLCanvas::keyPressEvent(QKeyEvent * e)
 {
     switch(e->key())
     {
@@ -105,27 +91,32 @@ void MySFMLCanvas::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MySFMLCanvas::mousePressEvent(QMouseEvent *e)
+void MySFMLCanvas::mousePressEvent(QMouseEvent * e)
 {
     mState->mousePressEvent(mouseEventToPoint(e));
 }
 
-void MySFMLCanvas::mouseMoveEvent(QMouseEvent *e)
+void MySFMLCanvas::mouseMoveEvent(QMouseEvent * e)
 {
     mState->mouseMoveEvent(mouseEventToPoint(e));
 }
 
-void MySFMLCanvas::mouseReleaseEvent(QMouseEvent *e)
+void MySFMLCanvas::mouseReleaseEvent(QMouseEvent * e)
 {
     mState->mouseReleaseEvent(mouseEventToPoint(e));
 }
 
-void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point &p1)
+bool MySFMLCanvas::findCellEvent(QString name)
+{
+    return mState->findCellEvent(name);
+}
+
+void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point & p1)
 {
     mCameraView.setCenter(sf::Vector2f(p1.x(), p1.y()));
 }
 
-void MySFMLCanvas::viewSize(const ophidian::geometry::Point &size)
+void MySFMLCanvas::viewSize(const ophidian::geometry::Point & size)
 {
     mCameraView.setSize(sf::Vector2f(size.x(), -size.y()));
 }
