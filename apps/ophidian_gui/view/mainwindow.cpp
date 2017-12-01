@@ -74,6 +74,13 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
     ui->circuitCells_2->setText(QString::number(cells));
     ui->circuitPins_2->setText(QString::number(pins));
     ui->circuitNets_2->setText(QString::number(nets));
+
+    ui->selectedCellName_2->setText("");
+    ui->selectedCellType_2->setText("");
+    ui->selectedCell_w_2->setText("");
+    ui->selectedCell_h_2->setText("");
+    ui->selectedCell_x_2->setValue(0);
+    ui->selectedCell_y_2->setValue(0);
 }
 
 void MainWindow::on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y)
