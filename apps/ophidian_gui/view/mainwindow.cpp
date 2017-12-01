@@ -45,7 +45,7 @@ void MainWindow::on_actionICCAD_2017_triggered()
 
 void MainWindow::on_actionICCAD_2015_triggered()
 {
-    DialogLefDef dialog(this);
+    DialogICCAD2015 dialog(this);
     QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string)),
                      &mMainController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
     dialog.exec();

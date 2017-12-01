@@ -1,11 +1,9 @@
-#ifndef DIALOGLEFDEF_H
-#define DIALOGLEFDEF_H
+#ifndef DIALOGICCAD2015_H
+#define DIALOGICCAD2015_H
 
 #include <QDialog>
 #include <QString>
 #include <iostream>
-
-#include "ui_dialoglefdef.h"
 
 #include <QFileDialog>
 #include <QFile>
@@ -13,25 +11,25 @@
 #include <QTextStream>
 
 namespace Ui {
-class DialogLefDef;
+class DialogICCAD2015;
 }
 
-class DialogLefDef : public QDialog
+class DialogICCAD2015 : public QDialog
 {
     Q_OBJECT
 
 public:
-    //! DialogLefDef Constructor
+    //! DialogICCAD2015 Constructor
     /*!
-       \brief Constructs a DialogLefDef.
+       \brief Constructs a DialogICCAD2015.
      */
-    explicit DialogLefDef(QWidget *parent = 0);
+    explicit DialogICCAD2015(QWidget *parent = 0);
 
-    //! DialogLefDef Destructor
+    //! DialogICCAD2015 Destructor
     /*!
-       \brief Destroys the DialogLefDef, including its properties.
+       \brief Destroys the DialogICCAD2015, including its properties.
      */
-    ~DialogLefDef();
+    ~DialogICCAD2015();
 
 private slots:
     //! Lef file choice button event
@@ -75,8 +73,7 @@ signals:
     void buildICCAD2015(std::string lef, std::string def, std::string verilog);
 
 private:
-    Ui::DialogLefDef *ui;
-
+    Ui::DialogICCAD2015 *ui;
 };
 
-#endif // DIALOGLEFDEF_H
+#endif // DIALOGICCAD2015_H

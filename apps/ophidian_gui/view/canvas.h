@@ -3,7 +3,7 @@
 
 #include <ophidian/circuit/Netlist.h>
 #include "./drawablebatch.h"
-#include "./Model/forms.h"
+#include "./model/forms.h"
 
 class Canvas : public sf::Drawable
 {

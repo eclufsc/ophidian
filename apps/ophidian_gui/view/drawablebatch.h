@@ -9,7 +9,7 @@
 #include <ophidian/geometry/Models.h>
 #include <ophidian/circuit/Netlist.h>
 
-#include "./Model/forms.h"
+#include "./model/forms.h"
 
 template<std::size_t NumberOfVertices>
 class DrawableBatch : public sf::Drawable

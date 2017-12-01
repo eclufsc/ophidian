@@ -20,7 +20,7 @@
 #include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/entity_system/Property.h>
 
-#include "Model/forms.h"
+#include "model/forms.h"
 #include "view/canvas.h"
 #include "control/spatialindex.h"
 #include "view/drawablebatch.h"

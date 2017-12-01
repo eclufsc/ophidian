@@ -1,18 +1,19 @@
-#include "dialoglefdef.h"
+#include "dialogiccad2015.h"
+#include "ui_dialogiccad2015.h"
 
-DialogLefDef::DialogLefDef(QWidget *parent) :
+DialogICCAD2015::DialogICCAD2015(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DialogLefDef)
+    ui(new Ui::DialogICCAD2015)
 {
     ui->setupUi(this);
 }
 
-DialogLefDef::~DialogLefDef()
+DialogICCAD2015::~DialogICCAD2015()
 {
     delete ui;
 }
 
-void DialogLefDef::on_chooseLef_clicked()
+void DialogICCAD2015::on_chooseLef_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
                                                     tr("LEF Files (*.lef)"));
@@ -23,7 +24,7 @@ void DialogLefDef::on_chooseLef_clicked()
     }
 }
 
-void DialogLefDef::on_chooseDef_clicked()
+void DialogICCAD2015::on_chooseDef_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
                                                     tr("DEF Files (*.def)"));
@@ -34,7 +35,7 @@ void DialogLefDef::on_chooseDef_clicked()
     }
 }
 
-void DialogLefDef::on_chooseVerilog_clicked()
+void DialogICCAD2015::on_chooseVerilog_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
                                                     tr("Verilog Files (*.v)"));
@@ -45,7 +46,7 @@ void DialogLefDef::on_chooseVerilog_clicked()
     }
 }
 
-void DialogLefDef::on_okButton_clicked()
+void DialogICCAD2015::on_okButton_clicked()
 {
     bool lef = ui->lefLine->text().isEmpty();
     bool def = ui->defLine->text().isEmpty();
@@ -88,7 +89,8 @@ void DialogLefDef::on_okButton_clicked()
     }
 }
 
-void DialogLefDef::on_cancelButton_clicked()
+void DialogICCAD2015::on_cancelButton_clicked()
 {
     this->close();
 }
+

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <ophidian/geometry/Models.h>
-#include <Model/forms.h>
+#include <model/forms.h>
 
 typedef std::pair<ophidian::geometry::Box, Quad> RTreeNode;
 

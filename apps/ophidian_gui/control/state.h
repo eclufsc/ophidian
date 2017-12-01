@@ -6,7 +6,7 @@
 
 #include <ophidian/geometry/Models.h>
 #include "control/maincontroller.h"
-#include "Model/forms.h"
+#include "model/forms.h"
 
 
 //#include "view/mysfmlcanvas.h"
