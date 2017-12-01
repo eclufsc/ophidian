@@ -7,6 +7,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->MyCanvas->setController(mMainController);
     ui->findName->setPlaceholderText("Find cell by name");
+    ui->selectedCellName_2->setReadOnly(true);
+    ui->selectedCellName_2->setPlaceholderText("Name");
+    ui->selectedCellType_2->setReadOnly(true);
+    ui->selectedCellType_2->setPlaceholderText("Type");
+    ui->selectedCell_w_2->setReadOnly(true);
+    ui->selectedCell_w_2->setPlaceholderText("Width");
+    ui->selectedCell_h_2->setReadOnly(true);
+    ui->selectedCell_h_2->setPlaceholderText("Height");
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
@@ -85,7 +93,7 @@ void MainWindow::on_selected_cellChanged(QString name, QString type, double widt
     ui->selectedCell_y_2->setValue(y);
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_selectedCellButton_clicked()
 {
     double x = ui->selectedCell_x_2->value();
     double y = ui->selectedCell_y_2->value();
@@ -95,16 +103,19 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_actionSlot_1_triggered()
 {
     mMainController.slot1();
+    on_findNameButtonClear_clicked();
 }
 
 void MainWindow::on_actionSlot_2_triggered()
 {
     mMainController.slot2();
+    on_findNameButtonClear_clicked();
 }
 
 void MainWindow::on_actionSlot_3_triggered()
 {
     mMainController.slot3();
+    on_findNameButtonClear_clicked();
 }
 
 void MainWindow::on_findNameButton_clicked()
@@ -115,4 +126,10 @@ void MainWindow::on_findNameButton_clicked()
         ui->findErro->setText("Cell found");
     else
         ui->findErro->setText("Cell not found");
+}
+
+void MainWindow::on_findNameButtonClear_clicked()
+{
+    ui->findName->clear();
+    ui->findErro->clear();
 }

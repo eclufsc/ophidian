@@ -12,6 +12,13 @@ public:
      */
     Form();
 
+    //! Form Constructor
+    /*!
+       \brief Constructs a Form
+       \param id Form identifier.
+     */
+    explicit Form(uint32_t id);
+
     //! Form Destructor
     /*!
        \brief Destroys the Form, including its properties
@@ -50,6 +57,13 @@ public:
        \param cell A circuit cell
      */
     explicit Quad(const ophidian::circuit::Cell & cell);
+
+    //! Quad Constructor
+    /*!
+       \brief Constructs a Quad
+       \param id Quad identifier.
+     */
+    Quad(uint32_t id);
 
     //! Quad Destructor
     /*!

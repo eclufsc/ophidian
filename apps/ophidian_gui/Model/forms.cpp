@@ -5,6 +5,12 @@ Form::Form()
 
 }
 
+Form::Form(uint32_t id) :
+    mId(id)
+{
+
+}
+
 Form::~Form()
 {
 
@@ -17,6 +23,12 @@ Quad::Quad()
 
 Quad::Quad(const ophidian::circuit::Cell & cell) :
     mCell(cell)
+{
+
+}
+
+Quad::Quad(uint32_t id) :
+    Form(id)
 {
 
 }

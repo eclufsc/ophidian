@@ -15,29 +15,26 @@ void MainController::setCanvas(Canvas * canvas)
     mCanvas = canvas;
 }
 
-void MainController::mousePress(const ophidian::geometry::Point &p)
+void MainController::selectedCell(const ophidian::circuit::Cell & cell)
 {
-    std::string name = "";
-    std::string type = "";
+    std::string name = mDesign->netlist().name(cell);
+    std::string type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(cell) );
+    ophidian::geometry::Point origin = mDesign->placement().cellLocation(cell).toPoint();
 
-    if (mIndex.hasQuad(p))
-    {
-        Quad quad = mIndex.quadContaining(p);
-        name = mDesign->netlist().name(quad.mCell);
-        type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(quad.mCell) );
-        ophidian::geometry::Point origin = mDesign->placement().cellLocation(quad.mCell).toPoint();
+    auto size = cellSize(cell);
 
-        auto size = cellSize(quad.mCell);
-
-        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), size.x(), size.y(), origin.x(), origin.y());
-    }
-    else
-    {
-        emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), 0, 0, p.x(), p.y());
-    }
+    emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), size.x(), size.y(), origin.x(), origin.y());
 }
 
-void MainController::mouseMove(const ophidian::geometry::Point &p)
+void MainController::mousePress(const ophidian::geometry::Point & p)
+{
+    if (mIndex.hasQuad(p))
+        selectedCell(mIndex.quadContaining(p).mCell);
+    else
+        emit on_selected_cellChanged("", "", 0, 0, p.x(), p.y());
+}
+
+void MainController::mouseMove(const ophidian::geometry::Point & p)
 {
     emit on_selected_cellChanged("moving", "moving", -1, -1, p.x(), p.y());
 }

@@ -91,6 +91,13 @@ bool Idle::findCellEvent(QString name)
     if(mMainController->hasCell(name.toStdString()))
     {
         Quad selected = mMainController->quadsCell(name.toStdString()).front();
+
+        mMainController->selectedCell(selected.mCell);
+
+        auto origin = mSFMLCanvas->canvas()->points(selected).front();
+        auto size = mMainController->cellSize(selected.mCell);
+        mSFMLCanvas->centerViewOn(ophidian::geometry::Point(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
+
         mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
         delete this;
 
@@ -183,7 +190,26 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
 
 bool Selected::findCellEvent(QString name)
 {
-    return true;
+    if(mMainController->hasCell(name.toStdString()))
+    {
+        Quad selected = mMainController->quadsCell(name.toStdString()).front();
+
+        if (selected.mCell != mQuad.mCell)
+        {
+            mMainController->clear(mWireQuad);
+            mMainController->selectedCell(selected.mCell);
+            mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
+            delete this;
+        }
+
+        auto origin = mSFMLCanvas->canvas()->points(selected).front();
+        auto size = mMainController->cellSize(selected.mCell);
+        mSFMLCanvas->centerViewOn(ophidian::geometry::Point(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
+
+        return true;
+    }
+
+    return false;
 }
 
 Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :

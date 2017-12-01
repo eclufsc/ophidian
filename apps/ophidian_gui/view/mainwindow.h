@@ -76,7 +76,7 @@ private slots:
     /*!
        \brief Sends a cell's position change to the main control.
      */
-    void on_pushButton_clicked();
+    void on_selectedCellButton_clicked();
 
     //! Deployment helper function
     /*!
@@ -96,7 +96,17 @@ private slots:
      */
     void on_actionSlot_3_triggered();
 
+    //! Find a cell by name
+    /*!
+       \brief Search for a cell by its name and display it on the canvas.
+     */
     void on_findNameButton_clicked();
+
+    //! Clear fields of action: find cell by name
+    /*!
+       \brief Cleans the fields for ease of performing a new search.
+     */
+    void on_findNameButtonClear_clicked();
 
 signals:
     //! Deployment helper function

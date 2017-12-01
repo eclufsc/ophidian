@@ -49,6 +49,13 @@ public:
      */
     void setCanvas(Canvas * canvas);
 
+    //! Selected cell event
+    /*!
+       \brief Transmits the cell information to the main window.
+       \param cell Selected circuit cell.
+     */
+    void selectedCell(const ophidian::circuit::Cell & cell);
+
     //! Mouse press event
     /*!
        \brief Finds cell at corresponding point and transmits its information to main window.
@@ -94,6 +101,14 @@ public:
        \return The quad corresponding to that position.
      */
     Quad quadAt(const ophidian::geometry::Point & p);
+
+    //! Cell size
+    /*!
+       \brief Calculates the size of a cell based on all its boxes.
+       \param cell Circuit cell.
+       \return Point containing the width (x) and height (y).
+     */
+    ophidian::geometry::Point cellSize(const ophidian::circuit::Cell & cell);
 
     //! Quads of a cell
     /*!
@@ -242,14 +257,6 @@ private:
        \brief Creates all quads of cells and has them draw on canvas.
      */
     void createQuads();
-
-    //! Cell size
-    /*!
-       \brief Calculates the size of a cell based on all its boxes.
-       \param cell Circuit cell.
-       \return Point containing the width (x) and height (y).
-     */
-    ophidian::geometry::Point cellSize(const ophidian::circuit::Cell & cell);
 
     Canvas * mCanvas;
     SpatialIndex mIndex;
