@@ -19,10 +19,10 @@ cmake_minimum_required(VERSION 3.2.2)
 # Set PROJECT_NAME global variable
 set(PROJECT_NAME "ophidian")
 
-# Set projec name
+# Set project name 
 project(${PROJECT_NAME})
 
-# Set c++14 globaly
+# Set c++14 globally 
 set(CMAKE_CXX_STANDARD 14)
 
 # Set Ophidian source dir
@@ -63,7 +63,7 @@ endif()
 # Project logic
 ################################################################################
 
-# Set globla compiler flags
+# Set global compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 
 # Set option build shared libs
