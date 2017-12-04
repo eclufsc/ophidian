@@ -34,11 +34,13 @@ configure_package_config_file(
 
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config-version.cmake
-  VERSION 0.1.1
+  VERSION ${ophidian_VERSION}
   COMPATIBILITY SameMajorVersion 
 )
 
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config.cmake
+    FILES 
+        ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config-version.cmake
     DESTINATION ${ophidian_install_lib_dir}/cmake
 )

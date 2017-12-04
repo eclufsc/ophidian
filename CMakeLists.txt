@@ -19,6 +19,9 @@ cmake_minimum_required(VERSION 3.5.2)
 # Set project name 
 project(ophidian)
 
+# Set project version
+set(ophidian_VERSION 0.1.1)
+
 # Set c++14 globally 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -45,6 +48,7 @@ set(ophidian_install_include_dir include)
 # Handle raquirements
 ################################################################################
 
+# Set Cmake module path for find_package
 set(CMAKE_MODULE_PATH ${ophidian_source_dir}/cmake)
 
 # Find Boost
