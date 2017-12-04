@@ -18,7 +18,8 @@
 using namespace qsfml;
 
 QSFMLCanvas::QSFMLCanvas(QWidget* parent) :
-QWidget       (parent)
+QWidget       (parent),
+myInitialized (false)
 {
     // Setup some states to allow direct rendering into the widget
     setAttribute(Qt::WA_PaintOnScreen);
@@ -40,7 +41,7 @@ QWidget       (parent)
     myTimer.setInterval(0);
 }
 
-QSFMLCanvas::QSFMLCanvas(QWidget* parent, const QPoint& position, const QSize& size, unsigned int frameTime) :
+QSFMLCanvas::QSFMLCanvas(QWidget * parent, const QPoint & position, const QSize & size, unsigned int frameTime) :
 QWidget       (parent),
 myInitialized (false)
 {

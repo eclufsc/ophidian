@@ -23,7 +23,7 @@ void MainController::selectedCell(const ophidian::circuit::Cell & cell)
 
     auto size = cellSize(cell);
 
-    emit on_selected_cellChanged(QString::fromStdString(name), QString::fromStdString(type), size.x(), size.y(), origin.x(), origin.y());
+    emit on_send_cellChanged(QString::fromStdString(name), QString::fromStdString(type), size.x(), size.y(), origin.x(), origin.y());
 }
 
 void MainController::mousePress(const ophidian::geometry::Point & p)
@@ -31,12 +31,12 @@ void MainController::mousePress(const ophidian::geometry::Point & p)
     if (mIndex.hasQuad(p))
         selectedCell(mIndex.quadContaining(p).mCell);
     else
-        emit on_selected_cellChanged("", "", 0, 0, p.x(), p.y());
+        emit on_send_cellChanged("", "", 0, 0, p.x(), p.y());
 }
 
 void MainController::mouseMove(const ophidian::geometry::Point & p)
 {
-    emit on_selected_cellChanged("moving", "moving", -1, -1, p.x(), p.y());
+    emit on_send_cellChanged("moving", "moving", -1, -1, p.x(), p.y());
 }
 
 void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def)
@@ -83,18 +83,8 @@ void MainController::init()
     concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
     std::string dieArea = concat.str();
 
-    /* Getting name of file
-    size_t pos = 0;
-    std::string name;
-    while ((pos = lef.find("/")) != std::string::npos) {
-        name = lef.substr(0, pos);
-        lef.erase(0, pos + 1);
-    }
-    name = lef.substr(0, lef.find("."));
-    */
-
     /* Saying to MainWindow display the information */
-    emit on_circuit_labelsChanged("Circuit", QString::fromStdString(dieArea), cells, pins, nets);
+    emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), cells, pins, nets);
 
     createQuads();
 }
@@ -153,6 +143,7 @@ bool MainController::hasCell(std::string name)
         return false;
 
     auto cell = mDesign->netlist().find(ophidian::circuit::Cell(), name);
+
     try {
         mDesign->placement().isFixed(cell);
         return true;
@@ -182,6 +173,7 @@ std::vector<Quad> MainController::quadsCell(std::string name)
         return std::vector<Quad>();
 
     auto cell = mDesign->netlist().find(ophidian::circuit::Cell(), name);
+
     try {
         return mCellToQuads[cell];
     } catch (const std::out_of_range & e) {
@@ -247,14 +239,11 @@ void MainController::remove(Quad quad, WireQuad wire)
     }
 
     mDesign->netlist().erase(quad.mCell);
-    /* Just hedge the points to the origin, not to need to
-     * find a cell to put in place (quantities of different quads).
-     */
 
     size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
     size_t pins = mDesign->netlist().size(ophidian::circuit::Pin());
     size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
-    emit on_circuit_labelsChanged("removing", "removing", cells, pins, nets);
+    emit on_send_circuitChanged("removing", "removing", cells, pins, nets);
 }
 
 ophidian::geometry::Point MainController::chipBoundaries()

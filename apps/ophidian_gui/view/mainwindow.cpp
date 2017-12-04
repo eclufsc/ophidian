@@ -18,10 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
     /* Connecting signals */
-    QObject::connect(&mMainController, SIGNAL(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)),
-                     this, SLOT(on_circuit_labelsChanged(QString, QString, size_t, size_t, size_t)));
-    QObject::connect(&mMainController, SIGNAL(on_selected_cellChanged(QString, QString, double, double, double, double)),
-                     this, SLOT(on_selected_cellChanged(QString, QString, double, double, double, double)));
+    QObject::connect(&mMainController, SIGNAL(on_send_circuitChanged(QString, QString, size_t, size_t, size_t)),
+                     this, SLOT(on_receive_circuitChanged(QString, QString, size_t, size_t, size_t)));
+    QObject::connect(&mMainController, SIGNAL(on_send_cellChanged(QString, QString, double, double, double, double)),
+                     this, SLOT(on_receive_cellChanged(QString, QString, double, double, double, double)));
 
     /* Name of Actions */
     ui->actionSlot_1->setText("Slot 1");
@@ -56,7 +56,7 @@ void MainWindow::on_actionQuit_triggered()
     QCoreApplication::quit();
 }
 
-void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets)
+void MainWindow::on_receive_circuitChanged(QString name, QString die, size_t cells, size_t pins, size_t nets)
 {   
     if (name.compare("removing")) {
         ui->circuitName_2->setText(name);
@@ -83,7 +83,7 @@ void MainWindow::on_circuit_labelsChanged(QString name, QString die, size_t cell
     ui->selectedCell_y_2->setValue(0);
 }
 
-void MainWindow::on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y)
+void MainWindow::on_receive_cellChanged(QString name, QString type, double width, double height, double x, double y)
 {
     QString w = width ? QString::number(width) + "μ" : width == -1? ui->selectedCell_w_2->text() : "";
     QString h = height ? QString::number(height) + "μ" : height == -1? ui->selectedCell_h_2->text() : "";

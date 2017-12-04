@@ -187,9 +187,7 @@ void DrawableBatch<NumberOfVertices>::alloc(Form & form, const std::vector<ophid
     std::array<sf::Vertex, NumberOfVertices> newVertices;
 
     for (auto i = 0; i < NumberOfVertices; ++i)
-    {
         newVertices[i].position = sf::Vector2f(points[i].x(), points[i].y());
-    }
 
     mVertices.push_back(newVertices);
 }
@@ -200,9 +198,7 @@ void DrawableBatch<NumberOfVertices>::desalloc(const Form & out)
     std::array<sf::Vertex, NumberOfVertices> newVertices;
 
     for (auto i = 0; i < NumberOfVertices; ++i)
-    {
         newVertices[i].position = sf::Vector2f(0, 0);
-    }
 
     mVertices[out.mId] = (newVertices);
 }
@@ -211,18 +207,14 @@ template<std::size_t NumberOfVertices>
 void DrawableBatch<NumberOfVertices>::transform(const Form & form, const sf::Transform & trans)
 {
     for (sf::Vertex & v : mVertices[form.mId])
-    {
         v.position = trans.transformPoint(v.position);
-    }
 }
 
 template<std::size_t NumberOfVertices>
 void DrawableBatch<NumberOfVertices>::paint(const Form & form, const sf::Color color)
 {
     for (sf::Vertex & v : mVertices[form.mId])
-    {
         v.color = color;
-    }
 }
 
 template<std::size_t NumberOfVertices>

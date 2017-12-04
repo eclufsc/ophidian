@@ -5,12 +5,12 @@
 #include <unordered_map>
 #include <QObject>
 
-#include <sstream>
+//#include <sstream>
 #include <string>
 
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
+//#include <iostream>
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Range.h>
@@ -226,7 +226,7 @@ signals:
        \param pins Amount of pins in the circuit.
        \param nets Amount of nets in the circuit.
      */
-    void on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
+    void on_send_circuitChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
 
     //! Sending cell information
     /*!
@@ -237,7 +237,7 @@ signals:
        \param y Position of the origin on the ordinate axis.
        \param worstSlack not implemented
      */
-    void on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y);
+    void on_send_cellChanged(QString name, QString type, double width, double height, double x, double y);
 
 private:
     //! Initializes design and cell property to quad.

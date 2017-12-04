@@ -59,7 +59,7 @@ private slots:
        \param pins Amount of pins in the circuit.
        \param nets Amount of nets in the circuit.
      */
-    void on_circuit_labelsChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
+    void on_receive_circuitChanged(QString name, QString die, size_t cells, size_t pins, size_t nets);
 
     //! Receiving cell information
     /*!
@@ -70,7 +70,7 @@ private slots:
        \param y Position of the origin on the ordinate axis.
        \param worstSlack not implemented
      */
-    void on_selected_cellChanged(QString name, QString type, double width, double height, double x, double y);
+    void on_receive_cellChanged(QString name, QString type, double width, double height, double x, double y);
 
     //! Changes the position of a cell
     /*!
