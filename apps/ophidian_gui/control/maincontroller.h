@@ -24,6 +24,7 @@
 #include "view/canvas.h"
 #include "control/spatialindex.h"
 #include "view/drawablebatch.h"
+#include "control/svgbuilder.h"
 
 class MainController : public QObject
 {
@@ -178,6 +179,13 @@ public:
        \return Point corresponding to the limits of the chip.
      */
     ophidian::geometry::Point chipBoundaries();
+
+    //! Draw the containers in svg
+    /*!
+       \brief Draws all contents of containers in svg.
+       \param svg Builder of the SVG image
+     */
+    void drawSVG(SVGBuilder & svg);
 
     //! Extra function 1
     /*!

@@ -140,3 +140,25 @@ void MainWindow::on_findNameButtonClear_clicked()
     ui->findName->clear();
     ui->findErro->clear();
 }
+
+void MainWindow::on_actionPNG_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save PNG"), "", tr("PNG Format (*.png);;All Files (*)"));
+
+    if (!(fileName.toStdString().find(".png") != std::string::npos)) {
+        fileName += ".png";
+    }
+
+    ui->MyCanvas->saveToPNG(fileName.toStdString());
+}
+
+void MainWindow::on_actionSVG_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save PNG"), "", tr("PNG Format (*.png);;All Files (*)"));
+
+    if (!(fileName.toStdString().find(".svg") != std::string::npos)) {
+        fileName += ".svg";
+    }
+
+    ui->MyCanvas->saveToSVG(fileName.toStdString());
+}

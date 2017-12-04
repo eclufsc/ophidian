@@ -299,3 +299,25 @@ ophidian::geometry::Point MainController::cellSize(const ophidian::circuit::Cell
 
     return ophidian::geometry::Point(width, height);
 }
+
+
+void MainController::drawSVG(SVGBuilder & svg)
+{
+    for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
+    {
+        ophidian::geometry::Point size = cellSize(*cellIt);
+        ophidian::geometry::Point loc = mDesign->placement().cellLocation(*cellIt).toPoint();
+
+        if (isFixed(*cellIt))
+        {
+            //mCanvas->paint(quads, sf::Color::Blue);
+            svg.insertRect(loc.x(), loc.y(), size.x(), size.y(), 0, 0, 255);
+        }
+        else
+        {
+            unsigned int random = rand();
+            //mCanvas->paint(quads, sf::Color(, , ));
+            svg.insertRect(loc.x(), loc.y(), size.x(), size.y(), (random % 10 + 195), (random % 75), (random % 120 + 135));
+        }
+    }
+}

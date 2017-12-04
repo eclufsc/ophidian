@@ -389,7 +389,15 @@
      <addaction name="actionICCAD_2017"/>
      <addaction name="actionICCAD_2015"/>
     </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionPNG"/>
+     <addaction name="actionSVG"/>
+    </widget>
     <addaction name="menuOpen_LEF_DEF"/>
+    <addaction name="menuExport"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -444,6 +452,16 @@
   <action name="actionSlot_3">
    <property name="text">
     <string>Slot 3</string>
+   </property>
+  </action>
+  <action name="actionPNG">
+   <property name="text">
+    <string>PNG</string>
+   </property>
+  </action>
+  <action name="actionSVG">
+   <property name="text">
+    <string>SVG</string>
    </property>
   </action>
  </widget>

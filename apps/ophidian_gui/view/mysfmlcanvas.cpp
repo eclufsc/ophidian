@@ -137,3 +137,33 @@ void MySFMLCanvas::updatePositionQuad(const ophidian::geometry::Point & p)
 {
     mState->mouseReleaseEvent(p);
 }
+
+void MySFMLCanvas::saveToPNG(const std::string & filename)
+{
+    sf::RenderTexture texture;
+    texture.create(1920, 1080);
+
+    texture.setView(mCameraView);
+    texture.clear(sf::Color::Black);
+    texture.draw(mCanvas);
+    texture.setView(texture.getDefaultView());
+
+    texture.getTexture().copyToImage().saveToFile(filename);
+
+    sf::Image upsideDownImage;
+    upsideDownImage.loadFromFile(filename);
+    upsideDownImage.flipVertically();
+    upsideDownImage.saveToFile(filename);
+}
+
+void MySFMLCanvas::saveToSVG(const std::string & filename)
+{
+    ophidian::geometry::Point size = mMainController->chipBoundaries();
+    SVGBuilder svg(size.x(), size.y());
+
+    mMainController->drawSVG(svg);
+
+    std::ofstream out(filename);
+    out << svg.getSVG();
+    out.close();
+}

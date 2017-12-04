@@ -8,6 +8,8 @@
 #include "dialogiccad2017.h"
 #include "control/maincontroller.h"
 
+#include <iostream>
+
 namespace Ui {
 class MainWindow;
 } // namespace Ui
@@ -107,6 +109,10 @@ private slots:
        \brief Cleans the fields for ease of performing a new search.
      */
     void on_findNameButtonClear_clicked();
+
+    void on_actionPNG_triggered();
+
+    void on_actionSVG_triggered();
 
 signals:
     //! Deployment helper function

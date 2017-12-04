@@ -7,12 +7,17 @@
 
 #include <omp.h>
 #include <memory>
+#include <fstream>
+#include <string>
+#include <iostream>
 
 #include <ophidian/geometry/Models.h>
 #include "qsfmlcanvas.h"
 #include "canvas.h"
 #include "control/maincontroller.h"
 #include "control/state.h"
+
+#include "control/svgbuilder.h"
 
 using namespace qsfml;
 
@@ -122,6 +127,20 @@ public:
        \param pos New center position.
      */
     void viewSize(const ophidian::geometry::Point & size);
+
+    //! Save the circuit in image with PNG format
+    /*!
+       \brief Saves the current state of the circuit in an image with PNG format.
+       \param filename File name and location where the image should be saved.
+     */
+    void saveToPNG(const std::string & filename);
+
+    //! Save the circuit in image with SVG format
+    /*!
+       \brief Saves the current state of the circuit in an image with SCG format.
+       \param filename File name and location where the image should be saved.
+     */
+    void saveToSVG(const std::string & filename);
 
 public slots:
     //! State setter
