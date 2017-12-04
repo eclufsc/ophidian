@@ -22,14 +22,14 @@ add_subdirectory(util)
 install(
     EXPORT ophidian-targets
     NAMESPACE ophidian::
-    DESTINATION ${ophidian_install_lib_dir}/cmake
+    DESTINATION ${ophidian_install_share_dir}/cmake
 )
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
     ophidian-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config.cmake
-    INSTALL_DESTINATION ${ophidian_install_lib_dir}/cmake
+    INSTALL_DESTINATION ${ophidian_install_share_dir}/cmake
 )
 
 write_basic_package_version_file(
@@ -42,5 +42,5 @@ install(
     FILES 
         ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config-version.cmake
-    DESTINATION ${ophidian_install_lib_dir}/cmake
+    DESTINATION ${ophidian_install_share_dir}/cmake
 )
