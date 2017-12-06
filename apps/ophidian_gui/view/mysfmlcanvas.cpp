@@ -148,6 +148,10 @@ void MySFMLCanvas::saveToPNG(const std::string & filename)
     texture.draw(mCanvas);
     texture.setView(texture.getDefaultView());
 
+    std::cout << "Center: " << mCameraView.getCenter().x << " x " << mCameraView.getCenter().y << std::endl;
+    std::cout << "Size: " << mCameraView.getSize().x << " x " << mCameraView.getSize().y << std::endl;
+    std::cout << "Port: " << mCameraView.getViewport().width << " x " << mCameraView.getViewport().height << std::endl;
+
     texture.getTexture().copyToImage().saveToFile(filename);
 
     sf::Image upsideDownImage;
@@ -158,12 +162,21 @@ void MySFMLCanvas::saveToPNG(const std::string & filename)
 
 void MySFMLCanvas::saveToSVG(const std::string & filename)
 {
-    ophidian::geometry::Point size = mMainController->chipBoundaries();
-    SVGBuilder svg(size.x(), size.y());
+    try
+    {
+        ophidian::geometry::Point size = mMainController->chipBoundaries();
+        SVGBuilder svg(size.x(), size.y());
 
-    mMainController->drawSVG(svg);
+        mMainController->drawSVG(svg);
 
-    std::ofstream out(filename);
-    out << svg.getSVG();
-    out.close();
+
+
+        std::ofstream out(filename);
+        out << svg.getSVG();
+        out.close();
+    }
+    catch (const std::out_of_range & e)
+    {
+
+    }
 }

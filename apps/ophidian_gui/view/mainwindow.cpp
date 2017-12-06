@@ -154,7 +154,7 @@ void MainWindow::on_actionPNG_triggered()
 
 void MainWindow::on_actionSVG_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save PNG"), "", tr("PNG Format (*.png);;All Files (*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save SVG"), "", tr("PNG Format (*.svg);;All Files (*)"));
 
     if (!(fileName.toStdString().find(".svg") != std::string::npos)) {
         fileName += ".svg";

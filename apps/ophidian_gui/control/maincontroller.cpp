@@ -248,6 +248,8 @@ void MainController::remove(Quad quad, WireQuad wire)
 
 ophidian::geometry::Point MainController::chipBoundaries()
 {
+    if (mDesign == nullptr)
+        throw std::out_of_range("Design not exist.");
     return mDesign->floorplan().chipUpperRightCorner().toPoint();
 }
 
