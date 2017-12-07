@@ -303,23 +303,41 @@ ophidian::geometry::Point MainController::cellSize(const ophidian::circuit::Cell
 }
 
 
-void MainController::drawSVG(SVGBuilder & svg)
+void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box & viewBox)
 {
-    for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
-    {
-        ophidian::geometry::Point size = cellSize(*cellIt);
-        ophidian::geometry::Point loc = mDesign->placement().cellLocation(*cellIt).toPoint();
+    if (mDesign)
+        return;
 
-        if (isFixed(*cellIt))
+    std::vector<Quad> quadsInArea = mIndex.quadsContaining(viewBox);
+
+    for (auto quadIt = quadsInArea.begin(); quadIt != quadsInArea.end(); quadIt++)
+    {
+        std::cout << mDesign->netlist().name(quadIt->mCell) << std::endl;
+        auto points = mCanvas->points(*quadIt);
+        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100,
+                                      (points[0].position.y - viewBox.min_corner().y())/100);
+        ophidian::geometry::Point max((points[2].position.x - viewBox.min_corner().x())/100,
+                                      (points[2].position.y - viewBox.min_corner().y())/100);
+
+        std::cout << "_ min:" << min.x() << " x " << min.y() << std::endl;
+        std::cout << "_ max:" << max.x() << " x " << max.y() << std::endl << std::endl;
+        ophidian::geometry::Box box(min, max);
+
+        QString style;
+        if (isFixed(quadIt->mCell))
         {
-            //mCanvas->paint(quads, sf::Color::Blue);
-            svg.insertRect(loc.x(), loc.y(), size.x(), size.y(), 0, 0, 255);
+            style += "fill:rgb(0,0,255)";
         }
         else
         {
             unsigned int random = rand();
-            //mCanvas->paint(quads, sf::Color(, , ));
-            svg.insertRect(loc.x(), loc.y(), size.x(), size.y(), (random % 10 + 195), (random % 75), (random % 120 + 135));
+            style += "fill:rgb(";
+            style += QString::number((random % 10 + 195)) + ",";
+            style += QString::number((random % 75)) + ",";
+            style += QString::number((random % 120 + 135)) + ")";
         }
+
+        mapper.add(box);
+        mapper.map(box, style.toStdString());
     }
 }

@@ -162,21 +162,23 @@ void MySFMLCanvas::saveToPNG(const std::string & filename)
 
 void MySFMLCanvas::saveToSVG(const std::string & filename)
 {
-    try
-    {
-        ophidian::geometry::Point size = mMainController->chipBoundaries();
-        SVGBuilder svg(size.x(), size.y());
+        double centerX = mCameraView.getCenter().x;
+        double centerY = mCameraView.getCenter().y;
+        double width = mCameraView.getSize().x;
 
-        mMainController->drawSVG(svg);
+        ophidian::geometry::Point min((centerX - width/2), (centerY - width/2));
+        ophidian::geometry::Point max((centerX + width/2), (centerY + width/2));
+        ophidian::geometry::Box viewSize(min, max);
 
+        std::cout << "view e w: " << centerX << " x " << centerY << " - " << width << std::endl;
+        std::cout << "min: " << min.x() << " x " << min.y() << std::endl;
+        std::cout << "max: " << max.x() << " x " << max.y() << std::endl;
 
+        std::ofstream svg(filename);
+        SVGMapper mapper(svg, width/100, width/100);
+        ophidian::geometry::Box b(ophidian::geometry::Point(0,0), ophidian::geometry::Point(width/100,width/100));
+        mapper.add(b);
+        mapper.map(b, "fill:rgb(0,0,0)");
 
-        std::ofstream out(filename);
-        out << svg.getSVG();
-        out.close();
-    }
-    catch (const std::out_of_range & e)
-    {
-
-    }
+        mMainController->drawSVG(mapper, viewSize);
 }

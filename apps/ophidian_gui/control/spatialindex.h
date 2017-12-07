@@ -57,6 +57,14 @@ public:
      */
     void quadRemove(const Quad & quad);
 
+    //! Quads from a area
+    /*!
+       \brief Select all quads that were in the specified area.
+       \param box A area of the circuit.
+       \return Vector containing the quads in the area.
+     */
+    std::vector<Quad> quadsContaining(const ophidian::geometry::Box & box) const;
+
     //! Quads from a point
     /*!
        \brief Find all quads that have intersection with the point.

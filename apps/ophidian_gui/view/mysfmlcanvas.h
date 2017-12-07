@@ -7,9 +7,7 @@
 
 #include <omp.h>
 #include <memory>
-#include <fstream>
 #include <string>
-#include <iostream>
 
 #include <ophidian/geometry/Models.h>
 #include "qsfmlcanvas.h"
@@ -17,7 +15,9 @@
 #include "control/maincontroller.h"
 #include "control/state.h"
 
-#include "control/svgbuilder.h"
+#include <iostream>
+#include <fstream>
+#include <boost/geometry.hpp>
 
 using namespace qsfml;
 
@@ -178,6 +178,8 @@ private:
        \param pos Click ou move position.
      */
     ophidian::geometry::Point mouseEventToPoint(QMouseEvent * e);
+
+    typedef boost::geometry::svg_mapper<ophidian::geometry::Point> SVGMapper;
 
     MainController * mMainController;
     State * mState;

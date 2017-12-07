@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <ctime>
 //#include <iostream>
+#include <boost/geometry.hpp>
+#include <unordered_set>
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Range.h>
@@ -24,11 +26,12 @@
 #include "view/canvas.h"
 #include "control/spatialindex.h"
 #include "view/drawablebatch.h"
-#include "control/svgbuilder.h"
 
 class MainController : public QObject
 {
     Q_OBJECT
+
+    typedef boost::geometry::svg_mapper<ophidian::geometry::Point> SVGMapper;
 
 public:
     //! MainController Constructor
@@ -183,9 +186,10 @@ public:
     //! Draw the containers in svg
     /*!
        \brief Draws all contents of containers in svg.
-       \param svg Builder of the SVG image
+       \param svg Builder of the SVG image.
+       \param viewBox Display area.
      */
-    void drawSVG(SVGBuilder & svg);
+    void drawSVG(SVGMapper & mapper, const ophidian::geometry::Box & viewBox);
 
     //! Extra function 1
     /*!
