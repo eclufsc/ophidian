@@ -110,8 +110,16 @@ private slots:
      */
     void on_findNameButtonClear_clicked();
 
+    //! Save PNG of the circuit
+    /*!
+       \brief Draw the current view of the circuit into a PNG image.
+     */
     void on_actionPNG_triggered();
 
+    //! Save SVG of the circuit
+    /*!
+       \brief Draw the current view of the circuit into a SVG image.
+     */
     void on_actionSVG_triggered();
 
 signals:

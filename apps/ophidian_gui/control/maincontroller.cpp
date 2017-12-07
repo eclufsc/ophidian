@@ -305,7 +305,7 @@ ophidian::geometry::Point MainController::cellSize(const ophidian::circuit::Cell
 
 void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box & viewBox)
 {
-    if (mDesign)
+    if (mDesign == nullptr)
         return;
 
     std::vector<Quad> quadsInArea = mIndex.quadsContaining(viewBox);
