@@ -43,14 +43,14 @@ file(GLOB ophidian_parser_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_parser SHARED ${ophidian_parser_source})
+add_library(ophidian_parser ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_parser
     PUBLIC ophidian_util
-    PRIVATE verilogparser
-    PRIVATE DEF
-    PRIVATE LEF
+    PRIVATE verilog-parser::verilogparser
+    PRIVATE DEF::def
+    PRIVATE LEF::lef
 )
 
 # Tell cmake the path to look for include files for this target

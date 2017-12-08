@@ -21,18 +21,8 @@ build_ophidian:
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
     - make -j2
-  artifacts:
-    paths:
-      - build/
-
-test_ophidian:
-  stage: test
-  script:
-    - cd build
     - cd test
     - ./ophidian_tests
-  dependencies:
-    - build_ophidian
   artifacts:
     paths:
       - build/

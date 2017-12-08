@@ -43,7 +43,7 @@ file(GLOB ophidian_circuit_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_circuit SHARED ${ophidian_circuit_source})
+add_library(ophidian_circuit ${ophidian_circuit_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_circuit

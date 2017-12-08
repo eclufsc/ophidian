@@ -43,7 +43,7 @@ file(GLOB ophidian_placement_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_placement SHARED ${ophidian_placement_source})
+add_library(ophidian_placement ${ophidian_placement_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_placement

@@ -43,7 +43,7 @@ file(GLOB ophidian_geometry_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_geometry SHARED ${ophidian_geometry_source})
+add_library(ophidian_geometry ${ophidian_geometry_source})
 
 # Add target dependencies
 target_link_libraries(ophidian_geometry
