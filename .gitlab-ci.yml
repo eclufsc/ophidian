@@ -18,6 +18,7 @@ stages:
 build_ophidian:
   stage: build
   script:
+    - sh build_dependencies.sh
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
     - make -j2
