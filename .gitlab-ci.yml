@@ -27,3 +27,19 @@ build_ophidian:
   artifacts:
     paths:
       - build/
+
+build_ophidian_tests_fully_static:
+  stage: build
+  script:
+    - sh build_dependencies.sh
+    - mkdir build && cd build
+    - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
+    - make -j2
+    - cd test
+    - ./ophidian_tests
+  artifacts:
+    paths:
+      - build/

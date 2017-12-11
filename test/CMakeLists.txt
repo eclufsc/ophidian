@@ -31,6 +31,13 @@ target_link_libraries(ophidian_tests
     PRIVATE ophidian_standard_cell
 )
 
+if(OPHIDIAN_TESTS_FULLY_STATIC)
+    # Link EVERYTHING staticly!
+    set_target_properties(ophidian_tests PROPERTIES
+        LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
+    )
+endif()
+
 ################################################################################
 # Prepare test input environment. 
 ################################################################################

@@ -25,6 +25,9 @@ set(ophidian_VERSION 0.1.1)
 # Set c++14 globally
 set(CMAKE_CXX_STANDARD 14)
 
+# Build ophidian_tests binary fully static
+OPTION(OPHIDIAN_TESTS_FULLY_STATIC OFF)
+
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
