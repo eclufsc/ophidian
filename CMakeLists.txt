@@ -48,7 +48,7 @@ set(ophidian_install_share_dir share/ophidian)
 # Set Cmake module path for find_package
 set(CMAKE_MODULE_PATH ${ophidian_source_dir}/cmake)
 
-# Set Cmake prefix path
+# Set Cmake prefix path for buildind with local dependencies
 set(CMAKE_PREFIX_PATH ${ophidian_source_dir}/dependencies)
 
 # Find Boost
