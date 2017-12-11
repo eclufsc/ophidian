@@ -70,7 +70,7 @@ find_package(LEF REQUIRED)
 find_package(Flute REQUIRED)
 
 # Find Verilog-parser
-find_package(verilog-parser REQUIRED) 
+find_package(verilog-parser REQUIRED)
 
 ################################################################################
 # Project logic 

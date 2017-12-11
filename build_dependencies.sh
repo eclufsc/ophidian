@@ -3,6 +3,8 @@
 # Ophidian library
 ################################################################################
 
+git submodule update --init --recursive
+
 # Absolute path to project root
 OPHIDIAN_PATH=$(pwd)
 
@@ -48,3 +50,19 @@ mv src/libverilogparser.a $DEPENDENCIES_LIB_PATH
 cd ..
 rm -rf build
 cp src/*.h $DEPENDENCIES_INCLUDE_PATH
+
+cd $OPHIDIAN_PATH/3rdparty/Lemon
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=/
+make DESTDIR=$DEPENDENCIES_ROOT install
+cd ..
+rm -rf build
+
+cd $OPHIDIAN_PATH/3rdparty/units
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=/
+make DESTDIR=$DEPENDENCIES_ROOT install
+cd ..
+rm -rf build

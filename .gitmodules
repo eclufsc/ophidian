@@ -13,3 +13,6 @@
 [submodule "3rdparty/LEF"]
 	path = 3rdparty/LEF
 	url = https://gitlab.com/eclufsc/LEF.git
+[submodule "3rdparty/Lemon"]
+	path = 3rdparty/Lemon
+	url = https://gitlab.com/eclufsc/Lemon.git

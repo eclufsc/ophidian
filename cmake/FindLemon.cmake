@@ -1,5 +1,5 @@
 find_path(Lemon_INCLUDE_DIR "lemon/maps.h" PATHS "/usr/include" )
-find_library(Lemon_LIBRARY "liblemon.a" "liblemon.so" NAMES "libemon.so" PATHS "/usr/lib" "/usr/lib/x86_64-linux-gnu")
+find_library(Lemon_LIBRARY "liblemon.a" "liblemon.so" NAMES "libemon.a" "libemon.so" PATHS "/usr/lib" "/usr/lib/x86_64-linux-gnu")
 
 include(FindPackageHandleStandardArgs)
 
