@@ -59,6 +59,14 @@ make DESTDIR=$DEPENDENCIES_ROOT install
 cd ..
 rm -rf build
 
+cd $OPHIDIAN_PATH/3rdparty/Lemon
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/
+make DESTDIR=$DEPENDENCIES_ROOT install
+cd ..
+rm -rf build
+
 cd $OPHIDIAN_PATH/3rdparty/units
 mkdir build
 cd build

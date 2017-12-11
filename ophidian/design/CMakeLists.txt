@@ -43,7 +43,7 @@ file(GLOB ophidian_design_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_design ${ophidian_design_source})
+add_library(ophidian_design SHARED ${ophidian_design_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_design
@@ -62,13 +62,33 @@ target_include_directories(ophidian_design PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add library target
+add_library(ophidian_design_static STATIC ${ophidian_design_source})
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_design_static
+    PUBLIC ophidian_circuit_static 
+    PUBLIC ophidian_floorplan_static
+    PUBLIC ophidian_standard_cell_static
+    PUBLIC ophidian_placement_static
+    PUBLIC ophidian_parser_static
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_design_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_design 
+    TARGETS ophidian_design ophidian_design_static 
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )

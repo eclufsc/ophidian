@@ -23,6 +23,7 @@ build_ophidian:
     - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
     - make -j2
     - cd test
+    - ldd ophidian_tests
     - ./ophidian_tests
   artifacts:
     paths:
@@ -39,6 +40,7 @@ build_ophidian_tests_fully_static:
             ..
     - make -j2
     - cd test
+    - ldd ophidian_tests
     - ./ophidian_tests
   artifacts:
     paths:

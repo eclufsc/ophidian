@@ -43,7 +43,7 @@ file(GLOB ophidian_parser_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_parser ${ophidian_parser_source})
+add_library(ophidian_parser SHARED ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_parser
@@ -61,13 +61,32 @@ target_include_directories(ophidian_parser PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add library target
+add_library(ophidian_parser_static STATIC ${ophidian_parser_source})
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_parser_static
+    PUBLIC ophidian_util
+    PRIVATE verilog-parser::verilogparser
+    PRIVATE DEF::def
+    PRIVATE LEF::lef
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_parser_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_parser 
+    TARGETS ophidian_parser ophidian_parser_static 
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )

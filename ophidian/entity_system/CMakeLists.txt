@@ -43,7 +43,7 @@ file(GLOB ophidian_entity_system_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_entity_system ${ophidian_entity_system_source})
+add_library(ophidian_entity_system SHARED ${ophidian_entity_system_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_entity_system
@@ -58,13 +58,29 @@ target_include_directories(ophidian_entity_system PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add library target
+add_library(ophidian_entity_system_static STATIC ${ophidian_entity_system_source})
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_entity_system_static
+    PUBLIC Lemon::lemon_static
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_entity_system_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_entity_system 
+    TARGETS ophidian_entity_system ophidian_entity_system_static 
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )

@@ -20,15 +20,15 @@ add_executable(ophidian_tests ${ophidian_run_tests_source})
 # Link target dependencies
 target_link_libraries(ophidian_tests
     PRIVATE Catch
-    PRIVATE ophidian_circuit
-    PRIVATE ophidian_design
-    PRIVATE ophidian_entity_system
-    PRIVATE ophidian_floorplan
-    PRIVATE ophidian_geometry
-    PRIVATE ophidian_interconnection
-    PRIVATE ophidian_parser
-    PRIVATE ophidian_placement
-    PRIVATE ophidian_standard_cell
+    PRIVATE ophidian_circuit_static
+    PRIVATE ophidian_design_static
+    PRIVATE ophidian_entity_system_static
+    PRIVATE ophidian_floorplan_static
+    PRIVATE ophidian_geometry_static
+    PRIVATE ophidian_interconnection_static
+    PRIVATE ophidian_parser_static
+    PRIVATE ophidian_placement_static
+    PRIVATE ophidian_standard_cell_static
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)

@@ -43,7 +43,7 @@ file(GLOB ophidian_interconnection_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_interconnection ${ophidian_interconnection_source})
+add_library(ophidian_interconnection SHARED ${ophidian_interconnection_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_interconnection
@@ -60,13 +60,31 @@ target_include_directories(ophidian_interconnection PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add library target
+add_library(ophidian_interconnection_static STATIC ${ophidian_interconnection_source})
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_interconnection_static
+    PUBLIC ophidian_geometry_static
+    PUBLIC Lemon::lemon_static
+    PRIVATE Flute::flute
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_interconnection_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_interconnection 
+    TARGETS ophidian_interconnection ophidian_interconnection_static
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )

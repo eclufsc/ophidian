@@ -43,7 +43,7 @@ file(GLOB ophidian_geometry_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_geometry ${ophidian_geometry_source})
+add_library(ophidian_geometry SHARED ${ophidian_geometry_source})
 
 # Add target dependencies
 target_link_libraries(ophidian_geometry
@@ -58,13 +58,29 @@ target_include_directories(ophidian_geometry PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add library target
+add_library(ophidian_geometry_static STATIC ${ophidian_geometry_source})
+
+# Add target dependencies
+target_link_libraries(ophidian_geometry_static
+    PUBLIC Boost::boost
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_geometry_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include>
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_geometry 
+    TARGETS ophidian_geometry ophidian_geometry_static
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 ) 

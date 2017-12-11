@@ -43,7 +43,7 @@ file(GLOB ophidian_floorplan_headers
 ################################################################################
 
 # Add library target
-add_library(ophidian_floorplan ${ophidian_floorplan_source})
+add_library(ophidian_floorplan SHARED ${ophidian_floorplan_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_floorplan
@@ -59,13 +59,30 @@ target_include_directories(ophidian_floorplan PUBLIC
     $<INSTALL_INTERFACE:include> 
 )
 
+# Add library target
+add_library(ophidian_floorplan_static STATIC ${ophidian_floorplan_source})
+
+# Tell cmake target's dependencies
+target_link_libraries(ophidian_floorplan_static
+    PUBLIC ophidian_entity_system_static
+    PUBLIC ophidian_parser_static
+)
+
+# Tell cmake the path to look for include files for this target
+# This is transitive, so any targets linked with this one will
+# search for headers in the respective paths
+target_include_directories(ophidian_floorplan_static PUBLIC
+    $<BUILD_INTERFACE:${ophidian_source_dir}>
+    $<INSTALL_INTERFACE:include> 
+)
+
 ################################################################################
 # Installation rules
 ################################################################################
 
 # Install rule for target
 install(
-    TARGETS ophidian_floorplan 
+    TARGETS ophidian_floorplan ophidian_floorplan_static
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )
