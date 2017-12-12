@@ -24,37 +24,35 @@ make CXXFLAGS="-fPIC" all
 cp bin/* $DEPENDENCIES_BIN_PATH
 cp lib/* $DEPENDENCIES_LIB_PATH
 cp include/* $DEPENDENCIES_INCLUDE_PATH
+make clean
 
 cd $OPHIDIAN_PATH/3rdparty/LEF
 make CXXFLAGS="-fPIC" all
 cp bin/* $DEPENDENCIES_BIN_PATH
 cp lib/* $DEPENDENCIES_LIB_PATH
 cp include/* $DEPENDENCIES_INCLUDE_PATH
+make clean
 
 cd $OPHIDIAN_PATH/3rdparty/Flute
 mkdir build
 cd build
-cmake ..
-make
-mv libflute.a $DEPENDENCIES_LIB_PATH
+cmake .. -DCMAKE_INSTALL_PREFIX=""
+make DESTDIR=$DEPENDENCIES_ROOT install
 cd ..
 rm -rf build
-cp flute.h $DEPENDENCIES_INCLUDE_PATH
 
 cd $OPHIDIAN_PATH/3rdparty/verilog-parser
 mkdir build
 cd build
-cmake ..
-make
-mv src/libverilogparser.a $DEPENDENCIES_LIB_PATH
+cmake .. -DCMAKE_INSTALL_PREFIX=""
+make DESTDIR=$DEPENDENCIES_ROOT install
 cd ..
 rm -rf build
-cp src/*.h $DEPENDENCIES_INCLUDE_PATH
 
 cd $OPHIDIAN_PATH/3rdparty/Lemon
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/
+cmake .. -DCMAKE_INSTALL_PREFIX=""
 make DESTDIR=$DEPENDENCIES_ROOT install
 cd ..
 rm -rf build
