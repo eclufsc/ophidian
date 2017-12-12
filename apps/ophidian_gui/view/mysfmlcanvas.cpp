@@ -170,15 +170,11 @@ void MySFMLCanvas::saveToSVG(const std::string & filename)
         ophidian::geometry::Point max((centerX + width/2), (centerY + width/2));
         ophidian::geometry::Box viewSize(min, max);
 
-        std::cout << "view e w: " << centerX << " x " << centerY << " - " << width << std::endl;
-        std::cout << "min: " << min.x() << " x " << min.y() << std::endl;
-        std::cout << "max: " << max.x() << " x " << max.y() << std::endl;
-
         std::ofstream svg(filename);
         SVGMapper mapper(svg, width/100, width/100);
         ophidian::geometry::Box b(ophidian::geometry::Point(0,0), ophidian::geometry::Point(width/100,width/100));
         mapper.add(b);
-        mapper.map(b, "fill:rgb(0,0,0)");
+        mapper.map(b, "fill:rgb(0,0,0);stroke:rgb(50,50,50)");
 
         mMainController->drawSVG(mapper, viewSize);
 }

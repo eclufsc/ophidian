@@ -308,19 +308,24 @@ void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box &
     if (mDesign == nullptr)
         return;
 
+    ophidian::geometry::Point chipUpper = mDesign->floorplan().chipUpperRightCorner().toPoint();
+
     std::vector<Quad> quadsInArea = mIndex.quadsContaining(viewBox);
 
     for (auto quadIt = quadsInArea.begin(); quadIt != quadsInArea.end(); quadIt++)
     {
-        std::cout << mDesign->netlist().name(quadIt->mCell) << std::endl;
         auto points = mCanvas->points(*quadIt);
-        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100,
-                                      (points[0].position.y - viewBox.min_corner().y())/100);
-        ophidian::geometry::Point max((points[2].position.x - viewBox.min_corner().x())/100,
-                                      (points[2].position.y - viewBox.min_corner().y())/100);
 
-        std::cout << "_ min:" << min.x() << " x " << min.y() << std::endl;
-        std::cout << "_ max:" << max.x() << " x " << max.y() << std::endl << std::endl;
+        // --
+        // There is a need to fix the points correctly, even though they are drawing correctly.
+        double yMin = points[0].position.y <= viewBox.min_corner().y() ? 0 : points[0].position.y - viewBox.min_corner().y();
+        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100, yMin/100);
+
+        double xMax = points[2].position.x - viewBox.min_corner().x() <= viewBox.max_corner().x() - viewBox.min_corner().x() ?
+                      points[2].position.x - viewBox.min_corner().x() : viewBox.max_corner().x() - viewBox.min_corner().x();
+        ophidian::geometry::Point max(xMax/100, (points[2].position.y - viewBox.min_corner().y())/100);
+        // --
+
         ophidian::geometry::Box box(min, max);
 
         QString style;
@@ -340,4 +345,62 @@ void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box &
         mapper.add(box);
         mapper.map(box, style.toStdString());
     }
+
+    // Left
+    if (viewBox.min_corner().x() <= 0)
+    {
+        double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
+        double uY = viewBox.max_corner().y() <= chipUpper.y() ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
+                                                                (chipUpper.y()-viewBox.min_corner().y())/100;
+
+        ophidian::geometry::Point bottomY(-viewBox.min_corner().x()/100, bY);
+        ophidian::geometry::Point upperY (-viewBox.min_corner().x()/100, uY);
+
+        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
+        mapper.add(line);
+        mapper.map(line, "stroke:rgb(255,255,255)");
+    }
+
+    // Rigth
+    if (viewBox.max_corner().x() >= chipUpper.x())
+    {
+        double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
+        double uY = viewBox.max_corner().y() <= chipUpper.y() ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
+                                                                (chipUpper.y()-viewBox.min_corner().y())/100;
+        ophidian::geometry::Point bottomY((chipUpper.x()-viewBox.min_corner().x())/100, bY);
+        ophidian::geometry::Point upperY ((chipUpper.x()-viewBox.min_corner().x())/100, uY);
+
+        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
+        mapper.add(line);
+        mapper.map(line, "stroke:rgb(255,255,255)");
+    }
+
+    // Bottom
+    if (viewBox.min_corner().y() <= 0)
+    {
+        double lX = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
+        double rX = viewBox.max_corner().x() <= chipUpper.x() ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
+                                                                (chipUpper.x()-viewBox.min_corner().x())/100;
+        ophidian::geometry::Point leftX (lX, -viewBox.min_corner().y()/100);
+        ophidian::geometry::Point rigthX(rX, -viewBox.min_corner().y()/100);
+
+        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({leftX, rigthX});
+        mapper.add(line);
+        mapper.map(line, "stroke:rgb(255,255,255)");
+    }
+
+    // Upper
+    if (viewBox.max_corner().y() >= chipUpper.y())
+    {
+        double bY = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
+        double uY = viewBox.max_corner().x() <= chipUpper.x() ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
+                                                                (chipUpper.x()-viewBox.min_corner().x())/100;
+        ophidian::geometry::Point bottomY(bY, (chipUpper.x()-viewBox.min_corner().y())/100);
+        ophidian::geometry::Point upperY (uY, (chipUpper.x()-viewBox.min_corner().y())/100);
+
+        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
+        mapper.add(line);
+        mapper.map(line, "stroke:rgb(255,255,255)");
+    }
+
 }
