@@ -1,6 +1,7 @@
 variables: 
   DEPENDENCIES: "build-essential 
                 cmake 
+                libboost1.63-dev
                 liblemon-dev
                 ophidian-units=2.3.1-1
                 ophidian-DEF=5.8-2
