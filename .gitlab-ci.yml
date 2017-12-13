@@ -1,13 +1,21 @@
 variables: 
-  DEPENDENCIES: "build-essential 
-                cmake 
-                libboost1.63-dev
-                liblemon-dev
-                ophidian-units=2.3.1-1
-                ophidian-DEF=5.8-2
-                ophidian-LEF=5.8-1
-                ophidian-Flute=1.0-1
-                ophidian-verilog-parser=0.2.31"
+  DEPENDENCIES: 
+    "build-essential 
+    cmake 
+    libboost1.63-dev
+    liblemon-dev
+    ophidian-units=2.3.1-1
+    ophidian-DEF=5.8-2
+    ophidian-LEF=5.8-1
+    ophidian-Flute=1.0-1
+    ophidian-verilog-parser=0.2.31"
+  BUILD_LOCAL_DEPENDENCIES:
+    "build-essential 
+    cmake 
+    libboost1.63-dev
+    zlib1g-dev
+    flex 
+    libbison-dev"
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
@@ -40,7 +48,7 @@ build_ophidian_with_system_dependencies_tests_fully_static:
     - apt-get update -qq
     - apt-get install -y curl
     - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
+    - apt-get update -qq && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
@@ -61,7 +69,7 @@ build_ophidian_with_local_dependencies:
     - apt-get update -qq
     - apt-get install -y curl
     - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update -qq && apt-get install -y -qq build-essential cmake
+    - apt-get update -qq && apt-get install -y -qq $BUILD_LOCAL_DEPENDENCIES
   script:
     - sh build_dependencies.sh
     - mkdir build && cd build
