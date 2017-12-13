@@ -1,38 +1,46 @@
-image: ubuntu:artful
-
 variables: 
-  DEPENDENCIES: "build-essential zlib1g-dev cmake flex libbison-dev libboost1.63-dev liblemon-dev units=2.3.2"
+  DEPENDENCIES: "build-essential 
+                cmake 
+                liblemon-dev
+                ophidian-units=2.3.1-1
+                ophidian-DEF=5.8-2
+                ophidian-LEF=5.8-1
+                ophidian-Flute=1.0-1
+                ophidian-verilog-parser=0.2.31"
   GIT_SUBMODULE_STRATEGY: recursive
-
-before_script:
-  - apt-get update -qq
-  - apt-get install -y curl
-  - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-  - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
 
 stages:
   - build
   - test
   - deploy
 
-build_ophidian:
+build_ophidian_with_system_dependencies:
+  image: ubuntu:artful
   stage: build
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y curl
+    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
+    - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
   script:
-    - sh build_dependencies.sh
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
     - make -j2
     - cd test
-    - ldd ophidian_tests
     - ./ophidian_tests
   artifacts:
     paths:
       - build/
 
-build_ophidian_tests_fully_static:
+build_ophidian_with_system_dependencies_tests_fully_static:
+  image: ubuntu:artful
   stage: build
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y curl
+    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
+    - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
   script:
-    - sh build_dependencies.sh
     - mkdir build && cd build
     - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
             -DCMAKE_INSTALL_PREFIX=/usr
@@ -40,7 +48,25 @@ build_ophidian_tests_fully_static:
             ..
     - make -j2
     - cd test
-    - ldd ophidian_tests
+    - ./ophidian_tests
+  artifacts:
+    paths:
+      - build/
+
+build_ophidian_with_local_dependencies:
+  image: ubuntu:artful
+  stage: build
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y curl
+    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
+    - apt-get update -qq && apt-get install -y -qq build-essential cmake
+  script:
+    - sh build_dependencies.sh
+    - mkdir build && cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+    - make -j2
+    - cd test
     - ./ophidian_tests
   artifacts:
     paths:
