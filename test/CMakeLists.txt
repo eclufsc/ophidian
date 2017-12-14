@@ -1,5 +1,5 @@
 ################################################################################
-# This is the CMakeLists file for the Ophidian library Test binary. 
+# This is the CMakeLists file for the Ophidian library Test binary.
 #
 # Its main goals are:
 #   - Fetch test files.
@@ -10,7 +10,7 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_run_tests_SRC  
+file(GLOB_RECURSE ophidian_run_tests_SRC
     "*.cpp"
 )
 
@@ -22,22 +22,22 @@ target_include_directories(Catch INTERFACE .)
 add_executable(ophidian_tests ${ophidian_run_tests_SRC})
 
 # Link target dependencies
-target_link_libraries(ophidian_tests PUBLIC 
-    Catch 
-    ophidian_circuit 
-    ophidian_design 
-    ophidian_entity_system 
-    ophidian_floorplan 
-    ophidian_geometry 
-    ophidian_interconnection 
-    ophidian_parser 
-    ophidian_placement 
-    ophidian_standard_cell 
-    ophidian_timing 
+target_link_libraries(ophidian_tests PUBLIC
+    Catch
+    ophidian_circuit
+    ophidian_design
+    ophidian_entity_system
+    ophidian_floorplan
+    ophidian_geometry
+    ophidian_interconnection
+    ophidian_parser
+    ophidian_placement
+    ophidian_standard_cell
+    ophidian_timing
 )
 
 ################################################################################
-# Prepare test input environment. 
+# Prepare test input environment.
 ################################################################################
 
 message("Creating symlink for test files")

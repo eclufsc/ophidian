@@ -18,3 +18,4 @@ install_manifest.txt
 /docs
 .DS_Store
 /test/input_files/superblue18.v
+CMakeLists.txt.user

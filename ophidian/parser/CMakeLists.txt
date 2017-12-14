@@ -7,7 +7,7 @@
 #   - Fetch library files.
 #   - Add compilation target.
 #   - Add target specific include paths.
-#   - Add compilation target dependencies. 
+#   - Add compilation target dependencies.
 #       `-(this is a must due to telling cmake what should it compile fisrt).
 #   - Define installation parameters.
 ################################################################################
@@ -25,7 +25,7 @@ add_library(ophidian_parser ${ophidian_parser_SRC})
 
 # Tell cmake target's dependencies
 add_dependencies(ophidian_parser def_parser lef_parser)
-target_link_libraries(ophidian_parser PUBLIC 
+target_link_libraries(ophidian_parser PUBLIC
     verilogparser
 )
 

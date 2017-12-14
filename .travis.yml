@@ -15,7 +15,7 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-      
+
 before_script:
   - sudo apt-get update
   - sudo apt-get install libgoogle-glog-dev
