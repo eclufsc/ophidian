@@ -19,6 +19,7 @@ file(GLOB ophidian_parser_SRC
 
 link_directories(${THIRD_PARTY_SOURCE_DIR}/DEF/lib)
 link_directories(${THIRD_PARTY_SOURCE_DIR}/LEF/lib)
+link_directories(${THIRD_PARTY_SOURCE_DIR}/libertyParser/lib/)
 
 # Add library target
 add_library(ophidian_parser ${ophidian_parser_SRC})
@@ -31,4 +32,4 @@ target_link_libraries(ophidian_parser PUBLIC
 
 # Instal parameters for make install
 install(TARGETS ophidian_parser DESTINATION lib)
-install(FILES VerilogParser.h DESTINATION include/ophidian/parser)
+install(FILES VerilogParser.h LibertyParser.h DESTINATION include/ophidian/parser)
