@@ -5,9 +5,9 @@ variables:
     libboost1.63-dev
     liblemon-dev
     ophidian-units
-    ophidian-DEF
-    ophidian-LEF
-    ophidian-Flute
+    ophidian-def
+    ophidian-lef
+    ophidian-flute
     ophidian-verilog-parser"
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
