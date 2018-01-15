@@ -4,11 +4,11 @@ variables:
     cmake 
     libboost1.63-dev
     liblemon-dev
-    ophidian-units=2.3.1-1
-    ophidian-DEF=5.8-2
-    ophidian-LEF=5.8-1
-    ophidian-Flute=1.0-1
-    ophidian-verilog-parser=0.2.31"
+    ophidian-units
+    ophidian-DEF
+    ophidian-LEF
+    ophidian-Flute
+    ophidian-verilog-parser"
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
     cmake 
