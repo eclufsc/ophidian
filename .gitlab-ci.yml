@@ -27,10 +27,10 @@ build_ophidian_with_system_dependencies:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update -qq
+    - apt-get update
     - apt-get install -y curl
     - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update -qq && apt-get install -y -qq $DEPENDENCIES
+    - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
@@ -45,10 +45,10 @@ build_ophidian_with_system_dependencies_tests_fully_static:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update -qq
+    - apt-get update
     - apt-get install -y curl
     - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update -qq && apt-get install -y $DEPENDENCIES
+    - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
@@ -66,10 +66,10 @@ build_ophidian_with_local_dependencies:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update -qq
+    - apt-get update
     - apt-get install -y curl
     - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update -qq && apt-get install -y -qq $BUILD_LOCAL_DEPENDENCIES
+    - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - sh build_dependencies.sh
     - mkdir build && cd build
