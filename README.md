@@ -10,6 +10,18 @@ Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](h
 
 Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](https://renannetto.github.io/), and [Vinicius Livramento](http://vinilivramento.com), under the advise of [Prof. José Güntzel](https://www.inf.ufsc.br/~j.guntzel/), during their research activities at Federal University of Santa Catarina.
 
+## Index
+* [Getting Started](#getting-started)
+    * [Debian Family](#debian-family)
+    * [Arch Linux](#arch-linux)
+    * [Red Hat Family](#red-hat-family)
+* [Hello World!](#hello-world)
+* [Compiling from source](#compiling-from-source)
+    * [Prerequisites](#prerequisites)
+    * [Compiling dependencies](#compiling-dependencies)
+    * [Compiling Ophidian](#compiling-ophidian)
+* [Credits](#credits)
+
 ## Getting Started!
 Get Ophidian! We support a few of the most used linux environments.
 
@@ -35,8 +47,7 @@ We do not support rpm packages yet. Sorry :(
 
 **If we do not support your distro, consider [compiling it from source!](#compiling-from-source)**
 
-### Hello World!
----
+## Hello World!
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
 
 ```
@@ -81,13 +92,6 @@ cd test
 ./ophidian_tests
 ```
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
-
-### Install Ophidian:
-If ophidian_tests did not fail you may install Ophidian.
-```
-cd build
-make install
-```
 
 # Credits:
 Currently, Ophidian has many collaborators in the same university that support its development.
