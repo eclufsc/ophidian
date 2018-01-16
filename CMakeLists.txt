@@ -45,6 +45,16 @@ set(ophidian_install_bin_dir bin)
 set(ophidian_install_share_dir share/ophidian)
 
 ################################################################################
+# Install License
+################################################################################
+
+# License installation rule
+install(
+    FILES ${ophidian_source_dir}/LICENSE
+    DESTINATION ${ophidian_install_share_dir}/copyright
+)
+
+################################################################################
 # Handle raquirements
 ################################################################################
 
@@ -83,3 +93,4 @@ find_package(verilog-parser REQUIRED)
 add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
+
