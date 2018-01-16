@@ -1,6 +1,3 @@
-[submodule "3rdparty/QtPropertyBrowser"]
-	path = 3rdparty/QtPropertyBrowser
-	url = https://github.com/commontk/QtPropertyBrowser
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
     url = https://gitlab.com/eclufsc/verilog-parser.git
