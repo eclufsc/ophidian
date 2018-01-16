@@ -2,33 +2,63 @@
 Open-Source Library for Physical Design Research and Teaching
 
 ## Build status
-[![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master)
+Master [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master)
+Development [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/development/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/development)
 
-## Installation
-We suport a few of the most used linux environments.
+## About
+Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](http://eclab.paginas.ufsc.br/), [Federal University of Santa Catarina (UFSC)](http://ufsc.br/), [Brazil](https://www.google.com.br/maps/place/Departamento+de+Inform%C3%A1tica+e+Estat%C3%ADstica/@-27.600561,-48.520762,17z/data=!3m1!4b1!4m5!3m4!1s0x95273900f56d3f99:0xc2fd35f96d3fb9b3!8m2!3d-27.6005658!4d-48.5185733?hl=en). The main objective of Ophidian project is to provide a multi-platform library to facilitate the research and teaching of topics associated to the physical design of integrated circuits.
+
+Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](https://renannetto.github.io/), and [Vinicius Livramento](http://vinilivramento.com), under the advise of [Prof. José Güntzel](https://www.inf.ufsc.br/~j.guntzel/), during their research activities at Federal University of Santa Catarina.
+
+## Getting Started!
+Get Ophidian! We support a few of the most used linux environments.
 
 ### Debian Family:
-Add the Ophidian repository via [package cloud](https://packagecloud.io/tarberd/ophidian) using the provided script.
+If you use Ubuntu, Debian and Mint you are probably covered! Add the Ophidian repository via [package cloud](https://packagecloud.io/tarberd/ophidian) using the provided script.
 ```
 $ curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | sudo bash
 ```
 
+Then install the ophidian package using apt
+```
+$ apt install ophidian
+```
+
 ### Arch Linux:
-Just install it via the AUR package.
+Just install it via the AUR package
 ```
 $ pacaur -S ophidian
 ```
 
 ### Red Hat Family:
-We do not support rpm packages yet, please take a look at 
+We do not support rpm packages yet. Sorry :(
 
-## Compile from Source
+**If we do not support your distro, consider [compiling it from source!](#compiling-from-source)**
+
+### Hello World!
+---
+So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
+
+```
+git clone https://gitlab.com/eclufsc/ophidian_project_template hello_world
+cd hello_world
+mkdir build
+cd build
+cmake ..
+make
+./hello_world
+```
+
+## Compiling from Source
 ### Prerequisites:
-* zlib
+* C compiler
+* C++ 14 compiler 
+* cmake (>= 3.5.2)
+* Boost (>= 1.59)
 * Flex
 * Bison
-* C compiler
-* c++ 14 compiler 
+* zlib
+* glog
 
 ### Compiling dependencies:
 Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies submodules located at 3rdparty, compile and install to a local fakeroot
@@ -60,10 +90,6 @@ make install
 ```
 
 # Credits:
-Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](http://eclab.paginas.ufsc.br/), [Federal University of Santa Catarina (UFSC)](http://ufsc.br/), [Brazil](https://www.google.com.br/maps/place/Departamento+de+Inform%C3%A1tica+e+Estat%C3%ADstica/@-27.600561,-48.520762,17z/data=!3m1!4b1!4m5!3m4!1s0x95273900f56d3f99:0xc2fd35f96d3fb9b3!8m2!3d-27.6005658!4d-48.5185733?hl=en). The main objective of Ophidian project is to provide a multi-platform library to facilitate the research and teaching of topics associated to the physical design of integrated circuits.
-
-Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](https://renannetto.github.io/), and [Vinicius Livramento](http://vinilivramento.com), under the advise of [Prof. José Güntzel](https://www.inf.ufsc.br/~j.guntzel/), during their research activities at Federal University of Santa Catarina.
-
 Currently, Ophidian has many collaborators in the same university that support its development.
 * [Bernardo Mendonça](http://tarberd.me)
 * [Chrystian Guth](http://csguth.com)
