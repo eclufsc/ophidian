@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png" width=80> Ophidian
+# Ophidian ![alt text](https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png "ophidian logo")
 Open-Source Library for Physical Design Research and Teaching
 
 ## Build status
@@ -93,7 +93,7 @@ cd test
 ```
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
 
-# Credits:
+# Credits
 Currently, Ophidian has many collaborators in the same university that support its development.
 * [Bernardo Mendonça](http://tarberd.me)
 * [Chrystian Guth](http://csguth.com)

@@ -41,6 +41,9 @@ set(ophidian_install_lib_dir lib)
 # Set ophidian binary install path
 set(ophidian_install_bin_dir bin)
 
+# Set ophidian binary install path
+set(ophidian_install_include_dir include)
+
 # Set ophidian shared files path
 set(ophidian_install_share_dir share/ophidian)
 
