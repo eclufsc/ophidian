@@ -1,9 +1,11 @@
 <img src="https://gitlab.com/eclufsc/ophidian/raw/master/logo.png" width=80 /> 
+
 # Ophidian
 Open-Source Library for Physical Design Research and Teaching
 
 ## Build status
 Master [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master)
+
 Development [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/development/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/development)
 
 ## About
