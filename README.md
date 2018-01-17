@@ -1,4 +1,5 @@
-# Ophidian ![alt text](https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png "ophidian logo")
+<img src="https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png" width=80> 
+# Ophidian
 Open-Source Library for Physical Design Research and Teaching
 
 ## Build status
@@ -69,7 +70,6 @@ make
 * Flex
 * Bison
 * zlib
-* glog
 
 ### Compiling dependencies:
 Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies submodules located at 3rdparty, compile and install to a local fakeroot
