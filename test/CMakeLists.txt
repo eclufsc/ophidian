@@ -48,13 +48,16 @@ execute_process(
     RESULT_VARIABLE result
 )
 
+find_file(POWV9 "POWV9.dat" PATHS "/usr/share/Flute" "${ophidian_source_dir}/dependencies/share/Flute")
+find_file(PORT9 "PORT9.dat" PATHS "/usr/share/Flute" "${ophidian_source_dir}/dependencies/share/Flute")
+
 message("Creating symlink FLUTE LUTs")
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/test/.
     RESULT_VARIABLE result
 )
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/test/.
     RESULT_VARIABLE result
 )
 
