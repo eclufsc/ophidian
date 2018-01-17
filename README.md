@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/eclufsc/ophidian/master/logo.png" width=80> 
+<img src="https://gitlab.com/eclufsc/ophidian/raw/master/logo.png" width=80 /> 
 # Ophidian
 Open-Source Library for Physical Design Research and Teaching
 
@@ -38,9 +38,9 @@ $ apt install ophidian
 ```
 
 ### Arch Linux:
-Just install it via the AUR package
+Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/packages/ophidian-git/)
 ```
-$ pacaur -S ophidian
+$ pacaur -S ophidian-git
 ```
 
 ### Red Hat Family:
