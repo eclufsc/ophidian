@@ -18,6 +18,9 @@ file(GLOB_RECURSE ophidian_run_tests_SRC
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE .)
 
+link_directories(${THIRD_PARTY_SOURCE_DIR}/libertyParser/lib/)
+LINK_DIRECTORIES(${THIRD_PARTY_SOURCE_DIR}/libertyParser/include/)
+
 # Add test target
 add_executable(ophidian_tests ${ophidian_run_tests_SRC})
 
@@ -34,6 +37,7 @@ target_link_libraries(ophidian_tests PUBLIC
     ophidian_placement
     ophidian_standard_cell
     ophidian_timing
+    si2dr_liberty
 )
 
 ################################################################################

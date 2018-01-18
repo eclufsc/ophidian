@@ -28,6 +28,7 @@ add_library(ophidian_parser ${ophidian_parser_SRC})
 add_dependencies(ophidian_parser def_parser lef_parser)
 target_link_libraries(ophidian_parser PUBLIC
     verilogparser
+    si2dr_liberty
 )
 
 # Instal parameters for make install

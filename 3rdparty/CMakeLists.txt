@@ -8,7 +8,7 @@
 
 # Init submodules and fetch dependences from git
 execute_process(
-    COMMAND git submodule update --init --recursive
+    COMMAND git submodule update --init --recursive --remote
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     RESULT_VARIABLE submodule_init_exit_code
 )
@@ -25,8 +25,8 @@ add_subdirectory(OpenTimer)
 # Add verilog-parser
 add_subdirectory(verilog-parser)
 
-# Add LibertyParser
-add_subdirectory(libertyParser)
+# Add LibertyParser - IS NOT COMPILING, try using .a
+# add_subdirectory(libertyParser)
 
 # Load ExternalProject cmake module
 include(ExternalProject)
