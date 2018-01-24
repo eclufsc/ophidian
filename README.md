@@ -110,8 +110,7 @@ cd test
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
 
 #### Install Ophidian to system:
-Make shure your have installed all [dependencies to your system](#install-dependencies-to-system).
-If you wish to install Ophidian to your system first make shure your have installed all [dependencies to your system](#install-dependencies-to-system) then run:
+If you wish to install Ophidian to your system first make shure your have installed all [dependencies to your system](#install-dependencies-to-system) first then run:
 ```
  $ sudo make install
 ```
