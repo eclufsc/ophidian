@@ -10,6 +10,9 @@ OPHIDIAN_PATH=$(pwd)
 
 # Make dependencies root path
 DEPENDENCIES_ROOT=$OPHIDIAN_PATH/dependencies
+if [[ $1 = "--install_to_usr_local" && "$(id -u)" = "0" ]]; then
+    DEPENDENCIES_ROOT=/usr/local
+fi
 mkdir $DEPENDENCIES_ROOT
 
 DEPENDENCIES_BIN_PATH=$DEPENDENCIES_ROOT/bin
