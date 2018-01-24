@@ -4,9 +4,9 @@
 Open-Source Library for Physical Design Research and Teaching
 
 ## Build status:
-Master [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master)
+Master: [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/master)
 
-Development [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/development/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/development)
+Development: [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/development/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/development)
 
 ## About:
 Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](http://eclab.paginas.ufsc.br/), [Federal University of Santa Catarina (UFSC)](http://ufsc.br/), [Brazil](https://www.google.com.br/maps/place/Departamento+de+Inform%C3%A1tica+e+Estat%C3%ADstica/@-27.600561,-48.520762,17z/data=!3m1!4b1!4m5!3m4!1s0x95273900f56d3f99:0xc2fd35f96d3fb9b3!8m2!3d-27.6005658!4d-48.5185733?hl=en). The main objective of Ophidian project is to provide a multi-platform library to facilitate the research and teaching of topics associated to the physical design of integrated circuits.
@@ -22,7 +22,9 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 * [Compiling from source](#compiling-from-source)
     * [Prerequisites](#prerequisites)
     * [Compiling dependencies](#compiling-dependencies)
+    * [Install dependencies to system](#install-dependencies-to-system)
     * [Compiling Ophidian](#compiling-ophidian)
+    * [Install Ophidian to system](#install-ophidian-to-system)
 * [Credits](#credits)
 
 ## Getting Started!
@@ -85,11 +87,12 @@ $ sh build_dependencies.sh
 ```
 All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
->If you wish to **install dependencies to your system** run:
->```
->$ sudo sh build_dependencies.sh --install_to_usr_local
->```
->This will install all dependencies to the `/usr/local` directory.
+#### Install dependencies to system:
+If you wish to install dependencies to your system run:
+```
+$ sudo sh build_dependencies.sh --install_to_usr_local
+```
+This will install all dependencies to the `/usr/local` directory.
 
 ### Compiling Ophidian:
 Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the folowing:
@@ -106,11 +109,13 @@ cd test
 ```
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
 
->If you wish to **install Ophidian to your system** run:
->```
-> $ sudo make install
->```
->This will install the Ophidian Library to the `/usr/local` directory.
+#### Install Ophidian to system:
+Make shure your have installed all [dependencies to your system](#install-dependencies-to-system).
+If you wish to install Ophidian to your system first make shure your have installed all [dependencies to your system](#install-dependencies-to-system) then run:
+```
+ $ sudo make install
+```
+This will install the Ophidian Library to the `/usr/local` directory.
 
 # Credits
 Currently, Ophidian has many collaborators in the same university that support its development.
