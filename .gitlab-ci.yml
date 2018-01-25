@@ -66,9 +66,6 @@ build_ophidian_with_install_script_source:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
     - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - sh build_dependencies.sh
@@ -87,9 +84,6 @@ build_ophidian_with_install_script_system:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
     - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - sh build_dependencies.sh --install_to_usr_local
