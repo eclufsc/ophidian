@@ -10,13 +10,15 @@
 
 namespace ophidian
 {
-namespace circuit
-{
-
-void def2LibraryMapping(const parser::Def & def, circuit::Netlist & netlist, standard_cell::StandardCells & standardCells, LibraryMapping & libraryMapping);
-
-} // namespace circuit
-} // namespace ophidian
+    namespace circuit
+    {
+        void def2LibraryMapping(
+            const parser::Def & def,
+            circuit::Netlist & netlist,
+            standard_cell::StandardCells & standardCells,
+            LibraryMapping & libraryMapping);
+    }     // namespace circuit
+}     // namespace ophidian
 
 
 #endif // DEF2LIBRARYMAPPING_H

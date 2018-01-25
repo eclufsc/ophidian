@@ -18,7 +18,7 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
     * [Red Hat Family](#red-hat-family)
-* [Hello World!](#hello-world)
+    * [Hello World!](#hello-world)
 * [Compiling from source](#compiling-from-source)
     * [Prerequisites](#prerequisites)
     * [Compiling dependencies](#compiling-dependencies)
@@ -27,7 +27,7 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Install Ophidian to system](#install-ophidian-to-system)
 * [Credits](#credits)
 
-## Getting Started!
+# Getting Started!
 Get Ophidian! We support a few of the most used linux environments.
 
 ### Debian Family:
@@ -43,7 +43,7 @@ $ apt install ophidian
 > **Linux Mint** users should either wait for Linux Mint Tara (19) or [compile it from source.](#compiling-from-source).
 
 ### Arch Linux:
-Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/packages/ophidian-git/)
+Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/packages/ophidian-git/):
 ```
 $ pacaur -S ophidian-git
 ```
@@ -67,9 +67,9 @@ make
 ./hello_world ../input_files/simple/simple.v ../input_files/simple/simple.def ../input_files/simple/simple.lef
 ``` 
 
-## Compiling from Source:
+# Compiling from Source:
 This section will guide you on the compilation process of the Ophidian library. First make shure you have the following software installed on your system:
-### Prerequisites:
+## Prerequisites:
 * C compiler
 * C++ 14 compiler 
 * cmake (>= 3.5.2)
@@ -87,7 +87,7 @@ $ sh build_dependencies.sh
 ```
 All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
-#### Install dependencies to system:
+### Install dependencies to system:
 If you wish to install dependencies to your system run:
 ```
 $ sudo sh build_dependencies.sh --install_to_usr_local
@@ -109,7 +109,7 @@ cd test
 ```
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
 
-#### Install Ophidian to system:
+### Install Ophidian to system:
 If you wish to install Ophidian to your system first make shure your have installed all [dependencies to your system](#install-dependencies-to-system) first then run:
 ```
  $ sudo make install

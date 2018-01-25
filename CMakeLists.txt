@@ -25,11 +25,20 @@ set(ophidian_VERSION 0.1)
 # Set c++14 globally
 set(CMAKE_CXX_STANDARD 14)
 
+# Set Ophidian source dir
+set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
+
 # Build ophidian_tests binary fully static
 OPTION(OPHIDIAN_TESTS_FULLY_STATIC OFF)
 
-# Set Ophidian source dir
-set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
+# Run Uncrustify on project source
+OPTION(UNCRUSTIFY_IT OFF)
+
+# Enable uncrustify to check for code style
+OPTION(RUN_UNCRUSTIFY_CHECK OFF)
+
+# Set the uncrustify config file
+set(ophidian_uncrustify_config ${ophidian_source_dir}/uncrustify.cfg)
 
 ################################################################################
 # Set up installation variables
@@ -96,4 +105,3 @@ find_package(verilog-parser REQUIRED)
 add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
-

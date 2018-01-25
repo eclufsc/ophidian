@@ -23,86 +23,97 @@
 
 namespace ophidian
 {
-namespace parser
-{
+    namespace parser
+    {
+        std::unique_ptr <Def> DefParser::readFile(const std::string & filename) const throw (
+            InexistentFile)
+        {
+            auto def = std::make_unique <Def>();
 
-std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const throw(InexistentFile)
-{
-	auto def = std::make_unique<Def>();
-	defrInit();
+            defrInit();
 
-	defrSetUnitsCbk([](defrCallbackType_e, double number, defiUserData ud) -> int {
-				Def& that = *static_cast<Def*>(ud);
-				that.mUnits = number;
-				return 0;
-			});
+            defrSetUnitsCbk(
+                [](defrCallbackType_e, double number, defiUserData ud) -> int {
+                Def & that = *static_cast <Def *>(ud);
+                that.mUnits = number;
 
-	defrSetDieAreaCbk([](defrCallbackType_e, defiBox *box, defiUserData ud) -> int {
-				Def& that = *static_cast<Def*>(ud);
-				that.mDie.lower = {box->xl(), box->yl()};
-				that.mDie.upper = {box->xh(), box->yh()};
-				return 0;
-			});
+                return 0;
+            });
 
-	defrSetRowCbk([](defrCallbackType_e, defiRow *defrow, defiUserData ud) -> int {
-				Def& that = *static_cast<Def*>(ud);
-				Def::row r;
-				r.name = defrow->name();
-				r.site = defrow->macro();
-				r.num = {defrow->xNum(), defrow->yNum()};
-				r.step = {defrow->xStep(), defrow->yStep()};
-				r.origin = {defrow->x(), defrow->y()};
-				that.mRows.push_back(r);
-				return 0;
-			});
+            defrSetDieAreaCbk(
+                [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
+                Def & that = *static_cast <Def *>(ud);
+                that.mDie.lower = {box->xl(), box->yl()};
+                that.mDie.upper = {box->xh(), box->yh()};
 
-	defrSetComponentStartCbk([](defrCallbackType_e, int number, defiUserData ud) -> int {
-				Def& that = *static_cast<Def*>(ud);
-				that.mComponents.reserve(number);
-				return 0;
-			});
+                return 0;
+            });
 
-	defrSetComponentCbk([](defrCallbackType_e, defiComponent *comp, defiUserData ud) -> int {
-				Def& that = *static_cast<Def*>(ud);
+            defrSetRowCbk(
+                [](defrCallbackType_e, defiRow * defrow, defiUserData ud) -> int {
+                Def & that = *static_cast <Def *>(ud);
+                Def::row r;
+                r.name = defrow->name();
+                r.site = defrow->macro();
+                r.num = {defrow->xNum(), defrow->yNum()};
+                r.step = {defrow->xStep(), defrow->yStep()};
+                r.origin = {defrow->x(), defrow->y()};
+                that.mRows.push_back(r);
 
-				Def::component c;
-				c.name = comp->id();
-				c.macro = comp->name();
-				c.fixed = comp->isFixed();
-				c.position = {comp->placementX(), comp->placementY()};
-				c.orientation = comp->placementOrientStr();
-				that.mComponents.push_back(c);
-				return 0;
-			});
+                return 0;
+            });
 
-	FILE* ifp = fopen(filename.c_str(), "r");
-	if(ifp)
-	{
-		auto res = defrRead(ifp, filename.c_str(), def.get(), true);
-	}
-	else {
-		throw InexistentFile();
-	}
+            defrSetComponentStartCbk(
+                [](defrCallbackType_e, int number, defiUserData ud) -> int {
+                Def & that = *static_cast <Def *>(ud);
+                that.mComponents.reserve(number);
 
-	fclose(ifp);
-	defrClear();
+                return 0;
+            });
 
-	return def;
-}
+            defrSetComponentCbk(
+                [](defrCallbackType_e, defiComponent * comp, defiUserData ud) -> int {
+                Def & that = *static_cast <Def *>(ud);
 
-DefParser::DefParser()
-{
-}
-DefParser::~DefParser()
-{
-}
+                Def::component c;
+                c.name = comp->id();
+                c.macro = comp->name();
+                c.fixed = comp->isFixed();
+                c.position = {comp->placementX(), comp->placementY()};
+                c.orientation = comp->placementOrientStr();
+                that.mComponents.push_back(c);
 
-Def::Def()
-{
-}
-Def::~Def()
-{
-}
+                return 0;
+            });
 
-} // namespace parser
-} // namespace ophidian
+            FILE * ifp = fopen(filename.c_str(), "r");
+            if(ifp) {
+                auto res = defrRead(ifp, filename.c_str(), def.get(), true);
+            }
+            else {
+                throw InexistentFile();
+            }
+
+            fclose(ifp);
+            defrClear();
+
+            return def;
+        }
+
+        DefParser::DefParser()
+        {
+        }
+
+        DefParser::~DefParser()
+        {
+        }
+
+        Def::Def()
+        {
+        }
+
+        Def::~Def()
+        {
+        }
+    }     // namespace parser
+}     // namespace ophidian

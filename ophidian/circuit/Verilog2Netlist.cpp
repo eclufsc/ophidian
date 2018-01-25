@@ -20,45 +20,51 @@
 
 namespace ophidian
 {
-namespace circuit
-{
+    namespace circuit
+    {
+        void verilog2Netlist(const parser::Verilog & verilog, Netlist & netlist)
+        {
+            const parser::Verilog::Module & module = verilog.modules().front();
 
-void verilog2Netlist(const parser::Verilog &verilog, Netlist &netlist){
-	const parser::Verilog::Module & module = verilog.modules().front();
+            std::size_t sizePins = 0;
+            for(auto instance : module.instances())
+            {
+                sizePins += instance.portMapping().size();
+            }
+            sizePins += module.ports().size();
 
-	std::size_t sizePins = 0;
-	for(auto instance : module.instances())
-		sizePins += instance.portMapping().size();
-	sizePins += module.ports().size();
-
-	netlist.reserve(Pin(), sizePins);
-	netlist.reserve(Net(), module.nets().size());
-	netlist.reserve(Cell(), module.instances().size());
+            netlist.reserve(Pin(), sizePins);
+            netlist.reserve(Net(), module.nets().size());
+            netlist.reserve(Cell(), module.instances().size());
 
 
-	for(auto net : module.nets())
-		netlist.add(Net(), net.name());
+            for(auto net : module.nets())
+            {
+                netlist.add(Net(), net.name());
+            }
 
-	for(auto port : module.ports())
-	{
-		auto pin = netlist.add(Pin(), port.name());
-		if(port.direction() == parser::Verilog::PortDirection::INPUT)
-			netlist.add(Input(), pin);
-		else if(port.direction() == parser::Verilog::PortDirection::OUTPUT)
-			netlist.add(Output(), pin);
-		netlist.connect(netlist.find(Net(), port.name()), pin);
-	}
+            for(auto port : module.ports())
+            {
+                auto pin = netlist.add(Pin(), port.name());
+                if(port.direction() == parser::Verilog::PortDirection::INPUT) {
+                    netlist.add(Input(), pin);
+                }
+                else if(port.direction() == parser::Verilog::PortDirection::OUTPUT) {
+                    netlist.add(Output(), pin);
+                }
+                netlist.connect(netlist.find(Net(), port.name()), pin);
+            }
 
-	for(auto instance : module.instances())
-	{
-		auto cell = netlist.add(Cell(), instance.name());
-		for(auto portMap : instance.portMapping())
-		{
-			auto pin = netlist.add(Pin(), instance.name()+":"+portMap.first->name());
-			netlist.add(cell, pin);
-			netlist.connect(netlist.find(Net(), portMap.second->name()), pin);
-		}
-	}
-}
-} // namespace circuit
-} // namespace ophidian
+            for(auto instance : module.instances())
+            {
+                auto cell = netlist.add(Cell(), instance.name());
+                for(auto portMap : instance.portMapping())
+                {
+                    auto pin = netlist.add(Pin(), instance.name() + ":" + portMap.first->name());
+                    netlist.add(cell, pin);
+                    netlist.connect(netlist.find(Net(), portMap.second->name()), pin);
+                }
+            }
+        }
+    }     // namespace circuit
+}     // namespace ophidian

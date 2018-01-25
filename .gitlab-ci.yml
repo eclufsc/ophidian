@@ -2,7 +2,8 @@ variables:
   DEPENDENCIES: 
     "build-essential 
     cmake 
-    libboost1.63-dev
+    uncrustify
+    libboost-dev
     liblemon-dev
     ophidian-units
     ophidian-def
@@ -12,7 +13,8 @@ variables:
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
     cmake 
-    libboost1.63-dev
+    uncrustify
+    libboost-dev
     zlib1g-dev
     flex 
     libbison-dev"
@@ -20,10 +22,8 @@ variables:
 
 stages:
   - build
-  - test
-  - deploy
 
-build_ophidian_with_system_dependencies:
+build_ophidian_with_system_packages:
   image: ubuntu:artful
   stage: build
   before_script:
@@ -33,7 +33,10 @@ build_ophidian_with_system_dependencies:
     - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
+            -DCMAKE_INSTALL_PREFIX=/usr 
+            -DCMAKE_BUILD_TYPE=Release 
+            ..
     - make -j2
     - cd test
     - ./ophidian_tests
@@ -41,7 +44,7 @@ build_ophidian_with_system_dependencies:
     paths:
       - build/
 
-build_ophidian_with_system_dependencies_tests_fully_static:
+build_ophidian_with_system_packages_static_libc:
   image: ubuntu:artful
   stage: build
   before_script:
@@ -51,7 +54,8 @@ build_ophidian_with_system_dependencies_tests_fully_static:
     - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
-    - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
+    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
+            -DOPHIDIAN_TESTS_FULLY_STATIC=ON
             -DCMAKE_INSTALL_PREFIX=/usr
             -DCMAKE_BUILD_TYPE=Release
             ..
@@ -62,7 +66,7 @@ build_ophidian_with_system_dependencies_tests_fully_static:
     paths:
       - build/
 
-build_ophidian_with_local_dependencies:
+build_ophidian_with_install_script_source:
   image: ubuntu:artful
   stage: build
   before_script:
@@ -73,7 +77,32 @@ build_ophidian_with_local_dependencies:
   script:
     - sh build_dependencies.sh
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
+            -DCMAKE_INSTALL_PREFIX=/usr 
+            -DCMAKE_BUILD_TYPE=Release
+            ..
+    - make -j2
+    - cd test
+    - ./ophidian_tests
+  artifacts:
+    paths:
+      - build/
+
+build_ophidian_with_install_script_system:
+  image: ubuntu:artful
+  stage: build
+  before_script:
+    - apt-get update
+    - apt-get install -y curl
+    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
+    - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
+  script:
+    - sh build_dependencies.sh --install_to_usr_local
+    - mkdir build && cd build
+    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
+            -DCMAKE_INSTALL_PREFIX=/usr 
+            -DCMAKE_BUILD_TYPE=Release
+            ..
     - make -j2
     - cd test
     - ./ophidian_tests

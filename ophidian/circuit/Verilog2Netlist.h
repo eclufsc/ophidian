@@ -26,10 +26,10 @@
 
 namespace ophidian
 {
-namespace circuit
-{
-void verilog2Netlist(const parser::Verilog & verilog, circuit::Netlist & netlist);
-} // namespace circuit
-} // namespace ophidian
+    namespace circuit
+    {
+        void verilog2Netlist(const parser::Verilog & verilog, circuit::Netlist & netlist);
+    }     // namespace circuit
+}     // namespace ophidian
 
 #endif // OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H

@@ -39,6 +39,22 @@ file(GLOB ophidian_entity_system_headers
 )
 
 ################################################################################
+# Uncrustify
+################################################################################
+
+set(uncrustify_files ${ophidian_entity_system_source} ${ophidian_entity_system_headers})
+
+if(UNCRUSTIFY_IT)
+    include(uncrustify_helper)
+    uncrustify_it(${ophidian_uncrustify_config} "${uncrustify_files}")
+endif()
+
+if(RUN_UNCRUSTIFY_CHECK)
+    include(uncrustify_helper)
+    uncrustify_check(${ophidian_uncrustify_config} "${uncrustify_files}")
+endif()
+
+################################################################################
 # Library target
 ################################################################################
 

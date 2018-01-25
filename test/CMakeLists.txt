@@ -10,12 +10,23 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_run_tests_source
+file(GLOB_RECURSE ophidian_tests_source
     "*.cpp"
+    "*.h"
 )
 
+if(UNCRUSTIFY_IT)
+    include(uncrustify_helper)
+    uncrustify_it(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
+
+if(RUN_UNCRUSTIFY_CHECK)
+    include(uncrustify_helper)
+    uncrustify_check(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
+
 # Add test target
-add_executable(ophidian_tests ${ophidian_run_tests_source})
+add_executable(ophidian_tests ${ophidian_tests_source})
 
 # Link target dependencies
 target_link_libraries(ophidian_tests
