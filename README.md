@@ -31,7 +31,7 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 Get Ophidian! We support a few of the most used linux environments.
 
 ### Debian Family:
-If you use Ubuntu zesty (17) or Debian stretch (7) and newer you are covered! Add the Ophidian repository via [package cloud](https://packagecloud.io/tarberd/ophidian) using the provided script.
+If you use Ubuntu zesty (17) or Debian buster (10) and newer you are covered! Add the Ophidian repository via [package cloud](https://packagecloud.io/tarberd/ophidian) using the provided script.
 ```
 $ curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | sudo bash
 ```
@@ -73,7 +73,7 @@ This section will guide you on the compilation process of the Ophidian library. 
 * C compiler
 * C++ 14 compiler 
 * cmake (>= 3.5.2)
-* Boost (>= 1.63)
+* Boost (<= 1.61 || >= 1.63)
 * Flex
 * Bison
 * zlib
