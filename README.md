@@ -73,7 +73,7 @@ This section will guide you on the compilation process of the Ophidian library. 
 * C compiler
 * C++ 14 compiler 
 * cmake (>= 3.5.2)
-* Boost (>= 1.59)
+* Boost (>= 1.63)
 * Flex
 * Bison
 * zlib

@@ -2,8 +2,7 @@ variables:
   DEPENDENCIES: 
     "build-essential 
     cmake 
-    uncrustify
-    libboost-dev
+    libboost1.63-dev
     liblemon-dev
     ophidian-units
     ophidian-def
@@ -13,8 +12,7 @@ variables:
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
     cmake 
-    uncrustify
-    libboost-dev
+    libboost1.63-dev
     zlib1g-dev
     flex 
     libbison-dev"
