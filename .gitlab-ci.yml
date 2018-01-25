@@ -33,8 +33,7 @@ build_ophidian_with_system_packages:
     - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
-    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
-            -DCMAKE_INSTALL_PREFIX=/usr 
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
             -DCMAKE_BUILD_TYPE=Release 
             ..
     - make -j2
@@ -54,8 +53,7 @@ build_ophidian_with_system_packages_static_libc:
     - apt-get update && apt-get install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
-    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
-            -DOPHIDIAN_TESTS_FULLY_STATIC=ON
+    - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
             -DCMAKE_INSTALL_PREFIX=/usr
             -DCMAKE_BUILD_TYPE=Release
             ..
@@ -77,8 +75,7 @@ build_ophidian_with_install_script_source:
   script:
     - sh build_dependencies.sh
     - mkdir build && cd build
-    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
-            -DCMAKE_INSTALL_PREFIX=/usr 
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
             -DCMAKE_BUILD_TYPE=Release
             ..
     - make -j2
@@ -99,8 +96,7 @@ build_ophidian_with_install_script_system:
   script:
     - sh build_dependencies.sh --install_to_usr_local
     - mkdir build && cd build
-    - cmake -DRUN_UNCRUSTIFY_CHECK=ON
-            -DCMAKE_INSTALL_PREFIX=/usr 
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
             -DCMAKE_BUILD_TYPE=Release
             ..
     - make -j2

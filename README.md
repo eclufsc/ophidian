@@ -18,7 +18,7 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
     * [Red Hat Family](#red-hat-family)
-    * [Hello World!](#hello-world)
+* [Hello World!](#hello-world)
 * [Compiling from source](#compiling-from-source)
     * [Prerequisites](#prerequisites)
     * [Compiling dependencies](#compiling-dependencies)
@@ -54,7 +54,7 @@ We do not support rpm packages yet. Sorry :(
 ### Others:
 **If we do not support your distro, consider [compiling it from source!](#compiling-from-source)**
 
-## Hello World!
+# Hello World!
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
 
 ```
@@ -87,8 +87,8 @@ $ sh build_dependencies.sh
 ```
 All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
-### Install dependencies to system:
-If you wish to install dependencies to your system run:
+### Install dependencies on system:
+If you wish to install dependencies on your system run:
 ```
 $ sudo sh build_dependencies.sh --install_to_usr_local
 ```
@@ -109,8 +109,8 @@ cd test
 ```
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
 
-### Install Ophidian to system:
-If you wish to install Ophidian to your system first make shure your have installed all [dependencies to your system](#install-dependencies-to-system) first then run:
+### Install Ophidian on system:
+If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-to-system) first then run:
 ```
  $ sudo make install
 ```
