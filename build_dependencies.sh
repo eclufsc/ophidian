@@ -34,7 +34,7 @@ echo "Install dependencies to: ${DEPENDENCIES_ROOT}"
 while true; do
     read -p "Do you wish to continue? (y/n):  " yn
     case $yn in
-        [Yy]* ) make install; break;;
+        [Yy]* ) break;;
         [Nn]* ) exit;;
         * ) echo "Please answer y (yes) or n (no).";;
     esac
