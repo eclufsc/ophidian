@@ -6,7 +6,8 @@
 git submodule update --init --recursive
 
 # Absolute path to project root
-OPHIDIAN_PATH=$(pwd)
+SCRIPT=$(readlink -f "$0")
+OPHIDIAN_PATH=$(dirname "$SCRIPT")
 
 # Make dependencies root path
 DEPENDENCIES_ROOT=$OPHIDIAN_PATH/dependencies
