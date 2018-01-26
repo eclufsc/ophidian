@@ -90,7 +90,7 @@ All dependencies are now compiled and installed to `"ophidian_source_root"/depen
 ### Install dependencies on system:
 If you wish to install dependencies on your system run:
 ```
-$ sudo sh build_dependencies.sh --install_to_usr_local
+$ sudo sh build_dependencies.sh --install_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
