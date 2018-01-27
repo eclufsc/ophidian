@@ -74,7 +74,7 @@ install(
 set(CMAKE_MODULE_PATH ${ophidian_source_dir}/cmake)
 
 # Set Cmake prefix path for buildind with local dependencies
-set(CMAKE_PREFIX_PATH ${ophidian_source_dir}/dependencies)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ophidian_source_dir}/dependencies)
 
 # Find Boost
 find_package(Boost 1.59 REQUIRED)
