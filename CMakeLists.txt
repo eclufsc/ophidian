@@ -83,7 +83,7 @@ find_package(Boost 1.59 REQUIRED)
 find_package(Lemon REQUIRED)
 
 # Find Units
-find_package(units 2.3.1 REQUIRED CONFIG)
+find_package(units REQUIRED CONFIG)
 
 # Find DEF
 find_package(DEF REQUIRED)
