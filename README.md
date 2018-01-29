@@ -83,14 +83,14 @@ There are a few more binaries we need to compile beforehand that are not suporte
 
 Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies sources through the submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
 ```
-$ sh build_dependencies.sh
+$ bash build_dependencies.sh
 ```
 All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
 ### Install dependencies on system:
 If you wish to install dependencies on your system run:
 ```
-$ sudo sh build_dependencies.sh --install_to /usr/local
+$ sudo bash build_dependencies.sh --install_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
