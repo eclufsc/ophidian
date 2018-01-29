@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_placement
-    SHARED ${ophidian_placement_source}
+add_library(ophidian_placement SHARED ${ophidian_placement_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_placement PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 

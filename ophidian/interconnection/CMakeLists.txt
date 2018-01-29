@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_interconnection
-    SHARED ${ophidian_interconnection_source}
+add_library(ophidian_interconnection SHARED ${ophidian_interconnection_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_interconnection PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 

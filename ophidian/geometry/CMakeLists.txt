@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_geometry
-    SHARED ${ophidian_geometry_source}
+add_library(ophidian_geometry SHARED ${ophidian_geometry_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_geometry PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 

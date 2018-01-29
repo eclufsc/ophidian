@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_parser
-    SHARED ${ophidian_parser_source}
+add_library(ophidian_parser SHARED ${ophidian_parser_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_parser PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 

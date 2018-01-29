@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_floorplan
-    SHARED ${ophidian_floorplan_source}
+add_library(ophidian_floorplan SHARED ${ophidian_floorplan_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_floorplan PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 

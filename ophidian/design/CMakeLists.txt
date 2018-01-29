@@ -59,8 +59,11 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_design 
-    SHARED ${ophidian_design_source}
+add_library(ophidian_design SHARED ${ophidian_design_source})
+
+# Set shared library version, this will make cmake create a link
+set_target_properties(ophidian_circuit PROPERTIES
+    VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 
