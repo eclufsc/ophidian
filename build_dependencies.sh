@@ -16,10 +16,10 @@ DEPENDENCIES_ROOT=$SOURCE_ROOT/dependencies
 
 # Check if user wants to install elsewhere
 AUX=$2
-if [ "$1" = "--install_to" && "${AUX:0:1}" != "/" ]
+if [ "$1" = "--install_to" ] && [ "${AUX:0:1}" != "/" ]
 then
     DEPENDENCIES_ROOT=$CURRENT_DIR/$2
-elif [ "$1" = "--install_to" && "${AUX:0:1}" = "/" ]
+elif [ "$1" = "--install_to" ] && [ "${AUX:0:1}" = "/" ]
 then
     DEPENDENCIES_ROOT=$2
 fi
