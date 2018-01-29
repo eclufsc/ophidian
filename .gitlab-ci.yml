@@ -1,6 +1,7 @@
 variables: 
   DEPENDENCIES: 
     "build-essential 
+    git
     cmake 
     libboost1.63-dev
     liblemon-dev
@@ -11,6 +12,7 @@ variables:
     ophidian-verilog-parser"
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
+    git
     cmake 
     libboost1.63-dev
     zlib1g-dev

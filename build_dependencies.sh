@@ -3,6 +3,9 @@
 # Ophidian library
 ################################################################################
 
+# Make shell stop at any command that not return 0
+set -e
+
 # Fetch git submodules
 git submodule update --init --recursive
 
