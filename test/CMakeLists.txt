@@ -59,8 +59,16 @@ execute_process(
     RESULT_VARIABLE result
 )
 
-find_file(POWV9 "POWV9.dat" PATHS "/usr/share/Flute" "${ophidian_source_dir}/dependencies/share/Flute")
-find_file(PORT9 "PORT9.dat" PATHS "/usr/share/Flute" "${ophidian_source_dir}/dependencies/share/Flute")
+find_file(POWV9 "POWV9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
+find_file(PORT9 "PORT9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
 
 message("Creating symlink FLUTE LUTs")
 execute_process(
