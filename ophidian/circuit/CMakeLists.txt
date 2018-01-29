@@ -59,7 +59,10 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_circuit SHARED ${ophidian_circuit_source})
+add_library(ophidian_circuit 
+    SHARED ${ophidian_circuit_source} 
+    SOVERSION ${ophidian_VERSION}
+)
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_circuit

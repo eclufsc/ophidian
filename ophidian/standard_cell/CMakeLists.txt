@@ -59,7 +59,10 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_standard_cell SHARED ${ophidian_standard_cell_source})
+add_library(ophidian_standard_cell 
+    SHARED ${ophidian_standard_cell_source}
+    SOVERSION ${ophidian_VERSION}
+)
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_standard_cell 

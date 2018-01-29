@@ -59,7 +59,10 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_entity_system SHARED ${ophidian_entity_system_source})
+add_library(ophidian_entity_system 
+    SHARED ${ophidian_entity_system_source}
+    SOVERSION ${ophidian_VERSION}
+)
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_entity_system

@@ -59,7 +59,10 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_geometry SHARED ${ophidian_geometry_source})
+add_library(ophidian_geometry
+    SHARED ${ophidian_geometry_source}
+    SOVERSION ${ophidian_VERSION}
+)
 
 # Add target dependencies
 target_link_libraries(ophidian_geometry
