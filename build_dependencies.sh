@@ -48,7 +48,7 @@ install_DEF()
 {
     echo "installing DEF"
     cd $SOURCE_ROOT/3rdparty/DEF
-    make CXXFLAGS="-fPIC -O3" all
+    make CXXFLAGS="-fPIC -O3 -w" all
     install -D -m 644 bin/* $DEPENDENCIES_BIN_PATH
     install -D -m 644 lib/* $DEPENDENCIES_LIB_PATH
     install -D -m 644 include/* $DEPENDENCIES_INCLUDE_PATH
@@ -59,7 +59,7 @@ install_LEF()
 {
     echo "installing LEF"
     cd $SOURCE_ROOT/3rdparty/LEF
-    make CXXFLAGS="-fPIC -O3" all
+    make CXXFLAGS="-fPIC -O3 -w" all
     install -D -m 644 bin/* $DEPENDENCIES_BIN_PATH
     install -D -m 644 lib/* $DEPENDENCIES_LIB_PATH
     install -D -m 644 include/* $DEPENDENCIES_INCLUDE_PATH
@@ -72,7 +72,7 @@ install_FLUTE()
     cd $SOURCE_ROOT/3rdparty/Flute
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build
@@ -84,7 +84,7 @@ install_VERILOG_PARSER()
     cd $SOURCE_ROOT/3rdparty/verilog-parser
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build
@@ -96,13 +96,13 @@ install_LEMON()
     cd $SOURCE_ROOT/3rdparty/Lemon
     mkdir build_static
     cd build_static
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build_static
     mkdir build_shared
     cd build_shared
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" -DBUILD_SHARED_LIBS=TRUE ..
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" -DBUILD_SHARED_LIBS=TRUE ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build_shared
