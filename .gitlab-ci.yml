@@ -27,10 +27,8 @@ build_ophidian_with_system_packages:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update && apt-get install -y $DEPENDENCIES
+    - add-apt-repository ppa:eclufsc/ophidian
+    - apt-get update -qq && apt-get -qq install -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr 
@@ -47,10 +45,8 @@ build_ophidian_with_system_packages_static_libc:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update
-    - apt-get install -y curl
-    - curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | bash
-    - apt-get update && apt-get install -y $DEPENDENCIES
+    - add-apt-repository ppa:eclufsc/ophidian
+    - apt-get update -qq && apt-get install -qq -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
@@ -68,7 +64,7 @@ build_ophidian_with_install_script_source:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
+    - apt-get update -qq && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - echo "y" | bash build_dependencies.sh
     - mkdir build && cd build
