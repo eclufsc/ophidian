@@ -19,6 +19,10 @@ add_subdirectory(placement)
 add_subdirectory(standard_cell)
 add_subdirectory(util)
 
+################################################################################
+# Install Ophidian cmake files
+################################################################################
+
 # Install export
 install(
     EXPORT ophidian-targets
@@ -43,10 +47,19 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion 
 )
 
-# Install generated files
 install(
     FILES 
         ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/ophidian-config-version.cmake
     DESTINATION ${ophidian_install_share_dir}/cmake
+)
+
+################################################################################
+# Install License
+################################################################################
+
+# License installation rule
+install(
+    FILES ${ophidian_source_dir}/LICENSE
+    DESTINATION ${ophidian_install_share_dir}/copyright
 )
