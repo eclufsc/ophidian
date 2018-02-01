@@ -61,5 +61,6 @@ install(
 # License installation rule
 install(
     FILES ${ophidian_source_dir}/LICENSE
-    DESTINATION ${ophidian_install_share_dir}/copyright
+    RENAME copyright
+    DESTINATION ${ophidian_install_copyright_dir}
 )
