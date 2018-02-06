@@ -28,9 +28,9 @@ build_ophidian_with_system_packages:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get install -qq -y software-properties-common
+    - apt-get update -qq && apt-get install -qq -y software-properties-common
     - add-apt-repository ppa:eclufsc/test2
-    - apt-get update -qq && apt-get install -qq -y $DEPENDENCIES
+    - apt-get install -qq -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr 
@@ -47,9 +47,9 @@ build_ophidian_with_system_packages_static_libc:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get install -qq -y software-properties-common
+    - apt-get update -qq && apt-get install -qq -y software-properties-common
     - add-apt-repository ppa:eclufsc/test2
-    - apt-get update -qq && apt-get install -qq -y $DEPENDENCIES
+    - apt-get install -qq -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
