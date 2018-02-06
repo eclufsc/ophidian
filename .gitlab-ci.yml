@@ -15,7 +15,7 @@ variables:
     git
     cmake 
     libboost1.63-dev
-    zlib-dev
+    libz-dev
     flex 
     bison
     libbison-dev"
