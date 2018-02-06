@@ -1,30 +1,87 @@
 variables: 
-  DEPENDENCIES: 
-    "build-essential 
-    git
-    cmake 
-    libboost1.63-dev
-    liblemon-dev
-    def
-    lef
-    ophidian-units
-    libflute-dev
-    libverilog-parser-dev"
-  BUILD_LOCAL_DEPENDENCIES:
-    "build-essential 
-    git
-    cmake 
-    libboost1.63-dev
-    libz-dev
-    flex 
-    bison
-    libbison-dev"
-  GIT_SUBMODULE_STRATEGY: recursive
+    DEPENDENCIES: 
+        "build-essential 
+        git
+        cmake 
+        libboost1.63-dev
+        liblemon-dev
+        def
+        lef
+        ophidian-units
+        libflute-dev
+        libverilog-parser-dev"
+    BUILD_LOCAL_DEPENDENCIES:
+        "build-essential 
+        git
+        cmake 
+        libboost1.63-dev
+        libz-dev
+        flex 
+        bison
+        libbison-dev"
+    GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
-  - build
+    - build
 
-build_ophidian_with_system_packages:
+build_on_debian-sid:
+    image: debian:sid
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y software-properties-common
+        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - apt-get install -qq -y $DEPENDENCIES
+    script:
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release 
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
+
+build_on_debian-buster:
+    image: debian:buster
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y software-properties-common
+        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - apt-get install -qq -y $DEPENDENCIES
+    script:
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release 
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+          - build/
+
+build_on_ubuntu-zesty:
+  image: ubuntu:zesty
+  stage: build
+  before_script:
+    - apt-get update -qq && apt-get install -qq -y software-properties-common
+    - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+    - apt-get install -qq -y $DEPENDENCIES
+  script:
+    - mkdir build && cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+            -DCMAKE_BUILD_TYPE=Release 
+            ..
+    - make -j2
+    - cd test
+    - ./ophidian_tests
+  artifacts:
+    paths:
+      - build/
+
+build_on_ubuntu-artful:
   image: ubuntu:artful
   stage: build
   before_script:
@@ -43,27 +100,7 @@ build_ophidian_with_system_packages:
     paths:
       - build/
 
-build_ophidian_with_system_packages_static_libc:
-  image: ubuntu:artful
-  stage: build
-  before_script:
-    - apt-get update -qq && apt-get install -qq -y software-properties-common
-    - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
-    - apt-get install -qq -y $DEPENDENCIES
-  script:
-    - mkdir build && cd build
-    - cmake -DOPHIDIAN_TESTS_FULLY_STATIC=ON
-            -DCMAKE_INSTALL_PREFIX=/usr
-            -DCMAKE_BUILD_TYPE=Release
-            ..
-    - make -j2
-    - cd test
-    - ./ophidian_tests
-  artifacts:
-    paths:
-      - build/
-
-build_ophidian_with_install_script_source:
+build_using_dependencies_script_on_source:
   image: ubuntu:artful
   stage: build
   before_script:
@@ -81,7 +118,7 @@ build_ophidian_with_install_script_source:
     paths:
       - build/
 
-build_ophidian_with_install_script_system:
+build_using_dependencies_script_on_sistem:
   image: ubuntu:artful
   stage: build
   before_script:
