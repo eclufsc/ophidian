@@ -6,17 +6,18 @@ variables:
     libboost1.63-dev
     liblemon-dev
     ophidian-units
-    ophidian-def
-    ophidian-lef
     ophidian-flute
-    ophidian-verilog-parser"
+    def
+    lef
+    verilog-parser"
   BUILD_LOCAL_DEPENDENCIES:
     "build-essential 
     git
     cmake 
     libboost1.63-dev
-    zlib1g-dev
+    zlib-dev
     flex 
+    bison
     libbison-dev"
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -27,8 +28,8 @@ build_ophidian_with_system_packages:
   image: ubuntu:artful
   stage: build
   before_script:
-    - add-apt-repository ppa:eclufsc/ophidian
-    - apt-get update -qq && apt-get -qq install -y $DEPENDENCIES
+    - add-apt-repository ppa:eclufsc/test2
+    - apt-get update -qq && apt-get install -qq -y $DEPENDENCIES
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_INSTALL_PREFIX=/usr 
@@ -45,7 +46,7 @@ build_ophidian_with_system_packages_static_libc:
   image: ubuntu:artful
   stage: build
   before_script:
-    - add-apt-repository ppa:eclufsc/ophidian
+    - add-apt-repository ppa:eclufsc/test2
     - apt-get update -qq && apt-get install -qq -y $DEPENDENCIES
   script:
     - mkdir build && cd build
@@ -64,7 +65,7 @@ build_ophidian_with_install_script_source:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update -qq && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
+    - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - echo "y" | bash build_dependencies.sh
     - mkdir build && cd build
@@ -82,7 +83,7 @@ build_ophidian_with_install_script_system:
   image: ubuntu:artful
   stage: build
   before_script:
-    - apt-get update && apt-get install -y $BUILD_LOCAL_DEPENDENCIES
+    - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
   script:
     - echo y | bash build_dependencies.sh --install_to /usr/local
     - mkdir build && cd build
