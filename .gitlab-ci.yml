@@ -24,8 +24,46 @@ variables:
 stages:
     - build
 
+build_on_debian-buster:
+    image: debian:buster
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
+        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - apt-get install -qq -y $DEPENDENCIES
+    script:
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release 
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+          - build/
+
 build_on_debian-sid:
     image: debian:sid
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
+        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - apt-get install -qq -y $DEPENDENCIES
+    script:
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release 
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
+
+build_on_ubuntu-artful:
+    image: ubuntu:artful
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
@@ -43,8 +81,8 @@ build_on_debian-sid:
         paths:
             - build/
 
-build_on_debian-buster:
-    image: debian:buster
+build_on_ubuntu-bionic:
+    image: ubuntu:bionic
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
@@ -60,78 +98,40 @@ build_on_debian-buster:
         - ./ophidian_tests
     artifacts:
         paths:
-          - build/
-
-build_on_ubuntu-zesty:
-  image: ubuntu:zesty
-  stage: build
-  before_script:
-    - apt-get update -qq && apt-get install -qq -y software-properties-common
-    - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
-    - apt-get install -qq -y $DEPENDENCIES
-  script:
-    - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-            -DCMAKE_BUILD_TYPE=Release 
-            ..
-    - make -j2
-    - cd test
-    - ./ophidian_tests
-  artifacts:
-    paths:
-      - build/
-
-build_on_ubuntu-artful:
-  image: ubuntu:artful
-  stage: build
-  before_script:
-    - apt-get update -qq && apt-get install -qq -y software-properties-common
-    - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
-    - apt-get install -qq -y $DEPENDENCIES
-  script:
-    - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-            -DCMAKE_BUILD_TYPE=Release 
-            ..
-    - make -j2
-    - cd test
-    - ./ophidian_tests
-  artifacts:
-    paths:
-      - build/
+            - build/
 
 build_using_dependencies_script_on_source:
-  image: ubuntu:artful
-  stage: build
-  before_script:
-    - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
-  script:
-    - echo "y" | bash build_dependencies.sh
-    - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-            -DCMAKE_BUILD_TYPE=Release
-            ..
-    - make -j2
-    - cd test
-    - ./ophidian_tests
-  artifacts:
-    paths:
-      - build/
+    image: ubuntu:artful
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
+    script:
+        - echo "y" | bash build_dependencies.sh
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
 
 build_using_dependencies_script_on_sistem:
-  image: ubuntu:artful
-  stage: build
-  before_script:
-    - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
-  script:
-    - echo y | bash build_dependencies.sh --install_to /usr/local
-    - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-            -DCMAKE_BUILD_TYPE=Release
-            ..
-    - make -j2
-    - cd test
-    - ./ophidian_tests
-  artifacts:
-    paths:
-      - build/
+    image: ubuntu:artful
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y $BUILD_LOCAL_DEPENDENCIES
+    script:
+        - echo y | bash build_dependencies.sh --install_to /usr/local
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
