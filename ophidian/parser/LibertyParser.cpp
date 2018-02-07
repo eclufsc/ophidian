@@ -368,5 +368,41 @@ std::shared_ptr<Liberty> LibertyParser::readFile(const std::string &filename)
     return lib;
 }
 
+Liberty::Cell Liberty::find(std::string cellName)
+{
+    for (auto cell : cells)
+        if (cell.name == cellName)
+            return cell;
+
+    return Liberty::Cell();
+}
+
+Liberty::Pin Liberty::Cell::find(std::string pinName)
+{
+    for (auto pin : pins)
+        if (pin.name == pinName)
+            return pin;
+
+    return Liberty::Pin();
+}
+
+Liberty::Timing Liberty::Pin::find(Liberty::Timing::type timingT)
+{
+    for (auto tim : timing)
+        if (tim.timingType == timingT)
+            return tim;
+
+    return Liberty::Timing();
+}
+
+Liberty::LUT Liberty::Timing::find(Liberty::LUT::lutInformation info)
+{
+    for (auto lut : luts)
+        if (lut._lutInformation == info)
+            return lut;
+
+    return Liberty::LUT();
+}
+
 }
 }

@@ -24,9 +24,17 @@ namespace ophidian
 namespace timing
 {
 
-Library::Library()
+Library::Library(std::shared_ptr<parser::Liberty> & liberty, const circuit::Netlist & netlist, const circuit::LibraryMapping & libMapping) :
+    mLiberty(liberty),
+    mNetlist(netlist),
+    mLibraryMapping(libMapping)
 {
 
+}
+
+util::picosecond_t Library::timingArc(circuit::Pin from, circuit::Pin to)
+{
+    standard_cell::Cell cell = mLibraryMapping.cellStdCell(mNetlist.cell(from));
 }
 
 } // namespace timing

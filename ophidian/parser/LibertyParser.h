@@ -55,6 +55,8 @@ public:
         unateness timingSense;
         std::string relatedPin;
         std::vector< LUT > luts;
+
+        LUT find(LUT::lutInformation info);
     };
     /**
      * A structure to represent a pin
@@ -69,6 +71,8 @@ public:
         };
         directionPin pinDirection;
         std::vector<Timing> timing;
+
+        Timing find(Timing::type timingT);
     };
     /**
      * A structure to represent a cell
@@ -77,7 +81,11 @@ public:
         std::string name;
         std::vector<Pin> pins;
         bool sequential = false;
+
+        Pin find(std::string pinName);
     };
+
+    Cell find(std::string cellName);
 
 public:
     std::string timeUnit = "";

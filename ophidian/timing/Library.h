@@ -20,6 +20,11 @@
 #ifndef OPHIDIAN_TIMING_LIBRARY_H
 #define OPHIDIAN_TIMING_LIBRARY_H
 
+#include <ophidian/circuit/Netlist.h>
+#include <ophidian/util/Units.h>
+#include <ophidian/parser/LibertyParser.h>
+#include <ophidian/circuit/LibraryMapping.h>
+
 namespace ophidian
 {
 namespace timing
@@ -28,7 +33,14 @@ namespace timing
 class Library
 {
 public:
-    Library();
+    Library(std::shared_ptr<parser::Liberty> & liberty, const circuit::Netlist & netlist, const circuit::LibraryMapping & libMapping);
+
+    util::picosecond_t timingArc(circuit::Pin from, circuit::Pin to);
+
+private:
+    std::shared_ptr<parser::Liberty> mLiberty;
+    const circuit::Netlist & mNetlist;
+    const circuit::LibraryMapping & mLibraryMapping;
 };
 
 } // namespace timing

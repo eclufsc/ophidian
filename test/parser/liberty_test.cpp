@@ -1,4 +1,4 @@
-#include "liberty_test.h"
+  #include "liberty_test.h"
 #include <catch.hpp>
 
 #include <ophidian/parser/LibertyParser.h>
@@ -100,6 +100,11 @@ TEST_CASE("Liberty: init", "[parser][LibertyParser]")
     REQUIRE(lutFlipFlopQ.values.size() == 7);
     REQUIRE(lutFlipFlopQ.values[0].size() == 8);
     REQUIRE(lutFlipFlopQ.values[6][7] == 211.2);
+
+    REQUIRE(liberty->find(inverter.name).name == inverter.name);
+    REQUIRE(inverter.find(inverter.pins.front().name).name == inverter.pins.front().name);
+    REQUIRE(inverter.pins.front().find(inverterTimingOut.timingType).timingType == inverterTimingOut.timingType);
+    REQUIRE(inverterTimingOut.find(lutInverterOut._lutInformation)._lutInformation == lutInverterOut._lutInformation);
 }
 
 
