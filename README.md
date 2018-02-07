@@ -31,16 +31,19 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 Get Ophidian! We support a few of the most used linux environments.
 
 ### Debian Family:
-If you use Ubuntu zesty (17) or Debian buster (10) and newer you are covered! Add the Ophidian repository via [package cloud](https://packagecloud.io/tarberd/ophidian) using the provided script.
-```
-$ curl -s https://packagecloud.io/install/repositories/tarberd/ophidian/script.deb.sh | sudo bash
-```
+Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu/ophidian).
 
-Then install the ophidian package using apt
+#### Ubuntu zesty (17) or newer:
 ```
+$ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ apt install ophidian
 ```
-> **Linux Mint** users should either wait for Linux Mint Tara (19) or [compile it from source.](#compiling-from-source).
+
+#### Debian boster (10) or newer:
+```
+$ sudo add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 ppa:eclufsc/ophidian
+$ apt install ophidian
+```
 
 ### Arch Linux:
 Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/packages/ophidian-git/):
