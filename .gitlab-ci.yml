@@ -29,7 +29,7 @@ build_on_debian-buster:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
@@ -48,7 +48,7 @@ build_on_debian-sid:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
@@ -67,7 +67,7 @@ build_on_ubuntu-artful:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
-        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
@@ -86,7 +86,7 @@ build_on_ubuntu-bionic:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
-        - add-apt-repository ppa:eclufsc/test2 && apt-get update -qq
+        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
