@@ -33,7 +33,7 @@ Get Ophidian! We support a few of the most used linux environments.
 ### Debian Family:
 Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu/ophidian).
 
-#### Ubuntu zesty (17) or newer:
+#### Ubuntu artful (17.10) or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ apt install ophidian
@@ -41,7 +41,7 @@ $ apt install ophidian
 
 #### Debian boster (10) or newer:
 ```
-$ sudo add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 ppa:eclufsc/ophidian
+$ sudo add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
 $ apt install ophidian
 ```
 

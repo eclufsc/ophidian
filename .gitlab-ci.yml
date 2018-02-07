@@ -40,7 +40,7 @@ build_on_debian-buster:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 ppa:eclufsc/ophidian
+        - add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
@@ -59,7 +59,7 @@ build_on_debian-sid:
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 ppa:eclufsc/ophidian
+        - add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
