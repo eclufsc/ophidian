@@ -158,7 +158,6 @@ private:
     entity_system::EntitySystem<Arc> mArcs;
     entity_system::Property<Arc, circuit::Pin> mFrom;
     entity_system::Property<Arc, circuit::Pin> mTo;
-
     entity_system::Property<Arc, std::string> mArcNames;
     std::unordered_map<std::string, Arc> mName2Arc;
 
