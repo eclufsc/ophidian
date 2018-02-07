@@ -19,7 +19,7 @@ variables:
         flex 
         bison
         libbison-dev"
-    DEPENDENCIES_UBUNTU-BIONIC:
+    DEPENDENCIES_UBUNTU_BIONIC:
         "build-essential 
         git
         cmake 
@@ -98,7 +98,7 @@ build_on_ubuntu-bionic:
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
         - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
-        - apt-get install -qq -y $DEPENDENCIES
+        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
