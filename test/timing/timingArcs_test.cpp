@@ -2,7 +2,7 @@
 #include <catch.hpp>
 
 #include <ophidian/timing/TimingArcs.h>
-#include <ophidian/circuit/Netlist.h>
+#include <ophidian/standard_cell/StandardCells.h>
 
 using namespace ophidian;
 
@@ -58,9 +58,9 @@ TEST_CASE("TimingArcs: Finding a Arc.", "[Timing][TimingArcs]")
 TEST_CASE("TimingArcs: Add from and to of an arc.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
-    circuit::Netlist nl;
-    auto from = nl.add(circuit::Pin(), "from");
-    auto to = nl.add(circuit::Pin(), "to");
+    standard_cell::StandardCells stdCells;
+    auto from = stdCells.add(standard_cell::Pin(), "from", standard_cell::PinDirection::INPUT);
+    auto to = stdCells.add(standard_cell::Pin(), "to", standard_cell::PinDirection::OUTPUT);
     auto arc = arcs.add("arc");
     arcs.from(arc, from);
     arcs.to(arc, to);

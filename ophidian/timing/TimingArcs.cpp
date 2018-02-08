@@ -6,8 +6,8 @@ namespace timing
 {
 
 TimingArcs::TimingArcs() :
-    mFrom(makeProperty<circuit::Pin>()),
-    mTo(makeProperty<circuit::Pin>()),
+    mFrom(makeProperty<standard_cell::Pin>()),
+    mTo(makeProperty<standard_cell::Pin>()),
     mArcNames(makeProperty<std::string>())
 {
 
@@ -32,12 +32,12 @@ Arc TimingArcs::add(const std::string & arcName)
     }
 }
 
-void TimingArcs::from(const Arc & arc, const circuit::Pin & from_)
+void TimingArcs::from(const Arc & arc, const standard_cell::Pin & from_)
 {
     mFrom[arc] = from_;
 }
 
-void TimingArcs::to(const Arc & arc, const circuit::Pin & to_)
+void TimingArcs::to(const Arc & arc, const standard_cell::Pin & to_)
 {
     mTo[arc] = to_;
 }
@@ -83,12 +83,12 @@ ophidian::util::Range<TimingArcs::ArcsIterator> TimingArcs::range() const
     return ophidian::util::Range<TimingArcs::ArcsIterator>(mArcs.begin(), mArcs.end());
 }
 
-circuit::Pin TimingArcs::from(const Arc & arc) const
+standard_cell::Pin TimingArcs::from(const Arc & arc) const
 {
     return mFrom[arc];
 }
 
-circuit::Pin TimingArcs::to(const Arc & arc) const
+standard_cell::Pin TimingArcs::to(const Arc & arc) const
 {
     return mTo[arc];
 }

@@ -24,18 +24,41 @@ namespace ophidian
 namespace timing
 {
 
-Library::Library(std::shared_ptr<parser::Liberty> & liberty, const circuit::Netlist & netlist, const circuit::LibraryMapping & libMapping) :
-    mLiberty(liberty),
-    mNetlist(netlist),
-    mLibraryMapping(libMapping)
+Library::Library(std::shared_ptr<parser::Liberty> & liberty, const standard_cell::StandardCells & stdCells, TimingArcs & arcs) :
+    mRiseDelays(arcs.makeProperty<LUT>()),
+    mFallDelays(arcs.makeProperty<LUT>()),
+    mRiseSlews(arcs.makeProperty<LUT>()),
+    mFallSlews(arcs.makeProperty<LUT>()),
+    mTimingSenses(arcs.makeProperty<unateness_t>())
 {
 
 }
 
-util::picosecond_t Library::timingArc(circuit::Pin from, circuit::Pin to)
+double Library::computeRiseDelay(const Arc & arc, double rv, double cv)
 {
-    standard_cell::Cell cell = mLibraryMapping.cellStdCell(mNetlist.cell(from));
+    return mRiseDelays[arc].compute(rv, cv);
 }
+
+double Library::computeFallDelay(const Arc & arc, double rv, double cv)
+{
+    return mFallDelays[arc].compute(rv, cv);
+}
+
+double Library::computeRiseSlews(const Arc & arc, double rv, double cv)
+{
+    return mRiseSlews[arc].compute(rv, cv);
+}
+
+double Library::computeFallSlews(const Arc & arc, double rv, double cv)
+{
+    return mFallSlews[arc].compute(rv, cv);
+}
+
+unateness_t Library::unateness(const Arc & arc)
+{
+    return mTimingSenses[arc];
+}
+
 
 } // namespace timing
 } // namespace ophidian

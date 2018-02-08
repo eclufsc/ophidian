@@ -404,5 +404,73 @@ Liberty::LUT Liberty::Timing::find(Liberty::LUT::lutInformation info)
     return Liberty::LUT();
 }
 
+double Liberty::LUT::compute(double rv, double cv)
+{
+    if (values.size() == 1)
+        if (values.front().size() == 1)
+            return values.front().front();
+
+    double wTransition, wLoad;
+    double y1, y2;
+    double x1, x2;
+    double t[2][2];
+    std::size_t row1, row2, column1, column2;
+
+    wTransition = 0.0f;
+    wLoad = 0.0f;
+
+    row1 = index_1.size() - 2;
+    row2 = index_1.size() - 1;
+    y1 = index_1[row1];
+    y2 = index_1[row2];
+
+    // loads -- rows
+    for (size_t i = 0; i < index_1.size() - 1; i++) {
+        if (rv >= index_1[i] && rv <= index_1[i + 1]) {
+            row1 = i;
+            row2 = i + 1;
+            y1 = index_1[row1];
+            y2 = index_1[row2];
+        }
+    }
+
+    // transitions -- columns
+    if (cv < index_2[0]) {
+        column1 = 0;
+        column2 = 1;
+        x1 = index_2[column1];
+        x2 = index_2[column2];
+    } else if (cv > index_2[index_2.size() - 1]) {
+        column1 = index_2.size() - 2;
+        column2 = index_2.size() - 1;
+        x1 = index_2[column1];
+        x2 = index_2[column2];
+    } else {
+        for (size_t i = 0; i < index_2.size() - 1; i++) {
+            if (cv >= index_2[i] && cv <= index_2[i + 1]) {
+                column1 = i;
+                column2 = i + 1;
+                x1 = index_2[column1];
+                x2 = index_2[column2];
+            }
+        }
+    }
+
+    //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
+    wTransition = (cv - x1) / (x2 - x1);
+    wLoad = (rv - y1) / (y2 - y1);
+
+    t[0][0] = values[row1][column1];
+    t[0][1] = values[row1][column2];
+    t[1][0] = values[row2][column1];
+    t[1][1] = values[row2][column2];
+
+    return ((1 - wTransition) * (1 - wLoad) * t[0][0])
+            + (wTransition * (1 - wLoad) * t[0][1])
+            + ((1 - wTransition) * wLoad * t[1][0])
+            + (wTransition * wLoad * t[1][1]);
+
+}
+
 }
 }

@@ -11,7 +11,7 @@
 
 using namespace ophidian::parser;
 
-TEST_CASE("Liberty: init", "[parser][LibertyParser]")
+TEST_CASE("Liberty: init", "[parser][LibertyParser][Liberty]")
 {
     LibertyParser libertyParser;
     std::shared_ptr<Liberty> lib = libertyParser.readFile("./input_files/sample2_Late.lib");
@@ -101,10 +101,24 @@ TEST_CASE("Liberty: init", "[parser][LibertyParser]")
     REQUIRE(lutFlipFlopQ.values[0].size() == 8);
     REQUIRE(lutFlipFlopQ.values[6][7] == 211.2);
 
+    // Liberty: Methods find
     REQUIRE(liberty->find(inverter.name).name == inverter.name);
     REQUIRE(inverter.find(inverter.pins.front().name).name == inverter.pins.front().name);
     REQUIRE(inverter.pins.front().find(inverterTimingOut.timingType).timingType == inverterTimingOut.timingType);
     REQUIRE(inverterTimingOut.find(lutInverterOut._lutInformation)._lutInformation == lutInverterOut._lutInformation);
+
+    // Liberty: LUT compute method
+    // Lower extrapolation
+
+    // Lower interpolation
+    REQUIRE(lutInverterOut.compute(1.5, 20.0) == 28.116);
+
+    // Central interpolation
+
+    // Superior interpolation
+    REQUIRE(lutInverterOut.compute(0.75, 325.0) == 71.244375);
+
+    // Superior extrapolation
 }
 
 

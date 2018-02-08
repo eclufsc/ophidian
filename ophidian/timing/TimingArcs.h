@@ -7,6 +7,7 @@
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/entity_system/Aggregation.h>
 #include <ophidian/circuit/Netlist.h>
+#include <ophidian/standard_cell/StandardCells.h>
 #include <ophidian/util/Range.h>
 
 namespace ophidian
@@ -61,7 +62,7 @@ public:
        \param arc A handler for the Arc we want to get the pin.
        \param from_ A handler for the pin of origin.
      */
-    void from(const Arc & arc, const circuit::Pin & from_);
+    void from(const Arc & arc, const standard_cell::Pin & from_);
 
     //! Add Target pin of an arc
     /*!
@@ -69,7 +70,7 @@ public:
        \param arc A handler for the Arc we want to get the pin.
        \param to_ A handler for the target pin.
      */
-    void to(const Arc & arc, const circuit::Pin & to_);
+    void to(const Arc & arc, const standard_cell::Pin & to_);
 
     //! Erase Arc
     /*!
@@ -131,7 +132,7 @@ public:
        \param arc A handler for the Arc we want to get the pin.
        \return circuit::Pin Pin of origin
      */
-    circuit::Pin from(const Arc & arc) const;
+    standard_cell::Pin from(const Arc & arc) const;
 
     //! Target pin of an arc
     /*!
@@ -139,7 +140,7 @@ public:
        \param arc A handler for the Arc we want to get the pin.
        \return circuit::Pin Target pin
      */
-    circuit::Pin to(const Arc & arc) const;
+    standard_cell::Pin to(const Arc & arc) const;
 
     //! Make Cell Property
     /*!
@@ -156,8 +157,8 @@ public:
 private:
     //Arcs entity system and properties
     entity_system::EntitySystem<Arc> mArcs;
-    entity_system::Property<Arc, circuit::Pin> mFrom;
-    entity_system::Property<Arc, circuit::Pin> mTo;
+    entity_system::Property<Arc, standard_cell::Pin> mFrom;
+    entity_system::Property<Arc, standard_cell::Pin> mTo;
     entity_system::Property<Arc, std::string> mArcNames;
     std::unordered_map<std::string, Arc> mName2Arc;
 

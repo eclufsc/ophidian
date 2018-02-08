@@ -24,23 +24,40 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/parser/LibertyParser.h>
 #include <ophidian/circuit/LibraryMapping.h>
+#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/timing/TimingArcs.h>
 
 namespace ophidian
 {
 namespace timing
 {
 
+enum unateness_t {
+    NEGATIVE_UNATE,
+    POSITIVE_UNATE,
+    NON_UNATE
+};
+
 class Library
 {
-public:
-    Library(std::shared_ptr<parser::Liberty> & liberty, const circuit::Netlist & netlist, const circuit::LibraryMapping & libMapping);
+    using LUT = parser::Liberty::LUT;
 
-    util::picosecond_t timingArc(circuit::Pin from, circuit::Pin to);
+public:
+    Library(std::shared_ptr<parser::Liberty> & liberty, const standard_cell::StandardCells & stdCells, TimingArcs & arcs);
+
+    double computeRiseDelay(const Arc & arc, double rv, double cv);
+    double computeFallDelay(const Arc & arc, double rv, double cv);
+    double computeRiseSlews(const Arc & arc, double rv, double cv);
+    double computeFallSlews(const Arc & arc, double rv, double cv);
+    unateness_t unateness(const Arc & arc);
 
 private:
-    std::shared_ptr<parser::Liberty> mLiberty;
-    const circuit::Netlist & mNetlist;
-    const circuit::LibraryMapping & mLibraryMapping;
+    entity_system::Property<Arc, LUT> mRiseDelays;
+    entity_system::Property<Arc, LUT> mFallDelays;
+    entity_system::Property<Arc, LUT> mRiseSlews;
+    entity_system::Property<Arc, LUT> mFallSlews;
+    entity_system::Property<Arc, unateness_t> mTimingSenses;
+
 };
 
 } // namespace timing
