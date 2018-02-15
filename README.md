@@ -74,7 +74,7 @@ This section will guide you on the compilation process of the Ophidian library. 
 * Bison
 * zlib
 
-### Compiling dependencies:
+## Compiling dependencies:
 There are a few more binaries we need to compile beforehand that are not suported by any distribution.
 
 Run the provided script **build\_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian\_source\_root"/3rdparty`, compile and install them.
@@ -90,7 +90,7 @@ $ sudo bash build\_dependencies.sh --install_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
-### Compiling Ophidian:
+## Compiling Ophidian:
 Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the following:
 ```
 mkdir build
