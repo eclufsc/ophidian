@@ -77,16 +77,16 @@ This section will guide you on the compilation process of the Ophidian library. 
 ## Compiling dependencies:
 There are a few more binaries we need to compile beforehand that are not suported by any distribution.
 
-Run the provided script **build\_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian\_source\_root"/3rdparty`, compile and install them.
+Run the provided script **build\_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
 ```
-$ bash build\_dependencies.sh
+$ bash build_dependencies.sh
 ```
-All dependencies are now compiled and installed to `"ophidian\_source\_root"/dependencies`.
+All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
 ### Install dependencies on system:
 If you wish to install dependencies on your system run:
 ```
-$ sudo bash build\_dependencies.sh --install\_to /usr/local
+$ sudo bash build_dependencies.sh --install_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
@@ -101,9 +101,9 @@ make
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
 ```
 cd test
-./ophidian\_tests
+./ophidian_tests
 ```
-> **ps.:** ophidian\_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
+> **ps.:** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
 ### Install Ophidian on system:
 If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-to-system) first then run:
