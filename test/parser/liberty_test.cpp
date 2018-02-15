@@ -119,6 +119,5 @@ TEST_CASE("Liberty: init", "[parser][LibertyParser][Liberty]")
     REQUIRE(lutInverterOut.compute(6.75, 150.50) == 100.5769125);
     REQUIRE(lutInverterOut.compute(35.0, 550.0) == lutInverterOut.compute(35.0, 550.0)); // 405.7725, bug
 
-
     // Superior extrapolation
 }

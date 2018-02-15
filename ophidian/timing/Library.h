@@ -32,8 +32,8 @@ namespace ophidian
 namespace timing
 {
 
-using unateness_t = parser::Liberty::Timing::unateness;
-using timing_type_t = parser::Liberty::Timing::type;
+using unateness_t = ophidian::parser::Liberty::Timing::unateness ;
+using timing_type_t = ophidian::parser::Liberty::Timing::type;
 
 class Library
 {
@@ -56,6 +56,7 @@ private:
     entity_system::Property<Arc, LUT> mFallSlews;
     entity_system::Property<Arc, unateness_t> mTimingSenses;
     entity_system::Property<Arc, timing_type_t> mTimingTypes;
+    entity_system::Property<standard_cell::Pin, double> mPinCapacitance;
 
 };
 

@@ -30,27 +30,38 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
     mRiseSlews(arcs.makeProperty<LUT>()),
     mFallSlews(arcs.makeProperty<LUT>()),
     mTimingSenses(arcs.makeProperty<unateness_t>()),
-    mTimingTypes(arcs.makeProperty<timing_type_t>())
+    mTimingTypes(arcs.makeProperty<timing_type_t>()),
+    mPinCapacitance(stdCells.makeProperty<double>(standard_cell::Pin()))
 {
     for (auto cell : liberty.cells)
     {
-        if (cell.sequential) {
+        for (auto pin : cell.pins)
+        {
+            for (auto tmg : pin.timing)
+            {
+                auto relatedPin = cell.find(tmg.relatedPin);
+                std::string nameFromPin, nameToPin;
 
-        } else {
-            for (auto out : cell.outputs())
-                for (auto tmg : out.timing)
-                    for (auto in : cell.inputs())
-                        if (in.name == tmg.relatedPin) {
-                            auto arc = arcs.add(cell.name+":"+in.name+"->"+cell.name+":"+out.name);
-                            arcs.from(arc, stdCells.find(standard_cell::Pin(), cell.name+":"+in.name));
-                            arcs.to(arc, stdCells.find(standard_cell::Pin(), cell.name+":"+out.name));
-                            mTimingSenses[arc] = tmg.timingSense;
-                            mTimingTypes[arc] = tmg.timingType;
-                            mRiseDelays[arc] = tmg.find(parser::Liberty::LUT::CELL_RISE);
-                            mFallDelays[arc] = tmg.find(parser::Liberty::LUT::CELL_FALL);
-                            mRiseSlews[arc] = tmg.find(parser::Liberty::LUT::RISE_TRANSITION);
-                            mFallSlews[arc] = tmg.find(parser::Liberty::LUT::FALL_TRANSITION);
-                        }
+                if (tmg.timingType != timing_type_t::HOLD_RISING) {
+                    nameFromPin = cell.name+":"+relatedPin.name;
+                    nameToPin = cell.name+":"+pin.name;
+                } else {
+                    nameFromPin = cell.name+":"+pin.name;
+                    nameToPin = cell.name+":"+relatedPin.name;
+                }
+
+                auto arc = arcs.add(nameFromPin+"->"+nameToPin);
+                arcs.from(arc, stdCells.find(standard_cell::Pin(), nameFromPin));
+                arcs.to(arc, stdCells.find(standard_cell::Pin(), nameToPin));
+                mTimingSenses[arc] = tmg.timingSense;
+                mTimingTypes[arc] = tmg.timingType;
+                mRiseDelays[arc] = tmg.find(LUT::CELL_RISE);
+                mFallDelays[arc] = tmg.find(LUT::CELL_FALL);
+                mRiseSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::RISE_CONSTRAINT : LUT::RISE_TRANSITION);
+                mFallSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::FALL_CONSTRAINT : LUT::FALL_TRANSITION);
+            }
+
+            mPinCapacitance[stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name)] = pin.capacitance;
         }
     }
 }
