@@ -86,7 +86,7 @@ All dependencies are now compiled and installed to `"ophidian\_source\_root"/dep
 ### Install dependencies on system:
 If you wish to install dependencies on your system run:
 ```
-$ sudo bash build\_dependencies.sh --install_to /usr/local
+$ sudo bash build\_dependencies.sh --install\_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
@@ -101,7 +101,7 @@ make
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
 ```
 cd test
-./ophidian_tests
+./ophidian\_tests
 ```
 > **ps.:** ophidian\_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
