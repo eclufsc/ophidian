@@ -85,6 +85,8 @@ public:
         bool sequential = false;
 
         Pin find(std::string pinName);
+        std::vector<Pin> inputs();
+        std::vector<Pin> outputs();
     };
 
     Cell find(std::string cellName);

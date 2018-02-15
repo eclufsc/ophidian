@@ -24,14 +24,35 @@ namespace ophidian
 namespace timing
 {
 
-Library::Library(std::shared_ptr<parser::Liberty> & liberty, const standard_cell::StandardCells & stdCells, TimingArcs & arcs) :
+Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs) :
     mRiseDelays(arcs.makeProperty<LUT>()),
     mFallDelays(arcs.makeProperty<LUT>()),
     mRiseSlews(arcs.makeProperty<LUT>()),
     mFallSlews(arcs.makeProperty<LUT>()),
-    mTimingSenses(arcs.makeProperty<unateness_t>())
+    mTimingSenses(arcs.makeProperty<unateness_t>()),
+    mTimingTypes(arcs.makeProperty<timing_type_t>())
 {
+    for (auto cell : liberty.cells)
+    {
+        if (cell.sequential) {
 
+        } else {
+            for (auto out : cell.outputs())
+                for (auto tmg : out.timing)
+                    for (auto in : cell.inputs())
+                        if (in.name == tmg.relatedPin) {
+                            auto arc = arcs.add(cell.name+":"+in.name+"->"+cell.name+":"+out.name);
+                            arcs.from(arc, stdCells.find(standard_cell::Pin(), cell.name+":"+in.name));
+                            arcs.to(arc, stdCells.find(standard_cell::Pin(), cell.name+":"+out.name));
+                            mTimingSenses[arc] = tmg.timingSense;
+                            mTimingTypes[arc] = tmg.timingType;
+                            mRiseDelays[arc] = tmg.find(parser::Liberty::LUT::CELL_RISE);
+                            mFallDelays[arc] = tmg.find(parser::Liberty::LUT::CELL_FALL);
+                            mRiseSlews[arc] = tmg.find(parser::Liberty::LUT::RISE_TRANSITION);
+                            mFallSlews[arc] = tmg.find(parser::Liberty::LUT::FALL_TRANSITION);
+                        }
+        }
+    }
 }
 
 double Library::computeRiseDelay(const Arc & arc, double rv, double cv)
@@ -57,6 +78,11 @@ double Library::computeFallSlews(const Arc & arc, double rv, double cv)
 unateness_t Library::unateness(const Arc & arc)
 {
     return mTimingSenses[arc];
+}
+
+timing_type_t Library::type(const Arc & arc)
+{
+    return mTimingTypes[arc];
 }
 
 

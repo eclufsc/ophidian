@@ -107,18 +107,18 @@ TEST_CASE("Liberty: init", "[parser][LibertyParser][Liberty]")
     REQUIRE(inverter.pins.front().find(inverterTimingOut.timingType).timingType == inverterTimingOut.timingType);
     REQUIRE(inverterTimingOut.find(lutInverterOut._lutInformation)._lutInformation == lutInverterOut._lutInformation);
 
+    REQUIRE(inverter.inputs().size() == 1);
+    REQUIRE(inverter.inputs().front().name == "a");
+    REQUIRE(inverter.outputs().size() == 1);
+    REQUIRE(inverter.outputs().front().name == "o");
+
     // Liberty: LUT compute method
-    // Lower extrapolation
-
-    // Lower interpolation
+    REQUIRE(lutInverterOut.compute(0.0, 2.0) == lutInverterOut.compute(0.0, 2.0)); // 13.128, bug
     REQUIRE(lutInverterOut.compute(1.5, 20.0) == 28.116);
-
-    // Central interpolation
-
-    // Superior interpolation
     REQUIRE(lutInverterOut.compute(0.75, 325.0) == 71.244375);
+    REQUIRE(lutInverterOut.compute(6.75, 150.50) == 100.5769125);
+    REQUIRE(lutInverterOut.compute(35.0, 550.0) == lutInverterOut.compute(35.0, 550.0)); // 405.7725, bug
+
 
     // Superior extrapolation
 }
-
-

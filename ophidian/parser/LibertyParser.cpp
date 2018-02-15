@@ -386,6 +386,26 @@ Liberty::Pin Liberty::Cell::find(std::string pinName)
     return Liberty::Pin();
 }
 
+std::vector<Liberty::Pin> Liberty::Cell::inputs()
+{
+    std::vector<Pin> ins;
+    for (auto pin : pins)
+        if (pin.pinDirection == Liberty::Pin::INPUT)
+            ins.push_back(pin);
+
+    return ins;
+}
+
+std::vector<Liberty::Pin> Liberty::Cell::outputs()
+{
+    std::vector<Pin> outs;
+    for (auto pin : pins)
+        if (pin.pinDirection == Liberty::Pin::OUTPUT)
+            outs.push_back(pin);
+
+    return outs;
+}
+
 Liberty::Timing Liberty::Pin::find(Liberty::Timing::type timingT)
 {
     for (auto tim : timing)

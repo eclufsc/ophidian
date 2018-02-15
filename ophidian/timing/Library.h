@@ -32,24 +32,22 @@ namespace ophidian
 namespace timing
 {
 
-enum unateness_t {
-    NEGATIVE_UNATE,
-    POSITIVE_UNATE,
-    NON_UNATE
-};
+using unateness_t = parser::Liberty::Timing::unateness;
+using timing_type_t = parser::Liberty::Timing::type;
 
 class Library
 {
     using LUT = parser::Liberty::LUT;
 
 public:
-    Library(std::shared_ptr<parser::Liberty> & liberty, const standard_cell::StandardCells & stdCells, TimingArcs & arcs);
+    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs);
 
     double computeRiseDelay(const Arc & arc, double rv, double cv);
     double computeFallDelay(const Arc & arc, double rv, double cv);
     double computeRiseSlews(const Arc & arc, double rv, double cv);
     double computeFallSlews(const Arc & arc, double rv, double cv);
     unateness_t unateness(const Arc & arc);
+    timing_type_t type(const Arc & arc);
 
 private:
     entity_system::Property<Arc, LUT> mRiseDelays;
@@ -57,6 +55,7 @@ private:
     entity_system::Property<Arc, LUT> mRiseSlews;
     entity_system::Property<Arc, LUT> mFallSlews;
     entity_system::Property<Arc, unateness_t> mTimingSenses;
+    entity_system::Property<Arc, timing_type_t> mTimingTypes;
 
 };
 
