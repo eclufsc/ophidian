@@ -36,13 +36,19 @@ Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu
 #### Ubuntu artful (17.10) or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
-$ apt install ophidian
+$ apt install libophidian-dev
 ```
 
-#### Debian boster (10) or newer:
+#### Debian buster (10) or newer:
+First you will need to add the **Launchpad PPA for eclufsc** gpg key:
 ```
-$ sudo add-apt-repository -y -u -k hkp://keyserver.ubuntu.com:80 "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
-$ apt install ophidian
+$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
+```
+
+Then add the launchpad repository and install ophidian.
+```
+$ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
+$ apt install libophidian-dev
 ```
 
 ### Arch Linux:
@@ -51,24 +57,11 @@ Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/pac
 $ pacaur -S ophidian-git
 ```
 
-### Red Hat Family:
-We do not support rpm packages yet. Sorry :(
-
 ### Others:
 **If we do not support your distro, consider [compiling it from source!](#compiling-from-source)**
 
 # Hello World!
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
-
-```
-git clone https://gitlab.com/eclufsc/ophidian_project_template hello_world
-cd hello_world
-mkdir build
-cd build
-cmake ..
-make
-./hello_world ../input_files/simple/simple.v ../input_files/simple/simple.def ../input_files/simple/simple.lef
-``` 
 
 # Compiling from Source:
 This section will guide you on the compilation process of the Ophidian library. First make shure you have the following software installed on your system:
@@ -84,38 +77,38 @@ This section will guide you on the compilation process of the Ophidian library. 
 ### Compiling dependencies:
 There are a few more binaries we need to compile beforehand that are not suported by any distribution.
 
-Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies sources through the submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
+Run the provided script **build\_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian\_source\_root"/3rdparty`, compile and install them.
 ```
-$ bash build_dependencies.sh
+$ bash build\_dependencies.sh
 ```
-All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
+All dependencies are now compiled and installed to `"ophidian\_source\_root"/dependencies`.
 
 ### Install dependencies on system:
 If you wish to install dependencies on your system run:
 ```
-$ sudo bash build_dependencies.sh --install_to /usr/local
+$ sudo bash build\_dependencies.sh --install_to /usr/local
 ```
 This will install all dependencies to the `/usr/local` directory.
 
 ### Compiling Ophidian:
-Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the folowing:
+Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the following:
 ```
 mkdir build
 cd build
 cmake ..
 make
 ```
-In order to run the unity tests, inside the build directory, execute the folowing:
+In order to run the ophidian unity tests, inside the build directory, execute the folowing:
 ```
 cd test
 ./ophidian_tests
 ```
-> **ps.:** ophidian_tests needs to be executed from the test directory due to the input file's path being hardcoded.
+> **ps.:** ophidian\_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
 ### Install Ophidian on system:
 If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-to-system) first then run:
 ```
- $ sudo make install
+ $ sudo make DESTDIR=/usr/local install
 ```
 This will install the Ophidian Library to the `/usr/local` directory.
 

@@ -48,7 +48,7 @@ build_on_debian-buster:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
@@ -61,14 +61,14 @@ build_on_debian-sid:
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
         - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
-        - add-apt-repository -y -u -m -k hkp://keyserver.ubuntu.com:80 "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
+        - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
         - apt-get install -qq -y $DEPENDENCIES
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
@@ -87,7 +87,7 @@ build_on_ubuntu-artful:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
@@ -106,7 +106,7 @@ build_on_ubuntu-bionic:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
@@ -124,7 +124,7 @@ build_using_dependencies_script_on_source:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
@@ -142,7 +142,7 @@ build_using_dependencies_script_on_sistem:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release
                 ..
-        - make -j2
+        - make -j
         - cd test
         - ./ophidian_tests
     artifacts:
