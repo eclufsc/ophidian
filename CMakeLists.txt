@@ -56,7 +56,7 @@ set(ophidian_install_include_dir include)
 set(ophidian_install_share_dir share/ophidian)
 
 # Set ophidian copyright path
-set(ophidian_install_copyright_dir shar/doc/ophidian)
+set(ophidian_install_copyright_dir share/doc/ophidian)
 
 ################################################################################
 # Set Linker RPATH options

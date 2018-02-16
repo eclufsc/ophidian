@@ -18,13 +18,9 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
 * [Hello World!](#hello-world)
-* [Build and Installation Guide](#build-and-installation-guide)
-    * [Dependencies](#dependencies)
-    * [Compiling Dependencies](#compiling-dependencies)
-    * [Install Dependencies on System](#install-dependencies-on-system)
-    * [Compiling Ophidian](#compiling-ophidian)
-    * [Install Ophidian on System](#install-ophidian-on-system)
-* []()
+* [Contributing](#contributing)
+    * [Project Structure](#project-structure)
+    * [Build and Installation Guide](#build-and-installation-guide)
 * [Credits](#credits)
 
 # Getting Started!
@@ -134,8 +130,8 @@ This file handles the compilation instructions for the unit tests binary.
 
 ## Build and Installation Guide:
 This section will guide you on the compilation process of the Ophidian library.
-
 The Ophidian library depends on the following third party software:
+
 ### Dependencies:
 * [Cmake](https://cmake.org/) (>= 3.5.2)
 * [Boost](http://www.boost.org/) (>= 1.63)
@@ -150,7 +146,7 @@ Although some of this dependencies like Cmake and Boost are realy well supported
 on any operational system, the others can be a hassle to have on your system. 
 So you can try [building them yourself!](#build-and-install-dependencies) 
 
-### Build and Install Dependencies:
+### Build Dependencies:
 First make shure you have all dependencies dependencies:
 
 #### Dependencies Dependencies:
@@ -158,7 +154,7 @@ First make shure you have all dependencies dependencies:
 * [Bison](https://www.gnu.org/software/bison/)
 * [Flex](https://www.gnu.org/software/flex/)
 
-#### Using the [build_dependencies.sh](#the-ophidian/build_dependencies.sh-script) script:
+#### Using the [build_dependencies.sh](#the-ophidianbuild_dependenciessh-script) script:
 Run the provided script **build_dependencies.sh** located at the source root. 
 
 ```
@@ -175,25 +171,36 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
+> Cmake Configuration options:
+> -DOPHIDIAN_TESTS_FULLY_STATIC=ON will staticly link libc and libc++.
+> -DUNCRUSTIFY_IT=ON will run uncrustify in all files.
+> -DUNCRUSTIFY_CHECK=ON will run check all files formating with uncrustify.
+
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
+
 ```
 cd test
 ./ophidian_tests
 ```
 > **P.S.** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
-### Install Dependencies on System:
+### [optional] Install Dependencies on System:
 If you wish to install dependencies on your system run:
+
 ```
 $ sudo bash build_dependencies.sh --install_to /usr/local
 ```
+
 This will install all dependencies to the `/usr/local` directory.
 
-### Install Ophidian on System:
-If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-on-system) first then run:
+### [optional] Install Ophidian on System:
+If you wish to install Ophidian on your system please make shure your have
+installed all [dependencies on your system](#install-dependencies-on-system) first then run:
+
 ```
  $ sudo make install
 ```
+
 This will install the Ophidian Library to the `/usr/local` directory.
 
 # Credits
