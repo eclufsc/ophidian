@@ -128,6 +128,7 @@ Here you will find directories for each ophidian library unit tests.
 ### The `ophidian/test/CMakeLists.txt` file:
 This file handles the compilation instructions for the unit tests binary.
 
+
 ## Build and Installation Guide:
 This section will guide you on the compilation process of the Ophidian library.
 The Ophidian library depends on the following third party software:
@@ -144,26 +145,24 @@ The Ophidian library depends on the following third party software:
 
 Although some of this dependencies like Cmake and Boost are realy well supported
 on any operational system, the others can be a hassle to have on your system. 
-So you can try [building them yourself!](#build-and-install-dependencies) 
+So you can try [building them yourself!](#build-dependencies) 
 
-### Build Dependencies:
+## Build Dependencies:
 First make shure you have all dependencies dependencies:
 
-#### Dependencies Dependencies:
+### Dependencies Dependencies:
 * [zlib](https://www.zlib.net/)
 * [Bison](https://www.gnu.org/software/bison/)
 * [Flex](https://www.gnu.org/software/flex/)
 
-#### Using the [build_dependencies.sh](#the-ophidianbuild_dependenciessh-script) script:
+### Using the [build_dependencies.sh](#the-ophidianbuild_dependenciessh-script) script:
 Run the provided script **build_dependencies.sh** located at the source root. 
 
 ```
 $ bash build_dependencies.sh
 ```
 
-All dependencies are now compiled and installed to `ophidian/dependencies`.
-
-### Compiling Ophidian:
+## Compiling Ophidian:
 Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the following:
 ```
 mkdir build
@@ -171,10 +170,14 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
-> Cmake Configuration options:
-> -DOPHIDIAN_TESTS_FULLY_STATIC=ON will staticly link libc and libc++.
-> -DUNCRUSTIFY_IT=ON will run uncrustify in all files.
-> -DUNCRUSTIFY_CHECK=ON will run check all files formating with uncrustify.
+
+> **Cmake Configuration options:**
+
+> **-DOPHIDIAN_TESTS_FULLY_STATIC=ON** will staticly link libc and libc++.
+
+> **-DUNCRUSTIFY_IT=ON** will run uncrustify in all files.
+
+> **-DUNCRUSTIFY_CHECK=ON** will run check all files formating with uncrustify.
 
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
 
@@ -184,7 +187,7 @@ cd test
 ```
 > **P.S.** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
-### [optional] Install Dependencies on System:
+## [optional] Install Dependencies on System:
 If you wish to install dependencies on your system run:
 
 ```
@@ -193,15 +196,16 @@ $ sudo bash build_dependencies.sh --install_to /usr/local
 
 This will install all dependencies to the `/usr/local` directory.
 
-### [optional] Install Ophidian on System:
+## [optional] Install Ophidian on System:
 If you wish to install Ophidian on your system please make shure your have
-installed all [dependencies on your system](#install-dependencies-on-system) first then run:
+installed all [dependencies on your system](#optional-install-dependencies-on-system) first then run:
 
 ```
  $ sudo make install
 ```
 
 This will install the Ophidian Library to the `/usr/local` directory.
+
 
 # Credits
 Currently, Ophidian has many collaborators in the same university that support its development.
