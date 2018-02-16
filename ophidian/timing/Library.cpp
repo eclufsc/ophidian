@@ -24,7 +24,7 @@ namespace ophidian
 namespace timing
 {
 
-Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs) :
+Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early) :
     mRiseDelays(arcs.makeProperty<LUT>()),
     mFallDelays(arcs.makeProperty<LUT>()),
     mRiseSlews(arcs.makeProperty<LUT>()),
@@ -39,16 +39,13 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
         {
             for (auto tmg : pin.timing)
             {
-                auto relatedPin = cell.find(tmg.relatedPin);
-                std::string nameFromPin, nameToPin;
+                if (!early && tmg.timingType == timing_type_t::HOLD_RISING ||
+                     early && tmg.timingType == timing_type_t::SETUP_RISING)
+                    continue;
 
-                if (tmg.timingType != timing_type_t::HOLD_RISING) {
-                    nameFromPin = cell.name+":"+relatedPin.name;
-                    nameToPin = cell.name+":"+pin.name;
-                } else {
-                    nameFromPin = cell.name+":"+pin.name;
-                    nameToPin = cell.name+":"+relatedPin.name;
-                }
+                auto relatedPin = cell.find(tmg.relatedPin);
+                std::string nameFromPin = cell.name+":"+relatedPin.name;
+                std::string nameToPin = cell.name+":"+pin.name;
 
                 auto arc = arcs.add(nameFromPin+"->"+nameToPin);
                 arcs.from(arc, stdCells.find(standard_cell::Pin(), nameFromPin));
@@ -95,7 +92,6 @@ timing_type_t Library::type(const Arc & arc)
 {
     return mTimingTypes[arc];
 }
-
 
 } // namespace timing
 } // namespace ophidian

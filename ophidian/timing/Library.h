@@ -40,7 +40,7 @@ class Library
     using LUT = parser::Liberty::LUT;
 
 public:
-    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs);
+    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early);
 
     double computeRiseDelay(const Arc & arc, double rv, double cv);
     double computeFallDelay(const Arc & arc, double rv, double cv);
