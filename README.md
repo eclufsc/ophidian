@@ -17,14 +17,13 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 * [Getting Started](#getting-started)
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
-    * [Red Hat Family](#red-hat-family)
 * [Hello World!](#hello-world)
 * [Compiling from source](#compiling-from-source)
     * [Prerequisites](#prerequisites)
     * [Compiling dependencies](#compiling-dependencies)
-    * [Install dependencies to system](#install-dependencies-to-system)
+    * [Install dependencies on system](#install-dependencies-on-system)
     * [Compiling Ophidian](#compiling-ophidian)
-    * [Install Ophidian to system](#install-ophidian-to-system)
+    * [Install Ophidian on system](#install-ophidian-on-system)
 * [Credits](#credits)
 
 # Getting Started!
@@ -36,7 +35,7 @@ Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu
 #### Ubuntu artful (17.10) or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
-$ apt install libophidian-dev
+$ sudo apt install libophidian-dev
 ```
 
 #### Debian buster (10) or newer:
@@ -48,7 +47,7 @@ $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A
 Then add the launchpad repository and install ophidian.
 ```
 $ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
-$ apt install libophidian-dev
+$ sudo apt install libophidian-dev
 ```
 
 ### Arch Linux:
@@ -77,7 +76,7 @@ This section will guide you on the compilation process of the Ophidian library. 
 ## Compiling dependencies:
 There are a few more binaries we need to compile beforehand that are not suported by any distribution.
 
-Run the provided script **build\_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
+Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
 ```
 $ bash build_dependencies.sh
 ```
@@ -106,9 +105,9 @@ cd test
 > **ps.:** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
 ### Install Ophidian on system:
-If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-to-system) first then run:
+If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-on-system) first then run:
 ```
- $ sudo make DESTDIR=/usr/local install
+ $ sudo make install
 ```
 This will install the Ophidian Library to the `/usr/local` directory.
 
