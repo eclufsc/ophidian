@@ -4,7 +4,6 @@
 # Its main goals are:
 #   - Set up global variables.
 #   - Configure Ophidian dependencies (find_packege).
-#   - Handle Ophidian compilation logic.
 #   - Add subdirectories.
 #
 ################################################################################
@@ -83,23 +82,13 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 ################################################################################
-# Install License
-################################################################################
-
-# License installation rule
-install(
-    FILES ${ophidian_source_dir}/LICENSE
-    DESTINATION ${ophidian_install_share_dir}/copyright
-)
-
-################################################################################
 # Handle raquirements
 ################################################################################
 
 # Set Cmake module path for find_package
 set(CMAKE_MODULE_PATH ${ophidian_source_dir}/cmake)
 
-# Set Cmake prefix path for buildind with local dependencies
+# Set Cmake prefix path for building with local dependencies
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ophidian_source_dir}/dependencies)
 
 # Find Boost

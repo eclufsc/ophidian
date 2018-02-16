@@ -18,27 +18,28 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
 * [Hello World!](#hello-world)
-* [Compiling from source](#compiling-from-source)
-    * [Prerequisites](#prerequisites)
-    * [Compiling dependencies](#compiling-dependencies)
-    * [Install dependencies on system](#install-dependencies-on-system)
+* [Build and Installation Guide](#build-and-installation-guide)
+    * [Dependencies](#dependencies)
+    * [Compiling Dependencies](#compiling-dependencies)
+    * [Install Dependencies on System](#install-dependencies-on-system)
     * [Compiling Ophidian](#compiling-ophidian)
-    * [Install Ophidian on system](#install-ophidian-on-system)
+    * [Install Ophidian on System](#install-ophidian-on-system)
+* []()
 * [Credits](#credits)
 
 # Getting Started!
 Get Ophidian! We support a few of the most used linux environments.
 
-### Debian Family:
+## Debian Family:
 Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu/ophidian).
 
-#### Ubuntu artful (17.10) or newer:
+### Ubuntu artful (17.10) or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ sudo apt install libophidian-dev
 ```
 
-#### Debian buster (10) or newer:
+### Debian buster (10) or newer:
 First you will need to add the **Launchpad PPA for eclufsc** gpg key:
 ```
 $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
@@ -50,46 +51,123 @@ $ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidia
 $ sudo apt install libophidian-dev
 ```
 
-### Arch Linux:
+## Arch Linux:
 Just install it via the AUR package [ophidian-git](https://aur.archlinux.org/packages/ophidian-git/):
 ```
 $ pacaur -S ophidian-git
 ```
 
-### Others:
-**If we do not support your distro, consider [compiling it from source!](#compiling-from-source)**
+## Others:
+**If we do not support your distro, consider [building it from source!](#build-and-installation-guide)**
 
 # Hello World!
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
 
-# Compiling from Source:
-This section will guide you on the compilation process of the Ophidian library. First make shure you have the following software installed on your system:
-## Prerequisites:
-* C compiler
-* C++ 14 compiler 
-* cmake (>= 3.5.2)
-* Boost (<= 1.61 || >= 1.63)
-* Flex
-* Bison
-* zlib
 
-## Compiling dependencies:
-There are a few more binaries we need to compile beforehand that are not suported by any distribution.
+# Contributing:
+So you want to push new code to Ophidian? First you should have an idea of the project structure:
 
-Run the provided script **build_dependencies.sh** located at the source root. It will fetch the dependencies sources through the git submodules located at `"ophidian_source_root"/3rdparty`, compile and install them.
+## Project Structure:
+```
+ophidian
+|   README.md
+|   CMakeLists.txt
+|   build_dependencies.sh
+|   uncrustify.cfg
+|   ...
+|
++---cmake
+|   |   FindLemon.cmake
+|   |   uncrustify_helper.cmake
+|   |   ...
+|
++---3rdparty
+|   |   +---catch
+|   |   +---DEF
+|   |   +---LEF
+|   |   ...
+|
++---ophidian
+|   |   CMakeLists.txt
+|   |   +---circuit
+|   |   +---design
+|   |   +---floorplan
+|   |   ...
+|
++---test
+    |    CMakeLists.txt
+    |   main.cpp
+    |   +---circuit
+    |   +---design
+    |   +---floorplan
+    |   ...
+
+```
+
+### The main `ophidian/CMakeLists.txt` file:
+This is the main Cmake file for the ophidian project, it's goals are set up project variables,
+handle dependencies and include the project subdirectories.
+
+### The `ophidian/build_dependencies.sh` script:
+This script serves as a c++ `npm`, `gem`, `pip`, equivalent.
+It will fetch all third party git submodules located at `ophidian/3rdparty`, 
+compile and install them to `ophidian/dependencies` by default.
+
+### The `ophidian/cmake` directory:
+Here you will have all custom made **cmake modules** used by the `CMakeLists.txt` files.
+
+### The `ophidian/3rdparty` directory:
+This directory holds the git submodules with the source code of ophidian's dependencies.
+
+### The `ophidian/ophidian` directory:
+Here you will have directories for each library developed by the ophidian team.
+Each library directory will have its own `CMakeLists.txt` file with its own compilation instructions.
+
+### The `ophidian/ophidian/CMakeLists.txt` file:
+This file handles the installation rules for the ophidian library.
+
+### The `ophidian/test` directory:
+Here you will find directories for each ophidian library unit tests.
+
+### The `ophidian/test/CMakeLists.txt` file:
+This file handles the compilation instructions for the unit tests binary.
+
+## Build and Installation Guide:
+This section will guide you on the compilation process of the Ophidian library.
+
+The Ophidian library depends on the following third party software:
+### Dependencies:
+* [Cmake](https://cmake.org/) (>= 3.5.2)
+* [Boost](http://www.boost.org/) (>= 1.63)
+* [Lemmon](http://lemon.cs.elte.hu/trac/lemon)
+* [Units](https://gitlab.com/eclufsc/units) 
+* [Flute](https://gitlab.com/eclufsc/Flute)
+* [Verilog-Parser](https://gitlab.com/eclufsc/verilog-parser)
+* [DEF](https://gitlab.com/eclufsc/DEF)
+* [LEF](https://gitlab.com/eclufsc/LEF)
+
+Although some of this dependencies like Cmake and Boost are realy well supported
+on any operational system, the others can be a hassle to have on your system. 
+So you can try [building them yourself!](#build-and-install-dependencies) 
+
+### Build and Install Dependencies:
+First make shure you have all dependencies dependencies:
+
+#### Dependencies Dependencies:
+* [zlib](https://www.zlib.net/)
+* [Bison](https://www.gnu.org/software/bison/)
+* [Flex](https://www.gnu.org/software/flex/)
+
+#### Using the [build_dependencies.sh](#the-ophidian/build_dependencies.sh-script) script:
+Run the provided script **build_dependencies.sh** located at the source root. 
+
 ```
 $ bash build_dependencies.sh
 ```
-All dependencies are now compiled and installed to `"ophidian_source_root"/dependencies`.
 
-### Install dependencies on system:
-If you wish to install dependencies on your system run:
-```
-$ sudo bash build_dependencies.sh --install_to /usr/local
-```
-This will install all dependencies to the `/usr/local` directory.
+All dependencies are now compiled and installed to `ophidian/dependencies`.
 
-## Compiling Ophidian:
+### Compiling Ophidian:
 Ophidian uses Cmake as a build system generator, if you are familiar with it you probably know the following:
 ```
 mkdir build
@@ -104,7 +182,14 @@ cd test
 ```
 > **P.S.** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
-### Install Ophidian on system:
+### Install Dependencies on System:
+If you wish to install dependencies on your system run:
+```
+$ sudo bash build_dependencies.sh --install_to /usr/local
+```
+This will install all dependencies to the `/usr/local` directory.
+
+### Install Ophidian on System:
 If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-on-system) first then run:
 ```
  $ sudo make install
