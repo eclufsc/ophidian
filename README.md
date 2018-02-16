@@ -94,7 +94,7 @@ Ophidian uses Cmake as a build system generator, if you are familiar with it you
 ```
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
@@ -102,7 +102,7 @@ In order to run the ophidian unity tests, inside the build directory, execute th
 cd test
 ./ophidian_tests
 ```
-> **ps.:** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
+> **P.S.** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
 
 ### Install Ophidian on system:
 If you wish to install Ophidian on your system please make shure your have installed all [dependencies on your system](#install-dependencies-on-system) first then run:
