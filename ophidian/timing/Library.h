@@ -32,13 +32,11 @@ namespace ophidian
 namespace timing
 {
 
-using unateness_t = ophidian::parser::Liberty::Timing::unateness ;
+using unateness_t = ophidian::parser::Liberty::Timing::unateness;
 using timing_type_t = ophidian::parser::Liberty::Timing::type;
 
 class Library
 {
-    using LUT = parser::Liberty::LUT;
-
 public:
     Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early);
 
@@ -50,6 +48,8 @@ public:
     timing_type_t type(const Arc & arc);
 
 private:
+    using LUT = parser::Liberty::LUT;
+
     entity_system::Property<Arc, LUT> mRiseDelays;
     entity_system::Property<Arc, LUT> mFallDelays;
     entity_system::Property<Arc, LUT> mRiseSlews;
