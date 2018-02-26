@@ -8,11 +8,11 @@ namespace timing
 
 TimingGraph::TimingGraph(const circuit::Netlist & netlist) :
     mPins(mGraph),
-    mNodeTypes(mGraph),
-    mEdges(mGraph),
-    mEdgeTypes(mGraph),
-    mRiseNodes(netlist.makeProperty<node_t>(circuit::Pin())),
-    mFallNodes(netlist.makeProperty<node_t>(circuit::Pin()))
+    mNodeProperties(mGraph),
+    mArcs(mGraph),
+    mArcProperties(mGraph),
+    mRiseNodes(netlist.makeProperty<NodeType>(circuit::Pin())),
+    mFallNodes(netlist.makeProperty<NodeType>(circuit::Pin()))
 {
 }
 
@@ -21,25 +21,25 @@ TimingGraph::~TimingGraph()
 
 }
 
-const TimingGraph::graph_t & TimingGraph::graph()
+const TimingGraph::GraphType & TimingGraph::graph()
 {
     return mGraph;
 }
 
-size_t TimingGraph::nodesAmount()
+size_t TimingGraph::size(NodeType)
 {
     return lemon::countNodes(mGraph);
 }
 
-size_t TimingGraph::edgesAmount()
+size_t TimingGraph::size(ArcType)
 {
     return lemon::countArcs(mGraph);
 }
 
 
-TimingGraph::node_t TimingGraph::nodeCreate(const circuit::Pin & pin, const node_types & type, entity_system::Property<circuit::Pin, node_t> & map)
+TimingGraph::NodeType TimingGraph::nodeCreate(const circuit::Pin & pin, const NodeProperty & prop, entity_system::Property<circuit::Pin, NodeType> & map)
 {
-    node_t newNode;
+    NodeType newNode;
 
     if (mGraph.valid(map[pin]))
         if (mPins[map[pin]] == pin)
@@ -51,94 +51,103 @@ TimingGraph::node_t TimingGraph::nodeCreate(const circuit::Pin & pin, const node
 
     map[pin] = newNode;
     mPins[newNode] = pin;
-    mNodeTypes[newNode] = type;
+    mNodeProperties[newNode] = prop;
 
     return newNode;
 }
 
-TimingGraph::node_t TimingGraph::riseNodeCreate(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::riseNodeCreate(const circuit::Pin & pin)
 {
-    return nodeCreate(pin, node_types::Rise, mRiseNodes);
+    return nodeCreate(pin, NodeProperty::Rise, mRiseNodes);
 }
 
-TimingGraph::node_t TimingGraph::riseNode(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::riseNode(const circuit::Pin & pin)
 {
     return mRiseNodes[pin];
 }
 
-TimingGraph::node_t TimingGraph::fallNodeCreate(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::fallNodeCreate(const circuit::Pin & pin)
 {
-    return nodeCreate(pin, node_types::Fall, mFallNodes);
+    return nodeCreate(pin, NodeProperty::Fall, mFallNodes);
 }
 
-TimingGraph::node_t TimingGraph::fallNode(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::fallNode(const circuit::Pin & pin)
 {
     return mFallNodes[pin];
 }
 
-TimingGraph::edge_t TimingGraph::edgeCreate(const node_t & from, const node_t & to, const Edge & edge, const edge_types & type)
+TimingGraph::ArcType TimingGraph::arcCreate(const NodeType & from, const NodeType & to, TimingArc timingArc)
 {
-    edge_t graphEdge = mGraph.addArc(from, to);
-    mEdges[graphEdge] = edge;
-    mEdgeTypes[graphEdge] = type;
+    ArcType graphEdge = mGraph.addArc(from, to);
+    mArcs[graphEdge] = *(static_cast<Arc*>(&timingArc));
+    mArcProperties[graphEdge] = ArcProperty::TimingArc;
 
     return graphEdge;
 }
 
-node_types TimingGraph::type(const node_t & node)
+TimingGraph::ArcType TimingGraph::arcCreate(const NodeType & from, const NodeType & to, circuit::Net net)
 {
-    return mNodeTypes[node];
+    ArcType graphEdge = mGraph.addArc(from, to);
+    mArcs[graphEdge] = *(static_cast<Arc*>(&net));
+    mArcProperties[graphEdge] = ArcProperty::Net;
+
+    return graphEdge;
 }
 
-edge_types TimingGraph::type(const edge_t & edge)
+TimingGraph::NodeProperty TimingGraph::property(const NodeType & node)
 {
-    return mEdgeTypes[edge];
+    return mNodeProperties[node];
 }
 
-TimingGraph::node_t TimingGraph::source(const edge_t & edge)
+TimingGraph::ArcProperty TimingGraph::property(const ArcType & arc)
 {
-    return mGraph.source(edge);
+    return mArcProperties[arc];
 }
 
-TimingGraph::node_t TimingGraph::target(const edge_t & edge)
+TimingGraph::NodeType TimingGraph::source(const ArcType & arc)
 {
-    return mGraph.target(edge);
+    return mGraph.source(arc);
 }
 
-TimingGraph::graph_t::OutArcIt TimingGraph::outEdge(const node_t & node)
+TimingGraph::NodeType TimingGraph::target(const ArcType & arc)
 {
-    return graph_t::OutArcIt(mGraph, node);
+    return mGraph.target(arc);
 }
 
-TimingGraph::graph_t::InArcIt TimingGraph::inEdge(const node_t & node)
+TimingGraph::GraphType::OutArcIt TimingGraph::outArc(const NodeType & node)
 {
-    return graph_t::InArcIt(mGraph, node);
+    return GraphType::OutArcIt(mGraph, node);
 }
 
-circuit::Pin TimingGraph::entity(const node_t & node)
+TimingGraph::GraphType::InArcIt TimingGraph::inArc(const NodeType & node)
+{
+    return GraphType::InArcIt(mGraph, node);
+}
+
+circuit::Pin TimingGraph::entity(const NodeType & node)
 {
     return mPins[node];
 }
 
-circuit::Net TimingGraph::entity(circuit::Net, const edge_t & edge)
+circuit::Net TimingGraph::entity(circuit::Net, const ArcType & arc)
 {
-    if (mEdgeTypes[edge] != edge_types::Net)
+    if (mArcProperties[arc] != ArcProperty::Net)
         throw std::logic_error("Incompatible conversion. It is not a net!");
 
-    return mEdges[edge];
+    return mArcs[arc];
 }
 
-Arc TimingGraph::entity(Arc, const edge_t & edge)
+TimingArc TimingGraph::entity(TimingArc, const ArcType & arc)
 {
-    if (mEdgeTypes[edge] != edge_types::TimingArc)
+    if (mArcProperties[arc] != ArcProperty::TimingArc)
         throw std::logic_error("Incompatible conversion. It is not a timing arc!");
 
-    return mEdges[edge];
+    return mArcs[arc];
 }
 
-Edge TimingGraph::entity(Edge, const edge_t & edge)
+TimingGraph::Arc TimingGraph::entity(Arc, const ArcType & arc)
 {
-    return mEdges[edge];
+    return mArcs[arc];
 }
 
 } // timing

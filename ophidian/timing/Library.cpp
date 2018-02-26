@@ -63,32 +63,32 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
     }
 }
 
-double Library::computeRiseDelay(const Arc & arc, double rv, double cv)
+double Library::computeRiseDelay(const TimingArc & arc, double rv, double cv)
 {
     return mRiseDelays[arc].compute(rv, cv);
 }
 
-double Library::computeFallDelay(const Arc & arc, double rv, double cv)
+double Library::computeFallDelay(const TimingArc & arc, double rv, double cv)
 {
     return mFallDelays[arc].compute(rv, cv);
 }
 
-double Library::computeRiseSlews(const Arc & arc, double rv, double cv)
+double Library::computeRiseSlews(const TimingArc & arc, double rv, double cv)
 {
     return mRiseSlews[arc].compute(rv, cv);
 }
 
-double Library::computeFallSlews(const Arc & arc, double rv, double cv)
+double Library::computeFallSlews(const TimingArc & arc, double rv, double cv)
 {
     return mFallSlews[arc].compute(rv, cv);
 }
 
-unateness_t Library::unateness(const Arc & arc)
+unateness_t Library::unateness(const TimingArc & arc)
 {
     return mTimingSenses[arc];
 }
 
-timing_type_t Library::type(const Arc & arc)
+timing_type_t Library::type(const TimingArc & arc)
 {
     return mTimingTypes[arc];
 }

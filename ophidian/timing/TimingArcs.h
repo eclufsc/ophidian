@@ -34,7 +34,7 @@ namespace ophidian
 namespace timing
 {
 
-class Arc : public entity_system::EntityBase
+class TimingArc : public entity_system::EntityBase
 {
 public:
     using entity_system::EntityBase::EntityBase;
@@ -43,8 +43,8 @@ public:
 class TimingArcs
 {
 public:
-    using ArcNotifier = entity_system::EntitySystem<Arc>::NotifierType;
-    using ArcsIterator = entity_system::EntitySystem<Arc>::const_iterator;
+    using ArcNotifier = entity_system::EntitySystem<TimingArc>::NotifierType;
+    using ArcsIterator = entity_system::EntitySystem<TimingArc>::const_iterator;
 
     //! TimingArcs Constructor
     /*!
@@ -67,45 +67,45 @@ public:
 
 //--------------------------- Arcs -------------------------------//
 
-    //! Add Arc
+    //! Add TimingArc
     /*!
        \brief Adds an arc instance. An arc has a name associated to it. If the arc already exist then just return the existing arc.
        \param name Name of the arc, used to identify it.
        \return A handler for the created/existing Cell.
      */
-    Arc add(const std::string & name);
+    TimingArc add(const std::string & name);
 
     //! Add Pin of origin of an arc
     /*!
        \brief Sets the pin of origin of an arc
-       \param arc A handler for the Arc we want to get the pin.
+       \param arc A handler for the TimingArc we want to get the pin.
        \param from_ A handler for the pin of origin.
      */
-    void from(const Arc & arc, const standard_cell::Pin & from_);
+    void from(const TimingArc & arc, const standard_cell::Pin & from_);
 
     //! Add Target pin of an arc
     /*!
        \brief Sets the target pin of an arc
-       \param arc A handler for the Arc we want to get the pin.
+       \param arc A handler for the TimingArc we want to get the pin.
        \param to_ A handler for the target pin.
      */
-    void to(const Arc & arc, const standard_cell::Pin & to_);
+    void to(const TimingArc & arc, const standard_cell::Pin & to_);
 
-    //! Erase Arc
+    //! Erase TimingArc
     /*!
-       \param atc A handler for the Arc to erase.
-       \brief Erases an Arc instance.
+       \param atc A handler for the TimingArc to erase.
+       \brief Erases an TimingArc instance.
      */
-    void erase(const Arc & arc);
+    void erase(const TimingArc & arc);
 
-    //! Allocate space for storing Arc entities
+    //! Allocate space for storing TimingArc entities
     /*!
        \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions arcs), then it is worth reserving space for this amount before starting to build the standard arcs.
        \param size Minimum capacity for the arc container.
      */
     void reserve(uint32_t size);
 
-    //! Size of Arc's System
+    //! Size of TimingArc's System
     /*!
        \brief Returns the number of Arcs.
        \return The number of Arcs.
@@ -125,9 +125,9 @@ public:
      */
     ArcsIterator end() const;
 
-    //! Capacity of the Arc's System
+    //! Capacity of the TimingArc's System
     /*!
-       \return The capacity of the Arc EntitySystem.
+       \return The capacity of the TimingArc EntitySystem.
      */
     uint32_t capacity() const;
 
@@ -137,7 +137,7 @@ public:
        \param The arc name.
        \return Return a arc handler by arc's name.
      */
-    Arc find(const std::string & arcName);
+    TimingArc find(const std::string & arcName);
 
     //! Arcs iterator
     /*!
@@ -148,18 +148,18 @@ public:
     //! Pin of origin of an arc
     /*!
        \brief Returns the pin of origin of the arc.
-       \param arc A handler for the Arc we want to get the pin.
+       \param arc A handler for the TimingArc we want to get the pin.
        \return circuit::Pin Pin of origin
      */
-    standard_cell::Pin from(const Arc & arc) const;
+    standard_cell::Pin from(const TimingArc & arc) const;
 
     //! Target pin of an arc
     /*!
        \brief Returns the target pin of the arc.
-       \param arc A handler for the Arc we want to get the pin.
+       \param arc A handler for the TimingArc we want to get the pin.
        \return circuit::Pin Target pin
      */
-    standard_cell::Pin to(const Arc & arc) const;
+    standard_cell::Pin to(const TimingArc & arc) const;
 
     //! Make Cell Property
     /*!
@@ -168,18 +168,18 @@ public:
        \return An Cell => \p Value Map.
      */
     template <typename Value>
-    entity_system::Property<Arc, Value> makeProperty()
+    entity_system::Property<TimingArc, Value> makeProperty()
     const {
-        return entity_system::Property<Arc, Value>(mArcs);
+        return entity_system::Property<TimingArc, Value>(mArcs);
     }
 
 private:
     //Arcs entity system and properties
-    entity_system::EntitySystem<Arc> mArcs;
-    entity_system::Property<Arc, standard_cell::Pin> mFrom;
-    entity_system::Property<Arc, standard_cell::Pin> mTo;
-    entity_system::Property<Arc, std::string> mArcNames;
-    std::unordered_map<std::string, Arc> mName2Arc;
+    entity_system::EntitySystem<TimingArc> mArcs;
+    entity_system::Property<TimingArc, standard_cell::Pin> mFrom;
+    entity_system::Property<TimingArc, standard_cell::Pin> mTo;
+    entity_system::Property<TimingArc, std::string> mArcNames;
+    std::unordered_map<std::string, TimingArc> mName2Arc;
 
 };
 

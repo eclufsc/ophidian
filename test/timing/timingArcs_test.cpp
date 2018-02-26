@@ -13,14 +13,14 @@ TEST_CASE("TimingArcs: Brand-new TimingArcs must be empty.", "[Timing][TimingArc
     REQUIRE(arcs.begin() == arcs.end());
 }
 
-TEST_CASE("TimingArcs: Add Arc.", "[Timing][TimingArcs]")
+TEST_CASE("TimingArcs: Add TimingArc.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
     auto arc = arcs.add("arc");
     REQUIRE(arcs.size() == 1);
 }
 
-TEST_CASE("TimingArcs: Erase Arc.", "[Timing][TimingArcs]")
+TEST_CASE("TimingArcs: Erase TimingArc.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
     auto arc = arcs.add("arc");
@@ -28,7 +28,7 @@ TEST_CASE("TimingArcs: Erase Arc.", "[Timing][TimingArcs]")
     REQUIRE(arcs.size() == 0);
 }
 
-TEST_CASE("TimingArcs: Arc mapping.", "[Timing][TimingArcs]")
+TEST_CASE("TimingArcs: TimingArc mapping.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
     arcs.add("arc");
@@ -45,7 +45,7 @@ TEST_CASE("TimingArcs: Try add the same arc twice.", "[Timing][TimingArcs]")
     REQUIRE(arcs.size() == 1);
 }
 
-TEST_CASE("TimingArcs: Finding a Arc.", "[Timing][TimingArcs]")
+TEST_CASE("TimingArcs: Finding a TimingArc.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
     auto arc1 = arcs.add("arc1");
@@ -68,7 +68,7 @@ TEST_CASE("TimingArcs: Add from and to of an arc.", "[Timing][TimingArcs]")
     arcs.to(arc, to);
 }
 
-TEST_CASE("TimingArcs: Make Arc Property.", "[Timing][TimingArcs]")
+TEST_CASE("TimingArcs: Make TimingArc Property.", "[Timing][TimingArcs]")
 {
     timing::TimingArcs arcs;
     auto arc1 = arcs.add("arc1");
