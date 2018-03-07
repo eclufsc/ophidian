@@ -1,6 +1,7 @@
 #include "timing_library_test.h"
 #include <catch.hpp>
 
+#include <ophidian/util/Units.h>
 #include <ophidian/timing/Library.h>
 
 namespace
@@ -52,6 +53,8 @@ TEST_CASE_METHOD(LibraryFixture, "Library: info about timing arcs in late mode",
             REQUIRE(lib.computeFallDelay(arc, 0.75, 325.0) == 71.244375);
             REQUIRE(lib.computeRiseSlews(arc, 18.5, 18.5) == 153.75);
             REQUIRE(lib.computeFallSlews(arc, 8.0, 300.0) == 106.536);
+            REQUIRE(lib.capacitance(mArcs.from(arc)) == ophidian::util::farad_t(1.0));
+            REQUIRE(lib.capacitance(mArcs.to(arc)) == ophidian::util::farad_t(0.0));
             break;
         case 1:
             REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
@@ -62,6 +65,8 @@ TEST_CASE_METHOD(LibraryFixture, "Library: info about timing arcs in late mode",
             REQUIRE(lib.computeFallDelay(arc, 2048.0, 300.0) == 115.2);
             REQUIRE(lib.computeRiseSlews(arc, 512.0, 200.0) == 43.2);
             REQUIRE(lib.computeFallSlews(arc, 32.0, 32.0) == 20.7);
+            REQUIRE(lib.capacitance(mArcs.from(arc)) == ophidian::util::farad_t(1.5));
+            REQUIRE(lib.capacitance(mArcs.to(arc)) == ophidian::util::farad_t(0.0));
             break;
         case 2:
             REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
@@ -69,6 +74,8 @@ TEST_CASE_METHOD(LibraryFixture, "Library: info about timing arcs in late mode",
             REQUIRE(lib.type(arc) == ophidian::timing::timing_type_t::SETUP_RISING);
             REQUIRE(lib.computeRiseSlews(arc, 1, 1) == 1.5);
             REQUIRE(lib.computeFallSlews(arc, 1, 1) == 2.5);
+            REQUIRE(lib.capacitance(mArcs.from(arc)) ==  ophidian::util::farad_t(1.5));
+            REQUIRE(lib.capacitance(mArcs.to(arc)) ==  ophidian::util::farad_t(3.49));
             break;
         default:
             break;

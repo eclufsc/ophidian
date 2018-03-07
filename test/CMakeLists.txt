@@ -37,6 +37,7 @@ target_link_libraries(ophidian_tests PUBLIC
     ophidian_placement
     ophidian_standard_cell
     ophidian_timing
+    ophidian_timingdriven_placement
     si2dr_liberty
 )
 

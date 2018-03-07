@@ -1,0 +1,137 @@
+VERSION 5.7 ;
+NAMESCASESENSITIVE ON ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+UNITS
+  DATABASE MICRONS	1000 ;
+END UNITS
+
+MANUFACTURINGGRID	0.0025 ;
+
+SITE core
+  SIZE 0.19 BY 1.71 ;
+  CLASS CORE ;
+END core
+
+LAYER metal1
+  TYPE			ROUTING ;
+  DIRECTION		HORIZONTAL ;
+  PITCH			0.200 ;
+  OFFSET		0.000 ;
+  WIDTH			0.100 ;
+END metal1
+
+LAYER metal2
+  TYPE			ROUTING ;
+  DIRECTION		VERTICAL ;
+  PITCH			0.200 ;
+  OFFSET		0.100 ;
+  WIDTH			0.1 ;
+END metal2
+
+LAYER metal3
+  TYPE			ROUTING ;
+  DIRECTION		HORIZONTAL ;
+  PITCH			0.200 ;
+  OFFSET		0.000 ;
+  WIDTH			0.1 ;
+END metal3
+
+MACRO mStdCell_u1
+    CLASS CORE ;
+    FOREIGN mStdCell_u1 0.000 0.000 ;
+    ORIGIN 0.000 0.000 ;
+    SIZE 0.760 BY 1.71 ;
+    SYMMETRY X Y ;
+    SITE core ;
+    PIN o
+        DIRECTION OUTPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.465 0.150 0.53 1.255 ;
+        RECT 0.415 0.150 0.61 0.28 ;
+        END
+    END o
+    PIN a
+        DIRECTION INPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.210 0.340 0.34 0.405 ;
+        END
+    END a
+END mStdCell_u1
+
+MACRO mStdCell_u2
+    CLASS CORE ;
+    FOREIGN mStdCell_u2 0.000 0.000 ;
+    ORIGIN 0.000 0.000 ;
+    SIZE 0.760 BY 1.71 ;
+    SYMMETRY X Y ;
+    SITE core ;
+    PIN o
+        DIRECTION OUTPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.465 0.150 0.53 1.255 ;
+        RECT 0.415 0.150 0.61 0.28 ;
+        END
+    END o
+    PIN a
+        DIRECTION INPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.210 0.340 0.34 0.405 ;
+        END
+    END a
+END mStdCell_u2
+
+MACRO mStdCell_u3
+    CLASS CORE ;
+    FOREIGN mStdCell_u3 0.000 0.000 ;
+    ORIGIN 0.000 0.000 ;
+    SIZE 0.760 BY 1.71 ;
+    SYMMETRY X Y ;
+    SITE core ;
+    PIN o
+        DIRECTION OUTPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.465 0.150 0.53 1.255 ;
+        RECT 0.415 0.150 0.61 0.28 ;
+        END
+    END o
+    PIN a
+        DIRECTION INPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.210 0.340 0.34 0.405 ;
+        END
+    END a
+END mStdCell_u3
+
+MACRO mStdCell_u4
+    CLASS CORE ;
+    FOREIGN mStdCell_u4 0.000 0.000 ;
+    ORIGIN 0.000 0.000 ;
+    SIZE 0.760 BY 1.71 ;
+    SYMMETRY X Y ;
+    SITE core ;
+    PIN o
+        DIRECTION OUTPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.465 0.150 0.53 1.255 ;
+        RECT 0.415 0.150 0.61 0.28 ;
+        END
+    END o
+    PIN a
+        DIRECTION INPUT ;
+        PORT
+        LAYER metal1 ;
+        RECT 0.210 0.340 0.34 0.405 ;
+        END
+    END a
+END mStdCell_u4
+
+END LIBRARY

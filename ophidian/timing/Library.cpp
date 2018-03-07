@@ -31,7 +31,7 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
     mFallSlews(arcs.makeProperty<LUT>()),
     mTimingSenses(arcs.makeProperty<unateness_t>()),
     mTimingTypes(arcs.makeProperty<timing_type_t>()),
-    mPinCapacitance(stdCells.makeProperty<double>(standard_cell::Pin()))
+    mPinCapacitance(stdCells.makeProperty<util::farad_t>(standard_cell::Pin()))
 {
     for (auto cell : liberty.cells)
     {
@@ -58,7 +58,7 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
                 mFallSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::FALL_CONSTRAINT : LUT::FALL_TRANSITION);
             }
 
-            mPinCapacitance[stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name)] = pin.capacitance;
+            mPinCapacitance[stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name)] = util::farad_t(pin.capacitance);
         }
     }
 }
@@ -91,6 +91,11 @@ unateness_t Library::unateness(const TimingArc & arc)
 timing_type_t Library::type(const TimingArc & arc)
 {
     return mTimingTypes[arc];
+}
+
+util::farad_t Library::capacitance(const standard_cell::Pin & pin) const
+{
+    return mPinCapacitance[pin];
 }
 
 } // namespace timing

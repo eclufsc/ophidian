@@ -45,7 +45,7 @@ public:
        \param stdCells The Standard Cells's system of the circuit.
        \param arcs The Timing Arcs' system of the circuit.
      */
-    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early);
+    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early = false);
 
     //! Compute Rise Delay
     /*!
@@ -103,6 +103,14 @@ public:
      */
     timing_type_t type(const TimingArc & arc);
 
+    //! Capacitance Getter
+    /*!
+       \brief Get the capacitance of a pin.
+       \param pin The Standard Pin.
+       \return Pin's capacitance.
+     */
+    util::farad_t capacitance(const standard_cell::Pin & pin) const;
+
 private:
     using LUT = parser::Liberty::LUT;
 
@@ -112,7 +120,7 @@ private:
     entity_system::Property<TimingArc, LUT> mFallSlews;
     entity_system::Property<TimingArc, unateness_t> mTimingSenses;
     entity_system::Property<TimingArc, timing_type_t> mTimingTypes;
-    entity_system::Property<standard_cell::Pin, double> mPinCapacitance;
+    entity_system::Property<standard_cell::Pin, util::farad_t> mPinCapacitance;
 
 };
 

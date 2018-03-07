@@ -31,7 +31,6 @@ namespace ophidian
 namespace timing
 {
 
-
 //! TimingGraph Class
 /*!
    A graph G(V,E), where V is the set of pins and E is the set of nets or timing arcs.
