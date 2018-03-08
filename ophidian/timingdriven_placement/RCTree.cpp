@@ -90,22 +90,25 @@ void RCTree::insertTap(const Capacitor & cap)
     mTaps.push_back(cap);
 }
 
-std::string RCTree::name(const Capacitor & cap)
+std::string RCTree::name(const Capacitor & cap) const
 {
     return mNames[cap];
 }
 
 RCTree::Capacitor RCTree::capacitor(const std::string name)
 {
-    return mName2Capacitor[name];
+    if (mName2Capacitor.find(name) != mName2Capacitor.end())
+        return mName2Capacitor[name];
+
+    return lemon::INVALID;
 }
 
-RCTree::Capacitor RCTree::oppositeCapacitor(const Capacitor & u, const Resistor & res)
+RCTree::Capacitor RCTree::oppositeCapacitor(const Capacitor & u, const Resistor & res) const
 {
     return mGraph.oppositeNode(u, res);
 }
 
-RCTree::Resistor RCTree::resistor(const Capacitor & u, const Capacitor & v)
+RCTree::Resistor RCTree::resistor(const Capacitor & u, const Capacitor & v) const
 {
     if (!mGraph.valid(u) || !mGraph.valid(v))
         return lemon::INVALID;
@@ -117,7 +120,7 @@ RCTree::Resistor RCTree::resistor(const Capacitor & u, const Capacitor & v)
     return lemon::INVALID;
 }
 
-RCTree::ResistorIt RCTree::resistors(const Capacitor & cap)
+RCTree::ResistorIt RCTree::resistors(const Capacitor & cap) const
 {
     return GraphType::OutArcIt(mGraph, cap);
 }
@@ -129,32 +132,32 @@ void RCTree::capacitance(const Capacitor & cap, const util::farad_t value)
     mLumpedCapacitance += mCapacitances[cap];
 }
 
-util::farad_t RCTree::capacitance(const Capacitor & cap)
+util::farad_t RCTree::capacitance(const Capacitor & cap) const
 {
     return mCapacitances[cap];
 }
 
-util::ohm_t RCTree::resistance(const Resistor & res)
+util::ohm_t RCTree::resistance(const Resistor & res) const
 {
     return mResistances[res];
 }
 
-std::size_t RCTree::size(Capacitor)
+std::size_t RCTree::size(Capacitor) const
 {
     return lemon::countNodes(mGraph);
 }
 
-std::size_t RCTree::size(Resistor)
+std::size_t RCTree::size(Resistor) const
 {
     return lemon::countEdges(mGraph);
 }
 
-util::farad_t RCTree::lumped()
+util::farad_t RCTree::lumped() const
 {
     return mLumpedCapacitance;
 }
 
-const RCTree::GraphType & RCTree::g()
+const RCTree::GraphType & RCTree::g() const
 {
     return mGraph;
 }

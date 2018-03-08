@@ -96,7 +96,7 @@ public:
        \param cap The handler to the capacitor.
        \return The name of the capacitor cap.
      */
-    std::string name(const Capacitor & cap);
+    std::string name(const Capacitor & cap) const;
 
     //! Name's capacitor
     /*!
@@ -113,7 +113,7 @@ public:
        \param res The handler to the resistor.
        \return The opposite capacitor v.
      */
-    Capacitor oppositeCapacitor(const Capacitor & u, const Resistor & res);
+    Capacitor oppositeCapacitor(const Capacitor & u, const Resistor & res) const;
 
     //! Resistor Getter
     /*!
@@ -122,7 +122,7 @@ public:
        \param v The handler to the capacitor.
        \return The handler to the resistor.
      */
-    Resistor resistor(const Capacitor & u, const Capacitor & v);
+    Resistor resistor(const Capacitor & u, const Capacitor & v) const;
 
     //! Resistor iterator
     /*!
@@ -130,7 +130,7 @@ public:
        \param cap The handler to the capacitor.
        \return The Iterator handler.
      */
-    ResistorIt resistors(const Capacitor & cap);
+    ResistorIt resistors(const Capacitor & cap) const;
 
     //! Capacitance assignment.
     /*!
@@ -146,7 +146,7 @@ public:
        \param cap The handler to the capacitor.
        \return The capacitance value.
      */
-    util::farad_t capacitance(const Capacitor & cap);
+    util::farad_t capacitance(const Capacitor & cap) const;
 
     //! Resistance's value.
     /*!
@@ -154,35 +154,35 @@ public:
        \param res The handler to the resistor.
        \return The resistance value.
      */
-    util::ohm_t resistance(const Resistor & res);
+    util::ohm_t resistance(const Resistor & res) const;
 
     //! Capacitor's size.
     /*!
        \brief Returns the amount of capacitors.
        \return The amount of capacitors.
      */
-    std::size_t size(Capacitor);
+    std::size_t size(Capacitor) const;
 
     //! Resistor's size.
     /*!
        \brief Returns the amount of resistor.
        \return The amount of resistor.
      */
-    std::size_t size(Resistor);
+    std::size_t size(Resistor) const;
 
     //! Returns the lumped capacitance.
     /*!
        \brief Returns the sum of the capacitance of all capacitors in the RC Tree.
        \return The RC Tree's lumped capacitance.
      */
-    util::farad_t lumped();
+    util::farad_t lumped() const;
 
     //! RCTree's graph.
     /*!
        \brief Returns the graph of the RCTree
        \return The graph of the RCTree.
      */
-    const GraphType & g();
+    const GraphType & g() const;
 
     //! Invalid iterator
     /*!

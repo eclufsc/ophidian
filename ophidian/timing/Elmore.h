@@ -20,6 +20,8 @@
 #ifndef OPHIDIAN_TIMING_ELMORE_H
 #define OPHIDIAN_TIMING_ELMORE_H
 
+#include <ophidian/timingdriven_placement/RCTree.h>
+
 namespace ophidian
 {
 namespace timing
@@ -28,10 +30,30 @@ namespace timing
 class Elmore
 {
 public:
-    Elmore();
+    using GraphRCTreeType = timingdriven_placement::RCTree::GraphType;
+    using CapacitorRCTree = timingdriven_placement::RCTree::Capacitor;
+    using ResistorRCTree = timingdriven_placement::RCTree::Resistor;
+
+    Elmore(const timingdriven_placement::RCTree & tree, const CapacitorRCTree & source);
+    virtual ~Elmore();
+
+    void update();
+
+    util::second_t at(const CapacitorRCTree cap) const;
+    const GraphRCTreeType::NodeMap<std::pair<CapacitorRCTree, ResistorRCTree>> & pred() const;
+    const std::vector<CapacitorRCTree> & order() const;
+
+private:
+    const timingdriven_placement::RCTree & mTree;
+    GraphRCTreeType::NodeMap<util::second_t> mElmoreDelay;
+    GraphRCTreeType::NodeMap<util::farad_t> mDownstreamCapacitance;
+    GraphRCTreeType::NodeMap<std::pair<CapacitorRCTree, ResistorRCTree>> mPred;
+    std::vector<CapacitorRCTree> mOrder;
+    const CapacitorRCTree mSource;
 };
 
 }   // namespace timing
 }   // namespace ophidian
 
 #endif // OPHIDIAN_TIMING_ELMORE_H
+
