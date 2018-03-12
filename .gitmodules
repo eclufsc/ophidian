@@ -16,3 +16,6 @@
 [submodule "3rdparty/units"]
 	path = 3rdparty/units
 	url = https://gitlab.com/eclufsc/units.git
+[submodule "3rdparty/libertyParser"]
+        path = 3rdparty/libertyParser
+        url = https://github.com/eclufsc/libertyParser.git
