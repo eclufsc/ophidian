@@ -26,125 +26,119 @@
 
 namespace ophidian
 {
-    namespace parser
+namespace parser
+{
+    class Verilog
     {
-        class Verilog
-        {
-        public:
-            enum class PortDirection {
-                INPUT, OUTPUT, INOUT, NONE
-            };
+    public:
+        class Port;
+        class Net;
+        class Instance;
+        class Module;
 
-            class Port
-            {
-            public:
-
-                Port(PortDirection direction, const std::string & name);
-
-                PortDirection direction() const;
-
-                const std::string & name() const;
-
-                bool operator==(const Port & o) const;
-
-            private:
-                PortDirection mDirection;
-                std::string   mName;
-            };
-
-            class Net
-            {
-            public:
-
-                Net(const std::string & name);
-
-                const std::string & name() const;
-
-                bool operator==(const Net & o) const;
-
-            private:
-                std::string mName;
-            };
-
-            class Module;
-            class Instance
-            {
-            public:
-
-                Instance(Module * module, const std::string name);
-
-                Module * module() const;
-
-                const std::string & name() const;
-
-                void mapPort(const Port * port, const Net * net);
-
-                const std::map <const Port *, const Net *> & portMapping() const;
-
-            private:
-                Module *                             mModule;
-                std::string                          mName;
-                std::map <const Port *, const Net *> mPortMapping;
-            };
-
-            class Module
-            {
-            public:
-
-                Module(const std::string & name);
-
-                Port * addPort(Verilog::PortDirection direction, const std::string name);
-
-                Net * addNet(const std::string & name);
-
-                Module * addModule(const std::string & name);
-
-                Instance * addInstance(Module * module, const std::string & name);
-
-                const std::string & name() const;
-
-                const std::list <Port> & ports() const;
-
-                const std::list <Net> & nets() const;
-
-                const std::list <Module> & modules() const;
-
-                const std::list <Instance> & instances() const;
-
-            private:
-                std::string          mName;
-                std::list <Port>     mPorts;
-                std::list <Net>      mNets;
-                std::list <Module>   mModules;
-                std::list <Instance> mInstances;
-            };
-
-            Module * addModule(const std::string & name);
-
-            const std::list <Module> & modules() const;
-
-        private:
-            std::list <Module> mModules;
+        enum class PortDirection {
+            INPUT, OUTPUT, INOUT, NONE
         };
 
-        class VerilogParser
-        {
-        public:
+        Module * addModule(const std::string & name);
 
-            VerilogParser();
+        const std::list<Module> & modules() const;
 
-            ~VerilogParser();
+    private:
+        std::list<Module> mModules;
+    };
 
-            Verilog * readStream(std::istream & in);
+    class Verilog::Port
+    {
+    public:
 
-            Verilog * readFile(const std::string & filename);
+        Port(PortDirection direction, const std::string & name);
 
-        private:
-            struct Impl;
+        PortDirection direction() const;
 
-            std::unique_ptr <Impl> mThis;
-        };
-    }     // namespace parser
+        const std::string & name() const;
+
+        bool operator==(const Port & o) const;
+
+    private:
+        PortDirection mDirection;
+        std::string   mName;
+    };
+
+    class Verilog::Net
+    {
+    public:
+
+        Net(const std::string & name);
+
+        const std::string & name() const;
+
+        bool operator==(const Net & o) const;
+
+    private:
+        std::string mName;
+    };
+
+    class Verilog::Instance
+    {
+    public:
+
+        Instance(Module * module, const std::string name);
+
+        Module * module() const;
+
+        const std::string & name() const;
+
+        void mapPort(const Port * port, const Net * net);
+
+        const std::map<const Port *, const Net *> & portMapping() const;
+
+    private:
+        Module *                            mModule;
+        std::string                         mName;
+        std::map<const Port *, const Net *> mPortMapping;
+    };
+
+    class Verilog::Module
+    {
+    public:
+
+        Module(const std::string & name);
+
+        Port * addPort(Verilog::PortDirection direction, const std::string name);
+
+        Net * addNet(const std::string & name);
+
+        Module * addModule(const std::string & name);
+
+        Instance * addInstance(Module * module, const std::string & name);
+
+        const std::string & name() const;
+
+        const std::list<Port> & ports() const;
+
+        const std::list<Net> & nets() const;
+
+        const std::list<Module> & modules() const;
+
+        const std::list<Instance> & instances() const;
+
+    private:
+        std::string         mName;
+        std::list<Port>     mPorts;
+        std::list<Net>      mNets;
+        std::list<Module>   mModules;
+        std::list<Instance> mInstances;
+    };
+
+    class VerilogParser
+    {
+    public:
+        Verilog * readStream(std::istream & in) const;
+
+        Verilog * readFile(const std::string & filename) const;
+    };
+}     // namespace parser
 }     // namespace ophidian
 
 #endif // VERILOGPARSER_H

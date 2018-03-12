@@ -20,19 +20,19 @@
 
 namespace ophidian
 {
-    namespace placement
+namespace placement
+{
+    void def2placement(
+        const parser::Def & def,
+        placement::Placement & placement,
+        circuit::Netlist & netlist)
     {
-        void def2placement(
-            const parser::Def & def,
-            placement::Placement & placement,
-            circuit::Netlist & netlist)
+        for(auto & component : def.components())
         {
-            for(auto & component : def.components())
-            {
-                util::LocationDbu cellPosition(component.position.x, component.position.y);
-                auto cell = netlist.add(circuit::Cell(), component.name);
-                placement.placeCell(cell, cellPosition);
-            }
+            util::LocationDbu cellPosition{component.position.x(), component.position.y()};
+            auto cell = netlist.add(circuit::Cell(), component.name);
+            placement.placeCell(cell, cellPosition);
         }
-    }     // namespace placement
+    }
+}     // namespace placement
 }     // namespace ophidian

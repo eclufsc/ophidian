@@ -16,104 +16,122 @@
    under the License.
  */
 
+#include <defrReader.hpp>
+
 #include "Def.h"
 #include "ParserException.h"
 
-#include <defrReader.hpp>
-
 namespace ophidian
 {
-    namespace parser
+namespace parser
+{
+    const geometry::Box<util::database_unit_t> & Def::die() const
     {
-        std::unique_ptr <Def> DefParser::readFile(const std::string & filename) const throw (
-            InexistentFile)
-        {
-            auto def = std::make_unique <Def>();
+        return mDie;
+    }
 
-            defrInit();
+    const std::vector<Def::component> & Def::components() const
+    {
+        return mComponents;
+    }
 
-            defrSetUnitsCbk(
-                [](defrCallbackType_e, double number, defiUserData ud) -> int {
-                Def & that = *static_cast <Def *>(ud);
+    const std::vector<Def::row> & Def::rows() const
+    {
+        return mRows;
+    }
+
+    util::database_unit_scalar_t Def::dbu_to_micrometer_convertion_factor() const
+    {
+        return mUnits;
+    }
+
+    std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const
+    {
+        auto def = std::make_unique<Def>();
+
+        defrInit();
+
+        defrSetUnitsCbk(
+            [](defrCallbackType_e, double number, defiUserData ud) -> int {
+                Def & that = *static_cast<Def *>(ud);
                 that.mUnits = number;
 
                 return 0;
             });
 
-            defrSetDieAreaCbk(
-                [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
-                Def & that = *static_cast <Def *>(ud);
-                that.mDie.lower = {box->xl(), box->yl()};
-                that.mDie.upper = {box->xh(), box->yh()};
+        defrSetDieAreaCbk(
+            [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
+                Def & that = *static_cast<Def *>(ud);
+                that.mDie = geometry::Box<util::database_unit_t>{
+                    geometry::Point<util::database_unit_t>{
+                        util::database_unit_t{box->xl()}, util::database_unit_t{box->yl()}
+                    }, geometry::Point<util::database_unit_t>{
+                        util::database_unit_t{box->xh()}, util::database_unit_t{box->yh()}
+                    }
+                };
 
                 return 0;
             });
 
-            defrSetRowCbk(
-                [](defrCallbackType_e, defiRow * defrow, defiUserData ud) -> int {
-                Def & that = *static_cast <Def *>(ud);
+        defrSetRowCbk(
+            [](defrCallbackType_e, defiRow * defrow, defiUserData ud) -> int {
+                Def & that = *static_cast<Def *>(ud);
                 Def::row r;
                 r.name = defrow->name();
                 r.site = defrow->macro();
-                r.num = {defrow->xNum(), defrow->yNum()};
-                r.step = {defrow->xStep(), defrow->yStep()};
-                r.origin = {defrow->x(), defrow->y()};
+                r.num = {
+                    util::database_unit_scalar_t{defrow->xNum()},
+                    util::database_unit_scalar_t{defrow->yNum()}
+                };
+                r.step = {
+                    util::database_unit_t{defrow->xStep()}, util::database_unit_t{defrow->yStep()}
+                };
+                r.origin = {
+                    util::database_unit_t{defrow->x()}, util::database_unit_t{defrow->y()}
+                };
                 that.mRows.push_back(r);
 
                 return 0;
             });
 
-            defrSetComponentStartCbk(
-                [](defrCallbackType_e, int number, defiUserData ud) -> int {
-                Def & that = *static_cast <Def *>(ud);
+        defrSetComponentStartCbk(
+            [](defrCallbackType_e, int number, defiUserData ud) -> int {
+                Def & that = *static_cast<Def *>(ud);
                 that.mComponents.reserve(number);
 
                 return 0;
             });
 
-            defrSetComponentCbk(
-                [](defrCallbackType_e, defiComponent * comp, defiUserData ud) -> int {
-                Def & that = *static_cast <Def *>(ud);
+        defrSetComponentCbk(
+            [](defrCallbackType_e, defiComponent * comp, defiUserData ud) -> int {
+                Def & that = *static_cast<Def *>(ud);
 
                 Def::component c;
                 c.name = comp->id();
                 c.macro = comp->name();
                 c.fixed = comp->isFixed();
-                c.position = {comp->placementX(), comp->placementY()};
+                c.position = {
+                    util::database_unit_t{comp->placementX()},
+                    util::database_unit_t{comp->placementY()}
+                };
                 c.orientation = comp->placementOrientStr();
                 that.mComponents.push_back(c);
 
                 return 0;
             });
 
-            FILE * ifp = fopen(filename.c_str(), "r");
-            if(ifp) {
-                auto res = defrRead(ifp, filename.c_str(), def.get(), true);
-            }
-            else {
-                throw InexistentFile();
-            }
-
-            fclose(ifp);
-            defrClear();
-
-            return def;
+        FILE * ifp = fopen(filename.c_str(), "r");
+        if(ifp) {
+            auto res = defrRead(ifp, filename.c_str(), def.get(), true);
+        }
+        else {
+            throw InexistentFile();
         }
 
-        DefParser::DefParser()
-        {
-        }
+        fclose(ifp);
+        defrClear();
 
-        DefParser::~DefParser()
-        {
-        }
-
-        Def::Def()
-        {
-        }
-
-        Def::~Def()
-        {
-        }
-    }     // namespace parser
+        return def;
+    }
+}     // namespace parser
 }     // namespace ophidian

@@ -20,30 +20,27 @@
 
 namespace ophidian
 {
-    namespace floorplan
+namespace floorplan
+{
+    void lefDef2Floorplan(const parser::Lef & lef, const parser::Def & def, Floorplan & floorplan)
     {
-        void lefDef2Floorplan(
-            const parser::Lef & lef,
-            const parser::Def & def,
-            Floorplan & floorplan)
+        floorplan.chipOrigin(def.die().min_corner());
+        floorplan.chipUpperRightCorner(def.die().max_corner());
+        for(auto & site : lef.sites())
         {
-            floorplan.chipOrigin(util::LocationDbu(def.die().lower.x, def.die().lower.y));
-            floorplan.chipUpperRightCorner(util::LocationDbu(def.die().upper.x, def.die().upper.y));
-            for(auto & site : lef.sites())
-            {
-                floorplan.add(
-                    Site(),
-                    site.name,
-                    util::LocationDbu(site.x * lef.databaseUnits(), site.y * lef.databaseUnits()));
-            }
-            for(auto & row : def.rows())
-            {
-                floorplan.add(
-                    Row(),
-                    util::LocationDbu(row.origin.x, row.origin.y),
-                    row.num.x,
-                    floorplan.find(row.site));
-            }
+            floorplan.add(
+                Site(),
+                site.name,
+                util::LocationDbu(site.x * lef.micron_to_dbu_convertion_factor(), site.y * lef.micron_to_dbu_convertion_factor()));
         }
-    }     // namespace floorplan
+        for(auto & row : def.rows())
+        {
+            floorplan.add(
+                Row(),
+                util::LocationDbu{row.origin},
+                row.num.x(),
+                floorplan.find(row.site));
+        }
+    }
+}     // namespace floorplan
 }     // namespace ophidian

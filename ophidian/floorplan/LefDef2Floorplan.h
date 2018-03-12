@@ -26,13 +26,10 @@
 
 namespace ophidian
 {
-    namespace floorplan
-    {
-        void lefDef2Floorplan(
-            const parser::Lef & lef,
-            const parser::Def & def,
-            Floorplan & floorplan);
-    }     // namespace floorplan
+namespace floorplan
+{
+    void lefDef2Floorplan(const parser::Lef & lef, const parser::Def & def, Floorplan & floorplan);
+}     // namespace floorplan
 }     // namespace ophidian
 
 #endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H

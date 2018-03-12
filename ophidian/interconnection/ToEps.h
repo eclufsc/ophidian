@@ -23,23 +23,23 @@
 
 namespace ophidian
 {
-    namespace interconnection
+namespace interconnection
+{
+    //! Helper class to write a .eps file
+    class ToEps
     {
-//! Helper class to write a .eps file
-        class ToEps
-        {
-        public:
+    public:
 
-            //! Write .eps file
+        //! Write .eps file
 
-            /*!
-               \param el The object one wants to draw.
-               \param filename The name of the output file.
-             */
-            template <class T>
-            static void run(const T & el, const std::string & filename);
-        };
-    }     // namespace interconnection
+        /*!
+           \param el The object one wants to draw.
+           \param filename The name of the output file.
+         */
+        template <class T>
+        static void run(const T & el, const std::string & filename);
+    };
+}     // namespace interconnection
 }     // namespace ophidian
 
 #endif // OPHIDIAN_INTERCONNECTION_TOEPS_H

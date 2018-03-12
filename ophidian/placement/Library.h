@@ -27,66 +27,66 @@
 
 namespace ophidian
 {
-    namespace placement
+namespace placement
+{
+    class Library
     {
-        class Library
+    public:
+
+        //! Library Copy Constructor
+
+        /*!
+           \brief Constructs a placement library.
+         */
+        Library(const standard_cell::StandardCells & std_cells);
+
+        //! Cell geometry getter
+
+        /*!
+           \brief Gets the geometry of a cell.
+           \param cell Cell entity to get the geometry.
+           \return Geometry of the cell.
+         */
+        geometry::MultiBox geometry(const standard_cell::Cell & cell) const
         {
-        public:
+            return mGeometries[cell];
+        }
 
-            //! Library Copy Constructor
+        //! Cell geometry setter
 
-            /*!
-               \brief Constructs a placement library.
-             */
-            Library(const standard_cell::StandardCells & std_cells);
+        /*!
+           \brief Set the geometry of a cell.
+           \param cell Cell entity to set the geometry.
+           \param geometry Gehmetry to assign to cell.
+         */
+        void geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry);
 
-            //! Cell geometry getter
+        //! Pin offset getter
 
-            /*!
-               \brief Gets the geometry of a cell.
-               \param cell Cell entity to get the geometry.
-               \return Geometry of the cell.
-             */
-            geometry::MultiBox geometry(const standard_cell::Cell & cell) const
-            {
-                return mGeometries[cell];
-            }
+        /*!
+           \brief Gets the offset of a pin.
+           \param pin Pin entity to get the offset.
+           \return Offset of the pin.
+         */
+        util::LocationDbu pinOffset(const standard_cell::Pin & pin) const
+        {
+            return mPinOffsets[pin];
+        }
 
-            //! Cell geometry setter
+        //! Pin offset setter
 
-            /*!
-               \brief Set the geometry of a cell.
-               \param cell Cell entity to set the geometry.
-               \param geometry Gehmetry to assign to cell.
-             */
-            void geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry);
+        /*!
+           \brief Sets the offset of a pin.
+           \param pin Pin entity to set the offset.
+           \param offset Offset to assign to pin.
+         */
+        void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
 
-            //! Pin offset getter
-
-            /*!
-               \brief Gets the offset of a pin.
-               \param pin Pin entity to get the offset.
-               \return Offset of the pin.
-             */
-            util::LocationDbu pinOffset(const standard_cell::Pin & pin) const
-            {
-                return mPinOffsets[pin];
-            }
-
-            //! Pin offset setter
-
-            /*!
-               \brief Sets the offset of a pin.
-               \param pin Pin entity to set the offset.
-               \param offset Offset to assign to pin.
-             */
-            void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
-
-        private:
-            entity_system::Property <standard_cell::Cell, geometry::MultiBox> mGeometries;
-            entity_system::Property <standard_cell::Pin, util::LocationDbu>   mPinOffsets;
-        };
-    }     // namespace placement
+    private:
+        entity_system::Property<standard_cell::Cell, geometry::MultiBox> mGeometries;
+        entity_system::Property<standard_cell::Pin, util::LocationDbu>   mPinOffsets;
+    };
+}     // namespace placement
 }     // namespace ophidian
 
 #endif // LIBRARY_H

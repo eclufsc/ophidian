@@ -27,62 +27,62 @@
 
 namespace ophidian
 {
-    namespace placement
+namespace placement
+{
+    class Placement
     {
-        class Placement
+    public:
+
+        //! Placement Constructor
+
+        /*!
+           \brief Constructs a placement system with no properties.
+           \param netlist Circuit netlist.
+         */
+        Placement(const circuit::Netlist & netlist);
+
+        //! Placement Destructor
+
+        /*!
+           \brief Destroys the placement system, including its properties.
+         */
+        ~Placement();
+
+        //! Places a cell
+
+        /*!
+           \brief Places a cell by setting its location
+           \param cell Cell to be placed
+           \param location LocationDbu of the lower left corner of the cell.
+         */
+        void placeCell(const circuit::Cell & cell, const util::LocationDbu & location);
+
+        //! LocationDbu getter
+
+        /*!
+           \brief Get the location of a given cell.
+           \param cell Cell entity to get the location.
+           \return LocationDbu of the cell.
+         */
+        util::LocationDbu cellLocation(const circuit::Cell & cell) const
         {
-        public:
+            return mCellLocations[cell];
+        }
 
-            //! Placement Constructor
+        void placeInputPad(const circuit::Input & input, const util::LocationDbu & location);
 
-            /*!
-               \brief Constructs a placement system with no properties.
-               \param netlist Circuit netlist.
-             */
-            Placement(const circuit::Netlist & netlist);
+        util::LocationDbu inputPadLocation(const circuit::Input & input) const;
 
-            //! Placement Destructor
+        void placeOutputPad(const circuit::Output & output, const util::LocationDbu & location);
 
-            /*!
-               \brief Destroys the placement system, including its properties.
-             */
-            ~Placement();
+        util::LocationDbu outputPadLocation(const circuit::Output & output) const;
 
-            //! Places a cell
-
-            /*!
-               \brief Places a cell by setting its location
-               \param cell Cell to be placed
-               \param location LocationDbu of the lower left corner of the cell.
-             */
-            void placeCell(const circuit::Cell & cell, const util::LocationDbu & location);
-
-            //! LocationDbu getter
-
-            /*!
-               \brief Get the location of a given cell.
-               \param cell Cell entity to get the location.
-               \return LocationDbu of the cell.
-             */
-            util::LocationDbu cellLocation(const circuit::Cell & cell) const
-            {
-                return mCellLocations[cell];
-            }
-
-            void placeInputPad(const circuit::Input & input, const util::LocationDbu & location);
-
-            util::LocationDbu inputPadLocation(const circuit::Input & input) const;
-
-            void placeOutputPad(const circuit::Output & output, const util::LocationDbu & location);
-
-            util::LocationDbu outputPadLocation(const circuit::Output & output) const;
-
-        private:
-            entity_system::Property <circuit::Cell, util::LocationDbu>   mCellLocations;
-            entity_system::Property <circuit::Input, util::LocationDbu>  mInputLocations;
-            entity_system::Property <circuit::Output, util::LocationDbu> mOutputLocations;
-        };
-    }     //namespace placement
+    private:
+        entity_system::Property<circuit::Cell, util::LocationDbu>   mCellLocations;
+        entity_system::Property<circuit::Input, util::LocationDbu>  mInputLocations;
+        entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
+    };
+}     //namespace placement
 }     //namespace ophidian
 
 #endif // OPHIDIAN_PLACEMENT_PLACEMENT_H

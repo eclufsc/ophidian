@@ -25,13 +25,13 @@
 
 namespace ophidian
 {
-    namespace placement
-    {
-        void lef2Library(
-            const parser::Lef & lef,
-            Library & library,
-            standard_cell::StandardCells & stdCells);
-    }     // namespace placement
+namespace placement
+{
+    void lef2Library(
+        const parser::Lef & lef,
+        Library & library,
+        standard_cell::StandardCells & stdCells);
+}     // namespace placement
 }     // namespace ophidian
 
 #endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

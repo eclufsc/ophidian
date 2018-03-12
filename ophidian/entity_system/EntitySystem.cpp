@@ -20,37 +20,37 @@
 
 namespace ophidian
 {
-    namespace entity_system
+namespace entity_system
+{
+    EntityBase::EntityBase():
+            mId(std::numeric_limits<uint32_t>::max()),
+            mSystem(nullptr)
     {
-        EntityBase::EntityBase():
-                mId(std::numeric_limits <uint32_t>::max()),
-                mSystem(nullptr)
-        {
-        }
+    }
 
-        EntityBase::~EntityBase()
-        {
-        }
+    EntityBase::~EntityBase()
+    {
+    }
 
-        bool EntityBase::operator==(const EntityBase & entity) const
-        {
-            return mId == entity.mId && mSystem == entity.mSystem;
-        }
+    bool EntityBase::operator==(const EntityBase & entity) const
+    {
+        return mId == entity.mId && mSystem == entity.mSystem;
+    }
 
-        bool EntityBase::operator!=(const EntityBase & entity) const
-        {
-            return !((*this) == entity);
-        }
+    bool EntityBase::operator!=(const EntityBase & entity) const
+    {
+        return !((*this) == entity);
+    }
 
-        EntityBase::EntityBase(uint32_t id, EntitySystemBase * system):
-                mId(id),
-                mSystem(system)
-        {
-        }
+    EntityBase::EntityBase(uint32_t id, EntitySystemBase * system):
+            mId(id),
+            mSystem(system)
+    {
+    }
 
-        uint32_t EntitySystemBase::id(const EntityBase & en) const
-        {
-            return en.mId;
-        }
-    }     // namespace entity_system
+    uint32_t EntitySystemBase::id(const EntityBase & en) const
+    {
+        return en.mId;
+    }
+}     // namespace entity_system
 }     // namespace ophidian

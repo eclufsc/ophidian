@@ -23,18 +23,18 @@
 
 namespace ophidian
 {
-    namespace parser
+namespace parser
+{
+    class InexistentFile :
+        public std::exception
     {
-        class InexistentFile :
-            public std::exception
+    public:
+        const char * what() const noexcept override
         {
-        public:
-            const char * what() const noexcept override
-            {
-                return "The given file was not found";
-            }
-        };
-    }     // namespace parser
+            return "The given file was not found";
+        }
+    };
+}     // namespace parser
 }     // namespace ophidian
 
 #endif

@@ -20,74 +20,85 @@
 
 namespace ophidian
 {
-    namespace floorplan
+namespace floorplan
+{
+
+    Floorplan::Floorplan():
+            mRows(),
+            mOrigins(mRows),
+            mNumberOfSites(mRows),
+            mSiteTypeOfRow(mRows),
+            mNames(mSites),
+            mDimensions(mSites),
+            mChipOrigin(util::database_unit_t
+        {
+            0.0
+        }, util::database_unit_t{0.0}), mChipUpperRightCorner(
+                util::database_unit_t{0.0},
+                util::database_unit_t{0.0})
     {
-        Floorplan::Floorplan():
-                mChipOrigin(0.0, 0.0),
-                mChipUpperRightCorner(0.0, 0.0),
-                mOrigins(mRows),
-                mNumberOfSites(mRows),
-                mSiteTypeOfRow(mRows),
-                mNames(mSites),
-                mDimensions(mSites)
-        {
-        }
+    }
 
-        Floorplan::~Floorplan()
-        {
-        }
+    Floorplan::~Floorplan()
+    {
+    }
 
-        void Floorplan::chipOrigin(const util::LocationDbu & loc)
-        {
-            mChipOrigin = loc;
-        }
+    void Floorplan::chipOrigin(const util::LocationDbu & loc)
+    {
+        mChipOrigin = loc;
+    }
 
-        void Floorplan::chipUpperRightCorner(const util::LocationDbu & loc)
-        {
-            mChipUpperRightCorner = loc;
-        }
+    void Floorplan::chipUpperRightCorner(const util::LocationDbu & loc)
+    {
+        mChipUpperRightCorner = loc;
+    }
 
-        Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
-        {
-            auto site = mSites.add();
+    Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
+    {
+        auto site = mSites.add();
 
-            mNames[site] = name;
-            mName2Site[name] = site;
-            mDimensions[site] = loc;
+        mNames[site] = name;
+        mName2Site[name] = site;
+        mDimensions[site] = loc;
 
-            return site;
-        }
+        return site;
+    }
 
-        void Floorplan::erase(Site site)
-        {
-            mName2Site.erase(name(site));
-            mSites.erase(site);
-        }
+    void Floorplan::erase(Site site)
+    {
+        mName2Site.erase(name(site));
+        mSites.erase(site);
+    }
 
-        Row Floorplan::add(Row, const util::LocationDbu & loc, size_t num, const Site & site)
-        {
-            auto row = mRows.add();
+    Row Floorplan::add(
+        Row,
+        const util::LocationDbu & loc,
+        util::database_unit_scalar_t num,
+        const Site & site)
+    {
+        auto row = mRows.add();
 
-            mOrigins[row] = loc;
-            mNumberOfSites[row] = num;
-            mSiteTypeOfRow[row] = site;
+        mOrigins[row] = loc;
+        mNumberOfSites[row] = num;
+        mSiteTypeOfRow[row] = site;
 
-            return row;
-        }
+        return row;
+    }
 
-        void Floorplan::erase(const Row & row)
-        {
-            mRows.erase(row);
-        }
+    void Floorplan::erase(const Row & row)
+    {
+        mRows.erase(row);
+    }
 
-        util::LocationDbu Floorplan::rowUpperRightCorner(const Row & row) const
-        {
-            auto   site = mSiteTypeOfRow[row];
-            size_t numSites = mNumberOfSites[row];
+    util::LocationDbu Floorplan::rowUpperRightCorner(const Row & row) const
+    {
+        auto site = mSiteTypeOfRow[row];
 
-            util::LocationDbu uRCorner = mDimensions[site];
+        util::database_unit_scalar_t numSites = mNumberOfSites[row];
 
-            return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
-        }
-    }     //namespace floorplan
+        util::LocationDbu uRCorner = mDimensions[site];
+
+        return util::LocationDbu{uRCorner.x() * numSites, uRCorner.y()};
+    }
+}     //namespace floorplan
 }     //namespace ophidian

@@ -21,210 +21,162 @@
 #ifndef OPHIDIAN_PARSER_LEF_H
 #define OPHIDIAN_PARSER_LEF_H
 
+// std headers
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
 
+// external headers
+#include <lefrReader.hpp>
+
+// ophidian headers
+#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
 namespace ophidian
 {
-    namespace parser
+namespace parser
+{
+    /**
+     * This is an encapsulation of the LEF library made by
+     * Cadence Design Systems to present the sites, layers
+     * and macros of a circuit
+     */
+    class Lef
     {
-/** @brief Lef reads a .lef file and stores its data.
- *
- * This is an encapsulation of the LEF library made by
- * Cadence Design Systems to present the sites, layers
- * and macros of a circuit
- */
-        class Lef
+        using micrometer_t = units::length::micrometer_t;
+        using dbu_t = util::database_unit_t;
+        using micrometer_ratio_t = util::database_unit_scalar_t;
+        using point = geometry::Point<micrometer_t>;
+        using box = geometry::Box<micrometer_t>;
+
+    public:
+
+        /**
+         * @brief An enumeration to represent all the possible symmetries in a site.
+         * They are numbered 1, 2 and 4 to enable binary operations to combine
+         * multiple symmetries
+         */
+        enum symmetry {
+            X= 1, Y= 2, NINETY= 4
+        };
+
+        struct site
         {
-        public:
+            std::string  name; ///< Name of the site
+            std::string  class_name; ///< Class of the site
+            micrometer_t x; ///< Width of the site
+            dbu_t        y; ///< Height of the site
 
-            /**
-             * A structure to represent a site
-             */
-            struct site
-            {
-                /**
-                 * @brief An enumeration to represent all the possible symmetries in a site.
-                 * They are numbered 1, 2 and 4 to enable binary operations to combine
-                 * multiple symmetries
-                 */
-                enum symmetries {
-                    X=  1, Y=2, NINETY=4
-                };
+            /// Stores the site's symmetry in accordance to the Lef::symmetrie enumeration
+            char symmetry = 0;
 
-                std::string name; ///< Name of the site
-                std::string mClass; ///< Class of the site
-                double      x; ///< Width of the site
-                double      y; ///< Height of the site
+            void setXsymmetry(); ///< Sets the X symmetry bit
 
-                /// Stores the site's symmetry in accordance to the site::symmetries enumeration
-                char symmetry {0};
-                void setXsymmetry(); ///< Sets the X symmetry bit
+            void setYsymmetry(); ///< Sets the Y symmetry bit
 
-                void setYsymmetry(); ///< Sets the Y symmetry bit
+            void set90symmetry(); ///< Sets the R90 symmetry bit
+        };
 
-                void set90symmetry(); ///< Sets the R90 symmetry bit
-
-                // void addRowPattern(const char* name, int orient);
+        struct layer
+        {
+            enum direction {
+                NOT_ASSIGNED, HORIZONTAL, VERTICAL
             };
 
-            /**
-             * A structure to represent a layer
-             */
-            struct layer
-            {
-                /// An enumeration to represent all the possible directions of a layer
-                enum directions {
-                    NOT_ASSIGNED, HORIZONTAL, VERTICAL
-                };
+            std::string  name; ///< Name of the layer
+            std::string  type; ///< Type of the layer
+            direction    direction; ///< Direction of the layer
+            micrometer_t pitch; ///< Pitch of the layer
+            micrometer_t offset;
+            micrometer_t width; ///< Width of the layer
+        };
 
-                std::string name; ///< Name of the layer
-                std::string type; ///< Type of the layer
-                directions  direction; ///< Direction of the layer
-                double      pitch; ///< Pitch of the layer
-                double      width; ///< Width of the layer
+        struct macro
+        {
+            struct macro_size
+            {
+                micrometer_t width; ///< Width of the macro
+                micrometer_t height; ///< Height of the macro
             };
 
-            /**
-             * A structure to represent a rectangle
-             */
-            struct rect
+            struct macro_foreign
             {
-                util::LocationMicron firstPoint; ///< coordinates of the first point
-                util::LocationMicron secondPoint; ///< coordinates of the second point
+                std::string  name; ///< Foreign cell name
+                micrometer_t x; ///< Offset in the x coordinate
+                micrometer_t y; ///< Offset in the y coordinate
             };
 
-            /**
-             * A structure to represent a port
-             */
-            struct port
-            {
-                std::vector <std::string> layers; ///< A vector with all the names of all the port layers
-                std::vector <rect>        rects; ///< A vector with all the rects of the port
-            };
-
-            /**
-             * A structure to represent a pin
-             */
             struct pin
             {
-                /// An enumeration to represent all the possible directions of a pin
-                enum directions {
+                enum direction {
                     INPUT, OUTPUT, INOUT, NA
                 };
 
-                std::string        name; ///< The pin name
-                directions         direction {NA}; ///< The pin's direction in accordance to pin::directions
-                std::vector <port> ports; ///< A vector with all the pin ports
+                struct port
+                {
+                    std::vector<std::string>                 layers; ///< A vector with all the names of all the port layers
+                    std::vector<geometry::Box<micrometer_t>> rects; ///< A vector with all the rects of the port
+                };
+
+                std::string       name; ///< The pin name
+                direction         direction{NA}; ///< The pin's direction in accordance to pin::directions
+                std::vector<port> ports;
             };
 
-            /**
-             * A structure to represent the size of a macro
-             */
-            struct macro_size
-            {
-                double x; ///< Width of the macro
-                double y; ///< Height of the macro
-            };
-
-            /**
-             * A structure to represent the foreign property of a macro
-             */
-            struct macro_foreign
-            {
-                std::string name; ///< Foreign cell name
-                double      x; ///< Offset in the x coordinate
-                double      y; ///< Offset in the y coordinate
-            };
-
-            /**
-             * A structure to represent the macro obstructions
-             */
-            struct obs
+            struct obstructions
             {
                 /// Map with all the rectangles of obstruction
-                std::map <std::string, std::vector <rect>> layer2rects;
+                std::map<std::string, std::vector<geometry::Box<micrometer_t>>> layer2rects;
             };
 
-            /**
-             * A structure to represent a macro
-             */
-            struct macro
-            {
-                std::string       name; ///< Name of the macro
-                std::string       mClass; ///< Class of the macro
-                std::vector <pin> pins; ///< Vector with all the macro pins
-                macro_foreign     foreign; ///< Struct with the foreign propertiy
-                macro_size        size; ///< Struct with the size
-                std::string       site; ///< Site name
-                obs               obses; ///< Struct with the macro rectangle geometry
-                macro_size        origin; ///< Struct containing the origin property
-            };
-
-        private:
-            struct Impl;
-
-            const std::unique_ptr <Impl> mThis;
-
-        public:
-
-            /// Constructor.
-
-            /**
-             * Parses a lef file
-             * \param filename path to a lef file. If the file does not exist the LEF
-             * library will generate a segmentation fault
-             */
-            Lef();
-
-            virtual ~Lef();
-
-            /// Returns the lef sites
-
-            /**
-             * Returns a vector containing all the sites in the lef
-             */
-            const std::vector <site> & sites() const;
-
-            /// Returns the lef layers
-
-            /**
-             * Returns a vector containing all the layers in the lef
-             */
-            const std::vector <layer> & layers() const;
-
-            /// Returns the lef macros
-
-            /**
-             * Returns a vector containing all the macros in the lef
-             */
-            const std::vector <macro> & macros() const;
-
-            /// Returns the database units
-
-            /**
-             * The return of this function is equivalent to one micron
-             */
-            double databaseUnits() const;
-
-            friend class LefParser;
+            std::string      name; ///< Name of the macro
+            std::string      class_name; ///< Class of the macro
+            macro_size       size; ///< Struct with the size
+            macro_foreign    foreign; ///< Struct with the foreign propertiy
+            point            origin; ///< Struct containing the origin property
+            std::string      site; ///< Site name
+            std::vector<pin> pins; ///< Vector with all the macro pins
+            obstructions     obstructions; ///< Struct with the macro rectangle geometry
         };
 
-        class LefParser
-        {
-        public:
+        /**
+         * Returns a vector containing all the sites in the lef
+         */
+        const std::vector<site> & sites() const;
 
-            LefParser();
+        /**
+         * Returns a vector containing all the layers in the lef
+         */
+        const std::vector<layer> & layers() const;
 
-            ~LefParser();
+        /**
+         * Returns a vector containing all the macros in the lef
+         */
+        const std::vector<macro> & macros() const;
 
-            void readFile(const std::string & filename, std::unique_ptr <Lef> & inp);
-        };
-    }     /* namespace parser */
+        /**
+         * The return of this function is equivalent to one micron
+         */
+        micrometer_ratio_t micron_to_dbu_convertion_factor() const;
+
+    private:
+        std::vector<site>       mSites;
+        std::vector<layer>      mLayers;
+        std::vector<macro>      mMacros;
+        LefDefParser::lefiUnits mUnits;
+
+    public:
+        friend class LefParser;
+    };
+
+    class LefParser
+    {
+    public:
+        void readFile(const std::string & filename, std::unique_ptr<Lef> & inp) const;
+    };
+}     /* namespace parser */
 }     /* namespace ophidian */
 
 #endif /* OPHIDIAN_PARSER_LEF_H */

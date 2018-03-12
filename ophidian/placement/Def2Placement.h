@@ -26,13 +26,13 @@
 
 namespace ophidian
 {
-    namespace placement
-    {
-        void def2placement(
-            const parser::Def & def,
-            placement::Placement & placement,
-            circuit::Netlist & netlist);
-    }     // namespace placement
+namespace placement
+{
+    void def2placement(
+        const parser::Def & def,
+        placement::Placement & placement,
+        circuit::Netlist & netlist);
+}     // namespace placement
 }     // namespace ophidian
 
 #endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

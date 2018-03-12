@@ -70,9 +70,10 @@ set_target_properties(ophidian_parser PROPERTIES
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_parser
     PUBLIC ophidian_util
+    PUBLIC ophidian_geometry
     PRIVATE verilog-parser::verilogparser
     PRIVATE DEF::def
-    PRIVATE LEF::lef
+    PUBLIC LEF::lef
 )
 
 # Tell cmake the path to look for include files for this target

@@ -20,163 +20,160 @@
 
 namespace ophidian
 {
-    namespace standard_cell
+namespace standard_cell
+{
+    StandardCells::StandardCells():
+            mCellNames(mCells),
+            mPinNames(mPins),
+            mPinDirections(mPins),
+            mCellPins(mCells, mPins)
     {
+    }
 
-        StandardCells::StandardCells():
-                mCellNames(mCells),
-                mPinNames(mPins),
-                mPinDirections(mPins),
-                mCellPins(mCells, mPins)
-        {
+    StandardCells::StandardCells(const StandardCells && stdCell):
+            mCells(std::move(stdCell.mCells)),
+            mPins(std::move(stdCell.mPins)),
+            mCellNames(std::move(stdCell.mCellNames)),
+            mPinNames(std::move(stdCell.mPinNames)),
+            mPinDirections(std::move(stdCell.mPinDirections)),
+            mCellPins(std::move(stdCell.mCellPins))
+    {
+    }
+
+    StandardCells::~StandardCells() = default;
+
+    //--------------------------- Cells -------------------------------//
+
+    Cell StandardCells::add(Cell, const std::string & name)
+    {
+        if(mName2Cell.find(name) == mName2Cell.end()) {
+            auto cell = mCells.add();
+            mCellNames[cell] = name;
+            mName2Cell[name] = cell;
+
+            return cell;
         }
-
-        StandardCells::StandardCells(const StandardCells && stdCell):
-                mCells(std::move(stdCell.mCells)),
-                mPins(std::move(stdCell.mPins)),
-                mCellNames(std::move(stdCell.mCellNames)),
-                mPinNames(std::move(stdCell.mPinNames)),
-                mPinDirections(std::move(stdCell.mPinDirections)),
-                mCellPins(std::move(stdCell.mCellPins))
-        {
+        else {
+            return mName2Cell[name];
         }
+    }
 
-        StandardCells::~StandardCells() = default;
+    void StandardCells::erase(const Cell & cell)
+    {
+        mName2Cell.erase(name(cell));
+        mCells.erase(cell);
+    }
 
-//--------------------------- Cells -------------------------------//
+    void StandardCells::reserve(Cell, uint32_t size)
+    {
+        mCells.reserve(size);
+    }
 
-        Cell StandardCells::add(Cell, const std::string & name)
-        {
-            if(mName2Cell.find(name) == mName2Cell.end()) {
-                auto cell = mCells.add();
-                mCellNames[cell] = name;
-                mName2Cell[name] = cell;
+    uint32_t StandardCells::size(Cell) const
+    {
+        return mCells.size();
+    }
 
-                return cell;
-            }
-            else {
-                return mName2Cell[name];
-            }
+    uint32_t StandardCells::capacity(Cell) const
+    {
+        return mCells.capacity();
+    }
+
+    Cell StandardCells::find(Cell, std::string cellName)
+    {
+        return mName2Cell[cellName];
+    }
+
+    std::string StandardCells::name(const Cell & cell) const
+    {
+        return mCellNames[cell];
+    }
+
+    entity_system::Association<Cell, Pin>::Parts StandardCells::pins(const Cell & cell) const
+    {
+        return mCellPins.parts(cell);
+    }
+
+    ophidian::util::Range<StandardCells::CellsIterator> StandardCells::range(Cell) const
+    {
+        return ophidian::util::Range<StandardCells::CellsIterator>(mCells.begin(), mCells.end());
+    }
+
+    //--------------------------- Pins -------------------------------//
+
+    Pin StandardCells::add(Pin, const std::string & name, PinDirection direction)
+    {
+        if(mName2Pin.find(name) == mName2Pin.end()) {
+            auto pin = mPins.add();
+            mPinNames[pin] = name;
+            mPinDirections[pin] = direction;
+            mName2Pin[name] = pin;
+
+            return pin;
         }
-
-        void StandardCells::erase(const Cell & cell)
-        {
-            mName2Cell.erase(name(cell));
-            mCells.erase(cell);
+        else {
+            return mName2Pin[name];
         }
+    }
 
-        void StandardCells::reserve(Cell, uint32_t size)
-        {
-            mCells.reserve(size);
-        }
+    void StandardCells::erase(const Pin & pin)
+    {
+        mName2Pin.erase(name(pin));
+        mPins.erase(pin);
+    }
 
-        uint32_t StandardCells::size(Cell) const
-        {
-            return mCells.size();
-        }
+    void StandardCells::reserve(Pin, uint32_t size)
+    {
+        mPins.reserve(size);
+    }
 
-        uint32_t StandardCells::capacity(Cell) const
-        {
-            return mCells.capacity();
-        }
+    uint32_t StandardCells::size(Pin) const
+    {
+        return mPins.size();
+    }
 
-        Cell StandardCells::find(Cell, std::string cellName)
-        {
-            return mName2Cell[cellName];
-        }
+    uint32_t StandardCells::capacity(Pin) const
+    {
+        return mPins.capacity();
+    }
 
-        std::string StandardCells::name(const Cell & cell) const
-        {
-            return mCellNames[cell];
-        }
+    Pin StandardCells::find(Pin, std::string pinName)
+    {
+        return mName2Pin[pinName];
+    }
 
-        entity_system::Association <Cell, Pin>::Parts StandardCells::pins(const Cell & cell) const
-        {
-            return mCellPins.parts(cell);
-        }
+    std::string StandardCells::name(const Pin & pin) const
+    {
+        return mPinNames[pin];
+    }
 
-        ophidian::util::Range <StandardCells::CellsIterator> StandardCells::range(Cell) const
-        {
-            return ophidian::util::Range <StandardCells::CellsIterator>(
-                mCells.begin(),
-                mCells.end());
-        }
+    PinDirection StandardCells::direction(const Pin & pin)
+    {
+        return mPinDirections[pin];
+    }
 
-//--------------------------- Pins -------------------------------//
+    Cell StandardCells::owner(const Pin & pin)
+    {
+        return mCellPins.whole(pin);
+    }
 
-        Pin StandardCells::add(Pin, const std::string & name, PinDirection direction)
-        {
-            if(mName2Pin.find(name) == mName2Pin.end()) {
-                auto pin = mPins.add();
-                mPinNames[pin] = name;
-                mPinDirections[pin] = direction;
-                mName2Pin[name] = pin;
+    ophidian::util::Range<StandardCells::PinsIterator> StandardCells::range(Pin) const
+    {
+        return ophidian::util::Range<StandardCells::PinsIterator>(mPins.begin(), mPins.end());
+    }
 
-                return pin;
-            }
-            else {
-                return mName2Pin[name];
-            }
-        }
+    //--------------------------- Association -------------------------------//
 
-        void StandardCells::erase(const Pin & pin)
-        {
-            mName2Pin.erase(name(pin));
-            mPins.erase(pin);
-        }
+    //! Add Pin into Cell
 
-        void StandardCells::reserve(Pin, uint32_t size)
-        {
-            mPins.reserve(size);
-        }
-
-        uint32_t StandardCells::size(Pin) const
-        {
-            return mPins.size();
-        }
-
-        uint32_t StandardCells::capacity(Pin) const
-        {
-            return mPins.capacity();
-        }
-
-        Pin StandardCells::find(Pin, std::string pinName)
-        {
-            return mName2Pin[pinName];
-        }
-
-        std::string StandardCells::name(const Pin & pin) const
-        {
-            return mPinNames[pin];
-        }
-
-        PinDirection StandardCells::direction(const Pin & pin)
-        {
-            return mPinDirections[pin];
-        }
-
-        Cell StandardCells::owner(const Pin & pin)
-        {
-            return mCellPins.whole(pin);
-        }
-
-        ophidian::util::Range <StandardCells::PinsIterator> StandardCells::range(Pin) const
-        {
-            return ophidian::util::Range <StandardCells::PinsIterator>(mPins.begin(), mPins.end());
-        }
-
-//--------------------------- Association -------------------------------//
-
-//! Add Pin into Cell
-
-/*!
-   \brief Adds a Pin to a given Cell.
-   \param cell A handler for the Cell we want to add a Pin.
-   \param pin A handler for the Pin we want to add in \p cell.
- */
-        void StandardCells::add(const Cell & cell, const Pin & pin)
-        {
-            mCellPins.addAssociation(cell, pin);
-        }
-    }     //namespace ophidian
+    /*!
+       \brief Adds a Pin to a given Cell.
+       \param cell A handler for the Cell we want to add a Pin.
+       \param pin A handler for the Pin we want to add in \p cell.
+     */
+    void StandardCells::add(const Cell & cell, const Pin & pin)
+    {
+        mCellPins.addAssociation(cell, pin);
+    }
+}     //namespace ophidian
 }     //namespace standard_cell
