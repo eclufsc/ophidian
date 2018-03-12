@@ -1,5 +1,23 @@
-#ifndef ENTITYSYSTEMMAP_H
-#define ENTITYSYSTEMMAP_H
+/*
+ * Copyright 2017 Ophidian
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+ */
+
+#ifndef OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H
+#define OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H
 
 #include <lemon/maps.h>
 #include "EntitySystem.h"
@@ -10,119 +28,126 @@ namespace ophidian
     {
         template <class Entity_, class Value_>
         class Property :
-            public lemon::MapBase<Entity_, Value_>,
-            public EntitySystem<Entity_>::NotifierType::ObserverBase
+            public lemon::MapBase <Entity_, Value_>,
+            public EntitySystem <Entity_>::NotifierType::ObserverBase
         {
-            public:
-                using Parent = typename EntitySystem<Entity_>::NotifierType::ObserverBase;
-                using Value = Value_;
-                using Entity = Entity_;
-                using ContainerType = std::vector<Value>;
+        public:
+            using Parent = typename EntitySystem <Entity_>::NotifierType::ObserverBase;
+            using Value = Value_;
+            using Entity = Entity_;
+            using ContainerType = std::vector <Value>;
 
-                Property(const EntitySystem<Entity_>& system, Value defaultValue = Value()) :
+            Property(const EntitySystem <Entity_> & system, Value defaultValue = Value()):
                     Parent(*system.notifier()),
-                    defaultValue_(defaultValue)
-                {
-                    properties_.reserve(system.capacity());
-                    properties_.resize(system.size());
-                    properties_.assign(properties_.size(), defaultValue_);
-                }
+                    mDefaultValue(defaultValue)
+            {
+                mProperties.reserve(system.capacity());
+                mProperties.resize(system.size());
+                mProperties.assign(mProperties.size(), mDefaultValue);
+            }
 
-                Property() :
+            Property():
                     Parent()
-                {
+            {
+            }
 
-                }
+            Property & operator=(const Property & o)
+            {
+                mProperties = o.mProperties;
+                Parent::attach(*o.notifier());
 
-                Property& operator=(const Property& o)
-                {
-                    properties_ = o.properties_;
-                    Parent::attach(*o.notifier());
-                    return *this;
-                }
+                return *this;
+            }
 
-                ~Property() override
-                {
+            ~Property() override
+            {
+            }
 
-                }
+            typename ContainerType::reference operator[](const Entity & entity)
+            {
+                return mProperties[Parent::notifier()->id(entity)];
+            }
 
-                typename ContainerType::reference operator[](const Entity& entity)
-                {
-                    return properties_[Parent::notifier()->id(entity)];
-                }
-                typename ContainerType::const_reference operator[](const Entity& entity) const
-                {
-                    return properties_[Parent::notifier()->id(entity)];
-                }
+            typename ContainerType::const_reference operator[](const Entity & entity) const
+            {
+                return mProperties[Parent::notifier()->id(entity)];
+            }
 
-                typename ContainerType::iterator begin()
-                {
-                    return properties_.begin();
-                }
-                typename ContainerType::iterator end()
-                {
-                    return properties_.end();
-                }
+            typename ContainerType::iterator begin()
+            {
+                return mProperties.begin();
+            }
 
-                typename ContainerType::const_iterator begin() const
-                {
-                    return properties_.begin();
-                }
-                typename ContainerType::const_iterator end() const
-                {
-                    return properties_.end();
-                }
-                typename ContainerType::size_type size() const
-                {
-                    return properties_.size();
-                }
-                bool empty() const
-                {
-                    return properties_.empty();
-                }
+            typename ContainerType::iterator end()
+            {
+                return mProperties.end();
+            }
 
-                void reserve(std::uint32_t size) override
-                {
-                    properties_.reserve(size);
-                }
+            typename ContainerType::const_iterator begin() const
+            {
+                return mProperties.begin();
+            }
 
-                void shrinkToFit() override
-                {
-                    properties_.shrink_to_fit();
-                }
+            typename ContainerType::const_iterator end() const
+            {
+                return mProperties.end();
+            }
 
-                std::uint32_t capacity() const
-                {
-                    return properties_.capacity();
-                }
+            typename ContainerType::size_type size() const
+            {
+                return mProperties.size();
+            }
 
-            protected:
+            bool empty() const
+            {
+                return mProperties.empty();
+            }
 
-                virtual void add(const Entity& item) override
-                {
-                    properties_.push_back(defaultValue_);
-                }
-                virtual void add(const std::vector<Entity>& items) override
-                {
-                    properties_.resize(properties_.size() + items.size(), defaultValue_);
-                }
-                virtual void erase(const Entity& item) override
-                {
-                    std::swap(properties_.back(), properties_[Parent::notifier()->id(item)]);
-                    properties_.pop_back();
-                }
+            void reserve(std::uint32_t size) override
+            {
+                mProperties.reserve(size);
+            }
 
-                virtual void clear() override
-                {
-                    properties_.clear();
-                }
+            void shrinkToFit() override
+            {
+                mProperties.shrink_to_fit();
+            }
 
-            protected:
-                ContainerType properties_;
-            private:
-                const Value defaultValue_;
+            std::uint32_t capacity() const
+            {
+                return mProperties.capacity();
+            }
+
+        protected:
+
+            virtual void add(const Entity & item) override
+            {
+                mProperties.push_back(mDefaultValue);
+            }
+
+            virtual void add(const std::vector <Entity> & items) override
+            {
+                mProperties.resize(mProperties.size() + items.size(), mDefaultValue);
+            }
+
+            virtual void erase(const Entity & item) override
+            {
+                std::swap(mProperties.back(), mProperties[Parent::notifier()->id(item)]);
+                mProperties.pop_back();
+            }
+
+            virtual void clear() override
+            {
+                mProperties.clear();
+            }
+
+        protected:
+            ContainerType mProperties;
+
+        private:
+            const Value mDefaultValue;
         };
-    }
-}
+    }     // namespace entity_system
+}     // namespace ophidian
 
-#endif // ENTITYSYSTEMMAP_H
+#endif // OPHIDIAN_ENTITY_SYSTEM_ENTITYSYSTEMMAP_H

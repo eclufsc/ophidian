@@ -1,3 +1,12 @@
-add_subdirectory(Lemon)
-add_subdirectory(verilog-parser)
-add_subdirectory(Flute)
+################################################################################
+# This is the CMakeLists file for the Ophidian Build Dependencies directory.
+# 
+#   - Fetch dependencies.
+#   - Configure dependencies.
+#
+################################################################################
+
+# Add Catch
+add_subdirectory(catch)
+
+

@@ -1,44 +1,88 @@
-set(SOURCE
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-        )
+################################################################################
+# This is the CMakeLists file for the Ophidian library Test binary. 
+#
+# Its main goals are:
+#   - Fetch test files.
+#   - Configure Catch test library.
+#   - Add test target.
+#   - Link test target.
+#   - Prepare test input environment.
+################################################################################
 
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE .)
+# Fetch test files recursevely
+file(GLOB_RECURSE ophidian_tests_source
+    "*.cpp"
+    "*.h"
+)
 
-INCLUDE_DIRECTORIES( ${THIRD_PARTY_PATH} )
+if(UNCRUSTIFY_IT)
+    include(uncrustify_helper)
+    uncrustify_it(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
 
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/DEF/lib/ ${THIRD_PARTY_PATH}/LEF/lib/ )
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/libertyParser/lib/ )
-LINK_DIRECTORIES( ${THIRD_PARTY_PATH}/libertyParser/include/ )
+if(RUN_UNCRUSTIFY_CHECK)
+    include(uncrustify_helper)
+    uncrustify_check(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
 
+# Add test target
+add_executable(ophidian_tests ${ophidian_tests_source})
 
-add_subdirectory(entity_system)
-add_subdirectory(circuit)
-add_subdirectory(geometry)
-add_subdirectory(parser)
-add_subdirectory(util)
-add_subdirectory(interconnection)
+# Link target dependencies
+target_link_libraries(ophidian_tests
+    PRIVATE Catch
+    PRIVATE ophidian_circuit_static
+    PRIVATE ophidian_design_static
+    PRIVATE ophidian_entity_system_static
+    PRIVATE ophidian_floorplan_static
+    PRIVATE ophidian_geometry_static
+    PRIVATE ophidian_interconnection_static
+    PRIVATE ophidian_parser_static
+    PRIVATE ophidian_placement_static
+    PRIVATE ophidian_standard_cell_static
+)
 
-add_executable( run_tests ${SOURCE} ${HEADERS} )
-target_link_libraries(run_tests Catch ophidian_entitysystem ophidian_circuit ophidian_geometry ophidian_parser ophidian_interconnection emon si2dr_liberty)
+if(OPHIDIAN_TESTS_FULLY_STATIC)
+    # Link EVERYTHING staticly!
+    set_target_properties(ophidian_tests PROPERTIES
+        LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
+    )
+endif()
 
-include_directories(${CMAKE_SOURCE_DIR})
-add_test(NAME unit_test COMMAND run_tests "~[Profiling] ~[superblue18obs]")
-
-add_custom_command(
-        TARGET run_tests POST_BUILD
-        COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/input_files ${CMAKE_CURRENT_BINARY_DIR}/input_files
-        )
+################################################################################
+# Prepare test input environment. 
+################################################################################
 
 message("Creating symlink for test files")
-execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/test/input_files ${CMAKE_BINARY_DIR}/test/.
-                RESULT_VARIABLE result )
-execute_process(COMMAND tar -zxvf superblue18.tar.gz
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/input_files
-                RESULT_VARIABLE result )
+execute_process(
+    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/test/.
+    RESULT_VARIABLE result
+)
+
+find_file(POWV9 "POWV9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
+find_file(PORT9 "PORT9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
 
 message("Creating symlink FLUTE LUTs")
-execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${CMAKE_BINARY_DIR}/test/.
-                RESULT_VARIABLE result )
-execute_process(COMMAND ln -f -s ${CMAKE_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${CMAKE_BINARY_DIR}/test/.
-                RESULT_VARIABLE result )
+execute_process(
+    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/test/.
+    RESULT_VARIABLE result
+)
+execute_process(
+    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/test/.
+    RESULT_VARIABLE result
+)
+
+################################################################################
+# Add test to ctest
+################################################################################
+
+enable_testing()
+add_test(NAME unit_test COMMAND ophidian_tests)

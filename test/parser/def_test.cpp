@@ -13,7 +13,7 @@ TEST_CASE("Def: Try to load inexistent file", "[parser][Def]")
 TEST_CASE("Def: Loading simple.def", "[parser][Def]")
 {
     ophidian::parser::DefParser reader;
-    std::shared_ptr<ophidian::parser::Def> parser = reader.readFile("input_files/simple.def");
+    std::shared_ptr<ophidian::parser::Def> parser = reader.readFile("./input_files/simple/simple.def");
     
     SECTION("Def: Diearea lower and upper points"){
         CHECK(parser->die().lower.x == 0);

@@ -1,21 +1,21 @@
-[submodule "3rdparty/QtPropertyBrowser"]
-	path = 3rdparty/QtPropertyBrowser
-	url = https://github.com/commontk/QtPropertyBrowser
-[submodule "3rdparty/Lemon"]
-	path = 3rdparty/Lemon
-	url = https://github.com/eclufsc/Lemon.git
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
-        url = https://github.com/eclufsc/verilog-parser.git
+    url = https://gitlab.com/eclufsc/verilog-parser.git
 [submodule "3rdparty/DEF"]
 	path = 3rdparty/DEF
-	url = http://github.com/eclufsc/DEF.git
+	url = https://gitlab.com/eclufsc/DEF.git
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
-	url = https://github.com/eclufsc/Flute.git
+	url = https://gitlab.com/eclufsc/Flute.git
+[submodule "3rdparty/LEF"]
+	path = 3rdparty/LEF
+	url = https://gitlab.com/eclufsc/LEF.git
+[submodule "3rdparty/Lemon"]
+	path = 3rdparty/Lemon
+	url = https://gitlab.com/eclufsc/Lemon.git
+[submodule "3rdparty/units"]
+	path = 3rdparty/units
+	url = https://gitlab.com/eclufsc/units.git
 [submodule "3rdparty/libertyParser"]
         path = 3rdparty/libertyParser
         url = https://github.com/eclufsc/libertyParser.git
-[submodule "3rdparty/LEF"]
-	path = 3rdparty/LEF
-	url = https://github.com/eclufsc/LEF.git

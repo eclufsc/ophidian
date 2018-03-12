@@ -1,276 +1,346 @@
+/*
+ * Copyright 2017 Ophidian
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+ */
+
 #include "Netlist.h"
 
-namespace ophidian {
-namespace circuit {
-
-Netlist::Netlist() :
-    netPins_(nets_, pins_),
-    cellPins_(cells_, pins_),
-    pinInput_(pins_, inputs_),
-    pinOutput_(pins_, outputs_)
+namespace ophidian
 {
-}
+    namespace circuit
+    {
+        Netlist::Netlist():
+                mNetPins(mNets, mPins),
+                mCellPins(mCells, mPins),
+                mPinInput(mPins, mInputs),
+                mPinOutput(mPins, mOutputs),
+                mCellNames(makeProperty <std::string>(Cell())),
+                mPinNames(makeProperty <std::string>(Pin())),
+                mNetNames(makeProperty <std::string>(Net()))
+        {
+        }
 
-Netlist::Netlist(Netlist &&nl) :
-    cells_(std::move(nl.cells_)),
-    pins_(std::move(nl.pins_)),
-    nets_(std::move(nl.nets_)),
-    inputs_(std::move(nl.inputs_)),
-    netPins_(std::move(nl.netPins_)),
-    cellPins_(std::move(nl.cellPins_)),
-    pinInput_(std::move(nl.pinInput_)),
-    pinOutput_(std::move(nl.pinOutput_))
-{
+        Netlist::~Netlist()
+        {
+        }
 
-}
+        Cell Netlist::add(Cell, std::string cellName)
+        {
+            if(mName2Cell.find(cellName) == mName2Cell.end()) {
+                auto cell = mCells.add();
+                mCellNames[cell] = cellName;
+                mName2Cell[cellName] = cell;
 
-Netlist::~Netlist()
-{
+                return cell;
+            }
+            else {
+                return mName2Cell[cellName];
+            }
+        }
 
-}
+        void Netlist::erase(const Cell & c)
+        {
+            mName2Cell.erase(mCellNames[c]);
+            mCells.erase(c);
+        }
 
-Cell Netlist::add(Cell)
-{
-    return cells_.add();
-}
+        uint32_t Netlist::size(Cell) const
+        {
+            return mCells.size();
+        }
 
-void Netlist::erase(const Cell &c)
-{
-    cells_.erase(c);
-}
+        Pin Netlist::add(Pin, std::string pinName)
+        {
+            if(mName2Pin.find(pinName) == mName2Pin.end()) {
+                auto pin = mPins.add();
+                mPinNames[pin] = pinName;
+                mName2Pin[pinName] = pin;
 
-uint32_t Netlist::size(Cell) const
-{
-    return cells_.size();
-}
+                return pin;
+            }
+            else {
+                return mName2Pin[pinName];
+            }
+        }
 
-Pin Netlist::add(Pin)
-{
-    return pins_.add();
-}
+        void Netlist::erase(const Pin & en)
+        {
+            mName2Pin.erase(mPinNames[en]);
+            mPins.erase(en);
+        }
 
-void Netlist::erase(const Pin &en)
-{
-    pins_.erase(en);
-}
+        uint32_t Netlist::size(Pin) const
+        {
+            return mPins.size();
+        }
 
-uint32_t Netlist::size(Pin) const
-{
-    return pins_.size();
-}
+        Net Netlist::add(Net, std::string netName)
+        {
+            if(mName2Net.find(netName) == mName2Net.end()) {
+                auto net = mNets.add();
+                mNetNames[net] = netName;
+                mName2Net[netName] = net;
 
-Net Netlist::add(Net)
-{
-    return nets_.add();
-}
+                return net;
+            }
+            else {
+                return mName2Net[netName];
+            }
+        }
 
-void Netlist::erase(const Net &en)
-{
-    nets_.erase(en);
-}
+        void Netlist::erase(const Net & en)
+        {
+            mName2Net.erase(mNetNames[en]);
+            mNets.erase(en);
+        }
 
-uint32_t Netlist::size(Net) const
-{
-    return nets_.size();
-}
+        uint32_t Netlist::size(Net) const
+        {
+            return mNets.size();
+        }
 
-Net Netlist::net(const Pin &p) const
-{
-    return netPins_.whole(p);
-}
+        Net Netlist::net(const Pin & p) const
+        {
+            return mNetPins.whole(p);
+        }
 
-void Netlist::disconnect(const Pin &p)
-{
-    netPins_.eraseAssociation(net(p), p);
-}
+        void Netlist::disconnect(const Pin & p)
+        {
+            mNetPins.eraseAssociation(net(p), p);
+        }
 
-Cell Netlist::cell(const Pin &p) const
-{
-    return cellPins_.whole(p);
-}
+        Cell Netlist::cell(const Pin & p) const
+        {
+            return mCellPins.whole(p);
+        }
 
-entity_system::EntitySystem<Pin>::NotifierType *Netlist::notifier(Pin) const
-{
-    return pins_.notifier();
-}
+        entity_system::EntitySystem <Pin>::NotifierType * Netlist::notifier(Pin) const {
+            return mPins.notifier();
+        }
 
-void Netlist::reserve(Pin, uint32_t size)
-{
-    pins_.reserve(size);
-}
+        void Netlist::reserve(Pin, uint32_t size)
+        {
+            mPins.reserve(size);
+            mName2Pin.reserve(size);
+        }
 
-uint32_t Netlist::capacity(Pin) const
-{
-    return pins_.capacity();
-}
+        uint32_t Netlist::capacity(Pin) const
+        {
+            return mPins.capacity();
+        }
 
-entity_system::EntitySystem<Cell>::const_iterator Netlist::begin(Cell) const
-{
-    return cells_.begin();
-}
+        Pin Netlist::find(Pin, std::string pinName)
+        {
+            return mName2Pin[pinName];
+        }
 
-entity_system::EntitySystem<Cell>::const_iterator Netlist::end(Cell) const
-{
-    return cells_.end();
-}
+        std::string Netlist::name(const Pin & pin) const
+        {
+            return mPinNames[pin];
+        }
 
-void Netlist::add(const Cell &c, const Pin &p)
-{
-    cellPins_.addAssociation(c, p);
-}
+        entity_system::EntitySystem <Cell>::const_iterator Netlist::begin(Cell) const
+        {
+            return mCells.begin();
+        }
 
-entity_system::EntitySystem<Cell>::NotifierType *Netlist::notifier(Cell) const
-{
-    return cells_.notifier();
-}
+        entity_system::EntitySystem <Cell>::const_iterator Netlist::end(Cell) const
+        {
+            return mCells.end();
+        }
 
-void Netlist::reserve(Cell, uint32_t size)
-{
-    cells_.reserve(size);
-}
+        void Netlist::add(const Cell & c, const Pin & p)
+        {
+            mCellPins.addAssociation(c, p);
+        }
 
-uint32_t Netlist::capacity(Cell) const
-{
-    return cells_.capacity();
-}
+        entity_system::EntitySystem <Cell>::NotifierType * Netlist::notifier(Cell) const {
+            return mCells.notifier();
+        }
 
-entity_system::Association<Cell, Pin>::Parts Netlist::pins(const Cell &cell) const
-{
-    return cellPins_.parts(cell);
-}
+        void Netlist::reserve(Cell, uint32_t size)
+        {
+            mCells.reserve(size);
+            mName2Cell.reserve(size);
+        }
 
-entity_system::EntitySystem<Pin>::const_iterator Netlist::begin(Pin) const
-{
-    return pins_.begin();
-}
+        uint32_t Netlist::capacity(Cell) const
+        {
+            return mCells.capacity();
+        }
 
-entity_system::EntitySystem<Pin>::const_iterator Netlist::end(Pin) const
-{
-    return pins_.end();
-}
+        Cell Netlist::find(Cell, std::string cellName)
+        {
+            return mName2Cell[cellName];
+        }
 
-entity_system::EntitySystem<Net>::const_iterator Netlist::begin(Net) const
-{
-    return nets_.begin();
-}
+        std::string Netlist::name(const Cell & cell) const
+        {
+            return mCellNames[cell];
+        }
 
-entity_system::EntitySystem<Net>::const_iterator Netlist::end(Net) const
-{
-    return nets_.end();
-}
+        entity_system::Association <Cell, Pin>::Parts Netlist::pins(const Cell & cell) const
+        {
+            return mCellPins.parts(cell);
+        }
 
-void Netlist::connect(const Net &net, const Pin &pin)
-{
-    netPins_.addAssociation(net, pin);
-}
+        entity_system::EntitySystem <Pin>::const_iterator Netlist::begin(Pin) const
+        {
+            return mPins.begin();
+        }
 
-entity_system::EntitySystem<Net>::NotifierType *Netlist::notifier(Net) const
-{
-    return nets_.notifier();
-}
+        entity_system::EntitySystem <Pin>::const_iterator Netlist::end(Pin) const
+        {
+            return mPins.end();
+        }
 
-void Netlist::reserve(Net, uint32_t size)
-{
-    nets_.reserve(size);
-}
+        entity_system::EntitySystem <Net>::const_iterator Netlist::begin(Net) const
+        {
+            return mNets.begin();
+        }
 
-uint32_t Netlist::capacity(Net) const
-{
-    return nets_.capacity();
-}
+        entity_system::EntitySystem <Net>::const_iterator Netlist::end(Net) const
+        {
+            return mNets.end();
+        }
 
-entity_system::Association<Net, Pin>::Parts Netlist::pins(const Net &net) const
-{
-    return netPins_.parts(net);
-}
+        void Netlist::connect(const Net & net, const Pin & pin)
+        {
+            mNetPins.addAssociation(net, pin);
+        }
 
-uint32_t Netlist::size(Input) const
-{
-    return inputs_.size();
-}
+        entity_system::EntitySystem <Net>::NotifierType * Netlist::notifier(Net) const {
+            return mNets.notifier();
+        }
 
-Input Netlist::add(Input, const Pin &p)
-{
-    Input inp = input(p);
-    if(inp != Input())
-        return inp;
-    pinInput_.addAssociation(p, inp = inputs_.add());
-    return inp;
-}
+        void Netlist::reserve(Net, uint32_t size)
+        {
+            mNets.reserve(size);
+            mName2Net.reserve(size);
+        }
 
-Pin Netlist::pin(const Input &input) const
-{
-    return pinInput_.whole(input);
-}
+        uint32_t Netlist::capacity(Net) const
+        {
+            return mNets.capacity();
+        }
 
-Input Netlist::input(const Pin &pin) const
-{
-    return pinInput_.firstPart(pin);
-}
+        Net Netlist::find(Net, std::string netName)
+        {
+            return mName2Net[netName];
+        }
 
-entity_system::EntitySystem<Input>::const_iterator Netlist::begin(Input) const
-{
-    return inputs_.begin();
-}
+        std::string Netlist::name(const Net & net) const
+        {
+            return mNetNames[net];
+        }
 
-entity_system::EntitySystem<Input>::const_iterator Netlist::end(Input) const
-{
-    return inputs_.end();
-}
+        entity_system::Association <Net, Pin>::Parts Netlist::pins(const Net & net) const
+        {
+            return mNetPins.parts(net);
+        }
 
-entity_system::EntitySystem<Input>::NotifierType *Netlist::notifier(Input) const
-{
-    return inputs_.notifier();
-}
+        uint32_t Netlist::size(Input) const
+        {
+            return mInputs.size();
+        }
 
-uint32_t Netlist::size(Output) const
-{
-    return outputs_.size();
-}
+        Input Netlist::add(Input, const Pin & p)
+        {
+            Input inp = input(p);
 
-Output Netlist::add(Output, const Pin &p)
-{
-    Output out = output(p);
-    if(out != Output())
-        return out;
-    pinOutput_.addAssociation(p, out = outputs_.add());
-    return out;
-}
+            if(inp != Input()) {
+                return inp;
+            }
+            mPinInput.addAssociation(p, inp = mInputs.add());
 
-Pin Netlist::pin(const Output &output) const
-{
-    return pinOutput_.whole(output);
-}
+            return inp;
+        }
 
-Output Netlist::output(const Pin &pin) const
-{
-    return pinOutput_.firstPart(pin);
-}
+        Pin Netlist::pin(const Input & input) const
+        {
+            return mPinInput.whole(input);
+        }
 
-entity_system::EntitySystem<Output>::const_iterator Netlist::begin(Output) const
-{
-    return outputs_.begin();
-}
+        Input Netlist::input(const Pin & pin) const
+        {
+            return mPinInput.firstPart(pin);
+        }
 
-entity_system::EntitySystem<Output>::const_iterator Netlist::end(Output) const
-{
-    return outputs_.end();
-}
+        entity_system::EntitySystem <Input>::const_iterator Netlist::begin(Input) const
+        {
+            return mInputs.begin();
+        }
 
-entity_system::EntitySystem<Output>::NotifierType *Netlist::notifier(Output) const
-{
-    return outputs_.notifier();
-}
+        entity_system::EntitySystem <Input>::const_iterator Netlist::end(Input) const
+        {
+            return mInputs.end();
+        }
 
-void Netlist::shrinkToFit()
-{
-    cells_.shrinkToFit();
-    pins_.shrinkToFit();
-    nets_.shrinkToFit();
-    inputs_.shrinkToFit();
-    outputs_.shrinkToFit();
-}
+        entity_system::EntitySystem <Input>::NotifierType * Netlist::notifier(Input) const {
+            return mInputs.notifier();
+        }
 
-}
-}
+        uint32_t Netlist::size(Output) const
+        {
+            return mOutputs.size();
+        }
 
+        Output Netlist::add(Output, const Pin & p)
+        {
+            Output out = output(p);
+
+            if(out != Output()) {
+                return out;
+            }
+            mPinOutput.addAssociation(p, out = mOutputs.add());
+
+            return out;
+        }
+
+        Pin Netlist::pin(const Output & output) const
+        {
+            return mPinOutput.whole(output);
+        }
+
+        Output Netlist::output(const Pin & pin) const
+        {
+            return mPinOutput.firstPart(pin);
+        }
+
+        entity_system::EntitySystem <Output>::const_iterator Netlist::begin(Output) const
+        {
+            return mOutputs.begin();
+        }
+
+        entity_system::EntitySystem <Output>::const_iterator Netlist::end(Output) const
+        {
+            return mOutputs.end();
+        }
+
+        entity_system::EntitySystem <Output>::NotifierType * Netlist::notifier(Output) const {
+            return mOutputs.notifier();
+        }
+
+        void Netlist::shrinkToFit()
+        {
+            mCells.shrinkToFit();
+            mPins.shrinkToFit();
+            mNets.shrinkToFit();
+            mInputs.shrinkToFit();
+            mOutputs.shrinkToFit();
+        }
+    }     // namespace circuit
+}     // namespace ophidian
