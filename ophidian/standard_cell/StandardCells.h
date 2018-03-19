@@ -196,6 +196,14 @@ public:
 	 */
 	Pin find(Pin, std::string pinName);
 
+    //! Find a pin
+    /*!
+       \brief Using the mapping, return a pin handler by pin's name.
+       \param The pin name.
+       \return Return a pin handler by pin's name.
+     */
+    Pin find(Pin, std::string pinName) const;
+
 	//! Pin name getter
 	/*!
 	   \brief Get the name of a given pin.
@@ -210,7 +218,7 @@ public:
 	   \param pin Pin entity to get the direction.
 	   \return Direction of the pin
 	 */
-	PinDirection direction(const Pin & pin);
+    PinDirection direction(const Pin & pin) const;
 
 	//! Pin owner getter
 	/*!

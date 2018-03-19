@@ -32,12 +32,12 @@ namespace ophidian
 namespace timing
 {
 
-using unateness_t = ophidian::parser::Liberty::Timing::unateness;
-using timing_type_t = ophidian::parser::Liberty::Timing::type;
-
 class Library
 {
 public:
+    using unateness_t = ophidian::parser::Liberty::Timing::unateness;
+    using timing_type_t = ophidian::parser::Liberty::Timing::type;
+
     //! Library Constructor
     /*!
        \brief Constructs a Library with properties.
@@ -45,7 +45,10 @@ public:
        \param stdCells The Standard Cells's system of the circuit.
        \param arcs The Timing Arcs' system of the circuit.
      */
-    Library(const parser::Liberty & liberty, standard_cell::StandardCells & stdCells, TimingArcs & arcs, bool early = false);
+    Library(const parser::Liberty & liberty,
+            standard_cell::StandardCells & stdCells,
+            TimingArcs & arcs,
+            bool early = false);
 
     //! Compute Rise Delay
     /*!
@@ -93,7 +96,7 @@ public:
        \param arc The Timing TimingArc.
        \return TimingArc's unateness.
      */
-    unateness_t unateness(const TimingArc & arc);
+    unateness_t unateness(const TimingArc & arc) const;
 
     //! type Getter
     /*!
@@ -101,7 +104,7 @@ public:
        \param arc The Timing TimingArc.
        \return TimingArc's timing type.
      */
-    timing_type_t type(const TimingArc & arc);
+    timing_type_t type(const TimingArc & arc) const;
 
     //! Capacitance Getter
     /*!
@@ -110,6 +113,22 @@ public:
        \return Pin's capacitance.
      */
     util::farad_t capacitance(const standard_cell::Pin & pin) const;
+
+    //! Check clock pin
+    /*!
+       \brief Checks whether a standard pin is a clock pin.
+       \param pin The Standard Pin.
+       \return True only if it is clock pin.
+     */
+    bool pinClock(const standard_cell::Pin & pin) const;
+
+    //! Check sequential cell
+    /*!
+       \brief Checks whether a standard cell is sequential.
+       \param cell The Standard Cell.
+       \return True only if it is sequential.
+     */
+    bool cellSequential(const standard_cell::Cell & cell) const;
 
 private:
     using LUT = parser::Liberty::LUT;
@@ -121,6 +140,8 @@ private:
     entity_system::Property<TimingArc, unateness_t> mTimingSenses;
     entity_system::Property<TimingArc, timing_type_t> mTimingTypes;
     entity_system::Property<standard_cell::Pin, util::farad_t> mPinCapacitance;
+    entity_system::Property<standard_cell::Pin, bool> mClock;
+    entity_system::Property<standard_cell::Cell, bool> mSequential;
 
 };
 

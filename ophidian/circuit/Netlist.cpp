@@ -151,6 +151,11 @@ Pin Netlist::find(Pin, std::string pinName)
 	return mName2Pin[pinName];
 }
 
+Pin Netlist::find(Pin, std::string pinName) const
+{
+    return mName2Pin.at(pinName);
+}
+
 std::string Netlist::name(const Pin& pin) const
 {
 	return mPinNames[pin];

@@ -7,13 +7,14 @@ namespace timing
 
 
 TimingGraph::TimingGraph(const circuit::Netlist & netlist) :
-    mPins(mGraph),
+    mPins(mGraph, circuit::Pin()),
     mNodeProperties(mGraph),
-    mArcs(mGraph),
+    mArcs(mGraph, Arc()),
     mArcProperties(mGraph),
     mRiseNodes(netlist.makeProperty<NodeType>(circuit::Pin())),
     mFallNodes(netlist.makeProperty<NodeType>(circuit::Pin()))
 {
+
 }
 
 TimingGraph::~TimingGraph()
@@ -39,17 +40,34 @@ size_t TimingGraph::size(ArcType)
 
 TimingGraph::NodeType TimingGraph::nodeCreate(const circuit::Pin & pin, const NodeProperty & prop, entity_system::Property<circuit::Pin, NodeType> & map)
 {
-    NodeType newNode;
+//    NodeType newNode;
 
-    if (mGraph.valid(map[pin]))
-        if (mPins[map[pin]] == pin)
-            newNode = map[pin];
-        else
-            newNode = mGraph.addNode();
-    else
-        newNode = mGraph.addNode();
+//    if (mGraph.valid(map[pin]))
+//        if (mPins[map[pin]] == pin)
+//            newNode = map[pin];
+//        else
+//            newNode = mGraph.addNode();
+//    else
+//        newNode = mGraph.addNode();
 
-    map[pin] = newNode;
+//    map[pin] = newNode;
+//    mPins[newNode] = pin;
+//    mNodeProperties[newNode] = prop;
+
+
+    // Algorithm uses more than one node per pin?
+    // It changes the source of the input arcs of the circuit.
+    // You need to create tests to see if it works correctly.
+    NodeType newNode = mGraph.addNode();
+
+    if (mGraph.valid(map[pin])) {
+        if (mPins[map[pin]] == circuit::Pin()) {
+            map[pin] = newNode;
+        }
+    } else {
+        map[pin] = newNode;
+    }
+
     mPins[newNode] = pin;
     mNodeProperties[newNode] = prop;
 
@@ -78,20 +96,20 @@ TimingGraph::NodeType TimingGraph::fallNode(const circuit::Pin & pin)
 
 TimingGraph::ArcType TimingGraph::arcCreate(const NodeType & from, const NodeType & to, TimingArc timingArc)
 {
-    ArcType graphEdge = mGraph.addArc(from, to);
-    mArcs[graphEdge] = *(static_cast<Arc*>(&timingArc));
-    mArcProperties[graphEdge] = ArcProperty::TimingArc;
+    ArcType graphArc = mGraph.addArc(from, to);
+    mArcs[graphArc] = *(static_cast<Arc*>(&timingArc));
+    mArcProperties[graphArc] = ArcProperty::TimingArc;
 
-    return graphEdge;
+    return graphArc;
 }
 
 TimingGraph::ArcType TimingGraph::arcCreate(const NodeType & from, const NodeType & to, circuit::Net net)
 {
-    ArcType graphEdge = mGraph.addArc(from, to);
-    mArcs[graphEdge] = *(static_cast<Arc*>(&net));
-    mArcProperties[graphEdge] = ArcProperty::Net;
+    ArcType graphArc = mGraph.addArc(from, to);
+    mArcs[graphArc] = *(static_cast<Arc*>(&net));
+    mArcProperties[graphArc] = ArcProperty::Net;
 
-    return graphEdge;
+    return graphArc;
 }
 
 TimingGraph::NodeProperty TimingGraph::property(const NodeType & node)
@@ -107,6 +125,11 @@ TimingGraph::ArcProperty TimingGraph::property(const ArcType & arc)
 TimingGraph::NodeType TimingGraph::source(const ArcType & arc)
 {
     return mGraph.source(arc);
+}
+
+void TimingGraph::source(const ArcType & arc, const NodeType & newSource)
+{
+    mGraph.changeSource(arc, newSource);
 }
 
 TimingGraph::NodeType TimingGraph::target(const ArcType & arc)

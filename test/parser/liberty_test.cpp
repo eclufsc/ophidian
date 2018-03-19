@@ -1,4 +1,4 @@
-  #include "liberty_test.h"
+#include "liberty_test.h"
 #include <catch.hpp>
 
 #include <ophidian/parser/LibertyParser.h>

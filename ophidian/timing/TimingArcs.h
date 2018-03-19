@@ -50,7 +50,7 @@ public:
     /*!
        \brief Constructs an empty system with no Arcs.
      */
-    TimingArcs();
+    TimingArcs(const standard_cell::StandardCells & stdCells);
 
 
     //! TimingArcs Move Constructor
@@ -161,6 +161,14 @@ public:
      */
     standard_cell::Pin to(const TimingArc & arc) const;
 
+    //! Arcs of a pin
+    /*!
+       \brief Returns a vector of the Arcs of a Pin.
+       \param pin A handler for the Pin we want to get the Arcs.
+       \return Vector for the Arcs of a Pin.
+     */
+    const std::vector<TimingArc> & pinArcs(const standard_cell::Pin & pin) const;
+
     //! Make Cell Property
     /*!
        \brief Creates a Property for the Standard Cell's Entity System.
@@ -180,7 +188,7 @@ private:
     entity_system::Property<TimingArc, standard_cell::Pin> mTo;
     entity_system::Property<TimingArc, std::string> mArcNames;
     std::unordered_map<std::string, TimingArc> mName2Arc;
-
+    entity_system::Property<standard_cell::Pin, std::vector<TimingArc>> mPin2TimingArcs;
 };
 
 } // namespace timing

@@ -1,5 +1,5 @@
-#ifndef LIBERTYPARSER_H
-#define LIBERTYPARSER_H
+#ifndef OPHIDIAN_PARSER_LIBERTYPARSER_H
+#define OPHIDIAN_PARSER_LIBERTYPARSER_H
 
 #include <memory>
 #include <vector>
@@ -71,6 +71,7 @@ public:
             INPUT,
             OUTPUT
         };
+        bool clock = false;
         directionPin pinDirection;
         std::vector<Timing> timing;
 
@@ -112,4 +113,4 @@ private:
 
 }
 }
-#endif // LIBERTYPARSER_H
+#endif // OPHIDIAN_PARSER_LIBERTYPARSER_H

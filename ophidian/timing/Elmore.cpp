@@ -34,7 +34,7 @@ Elmore::Elmore(const timingdriven_placement::RCTree & tree, const CapacitorRCTre
         }
     }
 
-    assert(mOrder.size() == mTree.size(CapacitorRCTree));
+    assert(mOrder.size() == mTree.size(CapacitorRCTree()));
 
     update();
 }

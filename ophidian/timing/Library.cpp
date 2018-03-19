@@ -31,7 +31,9 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
     mFallSlews(arcs.makeProperty<LUT>()),
     mTimingSenses(arcs.makeProperty<unateness_t>()),
     mTimingTypes(arcs.makeProperty<timing_type_t>()),
-    mPinCapacitance(stdCells.makeProperty<util::farad_t>(standard_cell::Pin()))
+    mPinCapacitance(stdCells.makeProperty<util::farad_t>(standard_cell::Pin())),
+    mClock(stdCells.makeProperty<bool>(standard_cell::Pin())),
+    mSequential(stdCells.makeProperty<bool>(standard_cell::Cell()))
 {
     for (auto cell : liberty.cells)
     {
@@ -58,8 +60,12 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
                 mFallSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::FALL_CONSTRAINT : LUT::FALL_TRANSITION);
             }
 
-            mPinCapacitance[stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name)] = util::farad_t(pin.capacitance);
+            standard_cell::Pin stdPin = stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name);
+            mPinCapacitance[stdPin] = util::farad_t(pin.capacitance);
+            mClock[stdPin] = pin.clock;
         }
+
+        mSequential[stdCells.find(standard_cell::Cell(), cell.name)] = cell.sequential;
     }
 }
 
@@ -83,12 +89,12 @@ double Library::computeFallSlews(const TimingArc & arc, double rv, double cv)
     return mFallSlews[arc].compute(rv, cv);
 }
 
-unateness_t Library::unateness(const TimingArc & arc)
+Library::unateness_t Library::unateness(const TimingArc & arc) const
 {
     return mTimingSenses[arc];
 }
 
-timing_type_t Library::type(const TimingArc & arc)
+Library::timing_type_t Library::type(const TimingArc & arc) const
 {
     return mTimingTypes[arc];
 }
@@ -96,6 +102,16 @@ timing_type_t Library::type(const TimingArc & arc)
 util::farad_t Library::capacitance(const standard_cell::Pin & pin) const
 {
     return mPinCapacitance[pin];
+}
+
+bool Library::pinClock(const standard_cell::Pin & pin) const
+{
+    return mClock[pin];
+}
+
+bool Library::cellSequential(const standard_cell::Cell & cell) const
+{
+    return mSequential[cell];
 }
 
 } // namespace timing

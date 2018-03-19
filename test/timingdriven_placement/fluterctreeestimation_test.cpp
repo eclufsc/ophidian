@@ -43,6 +43,7 @@ public:
         mPlacement(mNetlist),
         mPlacementLibrary(mStdCells),
         mPlacementMapping(mPlacement, mPlacementLibrary, mNetlist, mLibraryMapping),
+        mTimingArcs(mStdCells),
         mLef(std::make_unique<ophidian::parser::Lef>()),
         mLiberty(ophidian::parser::LibertyParser().readFile("input_files/rctree_files/sample_Late_rctree.lib")),
         pinXOutputOffset(512.5),

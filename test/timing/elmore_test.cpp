@@ -47,7 +47,7 @@ TEST_CASE("Elmore Delay: RCTree with 2 nodes", "[timing][RCTree][Elmore]")
     REQUIRE(delay.at(C1) == ophidian::util::second_t(ophidian::util::picosecond_t((0.223 * 2.2))));
 }
 
-TEST_CASE("elmore_delay/simulating tap node", "[timing][rc_tree][elmore]")
+TEST_CASE("Elmore Delay: Simulating tap node", "[timing][RCTree][Elmore]")
 {
     /*
 

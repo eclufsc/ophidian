@@ -128,7 +128,7 @@ public:
        \param timingArc The TimingArc entity associated.
        \return The arc created.
      */
-    ArcType arcCreate(const NodeType & from, const NodeType & to,TimingArc timingArc);
+    ArcType arcCreate(const NodeType & from, const NodeType & to, TimingArc timingArc);
 
     //! Create a Arc
     /*!
@@ -163,6 +163,14 @@ public:
        \return The source node.
      */
     NodeType source(const ArcType & arc);
+
+    //! Change the source node
+    /*!
+       \brief Change the source node of a arc.
+       \param arc A arc of the graph.
+       \param newSource The new source.
+     */
+    void source(const ArcType & arc, const NodeType & newSource);
 
     //! Target Node Getter
     /*!
@@ -219,6 +227,30 @@ public:
        \return A Arc.
      */
     Arc entity(Arc, const ArcType & arc);
+
+    //! Make Node Map
+    /*!
+       \brief Creates a map for the Graph's nodes.
+       \tparam Value value type of the map.
+       \return NodeMap the map.
+     */
+    template <typename Value>
+    GraphType::NodeMap<Value> makeNodeMap()
+    {
+        return GraphType::NodeMap<Value>(mGraph);
+    }
+
+    //! Make Arc Map
+    /*!
+       \brief Creates a map for the Graph's arcs.
+       \tparam Value value type of the map.
+       \return ArcMap the map.
+     */
+    template <typename Value>
+    GraphType::ArcMap<Value> makeArcMap()
+    {
+        return GraphType::ArcMap<Value>(mGraph);
+    }
 
     //! Remove Node or Edges
     /*!
