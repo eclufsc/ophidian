@@ -17,10 +17,13 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 * [Getting Started](#getting-started)
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
+    * [Others](#others)
 * [Hello World!](#hello-world)
 * [Contributing](#contributing)
     * [Project Structure](#project-structure)
     * [Build and Installation Guide](#build-and-installation-guide)
+    * [Build Dependencies](#build-dependencies)
+    * [Compiling Ophidian](#compiling-ophidian)
 * [Credits](#credits)
 
 # Getting Started!
