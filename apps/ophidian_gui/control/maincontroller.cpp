@@ -86,7 +86,7 @@ void MainController::init()
     /* Saying to MainWindow display the information */
     emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), cells, pins, nets);
 
-    createQuads();
+    redraw();
 }
 
 void MainController::createQuads()
@@ -259,7 +259,7 @@ void MainController::slot1()
      */
 
     if (mBuilder != nullptr)
-        updateAfterSlots();
+        redraw();
 }
 
 void MainController::slot2()
@@ -268,7 +268,7 @@ void MainController::slot2()
      */
 
     if (mBuilder != nullptr)
-        updateAfterSlots();
+        redraw();
 }
 
 void MainController::slot3()
@@ -277,10 +277,10 @@ void MainController::slot3()
      */
 
     if (mBuilder != nullptr)
-        updateAfterSlots();
+        redraw();
 }
 
-void MainController::updateAfterSlots()
+void MainController::redraw()
 {
     mCanvas->clear();
     mIndex.clear();

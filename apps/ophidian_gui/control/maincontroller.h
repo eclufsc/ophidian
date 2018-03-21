@@ -258,11 +258,11 @@ private:
      */
     void init();
 
-    //! Canvas upgrade
+    //! Canvas update
     /*!
        \brief Redraws circuit cells after executing a slot function.
      */
-    void updateAfterSlots();
+    void redraw();
 
     //! Creates the quad cells.
     /*!
