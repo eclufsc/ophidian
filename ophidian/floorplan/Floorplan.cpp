@@ -23,26 +23,6 @@ namespace ophidian
 namespace floorplan
 {
 
-    Floorplan::Floorplan():
-            mRows(),
-            mOrigins(mRows),
-            mNumberOfSites(mRows),
-            mSiteTypeOfRow(mRows),
-            mNames(mSites),
-            mDimensions(mSites),
-            mChipOrigin(util::database_unit_t
-        {
-            0.0
-        }, util::database_unit_t{0.0}), mChipUpperRightCorner(
-                util::database_unit_t{0.0},
-                util::database_unit_t{0.0})
-    {
-    }
-
-    Floorplan::~Floorplan()
-    {
-    }
-
     void Floorplan::chipOrigin(const util::LocationDbu & loc)
     {
         mChipOrigin = loc;

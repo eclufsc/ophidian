@@ -20,6 +20,7 @@
 #define OPHIDIAN_INTERCONNECTION_FLUTE_H
 
 #include <ophidian/geometry/Models.h>
+#include <ophidian/util/Units.h>
 #include <vector>
 #include <memory>
 
@@ -36,6 +37,8 @@ namespace interconnection
      */
     class Flute final
     {
+        using dbu_t = util::database_unit_t;
+        using Point = geometry::Point<dbu_t>;
     public:
 
         //! Singleton instantiation
@@ -53,6 +56,7 @@ namespace interconnection
         template <class T>
         inline std::unique_ptr<SteinerTree> create(const T & container)
         {
+
             const uint32_t kSize = container.size();
 
             if(kSize == 1) {
@@ -70,7 +74,7 @@ namespace interconnection
             X.resize(0);
             Y.resize(0);
 
-            geometry::Point offset(0.0, 0.0);
+            Point offset{dbu_t{0.0}, dbu_t{0.0}};
 
             for(const auto & point : container)
             {
@@ -95,15 +99,15 @@ namespace interconnection
 
     private:
         std::unique_ptr<SteinerTree> singleSegment(
-            const geometry::Point & p1,
-            const geometry::Point & p2);
+            const Point & p1,
+            const Point & p2);
 
-        std::unique_ptr<SteinerTree> trivialSteinerTree(const geometry::Point & p);
+        std::unique_ptr<SteinerTree> trivialSteinerTree(const Point & p);
 
         std::unique_ptr<SteinerTree> callFlute(
             const std::vector<unsigned> & X,
             const std::vector<unsigned> & Y,
-            const geometry::Point & offset);
+            const Point & offset);
 
         Flute();
 

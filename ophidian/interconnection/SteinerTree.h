@@ -20,6 +20,7 @@
 #define OPHIDIAN_INTERCONNECTION_STEINERTREE_H
 
 #include <ophidian/geometry/Models.h>
+#include <ophidian/util/Units.h>
 #include <lemon/smart_graph.h>
 #include <lemon/maps.h>
 #include <lemon/dim2.h>
@@ -43,6 +44,8 @@ namespace interconnection
     public:
         using GraphType = lemon::SmartGraph;
 
+        using dbu_t = util::database_unit_t;
+        using DbuPoint = geometry::Point<dbu_t>;
         //! Lemon Graph Element Wrapper
 
         /*!
@@ -310,7 +313,7 @@ namespace interconnection
            \param position The position.
            \return A handler for the created Steiner Point.
          */
-        Point add(const geometry::Point & position);
+        Point add(const DbuPoint & position);
 
         //! Add Segment
 
@@ -359,7 +362,7 @@ namespace interconnection
            \param p The handler for a Steiner Point.
            \return The position of \p.
          */
-        geometry::Point position(const Point & p) const;
+        DbuPoint position(const Point & p) const;
 
         //! Length of a Segment.
 
@@ -367,14 +370,14 @@ namespace interconnection
            \param segment The handler for a Segment.
            \return The rectilinear length of \p segment.
          */
-        double length(const Segment & segment) const;
+        dbu_t length(const Segment & segment) const;
 
         //! Length of the Steiner Tree.
 
         /*!
            \return The total length of the Steiner Tree.
          */
-        double length() const;
+        dbu_t length() const;
 
         //! Steiner Points
 
@@ -409,24 +412,9 @@ namespace interconnection
 
         GraphType                                      mGraph;
         GraphType::NodeMap<lemon::dim2::Point<double>> mPosition;
-        double                                         mLength {0.0};
+        dbu_t                                         mLength {0.0};
     };
 }     // namespace interconnection
-
-namespace geometry
-{
-    //! Make geometry::Segment
-
-    /*!
-       \param tree A Steiner Tree
-       \param segment The handler for a Segment.
-       \return Creates a geometry::Segment for a given Steiner Tree Segment.
-     */
-    template <class T>
-    T make(
-        const interconnection::SteinerTree & tree,
-        const interconnection::SteinerTree::Segment & segment);
-}     // namespace geometry
 }     // namespace ophidian
 
 #endif // OPHIDIAN_INTERCONNECTION_STEINERTREE_H

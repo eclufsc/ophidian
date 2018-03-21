@@ -35,12 +35,12 @@ namespace geometry
      * \param translationPoint Point representing the translation to be applied to geometry
      * \param result Geometry representing the translated geometry
      */
-    template <class Geometry>
-    Geometry translate(const Geometry & geometry, Point & translationPoint)
+    template <template <typename> class Geometry, class T>
+    Geometry<T> translate(const Geometry<T> & geometry, Point<T> & translationPoint)
     {
-        Geometry result;
+        Geometry<T> result;
 
-        boost::geometry::strategy::transform::translate_transformer<double, 2, 2> translate(
+        boost::geometry::strategy::transform::translate_transformer<T, 2, 2> translate(
             translationPoint.x(),
             translationPoint.y());
         boost::geometry::transform(geometry, result, translate);
@@ -56,12 +56,12 @@ namespace geometry
      * \param scalingPoint Point representing the scaling to be applied to geometry
      * \param result Geometry representing the scaled geometry
      */
-    template <class Geometry>
-    Geometry scale(const Geometry & geometry, Point & scalingPoint)
+    template <class Geometry, class T>
+    Geometry scale(const Geometry & geometry, Point<T> & scalingPoint)
     {
         Geometry result;
 
-        boost::geometry::strategy::transform::scale_transformer<double, 2, 2> scale(
+        boost::geometry::strategy::transform::scale_transformer<T, 2, 2> scale(
             scalingPoint.x(),
             scalingPoint.y());
         boost::geometry::transform(geometry, result, scale);

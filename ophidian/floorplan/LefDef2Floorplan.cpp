@@ -24,7 +24,7 @@ namespace floorplan
 {
     void lefDef2Floorplan(const parser::Lef & lef, const parser::Def & def, Floorplan & floorplan)
     {
-        floorplan.chipOrigin(def.die().min_corner());
+        floorplan.chipOrigin(def.die_area().min_corner());
         floorplan.chipUpperRightCorner(def.die().max_corner());
         for(auto & site : lef.sites())
         {

@@ -27,4 +27,3 @@ TEST_CASE_METHOD(Def2PlacementFixture, "Def2Placement: Test if def2placement map
     REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u4")) == util::LocationDbu(12160, 6840));
     REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "lcb1")) == util::LocationDbu(0, 10260));
 }
-

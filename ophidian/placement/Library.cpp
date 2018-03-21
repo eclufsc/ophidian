@@ -23,12 +23,12 @@ namespace ophidian
 namespace placement
 {
     Library::Library(const standard_cell::StandardCells & std_cells):
-            mGeometries(std_cells.makeProperty<geometry::MultiBox>(standard_cell::Cell())),
+            mGeometries(std_cells.makeProperty<MultiBox>(standard_cell::Cell())),
             mPinOffsets(std_cells.makeProperty<util::LocationDbu>(standard_cell::Pin()))
     {
     }
 
-    void Library::geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry)
+    void Library::geometry(const standard_cell::Cell & cell, const MultiBox & geometry)
     {
         mGeometries[cell] = geometry;
     }

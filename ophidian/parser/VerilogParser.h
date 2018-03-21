@@ -36,10 +36,6 @@ namespace parser
         class Instance;
         class Module;
 
-        enum class PortDirection {
-            INPUT, OUTPUT, INOUT, NONE
-        };
-
         Module * addModule(const std::string & name);
 
         const std::list<Module> & modules() const;
@@ -51,17 +47,20 @@ namespace parser
     class Verilog::Port
     {
     public:
+        enum class Direction {
+            INPUT, OUTPUT, INOUT, NONE
+        };
 
-        Port(PortDirection direction, const std::string & name);
+        Port(Direction direction, const std::string & name);
 
-        PortDirection direction() const;
+        Direction direction() const;
 
         const std::string & name() const;
 
         bool operator==(const Port & o) const;
 
     private:
-        PortDirection mDirection;
+        Direction mDirection;
         std::string   mName;
     };
 
@@ -105,7 +104,7 @@ namespace parser
 
         Module(const std::string & name);
 
-        Port * addPort(Verilog::PortDirection direction, const std::string name);
+        Port * addPort(Verilog::Port::Direction direction, const std::string name);
 
         Net * addNet(const std::string & name);
 

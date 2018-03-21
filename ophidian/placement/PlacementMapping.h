@@ -37,7 +37,7 @@ namespace placement
            \param cell Cell entity to get the geometry.
            \return Geometry of the cell.
          */
-        geometry::MultiBox geometry(const circuit::Cell & cell) const;
+        geometry::MultiBox<util::database_unit_t> geometry(const circuit::Cell & cell) const;
 
         //! Pin location getter
 

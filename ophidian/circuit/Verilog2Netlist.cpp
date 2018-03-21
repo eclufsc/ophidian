@@ -46,10 +46,10 @@ namespace circuit
         for(auto port : module.ports())
         {
             auto pin = netlist.add(Pin(), port.name());
-            if(port.direction() == parser::Verilog::PortDirection::INPUT) {
+            if(port.direction() == parser::Verilog::Port::Direction::INPUT) {
                 netlist.add(Input(), pin);
             }
-            else if(port.direction() == parser::Verilog::PortDirection::OUTPUT) {
+            else if(port.direction() == parser::Verilog::Port::Direction::OUTPUT) {
                 netlist.add(Output(), pin);
             }
             netlist.connect(netlist.find(Net(), port.name()), pin);

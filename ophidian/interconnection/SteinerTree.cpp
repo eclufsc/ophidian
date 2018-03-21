@@ -26,22 +26,21 @@ namespace ophidian
 {
 namespace interconnection
 {
-namespace
-{
-    inline geometry::Point convert(const lemon::dim2::Point<double> & p)
-    {
-        return {
-                   p.x, p.y
-        };
-    }
+    using dbu_t = util::database_unit_t;
+    using DbuPoint = geometry::Point<dbu_t>;
 
-    inline lemon::dim2::Point<double> convert(const geometry::Point & p)
+    namespace
     {
-        return {
-                   p.x(), p.y()
-        };
-    }
-}     // namespace
+        inline DbuPoint convert(const lemon::dim2::Point<double> & p)
+        {
+            return DbuPoint{dbu_t{p.x}, dbu_t{p.y}};
+        }
+
+        inline lemon::dim2::Point<double> convert(const DbuPoint & p)
+        {
+            return {units::unit_cast<double>(p.x()), units::unit_cast<double>(p.y())};
+        }
+    }     // namespace
 
     //
     SteinerTree::SteinerTree():
@@ -62,14 +61,13 @@ namespace
 namespace
 {
     SteinerTree::GraphType::Node findNodeWithPositionEqualsTo(
-        const geometry::Point & position,
+        const DbuPoint & position,
         const SteinerTree::GraphType::NodeMap<lemon::dim2::Point<double>> & mPosition,
         const SteinerTree::GraphType & mGraph)
     {
-        geometry::ManhattanDistance distance;
         for(SteinerTree::GraphType::NodeIt i(mGraph); mGraph.valid(i); ++i)
         {
-            if(distance(position, convert(mPosition[i])) == 0.0) {
+            if(geometry::ManhattanDistance(position, convert(mPosition[i])) == dbu_t{0.0}) {
                 return i;
             }
         }
@@ -84,7 +82,7 @@ namespace
         return std::unique_ptr<SteinerTree>{new SteinerTree};
     }
 
-    SteinerTree::Point SteinerTree::add(const geometry::Point & position)
+    SteinerTree::Point SteinerTree::add(const DbuPoint & position)
     {
         GraphType::Node node = findNodeWithPositionEqualsTo(position, mPosition, mGraph);
         if(node == lemon::INVALID) {
@@ -117,22 +115,20 @@ namespace
         return Point(mGraph.v(segment.mEl));
     }
 
-    geometry::Point SteinerTree::position(const SteinerTree::Point & p) const
+    DbuPoint SteinerTree::position(const SteinerTree::Point & p) const
     {
         return convert(mPosition[p.mEl]);
     }
 
-    double SteinerTree::length(const SteinerTree::Segment & segment) const
+    dbu_t SteinerTree::length(const SteinerTree::Segment & segment) const
     {
         const auto kU = mGraph.u(segment.mEl);
         const auto kV = mGraph.v(segment.mEl);
 
-        geometry::ManhattanDistance distance;
-
-        return distance(convert(mPosition[kU]), convert(mPosition[kV]));
+        return geometry::ManhattanDistance(convert(mPosition[kU]), convert(mPosition[kV]));
     }
 
-    double SteinerTree::length() const
+    dbu_t SteinerTree::length() const
     {
         return mLength;
     }
@@ -216,18 +212,6 @@ namespace
     {
         SteinerTreeToEps::run(tree, filename);
     }
-}     // namespace interconnection
 
-namespace geometry
-{
-    template <>
-    geometry::Segment make<geometry::Segment>(
-        const interconnection::SteinerTree & tree,
-        const interconnection::SteinerTree::Segment & segment)
-    {
-        return make<geometry::Segment>(
-            {tree.position(tree.u(segment)),
-                                        tree.position(tree.v(segment))});
-    }
-}     // namespace geometry
+}     // namespace interconnection
 }     // namespace ophidian

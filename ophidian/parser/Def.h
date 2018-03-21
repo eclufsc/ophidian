@@ -43,43 +43,54 @@ namespace parser
      */
     class Def
     {
-        using dbu_t = util::database_unit_t;
-        using dbu_scalar_t = util::database_unit_scalar_t;
-
     public:
-        struct component;
+        template <class T> using container_type = std::vector<T>;
 
-        struct row;
+        using dbu_type     = util::database_unit_t;
+        using scalar_type  = util::database_unit_scalar_t;
+        using point_dbu    = geometry::Point<dbu_type>;
+        using point_scalar = geometry::Point<scalar_type>;
+        using dbu_box      = geometry::Box<dbu_type>;
+
+        struct Row;
+        struct Component;
+
+        Def(const std::string& filename);
+
+        Def(const dbu_box& die_area,
+            const container_type<Row>& rows,
+            const container_type<Component>& components,
+            const scalar_type& dbu_to_micrometer_ratio);
+
+        Def(Def&&) = default;
+        Def& operator=(Def&&) = default;
 
         /**
          * Returns the @c dieArea.
          */
-        const geometry::Box<dbu_t> & die() const;
+        const dbu_box & die_area() const noexcept;
+
+        /**
+         * Returns a @c std::vector<row> with all rows.
+         */
+        const container_type<Row> & rows() const noexcept;
 
         /**
          * Returns a @c std::vector<component> with
          * all components.
          */
-        const std::vector<component> & components() const;
-
-        /**
-         * Returns a @c std::vector<row> with all rows.
-         */
-        const std::vector<row> & rows() const;
+        const container_type<Component> & components() const noexcept;
 
         /**
          * Returns the DEF database units.
          */
-        dbu_scalar_t dbu_to_micrometer_convertion_factor() const;
+        const scalar_type dbu_to_micrometer_ratio() const noexcept;
 
     private:
-        geometry::Box<dbu_t>   mDie;
-        dbu_scalar_t           mUnits;
-        std::vector<component> mComponents;
-        std::vector<row>       mRows;
-
-    public:
-        friend class DefParser;
+        dbu_box                   m_die_area;
+        container_type<Row>       m_rows;
+        container_type<Component> m_components;
+        scalar_type               m_dbu_to_micrometer_ratio;
     };
 
     /**
@@ -88,12 +99,16 @@ namespace parser
      * This is the data necessary to identify a given
      * component and it's characteristics.
      */
-    struct Def::component
+    struct Def::Component
     {
+        enum Orientation {
+            N, S, W, E, FN, FS, FW, FE
+        };
+
         std::string            name; ///< Component's name for identification.
         std::string            macro; ///< Component's type, like "NAND2_X1".
-        std::string            orientation; ///< Component's orientation, like "N" for north.
-        geometry::Point<dbu_t> position; ///< Component's lower left corner.
+        Orientation            orientation; ///< Component's orientation.
+        point_dbu position; ///< Component's lower left corner.
         bool                   fixed; ///< This determines if the component's position is fixed in space, @c true for fixed.
     };
 
@@ -103,24 +118,13 @@ namespace parser
      * This if the data necessary to identify a given
      * row and it's characteristics.
      */
-    struct Def::row
+    struct Def::Row
     {
         std::string                   name; ///< Row's name for identification.
         std::string                   site; ///< This is the site to be used by the row defined by a LEF file.
-        geometry::Point<dbu_t>        origin; ///< Specifies the location of the first site in the row.
-        geometry::Point<dbu_t>        step; ///< Specifies the spacing between sites in horizontal and vertical rows.
-        geometry::Point<dbu_scalar_t> num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
-    };
-
-    /**
-     * DefParser uses the DEF lib to read a def file,
-     * populating a def object returning a shared_ptr
-     * for it.
-     */
-    class DefParser
-    {
-    public:
-        std::unique_ptr<Def> readFile(const std::string & filename) const;
+        point_dbu        origin; ///< Specifies the location of the first site in the row.
+        point_dbu        step; ///< Specifies the spacing between sites in horizontal and vertical rows.
+        point_scalar num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
     };
 }
 }

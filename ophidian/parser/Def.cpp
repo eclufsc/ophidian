@@ -25,113 +25,117 @@ namespace ophidian
 {
 namespace parser
 {
-    const geometry::Box<util::database_unit_t> & Def::die() const
+    Def::Def(const std::string& filename):
+        m_die_area(),
+        m_rows(),
+        m_components(),
+        m_dbu_to_micrometer_ratio()
     {
-        return mDie;
-    }
-
-    const std::vector<Def::component> & Def::components() const
-    {
-        return mComponents;
-    }
-
-    const std::vector<Def::row> & Def::rows() const
-    {
-        return mRows;
-    }
-
-    util::database_unit_scalar_t Def::dbu_to_micrometer_convertion_factor() const
-    {
-        return mUnits;
-    }
-
-    std::unique_ptr<Def> DefParser::readFile(const std::string & filename) const
-    {
-        auto def = std::make_unique<Def>();
-
         defrInit();
-
         defrSetUnitsCbk(
             [](defrCallbackType_e, double number, defiUserData ud) -> int {
-                Def & that = *static_cast<Def *>(ud);
-                that.mUnits = number;
-
+                auto that = static_cast<Def *>(ud);
+                that->m_dbu_to_micrometer_ratio = Def::scalar_type{number};
                 return 0;
-            });
-
+            }
+        );
         defrSetDieAreaCbk(
             [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
-                Def & that = *static_cast<Def *>(ud);
-                that.mDie = geometry::Box<util::database_unit_t>{
-                    geometry::Point<util::database_unit_t>{
-                        util::database_unit_t{box->xl()}, util::database_unit_t{box->yl()}
-                    }, geometry::Point<util::database_unit_t>{
-                        util::database_unit_t{box->xh()}, util::database_unit_t{box->yh()}
-                    }
+                auto that = static_cast<Def *>(ud);
+                that->m_die_area = Def::dbu_box{
+                    Def::point_dbu{Def::dbu_type{box->xl()}, Def::dbu_type{box->yl()}}, 
+                    Def::point_dbu{Def::dbu_type{box->xh()}, Def::dbu_type{box->yh()}}
                 };
-
                 return 0;
-            });
-
+            }
+        );
         defrSetRowCbk(
             [](defrCallbackType_e, defiRow * defrow, defiUserData ud) -> int {
-                Def & that = *static_cast<Def *>(ud);
-                Def::row r;
-                r.name = defrow->name();
-                r.site = defrow->macro();
-                r.num = {
-                    util::database_unit_scalar_t{defrow->xNum()},
-                    util::database_unit_scalar_t{defrow->yNum()}
+                auto that = static_cast<Def *>(ud);
+                auto row = Def::Row{
+                    defrow->name(),
+                    defrow->macro(),
+                    {dbu_type{defrow->x()}, dbu_type{defrow->y()}},
+                    {dbu_type{defrow->xStep()}, dbu_type{defrow->yStep()}},
+                    {scalar_type{defrow->xNum()},scalar_type{defrow->yNum()}},
                 };
-                r.step = {
-                    util::database_unit_t{defrow->xStep()}, util::database_unit_t{defrow->yStep()}
-                };
-                r.origin = {
-                    util::database_unit_t{defrow->x()}, util::database_unit_t{defrow->y()}
-                };
-                that.mRows.push_back(r);
-
+                that->m_rows.push_back(std::move(row));
                 return 0;
-            });
-
+            }
+        );
         defrSetComponentStartCbk(
             [](defrCallbackType_e, int number, defiUserData ud) -> int {
-                Def & that = *static_cast<Def *>(ud);
-                that.mComponents.reserve(number);
-
+                auto that = static_cast<Def *>(ud);
+                that->m_components.reserve(number);
                 return 0;
-            });
-
+            }
+        );
         defrSetComponentCbk(
             [](defrCallbackType_e, defiComponent * comp, defiUserData ud) -> int {
-                Def & that = *static_cast<Def *>(ud);
+                auto that = static_cast<Def *>(ud);
 
-                Def::component c;
-                c.name = comp->id();
-                c.macro = comp->name();
-                c.fixed = comp->isFixed();
-                c.position = {
-                    util::database_unit_t{comp->placementX()},
-                    util::database_unit_t{comp->placementY()}
+                auto component = Def::Component{
+                    comp->id(),
+                    comp->name(),
+                    [&]() -> Def::Component::Orientation {
+                        auto orientation_str = comp->placementOrientStr();
+                        if(orientation_str == "N")      { return Def::Component::Orientation::N; }
+                        else if(orientation_str == "S") { return Def::Component::Orientation::S; }
+                        else if(orientation_str == "W") { return Def::Component::Orientation::W; }
+                        else if(orientation_str == "E") { return Def::Component::Orientation::E; }
+                        else if(orientation_str == "FN"){ return Def::Component::Orientation::FN; }
+                        else if(orientation_str == "FS"){ return Def::Component::Orientation::FS; }
+                        else if(orientation_str == "FW"){ return Def::Component::Orientation::FW; }
+                        else if(orientation_str == "FE"){ return Def::Component::Orientation::FE; }
+                        else { return Def::Component::Orientation::N; }
+                    }(),
+                    {Def::dbu_type{comp->placementX()},Def::dbu_type{comp->placementY()}},
+                    comp->isFixed()
                 };
-                c.orientation = comp->placementOrientStr();
-                that.mComponents.push_back(c);
 
+                that->m_components.push_back(component);
                 return 0;
-            });
+            }
+        );
 
-        FILE * ifp = fopen(filename.c_str(), "r");
-        if(ifp) {
-            auto res = defrRead(ifp, filename.c_str(), def.get(), true);
+        if(FILE * ifp = fopen(filename.c_str(), "r")) {
+            auto res = defrRead(ifp, filename.c_str(), this, true);
+            fclose(ifp);
+            defrClear();
         }
         else {
             throw InexistentFile();
         }
+    }
 
-        fclose(ifp);
-        defrClear();
+    Def::Def(const Def::dbu_box& die_area,
+        const Def::container_type<Row>& rows,
+        const Def::container_type<Component>& components,
+        const Def::scalar_type& dbu_to_micrometer_ratio):
+        m_die_area(die_area),
+        m_rows(rows),
+        m_components(components),
+        m_dbu_to_micrometer_ratio(dbu_to_micrometer_ratio)
+    {}
 
-        return def;
+    const Def::dbu_box & Def::die_area() const noexcept
+    {
+        return m_die_area;
+    }
+
+    const Def::container_type<Def::Component> & Def::components() const noexcept
+    {
+        return m_components;
+    }
+
+    const Def::container_type<Def::Row> & Def::rows() const noexcept
+    {
+        return m_rows;
+    }
+
+    const Def::scalar_type Def::dbu_to_micrometer_ratio() const noexcept
+    {
+        return m_dbu_to_micrometer_ratio;
     }
 }     // namespace parser
 }     // namespace ophidian

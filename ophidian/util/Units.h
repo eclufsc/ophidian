@@ -55,47 +55,54 @@ namespace util
     using meter_t = units::length::meter_t;
 
     //!Area Units
-//!New unit tag derived from area_unit to allow for creation of square_millimiter_t
-        using square_millimeter = units::unit <std::micro, units::category::area_unit>;
+    //!New unit tag derived from area_unit to allow for creation of square_millimiter_t
+    using square_millimeter = units::unit <std::micro, units::category::area_unit>;
 
-        using square_millimeter_t = units::unit_t <square_millimeter>;
-        using square_meter_t = units::area::square_meter_t;
+    using square_millimeter_t = units::unit_t <square_millimeter>;
+    using square_meter_t = units::area::square_meter_t;
 
-//!Time Units
-        using picosecond_t = units::time::picosecond_t;
-        using nanosecond_t = units::time::nanosecond_t;
-        using microsecond_t = units::time::microsecond_t;
-        using millisecond_t = units::time::millisecond_t;
-        using second_t = units::time::second_t;
+    //!Time Units
+    using picosecond_t = units::time::picosecond_t;
+    using nanosecond_t = units::time::nanosecond_t;
+    using microsecond_t = units::time::microsecond_t;
+    using millisecond_t = units::time::millisecond_t;
+    using second_t = units::time::second_t;
 
-//!Capacitance Units
-        using femtofarad_t = units::capacitance::femtofarad_t;
-        using picofarad_t = units::capacitance::picofarad_t;
-        using farad_t = units::capacitance::farad_t;
+    //!Capacitance Units
+    using femtofarad_t = units::capacitance::femtofarad_t;
+    using picofarad_t = units::capacitance::picofarad_t;
+    using farad_t = units::capacitance::farad_t;
 
-//!Resistance Units
-        using ohm_t = units::impedance::ohm_t;
-        using kiloohm_t = units::impedance::kiloohm_t;
+    //!Resistance Units
+    using ohm_t = units::impedance::ohm_t;
+    using kiloohm_t = units::impedance::kiloohm_t;
 
 
     //!Class to handle the conversion from micron <-> DBU. It has to be instantiated by a def/lef library, which defines the DBU to micron factor
     class DbuConverter
     {
     public:
+        DbuConverter(const DbuConverter& other) = default;
+        DbuConverter(DbuConverter&& other) = default;
+
+        DbuConverter(const database_unit_scalar_t& dbu_factor):
+            m_dbu_factor{dbu_factor}
+        {}
+        
         //!Converts a value from micrometer_t to database_unit_t
-        database_unit_t convert(micrometer_t value)
+        database_unit_t convert(micrometer_t value) const
         {
             return database_unit_t(value * m_dbu_factor);
         }
 
         //!Converts a value from database_unit_t to micrometer_t
-        micrometer_t convert(database_unit_t value)
+        micrometer_t convert(database_unit_t value) const
         {
             return micrometer_t(value / m_dbu_factor);
         }
 
         //!Converts a LocationMicron to LocationDbu
-        LocationDbu convert(LocationMicron value)
+        LocationDbu convert(LocationMicron value) const
         {
             database_unit_t conv_value_x = value.x() * m_dbu_factor;
             database_unit_t conv_value_y = value.y() * m_dbu_factor;
@@ -104,7 +111,7 @@ namespace util
         }
 
         //!Converts a LocationDbu to LocationMicron
-        LocationMicron convert(LocationDbu value)
+        LocationMicron convert(LocationDbu value) const
         {
             micrometer_t conv_value_x = value.x() / m_dbu_factor;
             micrometer_t conv_value_y = value.y() / m_dbu_factor;

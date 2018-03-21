@@ -67,7 +67,7 @@ namespace parser
             std::string  name; ///< Name of the site
             std::string  class_name; ///< Class of the site
             micrometer_t x; ///< Width of the site
-            dbu_t        y; ///< Height of the site
+            micrometer_t y; ///< Height of the site
 
             /// Stores the site's symmetry in accordance to the Lef::symmetrie enumeration
             char symmetry = 0;

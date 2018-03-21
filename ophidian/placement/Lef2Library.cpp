@@ -32,28 +32,34 @@ namespace placement
             auto stdCell = stdCells.add(standard_cell::Cell(), macro.name);
             auto layer2RectsM1 = macro.obstructions.layer2rects.find("metal1");
             if(layer2RectsM1 != macro.obstructions.layer2rects.end()) {
-                geometry::MultiBox geometry;
+                geometry::MultiBox<util::database_unit_t> geometry;
                 for(auto & rect : layer2RectsM1->second)
                 {
                     geometry::Point<util::database_unit_t> pmin =
-                    {rect.firstPoint.x() * lef.micron_to_dbu_convertion_factor(),
-                     rect.firstPoint.y() * lef.micron_to_dbu_convertion_factor()};
+                    {rect.min_corner().x() * lef.micron_to_dbu_convertion_factor(),
+                     rect.min_corner().y() * lef.micron_to_dbu_convertion_factor()};
                     geometry::Point<util::database_unit_t> pmax =
-                    {rect.secondPoint.x() * lef.micron_to_dbu_convertion_factor(),
-                     rect.secondPoint.y() * lef.micron_to_dbu_convertion_factor()};
-                    geometry.push_back(ophidian::geometry::Box(pmin, pmax));
+                    {rect.max_corner().x() * lef.micron_to_dbu_convertion_factor(),
+                     rect.max_corner().y() * lef.micron_to_dbu_convertion_factor()};
+                    geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
                 }
                 library.geometry(stdCell, geometry);
             }
             else {
-                ophidian::geometry::Point pmin =
-                {macro.origin.x * lef.micron_to_dbu_convertion_factor(), macro.origin.y * lef.micron_to_dbu_convertion_factor()};
-                ophidian::geometry::Point pmax =
-                {macro.size.x * lef.micron_to_dbu_convertion_factor(), macro.size.y * lef.micron_to_dbu_convertion_factor()};
+                geometry::Point<util::database_unit_t> pmin =
+                    {
+                        macro.origin.x() * lef.micron_to_dbu_convertion_factor(),
+                        macro.origin.y() * lef.micron_to_dbu_convertion_factor()
+                    };
+                geometry::Point<util::database_unit_t> pmax =
+                    {
+                        macro.size.width * lef.micron_to_dbu_convertion_factor(),
+                        macro.size.height * lef.micron_to_dbu_convertion_factor()
+                    };
                 library.geometry(stdCell,
-                    geometry::MultiBox({ophidian::geometry::Box(pmin, pmax)}));
+                    geometry::MultiBox<util::database_unit_t>{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
             }
-            util::DbuConverter dbuConverter(lef.micron_to_dbu_convertion_factor());
+            util::DbuConverter dbuConverter{lef.micron_to_dbu_convertion_factor()};
 
             for(auto pin : macro.pins)
             {
@@ -68,11 +74,11 @@ namespace placement
                         library.pinOffset(
                             stdPin,
                             util::LocationDbu(0.5 *
-                                (dbuConverter.convert(rect.firstPoint.x()) +
-                                 dbuConverter.convert(rect.secondPoint.x())),
+                                (dbuConverter.convert(rect.min_corner().x()) +
+                                 dbuConverter.convert(rect.max_corner().x())),
                                 0.5 *
-                                (dbuConverter.convert(rect.firstPoint.y()) +
-                                 dbuConverter.convert(rect.secondPoint.y()))));
+                                (dbuConverter.convert(rect.min_corner().y()) +
+                                 dbuConverter.convert(rect.max_corner().y()))));
                     }
                 }
             }

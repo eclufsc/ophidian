@@ -32,6 +32,7 @@ namespace placement
     class Library
     {
     public:
+        using MultiBox = geometry::MultiBox<util::database_unit_t>;
 
         //! Library Copy Constructor
 
@@ -47,7 +48,7 @@ namespace placement
            \param cell Cell entity to get the geometry.
            \return Geometry of the cell.
          */
-        geometry::MultiBox geometry(const standard_cell::Cell & cell) const
+        MultiBox geometry(const standard_cell::Cell & cell) const
         {
             return mGeometries[cell];
         }
@@ -59,7 +60,7 @@ namespace placement
            \param cell Cell entity to set the geometry.
            \param geometry Gehmetry to assign to cell.
          */
-        void geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry);
+        void geometry(const standard_cell::Cell & cell, const MultiBox & geometry);
 
         //! Pin offset getter
 
@@ -83,7 +84,7 @@ namespace placement
         void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
 
     private:
-        entity_system::Property<standard_cell::Cell, geometry::MultiBox> mGeometries;
+        entity_system::Property<standard_cell::Cell, MultiBox> mGeometries;
         entity_system::Property<standard_cell::Pin, util::LocationDbu>   mPinOffsets;
     };
 }     // namespace placement

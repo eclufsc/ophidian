@@ -56,20 +56,6 @@ namespace floorplan
         using RowsIterator = entity_system::EntitySystem<Row>::const_iterator;
         using SitesIterator = entity_system::EntitySystem<Site>::const_iterator;
 
-        //! Floorplan Constructor
-
-        /*!
-           \brief Constructs a floorplan system with no properties
-         */
-        Floorplan();
-
-        //! Floorplan Destructor
-
-        /*!
-           \brief Destroys the floorplan system, including its properties.
-         */
-        ~Floorplan();
-
         //! Chip origin location setter
 
         /*!

@@ -17,13 +17,13 @@ namespace placement
     {
     }
 
-    geometry::MultiBox PlacementMapping::geometry(const circuit::Cell & cell) const
+    geometry::MultiBox<util::database_unit_t> PlacementMapping::geometry(const circuit::Cell & cell) const
     {
         auto stdCell = mLibraryMapping.cellStdCell(cell);
         auto stdCellGeometry = mLibrary.geometry(stdCell);
         auto cellLocation = mPlacement.cellLocation(cell);
 
-        geometry::MultiBox cellGeometry = stdCellGeometry.translate(cellLocation.toPoint());
+        geometry::MultiBox<util::database_unit_t> cellGeometry = stdCellGeometry.translate(cellLocation);
 
         return cellGeometry;
     }

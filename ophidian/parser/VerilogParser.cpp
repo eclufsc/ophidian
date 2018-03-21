@@ -95,20 +95,20 @@ namespace
         {
             PortDeclaration * vPort = static_cast<PortDeclaration *>(i->data);
 
-            Verilog::PortDirection direction;
+            Verilog::Port::Direction direction;
             switch(vPort->direction)
             {
             case PORT_INPUT:
-                direction = Verilog::PortDirection::INPUT;
+                direction = Verilog::Port::Direction::INPUT;
 
             case PORT_OUTPUT:
-                direction = Verilog::PortDirection::OUTPUT;
+                direction = Verilog::Port::Direction::OUTPUT;
 
             case PORT_INOUT:
-                direction = Verilog::PortDirection::INOUT;
+                direction = Verilog::Port::Direction::INOUT;
 
             case PORT_NONE:
-                direction = Verilog::PortDirection::NONE;
+                direction = Verilog::Port::Direction::NONE;
             }
 
             for(ListElement * portNameWalker = vPort->port_names->head; portNameWalker;
@@ -149,7 +149,7 @@ namespace
                         }
                     }
                     if(!port) {
-                        port = theModule->addPort(Verilog::PortDirection::NONE, portName);
+                        port = theModule->addPort(Verilog::Port::Direction::NONE, portName);
                     }
                     auto netIt = netMapping.find(netName);
                     if(netIt == netMapping.end()) {
@@ -189,7 +189,7 @@ namespace
     }
 
     Verilog::Port * Verilog::Module::addPort(
-        Verilog::PortDirection direction,
+        Verilog::Port::Direction direction,
         const std::string name)
     {
         Port p(direction, name);
@@ -253,13 +253,13 @@ namespace
         return mInstances;
     }
 
-    Verilog::Port::Port(Verilog::PortDirection direction, const std::string & name):
+    Verilog::Port::Port(Verilog::Port::Direction direction, const std::string & name):
             mDirection(direction),
             mName(name)
     {
     }
 
-    Verilog::PortDirection Verilog::Port::direction() const
+    Verilog::Port::Direction Verilog::Port::direction() const
     {
         return mDirection;
     }

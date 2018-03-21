@@ -44,8 +44,8 @@ namespace interconnection
     }
 
     std::unique_ptr<SteinerTree> Flute::singleSegment(
-        const geometry::Point & p1,
-        const geometry::Point & p2)
+        const Point & p1,
+        const Point & p2)
     {
         auto steiner = SteinerTree::create();
 
@@ -54,7 +54,7 @@ namespace interconnection
         return std::move(steiner);
     }
 
-    std::unique_ptr<SteinerTree> Flute::trivialSteinerTree(const geometry::Point & p)
+    std::unique_ptr<SteinerTree> Flute::trivialSteinerTree(const Point & p)
     {
         auto steiner = SteinerTree::create();
 
@@ -66,7 +66,7 @@ namespace interconnection
     std::unique_ptr<SteinerTree> Flute::callFlute(
         const std::vector<unsigned> & X,
         const std::vector<unsigned> & Y,
-        const geometry::Point & offset)
+        const Point & offset)
     {
         Tree tree = flute(
             static_cast<int32_t>(X.size()),
@@ -76,7 +76,6 @@ namespace interconnection
         auto      steiner = SteinerTree::create();
         const int numBranches = 2 * tree.deg - 2;
 
-        geometry::ManhattanDistance distance;
         for(int i = 0; i < numBranches; ++i)
         {
             const Branch & branch = tree.branch[i];
@@ -86,10 +85,16 @@ namespace interconnection
             }
             const Branch & branchN = tree.branch[n];
 
-            geometry::Point u{static_cast<double>(branch.x), static_cast<double>(branch.y)};
-            geometry::Point v{static_cast<double>(branchN.x), static_cast<double>(branchN.y)};
+            Point u{
+                dbu_t{static_cast<double>(branch.x)},
+                dbu_t{static_cast<double>(branch.y)}
+            };
+            Point v{
+                dbu_t{static_cast<double>(branchN.x)}, 
+                dbu_t{static_cast<double>(branchN.y)}
+            };
 
-            auto translate = [&offset](geometry::Point & p) {
+            auto translate = [&offset](Point & p) {
                                  p.x(p.x() - offset.x());
                                  p.y(p.y() - offset.y());
                              };
@@ -97,7 +102,7 @@ namespace interconnection
             translate(u);
             translate(v);
 
-            if(std::abs(distance(u, v)) > std::numeric_limits<double>::epsilon()) {
+            if(geometry::ManhattanDistance(u, v) > dbu_t{std::numeric_limits<double>::epsilon()}) {
                 steiner->add(steiner->add(u), steiner->add(v));
             }
         }

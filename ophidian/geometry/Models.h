@@ -59,10 +59,10 @@ namespace geometry
      * \param points Vector of points of the geometry
      * \return The created geometry
      */
-    template <class Geometry, typename T>
-    Geometry make(const std::vector<Point<T>> & points)
+    template <template <typename> class Geometry, typename T>
+    Geometry<T> make(const std::vector<Point<T>> & points)
     {
-        Geometry geometry;
+        Geometry<T> geometry;
 
         for(auto point : points)
         {
@@ -93,53 +93,54 @@ namespace geometry
     }
 
     //!Class multibox using geometry::Box
+    template <typename T>
     class MultiBox
     {
     public:
 
-        //!Standard constructor
-        MultiBox()
-        {
-        }
+        //!Standar Constructors
+        MultiBox() = default;
+        MultiBox(const MultiBox<T> &) = default;
+        MultiBox(MultiBox<T> &&) = default;
+        MultiBox<T>& operator= ( const MultiBox<T> & ) = default;
+        MultiBox<T>& operator= ( MultiBox<T> && ) = default;
 
         //!Constructor receiving a vector of geometry::Box
-        MultiBox(const std::vector<geometry::Box<double>> & boxes):
+        MultiBox(const std::vector<geometry::Box<T>> & boxes):
                 mBoxes(boxes)
         {
         }
 
-        //!Copy constructor
-        MultiBox(const MultiBox & otherBox):
-                mBoxes(otherBox.mBoxes)
-        {
-        }
-
         //!Push back a geometry::Box
-        void push_back(const geometry::Box<double> & box)
+        void push_back(const Box<T> & box)
         {
             mBoxes.push_back(box);
         }
 
         //!Non-const iterator begin
-        std::vector<geometry::Box<double>>::iterator begin()
+        typename
+        std::vector<Box<T>>::iterator begin()
         {
             return mBoxes.begin();
         }
 
         //!Non-const iterator end
-        std::vector<geometry::Box<double>>::iterator end()
+        typename
+        std::vector<Box<T>>::iterator end()
         {
             return mBoxes.end();
         }
 
         //!Const iterator begin
-        std::vector<geometry::Box<double>>::const_iterator begin() const
+        typename
+        std::vector<Box<T>>::const_iterator begin() const
         {
             return mBoxes.begin();
         }
 
         //!Const iterator end
-        std::vector<geometry::Box<double>>::const_iterator end() const
+        typename
+        std::vector<Box<T>>::const_iterator end() const
         {
             return mBoxes.end();
         }
@@ -165,26 +166,26 @@ namespace geometry
         }
 
         //!Operator overload for difference between two multibox objects
-        bool operator!=(const MultiBox & other) const
+        bool operator!=(const MultiBox<T> & other) const
         {
             return !(*this == other);
         }
 
-        MultiBox translate(geometry::Point<double> translationPoint)
+        MultiBox<T> translate(Point<T> translationPoint)
         {
-            std::vector<geometry::Box<double>> translatedBoxes;
+            std::vector<Box<T>> translatedBoxes;
             translatedBoxes.reserve(mBoxes.size());
             for(auto box : mBoxes)
             {
-                geometry::Box<double> translatedBox = geometry::translate(box, translationPoint);
+                Box<T> translatedBox = geometry::translate(box, translationPoint);
                 translatedBoxes.push_back(translatedBox);
             }
 
-            return MultiBox(translatedBoxes);
+            return MultiBox{translatedBoxes};
         }
 
     private:
-        std::vector<geometry::Box<double>> mBoxes;
+        std::vector<Box<T>> mBoxes;
     };
 }     //namespace geometry
 }     //namespace ophidian
