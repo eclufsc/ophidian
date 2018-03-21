@@ -1,0 +1,5 @@
+# This file is suposed to se simple, it's goal is to be used by find_package
+# It will load the ophidian-targets export wich shoul be located on the same
+# directory.
+
+include("${CMAKE_CURRENT_LIST_DIR}/ophidian-targets.cmake")

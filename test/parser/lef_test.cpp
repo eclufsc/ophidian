@@ -150,7 +150,7 @@ TEST_CASE("lef: missing file", "[parser][lef][missing_file]")
 {
 	parser::LefParser parser;
 	std::unique_ptr<ophidian::parser::Lef> lef =  std::make_unique<ophidian::parser::Lef>();
-	REQUIRE_THROWS(parser.readFile("input_files/thisFileDoesNotExist.lef", lef));
+	REQUIRE_THROWS(parser.readFile("thisFileDoesNotExist.lef", lef));
 }
 
 TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
@@ -158,7 +158,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
 	parser::LefParser parser;
 
 	std::unique_ptr<parser::Lef> simpleLef = std::make_unique<ophidian::parser::Lef>();
-	parser.readFile("input_files/simple.lef", simpleLef);
+	parser.readFile("input_files/simple/simple.lef", simpleLef);
 
 	SECTION("Sites are parsed correctly", "[parser][lef][simple]")
 	{
@@ -235,30 +235,5 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
 	SECTION("Database units are correct", "[parser][lef][simple][dbunits]")
 	{
 		CHECK(Approx(simpleLef->databaseUnits()) == 2000.0);
-	}
-}
-
-TEST_CASE("lef: superblue18.lef parsing", "[parser][lef][superblue18]")
-{
-	parser::LefParser parser;
-
-	INFO("Have you put `superblue18.lef` in the tests binary directory?");
-	std::unique_ptr<parser::Lef> superblue18 = std::make_unique<ophidian::parser::Lef>();
-	parser.readFile("input_files/superblue18.lef", superblue18);
-
-	SECTION("Obses are correct", "[parser][lef][superblue18][obses]")
-	{
-		parser::Lef::rect r1 = {util::LocationMicron(0, 0), util::LocationMicron(3.420, 1.71)};
-
-		parser::Lef::obs obs1;
-		obs1.layer2rects["metal1"] = {r1};
-		obs1.layer2rects["metal2"] = {r1};
-		obs1.layer2rects["metal3"] = {r1};
-		obs1.layer2rects["metal4"] = {r1};
-		obs1.layer2rects["via1"] = {r1};
-		obs1.layer2rects["via2"] = {r1};
-		obs1.layer2rects["via3"] = {r1};
-
-		REQUIRE(compare(superblue18->macros()[212].obses, obs1));
 	}
 }

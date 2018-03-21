@@ -23,52 +23,56 @@
 
 namespace ophidian
 {
-namespace geometry
-{
+    namespace geometry
+    {
+        class ManhattanDistance
+        {
+        public:
 
-class ManhattanDistance
-{
-public:
-	//! Construct ManhattanDistance
-	/*!
-	 * \brief Empty default constructor
-	 */
-	ManhattanDistance() {
+            //! Construct ManhattanDistance
 
-	}
+            /*!
+             * \brief Empty default constructor
+             */
+            ManhattanDistance()
+            {
+            }
 
-	//! Distance operator
-	/*!
-	 * \brief Calculates the Manhattan distance between two points
-	 * \param point1 First point to calculate the distance
-	 * \param point2 Second point to calculate the distance
-	 * \return Manhattan distance between point1 and point2
-	 */
-	double operator()(const Point & point1, const Point & point2);
-};
+            //! Distance operator
 
-class EuclideanDistance
-{
-public:
-	//! Construct EuclideanDistance
-	/*!
-	 * \brief Empty default constructor
-	 */
-	EuclideanDistance() {
+            /*!
+             * \brief Calculates the Manhattan distance between two points
+             * \param point1 First point to calculate the distance
+             * \param point2 Second point to calculate the distance
+             * \return Manhattan distance between point1 and point2
+             */
+            double operator()(const Point & point1, const Point & point2);
+        };
 
-	}
+        class EuclideanDistance
+        {
+        public:
 
-	//! Distance operator
-	/*!
-	 * \brief Calculates the Euclidean distance between two points
-	 * \param point1 First point to calculate the distance
-	 * \param point2 Second point to calculate the distance
-	 * \return Euclidean distance between point1 and point2
-	 */
-	double operator()(const Point &point1, const Point &point2);
-};
+            //! Construct EuclideanDistance
 
-} // namespace geometry
-} // namespace ophidian
+            /*!
+             * \brief Empty default constructor
+             */
+            EuclideanDistance()
+            {
+            }
+
+            //! Distance operator
+
+            /*!
+             * \brief Calculates the Euclidean distance between two points
+             * \param point1 First point to calculate the distance
+             * \param point2 Second point to calculate the distance
+             * \return Euclidean distance between point1 and point2
+             */
+            double operator()(const Point & point1, const Point & point2);
+        };
+    }     // namespace geometry
+}     // namespace ophidian
 
 #endif // OPHIDIAN_GEOMETRY_DISTANCE_H

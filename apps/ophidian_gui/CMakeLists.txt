@@ -49,7 +49,6 @@ target_link_libraries(ophidian_gui PUBLIC
     ophidian_parser
     ophidian_placement
     ophidian_standard_cell
-    ophidian_timing
 )
 
 #${SFML_LIBRARIES}

@@ -20,14 +20,18 @@
 #define OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
 
 #include <ophidian/parser/Lef.h>
-#include <ophidian/placement/Library.h>
+
+#include "Library.h"
 
 namespace ophidian
 {
-namespace placement
-{
-void lef2Library(const parser::Lef & lef, Library & library, standard_cell::StandardCells & stdCells);
-} // namespace placement
-} // namespace ophidian
+    namespace placement
+    {
+        void lef2Library(
+            const parser::Lef & lef,
+            Library & library,
+            standard_cell::StandardCells & stdCells);
+    }     // namespace placement
+}     // namespace ophidian
 
 #endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

@@ -20,70 +20,74 @@
 
 namespace ophidian
 {
+    namespace floorplan
+    {
+        Floorplan::Floorplan():
+                mChipOrigin(0.0, 0.0),
+                mChipUpperRightCorner(0.0, 0.0),
+                mOrigins(mRows),
+                mNumberOfSites(mRows),
+                mSiteTypeOfRow(mRows),
+                mNames(mSites),
+                mDimensions(mSites)
+        {
+        }
 
-namespace floorplan
-{
+        Floorplan::~Floorplan()
+        {
+        }
 
-Floorplan::Floorplan()
-	: mChipOrigin(0.0, 0.0), mChipUpperRightCorner(0.0, 0.0),
-	mOrigins(mRows), mNumberOfSites(mRows), mSiteTypeOfRow(mRows),
-	mNames(mSites), mDimensions(mSites)
-{
+        void Floorplan::chipOrigin(const util::LocationDbu & loc)
+        {
+            mChipOrigin = loc;
+        }
 
-}
+        void Floorplan::chipUpperRightCorner(const util::LocationDbu & loc)
+        {
+            mChipUpperRightCorner = loc;
+        }
 
-Floorplan::~Floorplan()
-{
+        Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
+        {
+            auto site = mSites.add();
 
-}
+            mNames[site] = name;
+            mName2Site[name] = site;
+            mDimensions[site] = loc;
 
-void Floorplan::chipOrigin(const util::LocationDbu &loc)
-{
-	mChipOrigin = loc;
-}
+            return site;
+        }
 
-void Floorplan::chipUpperRightCorner(const util::LocationDbu &loc)
-{
-	mChipUpperRightCorner = loc;
-}
+        void Floorplan::erase(Site site)
+        {
+            mName2Site.erase(name(site));
+            mSites.erase(site);
+        }
 
-Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
-{
-	auto site = mSites.add();
-	mNames[site] = name;
-	mName2Site[name] = site;
-	mDimensions[site] = loc;
-	return site;
-}
+        Row Floorplan::add(Row, const util::LocationDbu & loc, size_t num, const Site & site)
+        {
+            auto row = mRows.add();
 
-void Floorplan::erase(Site site)
-{
-	mName2Site.erase(name(site));
-	mSites.erase(site);
-}
+            mOrigins[row] = loc;
+            mNumberOfSites[row] = num;
+            mSiteTypeOfRow[row] = site;
 
-Row Floorplan::add(Row, const util::LocationDbu &loc, size_t num, const Site &site)
-{
-	auto row = mRows.add();
-	mOrigins[row] = loc;
-	mNumberOfSites[row] = num;
-	mSiteTypeOfRow[row] = site;
-	return row;
-}
+            return row;
+        }
 
-void Floorplan::erase(const Row &row)
-{
-	mRows.erase(row);
-}
+        void Floorplan::erase(const Row & row)
+        {
+            mRows.erase(row);
+        }
 
-util::LocationDbu Floorplan::rowUpperRightCorner(const Row &row) const
-{
-	auto site = mSiteTypeOfRow[row];
-	size_t numSites = mNumberOfSites[row];
-	util::LocationDbu uRCorner = mDimensions[site];
-	return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
-}
+        util::LocationDbu Floorplan::rowUpperRightCorner(const Row & row) const
+        {
+            auto   site = mSiteTypeOfRow[row];
+            size_t numSites = mNumberOfSites[row];
 
-} //namespace floorplan
+            util::LocationDbu uRCorner = mDimensions[site];
 
-} //namespace ophidian
+            return util::LocationDbu(uRCorner.x() * numSites, uRCorner.y());
+        }
+    }     //namespace floorplan
+}     //namespace ophidian

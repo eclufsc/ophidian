@@ -27,227 +27,243 @@
 
 namespace ophidian
 {
-
 /// Namespace describing floorplan entities, properties and basic floorplan interface.
-namespace floorplan
-{
+    namespace floorplan
+    {
+        class Row :
+            public entity_system::EntityBase
+        {
+        public:
+            using entity_system::EntityBase::EntityBase;
+        };
 
-class Row : public entity_system::EntityBase
-{
-public:
-	using entity_system::EntityBase::EntityBase;
-};
-
-class Site : public entity_system::EntityBase
-{
-public:
-	using entity_system::EntityBase::EntityBase;
-};
+        class Site :
+            public entity_system::EntityBase
+        {
+        public:
+            using entity_system::EntityBase::EntityBase;
+        };
 
 /// Floorplan class.
+
 /**
  * This class provides the basic floorplan interface, such as site and rows insertion, site and rows properties and circuit dimensions.
  */
-class Floorplan
-{
-public:
-	using RowsIterator = entity_system::EntitySystem<Row>::const_iterator;
-	using SitesIterator = entity_system::EntitySystem<Site>::const_iterator;
+        class Floorplan
+        {
+        public:
+            using RowsIterator = entity_system::EntitySystem <Row>::const_iterator;
+            using SitesIterator = entity_system::EntitySystem <Site>::const_iterator;
 
-	//! Floorplan Constructor
-	/*!
-	   \brief Constructs a floorplan system with no properties
-	 */
-	Floorplan();
+            //! Floorplan Constructor
 
-	//! Floorplan Destructor
-	/*!
-	   \brief Destroys the floorplan system, including its properties.
-	 */
-	~Floorplan();
+            /*!
+               \brief Constructs a floorplan system with no properties
+             */
+            Floorplan();
 
-	//! Chip origin location setter
-	/*!
-	   \brief Set the chip origin location.
-	   \param loc Chip origin location.
-	 */
-	void chipOrigin(const util::LocationDbu & loc);
+            //! Floorplan Destructor
 
-	//! Chip origin location getter
-	/*!
-	   \brief Get the chip origin location.
-	   \return Chip origin location.
-	 */
-	util::LocationDbu chipOrigin()
-	{
-		return mChipOrigin;
-	}
+            /*!
+               \brief Destroys the floorplan system, including its properties.
+             */
+            ~Floorplan();
 
-	//! Chip upper right corner location setter
-	/*!
-	   \brief Set the chip upper right corner location.
-	   \param loc Chip upper right corner location.
-	 */
-	void chipUpperRightCorner(const util::LocationDbu & loc);
+            //! Chip origin location setter
 
-	//! Chip upper right corner location getter
-	/*!
-	   \brief Get the chip upper right corner location.
-	   \param Chip upper right corner location.
-	 */
-	util::LocationDbu chipUpperRightCorner()
-	{
-		return mChipUpperRightCorner;
-	}
+            /*!
+               \brief Set the chip origin location.
+               \param loc Chip origin location.
+             */
+            void chipOrigin(const util::LocationDbu & loc);
 
+            //! Chip origin location getter
 
-	// sites
-	//! Add site in the floorplan
-	/*!
-	   \brief Adds a a new site in the floorplan. A site has a name and a dimension associated to it.
-	   \param name Name of the site, used to identify it.
-	   \param dimension LocationDbu describing the site dimension.
-	   \return The created site.
-	 */
-	Site add(Site, const std::string & name, const util::LocationDbu & loc);
+            /*!
+               \brief Get the chip origin location.
+               \return Chip origin location.
+             */
+            util::LocationDbu chipOrigin()
+            {
+                return mChipOrigin;
+            }
 
-	//! Erase site in the floorplan
-	/*!
-	   \brief Erases an existing site.
-	   \param site Site to be erased.
-	 */
-	void erase(Site site);
+            //! Chip upper right corner location setter
 
+            /*!
+               \brief Set the chip upper right corner location.
+               \param loc Chip upper right corner location.
+             */
+            void chipUpperRightCorner(const util::LocationDbu & loc);
 
-	//! Name getter
-	/*!
-	   \brief Get the name of a given site
-	   \param site Site entity to get the name.
-	   \return Name of the site.
-	 */
-	std::string name(const Site & site) const
-	{
-		return mNames[site];
-	}
+            //! Chip upper right corner location getter
 
-	//! Site getter
-	/*!
-	   \brief Get the site of a given site name
-	   \param A name of a site.
-	   \return Site entity of the given name.
-	 */
-	Site find(std::string siteName)
-	{
-		return mName2Site[siteName];
-	}
+            /*!
+               \brief Get the chip upper right corner location.
+               \param Chip upper right corner location.
+             */
+            util::LocationDbu chipUpperRightCorner()
+            {
+                return mChipUpperRightCorner;
+            }
 
-	//! Site Upper right corner getter
-	/*!
-	   \brief get the upper right corner of a given site
-	   \param site Site entity to get the upper right corner.
-	   \return upper right corner of the site.
-	 */
-	util::LocationDbu siteUpperRightCorner(const Site & site) const
-	{
-		return mDimensions[site];
-	}
+            // sites
+            //! Add site in the floorplan
 
-	//! Sites iterator
-	/*!
-	   \return Range iterator for the Sites.
-	 */
-	ophidian::util::Range<SitesIterator> sitesRange() const
-	{
-		return ophidian::util::Range<SitesIterator>(mSites.begin(), mSites.end());
-	}
+            /*!
+               \brief Adds a a new site in the floorplan. A site has a name and a dimension associated to it.
+               \param name Name of the site, used to identify it.
+               \param dimension LocationDbu describing the site dimension.
+               \return The created site.
+             */
+            Site add(Site, const std::string & name, const util::LocationDbu & loc);
+
+            //! Erase site in the floorplan
+
+            /*!
+               \brief Erases an existing site.
+               \param site Site to be erased.
+             */
+            void erase(Site site);
 
 
-	// rows
-	//! Add row in the floorplan
-	/*!
-	   \brief Adds a a new row in the floorplan. A row has a origin location, number of sites and a siteTyoe associated to it.
-	   \param loc Origin location of the row.
-	   \param num Number of sites of the row.
-	   \param site Site type of the row.
-	   \return The created row.
-	 */
-	Row add(Row, const util::LocationDbu & loc, size_t num, const Site &site);
+            //! Name getter
 
-	//! Erase row in the floorplan
-	/*!
-	   \brief Erases an existing row.
-	   \param row Row to be erased.
-	 */
-	void erase(const Row & row);
+            /*!
+               \brief Get the name of a given site
+               \param site Site entity to get the name.
+               \return Name of the site.
+             */
+            std::string name(const Site & site) const
+            {
+                return mNames[site];
+            }
 
-	//! Origin location getter
-	/*!
-	   \brief Get the origin location of a given row.
-	   \param row Row entity to get the origin location.
-	   \return Origin location of the row.
-	 */
-	util::LocationDbu origin(const Row & row) const
-	{
-		return mOrigins[row];
-	}
+            //! Site getter
 
-	//! Number of sites getter
-	/*!
-	   \brief Get the number of sites of a given row.
-	   \param row Row entity to get the origin location.
-	   \return Number of sites of the row.
-	 */
-	size_t numberOfSites(const Row & row) const
-	{
-		return mNumberOfSites[row];
-	}
+            /*!
+               \brief Get the site of a given site name
+               \param A name of a site.
+               \return Site entity of the given name.
+             */
+            Site find(std::string siteName)
+            {
+                return mName2Site[siteName];
+            }
 
-	//! Site type getter
-	/*!
-	   \brief Get the site type which the row is composed of.
-	   \param row Row entity to get the origin location.
-	   \return Site type of the row.
-	 */
-	Site site(const Row & row) const
-	{
-		return mSiteTypeOfRow[row];
-	}
+            //! Site Upper right corner getter
 
-	//! Rows iterator
-	/*!
-	   \return Range iterator for the Rows.
-	 */
-	ophidian::util::Range<RowsIterator> rowsRange() const
-	{
-		return util::Range<RowsIterator>(mRows.begin(), mRows.end());
-	}
+            /*!
+               \brief get the upper right corner of a given site
+               \param site Site entity to get the upper right corner.
+               \return upper right corner of the site.
+             */
+            util::LocationDbu siteUpperRightCorner(const Site & site) const
+            {
+                return mDimensions[site];
+            }
 
-	/// Row dimensions getter.
-	/**
-	 * Returns the upper right corner of a row, calculated using the number of sites and site dimensions in that row.
-	 * \param row Row entity to gets the dimensions.
-	 * \return LocationDbu describing the upper right corner of that row.
-	 */
-	util::LocationDbu rowUpperRightCorner(const Row & row) const;
+            //! Sites iterator
 
-private:
-	entity_system::EntitySystem<Row> mRows;
-	entity_system::Property<Row, util::LocationDbu> mOrigins;
-	entity_system::Property<Row, size_t> mNumberOfSites;
-	entity_system::Property<Row, Site> mSiteTypeOfRow;
+            /*!
+               \return Range iterator for the Sites.
+             */
+            ophidian::util::Range <SitesIterator> sitesRange() const
+            {
+                return ophidian::util::Range <SitesIterator>(mSites.begin(), mSites.end());
+            }
 
-	entity_system::EntitySystem<Site> mSites;
-	entity_system::Property<Site, std::string> mNames;
-	entity_system::Property<Site, util::LocationDbu> mDimensions;
+            // rows
+            //! Add row in the floorplan
 
-	util::LocationDbu mChipOrigin;
-	util::LocationDbu mChipUpperRightCorner;
+            /*!
+               \brief Adds a a new row in the floorplan. A row has a origin location, number of sites and a siteTyoe associated to it.
+               \param loc Origin location of the row.
+               \param num Number of sites of the row.
+               \param site Site type of the row.
+               \return The created row.
+             */
+            Row add(Row, const util::LocationDbu & loc, size_t num, const Site &site);
 
-	std::unordered_map<std::string, Site> mName2Site;
-};
+            //! Erase row in the floorplan
 
-} //namespace floorplan
+            /*!
+               \brief Erases an existing row.
+               \param row Row to be erased.
+             */
+            void erase(const Row & row);
 
-} //namespace ophidian
+            //! Origin location getter
+
+            /*!
+               \brief Get the origin location of a given row.
+               \param row Row entity to get the origin location.
+               \return Origin location of the row.
+             */
+            util::LocationDbu origin(const Row & row) const
+            {
+                return mOrigins[row];
+            }
+
+            //! Number of sites getter
+
+            /*!
+               \brief Get the number of sites of a given row.
+               \param row Row entity to get the origin location.
+               \return Number of sites of the row.
+             */
+            size_t numberOfSites(const Row & row) const
+            {
+                return mNumberOfSites[row];
+            }
+
+            //! Site type getter
+
+            /*!
+               \brief Get the site type which the row is composed of.
+               \param row Row entity to get the origin location.
+               \return Site type of the row.
+             */
+            Site site(const Row & row) const
+            {
+                return mSiteTypeOfRow[row];
+            }
+
+            //! Rows iterator
+
+            /*!
+               \return Range iterator for the Rows.
+             */
+            ophidian::util::Range <RowsIterator> rowsRange() const
+            {
+                return util::Range <RowsIterator>(mRows.begin(), mRows.end());
+            }
+
+            /// Row dimensions getter.
+
+            /**
+             * Returns the upper right corner of a row, calculated using the number of sites and site dimensions in that row.
+             * \param row Row entity to gets the dimensions.
+             * \return LocationDbu describing the upper right corner of that row.
+             */
+            util::LocationDbu rowUpperRightCorner(const Row & row) const;
+
+        private:
+            entity_system::EntitySystem <Row>                mRows;
+            entity_system::Property <Row, util::LocationDbu> mOrigins;
+            entity_system::Property <Row, size_t>            mNumberOfSites;
+            entity_system::Property <Row, Site>              mSiteTypeOfRow;
+
+            entity_system::EntitySystem <Site>                mSites;
+            entity_system::Property <Site, std::string>       mNames;
+            entity_system::Property <Site, util::LocationDbu> mDimensions;
+
+            util::LocationDbu mChipOrigin;
+            util::LocationDbu mChipUpperRightCorner;
+
+            std::unordered_map <std::string, Site> mName2Site;
+        };
+    }     //namespace floorplan
+}     //namespace ophidian
 
 #endif // OPHIDIAN_FLOORPLAN_FLOORPLAN_H

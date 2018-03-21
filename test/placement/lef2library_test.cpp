@@ -1,4 +1,3 @@
-#include "lef2library_test.h"
 #include <catch.hpp>
 
 #include <ophidian/placement/Lef2Library.h>
@@ -10,7 +9,7 @@ class Lef2LibraryFixture
 public:
 	Lef2LibraryFixture(){
 		lef = std::make_unique<ophidian::parser::Lef>();
-		parser.readFile("./input_files/simple.lef", lef);
+		parser.readFile("./input_files/simple/simple.lef", lef);
 		library.reset(new placement::Library(stdCells));
 		placement::lef2Library(*lef, *library, stdCells);
 	}

@@ -27,12 +27,12 @@
 
 namespace ophidian
 {
-namespace placement
-{
+    namespace placement
+    {
+        class Placement
+        {
+        public:
 
-class Placement
-{
-public:
 	//! Placement Constructor
 	/*!
        \brief Constructs a placement system with no properties.
@@ -72,17 +72,15 @@ public:
 
     util::LocationDbu outputPadLocation(const circuit::Output & output) const;
 
-    //! Get from branch iccad2017
     void fixLocation(const circuit::Cell & cell, bool fixed);
 
-    //! Get from branch iccad2017
     bool isFixed(const circuit::Cell & cell) const;
 
 private:
     entity_system::Property<circuit::Cell, util::LocationDbu> mCellLocations;
     entity_system::Property<circuit::Input, util::LocationDbu> mInputLocations;
     entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
-    entity_system::Property<circuit::Cell, bool> cellFixed_; //! Get from branch iccad2017
+    entity_system::Property<circuit::Cell, bool> mCellFixed;
 };
 
 } //namespace placement

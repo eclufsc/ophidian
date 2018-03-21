@@ -29,110 +29,108 @@
 
 namespace ophidian
 {
-
-/// Design describing a whole system
-namespace design
-{
-
-class Design
-{
-public:
-
-	//! Design Constructor
-	/*!
-	   \brief Constructs a design system with no properties
-	 */
-	Design();
-
-	//! Design Destructor
-	/*!
-	   \brief Destroys the design system, including its properties.
-	 */
-	~Design();
-
-	//! netlist getter
-	/*!
-	   \brief Get the netlist.
-	   \return Netlist.
-	 */
-	circuit::Netlist & netlist()
+	/// Design describing a whole system
+	namespace design
 	{
-		return mNetlist;
-	}
+		class Design
+		{
+		public:
 
-	//! floorplan getter
-	/*!
-	   \brief Get the floorplan.
-	   \return Floorplan.
-	 */
-	floorplan::Floorplan & floorplan()
-	{
-		return mFloorplan;
-	}
+			//! Design Constructor
+			/*!
+			\brief Constructs a design system with no properties
+			*/
+			Design();
 
-	//! placement getter
-	/*!
-	   \brief Get the placement.
-	   \return Placement.
-	 */
-	placement::Placement & placement()
-	{
-		return mPlacement;
-	}
+			//! Design Destructor
+			/*!
+			\brief Destroys the design system, including its properties.
+			*/
+			~Design();
 
-	//! standardCells getter
-	/*!
-	   \brief Get standardCells.
-	   \return StandardCells.
-	 */
-	standard_cell::StandardCells & standardCells()
-	{
-		return mStandardCells;
-	}
+			//! netlist getter
+			/*!
+			\brief Get the netlist.
+			\return Netlist.
+			*/
+			circuit::Netlist & netlist()
+			{
+				return mNetlist;
+			}
 
-	//! library getter
-	/*!
-	   \brief Get the library.
-	   \return Library.
-	 */
-	placement::Library & library()
-	{
-		return mLibrary;
-	}
+			//! floorplan getter
+			/*!
+			\brief Get the floorplan.
+			\return Floorplan.
+			*/
+			floorplan::Floorplan & floorplan()
+			{
+				return mFloorplan;
+			}
 
-	//! libraryMapping getter
-	/*!
-	   \brief Get the libraryMapping.
-	   \return LibraryMapping.
-	 */
-	circuit::LibraryMapping & libraryMapping()
-	{
-		return mLibraryMapping;
-	}
+			//! placement getter
+			/*!
+			\brief Get the placement.
+			\return Placement.
+			*/
+			placement::Placement & placement()
+			{
+				return mPlacement;
+			}
 
-    //! placementMapping getter
-    /*!
-       \brief Get the placementMapping.
-       \return PlacementMapping.
-     */
-    placement::PlacementMapping & placementMapping()
-    {
-        return mPlacementMapping;
-    }
+			//! standardCells getter
+			/*!
+			\brief Get standardCells.
+			\return StandardCells.
+			*/
+			standard_cell::StandardCells & standardCells()
+			{
+				return mStandardCells;
+			}
 
-private:
+			//! library getter
+			/*!
+			\brief Get the library.
+			\return Library.
+			*/
+			placement::Library & library()
+			{
+				return mLibrary;
+			}
 
-	circuit::Netlist mNetlist;
-	floorplan::Floorplan mFloorplan;
-	placement::Placement mPlacement;
-	standard_cell::StandardCells mStandardCells;
-	placement::Library mLibrary;
-	circuit::LibraryMapping mLibraryMapping;
-    placement::PlacementMapping mPlacementMapping;
+			//! libraryMapping getter
+			/*!
+			\brief Get the libraryMapping.
+			\return LibraryMapping.
+			*/
+			circuit::LibraryMapping & libraryMapping()
+			{
+				return mLibraryMapping;
+			}
 
-};
+			//! placementMapping getter
+			/*!
+			\brief Get the placementMapping.
+			\return PlacementMapping.
+			*/
+			placement::PlacementMapping & placementMapping()
+			{
+				return mPlacementMapping;
+			}
 
-} //namespace design
+		private:
+
+			circuit::Netlist mNetlist;
+			floorplan::Floorplan mFloorplan;
+			placement::Placement mPlacement;
+			standard_cell::StandardCells mStandardCells;
+			placement::Library mLibrary;
+			circuit::LibraryMapping mLibraryMapping;
+			placement::PlacementMapping mPlacementMapping;
+
+		};
+
+	} //namespace design
 
 } //namespace ophidian
 
