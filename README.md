@@ -17,10 +17,13 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 * [Getting Started](#getting-started)
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
+    * [Others](#others)
 * [Hello World!](#hello-world)
 * [Contributing](#contributing)
     * [Project Structure](#project-structure)
     * [Build and Installation Guide](#build-and-installation-guide)
+    * [Build Dependencies](#build-dependencies)
+    * [Compiling Ophidian](#compiling-ophidian)
 * [Credits](#credits)
 
 # Getting Started!
@@ -100,32 +103,32 @@ ophidian
 
 ```
 
-### The main `ophidian/CMakeLists.txt` file:
+### The main [`ophidian/CMakeLists.txt`](CMakeLists.txt) file:
 This is the main Cmake file for the ophidian project, it's goals are set up project variables,
 handle dependencies and include the project subdirectories.
 
-### The `ophidian/build_dependencies.sh` script:
+### The [`ophidian/build_dependencies.sh`](build_dependencies.sh) script:
 This script serves as a c++ `npm`, `gem`, `pip`, equivalent.
 It will fetch all third party git submodules located at `ophidian/3rdparty`, 
 compile and install them to `ophidian/dependencies` by default.
 
-### The `ophidian/cmake` directory:
+### The [`ophidian/cmake`](cmake) directory:
 Here you will have all custom made **cmake modules** used by the `CMakeLists.txt` files.
 
-### The `ophidian/3rdparty` directory:
+### The [`ophidian/3rdparty`](3rdparty) directory:
 This directory holds the git submodules with the source code of ophidian's dependencies.
 
-### The `ophidian/ophidian` directory:
+### The [`ophidian/ophidian`](ophidian) directory:
 Here you will have directories for each library developed by the ophidian team.
 Each library directory will have its own `CMakeLists.txt` file with its own compilation instructions.
 
-### The `ophidian/ophidian/CMakeLists.txt` file:
+### The [`ophidian/ophidian/CMakeLists.txt`](ophidian/CMakeLists.txt) file:
 This file handles the installation rules for the ophidian library.
 
-### The `ophidian/test` directory:
+### The [`ophidian/test`](test) directory:
 Here you will find directories for each ophidian library unit tests.
 
-### The `ophidian/test/CMakeLists.txt` file:
+### The [`ophidian/test/CMakeLists.txt`](test/CMakeLists.txt) file:
 This file handles the compilation instructions for the unit tests binary.
 
 
