@@ -1,18 +1,18 @@
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
-    url = https://gitlab.com/eclufsc/verilog-parser.git
+    url = https://gitlab.com/eclufsc/eda/verilog-parser.git
 [submodule "3rdparty/DEF"]
 	path = 3rdparty/DEF
-	url = https://gitlab.com/eclufsc/DEF.git
+	url = https://gitlab.com/eclufsc/eda/DEF.git
 [submodule "3rdparty/Flute"]
 	path = 3rdparty/Flute
-	url = https://gitlab.com/eclufsc/Flute.git
+	url = https://gitlab.com/eclufsc/eda/Flute.git
 [submodule "3rdparty/LEF"]
 	path = 3rdparty/LEF
-	url = https://gitlab.com/eclufsc/LEF.git
+	url = https://gitlab.com/eclufsc/eda/LEF.git
 [submodule "3rdparty/Lemon"]
 	path = 3rdparty/Lemon
-	url = https://gitlab.com/eclufsc/Lemon.git
+	url = https://gitlab.com/eclufsc/eda/Lemon.git
 [submodule "3rdparty/units"]
 	path = 3rdparty/units
-	url = https://gitlab.com/eclufsc/units.git
+	url = https://gitlab.com/eclufsc/eda/units.git
