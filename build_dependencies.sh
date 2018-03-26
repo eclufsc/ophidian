@@ -17,6 +17,25 @@ SOURCE_ROOT=$(dirname "$SCRIPT")
 # Set default Dependencies Root
 DEPENDENCIES_ROOT=$SOURCE_ROOT/dependencies
 
+# Set GUI dependences instalation
+INSTALL_GUI=false
+
+# Check if user wants to install elsewhere
+AUX=$2
+if [ "$1" = "--install_to" ] && [ "${AUX:0:1}" != "/" ]
+then
+    DEPENDENCIES_ROOT=$CURRENT_DIR/$2
+elif [ "$1" = "--install_to" ] && [ "${AUX:0:1}" = "/" ]
+then
+    DEPENDENCIES_ROOT=$2
+fi
+
+# Check if user wants to install gui dependences
+if [ "$3" = "--install_gui" ]
+then
+    INSTALL_GUI=true
+fi
+
 # Check if user wants to install elsewhere
 AUX=$2
 if [ "$1" = "--install_to" ] && [ "${AUX:0:1}" != "/" ]
@@ -120,6 +139,24 @@ install_UNITS()
     rm -rf build
 }
 
+install_SFML()
+{
+    echo "installing sfml"
+    wget https://www.sfml-dev.org/files/SFML-2.4.2-linux-gcc-64-bit.tar.gz
+    tar -xvzf SFML-2.4.2-linux-gcc-64-bit.tar.gz
+    cp -a SFML-2.4.2/include/. DEPENDENCIES_INCLUDE_PATH/
+    cp -a SFML-2.4.2/lib/. DEPENDENCIES_LIB_PATH/
+    cp -a SFML-2.4.2/share/. DEPENDENCIES_SHARE_PATH/
+    rm -rf SFML-2.4.2/
+    rm SFML-2.4.2-linux-gcc-64-bit.tar.gz
+}
+
+install_QT5()
+{
+    echo "installing qt5"
+    apt install qtbase5-dev
+}
+
 run_install()
 {
     install -d $DEPENDENCIES_ROOT
@@ -134,6 +171,13 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
+
+    if [ "$INSTALL_GUI" = true ]
+    then
+        install_SFML
+        install_QT5
+    fi
+
 }
 
 run_install

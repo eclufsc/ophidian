@@ -39,6 +39,9 @@ OPTION(RUN_UNCRUSTIFY_CHECK OFF)
 # Set the uncrustify config file
 set(ophidian_uncrustify_config ${ophidian_source_dir}/uncrustify.cfg)
 
+# Build graphic user interface of ophidian
+OPTION(OPHIDIAN_GUI ON)
+
 ################################################################################
 # Set up installation variables
 ################################################################################
@@ -112,6 +115,11 @@ find_package(Flute REQUIRED)
 # Find Verilog-parser
 find_package(verilog-parser REQUIRED)
 
+IF(ON)
+   find_package(SFML 2 REQUIRED network audio graphics window system)
+   find_package(Qt5Widgets REQUIRED)
+ENDIF(ON)
+
 ################################################################################
 # Project logic 
 ################################################################################
@@ -121,5 +129,6 @@ add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
 
-# Then add app
-add_subdirectory(apps)
+IF(ON)
+    add_subdirectory(apps)
+ENDIF(ON)
