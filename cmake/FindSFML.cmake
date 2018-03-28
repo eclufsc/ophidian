@@ -367,12 +367,12 @@ if(SFML_FOUND AND NOT SFML_FIND_QUIETLY)
     message(STATUS "Found SFML ${SFML_VERSION_MAJOR}.${SFML_VERSION_MINOR}.${SFML_VERSION_PATCH} in ${SFML_INCLUDE_DIR}")
 endif()
 
-#include(FindPackageHandleStandardArgs)
+include(FindPackageHandleStandardArgs)
 
-#find_package_handle_standard_args(SFML::sfml DEFAULT_MSG
-#    SFML_INCLUDE_DIR
-#    SFML_LIBRARIES
-#)
+find_package_handle_standard_args(SFML DEFAULT_MSG
+    SFML_INCLUDE_DIR
+    SFML_LIBRARIES
+)
 
 add_library(SFML::sfml STATIC IMPORTED)
 set_target_properties(SFML::sfml PROPERTIES

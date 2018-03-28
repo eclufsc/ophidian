@@ -4,13 +4,14 @@ file(GLOB_RECURSE ophidian_gui_SRC
 )
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable( ophidian_gui ${ophidian_gui_SRC} )
 
 target_link_libraries(ophidian_gui PUBLIC
     PRIVATE Qt5::Widgets
-    PRIVATE ${SFML_LIBRARIES}
+    PRIVATE SFML::sfml
     PRIVATE ophidian_circuit
     PRIVATE ophidian_design
     PRIVATE ophidian_entity_system

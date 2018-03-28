@@ -115,10 +115,13 @@ find_package(Flute REQUIRED)
 # Find Verilog-parser
 find_package(verilog-parser REQUIRED)
 
-IF(ON)
-   find_package(SFML 2 REQUIRED network audio graphics window system)
-   find_package(Qt5Widgets REQUIRED)
-ENDIF(ON)
+IF(OPHIDIAN_GUI)
+    # Find SFML
+    find_package(SFML 2 REQUIRED network audio graphics window system)
+
+    # Find Qt5
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
+ENDIF(OPHIDIAN_GUI)
 
 ################################################################################
 # Project logic 
@@ -129,6 +132,6 @@ add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
 
-IF(ON)
+IF(OPHIDIAN_GUI)
     add_subdirectory(apps)
-ENDIF(ON)
+ENDIF(OPHIDIAN_GUI)
