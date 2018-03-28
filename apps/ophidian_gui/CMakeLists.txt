@@ -11,7 +11,7 @@ add_executable( ophidian_gui ${ophidian_gui_SRC} )
 
 target_link_libraries(ophidian_gui PUBLIC
     PRIVATE Qt5::Widgets
-    PRIVATE SFML::sfml
+    PRIVATE ${SFML_LIBRARIES}
     PRIVATE ophidian_circuit
     PRIVATE ophidian_design
     PRIVATE ophidian_entity_system
@@ -24,4 +24,3 @@ target_link_libraries(ophidian_gui PUBLIC
 )
 
 #${SFML_LIBRARIES}
-#${SFML_DEPENDENCIES}

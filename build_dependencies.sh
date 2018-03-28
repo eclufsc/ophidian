@@ -147,7 +147,7 @@ install_SFML()
     cp -a SFML-2.4.2/include/. $DEPENDENCIES_INCLUDE_PATH
     cp -a SFML-2.4.2/lib/. $DEPENDENCIES_LIB_PATH
     cp -a SFML-2.4.2/share/. $DEPENDENCIES_SHARE_PATH
-    rm -rf SFML-2.4.2/
+    rm -rf SFML-2.4.
     rm SFML-2.4.2-linux-gcc-64-bit.tar.gz
 }
 

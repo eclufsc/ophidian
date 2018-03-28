@@ -40,7 +40,7 @@ OPTION(RUN_UNCRUSTIFY_CHECK OFF)
 set(ophidian_uncrustify_config ${ophidian_source_dir}/uncrustify.cfg)
 
 # Build graphic user interface of ophidian
-OPTION(OPHIDIAN_GUI ON)
+OPTION(OPHIDIAN_GUI OFF)
 
 ################################################################################
 # Set up installation variables
