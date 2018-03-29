@@ -146,8 +146,7 @@ install_SFML()
     cd SFML/
     mkdir build/
     cd build/
-    cmake -G"Unix Makefiles" ..
-    make
+    cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ../..
     rm -rf SFML
@@ -156,7 +155,16 @@ install_SFML()
 install_QT5()
 {
     echo "installing qt5"
-    apt install qtbase5-dev
+    git clone https://github.com/qt/qt5.git
+    cd qt5
+    git checkout 5.10
+    perl init-repository
+    export LLVM_INSTALL_DIR=/usr/llvm
+    ./configure --prefix=$DEPENDENCIES_ROOT -developer-build -opensource -nomake examples -nomake tests
+    make -j4
+    make install
+    cd ..
+    rm -rf qt5
 }
 
 run_install()

@@ -49,7 +49,18 @@ variables:
         libogg-dev
         libvorbis-dev
         libopenal-dev
-        libpthread-stubs0-dev"
+        libpthread-stubs0-dev
+        perl
+        libgl1-mesa-dev"
+
+        #https://wiki.qt.io/Building_Qt_5_from_Git
+
+        # QT 5 fedora
+        #sudo yum groupinstall "C Development Tools and Libraries"
+        #sudo yum install mesa-libGL-devel
+        
+        # QT 5 openSUSE
+        #sudo zypper install -t pattern devel_basis
 
 
     GIT_SUBMODULE_STRATEGY: recursive
