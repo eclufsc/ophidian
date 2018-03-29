@@ -33,6 +33,25 @@ variables:
         libflute-dev
         libverilog-parser-dev"
 
+    DEPENDENCIES_GUI:
+        "freetype2-demos
+        libjpeg-dev
+        x11-xserver-utils
+        xorg-dev
+        openbox
+        xcb
+        libx11-xcb-dev
+        libxcb-randr0-dev
+        libxcb-image0-dev
+        freeglut3-dev
+        libudev-dev
+        libflac-dev
+        libogg-dev
+        libvorbis-dev
+        libopenal-dev
+        libpthread-stubs0-dev"
+
+
     GIT_SUBMODULE_STRATEGY: recursive
 
 stages:

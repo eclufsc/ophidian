@@ -142,13 +142,15 @@ install_UNITS()
 install_SFML()
 {
     echo "installing sfml"
-    wget https://www.sfml-dev.org/files/SFML-2.4.2-linux-gcc-64-bit.tar.gz
-    tar -xvzf SFML-2.4.2-linux-gcc-64-bit.tar.gz
-    cp -a SFML-2.4.2/include/. $DEPENDENCIES_INCLUDE_PATH
-    cp -a SFML-2.4.2/lib/. $DEPENDENCIES_LIB_PATH
-    cp -a SFML-2.4.2/share/. $DEPENDENCIES_SHARE_PATH
-    rm -rf SFML-2.4.
-    rm SFML-2.4.2-linux-gcc-64-bit.tar.gz
+    git clone https://github.com/SFML/SFML.git
+    cd SFML/
+    mkdir build/
+    cd build/
+    cmake -G"Unix Makefiles" ..
+    make
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cd ../..
+    rm -rf SFML
 }
 
 install_QT5()
