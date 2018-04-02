@@ -13,17 +13,22 @@ TEST_CASE("Def: Try to load inexistent file", "[parser][Def]")
     );
 }
 
-TEST_CASE("Def: Loading simple.def", "[parser][Def]")
+TEST_CASE("Def: Loading simple.def", "[parser][Def][simple]")
 {
-    auto simple = Def{"./input_files/simple/simple.def"};
+    auto simple = Def{"input_files/simple/simple.def"};
 
-    SECTION("Def: Diearea lower and upper points"){
+    SECTION("Def: Check units distance", "[parser][Def][simple][ratio]"){
+        CHECK(simple.dbu_to_micrometer_ratio() == 2000.0);
+    }
+
+    SECTION("Def: Diearea lower and upper points", "[parser][Def][simple][die_area]"){
         CHECK(simple.die_area().min_corner().x() == Def::dbu_type{0});
         CHECK(simple.die_area().min_corner().y() == Def::dbu_type{0});
         CHECK(simple.die_area().max_corner().x() == Def::dbu_type{27360});
         CHECK(simple.die_area().max_corner().y() == Def::dbu_type{13680});
     }
-    SECTION("Def: Checking Component vector"){
+
+    SECTION("Def: Checking Component vector", "[parser][Def][simple][components]"){
         auto components = simple.components();
         CHECK(components.size() == 6);
 
@@ -41,29 +46,27 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def]")
         CHECK(components[2].position.y() == Def::dbu_type{0});
         CHECK(components[2].fixed);
     }
-    // SECTION("Def: Checking Row vector"){
-    //     auto rows = simple.rows();
-    //     CHECK(rows.size() == 4);
-    //
-    //     CHECK(rows[0].name == "core_SITE_ROW_0");
-    //     CHECK(rows[0].site == "core");
-    //     CHECK(rows[0].origin.x == 0.0);
-    //     CHECK(rows[0].origin.y == 0.0);
-    //     CHECK(rows[0].step.x == 380.0);
-    //     CHECK(rows[0].step.y == 0.0);
-    //     CHECK(rows[0].num.x == 72.0);
-    //     CHECK(rows[0].num.y == 1.0);
-    //
-    //     CHECK(rows[3].name == "core_SITE_ROW_3");
-    //     CHECK(rows[3].site == "core");
-    //     CHECK(rows[3].origin.x == 0.0);
-    //     CHECK(rows[3].origin.y == 10260.0);
-    //     CHECK(rows[3].step.x == 380.0);
-    //     CHECK(rows[3].step.y == 0.0);
-    //     CHECK(rows[3].num.x == 72.0);
-    //     CHECK(rows[3].num.y == 1.0);
-    // }
-    // SECTION("Def: Check units distance"){
-    //     CHECK(simple.database_units() == 2000.0);
-    // }
+
+    SECTION("Def: Checking Row vector", "[parser][Def][simple][rows]"){
+        auto rows = simple.rows();
+        CHECK(rows.size() == 4);
+
+        CHECK(rows[0].name == "core_SITE_ROW_0");
+        CHECK(rows[0].site == "core");
+        CHECK(rows[0].origin.x() == Def::dbu_type{0.0});
+        CHECK(rows[0].origin.y() == Def::dbu_type{0.0});
+        CHECK(rows[0].step.x() == Def::dbu_type{380.0});
+        CHECK(rows[0].step.y() == Def::dbu_type{0.0});
+        CHECK(rows[0].num.x() == Def::scalar_type{72.0});
+        CHECK(rows[0].num.y() == Def::scalar_type{1.0});
+
+        CHECK(rows[3].name == "core_SITE_ROW_3");
+        CHECK(rows[3].site == "core");
+        CHECK(rows[3].origin.x() == Def::dbu_type{0.0});
+        CHECK(rows[3].origin.y() == Def::dbu_type{10260.0});
+        CHECK(rows[3].step.x() == Def::dbu_type{380.0});
+        CHECK(rows[3].step.y() == Def::dbu_type{0.0});
+        CHECK(rows[3].num.x() == Def::scalar_type{72.0});
+        CHECK(rows[3].num.y() == Def::scalar_type{1.0});
+    }
 }

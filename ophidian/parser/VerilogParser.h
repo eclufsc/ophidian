@@ -31,6 +31,8 @@ namespace parser
     class Verilog
     {
     public:
+        template <class T> using container_type = std::list<T>;
+
         class Port;
         class Net;
         class Instance;
@@ -38,10 +40,10 @@ namespace parser
 
         Module * addModule(const std::string & name);
 
-        const std::list<Module> & modules() const;
+        const container_type<Module> & modules() const;
 
     private:
-        std::list<Module> mModules;
+        container_type<Module> m_modules;
     };
 
     class Verilog::Port
@@ -114,20 +116,20 @@ namespace parser
 
         const std::string & name() const;
 
-        const std::list<Port> & ports() const;
+        const container_type<Port> & ports() const;
 
-        const std::list<Net> & nets() const;
+        const container_type<Net> & nets() const;
 
-        const std::list<Module> & modules() const;
+        const container_type<Module> & modules() const;
 
-        const std::list<Instance> & instances() const;
+        const container_type<Instance> & instances() const;
 
     private:
         std::string         mName;
-        std::list<Port>     mPorts;
-        std::list<Net>      mNets;
-        std::list<Module>   mModules;
-        std::list<Instance> mInstances;
+        container_type<Port>     mPorts;
+        container_type<Net>      mNets;
+        container_type<Module>   mModules;
+        container_type<Instance> mInstances;
     };
 
     class VerilogParser

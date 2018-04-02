@@ -18,6 +18,9 @@
    under the License.
  */
 
+#include <memory>
+#include <string>
+
 #include <lefrReader.hpp>
 
 #include "Lef.h"
@@ -27,160 +30,155 @@ namespace ophidian
 {
 namespace parser
 {
-    const std::vector<Lef::site> & Lef::sites() const
+    using namespace std::literals;
+
+    Lef::Lef(const std::string& filename):
+        m_sites(),
+        m_layers(),
+        m_macros(),
+        m_micrometer_to_dbu_ratio(0)
     {
-        return mSites;
-    }
-
-    const std::vector<Lef::layer> & Lef::layers() const
-    {
-        return mLayers;
-    }
-
-    const std::vector<Lef::macro> & Lef::macros() const
-    {
-        return mMacros;
-    }
-
-    util::database_unit_scalar_t Lef::micron_to_dbu_convertion_factor() const
-    {
-        return util::database_unit_scalar_t{mUnits.databaseNumber()};
-    }
-
-    void LefParser::readFile(const std::string & filename, std::unique_ptr<Lef> & inp) const
-    {
-        auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
-            std::fopen(filename.c_str(), "r"),
-            &std::fclose);
-
-        if(!fp) {
-            throw InexistentFile();
-        }
-
         lefrInit();
         lefrSetUnitsCbk(
             [](lefrCallbackType_e, lefiUnits * units, lefiUserData ud) -> int {
-                static_cast<Lef *>(ud)->mUnits = *units;
-                static_cast<Lef *>(ud)->mUnits.setDatabase(
-                    units->databaseName(),
-                    units->databaseNumber());
-
+                auto that = static_cast<Lef *>(ud);
+                that->m_micrometer_to_dbu_ratio = Lef::scalar_type{units->databaseNumber()};
                 return 0;
             });
-
         lefrSetSiteCbk(
             [](lefrCallbackType_e, lefiSite * l, lefiUserData ud) -> int {
-                Lef::site s;
-                s.name = l->name();
-                s.class_name = (l->hasClass() ? l->siteClass() : "");
+                auto that = static_cast<Lef *>(ud);
 
-                if(l->hasXSymmetry()) {
-                    s.setXsymmetry();
-                }
+                auto site = Lef::Site{
+                    l->name(),
+                    [&](){ return (l->hasClass() ? l->siteClass() : ""); }(),
+                    Lef::micrometer_type{l->sizeX()},
+                    Lef::micrometer_type{l->sizeY()},
+                    {l->hasXSymmetry(), l->hasYSymmetry(), l->has90Symmetry()}
+                };
 
-                if(l->hasYSymmetry()) {
-                    s.setYsymmetry();
-                }
+                that->m_sites.push_back(site);
+                return 0;
+            });
+        lefrSetLayerCbk(
+            [](lefrCallbackType_e, lefiLayer * l, lefiUserData ud) -> int {
+                auto that = static_cast<Lef *>(ud);
 
-                if(l->has90Symmetry()) {
-                    s.set90symmetry();
-                }
+                auto layer = Lef::Layer{
+                    l->name(),
+                    [&](){
+                        if(l->hasType()){
+                            auto type_name = std::string{l->type()};
+                            if (type_name == "MASTERSLICE"){
+                                return Lef::Layer::Type::MASTERSLICE;
+                            }
+                            else if(type_name == "CUT"){
+                                return Lef::Layer::Type::CUT;
+                            }
+                            else if(type_name == "ROUTING"){
+                                return Lef::Layer::Type::ROUTING;
+                            }
+                        }
+                    }(),
+                    [&](){
+                        if(l->hasDirection()){
+                            auto direction_name = std::string(l->direction());
+                            if((direction_name == "HORIZONTAL") ||
+                               (direction_name == "horizontal"))
+                            {
+                                return Lef::Layer::Direction::HORIZONTAL;
+                            }
+                            else if((direction_name == "VERTICAL") ||
+                                    (direction_name == "vertical"))
+                            {
+                                return Lef::Layer::Direction::VERTICAL;
+                            }
+                        }
+                        else {
+                            return Lef::Layer::Direction::NOT_ASSIGNED; 
+                        }
+                    }(),
+                    Lef::micrometer_type{l->pitch()},
+                    Lef::micrometer_type{l->offset()},
+                    Lef::micrometer_type{l->width()}
+                };
 
-                s.x = util::database_unit_t{l->sizeX()};
-                s.y = util::database_unit_t{l->sizeY()};
-
-                static_cast<Lef *>(ud)->mSites.push_back(s);
-
+                that->m_layers.push_back(layer);
                 return 0;
             });
 
-        lefrSetLayerCbk(
-            [](lefrCallbackType_e, lefiLayer * l, lefiUserData ud) -> int {
-                Lef::layer lay;
-                lay.name = l->name();
-                lay.type = (l->hasType() ? l->type() : "");
-                lay.direction = Lef::layer::NOT_ASSIGNED;
-
-                if(l->hasDirection()) {
-                    if((std::string(l->direction()) == "HORIZONTAL") ||
-                       (std::string(l->direction()) == "horizontal"))
-                    {
-                        lay.direction = Lef::layer::HORIZONTAL;
-                    }
-                    else if((std::string(l->direction()) == "VERTICAL") ||
-                            (std::string(l->direction()) == "vertical"))
-                    {
-                        lay.direction = Lef::layer::VERTICAL;
-                    }
-                }
-
-                lay.pitch = util::micrometer_t{l->pitch()};
-                lay.width = util::micrometer_t{l->width()};
-
-                static_cast<Lef *>(ud)->mLayers.push_back(lay);
+        lefrSetMacroBeginCbk(
+            [](lefrCallbackType_e, const char * macro_name, lefiUserData ud) -> int {
+                static_cast<Lef *>(ud)->m_macros.push_back(Lef::Macro{std::string{macro_name}});
 
                 return 0;
             });
 
         lefrSetPinCbk(
             [](lefrCallbackType_e, lefiPin * l, lefiUserData ud) -> int {
-                Lef::macro & m = static_cast<Lef *>(ud)->mMacros.back();
-                Lef::macro::pin p;
-                p.name = l->name();
+                auto that = static_cast<Lef *>(ud);
 
-                if(l->hasDirection()) {
-                    if(std::string(l->direction()) == "INPUT") {
-                        p.direction = Lef::macro::pin::INPUT;
-                    }
-                    else if(std::string(l->direction()) == "OUTPUT") {
-                        p.direction = Lef::macro::pin::OUTPUT;
-                    }
-                }
+                auto port = Lef::Macro::Pin::Port{};
 
                 for(int i = 0; i < l->numPorts(); ++i)
                 {
-                    Lef::macro::pin::port pt;
+                    auto rect = Lef::box_micrometer{};
+                    auto layer_name = "none"s;
                     for(int j = 0; j < l->port(i)->numItems(); ++j)
                     {
                         switch(l->port(i)->itemType(j))
                         {
                         case lefiGeomLayerE:
-                            pt.layers.push_back(l->port(i)->getLayer(j));
+                            layer_name = l->port(i)->getLayer(j);
                             break;
 
                         case lefiGeomRectE:
-                            geometry::Box<util::micrometer_t> r{
-                                geometry::Point<util::micrometer_t>{
-                                    util::micrometer_t{l->port(i)->getRect(j)->xl},
-                                    util::micrometer_t{l->port(i)->getRect(j)->yl}
-                                }, geometry::Point<util::micrometer_t>{
-                                    util::micrometer_t{l->port(i)->getRect(j)->xh},
-                                    util::micrometer_t{l->port(i)->getRect(j)->yh}
+                            rect = Lef::box_micrometer{
+                                Lef::point_micrometer{
+                                    Lef::micrometer_type{l->port(i)->getRect(j)->xl},
+                                    Lef::micrometer_type{l->port(i)->getRect(j)->yl}
+                                }, Lef::point_micrometer{
+                                    Lef::micrometer_type{l->port(i)->getRect(j)->xh},
+                                    Lef::micrometer_type{l->port(i)->getRect(j)->yh}
                                 }
                             };
-                            pt.rects.push_back(r);
+                            port.layer2rects[layer_name].push_back(rect);
                             break;
                         }
                     }
-                    p.ports.push_back(pt);
                 }
 
-                m.pins.push_back(p);
+                auto pin = Lef::Macro::Pin{
+                    l->name(),
+                    [&](){
+                        if(l->hasDirection()) {
+                            if(std::string(l->direction()) == "INPUT") {
+                                return Lef::Macro::Pin::Direction::INPUT;
+                            }
+                            else if(std::string(l->direction()) == "OUTPUT") {
+                                return Lef::Macro::Pin::Direction::OUTPUT;
+                            }
+                            else if(std::string(l->direction()) == "INOUT") {
+                                return Lef::Macro::Pin::Direction::INOUT;
+                            }
+                        }
+                        else {
+                            return Lef::Macro::Pin::Direction::NA;
+                        }
+                    }(),
+                    port
+                };
 
-                return 0;
-            });
-
-        lefrSetMacroBeginCbk(
-            [](lefrCallbackType_e, const char * string, lefiUserData ud) -> int {
-                static_cast<Lef *>(ud)->mMacros.push_back(Lef::macro {string});
-
+                that->m_macros.back().pins.push_back(pin);
                 return 0;
             });
 
         lefrSetObstructionCbk(
             [](lefrCallbackType_e, lefiObstruction * l, lefiUserData ud) -> int {
+                auto that = static_cast<Lef *>(ud);
+
                 auto geometries = l->geometries();
-                Lef::macro & m = static_cast<Lef *>(ud)->mMacros.back();
+
                 std::string last_layer;
                 for(int i = 0; i < geometries->numItems(); ++i)
                 {
@@ -192,16 +190,16 @@ namespace parser
 
                     case lefiGeomRectE:
                         auto geom_rect = geometries->getRect(i);
-                        geometry::Box<util::micrometer_t> r{
-                            geometry::Point<util::micrometer_t>{
-                                util::micrometer_t{geom_rect->xl},
-                                util::micrometer_t{geom_rect->yl}
-                            }, geometry::Point<util::micrometer_t>{
-                                util::micrometer_t{geom_rect->xh}, 
-                                util::micrometer_t{geom_rect->yh}
+                        auto rect = Lef::box_micrometer{
+                            Lef::point_micrometer{
+                                Lef::micrometer_type{geom_rect->xl},
+                                Lef::micrometer_type{geom_rect->yl}
+                            }, Lef::point_micrometer{
+                                Lef::micrometer_type{geom_rect->xh}, 
+                                Lef::micrometer_type{geom_rect->yh}
                             }
                         };
-                        m.obstructions.layer2rects[last_layer].push_back(r);
+                        that->m_macros.back().obstructions.layer2rects[last_layer].push_back(rect);
                         break;
                     }
                 }
@@ -211,21 +209,21 @@ namespace parser
 
         lefrSetMacroCbk(
             [](lefrCallbackType_e, lefiMacro * l, lefiUserData ud) -> int {
-                Lef::macro & m = static_cast<Lef *>(ud)->mMacros.back();
+                auto& m = static_cast<Lef *>(ud)->m_macros.back();
                 m.name = l->name();
                 m.class_name = (l->hasClass() ? l->macroClass() : "");
-                m.origin = geometry::Point<util::micrometer_t>{
-                    util::micrometer_t{l->originX()},
-                    util::micrometer_t{l->originY()}
+                m.origin = Lef::point_micrometer{
+                    Lef::micrometer_type{l->originX()},
+                    Lef::micrometer_type{l->originY()}
                 };
                 if(l->hasForeign()) {
                     m.foreign.name = l->foreignName();
-                    m.foreign.x = util::micrometer_t{l->foreignX()};
-                    m.foreign.y = util::micrometer_t{l->foreignY()};
+                    m.foreign.x_offset = Lef::micrometer_type{l->foreignX()};
+                    m.foreign.y_offset = Lef::micrometer_type{l->foreignY()};
                 }
-                m.size = Lef::macro::macro_size {
-                    util::micrometer_t{l->sizeX()},
-                    util::micrometer_t{l->sizeY()}
+                m.size = Lef::Macro::Macro_size {
+                    Lef::micrometer_type{l->sizeX()},
+                    Lef::micrometer_type{l->sizeY()}
                 };
                 m.site = (l->hasSiteName() ? l->siteName() : "");
 
@@ -238,22 +236,58 @@ namespace parser
                 return 0;
             });
 
-        auto res = lefrRead(fp.get(), filename.c_str(), inp.get());
+        auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
+            std::fopen(filename.c_str(), "r"),
+            &std::fclose);
+
+        if(!fp) {
+            throw InexistentFile();
+        }
+
+        auto res = lefrRead(fp.get(), filename.c_str(), this);
     }
 
-    void Lef::site::setXsymmetry()
+    const Lef::container_type<Lef::Site> & Lef::sites() const noexcept
     {
-        symmetry |= X;
+        return m_sites;
     }
 
-    void Lef::site::setYsymmetry()
+    const Lef::container_type<Lef::Layer> & Lef::layers() const noexcept
     {
-        symmetry |= Y;
+        return m_layers;
     }
 
-    void Lef::site::set90symmetry()
+    const Lef::container_type<Lef::Macro> & Lef::macros() const noexcept
     {
-        symmetry |= NINETY;
+        return m_macros;
+    }
+
+    const Lef::scalar_type& Lef::micrometer_to_dbu_ratio() const noexcept
+    {
+        return m_micrometer_to_dbu_ratio;
+    }
+
+    bool Lef::Site::Symmetry::operator ==(const Lef::Site::Symmetry& rhs) const {
+        return is_x_symmetric == rhs.is_x_symmetric &&
+            is_y_symmetric == rhs.is_y_symmetric &&
+            is_90_symmetric == rhs.is_90_symmetric;
+    }
+
+    bool Lef::Site::operator ==(const Lef::Site& rhs) const {
+        return name == rhs.name &&
+            class_name == rhs.class_name &&
+            width == rhs.width &&
+            height == rhs.height &&
+            symetry == rhs.symetry;
+    }
+
+    bool Lef::Layer::operator ==(const Lef::Layer& rhs) const {
+        return name == rhs.name &&
+            type == rhs.type &&
+            direction == rhs.direction &&
+            pitch == rhs.pitch &&
+            offset == rhs.offset &&
+            width == rhs.width;
     }
 }     /* namespace parser */
 }     /* namespace ophidian */

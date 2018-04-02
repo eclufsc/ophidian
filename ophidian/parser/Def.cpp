@@ -16,6 +16,8 @@
    under the License.
  */
 
+#include <memory>
+
 #include <defrReader.hpp>
 
 #include "Def.h"
@@ -29,7 +31,7 @@ namespace parser
         m_die_area(),
         m_rows(),
         m_components(),
-        m_dbu_to_micrometer_ratio()
+        m_dbu_to_micrometer_ratio(0)
     {
         defrInit();
         defrSetUnitsCbk(
@@ -42,7 +44,7 @@ namespace parser
         defrSetDieAreaCbk(
             [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
-                that->m_die_area = Def::dbu_box{
+                that->m_die_area = Def::box_dbu{
                     Def::point_dbu{Def::dbu_type{box->xl()}, Def::dbu_type{box->yl()}}, 
                     Def::point_dbu{Def::dbu_type{box->xh()}, Def::dbu_type{box->yh()}}
                 };
@@ -108,17 +110,7 @@ namespace parser
         }
     }
 
-    Def::Def(const Def::dbu_box& die_area,
-        const Def::container_type<Row>& rows,
-        const Def::container_type<Component>& components,
-        const Def::scalar_type& dbu_to_micrometer_ratio):
-        m_die_area(die_area),
-        m_rows(rows),
-        m_components(components),
-        m_dbu_to_micrometer_ratio(dbu_to_micrometer_ratio)
-    {}
-
-    const Def::dbu_box & Def::die_area() const noexcept
+    const Def::box_dbu & Def::die_area() const noexcept
     {
         return m_die_area;
     }

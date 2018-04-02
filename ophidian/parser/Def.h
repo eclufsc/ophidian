@@ -22,10 +22,8 @@
 // std headers
 #include <string>
 #include <vector>
-#include <memory>
 
 // external headers
-#include <units/units.h>
 
 // ophidian headers
 #include <ophidian/geometry/Models.h>
@@ -50,25 +48,20 @@ namespace parser
         using scalar_type  = util::database_unit_scalar_t;
         using point_dbu    = geometry::Point<dbu_type>;
         using point_scalar = geometry::Point<scalar_type>;
-        using dbu_box      = geometry::Box<dbu_type>;
+        using box_dbu      = geometry::Box<dbu_type>;
 
         struct Row;
         struct Component;
 
         Def(const std::string& filename);
 
-        Def(const dbu_box& die_area,
-            const container_type<Row>& rows,
-            const container_type<Component>& components,
-            const scalar_type& dbu_to_micrometer_ratio);
-
-        Def(Def&&) = default;
-        Def& operator=(Def&&) = default;
+        Def(Def&&) noexcept = default;
+        Def& operator=(Def&&) noexcept = default;
 
         /**
          * Returns the @c dieArea.
          */
-        const dbu_box & die_area() const noexcept;
+        const box_dbu & die_area() const noexcept;
 
         /**
          * Returns a @c std::vector<row> with all rows.
@@ -87,7 +80,7 @@ namespace parser
         const scalar_type dbu_to_micrometer_ratio() const noexcept;
 
     private:
-        dbu_box                   m_die_area;
+        box_dbu                   m_die_area;
         container_type<Row>       m_rows;
         container_type<Component> m_components;
         scalar_type               m_dbu_to_micrometer_ratio;

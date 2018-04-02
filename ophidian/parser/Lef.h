@@ -25,10 +25,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <memory>
-
-// external headers
-#include <lefrReader.hpp>
 
 // ophidian headers
 #include <ophidian/geometry/Models.h>
@@ -45,136 +41,142 @@ namespace parser
      */
     class Lef
     {
-        using micrometer_t = units::length::micrometer_t;
-        using dbu_t = util::database_unit_t;
-        using micrometer_ratio_t = util::database_unit_scalar_t;
-        using point = geometry::Point<micrometer_t>;
-        using box = geometry::Box<micrometer_t>;
-
     public:
+        template <class T> using container_type = std::vector<T>;
 
-        /**
-         * @brief An enumeration to represent all the possible symmetries in a site.
-         * They are numbered 1, 2 and 4 to enable binary operations to combine
-         * multiple symmetries
-         */
-        enum symmetry {
-            X= 1, Y= 2, NINETY= 4
-        };
+        using dbu_type     = util::database_unit_t;
+        using micrometer_type = units::length::micrometer_t;
+        using scalar_type  = util::database_unit_scalar_t;
 
-        struct site
-        {
-            std::string  name; ///< Name of the site
-            std::string  class_name; ///< Class of the site
-            micrometer_t x; ///< Width of the site
-            micrometer_t y; ///< Height of the site
+        using point_micrometer    = geometry::Point<micrometer_type>;
+        using point_scalar = geometry::Point<scalar_type>;
+        using box_micrometer      = geometry::Box<micrometer_type>;
 
-            /// Stores the site's symmetry in accordance to the Lef::symmetrie enumeration
-            char symmetry = 0;
+        struct Site;
+        struct Layer;
+        struct Macro;
 
-            void setXsymmetry(); ///< Sets the X symmetry bit
+        Lef(const std::string& filename);
 
-            void setYsymmetry(); ///< Sets the Y symmetry bit
-
-            void set90symmetry(); ///< Sets the R90 symmetry bit
-        };
-
-        struct layer
-        {
-            enum direction {
-                NOT_ASSIGNED, HORIZONTAL, VERTICAL
-            };
-
-            std::string  name; ///< Name of the layer
-            std::string  type; ///< Type of the layer
-            direction    direction; ///< Direction of the layer
-            micrometer_t pitch; ///< Pitch of the layer
-            micrometer_t offset;
-            micrometer_t width; ///< Width of the layer
-        };
-
-        struct macro
-        {
-            struct macro_size
-            {
-                micrometer_t width; ///< Width of the macro
-                micrometer_t height; ///< Height of the macro
-            };
-
-            struct macro_foreign
-            {
-                std::string  name; ///< Foreign cell name
-                micrometer_t x; ///< Offset in the x coordinate
-                micrometer_t y; ///< Offset in the y coordinate
-            };
-
-            struct pin
-            {
-                enum direction {
-                    INPUT, OUTPUT, INOUT, NA
-                };
-
-                struct port
-                {
-                    std::vector<std::string>                 layers; ///< A vector with all the names of all the port layers
-                    std::vector<geometry::Box<micrometer_t>> rects; ///< A vector with all the rects of the port
-                };
-
-                std::string       name; ///< The pin name
-                direction         direction{NA}; ///< The pin's direction in accordance to pin::directions
-                std::vector<port> ports;
-            };
-
-            struct obstructions
-            {
-                /// Map with all the rectangles of obstruction
-                std::map<std::string, std::vector<geometry::Box<micrometer_t>>> layer2rects;
-            };
-
-            std::string      name; ///< Name of the macro
-            std::string      class_name; ///< Class of the macro
-            macro_size       size; ///< Struct with the size
-            macro_foreign    foreign; ///< Struct with the foreign propertiy
-            point            origin; ///< Struct containing the origin property
-            std::string      site; ///< Site name
-            std::vector<pin> pins; ///< Vector with all the macro pins
-            obstructions     obstructions; ///< Struct with the macro rectangle geometry
-        };
+        Lef(Lef&&) noexcept = default;
+        Lef& operator=(Lef&&) noexcept = default;
 
         /**
          * Returns a vector containing all the sites in the lef
          */
-        const std::vector<site> & sites() const;
+        const container_type<Site>& sites() const noexcept;
 
         /**
          * Returns a vector containing all the layers in the lef
          */
-        const std::vector<layer> & layers() const;
+        const container_type<Layer>& layers() const noexcept;
 
         /**
          * Returns a vector containing all the macros in the lef
          */
-        const std::vector<macro> & macros() const;
+        const container_type<Macro>& macros() const noexcept;
 
         /**
          * The return of this function is equivalent to one micron
          */
-        micrometer_ratio_t micron_to_dbu_convertion_factor() const;
+        const scalar_type& micrometer_to_dbu_ratio() const noexcept;
 
     private:
-        std::vector<site>       mSites;
-        std::vector<layer>      mLayers;
-        std::vector<macro>      mMacros;
-        LefDefParser::lefiUnits mUnits;
+        container_type<Site>       m_sites;
+        container_type<Layer>      m_layers;
+        container_type<Macro>      m_macros;
+        scalar_type               m_micrometer_to_dbu_ratio;
+    };
+    
+    struct Lef::Site
+    {
+        struct Symmetry {
+            bool is_x_symmetric;
+            bool is_y_symmetric;
+            bool is_90_symmetric;
 
-    public:
-        friend class LefParser;
+            bool operator ==(const Symmetry& rhs) const;
+        }; 
+
+        std::string  name; ///< Name of the site
+        std::string  class_name; ///< Class of the site
+        micrometer_type width; ///< Width of the site
+        micrometer_type height; ///< Height of the site
+        Symmetry symetry;
+
+        bool operator ==(const Site& rhs) const;
     };
 
-    class LefParser
+    struct Lef::Layer
     {
-    public:
-        void readFile(const std::string & filename, std::unique_ptr<Lef> & inp) const;
+        enum Type {
+            MASTERSLICE,
+            CUT,
+            ROUTING
+        };
+
+        enum Direction {
+            HORIZONTAL, 
+            VERTICAL,
+            NOT_ASSIGNED
+        };
+
+        std::string  name; ///< Name of the layer
+        Type  type; ///< Type of the layer
+        Direction    direction; ///< Direction of the layer
+        micrometer_type pitch; ///< Pitch of the layer
+        micrometer_type offset;
+        micrometer_type width; ///< Width of the layer
+
+        bool operator ==(const Layer& rhs) const;
+    };
+
+    struct Lef::Macro
+    {
+        struct Macro_size
+        {
+            micrometer_type width; ///< Width of the macro
+            micrometer_type height; ///< Height of the macro
+        };
+
+        struct Macro_foreign
+        {
+            std::string  name; ///< Foreign cell name
+            micrometer_type x_offset; ///< Offset in the x coordinate
+            micrometer_type y_offset; ///< Offset in the y coordinate
+        };
+
+        struct Pin
+        {
+            enum Direction {
+                INPUT, OUTPUT, INOUT, NA
+            };
+
+            struct Port
+            {
+                ///< A vector with all the rects of the port
+                std::map<std::string, container_type<box_micrometer>> layer2rects; 
+            };
+
+            std::string       name; ///< The pin name
+            Direction         direction; ///< The pin's direction in accordance to pin::directions
+            Port ports;
+        };
+
+        struct Obstructions
+        {
+            /// Map with all the rectangles of obstruction
+            std::map<std::string, container_type<box_micrometer>> layer2rects;
+        };
+
+        std::string      name; ///< Name of the macro
+        std::string      class_name; ///< Class of the macro
+        Macro_size       size; ///< Struct with the size
+        Macro_foreign    foreign; ///< Struct with the foreign propertiy
+        point_micrometer origin; ///< Struct containing the origin property
+        std::string      site; ///< Site name
+        container_type<Pin> pins; ///< Vector with all the macro pins
+        Obstructions     obstructions; ///< Struct with the macro rectangle geometry
     };
 }     /* namespace parser */
 }     /* namespace ophidian */
