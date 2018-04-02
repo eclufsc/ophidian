@@ -142,6 +142,7 @@ install_UNITS()
 install_SFML()
 {
     echo "installing sfml"
+    cd $SOURCE_ROOT/3rdparty/
     git clone https://github.com/SFML/SFML.git
     cd SFML/
     mkdir build/
@@ -155,14 +156,15 @@ install_SFML()
 install_QT5()
 {
     echo "installing qt5"
+    cd $SOURCE_ROOT/3rdparty/
     git clone https://github.com/qt/qt5.git
     cd qt5
     git checkout 5.10
-    perl init-repository
-    export LLVM_INSTALL_DIR=/usr/llvm
-    ./configure --prefix=$DEPENDENCIES_ROOT -developer-build -opensource -nomake examples -nomake tests
+    perl init-repository --module-subset=default
+    export LLVM_INSTALL_DIR=$DEPENDENCIES_ROOT/llvm
+    ./configure -prefix $DEPENDENCIES_ROOT -opensource -nomake examples -nomake tests
     make -j4
-    make install
+    make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf qt5
 }

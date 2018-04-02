@@ -51,7 +51,8 @@ variables:
         libopenal-dev
         libpthread-stubs0-dev
         perl
-        libgl1-mesa-dev"
+        libgl1-mesa-dev
+        gperf"
 
         #https://wiki.qt.io/Building_Qt_5_from_Git
 
