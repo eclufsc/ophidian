@@ -217,6 +217,6 @@ Currently, Ophidian has many collaborators in the same university that support i
 * [José Güntzel](https://www.inf.ufsc.br/~j.guntzel/)
 * [Renan Netto](https://renannetto.github.io/)
 * Thiago Barbato
-* Tiago Fontana
+* [Tiago Augusto Fontana](https://tiagoafontana.github.io)
 * Sheiny Almeida
 * [Vinicius Livramento](http://vinilivramento.com)
