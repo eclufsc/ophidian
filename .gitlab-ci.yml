@@ -165,11 +165,10 @@ build_using_dependencies_for_gui:
     script:
         - echo "y" | bash build_dependencies.sh
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
                 -DOPHIDIAN_GUI=ON
                 ..
-
         - make -j2
         - cd test
         - ./ophidian_tests
