@@ -17,9 +17,6 @@ SOURCE_ROOT=$(dirname "$SCRIPT")
 # Set default Dependencies Root
 DEPENDENCIES_ROOT=$SOURCE_ROOT/dependencies
 
-# Set GUI dependences instalation
-INSTALL_GUI=false
-
 # Check if user wants to install elsewhere
 AUX=$2
 if [ "$1" = "--install_to" ] && [ "${AUX:0:1}" != "/" ]
@@ -28,12 +25,6 @@ then
 elif [ "$1" = "--install_to" ] && [ "${AUX:0:1}" = "/" ]
 then
     DEPENDENCIES_ROOT=$2
-fi
-
-# Check if user wants to install gui dependences
-if [ "$3" = "--install_gui" ]
-then
-    INSTALL_GUI=true
 fi
 
 # Check if user wants to install elsewhere
@@ -139,36 +130,6 @@ install_UNITS()
     rm -rf build
 }
 
-install_SFML()
-{
-    echo "installing sfml"
-    cd $SOURCE_ROOT/3rdparty/
-    git clone https://github.com/SFML/SFML.git
-    cd SFML/
-    mkdir build/
-    cd build/
-    cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX="" ..
-    make DESTDIR=$DEPENDENCIES_ROOT install
-    cd ../..
-    rm -rf SFML
-}
-
-install_QT5()
-{
-    echo "installing qt5"
-    cd $SOURCE_ROOT/3rdparty/
-    git clone https://github.com/qt/qt5.git
-    cd qt5
-    git checkout 5.10
-    perl init-repository --module-subset=default
-    export LLVM_INSTALL_DIR=$DEPENDENCIES_ROOT/llvm
-    ./configure -prefix $DEPENDENCIES_ROOT -opensource -nomake examples -nomake tests
-    make -j4
-    make DESTDIR=$DEPENDENCIES_ROOT install
-    cd ..
-    rm -rf qt5
-}
-
 run_install()
 {
     install -d $DEPENDENCIES_ROOT
@@ -183,13 +144,6 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
-
-    if [ "$INSTALL_GUI" = true ]
-    then
-        install_SFML
-        install_QT5
-    fi
-
 }
 
 run_install

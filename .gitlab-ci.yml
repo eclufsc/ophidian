@@ -34,34 +34,8 @@ variables:
         libverilog-parser-dev"
 
     DEPENDENCIES_GUI:
-        "freetype2-demos
-        libjpeg-dev
-        x11-xserver-utils
-        xorg-dev
-        openbox
-        xcb
-        libx11-xcb-dev
-        libxcb-randr0-dev
-        libxcb-image0-dev
-        freeglut3-dev
-        libudev-dev
-        libflac-dev
-        libogg-dev
-        libvorbis-dev
-        libopenal-dev
-        libpthread-stubs0-dev
-        perl
-        libgl1-mesa-dev
-        gperf"
-
-        #https://wiki.qt.io/Building_Qt_5_from_Git
-
-        # QT 5 fedora
-        #sudo yum groupinstall "C Development Tools and Libraries"
-        #sudo yum install mesa-libGL-devel
-        
-        # QT 5 openSUSE
-        #sudo zypper install -t pattern devel_basis
+        "libsfml-dev
+        qtbase5-dev"
 
 
     GIT_SUBMODULE_STRATEGY: recursive
@@ -176,6 +150,26 @@ build_using_dependencies_script_on_sistem:
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release
                 ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
+
+build_using_dependencies_for_gui:
+    image: ubuntu:artful
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
+    script:
+        - echo "y" | bash build_dependencies.sh
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+                -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON
+                ..
+
         - make -j2
         - cd test
         - ./ophidian_tests

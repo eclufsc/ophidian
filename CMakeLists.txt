@@ -117,7 +117,7 @@ find_package(verilog-parser REQUIRED)
 
 IF(OPHIDIAN_GUI)
     # Find SFML
-    find_package(SFML 2 REQUIRED network audio graphics window system)
+    find_package(SFML 2 REQUIRED graphics window system)
 
     # Find Qt5
     find_package(Qt5 REQUIRED COMPONENTS Widgets)

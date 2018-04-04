@@ -205,6 +205,14 @@ foreach(FIND_SFML_COMPONENT ${SFML_FIND_COMPONENTS})
             set(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DEBUG ${SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE})
             set(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY       ${SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE})
         endif()
+
+        # Ophidian targets to acess SFML library modules
+        add_library(SFML::${FIND_SFML_COMPONENT_UPPER} STATIC IMPORTED)
+        set_target_properties(SFML::${FIND_SFML_COMPONENT_UPPER} PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES ${SFML_INCLUDE_DIR}
+            IMPORTED_LOCATION "${SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY}"
+        )
+
     else()
         # library not found
         set(SFML_FOUND FALSE)
@@ -366,16 +374,3 @@ endif()
 if(SFML_FOUND AND NOT SFML_FIND_QUIETLY)
     message(STATUS "Found SFML ${SFML_VERSION_MAJOR}.${SFML_VERSION_MINOR}.${SFML_VERSION_PATCH} in ${SFML_INCLUDE_DIR}")
 endif()
-
-include(FindPackageHandleStandardArgs)
-
-find_package_handle_standard_args(SFML DEFAULT_MSG
-    SFML_INCLUDE_DIR
-    SFML_LIBRARIES
-)
-
-add_library(SFML::sfml STATIC IMPORTED)
-set_target_properties(SFML::sfml PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES ${SFML_INCLUDE_DIR}
-    IMPORTED_LOCATION ${SFML_LIBRARIES}
-)
