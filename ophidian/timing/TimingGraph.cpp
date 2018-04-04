@@ -7,6 +7,7 @@ namespace timing
 
 
 TimingGraph::TimingGraph(const circuit::Netlist & netlist) :
+    mDefaultNode(mGraph.addNode()),
     mPins(mGraph, circuit::Pin()),
     mNodeProperties(mGraph),
     mArcs(mGraph, Arc()),
@@ -29,7 +30,7 @@ const TimingGraph::GraphType & TimingGraph::graph()
 
 size_t TimingGraph::size(NodeType)
 {
-    return lemon::countNodes(mGraph);
+    return lemon::countNodes(mGraph) - 1;
 }
 
 size_t TimingGraph::size(ArcType)
@@ -60,11 +61,8 @@ TimingGraph::NodeType TimingGraph::nodeCreate(const circuit::Pin & pin, const No
     // You need to create tests to see if it works correctly.
     NodeType newNode = mGraph.addNode();
 
-    if (mGraph.valid(map[pin])) {
-        if (mPins[map[pin]] == circuit::Pin()) {
-            map[pin] = newNode;
-        }
-    } else {
+    // Overrides the node only if the map does not have a valid associated pin or first node on graph.
+    if (mGraph.id(map[pin]) == mGraph.id(mDefaultNode)) {
         map[pin] = newNode;
     }
 

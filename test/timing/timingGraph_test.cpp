@@ -51,15 +51,21 @@ TEST_CASE_METHOD(TimingGraphFixture, "TimingGraph: creating rise nodes", "[timin
     auto no1 = graph.riseNodeCreate(cell1Input);
     auto no2 = graph.riseNodeCreate(cell1Output);
     REQUIRE(graph.size(TimingGraph::NodeType()) == 2);
+
+    REQUIRE(graph.graph().id(graph.riseNode(cell1Input)) == graph.graph().id(no1));
+    REQUIRE(graph.graph().id(graph.riseNode(cell1Output)) == graph.graph().id(no2));
 }
 
 TEST_CASE_METHOD(TimingGraphFixture, "TimingGraph: creating fall nodes", "[timing][TimingGraph]")
 {
     TimingGraph graph(mNetlist);
 
-    graph.fallNodeCreate(cell1Input);
-    graph.fallNodeCreate(cell1Output);
+    auto no1 = graph.fallNodeCreate(cell1Input);
+    auto no2 = graph.fallNodeCreate(cell1Output);
     REQUIRE(graph.size(TimingGraph::NodeType()) == 2);
+
+    REQUIRE(graph.graph().id(graph.fallNode(cell1Input)) == graph.graph().id(no1));
+    REQUIRE(graph.graph().id(graph.fallNode(cell1Output)) == graph.graph().id(no2));
 }
 
 TEST_CASE_METHOD(TimingGraphFixture, "TimingGraph: arc from net creating", "[timing][TimingGraph]")

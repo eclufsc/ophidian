@@ -277,6 +277,7 @@ private:
     NodeType nodeCreate(const circuit::Pin & pin, const NodeProperty & prop, entity_system::Property<circuit::Pin, NodeType> & map);
 
     GraphType mGraph;
+    NodeType mDefaultNode;
     GraphType::NodeMap<circuit::Pin> mPins;
     GraphType::NodeMap<NodeProperty> mNodeProperties;
     GraphType::ArcMap<Arc> mArcs;

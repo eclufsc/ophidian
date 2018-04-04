@@ -60,26 +60,13 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(const circuit::Netlist & 
     using StdPinName = std::string;
     std::unordered_map<StdPinName, circuit::Pin> outputPins;
 
-    //    std::size_t currentCell = 0;
-    //    std::vector<double> percentages {
-    //        0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0
-    //    };
-
     for (auto cellIt = netlist.begin(circuit::Cell()); cellIt != netlist.end(circuit::Cell()); ++cellIt)
     {
-        //        ++currentCell;
-        //        for(auto p : percentages)
-        //        {
-        //            if(static_cast<std::size_t>(p*netlist.cell_system().size()) == currentCell)
-        //                std::cout << "       graph_builder::build(): ["<<100*p<<"%]" << std::endl << std::flush;
-        //        }
-
         auto cellPins = netlist.pins(*cellIt);
-        //        std::cout << "  graph_builder::build(): creating timing arcs for cell " << netlist.cell_name(cell.first) << std::endl << std::endl << std::flush;
         inputPins.resize(0);
         outputPins.clear();
 
-        circuit::Pin dataPin, clkPin; // Para os testes antigos (!testCreated)???
+//        circuit::Pin dataPin, clkPin; // Para os testes antigos (!testCreated)???
 
         for(auto pin : cellPins)
         {
@@ -89,10 +76,10 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(const circuit::Netlist & 
             case standard_cell::PinDirection::INPUT:
                 inputPins.push_back(pin);
 
-                if(timingLibrary.pinClock(stdPin))
-                    clkPin = pin;
-                else if(timingLibrary.cellSequential(libraryMapping.cellStdCell(*cellIt)))
-                    dataPin = pin;
+//                if(timingLibrary.pinClock(stdPin))
+//                    clkPin = pin;
+//                else if(timingLibrary.cellSequential(libraryMapping.cellStdCell(*cellIt)))
+//                    dataPin = pin;
 
                 break;
             case standard_cell::PinDirection::OUTPUT:
@@ -160,10 +147,9 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(const circuit::Netlist & 
         auto newRiseNode = graph->riseNodeCreate(PI_pin);
         auto newFallNode = graph->fallNodeCreate(PI_pin);
 
-        // Da pra usar o metodo iterator do timinggraph???
-        for (lemon::ListDigraph::OutArcIt out(graph->graph(), riseNode); out != lemon::INVALID; ++out)
+        for (lemon::ListDigraph::OutArcIt out(graph->outArc(riseNode)); out != lemon::INVALID; ++out)
             outRiseArcs.push_back(out);
-        for (lemon::ListDigraph::OutArcIt out(graph->graph(), fallNode); out != lemon::INVALID; ++out)
+        for (lemon::ListDigraph::OutArcIt out(graph->outArc(fallNode)); out != lemon::INVALID; ++out)
             outFallArcs.push_back(out);
 
         for (auto arc : outRiseArcs)
@@ -171,7 +157,6 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(const circuit::Netlist & 
         for (auto arc : outFallArcs)
             graph->source(arc, newFallNode);
 
-        //auto& arcs = lib.pin_timing_arcs(lib.pin_create(lib.cell_create(drivingCell.libCell), drivingCell.pinName));
         const std::vector<TimingArc> & arcs = timingArcs.pinArcs(stdCells.find(standard_cell::Pin(), drivingCell.libCell + ":" + drivingCell.pinName));
         for (const auto & arc : arcs)
         {
