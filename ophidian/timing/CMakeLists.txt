@@ -1,7 +1,7 @@
 ################################################################################
 # This is the CMakeLists file for the:
 #
-#   namespace ophidian::timingdriven_placement
+#   namespace ophidian::timing
 #
 # Its main goals are:
 #   - Fetch library files.
@@ -20,7 +20,7 @@
 ################################################################################
 
 # Set the include path for installed target
-set(ophidian_timingdriven_placement_install_include_dir 
+set(ophidian_timing_install_include_dir 
     ${ophidian_install_include_dir}/ophidian/timing
 )
 
@@ -29,12 +29,12 @@ set(ophidian_timingdriven_placement_install_include_dir
 ################################################################################
 
 # Fetch .cpp files for library creation
-file(GLOB ophidian_timingdriven_placement_source
+file(GLOB ophidian_timing_source
     "*.cpp"
 )
 
 # Fetch .h files for library creation
-file(GLOB ophidian_timingdriven_placement_headers
+file(GLOB ophidian_timing_headers
     "*.h"
 )
 
@@ -42,7 +42,7 @@ file(GLOB ophidian_timingdriven_placement_headers
 # Uncrustify
 ################################################################################
 
-set(uncrustify_files ${ophidian_timingdriven_placement_source} ${ophidian_timingdriven_placement_headers})
+set(uncrustify_files ${ophidian_timing_source} ${ophidian_timing_headers})
 
 if(UNCRUSTIFY_IT)
     include(uncrustify_helper)
@@ -59,53 +59,47 @@ endif()
 ################################################################################
 
 # Add library target
-add_library(ophidian_timingdriven_placement SHARED ${ophidian_timingdriven_placement_source})
+add_library(ophidian_timing SHARED ${ophidian_timing_source})
 
 # Set shared library version, this will make cmake create a link
-set_target_properties(ophidian_timingdriven_placement PROPERTIES
+set_target_properties(ophidian_timing PROPERTIES
     VERSION ${ophidian_VERSION}
     SOVERSION ${ophidian_VERSION}
 )
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_timingdriven_placement
+target_link_libraries(ophidian_timing
     PUBLIC ophidian_entity_system 
     PUBLIC ophidian_parser 
     PUBLIC ophidian_circuit 
-    PUBLIC ophidian_standard_cell 
-    PUBLIC ophidian_timing
-    PUBLIC ophidian_geometry
-    PUBLIC Lemon::lemon 
-    PRIVATE Flute::flute 
+    PUBLIC ophidian_standard_cell
+    PUBLIC Lemon::lemon
 )
 
 # Tell cmake the path to look for include files for this target
 # This is transitive, so any targets linked with this one will
 # search for headers in the respective paths
-target_include_directories(ophidian_timingdriven_placement PUBLIC
+target_include_directories(ophidian_timing PUBLIC
     $<BUILD_INTERFACE:${ophidian_source_dir}>
     $<INSTALL_INTERFACE:include>
 )
 
 # Add library target
-add_library(ophidian_timingdriven_placement_static STATIC ${ophidian_timingdriven_placement_source})
+add_library(ophidian_timing_static STATIC ${ophidian_timing_source})
 
 # Tell cmake target's dependencies
-target_link_libraries(ophidian_timingdriven_placement_static
+target_link_libraries(ophidian_timing_static
     PUBLIC ophidian_entity_system_static 
     PUBLIC ophidian_parser_static 
     PUBLIC ophidian_circuit_static 
-    PUBLIC ophidian_standard_cell_static 
-    PUBLIC ophidian_timing_static  
-    PUBLIC ophidian_geometry_static
-    PUBLIC Lemon::lemon 
-    PRIVATE Flute::flute 
+    PUBLIC ophidian_standard_cell_static
+    PUBLIC Lemon::lemon
 )
 
 # Tell cmake the path to look for include files for this target
 # This is transitive, so any targets linked with this one will
 # search for headers in the respective paths
-target_include_directories(ophidian_timingdriven_placement_static PUBLIC
+target_include_directories(ophidian_timing_static PUBLIC
     $<BUILD_INTERFACE:${ophidian_source_dir}>
     $<INSTALL_INTERFACE:include>
 )
@@ -115,13 +109,13 @@ target_include_directories(ophidian_timingdriven_placement_static PUBLIC
 
 # Install rule for target
 install(
-    TARGETS ophidian_timingdriven_placement ophidian_timingdriven_placement_static
+    TARGETS ophidian_timing ophidian_timing_static
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )
 
 # Install rule for headers
 install(
-    FILES ${ophidian_timingdriven_placement_headers} 
-    DESTINATION ${ophidian_timingdriven_placement_install_include_dir}
+    FILES ${ophidian_timing_headers} 
+    DESTINATION ${ophidian_timing_install_include_dir}
 )

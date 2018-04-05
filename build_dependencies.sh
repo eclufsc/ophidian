@@ -130,6 +130,17 @@ install_UNITS()
     rm -rf build
 }
 
+install_LIBERTY_PARSER()
+{
+    echo "installing libertyParser"
+    cd $SOURCE_ROOT/3rdparty/libertyParser
+    make CXXFLAGS="-fPIC -O3 -w" all
+    install -D -m 644 bin/* $DEPENDENCIES_BIN_PATH
+    install -D -m 644 lib/* $DEPENDENCIES_LIB_PATH
+    install -D -m 644 include/* $DEPENDENCIES_INCLUDE_PATH
+    make clean
+}
+
 run_install()
 {
     install -d $DEPENDENCIES_ROOT
@@ -144,6 +155,7 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
+    install_LIBERTY_PARSER
 }
 
 run_install

@@ -43,8 +43,8 @@ target_link_libraries(ophidian_tests
     PRIVATE ophidian_parser_static
     PRIVATE ophidian_placement_static
     PRIVATE ophidian_standard_cell_static
-    PRIVATE ophidian_timing
-    PRIVATE ophidian_timingdriven_placement
+    PRIVATE ophidian_timing_static
+    PRIVATE ophidian_timingdriven_placement_static
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)
