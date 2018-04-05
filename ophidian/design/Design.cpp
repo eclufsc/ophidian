@@ -26,19 +26,20 @@ namespace design
 
 Design::Design() :
 
-	mNetlist(),
-	mFloorplan(),
-	mPlacement(mNetlist),
-	mStandardCells(),
-	mLibrary(mStandardCells),
-	mLibraryMapping(mNetlist)
+    mNetlist(),
+    mFloorplan(),
+    mPlacement(mNetlist),
+    mStandardCells(),
+    mLibrary(mStandardCells),
+    mLibraryMapping(mNetlist),
+    mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping)
 {
 
 }
 
 Design::~Design()
 {
-
+  
 }
 
 } //namespace design

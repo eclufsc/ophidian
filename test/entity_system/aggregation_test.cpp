@@ -1,4 +1,3 @@
-#include "aggregation_test.h"
 #include <catch.hpp>
 
 #include <ophidian/entity_system/Aggregation.h>

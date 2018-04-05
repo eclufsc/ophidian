@@ -23,18 +23,19 @@ namespace ophidian
 namespace placement
 {
 
-Placement::Placement(const circuit::Netlist &netlist): 
+Placement::Placement(const circuit::Netlist &netlist) :
     mCellLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell())),
     mInputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
-    mOutputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
-    { }
+    mOutputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Output())),
+    mCellFixed(netlist.makeProperty<bool>(circuit::Cell()))
+{
+}
 
 Placement::~Placement()
 {
-
 }
 
-void Placement::placeCell(const circuit::Cell & cell, const util::LocationDbu & location)
+void Placement::placeCell(const circuit::Cell &cell, const util::LocationDbu &location)
 {
     mCellLocations[cell] = location;
 }
@@ -42,6 +43,16 @@ void Placement::placeCell(const circuit::Cell & cell, const util::LocationDbu & 
 void Placement::placeInputPad(const circuit::Input &input, const util::LocationDbu &location)
 {
     mInputLocations[input] = location;
+}
+
+void Placement::fixLocation(const circuit::Cell &cell, bool fixed)
+{
+    mCellFixed[cell] = fixed;
+}
+
+bool Placement::isFixed(const circuit::Cell &cell) const
+{
+    return mCellFixed[cell];
 }
 
 util::LocationDbu Placement::inputPadLocation(const circuit::Input &input) const
@@ -59,7 +70,5 @@ util::LocationDbu Placement::outputPadLocation(const circuit::Output &output) co
     return mOutputLocations[output];
 }
 
-
 } //namespace placement
-
 } //namespace ophidian

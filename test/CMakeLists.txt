@@ -10,36 +10,49 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_run_tests_SRC
+file(GLOB_RECURSE ophidian_tests_source
     "*.cpp"
+    "*.h"
 )
 
-# Add Catch lib interface
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE .)
+if(UNCRUSTIFY_IT)
+    include(uncrustify_helper)
+    uncrustify_it(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
+
+if(RUN_UNCRUSTIFY_CHECK)
+    include(uncrustify_helper)
+    uncrustify_check(${ophidian_uncrustify_config} ${ophidian_tests_source})
+endif()
 
 link_directories(${THIRD_PARTY_SOURCE_DIR}/libertyParser/lib/)
 LINK_DIRECTORIES(${THIRD_PARTY_SOURCE_DIR}/libertyParser/include/)
 
 # Add test target
-add_executable(ophidian_tests ${ophidian_run_tests_SRC})
+add_executable(ophidian_tests ${ophidian_tests_source})
 
 # Link target dependencies
-target_link_libraries(ophidian_tests PUBLIC
-    Catch
-    ophidian_circuit
-    ophidian_design
-    ophidian_entity_system
-    ophidian_floorplan
-    ophidian_geometry
-    ophidian_interconnection
-    ophidian_parser
-    ophidian_placement
-    ophidian_standard_cell
-    ophidian_timing
-    ophidian_timingdriven_placement
-    si2dr_liberty
+target_link_libraries(ophidian_tests
+    PRIVATE Catch
+    PRIVATE ophidian_circuit_static
+    PRIVATE ophidian_design_static
+    PRIVATE ophidian_entity_system_static
+    PRIVATE ophidian_floorplan_static
+    PRIVATE ophidian_geometry_static
+    PRIVATE ophidian_interconnection_static
+    PRIVATE ophidian_parser_static
+    PRIVATE ophidian_placement_static
+    PRIVATE ophidian_standard_cell_static
+    PRIVATE ophidian_timing
+    PRIVATE ophidian_timingdriven_placement
 )
+
+if(OPHIDIAN_TESTS_FULLY_STATIC)
+    # Link EVERYTHING staticly!
+    set_target_properties(ophidian_tests PROPERTIES
+        LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
+    )
+endif()
 
 ################################################################################
 # Prepare test input environment.
@@ -50,19 +63,25 @@ execute_process(
     COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/test/.
     RESULT_VARIABLE result
 )
-execute_process(
-    COMMAND tar -zxvf superblue18.tar.gz
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/test/input_files
-    RESULT_VARIABLE result
+
+find_file(POWV9 "POWV9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
+find_file(PORT9 "PORT9.dat" PATHS 
+    "/usr/share/Flute" 
+    "/usr/local/share/Flute" 
+    "${ophidian_source_dir}/dependencies/share/Flute"
 )
 
 message("Creating symlink FLUTE LUTs")
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/3rdparty/Flute/PORT9.dat ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/test/.
     RESULT_VARIABLE result
 )
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/3rdparty/Flute/POWV9.dat ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/test/.
     RESULT_VARIABLE result
 )
 
@@ -71,4 +90,4 @@ execute_process(
 ################################################################################
 
 enable_testing()
-add_test(NAME unit_test COMMAND ophidian_tests "~[Profiling] ~[superblue18obs]")
+add_test(NAME unit_test COMMAND ophidian_tests)

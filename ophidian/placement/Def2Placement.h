@@ -20,16 +20,19 @@
 #define OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
 
 #include <ophidian/parser/Def.h>
-#include <ophidian/placement/Placement.h>
 #include <ophidian/circuit/Netlist.h>
 
+#include "Placement.h"
 
 namespace ophidian
 {
-namespace placement
-{
-void def2placement(const parser::Def & def, placement::Placement & placement, circuit::Netlist & netlist);
-} // namespace placement
-} // namespace ophidian
+    namespace placement
+    {
+        void def2placement(
+            const parser::Def & def,
+            placement::Placement & placement,
+            circuit::Netlist & netlist);
+    }     // namespace placement
+}     // namespace ophidian
 
 #endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

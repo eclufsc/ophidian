@@ -19,16 +19,20 @@
 #ifndef OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
 #define OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
 
-#include <ophidian/floorplan/Floorplan.h>
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
 
+#include "Floorplan.h"
+
 namespace ophidian
 {
-namespace floorplan
-{
-void lefDef2Floorplan(const parser::Lef &lef, const parser::Def &def, Floorplan &floorplan);
-} // namespace floorplan
-} // namespace ophidian
+    namespace floorplan
+    {
+        void lefDef2Floorplan(
+            const parser::Lef & lef,
+            const parser::Def & def,
+            Floorplan & floorplan);
+    }     // namespace floorplan
+}     // namespace ophidian
 
 #endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H
