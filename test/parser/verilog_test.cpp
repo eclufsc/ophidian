@@ -2,92 +2,114 @@
 
 #include <catch.hpp>
 
-#include <ophidian/parser/VerilogParser.h>
+#include <ophidian/parser/Verilog.h>
+#include <ophidian/parser/ParserException.h>
 
-using namespace ophidian::parser;
+using ophidian::parser::Verilog;
 
-TEST_CASE("Verilog: add module", "[parser][VerilogParser]")
+TEST_CASE("Verilog: missing file", "[parser][verilog]")
 {
-    Verilog file;
-    auto m = file.addModule("simple");
-    REQUIRE( file.modules().size() == 1 );
-    REQUIRE( std::count_if(file.modules().begin(), file.modules().end(), [m](const Verilog::Module & module)->bool{
-        return module.name() == m->name();
-    }) == 1 );
-    REQUIRE( m->name() == "simple" );
+    CHECK_THROWS_AS(
+        Verilog{"thisFileDoesNotExist.lef"},
+        ophidian::parser::exceptions::InexistentFile
+    );
 }
 
-TEST_CASE("Verilog::Module: add port", "[parser][VerilogParser]")
+TEST_CASE("Verilog: simple.v", "[parser][verilog][simple]")
 {
-    Verilog::Module simple("simple");
-    auto p = simple.addPort(Verilog::Port::Direction::INPUT, "inp");
-    REQUIRE( simple.ports().size() == 1 );
-    REQUIRE( p->name() == "inp" );
-    REQUIRE( p->direction() == Verilog::Port::Direction::INPUT );
-    REQUIRE( std::count_if(simple.ports().begin(), simple.ports().end(), [p](const Verilog::Port & port)->bool{
-        return p->name() == port.name() && p->direction() == port.direction();
-    }) == 1 );
+    auto simple = Verilog{"input_files/simple/simple.v"};
+
+    SECTION("Verilog: check modules size", "[parser][verilog][simple][size]"){
+        CHECK(simple.modules().size() == 1);
+    }
+
+    SECTION("Verilog: check module", "[parser][verilog][simple][module]"){
+        auto& module = simple.modules().front();
+
+        CHECK(module.name() == "simple");
+
+        CHECK(module.ports().size() == 4);
+
+        auto& first_port = module.ports().front();
+        CHECK(first_port.name() == "inp1");
+        CHECK(first_port.direction() == Verilog::module_type::port_type::direction_type::INPUT);
+
+        auto& last_port = module.ports().back();
+        CHECK(last_port.name() == "out");
+        CHECK(last_port.direction() == Verilog::module_type::port_type::direction_type::OUTPUT);
+    }
 }
-
-TEST_CASE("Verilog::Module: add net", "[parser][VerilogParser]")
-{
-    Verilog::Module simple("simple");
-    auto n = simple.addNet("inp");
-    REQUIRE( simple.nets().size() == 1 );
-    REQUIRE( n->name() == "inp" );
-    REQUIRE( std::count_if(simple.nets().begin(), simple.nets().end(), [n](const Verilog::Net & net)->bool{
-        return n->name() == net.name();
-    }) == 1 );
-}
-
-TEST_CASE("Verilog::Module: add module", "[parser][VerilogParser]")
-{
-    Verilog::Module simple("simple");
-    auto submodule = simple.addModule("submodule");
-    REQUIRE( simple.modules().size() == 1 );
-    REQUIRE( submodule->name() == "submodule" );
-}
-
-TEST_CASE("Verilog::Module: add instance", "[parser][VerilogParser]")
-{
-    Verilog::Module simple("simple");
-    auto mod = simple.addModule("sub");
-    auto inst = simple.addInstance(mod, "u1");
-    REQUIRE( inst->module() == mod );
-    REQUIRE( inst->name() == "u1" );
-    REQUIRE( simple.instances().size() == 1 );
-}
-
-TEST_CASE("Verilog::Module: instance port mapping", "[parser][VerilogParser]")
-{
-    Verilog::Module simple("simple");
-    auto inpNet = simple.addNet("inpNet");
-    auto outNet = simple.addNet("outNet");
-
-    auto INV = simple.addModule("INV");
-    auto INVa = INV->addPort(Verilog::Port::Direction::INPUT, "a");
-    auto INVo = INV->addPort(Verilog::Port::Direction::OUTPUT, "o");
-
-    auto inst = simple.addInstance(INV, "u1");
-
-    inst->mapPort(INVa, inpNet);
-    inst->mapPort(INVo, outNet);
-
-    auto mapping = inst->portMapping();
-
-    REQUIRE( mapping[INVa] == inpNet );
-    REQUIRE( mapping[INVo] == outNet );
-    REQUIRE( mapping.size() == 2 );
-
-}
-
-TEST_CASE("VerilogParser: invalid input", "[parser][VerilogParser]")
-{
-    std::stringstream input("module simput in; output out; endmodule");
-    VerilogParser parser;
-    std::unique_ptr<Verilog> file(parser.readStream(input));
-    REQUIRE( !file );
-}
+// TEST_CASE("Verilog::Module: add port", "[parser][VerilogParser]")
+// {
+//     Verilog::Module simple("simple");
+//     auto p = simple.addPort(Verilog::Port::Direction::INPUT, "inp");
+//     REQUIRE( simple.ports().size() == 1 );
+//     REQUIRE( p->name() == "inp" );
+//     REQUIRE( p->direction() == Verilog::Port::Direction::INPUT );
+//     REQUIRE( std::count_if(simple.ports().begin(), simple.ports().end(), [p](const Verilog::Port & port)->bool{
+//         return p->name() == port.name() && p->direction() == port.direction();
+//     }) == 1 );
+// }
+//
+// TEST_CASE("Verilog::Module: add net", "[parser][VerilogParser]")
+// {
+//     Verilog::Module simple("simple");
+//     auto n = simple.addNet("inp");
+//     REQUIRE( simple.nets().size() == 1 );
+//     REQUIRE( n->name() == "inp" );
+//     REQUIRE( std::count_if(simple.nets().begin(), simple.nets().end(), [n](const Verilog::Net & net)->bool{
+//         return n->name() == net.name();
+//     }) == 1 );
+// }
+//
+// TEST_CASE("Verilog::Module: add module", "[parser][VerilogParser]")
+// {
+//     Verilog::Module simple("simple");
+//     auto submodule = simple.addModule("submodule");
+//     REQUIRE( simple.modules().size() == 1 );
+//     REQUIRE( submodule->name() == "submodule" );
+// }
+//
+// TEST_CASE("Verilog::Module: add instance", "[parser][VerilogParser]")
+// {
+//     Verilog::Module simple("simple");
+//     auto mod = simple.addModule("sub");
+//     auto inst = simple.addInstance(mod, "u1");
+//     REQUIRE( inst->module() == mod );
+//     REQUIRE( inst->name() == "u1" );
+//     REQUIRE( simple.instances().size() == 1 );
+// }
+//
+// TEST_CASE("Verilog::Module: instance port mapping", "[parser][VerilogParser]")
+// {
+//     Verilog::Module simple("simple");
+//     auto inpNet = simple.addNet("inpNet");
+//     auto outNet = simple.addNet("outNet");
+//
+//     auto INV = simple.addModule("INV");
+//     auto INVa = INV->addPort(Verilog::Port::Direction::INPUT, "a");
+//     auto INVo = INV->addPort(Verilog::Port::Direction::OUTPUT, "o");
+//
+//     auto inst = simple.addInstance(INV, "u1");
+//
+//     inst->mapPort(INVa, inpNet);
+//     inst->mapPort(INVo, outNet);
+//
+//     auto mapping = inst->portMapping();
+//
+//     REQUIRE( mapping[INVa] == inpNet );
+//     REQUIRE( mapping[INVo] == outNet );
+//     REQUIRE( mapping.size() == 2 );
+//
+// }
+//
+// TEST_CASE("VerilogParser: invalid input", "[parser][VerilogParser]")
+// {
+//     std::stringstream input("module simput in; output out; endmodule");
+//     VerilogParser parser;
+//     std::unique_ptr<Verilog> file(parser.readStream(input));
+//     REQUIRE( !file );
+// }
 
 // TEST_CASE("VerilogParser: read module with two ports", "[parser][VerilogParser]")
 // {

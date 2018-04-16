@@ -25,6 +25,7 @@ namespace ophidian
 {
 namespace parser
 {
+namespace exceptions {
     class InexistentFile :
         public std::exception
     {
@@ -34,6 +35,16 @@ namespace parser
             return "The given file was not found";
         }
     };
+    class VerilogRuntimeException :
+        public std::exception
+    {
+    public:
+        const char * what() const noexcept override
+        {
+            return "Verilog runtime error";
+        }
+    };
+}
 }     // namespace parser
 }     // namespace ophidian
 
