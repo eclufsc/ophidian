@@ -55,22 +55,24 @@ namespace parser
                 return 0;
             }
         );
+
         defrSetDieAreaCbk(
             [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
                 that->m_die_area = Def::database_unit_box_type{
                     {
-                        Def::database_unit_type{box->xl()},
-                        Def::database_unit_type{box->yl()}
+                        Def::database_unit_type{static_cast<double>(box->xl())},
+                        Def::database_unit_type{static_cast<double>(box->yl())}
                     }, 
                     {
-                        Def::database_unit_type{box->xh()},
-                        Def::database_unit_type{box->yh()}
+                        Def::database_unit_type{static_cast<double>(box->xh())},
+                        Def::database_unit_type{static_cast<double>(box->yh())}
                     }
                 };
                 return 0;
             }
         );
+
         defrSetRowCbk(
             [](defrCallbackType_e, defiRow * defrow, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -94,6 +96,7 @@ namespace parser
                 return 0;
             }
         );
+
         defrSetComponentStartCbk(
             [](defrCallbackType_e, int number, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -101,6 +104,7 @@ namespace parser
                 return 0;
             }
         );
+
         defrSetComponentCbk(
             [](defrCallbackType_e, defiComponent * comp, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -121,8 +125,8 @@ namespace parser
                         else { return Def::component_type::orientation_type::N; }
                     }(),
                     Def::component_type::database_unit_point_type{
-                        Def::component_type::database_unit_type{comp->placementX()},
-                        Def::component_type::database_unit_type{comp->placementY()}
+                        Def::component_type::database_unit_type{static_cast<double>(comp->placementX())},
+                        Def::component_type::database_unit_type{static_cast<double>(comp->placementY())}
                     },
                     comp->isFixed()
                 );

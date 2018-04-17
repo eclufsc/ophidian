@@ -51,19 +51,19 @@ namespace parser
         template <class T> using point_type     = geometry::Point<T>;
         template <class T> using box_type       = geometry::Box<T>;
 
-        using row_type           = Row;
-        using row_container_type = container_type<row_type>;
+        using row_type                          = Row;
+        using row_container_type                = container_type<row_type>;
 
-        using component_type           = Component;
-        using component_container_type = container_type<component_type>;
+        using component_type                    = Component;
+        using component_container_type          = container_type<component_type>;
 
-        using database_unit_type       = util::database_unit_t;
-        using database_unit_point_type = point_type<database_unit_type>;
-        using database_unit_box_type   = box_type<database_unit_type>;
+        using database_unit_type                = util::database_unit_t;
+        using database_unit_point_type          = point_type<database_unit_type>;
+        using database_unit_box_type            = box_type<database_unit_type>;
 
-        using scalar_type       = util::database_unit_scalar_t;
-        using scalar_point_type = point_type<scalar_type>;
-        using scalar_box_type   = box_type<scalar_type>;
+        using scalar_type                       = util::database_unit_scalar_t;
+        using scalar_point_type                 = point_type<scalar_type>;
+        using scalar_box_type                   = box_type<scalar_type>;
 
         // Class constructors
         Def() = default;
@@ -166,13 +166,13 @@ namespace parser
     {
     public:
         // Class member types
-        using string_type = std::string;
+        using string_type              = std::string;
 
         using database_unit_type       = Def::database_unit_type;
         using database_unit_point_type = Def::database_unit_point_type;
 
-        using scalar_type       = Def::scalar_type;
-        using scalar_point_type = Def::scalar_point_type;
+        using scalar_type              = Def::scalar_type;
+        using scalar_point_type        = Def::scalar_point_type;
 
         // Class constructors
         Row() = delete;

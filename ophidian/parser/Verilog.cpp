@@ -96,30 +96,34 @@ namespace parser
 
         verilog_resolve_modules(source_tree);
 
+        // Iterate all modules
         for(auto module_it = source_tree->modules->head; module_it; module_it = module_it->next) {
 
             auto module = static_cast<ast_module_declaration*>(module_it->data);
 
             auto ports = Verilog::Module::container_type<Verilog::Module::Port>{};
 
+            // Iterate all module ports
+            // grab the port type thant iterate on ports of the same type
             for(auto port_it = module->module_ports->head; port_it; port_it = port_it->next){
                 
                 auto port = static_cast<ast_port_declaration*>(port_it->data);
 
-                auto direction = Verilog::Module::Port::Direction{};
+                auto direction = Verilog::Module::Port::Direction::NONE;;
                 switch(port->direction)
                 {
                 case PORT_INPUT:
                     direction = Verilog::Module::Port::Direction::INPUT;
-
+                    break;
                 case PORT_OUTPUT:
                     direction = Verilog::Module::Port::Direction::OUTPUT;
-
+                    break;
                 case PORT_INOUT:
                     direction = Verilog::Module::Port::Direction::INOUT;
-
-                case PORT_NONE:
+                    break;
+                default:
                     direction = Verilog::Module::Port::Direction::NONE;
+                    break;
                 }
 
                 for(auto name_it = port->port_names->head; name_it; name_it = name_it->next)
@@ -127,62 +131,86 @@ namespace parser
                     auto port_identifier = static_cast<ast_identifier>(name_it->data);
                     auto name = port_identifier->identifier;
 
-                    ports.emplace_back(std::move(name), std::move(direction));
+                    ports.emplace_back(std::move(name), direction);
+                }
+            }
+
+            auto nets = Verilog::module_type::net_container_type{};
+
+            // Iterate module nets
+            for(auto net_it = module->net_declarations->head; net_it; net_it = net_it->next)
+            {
+                auto net = static_cast<ast_net_declaration*>(net_it->data);
+
+                nets.emplace_back(net->identifier->identifier);
+            }
+
+            auto module_instances = Verilog::module_type::module_instance_container_type{};
+
+            // Iterate module instantiations
+            for(auto instantiation_it = module->module_instantiations->head; instantiation_it; instantiation_it = instantiation_it->next)
+            {
+                auto module_instantiation = static_cast<ast_module_instantiation*>(instantiation_it->data);
+
+                auto module_instantiation_name = module_instantiation->module_identifer->identifier;
+
+                // Iterate module instances
+                for(auto instance_it = module_instantiation->module_instances->head; instance_it; instance_it = instance_it->next)
+                {
+                    auto instance = static_cast<ast_module_instance*>(instance_it->data);
+
+                    auto instance_name = instance->instance_identifier->identifier;
+
+                    auto port_net_map = Verilog::module_type::module_instance_type::net_map_type{};
+                    
+                    // Iterate instance conections
+                    for(auto port_it = instance->port_connections->head; port_it; port_it = port_it->next)
+                    {
+                        auto connection = static_cast<ast_port_connection*>(port_it->data);
+
+                        auto expression = connection->expression;
+
+                        auto port_name = connection->port_name->identifier;
+
+                        auto net_name = expression->primary->value.identifier->identifier;
+
+                        port_net_map[port_name] = net_name;
+                    }
+
+                    module_instances.emplace_back(instance_name, module_instantiation_name, std::move(port_net_map));
                 }
             }
 
             m_modules.emplace_back(
                 std::string(module->identifier->identifier),
                 std::move(ports), 
-                std::vector<Verilog::Module::Net>{}, 
-                std::vector<Verilog::Module>{}, 
-                std::vector<Verilog::Module::Module_instance>{}
+                std::move(nets), 
+                std::move(module_instances) 
             );
         }
     }
 
-    const Verilog::container_type<Verilog::Module>& Verilog::modules() const noexcept
+    const Verilog::module_container_type& Verilog::modules() const noexcept
     {
         return m_modules;
     }
-
-    Verilog::Module::Module(const Verilog::Module::string_type& name):
-        m_name{name},
-        m_ports{},
-        m_nets{},
-        m_modules{},
-        m_module_instances{}
-    {}
-
-    Verilog::Module::Module(Verilog::Module::string_type&& name):
-        m_name{std::move(name)},
-        m_ports{},
-        m_nets{},
-        m_modules{},
-        m_module_instances{}
-    {}
 
     const Verilog::Module::string_type& Verilog::Module::name() const noexcept
     {
         return m_name;
     }
 
-    const Verilog::Module::container_type<Verilog::Module::Port> & Verilog::Module::ports() const noexcept
+    const Verilog::Module::port_container_type& Verilog::Module::ports() const noexcept
     {
         return m_ports;
     }
 
-    const Verilog::Module::container_type<Verilog::Module::Net>& Verilog::Module::nets() const noexcept
+    const Verilog::Module::net_container_type& Verilog::Module::nets() const noexcept
     {
         return m_nets;
     }
 
-    const Verilog::Module::container_type<Verilog::Module>& Verilog::Module::modules() const noexcept
-    {
-        return m_modules;
-    }
-
-    const Verilog::Module::container_type<Verilog::Module::Module_instance>& Verilog::Module::module_instances() const noexcept
+    const Verilog::Module::module_instance_container_type& Verilog::Module::module_instances() const noexcept
     {
         return m_module_instances;
     }
@@ -200,6 +228,28 @@ namespace parser
     bool Verilog::Module::Port::operator==(const Verilog::Module::Port& rhs) const noexcept
     {
         return m_name == rhs.m_name && m_direction == rhs.m_direction;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Verilog::Module::Port& port)
+    {
+        auto direction_string = [&](){
+            switch(port.m_direction){
+                case Verilog::Module::Port::direction_type::INPUT:
+                    return "INPUT";
+                case Verilog::Module::Port::direction_type::OUTPUT:
+                    return "OUTPUT";
+                case Verilog::Module::Port::direction_type::INOUT:
+                    return "INOUT";
+                default:
+                    return "NONE";
+            }
+        };
+
+        os << "{name: " << port.m_name
+            << ", direction: " << direction_string()
+            << "}";
+
+        return os;
     }
 
     Verilog::Module::Net::Net(const Verilog::Module::Net::string_type& name):
@@ -220,28 +270,24 @@ namespace parser
         return m_name == rhs.m_name;
     }
 
-    Verilog::Module::Module_instance::Module_instance(
-        const Verilog::Module::Module_instance::string_type& name, 
-        const Verilog::Module::Module_instance::module_type& module):
-        m_name{name},
-        m_module{&module}
-    {}
-
-    Verilog::Module::Module_instance::Module_instance(
-        Verilog::Module::Module_instance::string_type&& name, 
-        const Verilog::Module::Module_instance::module_type& module):
-        m_name{std::move(name)},
-        m_module{&module}
-    {}
+    std::ostream& operator<<(std::ostream& os, const Verilog::Module::Net& net)
+    {
+        return os << "{name: " << net.m_name << "}";
+    }
 
     const Verilog::Module::Module_instance::string_type& Verilog::Module::Module_instance::name() const noexcept
     {
         return m_name;
     }
 
-    const Verilog::Module::Module_instance::module_type& Verilog::Module::Module_instance::module() const noexcept
+    const Verilog::Module::Module_instance::string_type& Verilog::Module::Module_instance::module() const noexcept
     {
-        return *m_module;
+        return m_module;
+    }
+
+    const Verilog::Module::Module_instance::net_map_type& Verilog::Module::Module_instance::net_map() const noexcept
+    {
+        return m_net_map;
     }
 }     // namespace parser
 }     // namespace ophidian

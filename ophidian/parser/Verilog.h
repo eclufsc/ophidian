@@ -73,19 +73,19 @@ namespace parser
 
         template <class T> using container_type = std::vector<T>;
 
-        using string_type = std::string;
+        using string_type                       = std::string;
 
-        using module_type = Module;
-        using module_container_type = container_type<module_type>;
+        using module_type                       = Module;
+        using module_container_type             = container_type<module_type>;
 
-        using port_type = Port;
-        using port_container_type = container_type<port_type>;
+        using port_type                         = Port;
+        using port_container_type               = container_type<port_type>;
 
-        using net_type = Net;
-        using net_container_type = container_type<net_type>;
+        using net_type                          = Net;
+        using net_container_type                = container_type<net_type>;
 
-        using module_instance_type = Module_instance;
-        using module_instance_container_type = container_type<module_instance_type>;
+        using module_instance_type              = Module_instance;
+        using module_instance_container_type    = container_type<module_instance_type>;
 
         // Class constructors
         Module() = delete;
@@ -96,16 +96,12 @@ namespace parser
         Module(Module&&) = default;
         Module& operator=(Module&&) = default;
 
-        Module(const string_type& name);
-        Module(string_type&& name);
-
-        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-        Module(Arg1&& name, Arg2&& ports, Arg3&& nets, Arg4&& modules, Arg5&& module_instances):
+        template<class Arg1, class Arg2, class Arg3, class Arg4>
+        Module(Arg1&& name, Arg2&& ports, Arg3&& nets, Arg4&& module_instances):
             m_name{std::forward<Arg1>(name)},
             m_ports{std::forward<Arg2>(ports)},
             m_nets{std::forward<Arg3>(nets)},
-            m_modules{std::forward<Arg4>(modules)},
-            m_module_instances{std::forward<Arg5>(module_instances)}
+            m_module_instances{std::forward<Arg4>(module_instances)}
         {}
 
         // Class member functions
@@ -115,15 +111,12 @@ namespace parser
 
         const net_container_type& nets() const noexcept;
 
-        const module_container_type& modules() const noexcept;
-
         const module_instance_container_type& module_instances() const noexcept;
 
     private:
         string_type                    m_name;
         port_container_type            m_ports;
         net_container_type             m_nets;
-        module_container_type          m_modules;
         module_instance_container_type m_module_instances;
     };
 
@@ -135,7 +128,7 @@ namespace parser
             INPUT, OUTPUT, INOUT, NONE
         };
 
-        using string_type = std::string;
+        using string_type    = std::string;
         using direction_type = Direction;
 
         // Class constructors
@@ -159,6 +152,8 @@ namespace parser
         const direction_type& direction() const noexcept;
 
         bool operator==(const Port& rhs) const noexcept;
+
+        friend std::ostream& operator<<(std::ostream& os, const Port& port);
 
     private:
         string_type    m_name;
@@ -188,6 +183,8 @@ namespace parser
 
         bool operator==(const Net& rhs) const noexcept;
 
+        friend std::ostream& operator<<(std::ostream& os, const Net& net);
+
     private:
         string_type m_name;
     };
@@ -196,8 +193,13 @@ namespace parser
     {
     public:
         // Class member types
-        using string_type = std::string;
-        using module_type = Module;
+        template <class K, class V> using map_type = std::map<K,V>;
+
+        using string_type         = std::string;
+
+        using net_map_key_type    = string_type;
+        using net_map_mapped_type = string_type;
+        using net_map_type        = map_type<net_map_key_type, net_map_mapped_type>;
 
         // Class constructors
         Module_instance() = delete;
@@ -208,17 +210,24 @@ namespace parser
         Module_instance(Module_instance&&) = default;
         Module_instance& operator=(Module_instance&&) = default;
 
-        Module_instance(const std::string& name, const Module& module);
-        Module_instance(std::string&& name, const Module& module);
+        template<class A1, class A2, class A3>
+        Module_instance(A1&& name, A2&& module, A3&& net_map):
+            m_name{std::forward<A1>(name)},
+            m_module{std::forward<A2>(module)},
+            m_net_map{std::forward<A3>(net_map)}
+        {}
 
         // Class member functions
         const string_type& name() const noexcept;
 
-        const module_type& module() const noexcept;
+        const string_type& module() const noexcept;
+
+        const net_map_type& net_map() const noexcept;
 
     private:
         string_type  m_name;
-        const module_type* m_module;
+        string_type  m_module;
+        net_map_type m_net_map;
     };
 }     // namespace parser
 }     // namespace ophidian

@@ -227,8 +227,8 @@ namespace parser
         struct Macro_foreign;
         class Pin;
 
-        template <class T> using container_type = Lef::container_type<T>;
-        template <class K, class V> using map_type    = std::map<K,V>;
+        template <class T> using container_type    = Lef::container_type<T>;
+        template <class K, class V> using map_type = std::map<K,V>;
 
         template <class T> using point_type     = Lef::point_type<T>;
         template <class T> using box_type       = Lef::box_type<T>;

@@ -11,8 +11,7 @@
 
 # Fetch test files recursevely
 file(GLOB_RECURSE ophidian_tests_source
-    "parser/*.cpp"
-    "parser/*.h"
+    "*.cpp"
     "main.cpp"
 )
 
@@ -32,15 +31,15 @@ add_executable(ophidian_tests ${ophidian_tests_source})
 # Link target dependencies
 target_link_libraries(ophidian_tests
     PRIVATE Catch
-    # PRIVATE ophidian_circuit_static
-    # PRIVATE ophidian_design_static
-    # PRIVATE ophidian_entity_system_static
-    # PRIVATE ophidian_floorplan_static
-    # PRIVATE ophidian_geometry_static
-    # PRIVATE ophidian_interconnection_static
+    PRIVATE ophidian_circuit_static
+    PRIVATE ophidian_design_static
+    PRIVATE ophidian_entity_system_static
+    PRIVATE ophidian_floorplan_static
+    PRIVATE ophidian_geometry_static
+    PRIVATE ophidian_interconnection_static
     PRIVATE ophidian_parser_static
-    # PRIVATE ophidian_placement_static
-    # PRIVATE ophidian_standard_cell_static
+    PRIVATE ophidian_placement_static
+    PRIVATE ophidian_standard_cell_static
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)

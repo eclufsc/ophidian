@@ -335,6 +335,30 @@ namespace parser
 
     std::ostream& operator<<(std::ostream& os, const Lef::Site& site)
     {
+        auto symmetry_string = [&](){
+            using namespace std::literals;
+
+            auto st = ""s;
+            if(site.m_symmetry.is_x_symmetric){
+                st += "X";
+            }
+            if(site.m_symmetry.is_y_symmetric){
+                st += "Y";
+            }
+            if(site.m_symmetry.is_90_symmetric){
+                st += "90";
+            }
+
+            return st;
+        };
+
+        os << "{name: " << site.m_name 
+            << ", class: " << site.m_class_name
+            << ", width: " << site.m_width
+            << ", height: " << site.m_height
+            << ", symmetry:" << symmetry_string() 
+            << "}";
+
         return os;
     }
 
@@ -396,6 +420,38 @@ namespace parser
 
     std::ostream& operator<<(std::ostream& os, const Lef::Layer& layer)
     {
+        auto type_string = [&](){
+            switch(layer.m_type){
+                case Lef::Layer::type_type::MASTERSLICE:
+                    return "MASTERSLICE";
+                case Lef::Layer::type_type::CUT:
+                    return "CUT";
+                case Lef::Layer::type_type::ROUTING:
+                    return "ROUTING";
+                default:
+                    return "NOT_ASSIGNED";
+            }
+        };
+
+        auto direction_string = [&](){
+            switch(layer.m_direction){
+                case Lef::Layer::direction_type::HORIZONTAL:
+                    return "HORIZONTAL";
+                case Lef::Layer::direction_type::VERTICAL:
+                    return "VERTICAL";
+                default:
+                    return "NOT_ASSIGNED";
+            }
+        };
+
+        os << "{name: " << layer.m_name 
+            << ", type: " << type_string()
+            << ", direction: " << direction_string()
+            << ", pitch: " << layer.m_pitch
+            << ", offset:" << layer.m_offset
+            << ", width: " << layer.m_width
+            << "}";
+
         return os;
     }
 
