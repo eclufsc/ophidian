@@ -128,12 +128,12 @@ namespace ophidian
 			}
 
 		private:
-			circuit::Netlist			 mNetlist;
-			floorplan::Floorplan 		 mFloorplan;
-			placement::Placement 		 mPlacement;
+			circuit::Netlist             mNetlist;
+			floorplan::Floorplan         mFloorplan;
+			placement::Placement         mPlacement;
 			standard_cell::StandardCells mStandardCells;
-			placement::Library 			 mLibrary;
-			circuit::LibraryMapping 	 mLibraryMapping;
+			placement::Library           mLibrary;
+			circuit::LibraryMapping      mLibraryMapping;
 			placement::PlacementMapping  mPlacementMapping;
 
 		};
