@@ -38,7 +38,7 @@ $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ sudo apt install libophidian-dev
 ```
 
-### Debian buster (10) or newer:
+### Debian Sid:
 First you will need to add the **Launchpad PPA for eclufsc** gpg key:
 ```
 $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
