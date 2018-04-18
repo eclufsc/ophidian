@@ -2,7 +2,6 @@
 #define SPATIALINDEX_H
 
 #include <vector>
-
 #include <ophidian/geometry/Models.h>
 #include <model/forms.h>
 

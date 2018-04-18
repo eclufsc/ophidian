@@ -65,8 +65,8 @@ Idle::Idle(MySFMLCanvas * SFMLCanvas, MainController * controller) :
 
 }
 
+//! This include is needed here for MySFMLCanvas see the idle constructor without circular including
 #include "view/mysfmlcanvas.h"
-//< Include needed here for MySFMLCanvas see the idle constructor without circular including
 
 void Idle::mousePressEvent(ophidian::geometry::Point pos)
 {
@@ -182,7 +182,6 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
         mMainController->transform(mWireQuad, translation);
 
         origin = mSFMLCanvas->canvas()->points(first).front();
-        //mMainController->clear(mWireQuad);
         mMainController->update(mQuad);
         mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
     }
@@ -241,7 +240,6 @@ void Dragging::mouseMoveEvent(ophidian::geometry::Point pos)
 
 void Dragging::mouseReleaseEvent(ophidian::geometry::Point pos)
 {
-    //mouseMoveEvent(pos); maybe need update the position?
     mMainController->clear(mWireQuad);
     if (mMoved)
         mMainController->update(mQuad);

@@ -17,13 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->selectedCell_h_2->setPlaceholderText("Height");
     mMainController.setCanvas(ui->MyCanvas->canvas());
 
-    /* Connecting signals */
     QObject::connect(&mMainController, SIGNAL(on_send_circuitChanged(QString, QString, size_t, size_t, size_t)),
                      this, SLOT(on_receive_circuitChanged(QString, QString, size_t, size_t, size_t)));
     QObject::connect(&mMainController, SIGNAL(on_send_cellChanged(QString, QString, double, double, double, double)),
                      this, SLOT(on_receive_cellChanged(QString, QString, double, double, double, double)));
 
-    /* Name of Actions */
     ui->actionSlot_1->setText("Slot 1");
     ui->actionSlot_2->setText("Slot 2");
     ui->actionSlot_3->setText("Slot 3");

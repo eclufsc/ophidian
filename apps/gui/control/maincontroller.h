@@ -1,18 +1,14 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
 
-#include <vector>
-#include <unordered_map>
-#include <QObject>
-
-//#include <sstream>
 #include <string>
-
 #include <cstdlib>
 #include <ctime>
-//#include <iostream>
-#include <boost/geometry.hpp>
+#include <vector>
+#include <unordered_map>
 #include <unordered_set>
+#include <boost/geometry.hpp>
+#include <QObject>
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Range.h>

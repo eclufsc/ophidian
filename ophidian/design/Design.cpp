@@ -20,28 +20,21 @@
 
 namespace ophidian
 {
+    namespace design
+    {
+        Design::Design() :
+                mNetlist(),
+                mFloorplan(),
+                mPlacement(mNetlist),
+                mStandardCells(),
+                mLibrary(mStandardCells),
+                mLibraryMapping(mNetlist),
+                mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping)
+        {
+        }
 
-namespace design
-{
-
-Design::Design() :
-
-    mNetlist(),
-    mFloorplan(),
-    mPlacement(mNetlist),
-    mStandardCells(),
-    mLibrary(mStandardCells),
-    mLibraryMapping(mNetlist),
-    mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping)
-{
-
-}
-
-Design::~Design()
-{
-  
-}
-
-} //namespace design
-
+        Design::~Design()
+        {
+        }
+    } //namespace design
 } //namespace ophidian

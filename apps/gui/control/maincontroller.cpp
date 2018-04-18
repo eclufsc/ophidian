@@ -47,7 +47,6 @@ void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef,
         mCanvas->clear();
     }
 
-    /* Building */
     mBuilder = new ophidian::design::ICCAD2017ContestDesignBuilder(cells_lef, tech_lef, placed_def);
     init();
 }
@@ -60,7 +59,6 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
         mCanvas->clear();
     }
 
-    /* Building */
     mBuilder = new ophidian::design::ICCAD2015ContestDesignBuilder(lef, def, verilog);
     init();
 }
@@ -69,13 +67,11 @@ void MainController::init()
 {
     mDesign = & mBuilder->build();
 
-    /* Creating property Cells to Quads */
     mCellToQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(ophidian::circuit::Cell());
 
-    /* Getting information of netlist */
-    size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
-    size_t pins = mDesign->netlist().size(ophidian::circuit::Pin());
-    size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
+    size_t amountCells = mDesign->netlist().size(ophidian::circuit::Cell());
+    size_t amountPins = mDesign->netlist().size(ophidian::circuit::Pin());
+    size_t amountNets = mDesign->netlist().size(ophidian::circuit::Net());
 
     ophidian::geometry::Point chipUpper = mDesign->floorplan().chipUpperRightCorner().toPoint();
 
@@ -83,18 +79,15 @@ void MainController::init()
     concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
     std::string dieArea = concat.str();
 
-    /* Saying to MainWindow display the information */
-    emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), cells, pins, nets);
+    emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), amountCells, amountPins, amountNets);
 
     redraw();
 }
 
 void MainController::createQuads()
 {
-    // Chip Area
     mCanvas->createBoundaries(mDesign->floorplan().chipUpperRightCorner().toPoint());
 
-    // Cells
     for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
     {
 
@@ -255,27 +248,18 @@ ophidian::geometry::Point MainController::chipBoundaries()
 
 void MainController::slot1()
 {
-    /* - Implement your algorithm or functionality here.
-     */
-
     if (mBuilder != nullptr)
         redraw();
 }
 
 void MainController::slot2()
 {
-    /* - Implement your algorithm or functionality here.
-     */
-
     if (mBuilder != nullptr)
         redraw();
 }
 
 void MainController::slot3()
 {
-    /* - Implement your algorithm or functionality here.
-     */
-
     if (mBuilder != nullptr)
         redraw();
 }
@@ -316,16 +300,12 @@ void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box &
     {
         auto points = mCanvas->points(*quadIt);
 
-        // --
-        // There is a need to fix the points correctly, even though they are drawing correctly.
         double yMin = points[0].position.y <= viewBox.min_corner().y() ? 0 : points[0].position.y - viewBox.min_corner().y();
-        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100, yMin/100);
-
         double xMax = points[2].position.x - viewBox.min_corner().x() <= viewBox.max_corner().x() - viewBox.min_corner().x() ?
                       points[2].position.x - viewBox.min_corner().x() : viewBox.max_corner().x() - viewBox.min_corner().x();
+        
+        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100, yMin/100);
         ophidian::geometry::Point max(xMax/100, (points[2].position.y - viewBox.min_corner().y())/100);
-        // --
-
         ophidian::geometry::Box box(min, max);
 
         QString style;

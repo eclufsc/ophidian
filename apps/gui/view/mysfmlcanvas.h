@@ -1,23 +1,22 @@
 #ifndef MYSFMLCANVAS_H
 #define MYSFMLCANVAS_H
 
-#include <QKeyEvent>
-#include <QWheelEvent>
-#include <QResizeEvent>
-
 #include <omp.h>
 #include <memory>
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <boost/geometry.hpp>
+
+#include <QKeyEvent>
+#include <QWheelEvent>
+#include <QResizeEvent>
 
 #include <ophidian/geometry/Models.h>
 #include "qsfmlcanvas.h"
 #include "canvas.h"
 #include "control/maincontroller.h"
 #include "control/state.h"
-
-#include <iostream>
-#include <fstream>
-#include <boost/geometry.hpp>
 
 using namespace qsfml;
 

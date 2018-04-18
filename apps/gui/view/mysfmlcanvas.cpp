@@ -4,7 +4,6 @@ MySFMLCanvas::MySFMLCanvas(QWidget * parent) :
     QSFMLCanvas(parent),
     mCameraView(sf::FloatRect(0, 0, 51599.25, 34200.0))
 {
-    //mCameraView.setViewport(sf::FloatRect(0.0, 0.0, 1.0, 1.0));
     mCameraView.setSize(mCameraView.getSize().x, -mCameraView.getSize().y);
 }
 
@@ -47,8 +46,6 @@ void MySFMLCanvas::OnInit()
 
 void MySFMLCanvas::OnUpdate()
 {
-    // mCanvas.update(); ???
-
     clear(sf::Color::Black);
     setView(mCameraView);
 

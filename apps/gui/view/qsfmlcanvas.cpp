@@ -21,23 +21,10 @@ QSFMLCanvas::QSFMLCanvas(QWidget* parent) :
 QWidget       (parent),
 myInitialized (false)
 {
-    // Setup some states to allow direct rendering into the widget
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
-
-    // Strong focus for events in SFML
     setFocusPolicy(Qt::StrongFocus);
-
-    // Setup the widget geometry
-    //move(position);
-    //resize(size);
-
-    // Add Vertical sync to SFML
-    //this->setVerticalSyncEnabled(true);
-    //this->setFramerateLimit(60);
-
-    // Setup the timer
     myTimer.setInterval(0);
 }
 
@@ -45,39 +32,26 @@ QSFMLCanvas::QSFMLCanvas(QWidget * parent, const QPoint & position, const QSize 
 QWidget       (parent),
 myInitialized (false)
 {
-    // Setup some states to allow direct rendering into the widget
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
-
-    // Strong focus for events in SFML
     setFocusPolicy(Qt::StrongFocus);
-
-    // Setup the widget geometry
-    //move(position);
-    //resize(size);
-
-    // Add Vertical sync to SFML
-    //this->setVerticalSyncEnabled(true);
-    //this->setFramerateLimit(60);
-
-    // Setup the timer
     myTimer.setInterval(frameTime);
 }
 
 QSFMLCanvas::~QSFMLCanvas()
 {
-    // Nothing to do...
+
 }
 
 void QSFMLCanvas::OnInit()
 {
-    // Nothing to do by default...
+
 }
 
 void QSFMLCanvas::OnUpdate()
 {
-    // Nothing to do by default...
+
 }
 
 
@@ -88,13 +62,10 @@ void QSFMLCanvas::showEvent(QShowEvent*)
         #ifdef Q_WS_X11
            XFlush(QX11Info::display());
        #endif
-        // Create the SFML window with the widget handle
-        sf::Window::create(winId());
 
-        // Let the derived class do its specific stuff
+        sf::Window::create(winId());
         OnInit();
 
-        // Setup the timer to trigger a refresh at specified framerate
         connect(&myTimer, SIGNAL(timeout()), this, SLOT(repaint()));
         myTimer.start();
 
@@ -104,15 +75,11 @@ void QSFMLCanvas::showEvent(QShowEvent*)
 
 void QSFMLCanvas::paintEvent(QPaintEvent*)
 {
-    // Let the derived class do its specific stuff
     OnUpdate();
-
-    // Display on SFML widget
     sf::Window::display();
 }
 
 QPaintEngine* QSFMLCanvas::paintEngine() const
 {
-    // Don't use Qt render engine
     return 0;
 }

@@ -20,88 +20,93 @@
 
 namespace ophidian
 {
+    namespace design
+    {
 
-namespace design
-{
+        ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(
+            const std::string & cellLefFile,
+            const std::string & techLefFile,
+            const std::string & placedDefFile):
+                mDesign(),
+                mLef(),
+                mDef(),
+                mCellLefFile(cellLefFile),
+                mTechLefFile(techLefFile),
+                mPlacedDefFile(placedDefFile)
+        {
+        }
 
-ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile) :
+        ICCAD2017ContestDesignBuilder::~ICCAD2017ContestDesignBuilder()
+        {
+        }
 
-	mDesign(),
-	mLef(),
-	mDef(),
-	mCellLefFile(cellLefFile),
-	mTechLefFile(techLefFile),
-	mPlacedDefFile(placedDefFile)
-{
+        Design & ICCAD2017ContestDesignBuilder::build()
+        {
+            parser::LefParser lefParser;
+            parser::DefParser defParser;
 
-}
+            mLef = std::make_unique<ophidian::parser::Lef>();
+            lefParser.readFile(mCellLefFile, mLef);
+            lefParser.readFile(mTechLefFile, mLef);
 
-ICCAD2017ContestDesignBuilder::~ICCAD2017ContestDesignBuilder()
-{
+            mDef = defParser.readFile(mPlacedDefFile);
 
-}
+            placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
+            floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
+            placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
+            circuit::def2LibraryMapping(
+                *mDef,
+                mDesign.netlist(),
+                mDesign.standardCells(),
+                mDesign.libraryMapping());
 
-Design & ICCAD2017ContestDesignBuilder::build()
-{
-	parser::LefParser lefParser;
-	parser::DefParser defParser;
+            return mDesign;
+        }
 
-	mLef =  std::make_unique<ophidian::parser::Lef>();
-	lefParser.readFile(mCellLefFile, mLef);
-	lefParser.readFile(mTechLefFile, mLef);
+        ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(
+            const std::string & lefFile,
+            const std::string & defFile,
+            const std::string & verilogFile):
+                mDesign(),
+                mLef(),
+                mDef(),
+                mVerilog(),
+                mLefFile(lefFile),
+                mDefFile(defFile),
+                mVerilogFile(verilogFile)
+        {
 
-	mDef = defParser.readFile(mPlacedDefFile);
+        }
 
-	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
-	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
-	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
-	circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        ICCAD2015ContestDesignBuilder::~ICCAD2015ContestDesignBuilder()
+        {
 
-    return mDesign;
-}
+        }
 
+        Design & ICCAD2015ContestDesignBuilder::build()
+        {
+            parser::LefParser lefParser;
+            parser::DefParser defParser;
+            parser::VerilogParser vParser;
 
-ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile) :
+            mLef = std::make_unique<ophidian::parser::Lef>();
+            lefParser.readFile(mLefFile, mLef);
 
-	mDesign(),
-	mLef(),
-	mDef(),
-	mVerilog(),
-	mLefFile(lefFile),
-	mDefFile(defFile),
-	mVerilogFile(verilogFile)
-{
+            mDef = defParser.readFile(mDefFile);
 
-}
+            mVerilog.reset(vParser.readFile(mVerilogFile));
 
-ICCAD2015ContestDesignBuilder::~ICCAD2015ContestDesignBuilder()
-{
+            placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
+            floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
+            placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
+            circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
+            circuit::def2LibraryMapping(
+                *mDef,
+                mDesign.netlist(),
+                mDesign.standardCells(),
+                mDesign.libraryMapping());
 
-}
-
-Design & ICCAD2015ContestDesignBuilder::build()
-{
-	parser::LefParser lefParser;
-	parser::DefParser defParser;
-	parser::VerilogParser vParser;
-
-	mLef =  std::make_unique<ophidian::parser::Lef>();
-	lefParser.readFile(mLefFile, mLef);
-
-	mDef = defParser.readFile(mDefFile);
-
-	mVerilog.reset(vParser.readFile(mVerilogFile));
-
-
-	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
-	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
-	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
-	circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
-    circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
-
-    return mDesign;
-}
-
-} //namespace design
-
+            return mDesign;
+        }
+    } //namespace design
 } //namespace ophidian

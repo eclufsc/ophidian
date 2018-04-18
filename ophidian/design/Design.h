@@ -37,21 +37,24 @@ namespace ophidian
 		public:
 
 			//! Design Constructor
+
 			/*!
-			\brief Constructs a design system with no properties
+			   \brief Constructs a design system with no properties
 			*/
 			Design();
 
 			//! Design Destructor
+
 			/*!
-			\brief Destroys the design system, including its properties.
+			   \brief Destroys the design system, including its properties.
 			*/
 			~Design();
 
 			//! netlist getter
+
 			/*!
-			\brief Get the netlist.
-			\return Netlist.
+			   \brief Get the netlist.
+			   \return Netlist.
 			*/
 			circuit::Netlist & netlist()
 			{
@@ -59,9 +62,10 @@ namespace ophidian
 			}
 
 			//! floorplan getter
+
 			/*!
-			\brief Get the floorplan.
-			\return Floorplan.
+			   \brief Get the floorplan.
+			   \return Floorplan.
 			*/
 			floorplan::Floorplan & floorplan()
 			{
@@ -69,9 +73,10 @@ namespace ophidian
 			}
 
 			//! placement getter
+
 			/*!
-			\brief Get the placement.
-			\return Placement.
+			   \brief Get the placement.
+			   \return Placement.
 			*/
 			placement::Placement & placement()
 			{
@@ -79,9 +84,10 @@ namespace ophidian
 			}
 
 			//! standardCells getter
+
 			/*!
-			\brief Get standardCells.
-			\return StandardCells.
+			   \brief Get standardCells.
+			   \return StandardCells.
 			*/
 			standard_cell::StandardCells & standardCells()
 			{
@@ -89,9 +95,10 @@ namespace ophidian
 			}
 
 			//! library getter
+
 			/*!
-			\brief Get the library.
-			\return Library.
+			   \brief Get the library.
+			   \return Library.
 			*/
 			placement::Library & library()
 			{
@@ -99,9 +106,10 @@ namespace ophidian
 			}
 
 			//! libraryMapping getter
+
 			/*!
-			\brief Get the libraryMapping.
-			\return LibraryMapping.
+			   \brief Get the libraryMapping.
+			   \return LibraryMapping.
 			*/
 			circuit::LibraryMapping & libraryMapping()
 			{
@@ -109,9 +117,10 @@ namespace ophidian
 			}
 
 			//! placementMapping getter
+
 			/*!
-			\brief Get the placementMapping.
-			\return PlacementMapping.
+			   \brief Get the placementMapping.
+			   \return PlacementMapping.
 			*/
 			placement::PlacementMapping & placementMapping()
 			{
@@ -119,19 +128,16 @@ namespace ophidian
 			}
 
 		private:
-
-			circuit::Netlist mNetlist;
-			floorplan::Floorplan mFloorplan;
-			placement::Placement mPlacement;
+			circuit::Netlist			 mNetlist;
+			floorplan::Floorplan 		 mFloorplan;
+			placement::Placement 		 mPlacement;
 			standard_cell::StandardCells mStandardCells;
-			placement::Library mLibrary;
-			circuit::LibraryMapping mLibraryMapping;
-			placement::PlacementMapping mPlacementMapping;
+			placement::Library 			 mLibrary;
+			circuit::LibraryMapping 	 mLibraryMapping;
+			placement::PlacementMapping  mPlacementMapping;
 
 		};
-
 	} //namespace design
-
 } //namespace ophidian
 
 #endif // OPHIDIAN_DESIGN_DESIGN_H

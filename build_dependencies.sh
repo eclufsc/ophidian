@@ -27,16 +27,6 @@ then
     DEPENDENCIES_ROOT=$2
 fi
 
-# Check if user wants to install elsewhere
-AUX=$2
-if [ "$1" = "--install_to" ] && [ "${AUX:0:1}" != "/" ]
-then
-    DEPENDENCIES_ROOT=$CURRENT_DIR/$2
-elif [ "$1" = "--install_to" ] && [ "${AUX:0:1}" = "/" ]
-then
-    DEPENDENCIES_ROOT=$2
-fi
-
 # Useful variables
 DEPENDENCIES_BIN_PATH=$DEPENDENCIES_ROOT/bin
 DEPENDENCIES_LIB_PATH=$DEPENDENCIES_ROOT/lib

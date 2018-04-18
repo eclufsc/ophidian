@@ -1,14 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <iostream>
 #include <QMainWindow>
 
 #include "ui_mainwindow.h"
 #include "dialogiccad2015.h"
 #include "dialogiccad2017.h"
 #include "control/maincontroller.h"
-
-#include <iostream>
 
 namespace Ui {
 class MainWindow;
