@@ -25,21 +25,23 @@ namespace floorplan
     void lefDef2Floorplan(const parser::Lef & lef, const parser::Def & def, Floorplan & floorplan)
     {
         floorplan.chipOrigin(def.die_area().min_corner());
-        floorplan.chipUpperRightCorner(def.die().max_corner());
+        floorplan.chipUpperRightCorner(def.die_area().max_corner());
+
         for(auto & site : lef.sites())
         {
             floorplan.add(
-                Site(),
-                site.name,
-                util::LocationDbu(site.x * lef.micron_to_dbu_convertion_factor(), site.y * lef.micron_to_dbu_convertion_factor()));
+                Site{},
+                site.name(),
+                util::LocationDbu{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()});
         }
+
         for(auto & row : def.rows())
         {
             floorplan.add(
-                Row(),
-                util::LocationDbu{row.origin},
-                row.num.x(),
-                floorplan.find(row.site));
+                Row{},
+                row.origin(),
+                row.num().x(),
+                floorplan.find(row.site()));
         }
     }
 }     // namespace floorplan

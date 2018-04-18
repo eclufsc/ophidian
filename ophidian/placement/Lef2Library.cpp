@@ -27,20 +27,20 @@ namespace placement
         Library & library,
         standard_cell::StandardCells & stdCells)
     {
-        for(auto & macro : lef.macros())
+        for(auto& macro : lef.macros())
         {
-            auto stdCell = stdCells.add(standard_cell::Cell(), macro.name);
-            auto layer2RectsM1 = macro.obstructions.layer2rects.find("metal1");
-            if(layer2RectsM1 != macro.obstructions.layer2rects.end()) {
+            auto stdCell = stdCells.add(standard_cell::Cell(), macro.name());
+            auto layer2RectsM1 = macro.obstructions().find("metal1");
+            if(layer2RectsM1 != macro.obstructions().end()) {
                 geometry::MultiBox<util::database_unit_t> geometry;
-                for(auto & rect : layer2RectsM1->second)
+                for(auto& rect : layer2RectsM1->second)
                 {
                     geometry::Point<util::database_unit_t> pmin =
-                    {rect.min_corner().x() * lef.micron_to_dbu_convertion_factor(),
-                     rect.min_corner().y() * lef.micron_to_dbu_convertion_factor()};
+                    {rect.min_corner().x() * lef.micrometer_to_dbu_ratio(),
+                     rect.min_corner().y() * lef.micrometer_to_dbu_ratio()};
                     geometry::Point<util::database_unit_t> pmax =
-                    {rect.max_corner().x() * lef.micron_to_dbu_convertion_factor(),
-                     rect.max_corner().y() * lef.micron_to_dbu_convertion_factor()};
+                    {rect.max_corner().x() * lef.micrometer_to_dbu_ratio(),
+                     rect.max_corner().y() * lef.micrometer_to_dbu_ratio()};
                     geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
                 }
                 library.geometry(stdCell, geometry);
@@ -48,28 +48,28 @@ namespace placement
             else {
                 geometry::Point<util::database_unit_t> pmin =
                     {
-                        macro.origin.x() * lef.micron_to_dbu_convertion_factor(),
-                        macro.origin.y() * lef.micron_to_dbu_convertion_factor()
+                        macro.origin().x() * lef.micrometer_to_dbu_ratio(),
+                        macro.origin().y() * lef.micrometer_to_dbu_ratio()
                     };
                 geometry::Point<util::database_unit_t> pmax =
                     {
-                        macro.size.width * lef.micron_to_dbu_convertion_factor(),
-                        macro.size.height * lef.micron_to_dbu_convertion_factor()
+                        macro.size().x() * lef.micrometer_to_dbu_ratio(),
+                        macro.size().y() * lef.micrometer_to_dbu_ratio()
                     };
                 library.geometry(stdCell,
                     geometry::MultiBox<util::database_unit_t>{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
             }
-            util::DbuConverter dbuConverter{lef.micron_to_dbu_convertion_factor()};
+            util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
 
-            for(auto pin : macro.pins)
+            for(auto& pin : macro.pins())
             {
                 auto stdPin = stdCells.add(standard_cell::Pin(),
-                    macro.name + ":" + pin.name,
-                    standard_cell::PinDirection(pin.direction));
+                    macro.name() + ":" + pin.name(),
+                    standard_cell::PinDirection(pin.direction()));
                 stdCells.add(stdCell, stdPin);
-                for(auto port : pin.ports)
+                for(auto& port : pin.ports())
                 {
-                    for(auto rect : port.rects)
+                    for(auto& rect : port.second)
                     {
                         library.pinOffset(
                             stdPin,

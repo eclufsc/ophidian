@@ -27,15 +27,15 @@ namespace circuit
         const parser::Verilog::Module & module = verilog.modules().front();
 
         std::size_t sizePins = 0;
-        for(auto instance : module.instances())
+        for(auto instance : module.module_instances())
         {
-            sizePins += instance.portMapping().size();
+            sizePins += instance.net_map().size();
         }
         sizePins += module.ports().size();
 
         netlist.reserve(Pin(), sizePins);
         netlist.reserve(Net(), module.nets().size());
-        netlist.reserve(Cell(), module.instances().size());
+        netlist.reserve(Cell(), module.module_instances().size());
 
 
         for(auto net : module.nets())
@@ -46,23 +46,23 @@ namespace circuit
         for(auto port : module.ports())
         {
             auto pin = netlist.add(Pin(), port.name());
-            if(port.direction() == parser::Verilog::Port::Direction::INPUT) {
+            if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
                 netlist.add(Input(), pin);
             }
-            else if(port.direction() == parser::Verilog::Port::Direction::OUTPUT) {
+            else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
                 netlist.add(Output(), pin);
             }
             netlist.connect(netlist.find(Net(), port.name()), pin);
         }
 
-        for(auto instance : module.instances())
+        for(auto instance : module.module_instances())
         {
             auto cell = netlist.add(Cell(), instance.name());
-            for(auto portMap : instance.portMapping())
+            for(auto portMap : instance.net_map())
             {
-                auto pin = netlist.add(Pin(), instance.name() + ":" + portMap.first->name());
+                auto pin = netlist.add(Pin(), instance.name() + ":" + portMap.first);
                 netlist.add(cell, pin);
-                netlist.connect(netlist.find(Net(), portMap.second->name()), pin);
+                netlist.connect(netlist.find(Net(), portMap.second), pin);
             }
         }
     }

@@ -19,7 +19,7 @@
 #ifndef VERILOG_H
 #define VERILOG_H
 
-#include <list>
+#include <vector>
 #include <map>
 #include <istream>
 

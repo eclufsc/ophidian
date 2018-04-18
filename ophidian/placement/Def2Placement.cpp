@@ -29,8 +29,8 @@ namespace placement
     {
         for(auto & component : def.components())
         {
-            util::LocationDbu cellPosition{component.position.x(), component.position.y()};
-            auto cell = netlist.add(circuit::Cell(), component.name);
+            util::LocationDbu cellPosition{component.position()};
+            auto cell = netlist.add(circuit::Cell(), component.name());
             placement.placeCell(cell, cellPosition);
         }
     }

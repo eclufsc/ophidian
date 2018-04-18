@@ -12,8 +12,8 @@ namespace circuit
     {
         for(auto & component : def.components())
         {
-            auto cell = netlist.add(Cell(), component.name);
-            auto stdCell = standardCells.add(standard_cell::Cell(), component.macro);
+            auto cell = netlist.add(Cell(), component.name());
+            auto stdCell = standardCells.add(standard_cell::Cell(), component.macro());
             libraryMapping.cellStdCell(cell, stdCell);
         }
     }

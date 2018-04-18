@@ -10,9 +10,8 @@ class Verilog2NetlistFixture
 {
 public:
 	Verilog2NetlistFixture(){
-		parser::VerilogParser parser;
 		std::stringstream input(simpleInput);
-		verilog.reset(parser.readStream(input));
+		verilog = std::make_unique<parser::Verilog>(input);
 	}
 
 	const std::string simpleInput = "module simple (\n"
@@ -56,11 +55,11 @@ TEST_CASE_METHOD(Verilog2NetlistFixture, "Verilog2Netlist: The Verilog object an
 	const parser::Verilog::Module & simple = verilog->modules().front();
 	REQUIRE(simple.nets().size() == netlist.size(circuit::Net()));
 	REQUIRE(simple.ports().size() == (netlist.size(circuit::Input()) + netlist.size(circuit::Output())));
-	REQUIRE(simple.instances().size() == netlist.size(circuit::Cell()));
+	REQUIRE(simple.module_instances().size() == netlist.size(circuit::Cell()));
 
 	std::size_t moduleSizePins = 0;
-	for(auto instance : simple.instances())
-		moduleSizePins += instance.portMapping().size();
+	for(auto instance : simple.module_instances())
+		moduleSizePins += instance.net_map().size();
 	moduleSizePins += simple.ports().size();
 	REQUIRE(moduleSizePins == netlist.size(circuit::Pin()));
 }

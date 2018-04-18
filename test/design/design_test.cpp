@@ -1,8 +1,10 @@
 #include <catch.hpp>
 
 #include <ophidian/design/Design.h>
+#include <ophidian/util/Units.h>
 
 using namespace ophidian::design;
+using dbu_t = ophidian::util::database_unit_t;
 
 Design design;
 
@@ -21,20 +23,22 @@ TEST_CASE("Design: testing netlist.", "[design]")
 
 TEST_CASE("Design: testing floorplan.", "[design]")
 {
-	ophidian::util::LocationDbu origin(0.0, 0.0);
-	ophidian::util::LocationDbu boundaries(0.0, 0.0);
-
-	REQUIRE(design.floorplan().chipOrigin() == origin);
-	REQUIRE(design.floorplan().chipUpperRightCorner() == boundaries);
+	REQUIRE(design.floorplan().chipOrigin().x() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chipOrigin().y() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chipUpperRightCorner().x() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chipUpperRightCorner().y() == dbu_t{0.0});
 	REQUIRE(design.floorplan().sitesRange().empty());
 	REQUIRE(design.floorplan().rowsRange().empty());
 
-	origin = ophidian::util::LocationDbu(2.0, 3.0);
-	boundaries = ophidian::util::LocationDbu(4000.0, 3000.0);
+	auto origin = ophidian::util::LocationDbu{dbu_t{2.0}, dbu_t{3.0}};
+	auto boundaries = ophidian::util::LocationDbu{dbu_t{4000.0}, dbu_t{3000.0}};
+
 	design.floorplan().chipOrigin(origin);
 	design.floorplan().chipUpperRightCorner(boundaries);
-	REQUIRE(design.floorplan().chipOrigin() == origin);
-	REQUIRE(design.floorplan().chipUpperRightCorner() == boundaries);
+	REQUIRE(design.floorplan().chipOrigin().x() == dbu_t{2.0});
+	REQUIRE(design.floorplan().chipOrigin().y() == dbu_t{3.0});
+	REQUIRE(design.floorplan().chipUpperRightCorner().x() == dbu_t{4000.0});
+	REQUIRE(design.floorplan().chipUpperRightCorner().y() == dbu_t{3000.0});
 
 }
 
@@ -42,13 +46,17 @@ TEST_CASE("Design: testing placement.", "[design]")
 {
 	auto cell1 = design.netlist().add(ophidian::circuit::Cell(), "cell1");
 	auto cell2 = design.netlist().add(ophidian::circuit::Cell(), "cell2");
-	ophidian::util::LocationDbu cell1Location(10,20);
-	ophidian::util::LocationDbu cell2Location(20,10);
+
+	auto cell1Location = ophidian::util::LocationDbu{ dbu_t{10}, dbu_t{20}};
+	auto cell2Location = ophidian::util::LocationDbu{ dbu_t{20}, dbu_t{10}};
+
 	design.placement().placeCell(cell1, cell1Location);
 	design.placement().placeCell(cell2, cell2Location);
 
-	REQUIRE(cell1Location == design.placement().cellLocation((cell1)));
-	REQUIRE(cell2Location == design.placement().cellLocation((cell2)));
+	REQUIRE(cell1Location.x() == design.placement().cellLocation((cell1)).x());
+	REQUIRE(cell1Location.y() == design.placement().cellLocation((cell1)).y());
+	REQUIRE(cell2Location.x() == design.placement().cellLocation((cell2)).x());
+	REQUIRE(cell2Location.y() == design.placement().cellLocation((cell2)).y());
 }
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
@@ -56,12 +64,19 @@ TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 	auto cell1 = design.standardCells().add(ophidian::standard_cell::Cell(), "cell1");
 	auto cell2 = design.standardCells().add(ophidian::standard_cell::Cell(), "cell2");
 
-	std::vector<ophidian::geometry::Box> cell1Boxes = {ophidian::geometry::Box(ophidian::geometry::Point(0, 0), ophidian::geometry::Point(10, 10))};
-	ophidian::geometry::MultiBox cell1Geometry(cell1Boxes);
+	std::vector<ophidian::geometry::Box<dbu_t>> cell1Boxes = {
+        ophidian::geometry::Box<dbu_t>{ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}}, ophidian::geometry::Point<dbu_t>{dbu_t{10}, dbu_t{10}}}
+    };
+	ophidian::geometry::MultiBox<dbu_t> cell1Geometry(cell1Boxes);
 	design.library().geometry(cell1, cell1Geometry);
 
-	std::vector<ophidian::geometry::Box> cell2Boxes = {ophidian::geometry::Box(ophidian::geometry::Point(0, 0), ophidian::geometry::Point(20, 10))};
-	ophidian::geometry::MultiBox cell2Geometry(cell2Boxes);
+	std::vector<ophidian::geometry::Box<dbu_t>> cell2Boxes = {
+        ophidian::geometry::Box<dbu_t>{
+            ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}},
+            ophidian::geometry::Point<dbu_t>{dbu_t{20}, dbu_t{10}}
+        }
+    };
+	ophidian::geometry::MultiBox<dbu_t> cell2Geometry(cell2Boxes);
 	design.library().geometry(cell2, cell2Geometry);
 
 	REQUIRE(cell1Geometry == design.library().geometry(cell1));

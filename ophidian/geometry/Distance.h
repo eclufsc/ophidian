@@ -33,10 +33,20 @@ namespace geometry
      * \param point2 Second point to calculate the distance
      * \return Manhattan distance between point1 and point2
      */
-    template <typename UnitType, class = std::enable_if_t<units::traits::is_unit_t<UnitType>::value>>
-    UnitType ManhattanDistance(const Point<UnitType> & point1, const Point<UnitType> & point2)
+    template <typename UnitType>
+    typename std::enable_if<units::traits::is_unit_t<UnitType>::value, UnitType>::type
+    ManhattanDistance(const Point<UnitType> & point1, const Point<UnitType> & point2)
     {
         auto distance = units::math::abs(point1.x() - point2.x()) + units::math::abs(point1.y() - point2.y());
+
+        return distance;
+    }
+
+    template <typename UnitType>
+    typename std::enable_if<std::is_arithmetic<UnitType>::value, UnitType>::type
+    ManhattanDistance(const Point<UnitType> & point1, const Point<UnitType> & point2)
+    {
+        auto distance = std::abs(point1.x() - point2.x()) + std::abs(point1.y() - point2.y());
 
         return distance;
     }

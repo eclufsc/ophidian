@@ -188,6 +188,11 @@ namespace parser
                 std::move(module_instances) 
             );
         }
+
+        yy_preproc = nullptr;
+        yy_verilog_source_tree = nullptr;
+
+        ast_free_all();
     }
 
     const Verilog::module_container_type& Verilog::modules() const noexcept

@@ -19,9 +19,7 @@
 #ifndef OPHIDIAN_DESIGN_DESIGNBUILDER_H
 #define OPHIDIAN_DESIGN_DESIGNBUILDER_H
 
-#include <fstream>
-#include <ophidian/parser/ParserException.h>
-#include <ophidian/parser/VerilogParser.h>
+#include <ophidian/parser/Verilog.h>
 #include <ophidian/floorplan/LefDef2Floorplan.h>
 #include <ophidian/placement/Def2Placement.h>
 #include <ophidian/placement/Lef2Library.h>

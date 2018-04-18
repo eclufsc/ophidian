@@ -42,14 +42,13 @@ namespace design
 
     Design & ICCAD2017ContestDesignBuilder::build()
     {
-        parser::LefParser lefParser;
-        parser::DefParser defParser;
-
         mLef = std::make_unique<ophidian::parser::Lef>();
-        lefParser.readFile(mCellLefFile, mLef);
-        lefParser.readFile(mTechLefFile, mLef);
+        mDef = std::make_unique<ophidian::parser::Def>();
 
-        mDef = defParser.readFile(mPlacedDefFile);
+        mLef->read_file(mCellLefFile);
+        mLef->read_file(mTechLefFile);
+
+        mDef->read_file(mPlacedDefFile);
 
         placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
         floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
@@ -83,16 +82,14 @@ namespace design
 
     Design & ICCAD2015ContestDesignBuilder::build()
     {
-        parser::LefParser     lefParser;
-        parser::DefParser     defParser;
-        parser::VerilogParser vParser;
-
         mLef = std::make_unique<ophidian::parser::Lef>();
-        lefParser.readFile(mLefFile, mLef);
+        mLef->read_file(mLefFile);
 
-        mDef = defParser.readFile(mDefFile);
+        mDef = std::make_unique<ophidian::parser::Def>();
+        mDef->read_file(mDefFile);
 
-        mVerilog.reset(vParser.readFile(mVerilogFile));
+        mVerilog = std::make_unique<ophidian::parser::Verilog>();
+        mVerilog->read_file(mVerilogFile);
 
 
         placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());

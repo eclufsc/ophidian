@@ -3,13 +3,25 @@
 #include <ophidian/placement/Def2Placement.h>
 
 using namespace ophidian;
+using dbu_t = ophidian::util::database_unit_t;
+
+namespace {
+bool operator==(const ophidian::util::LocationDbu& a, const ophidian::util::LocationDbu& b) noexcept
+{
+    return a.x() == b.x() && a.y() == b.y();
+}
+
+bool operator!=(const ophidian::util::LocationDbu& a, const ophidian::util::LocationDbu& b) noexcept
+{
+    return !(a == b);
+}
+}
 
 class Def2PlacementFixture
 {
 public:
 	Def2PlacementFixture() : placement(netlist){
-		parser::DefParser parser;
-		def = std::move(parser.readFile("./input_files/simple/simple.def"));
+		def = std::make_unique<parser::Def>("./input_files/simple/simple.def");
 	}
 
 	std::unique_ptr<parser::Def> def;
@@ -21,9 +33,9 @@ TEST_CASE_METHOD(Def2PlacementFixture, "Def2Placement: Test if def2placement map
 {
 	ophidian::placement::def2placement(*def, placement, netlist);
 
-    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u1")) == util::LocationDbu(3420, 6840));
-    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u2")) == util::LocationDbu(3420, 3420));
-    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u3")) == util::LocationDbu(6840, 3420));
-    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u4")) == util::LocationDbu(12160, 6840));
-    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "lcb1")) == util::LocationDbu(0, 10260));
+    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u1")) == util::LocationDbu{dbu_t{3420}, dbu_t{6840}});
+    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u2")) == util::LocationDbu{dbu_t{3420}, dbu_t{3420}});
+    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u3")) == util::LocationDbu{dbu_t{6840}, dbu_t{3420}});
+    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "u4")) == util::LocationDbu{dbu_t{12160}, dbu_t{6840}});
+    REQUIRE(placement.cellLocation(netlist.find(circuit::Cell(), "lcb1")) == util::LocationDbu{dbu_t{0}, dbu_t{10260}});
 }

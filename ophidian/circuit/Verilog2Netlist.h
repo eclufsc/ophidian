@@ -19,8 +19,7 @@
 #ifndef OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
 #define OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
 
-#include <ophidian/parser/VerilogParser.h>
-#include <unordered_map>
+#include <ophidian/parser/Verilog.h>
 
 #include "Netlist.h"
 

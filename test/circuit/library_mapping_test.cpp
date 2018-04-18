@@ -37,9 +37,8 @@ namespace
     };
 }
 
-TEST_CASE(
-    "LibraryMapping: setting the standard cell of a cell",
-    "[library_mapping][cell]")                                                              {
+TEST_CASE("LibraryMapping: setting the standard cell of a cell","[library_mapping][cell]")
+{
     NetlistAndStdCellFixture netlistAndStdCellFixture;
 
     ophidian::circuit::LibraryMapping libraryMapping(netlistAndStdCellFixture.netlist);
@@ -58,9 +57,8 @@ TEST_CASE(
         libraryMapping.cellStdCell(netlistAndStdCellFixture.cell2));
 }
 
-TEST_CASE(
-    "LibraryMapping: setting the standard cell of a pin",
-    "[library_mapping][pin]")                                                             {
+TEST_CASE("LibraryMapping: setting the standard cell of a pin", "[library_mapping][pin]")
+{
     NetlistAndStdCellFixture netlistAndStdCellFixture;
 
     ophidian::circuit::LibraryMapping libraryMapping(netlistAndStdCellFixture.netlist);

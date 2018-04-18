@@ -145,7 +145,7 @@ namespace entity_system
         ContainerType mProperties;
 
     private:
-        const Value mDefaultValue;
+        const Value mDefaultValue{};
     };
 }     // namespace entity_system
 }     // namespace ophidian
