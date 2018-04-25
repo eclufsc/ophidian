@@ -17,12 +17,12 @@
  */
 
 #include "Floorplan.h"
+#include "iostream"
 
 namespace ophidian
 {
 namespace floorplan
 {
-
     void Floorplan::chipOrigin(const util::LocationDbu & loc)
     {
         mChipOrigin = loc;

@@ -62,7 +62,6 @@ namespace circuit
     public:
         using entity_system::EntityBase::EntityBase;
     };
-
     /*! A flatten Netlist */
     class Netlist final
     {
@@ -71,6 +70,25 @@ namespace circuit
         using PinNotifier = entity_system::EntitySystem<Pin>::NotifierType;
         using NetNotifier = entity_system::EntitySystem<Net>::NotifierType;
 
+        template <class T> using entity_container_type = entity_system::EntitySystem<T>;
+
+        using cell_entity_type = Cell;
+        using cell_entity_container_type = entity_container_type<cell_entity_type>;
+
+        using cell_name_type   = std::string;
+
+        using net_entity_type = Net;
+        using net_name_type   = std::string;
+
+        using pin_entity_type = Pin;
+        using pin_name_type   = std::string;
+
+        using input_pad_entity_type = Input;
+        using input_pad_name_type   = std::string;
+
+        using output_pad_entity_type = Output;
+        using output_pad_name_type   = std::string;
+
         //! Construct Netlist
 
         /*!
@@ -78,15 +96,13 @@ namespace circuit
          */
         Netlist();
 
+        //! Delete coppy constructor
+        Netlist(const Netlist & nl) = delete;
+        Netlist & operator =(const Netlist & nl) = delete;
+
         //! Move Constructor
-        Netlist(Netlist && nl) = default;
-
-        //! Netlist Destructor
-
-        /*!
-           \brief This destroy all Netlist's EntitySystems.
-         */
-        ~Netlist();
+        Netlist(Netlist &&) = default;
+        Netlist& operator=(Netlist &&) = default;
 
         //! Add Cell
 
@@ -95,7 +111,7 @@ namespace circuit
            \brief Adds a Cell instance, if the cell already exist then just return the existing cell.
            \return A handler for the created/existing Cell.
          */
-        Cell add(Cell, std::string cellName);
+        cell_entity_type add(cell_entity_type, cell_name_type cellName);
 
         //! Erase Cell
 
@@ -103,7 +119,7 @@ namespace circuit
            \param cell A handler for the Cell to erase.
            \brief Erases a Cell instance.
          */
-        void erase(const Cell & cell);
+        void erase(const cell_entity_type& cell);
 
         //! Size of Cell's System
 
@@ -111,7 +127,7 @@ namespace circuit
            \brief Returns the number of Cells.
            \return The number of Cells.
          */
-        uint32_t size(Cell) const;
+        uint32_t size(cell_entity_type) const;
 
         //! Iterator to beginning
 
@@ -119,7 +135,7 @@ namespace circuit
            \brief Returns an iterator pointing to the first element in the Cell's EntitySystem.
            \return Iterator to the first element in the Cell's EntitySystem.
          */
-        entity_system::EntitySystem<Cell>::const_iterator begin(Cell) const;
+        cell_entity_container_type::const_iterator begin(cell_entity_type) const;
 
         //! Iterator to end
 
@@ -127,7 +143,7 @@ namespace circuit
            \brief Returns an iterator referring to the past-the-end element in the Cell's EntitySystem.
            \return Iterator referring to the past-the-end element in the Cell's EntitySystem.
          */
-        entity_system::EntitySystem<Cell>::const_iterator end(Cell) const;
+        cell_entity_container_type::const_iterator end(cell_entity_type) const;
 
         //! Make Cell Property
 
@@ -590,11 +606,6 @@ namespace circuit
         void shrinkToFit();
 
     private:
-
-        Netlist(const Netlist & nl) = delete;
-
-        Netlist & operator =(const Netlist & nl) = delete;
-
         entity_system::EntitySystem<Cell>          mCells;
         entity_system::EntitySystem<Pin>           mPins;
         entity_system::EntitySystem<Net>           mNets;

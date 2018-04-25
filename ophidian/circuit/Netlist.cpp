@@ -33,10 +33,6 @@ namespace circuit
     {
     }
 
-    Netlist::~Netlist()
-    {
-    }
-
     Cell Netlist::add(Cell, std::string cellName)
     {
         if(mName2Cell.find(cellName) == mName2Cell.end()) {

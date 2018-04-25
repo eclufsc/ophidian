@@ -16,19 +16,23 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
-#define OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
+#ifndef OPHIDIAN_FLOORPLAN_FLOORPLANFACTORY_H
+#define OPHIDIAN_FLOORPLAN_FLOORPLANFACTORY_H
 
-#include <ophidian/parser/Verilog.h>
+#include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Def.h>
 
-#include "Netlist.h"
+#include "Floorplan.h"
 
 namespace ophidian
 {
-namespace circuit
+namespace floorplan
 {
-    void verilog2Netlist(const parser::Verilog & verilog, circuit::Netlist & netlist);
-}     // namespace circuit
+    namespace factory
+    {
+        Floorplan make_floorplan(const parser::Lef & lef, const parser::Def & def);
+    }
+}     // namespace floorplan
 }     // namespace ophidian
 
-#endif // OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
+#endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H

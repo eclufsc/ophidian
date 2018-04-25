@@ -16,23 +16,26 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
-#define OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
-
-#include <ophidian/parser/Def.h>
-#include <ophidian/circuit/Netlist.h>
-
-#include "Placement.h"
+#include "PlacementFactory.h"
 
 namespace ophidian
 {
 namespace placement
 {
-    void def2placement(
-        const parser::Def & def,
-        placement::Placement & placement,
-        circuit::Netlist & netlist);
+    // namespace factory
+    // {
+    //     Placement make_placement(const parser::Def & def) noexcept
+    //     {
+    //         auto placement = Placement{};
+    //
+    //         for(auto & component : def.components())
+    //         {
+    //             util::LocationDbu cellPosition{component.position()};
+    //             placement.placeCell(cell, cellPosition);
+    //         }
+    //
+    //         return placement;
+    //     }
+    // }
 }     // namespace placement
 }     // namespace ophidian
-
-#endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

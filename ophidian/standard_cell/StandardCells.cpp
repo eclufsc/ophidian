@@ -22,26 +22,6 @@ namespace ophidian
 {
 namespace standard_cell
 {
-    StandardCells::StandardCells():
-            mCellNames(mCells),
-            mPinNames(mPins),
-            mPinDirections(mPins),
-            mCellPins(mCells, mPins)
-    {
-    }
-
-    StandardCells::StandardCells(const StandardCells && stdCell):
-            mCells(std::move(stdCell.mCells)),
-            mPins(std::move(stdCell.mPins)),
-            mCellNames(std::move(stdCell.mCellNames)),
-            mPinNames(std::move(stdCell.mPinNames)),
-            mPinDirections(std::move(stdCell.mPinDirections)),
-            mCellPins(std::move(stdCell.mCellPins))
-    {
-    }
-
-    StandardCells::~StandardCells() = default;
-
     //--------------------------- Cells -------------------------------//
 
     Cell StandardCells::add(Cell, const std::string & name)

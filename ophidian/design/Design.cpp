@@ -22,18 +22,64 @@ namespace ophidian
 {
 namespace design
 {
-    Design::Design():
-            mNetlist(),
-            mFloorplan(),
-            mPlacement(mNetlist),
-            mStandardCells(),
-            mLibrary(mStandardCells),
-            mLibraryMapping(mNetlist)
+    Design::netlist_type& Design::netlist() noexcept
     {
+        return m_netlist;
     }
 
-    Design::~Design()
+    const Design::netlist_type& Design::netlist() const noexcept
     {
+        return m_netlist;
+    }
+
+    Design::floorplan_type& Design::floorplan() noexcept
+    {
+        return m_floorplan;
+    }
+
+    const Design::floorplan_type& Design::floorplan() const noexcept
+    {
+        return m_floorplan;
+    }
+
+    Design::placement_type& Design::placement() noexcept
+    {
+        return m_placement;
+    }
+
+    const Design::placement_type& Design::placement() const noexcept
+    {
+        return m_placement;
+    }
+
+    Design::standard_cell_type& Design::standard_cells() noexcept
+    {
+        return m_standard_cells;
+    }
+
+    const Design::standard_cell_type& Design::standard_cells() const noexcept
+    {
+        return m_standard_cells;
+    }
+
+    Design::library_type& Design::library() noexcept
+    {
+        return m_library;
+    }
+
+    const Design::library_type& Design::library() const noexcept
+    {
+        return m_library;
+    }
+
+    Design::library_mapping_type& Design::library_mapping() noexcept
+    {
+        return m_library_mapping;
+    }
+
+    const Design::library_mapping_type& Design::library_mapping() const noexcept
+    {
+        return m_library_mapping;
     }
 }     //namespace design
 }     //namespace ophidian

@@ -28,7 +28,6 @@
 
 namespace ophidian
 {
-    /// Namespace describing floorplan entities, properties and basic floorplan interface.
 namespace floorplan
 {
     class Row :
@@ -239,19 +238,19 @@ namespace floorplan
         util::LocationDbu rowUpperRightCorner(const Row & row) const;
 
     private:
-        entity_system::EntitySystem<Row>                           mRows;
-        entity_system::Property<Row, util::LocationDbu>            mOrigins;
-        entity_system::Property<Row, util::database_unit_scalar_t> mNumberOfSites;
-        entity_system::Property<Row, Site>                         mSiteTypeOfRow;
+        entity_system::EntitySystem<Row>                           mRows{};
+        entity_system::Property<Row, util::LocationDbu>            mOrigins{mRows};
+        entity_system::Property<Row, util::database_unit_scalar_t> mNumberOfSites{mRows};
+        entity_system::Property<Row, Site>                         mSiteTypeOfRow{mRows};
 
-        entity_system::EntitySystem<Site>                mSites;
-        entity_system::Property<Site, std::string>       mNames;
-        entity_system::Property<Site, util::LocationDbu> mDimensions;
+        entity_system::EntitySystem<Site>                mSites{};
+        entity_system::Property<Site, std::string>       mNames{mSites};
+        entity_system::Property<Site, util::LocationDbu> mDimensions{mSites};
 
-        util::LocationDbu mChipOrigin;
-        util::LocationDbu mChipUpperRightCorner;
+        util::LocationDbu mChipOrigin{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
+        util::LocationDbu mChipUpperRightCorner{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
 
-        std::unordered_map<std::string, Site> mName2Site;
+        std::unordered_map<std::string, Site> mName2Site{};
     };
 }     //namespace floorplan
 }     //namespace ophidian

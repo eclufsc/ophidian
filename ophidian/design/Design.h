@@ -28,26 +28,41 @@
 
 namespace ophidian
 {
-    /// Design describing a whole system
 namespace design
 {
     class Design
     {
     public:
+        //! Class member types
+        using netlist_type         = circuit::Netlist;
+        using floorplan_type       = floorplan::Floorplan;
+        using placement_type       = placement::Placement;
+        using standard_cell_type   = standard_cell::StandardCells;
+        using library_type         = placement::Library;
+        using library_mapping_type = circuit::LibraryMapping;
 
         //! Design Constructor
 
         /*!
            \brief Constructs a design system with no properties
          */
-        Design();
+        Design() = default;
+        
+        Design(const Design&) = delete;
+        Design& operator=(const Design&) = delete;
 
-        //! Design Destructor
+        Design(Design&&) = default;
+        Design& operator=(Design&&) = default;
 
-        /*!
-           \brief Destroys the design system, including its properties.
-         */
-        ~Design();
+        template<class A1, class A2, class A3, class A4, class A5, class A6>
+        Design(A1&& netlist, A2&& floorplan, A3&& placement, A4&& standard_cells, A5&& library, A6&& library_mapping):
+            m_netlist{std::forward<A1>(netlist)},
+            m_floorplan{std::forward<A2>(floorplan)},
+            m_placement{std::forward<A3>(placement)},
+            m_standard_cells{std::forward<A4>(standard_cells)},
+            m_library{std::forward<A5>(library)},
+            m_library_mapping{std::forward<A6>(library_mapping)}
+        {}
 
         //! netlist getter
 
@@ -55,10 +70,9 @@ namespace design
            \brief Get the netlist.
            \return Netlist.
          */
-        circuit::Netlist & netlist()
-        {
-            return mNetlist;
-        }
+        netlist_type& netlist() noexcept;
+
+        const netlist_type& netlist() const noexcept;
 
         //! floorplan getter
 
@@ -66,10 +80,9 @@ namespace design
            \brief Get the floorplan.
            \return Floorplan.
          */
-        floorplan::Floorplan & floorplan()
-        {
-            return mFloorplan;
-        }
+        floorplan_type& floorplan() noexcept;
+
+        const floorplan_type& floorplan() const noexcept;
 
         //! placement getter
 
@@ -77,10 +90,9 @@ namespace design
            \brief Get the placement.
            \return Placement.
          */
-        placement::Placement & placement()
-        {
-            return mPlacement;
-        }
+        placement_type& placement() noexcept;
+
+        const placement_type& placement() const noexcept;
 
         //! standardCells getter
 
@@ -88,10 +100,9 @@ namespace design
            \brief Get standardCells.
            \return StandardCells.
          */
-        standard_cell::StandardCells & standardCells()
-        {
-            return mStandardCells;
-        }
+        standard_cell_type& standard_cells() noexcept;
+
+        const standard_cell_type& standard_cells() const noexcept;
 
         //! library getter
 
@@ -99,10 +110,9 @@ namespace design
            \brief Get the library.
            \return Library.
          */
-        placement::Library & library()
-        {
-            return mLibrary;
-        }
+        library_type& library() noexcept;
+
+        const library_type& library() const noexcept;
 
         //! libraryMapping getter
 
@@ -110,19 +120,16 @@ namespace design
            \brief Get the libraryMapping.
            \return LibraryMapping.
          */
-        circuit::LibraryMapping & libraryMapping()
-        {
-            return mLibraryMapping;
-        }
+        library_mapping_type& library_mapping() noexcept;
 
+        const library_mapping_type& library_mapping() const noexcept;
     private:
-
-        circuit::Netlist             mNetlist;
-        floorplan::Floorplan         mFloorplan;
-        placement::Placement         mPlacement;
-        standard_cell::StandardCells mStandardCells;
-        placement::Library           mLibrary;
-        circuit::LibraryMapping      mLibraryMapping;
+        netlist_type         m_netlist{};
+        floorplan_type       m_floorplan{};
+        placement_type       m_placement{m_netlist};
+        standard_cell_type   m_standard_cells{};
+        library_type         m_library{m_standard_cells};
+        library_mapping_type m_library_mapping{m_netlist};
     };
 }     //namespace design
 }     //namespace ophidian

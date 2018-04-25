@@ -59,21 +59,18 @@ namespace standard_cell
         /*!
            \brief Constructs an empty system with no Cells and Pins.
          */
-        StandardCells();
+        StandardCells() = default;
+
+        StandardCells(const StandardCells&) = delete;
+        StandardCells& operator=(const StandardCells&) = delete;
 
         //! StandardCell Move Constructor
 
         /*!
             \brief Move the entity system and its properties.
          */
-        StandardCells(const StandardCells && stdCell);
-
-        //! StandardCell Destructor
-
-        /*!
-           \brief Destroys the Cells and Pins EntitySystem, including its properties.
-         */
-        ~StandardCells();
+        StandardCells(StandardCells&&) = default;
+        StandardCells& operator=(StandardCells&&) = default;
 
         //--------------------------- Cells -------------------------------//
 
@@ -278,20 +275,20 @@ namespace standard_cell
     private:
 
         //cells entity system and properties
-        entity_system::EntitySystem<Cell>          mCells;
-        entity_system::Property<Cell, std::string> mCellNames;
+        entity_system::EntitySystem<Cell>          mCells{};
+        entity_system::Property<Cell, std::string> mCellNames{mCells};
 
         //pins entity system and properties
-        entity_system::EntitySystem<Pin>           mPins;
-        entity_system::Property<Pin, std::string>  mPinNames;
-        entity_system::Property<Pin, PinDirection> mPinDirections;
+        entity_system::EntitySystem<Pin>           mPins{};
+        entity_system::Property<Pin, std::string>  mPinNames{mPins};
+        entity_system::Property<Pin, PinDirection> mPinDirections{mPins};
 
         //composition and aggregation relations
-        entity_system::Composition<Cell, Pin> mCellPins;
+        entity_system::Composition<Cell, Pin> mCellPins{mCells, mPins};
 
         //std_cell and pin mapping
-        std::unordered_map<std::string, Cell> mName2Cell;
-        std::unordered_map<std::string, Pin>  mName2Pin;
+        std::unordered_map<std::string, Cell> mName2Cell{};
+        std::unordered_map<std::string, Pin>  mName2Pin{};
     };
 }     //namespace ophidian
 }     //namespace standard_cell
