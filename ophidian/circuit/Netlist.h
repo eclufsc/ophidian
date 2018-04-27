@@ -22,20 +22,21 @@
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Aggregation.h>
 #include <ophidian/entity_system/Composition.h>
+#include <ophidian/circuit/StandardCells.h>
 #include <unordered_map>
 
 namespace ophidian
 {
 namespace circuit
 {
-    class Cell :
+    class CellInstance :
         public entity_system::EntityBase
     {
     public:
         using entity_system::EntityBase::EntityBase;
     };
 
-    class Pin :
+    class PinInstance :
         public entity_system::EntityBase
     {
     public:
@@ -66,13 +67,13 @@ namespace circuit
     class Netlist final
     {
     public:
-        using CellNotifier = entity_system::EntitySystem<Cell>::NotifierType;
-        using PinNotifier = entity_system::EntitySystem<Pin>::NotifierType;
+        using CellNotifier = entity_system::EntitySystem<CellInstance>::NotifierType;
+        using PinNotifier = entity_system::EntitySystem<PinInstance>::NotifierType;
         using NetNotifier = entity_system::EntitySystem<Net>::NotifierType;
 
         template <class T> using entity_container_type = entity_system::EntitySystem<T>;
 
-        using cell_entity_type = Cell;
+        using cell_entity_type = CellInstance;
         using cell_entity_container_type = entity_container_type<cell_entity_type>;
 
         using cell_name_type   = std::string;
@@ -80,7 +81,7 @@ namespace circuit
         using net_entity_type = Net;
         using net_name_type   = std::string;
 
-        using pin_entity_type = Pin;
+        using pin_entity_type = PinInstance;
         using pin_name_type   = std::string;
 
         using input_pad_entity_type = Input;
@@ -153,9 +154,9 @@ namespace circuit
            \return An Cell => \p Value Map.
          */
         template <typename Value>
-        entity_system::Property<Cell, Value> makeProperty(Cell) const
+        entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
         {
-            return entity_system::Property<Cell, Value>(mCells);
+            return entity_system::Property<CellInstance, Value>(mCells);
         }
 
         //! Get the Cell Notifier
@@ -164,7 +165,7 @@ namespace circuit
            \brief Returns a pointer to the AlterationNotifier of the Cell's EntitySystem.
            \return A pointer to the AlterationNotifier of the Cell's EntitySystem.
          */
-        entity_system::EntitySystem<Cell>::NotifierType * notifier(Cell) const;
+        entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
 
         //! Allocate space for storing Cell entities
 
@@ -172,14 +173,14 @@ namespace circuit
            \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the netlist.
            \param size Minimum capacity for the cell container.
          */
-        void reserve(Cell, uint32_t size);
+        void reserve(CellInstance, uint32_t size);
 
         //! Capacity of the Cell's System
 
         /*!
            \return The capacity of the Cell EntitySystem.
          */
-        uint32_t capacity(Cell) const;
+        uint32_t capacity(CellInstance) const;
 
         //! Find a cell
 
@@ -188,7 +189,7 @@ namespace circuit
            \param The cell name.
            \return Return a cell handler by cell's name.
          */
-        Cell find(Cell, std::string cellName);
+        CellInstance find(CellInstance, std::string cellName);
 
         //! Returns the name of the cell
 
@@ -197,7 +198,7 @@ namespace circuit
            \param A handler for the cell.
            \return Return the cell's name.
          */
-        std::string name(const Cell & cell) const;
+        std::string name(const CellInstance & cell) const;
 
         //! Pins of a Cell
 
@@ -206,7 +207,7 @@ namespace circuit
            \param cell A handler for the Cell we want to get the Pins.
            \return Container Wrapper for the Pins of a Cell.
          */
-        entity_system::Association<Cell, Pin>::Parts pins(const Cell & cell) const;
+        entity_system::Association<CellInstance, PinInstance>::Parts pins(const CellInstance & cell) const;
 
         //! Add Pin into Cell
 
@@ -215,7 +216,7 @@ namespace circuit
            \param cell A handler for the Cell we want to add a Pin.
            \param pin A handler for the Pin we want to add in \p cell.
          */
-        void add(const Cell & cell, const Pin & pin);
+        void add(const CellInstance & cell, const PinInstance & pin);
 
         //! Add Pin
 
@@ -224,7 +225,7 @@ namespace circuit
            \brief Adds a Pin instance, if the pin already exist then just return the existing pin.
            \return A handler for the created/existing Pin.
          */
-        Pin add(Pin, std::string pinName);
+        PinInstance add(PinInstance, std::string pinName);
 
         //! Erase Pin
 
@@ -232,7 +233,7 @@ namespace circuit
            \param pin A handler for the Pin to erase.
            \brief Erases a Pin instance.
          */
-        void erase(const Pin & pin);
+        void erase(const PinInstance & pin);
 
         //! Size of Pin's System
 
@@ -240,7 +241,7 @@ namespace circuit
            \brief Returns the number of Pins.
            \return The number of Pins.
          */
-        uint32_t size(Pin) const;
+        uint32_t size(PinInstance) const;
 
         //! Iterator to beginning
 
@@ -248,7 +249,7 @@ namespace circuit
            \brief Returns an iterator pointing to the first element in the Pin's EntitySystem.
            \return Iterator to the first element in the Pin's EntitySystem.
          */
-        entity_system::EntitySystem<Pin>::const_iterator begin(Pin) const;
+        entity_system::EntitySystem<PinInstance>::const_iterator begin(PinInstance) const;
 
         //! Iterator to end
 
@@ -256,7 +257,7 @@ namespace circuit
            \brief Returns an iterator referring to the past-the-end element in the Pin's EntitySystem.
            \return Iterator referring to the past-the-end element in the Pin's EntitySystem.
          */
-        entity_system::EntitySystem<Pin>::const_iterator end(Pin) const;
+        entity_system::EntitySystem<PinInstance>::const_iterator end(PinInstance) const;
 
         //! Make Pin Property
 
@@ -266,9 +267,9 @@ namespace circuit
            \return An Pin => \p Value Map.
          */
         template <typename Value>
-        entity_system::Property<Pin, Value> makeProperty(Pin) const
+        entity_system::Property<PinInstance, Value> makeProperty(PinInstance) const
         {
-            return entity_system::Property<Pin, Value>(mPins);
+            return entity_system::Property<PinInstance, Value>(mPins);
         }
 
         //! Get the Pin Notifier
@@ -277,7 +278,7 @@ namespace circuit
            \brief Returns a pointer to the AlterationNotifier of the Pin's EntitySystem.
            \return A pointer to the AlterationNotifier of the Pin's EntitySystem.
          */
-        entity_system::EntitySystem<Pin>::NotifierType * notifier(Pin) const;
+        entity_system::EntitySystem<PinInstance>::NotifierType * notifier(PinInstance) const;
 
         //! Allocate space for storing Pin entities
 
@@ -285,14 +286,14 @@ namespace circuit
            \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the netlist.
            \param size Minimum capacity for the Pin container.
          */
-        void reserve(Pin, uint32_t size);
+        void reserve(PinInstance, uint32_t size);
 
         //! Capacity of the Pin's System
 
         /*!
            \return The capacity of the Pin EntitySystem.
          */
-        uint32_t capacity(Pin) const;
+        uint32_t capacity(PinInstance) const;
 
         //! Find a pin
 
@@ -301,7 +302,7 @@ namespace circuit
            \param The pin name.
            \return Return a pin handler by pin's name.
          */
-        Pin find(Pin, std::string pinName);
+        PinInstance find(PinInstance, std::string pinName);
 
         //! Returns the name of the pin
 
@@ -310,7 +311,7 @@ namespace circuit
            \param A handler for the pin.
            \return Return the pin's name.
          */
-        std::string name(const Pin & pin) const;
+        std::string name(const PinInstance & pin) const;
 
         //! Net of a Pin
 
@@ -320,7 +321,7 @@ namespace circuit
            \return A handler for the Net of \p pin.
            \remark If \p pin is disconnected, returns Net().
          */
-        Net net(const Pin & pin) const;
+        Net net(const PinInstance & pin) const;
 
         //! Disconnect Pin
 
@@ -328,7 +329,7 @@ namespace circuit
            \brief Disconnects a pin from its net.
            \param pin A handler for the Pin we want to disconnect.
          */
-        void disconnect(const Pin & pin);
+        void disconnect(const PinInstance & pin);
 
         //! Cell of a Pin
 
@@ -337,7 +338,7 @@ namespace circuit
            \param pin A handler for the Pin we want to get the Cell.
            \remark If \p pin doesn't have a Cell, returns Cell().
          */
-        Cell cell(const Pin & pin) const;
+        CellInstance cell(const PinInstance & pin) const;
 
         //! Add Net
 
@@ -441,7 +442,7 @@ namespace circuit
            \param net A handler for the Net we want to get the Pins.
            \return Container Wrapper for the Pins of a Net.
          */
-        entity_system::Association<Net, Pin>::Parts pins(const Net & net) const;
+        entity_system::Association<Net, PinInstance>::Parts pins(const Net & net) const;
 
         //! Connect Pin on Net
 
@@ -450,7 +451,7 @@ namespace circuit
            \param net A handler for the Net we want to connect \p pin.
            \param pin A handler for the Pin we want to connect.
          */
-        void connect(const Net & net, const Pin & pin);
+        void connect(const Net & net, const PinInstance & pin);
 
         //! Number of Inputs
 
@@ -467,7 +468,7 @@ namespace circuit
            \param pin The Pin we want to create an Input.
            \return A handler for the created Input.
          */
-        Input add(Input, const Pin &pin);
+        Input add(Input, const PinInstance &pin);
 
         //! Pin of an Input
 
@@ -476,7 +477,7 @@ namespace circuit
            \param input the Input we want the Pin.
            \return A handler for the Pin of \p input.
          */
-        Pin pin(const Input & input) const;
+        PinInstance pin(const Input & input) const;
 
         //! Input of a Pin
 
@@ -486,7 +487,7 @@ namespace circuit
            \return A handler for the Input of \p pin.
            \remark If \p pin isn't associated with any Input, returns Input().
          */
-        Input input(const Pin & pin) const;
+        Input input(const PinInstance & pin) const;
 
         //! Iterator to beginning
 
@@ -540,7 +541,7 @@ namespace circuit
            \param pin The Pin we want to create an Output.
            \return A handler for the created Output.
          */
-        Output add(Output, const Pin &pin);
+        Output add(Output, const PinInstance &pin);
 
         //! Pin of an Output
 
@@ -549,7 +550,7 @@ namespace circuit
            \param output the Output we want the Pin.
            \return A handler for the Pin of \p output.
          */
-        Pin pin(const Output & output) const;
+        PinInstance pin(const Output & output) const;
 
         //! Output of a Pin
 
@@ -559,7 +560,7 @@ namespace circuit
            \return A handler for the Output of \p pin.
            \remark If pin isn't associated with any Output, returns Output().
          */
-        Output output(const Pin & pin) const;
+        Output output(const PinInstance & pin) const;
 
         //! Iterator to beginning
 
@@ -605,22 +606,61 @@ namespace circuit
          */
         void shrinkToFit();
 
+        //! Cell standard cell getter
+
+        /*!
+           \brief Get the standard cell of a given cell.
+           \param cell Cell entity to get the standard cell.
+           \return Standard cell of the cell.
+         */
+        Cell cellStdCell(const CellInstance & cell) const;
+
+        //! Sets cell standard cell
+
+        /*!
+           \brief Sets the standard cell of a cell.
+           \param cell Cell entity to be set.
+           \param stdCell Standard cell of the cell.
+         */
+        void cellStdCell(const CellInstance & cell, const Cell & stdCell);
+
+        //! Pin standard cell getter
+
+        /*!
+           \brief Get the standard cell of a given pin.
+           \param pin Pin entity to get the standard cell.
+           \return Standard cell of the pin.
+         */
+        Pin pinStdCell(const PinInstance & pin) const;
+
+        //! Sets pin standard cell
+
+        /*!
+           \brief Sets the standard cell of a pin.
+           \param pin Pin entity to be set.
+           \param stdCell Standard cell of the pin.
+         */
+        void pinStdCell(const PinInstance & pin, const Pin & stdCell);
+
     private:
-        entity_system::EntitySystem<Cell>          mCells;
-        entity_system::EntitySystem<Pin>           mPins;
+        entity_system::EntitySystem<CellInstance>          mCells;
+        entity_system::EntitySystem<PinInstance>           mPins;
         entity_system::EntitySystem<Net>           mNets;
         entity_system::EntitySystem<Input>         mInputs;
         entity_system::EntitySystem<Output>        mOutputs;
-        entity_system::Property<Cell, std::string> mCellNames;
-        entity_system::Property<Pin, std::string>  mPinNames;
+        entity_system::Property<CellInstance, std::string> mCellNames;
+        entity_system::Property<PinInstance, std::string>  mPinNames;
         entity_system::Property<Net, std::string>  mNetNames;
-        std::unordered_map<std::string, Cell>      mName2Cell;
-        std::unordered_map<std::string, Pin>       mName2Pin;
+        std::unordered_map<std::string, CellInstance>      mName2Cell;
+        std::unordered_map<std::string, PinInstance>       mName2Pin;
         std::unordered_map<std::string, Net>       mName2Net;
-        entity_system::Aggregation<Net, Pin>       mNetPins;
-        entity_system::Composition<Cell, Pin>      mCellPins;
-        entity_system::Composition<Pin, Input>     mPinInput;
-        entity_system::Composition<Pin, Output>    mPinOutput;
+        entity_system::Aggregation<Net, PinInstance>       mNetPins;
+        entity_system::Composition<CellInstance, PinInstance>      mCellPins;
+        entity_system::Composition<PinInstance, Input>     mPinInput;
+        entity_system::Composition<PinInstance, Output>    mPinOutput;
+
+        entity_system::Property<CellInstance, Cell> cells2StdCells_;
+        entity_system::Property<PinInstance, Pin>   pins2StdCells_;
     };
 }     // namespace circuit
 }     // namespace ophidian

@@ -25,11 +25,11 @@ namespace placement
     void lef2Library(
         const parser::Lef & lef,
         Library & library,
-        standard_cell::StandardCells & stdCells)
+        circuit::StandardCells & stdCells)
     {
         for(auto& macro : lef.macros())
         {
-            auto stdCell = stdCells.add(standard_cell::Cell(), macro.name());
+            auto stdCell = stdCells.add(circuit::Cell(), macro.name());
             auto layer2RectsM1 = macro.obstructions().find("metal1");
             if(layer2RectsM1 != macro.obstructions().end()) {
                 geometry::MultiBox<util::database_unit_t> geometry;
@@ -63,9 +63,9 @@ namespace placement
 
             for(auto& pin : macro.pins())
             {
-                auto stdPin = stdCells.add(standard_cell::Pin(),
+                auto stdPin = stdCells.add(circuit::Pin(),
                     macro.name() + ":" + pin.name(),
-                    standard_cell::PinDirection(pin.direction()));
+                    circuit::PinDirection(pin.direction()));
                 stdCells.add(stdCell, stdPin);
                 for(auto& port : pin.ports())
                 {

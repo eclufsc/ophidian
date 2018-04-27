@@ -28,7 +28,7 @@
 
 namespace ophidian
 {
-namespace standard_cell
+namespace circuit
 {
     class Pin :
         public entity_system::EntityBase

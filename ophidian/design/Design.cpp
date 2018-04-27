@@ -71,15 +71,5 @@ namespace design
     {
         return m_library;
     }
-
-    Design::library_mapping_type& Design::library_mapping() noexcept
-    {
-        return m_library_mapping;
-    }
-
-    const Design::library_mapping_type& Design::library_mapping() const noexcept
-    {
-        return m_library_mapping;
-    }
 }     //namespace design
 }     //namespace ophidian

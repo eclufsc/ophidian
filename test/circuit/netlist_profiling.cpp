@@ -11,14 +11,14 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 {
 	Netlist nl;
 	const std::uint32_t kNumCells = 1000000;
-	nl.reserve(Cell(), kNumCells);
-	nl.reserve(Pin(), 4*kNumCells);
-	std::vector<Cell> cells(kNumCells);
-	auto cellsPins = nl.makeProperty<std::vector<Pin> >(Cell());
-	auto cellNames = nl.makeProperty<std::string>(Cell());
+    nl.reserve(CellInstance(), kNumCells);
+    nl.reserve(PinInstance(), 4*kNumCells);
+    std::vector<CellInstance> cells(kNumCells);
+    auto cellsPins = nl.makeProperty<std::vector<PinInstance> >(CellInstance());
+    auto cellNames = nl.makeProperty<std::string>(CellInstance());
 	for(uint32_t i = 0; i < cells.size(); ++i)
 	{
-		cells[i] = nl.add(Cell(), "cell_" + std::to_string(i));
+        cells[i] = nl.add(CellInstance(), "cell_" + std::to_string(i));
 		cellNames[cells[i]] = "cell_" + std::to_string(i);
 	}
 	std::default_random_engine engine;
@@ -30,18 +30,18 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 //        std::cout << "cell " << cellNames[cell] << " will have " << cellPins << " pins" << std::endl;
 		for(uint32_t i = 0; i < cellPins; ++i)
 		{
-			auto pin = nl.add(Pin(), cellNames[cell]+":"+std::to_string(i));
+            auto pin = nl.add(PinInstance(), cellNames[cell]+":"+std::to_string(i));
 			nl.add(cell, pin);
 			cellsPins[cell].push_back(pin);
 		}
 	}
 
-	std::list<Cell> cellsWithoutTheExpectedPins;
-	std::for_each(nl.begin(Cell()), nl.end(Cell()), [&cellsPins, &nl, &cellsWithoutTheExpectedPins](const Cell & cell){
+    std::list<CellInstance> cellsWithoutTheExpectedPins;
+    std::for_each(nl.begin(CellInstance()), nl.end(CellInstance()), [&cellsPins, &nl, &cellsWithoutTheExpectedPins](const CellInstance & cell){
 		auto const & pins = cellsPins[cell];
 		auto nlCellPins = nl.pins(cell);
 		bool insert = false;
-		std::for_each(nlCellPins.begin(), nlCellPins.end(), [&insert, &pins](const Pin & pin){
+        std::for_each(nlCellPins.begin(), nlCellPins.end(), [&insert, &pins](const PinInstance & pin){
 			insert = insert || (std::count(pins.begin(), pins.end(), pin) != 1);
 		});
 		if(insert)
@@ -52,7 +52,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 
 	REQUIRE( cellsWithoutTheExpectedPins.empty() );
 	nl.shrinkToFit();
-	REQUIRE( nl.capacity(Pin()) == nl.size(Pin()) );
+    REQUIRE( nl.capacity(PinInstance()) == nl.size(PinInstance()) );
 	REQUIRE( nl.capacity(Net()) == nl.size(Net()) );
-	REQUIRE( nl.capacity(Cell()) == nl.size(Cell()) );
+    REQUIRE( nl.capacity(CellInstance()) == nl.size(CellInstance()) );
 }

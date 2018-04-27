@@ -1,45 +1,43 @@
 #include <catch.hpp>
 
-#include <ophidian/placement/PlacementMapping.h>
+#include <ophidian/placement/Placement.h>
 
 using namespace ophidian::geometry;
 using namespace ophidian::util;
 
-namespace {
-class LibraryMappingFixture {
-public:
-    ophidian::circuit::Cell cell1, cell2;
-    ophidian::circuit::Pin pin1, pin2;
-    ophidian::standard_cell::Cell stdCell1, stdCell2;
-    ophidian::standard_cell::Pin stdCell3, stdCell4;
+namespace
+{
+    class NetlistAndStdCellFixture
+    {
+    public:
+        ophidian::circuit::CellInstance       cell1, cell2;
+        ophidian::circuit::PinInstance        pin1, pin2;
+        ophidian::circuit::Cell stdCell1, stdCell2;
+        ophidian::circuit::Pin  stdCell3, stdCell4;
 
-    ophidian::circuit::Netlist netlist;
-    ophidian::standard_cell::StandardCells stdCells;
+        ophidian::circuit::Netlist             netlist;
+        ophidian::circuit::StandardCells stdCells;
 
-    ophidian::circuit::LibraryMapping libraryMapping;
+        NetlistAndStdCellFixture()
+        {
+            cell1 = netlist.add(ophidian::circuit::CellInstance(), "cell1");
+            cell2 = netlist.add(ophidian::circuit::CellInstance(), "cell2");
 
-    LibraryMappingFixture()
-        : libraryMapping(netlist) {
-        cell1 = netlist.add(ophidian::circuit::Cell(), "cell1");
-        cell2 = netlist.add(ophidian::circuit::Cell(), "cell2");
+            pin1 = netlist.add(ophidian::circuit::PinInstance(), "pin1");
+            pin2 = netlist.add(ophidian::circuit::PinInstance(), "pin2");
 
-        pin1 = netlist.add(ophidian::circuit::Pin(), "pin1");
-        pin2 = netlist.add(ophidian::circuit::Pin(), "pin2");
-
-        netlist.add(cell1, pin1);
-        netlist.add(cell2, pin2);
-
-        stdCell1 = stdCells.add(ophidian::standard_cell::Cell(), "INVX1");
-        stdCell2 = stdCells.add(ophidian::standard_cell::Cell(), "INVX2");
-        stdCell3 = stdCells.add(ophidian::standard_cell::Pin(), "INVX1_in", ophidian::standard_cell::PinDirection::INPUT);
-        stdCell4 = stdCells.add(ophidian::standard_cell::Pin(), "INVX2_out", ophidian::standard_cell::PinDirection::OUTPUT);
-
-        libraryMapping.cellStdCell(cell1, stdCell1);
-        libraryMapping.cellStdCell(cell2, stdCell2);
-        libraryMapping.pinStdCell(pin1, stdCell3);
-        libraryMapping.pinStdCell(pin2, stdCell4);
-    }
-};
+            stdCell1 = stdCells.add(ophidian::circuit::Cell(), "INVX1");
+            stdCell2 = stdCells.add(ophidian::circuit::Cell(), "INVX2");
+            stdCell3 = stdCells.add(
+                ophidian::circuit::Pin(),
+                "INVX1_in",
+                ophidian::circuit::PinDirection::INPUT);
+            stdCell4 = stdCells.add(
+                ophidian::circuit::Pin(),
+                "INVX2_out",
+                ophidian::circuit::PinDirection::OUTPUT);
+        }
+    };
 
 // class PlacementAndLibraryFixture {
 // public:

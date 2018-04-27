@@ -72,7 +72,6 @@ target_link_libraries(ophidian_placement
     PUBLIC ophidian_parser
     PUBLIC ophidian_circuit
     PUBLIC ophidian_entity_system
-    PUBLIC ophidian_standard_cell
     PUBLIC ophidian_geometry
 )
 
@@ -92,7 +91,6 @@ target_link_libraries(ophidian_placement_static
     PUBLIC ophidian_parser_static
     PUBLIC ophidian_circuit_static
     PUBLIC ophidian_entity_system_static
-    PUBLIC ophidian_standard_cell_static
     PUBLIC ophidian_geometry_static
 )
 

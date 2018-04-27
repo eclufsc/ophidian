@@ -7,8 +7,8 @@ using namespace ophidian::circuit;
 TEST_CASE("Netlist: Brand-new Netlist must be empty.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 	REQUIRE(nl.size(Input()) == 0 );
 	REQUIRE(nl.size(Output()) == 0 );
@@ -18,9 +18,9 @@ TEST_CASE("Netlist: Brand-new Netlist must be empty.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Add Cell.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto cell = nl.add(Cell(), "cell");
-	REQUIRE(nl.size(Cell()) == 1);
-	REQUIRE(nl.size(Pin()) == 0);
+    auto cell = nl.add(CellInstance(), "cell");
+    REQUIRE(nl.size(CellInstance()) == 1);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
@@ -28,72 +28,72 @@ TEST_CASE("Netlist: Erase Cell.", "[circuit][Netlist]")
 {
 
 	Netlist nl;
-	auto cell = nl.add(Cell(), "cell");
+    auto cell = nl.add(CellInstance(), "cell");
 	nl.erase(cell);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Cell mapping.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	nl.add(Cell(), "cell");
-	auto cell = nl.find(Cell(), "cell");
+    nl.add(CellInstance(), "cell");
+    auto cell = nl.find(CellInstance(), "cell");
 	nl.erase(cell);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Try add the same cell twice.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	nl.add(Cell(), "cell");
-	nl.add(Cell(), "cell");
-	REQUIRE(nl.size(Cell()) == 1);
-	REQUIRE(nl.size(Pin()) == 0);
+    nl.add(CellInstance(), "cell");
+    nl.add(CellInstance(), "cell");
+    REQUIRE(nl.size(CellInstance()) == 1);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Add Pin.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto pin = nl.add(Pin(), "pin");
+    auto pin = nl.add(PinInstance(), "pin");
 	REQUIRE(nl.net(pin) == Net());
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 1);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 1);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Erase Pin.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto pin = nl.add(Pin(), "pin");
+    auto pin = nl.add(PinInstance(), "pin");
 	nl.erase(pin);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Pin mapping.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	nl.add(Pin(), "pin");
-	auto pin = nl.find(Pin(), "pin");
+    nl.add(PinInstance(), "pin");
+    auto pin = nl.find(PinInstance(), "pin");
 	nl.erase(pin);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
 TEST_CASE("Netlist: Try add the same pin twice.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	nl.add(Pin(), "pin");
-	nl.add(Pin(), "pin");
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 1);
+    nl.add(PinInstance(), "pin");
+    nl.add(PinInstance(), "pin");
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 1);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
@@ -103,8 +103,8 @@ TEST_CASE("Netlist: Add Net.", "[circuit][Netlist]")
 	auto net = nl.add(Net(), "net");
 	REQUIRE(nl.pins(net).empty());
 	REQUIRE(nl.pins(net).size() == 0);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 1);
 }
 
@@ -113,8 +113,8 @@ TEST_CASE("Netlist: Erase Net.", "[circuit][Netlist]")
 	Netlist nl;
 	auto net = nl.add(Net(), "net");
 	nl.erase(net);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
@@ -124,8 +124,8 @@ TEST_CASE("Netlist: Net mapping.", "[circuit][Netlist]")
 	nl.add(Net(), "net");
 	auto net = nl.find(Net(), "net");
 	nl.erase(net);
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 0);
 }
 
@@ -134,8 +134,8 @@ TEST_CASE("Netlist: Try add the same net twice.", "[circuit][Netlist]")
 	Netlist nl;
 	nl.add(Net(), "net");
 	nl.add(Net(), "net");
-	REQUIRE(nl.size(Cell()) == 0);
-	REQUIRE(nl.size(Pin()) == 0);
+    REQUIRE(nl.size(CellInstance()) == 0);
+    REQUIRE(nl.size(PinInstance()) == 0);
 	REQUIRE(nl.size(Net()) == 1);
 }
 
@@ -144,7 +144,7 @@ TEST_CASE("Netlist: Connect/Disconnect Net and Pin.", "[circuit][Netlist]")
 
 	Netlist nl;
 	auto net = nl.add(Net(), "net");
-	auto pin = nl.add(Pin(), "pin");
+    auto pin = nl.add(PinInstance(), "pin");
 	nl.connect(net, pin);
 	REQUIRE(nl.pins(net).size() == 1);
 	REQUIRE(std::count(nl.pins(net).begin(), nl.pins(net).end(), pin) == 1);
@@ -157,8 +157,8 @@ TEST_CASE("Netlist: Connect/Disconnect Net and Pin.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Add Pin Into Cell.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto cell = nl.add(Cell(), "cell");
-	auto pin = nl.add(Pin(), "cell:pin");
+    auto cell = nl.add(CellInstance(), "cell");
+    auto pin = nl.add(PinInstance(), "cell:pin");
 	nl.add(cell, pin);
 	REQUIRE(nl.pins(cell).size());
 	REQUIRE(std::count(nl.pins(cell).begin(), nl.pins(cell).end(), pin) == 1);
@@ -168,9 +168,9 @@ TEST_CASE("Netlist: Add Pin Into Cell.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Make Cell Property (names)", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto u1 = nl.add(Cell(), "u1");
-	auto u2  = nl.add(Cell(), "u2");
-	auto names = nl.makeProperty<std::string>(Cell());
+    auto u1 = nl.add(CellInstance(), "u1");
+    auto u2  = nl.add(CellInstance(), "u2");
+    auto names = nl.makeProperty<std::string>(CellInstance());
 	names[u1] = "u1";
 	names[u2] = "u2";
 	REQUIRE(names[u1] == "u1");
@@ -186,9 +186,9 @@ struct Point2D
 TEST_CASE("Netlist: Make Pin Property (position).", "[circuit][Netlist]")
 {
 	Netlist nl;
-	auto u1_a = nl.add(Pin(), "u1_a");
-	auto u1_b  = nl.add(Pin(), "u1_b");
-	auto positions = nl.makeProperty<Point2D>(Pin());
+    auto u1_a = nl.add(PinInstance(), "u1_a");
+    auto u1_b  = nl.add(PinInstance(), "u1_b");
+    auto positions = nl.makeProperty<Point2D>(PinInstance());
 	positions[u1_a] = {0, 1};
 	positions[u1_b] = {2, 3};
 	REQUIRE(positions[u1_a].x == 0);
@@ -215,7 +215,7 @@ class DummyCellObserver : public Netlist::CellNotifier::ObserverBase
 {
 public:
 	DummyCellObserver(const Netlist & nl) :
-		Netlist::CellNotifier::ObserverBase(*nl.notifier(Cell())),
+		Netlist::CellNotifier::ObserverBase(*nl.notifier(CellInstance())),
 		added(0),
 		erased(0),
 		capacity(0)
@@ -233,15 +233,15 @@ public:
 	{
 		capacity = std::max(capacity, size);
 	}
-	void add(const Cell&) override
+	void add(const CellInstance&) override
 	{
 		++added;
 	}
-	void add(const std::vector<Cell>& cells) override
+	void add(const std::vector<CellInstance>& cells) override
 	{
 		added += cells.size();
 	}
-	void erase(const Cell&) override
+	void erase(const CellInstance&) override
 	{
 		++erased;
 	}
@@ -258,13 +258,13 @@ TEST_CASE("Netlist: Make Custom Cell Observer.", "[circuit][Netlist]")
 {
 	Netlist nl;
 	auto prop = DummyCellObserver(nl);
-	auto n1 = nl.add(Cell(), "n1");
-	auto n2  = nl.add(Cell(), "n2");
-	auto n3 = nl.add(Cell(), "n3");
+    auto n1 = nl.add(CellInstance(), "n1");
+    auto n2  = nl.add(CellInstance(), "n2");
+    auto n3 = nl.add(CellInstance(), "n3");
 	nl.erase(n2);
 	REQUIRE( prop.added == 3 );
 	REQUIRE( prop.erased == 1 );
-	nl.reserve(Cell(), 3214);
+    nl.reserve(CellInstance(), 3214);
 	REQUIRE( prop.capacity == 3214 );
 }
 
@@ -272,8 +272,8 @@ TEST_CASE("Netlist: Make Custom Cell Observer.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Add Input.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	Pin p1 = nl.add(Pin(), "p1");
-	Pin p2 = nl.add(Pin(), "p2");
+    PinInstance p1 = nl.add(PinInstance(), "p1");
+    PinInstance p2 = nl.add(PinInstance(), "p2");
 	auto inp1 = nl.add(Input(), p1 );
 	REQUIRE(nl.size(Input()) == 1);
 	auto inp2 = nl.add(Input(), p2 );
@@ -285,7 +285,7 @@ TEST_CASE("Netlist: Add Input.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Add Output.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	Pin p1 = nl.add(Pin(), "p1");
+    PinInstance p1 = nl.add(PinInstance(), "p1");
 	REQUIRE(nl.output(p1) == Output());
 	auto out = nl.add(Output(), p1 );
 	REQUIRE(nl.size(Output()) == 1);
@@ -296,9 +296,9 @@ TEST_CASE("Netlist: Add Output.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
 {
 	Netlist nl;
-	Pin p1, p2;
-	auto inp = nl.add(Input(), p1 = nl.add(Pin(), "p1"));
-	auto out = nl.add(Output(), p2 = nl.add(Pin(), "p2"));
+    PinInstance p1, p2;
+    auto inp = nl.add(Input(), p1 = nl.add(PinInstance(), "p1"));
+    auto out = nl.add(Output(), p2 = nl.add(PinInstance(), "p2"));
 	REQUIRE(std::count(nl.begin(Input()), nl.end(Input()), inp) == 1);
 	REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
 }
@@ -306,12 +306,12 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
 TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")
 {
 	Netlist nl;
-	Pin inp1, inp2;
-	Pin out;
+    PinInstance inp1, inp2;
+    PinInstance out;
 
-	inp1 = nl.add(Pin(), "inp1");
-	inp2 = nl.add(Pin(), "inp2");
-	out = nl.add(Pin(), "out");
+    inp1 = nl.add(PinInstance(), "inp1");
+    inp2 = nl.add(PinInstance(), "inp2");
+    out = nl.add(PinInstance(), "out");
 
 	nl.add(Input(), inp1);
 	nl.add(Input(), inp2);

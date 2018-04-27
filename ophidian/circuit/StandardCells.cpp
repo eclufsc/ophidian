@@ -20,7 +20,7 @@
 
 namespace ophidian
 {
-namespace standard_cell
+namespace circuit
 {
     //--------------------------- Cells -------------------------------//
 

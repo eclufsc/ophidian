@@ -30,7 +30,7 @@ namespace placement
     void lef2Library(
         const parser::Lef & lef,
         Library & library,
-        standard_cell::StandardCells & stdCells);
+        circuit::StandardCells & stdCells);
 }     // namespace placement
 }     // namespace ophidian
 

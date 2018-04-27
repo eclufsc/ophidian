@@ -14,7 +14,7 @@ public:
 	}
 	std::unique_ptr<parser::Lef> lef;
 	std::unique_ptr<placement::Library> library;
-	standard_cell::StandardCells stdCells;
+    circuit::StandardCells stdCells;
 };
 
 // TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test library cell geometries.", "[standard_cell][library][placement][lef][dbunits]")
@@ -30,8 +30,8 @@ public:
 //
 TEST_CASE_METHOD(Lef2LibraryFixture, "Lef2Library: Test of association between standard_cell::Pin and standard_cell::Cell.", "[circuit][standard_cell][lef][EntitySystem]")
 {
-	auto cellNAND2X1 = stdCells.find(standard_cell::Cell(), "NAND2_X1");
-	auto pincellNAND2X1a = stdCells.find(standard_cell::Pin(), "NAND2_X1:a");
+    auto cellNAND2X1 = stdCells.find(circuit::Cell(), "NAND2_X1");
+    auto pincellNAND2X1a = stdCells.find(circuit::Pin(), "NAND2_X1:a");
 	REQUIRE(stdCells.owner(pincellNAND2X1a) == cellNAND2X1);
 	REQUIRE(stdCells.pins(cellNAND2X1).size() == 3);
 }

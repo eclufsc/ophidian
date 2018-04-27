@@ -23,8 +23,10 @@ namespace ophidian
 namespace placement
 {
 
-    Placement::Placement(const circuit::Netlist & netlist):
-            mCellLocations(netlist.makeProperty<util::LocationDbu>(circuit::Cell())),
+    Placement::Placement(const circuit::Netlist & netlist, const Library &library):
+            mNetlist(netlist),
+            mLibrary(library),
+            mCellLocations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
             mInputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
             mOutputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
     {
@@ -34,7 +36,7 @@ namespace placement
     {
     }
 
-    void Placement::placeCell(const circuit::Cell & cell, const util::LocationDbu & location)
+    void Placement::placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location)
     {
         mCellLocations[cell] = location;
     }
@@ -59,6 +61,30 @@ namespace placement
     util::LocationDbu Placement::outputPadLocation(const circuit::Output & output) const
     {
         return mOutputLocations[output];
+    }
+
+    geometry::MultiBox<util::database_unit_t> Placement::geometry(const circuit::CellInstance & cell) const
+    {
+        auto stdCell = mNetlist.cellStdCell(cell);
+        auto stdCellGeometry = mLibrary.geometry(stdCell);
+        auto location = cellLocation(cell);
+
+        geometry::MultiBox<util::database_unit_t> cellGeometry = stdCellGeometry.translate(location);
+
+        return cellGeometry;
+    }
+
+    util::LocationDbu Placement::location(const circuit::PinInstance & pin) const
+    {
+        auto stdCellPin = mNetlist.pinStdCell(pin);
+        auto pinOwner = mNetlist.cell(pin);
+        auto location = cellLocation(pinOwner);
+        auto pinOffset = mLibrary.pinOffset(stdCellPin);
+
+        util::LocationDbu pinLocation(location.x() + pinOffset.x(),
+            location.y() + pinOffset.y());
+
+        return pinLocation;
     }
 }     //namespace placement
 }     //namespace ophidian
