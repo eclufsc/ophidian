@@ -1,8 +1,8 @@
 #include <catch.hpp>
 
-#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/circuit/StandardCells.h>
 
-using namespace ophidian::standard_cell;
+using namespace ophidian::circuit;
 
 namespace
 {

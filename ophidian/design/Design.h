@@ -23,8 +23,7 @@
 #include <ophidian/floorplan/Floorplan.h>
 #include <ophidian/placement/Placement.h>
 #include <ophidian/placement/Library.h>
-#include <ophidian/circuit/LibraryMapping.h>
-#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/circuit/StandardCells.h>
 
 namespace ophidian
 {
@@ -37,9 +36,8 @@ namespace design
         using netlist_type         = circuit::Netlist;
         using floorplan_type       = floorplan::Floorplan;
         using placement_type       = placement::Placement;
-        using standard_cell_type   = standard_cell::StandardCells;
+        using standard_cell_type   = circuit::StandardCells;
         using library_type         = placement::Library;
-        using library_mapping_type = circuit::LibraryMapping;
 
         //! Design Constructor
 
@@ -60,8 +58,7 @@ namespace design
             m_floorplan{std::forward<A2>(floorplan)},
             m_placement{std::forward<A3>(placement)},
             m_standard_cells{std::forward<A4>(standard_cells)},
-            m_library{std::forward<A5>(library)},
-            m_library_mapping{std::forward<A6>(library_mapping)}
+            m_library{std::forward<A5>(library)}
         {}
 
         //! netlist getter
@@ -113,23 +110,12 @@ namespace design
         library_type& library() noexcept;
 
         const library_type& library() const noexcept;
-
-        //! libraryMapping getter
-
-        /*!
-           \brief Get the libraryMapping.
-           \return LibraryMapping.
-         */
-        library_mapping_type& library_mapping() noexcept;
-
-        const library_mapping_type& library_mapping() const noexcept;
     private:
         netlist_type         m_netlist{};
         floorplan_type       m_floorplan{};
-        placement_type       m_placement{m_netlist};
         standard_cell_type   m_standard_cells{};
         library_type         m_library{m_standard_cells};
-        library_mapping_type m_library_mapping{m_netlist};
+        placement_type       m_placement{m_netlist, m_library};
     };
 }     //namespace design
 }     //namespace ophidian

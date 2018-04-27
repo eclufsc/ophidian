@@ -24,6 +24,8 @@
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/Netlist.h>
+#include <ophidian/placement/Library.h>
+#include <ophidian/geometry/MultiBox.h>
 
 namespace ophidian
 {
@@ -39,7 +41,7 @@ namespace placement
            \brief Constructs a placement system with no properties.
            \param netlist Circuit netlist.
          */
-        Placement(const circuit::Netlist & netlist);
+        Placement(const circuit::Netlist & netlist, const Library & library);
 
         //! Placement Destructor
 
@@ -55,7 +57,7 @@ namespace placement
            \param cell Cell to be placed
            \param location LocationDbu of the lower left corner of the cell.
          */
-        void placeCell(const circuit::Cell & cell, const util::LocationDbu & location);
+        void placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location);
 
         //! LocationDbu getter
 
@@ -64,7 +66,7 @@ namespace placement
            \param cell Cell entity to get the location.
            \return LocationDbu of the cell.
          */
-        util::LocationDbu cellLocation(const circuit::Cell & cell) const
+        util::LocationDbu cellLocation(const circuit::CellInstance & cell) const
         {
             return mCellLocations[cell];
         }
@@ -77,8 +79,29 @@ namespace placement
 
         util::LocationDbu outputPadLocation(const circuit::Output & output) const;
 
+        //! Cell geometry getter
+
+        /*!
+           \brief Get the geometry of a cell in the circuit.
+           \param cell Cell entity to get the geometry.
+           \return Geometry of the cell.
+         */
+        geometry::MultiBox<util::database_unit_t> geometry(const circuit::CellInstance & cell) const;
+
+        //! Pin location getter
+
+        /*!
+           \brief Get the location of a pin in the circuit.
+           \param cell Pin entity to get the location.
+           \return Location of the cell.
+         */
+        util::LocationDbu location(const circuit::PinInstance &pin) const;
+
     private:
-        entity_system::Property<circuit::Cell, util::LocationDbu>   mCellLocations;
+        const circuit::Netlist & mNetlist;
+        const Library & mLibrary;
+
+        entity_system::Property<circuit::CellInstance, util::LocationDbu>   mCellLocations;
         entity_system::Property<circuit::Input, util::LocationDbu>  mInputLocations;
         entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
     };

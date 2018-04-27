@@ -21,9 +21,9 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-#include <ophidian/geometry/Models.h>
-#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/geometry/MultiBox.h>
 #include <ophidian/util/Units.h>
+#include <ophidian/circuit/StandardCells.h>
 
 namespace ophidian
 {
@@ -39,7 +39,7 @@ namespace placement
         /*!
            \brief Constructs a placement library.
          */
-        Library(const standard_cell::StandardCells & std_cells);
+        Library(const circuit::StandardCells & std_cells);
 
         //! Cell geometry getter
 
@@ -48,7 +48,7 @@ namespace placement
            \param cell Cell entity to get the geometry.
            \return Geometry of the cell.
          */
-        MultiBox geometry(const standard_cell::Cell & cell) const
+        MultiBox geometry(const circuit::Cell & cell) const
         {
             return mGeometries[cell];
         }
@@ -60,7 +60,7 @@ namespace placement
            \param cell Cell entity to set the geometry.
            \param geometry Gehmetry to assign to cell.
          */
-        void geometry(const standard_cell::Cell & cell, const MultiBox & geometry);
+        void geometry(const circuit::Cell & cell, const MultiBox & geometry);
 
         //! Pin offset getter
 
@@ -69,7 +69,7 @@ namespace placement
            \param pin Pin entity to get the offset.
            \return Offset of the pin.
          */
-        util::LocationDbu pinOffset(const standard_cell::Pin & pin) const
+        util::LocationDbu pinOffset(const circuit::Pin & pin) const
         {
             return mPinOffsets[pin];
         }
@@ -81,11 +81,11 @@ namespace placement
            \param pin Pin entity to set the offset.
            \param offset Offset to assign to pin.
          */
-        void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
+        void pinOffset(const circuit::Pin & pin, const util::LocationDbu & offset);
 
     private:
-        entity_system::Property<standard_cell::Cell, MultiBox> mGeometries;
-        entity_system::Property<standard_cell::Pin, util::LocationDbu>   mPinOffsets;
+        entity_system::Property<circuit::Cell, MultiBox> mGeometries;
+        entity_system::Property<circuit::Pin, util::LocationDbu>   mPinOffsets;
     };
 }     // namespace placement
 }     // namespace ophidian

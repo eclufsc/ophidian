@@ -71,7 +71,6 @@ set_target_properties(ophidian_circuit PROPERTIES
 target_link_libraries(ophidian_circuit
     PUBLIC ophidian_entity_system 
     PUBLIC ophidian_parser 
-    PUBLIC ophidian_standard_cell
 )
 
 # Tell cmake the path to look for include files for this target
@@ -89,7 +88,6 @@ add_library(ophidian_circuit_static STATIC ${ophidian_circuit_source})
 target_link_libraries(ophidian_circuit_static
     PUBLIC ophidian_entity_system_static 
     PUBLIC ophidian_parser_static
-    PUBLIC ophidian_standard_cell_static
 )
 
 # Tell cmake the path to look for include files for this target

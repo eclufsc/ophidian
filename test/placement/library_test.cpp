@@ -4,7 +4,7 @@
 #include <ophidian/placement/Library.h>
 
 using namespace ophidian::placement;
-using namespace ophidian::standard_cell;
+using namespace ophidian::circuit;
 using namespace ophidian::geometry;
 
 namespace
@@ -18,8 +18,8 @@ public:
 	StandardCells std_cells;
 
 	StandardCellsFixture() {
-		cell1 = std_cells.add(ophidian::standard_cell::Cell(), "cell1");
-		cell2 = std_cells.add(ophidian::standard_cell::Cell(), "cell2");
+        cell1 = std_cells.add(ophidian::circuit::Cell(), "cell1");
+        cell2 = std_cells.add(ophidian::circuit::Cell(), "cell2");
 
 		pin1 = std_cells.add(Pin(), "pin1", PinDirection::NA);
 		pin2 = std_cells.add(Pin(), "pin2", PinDirection::NA);

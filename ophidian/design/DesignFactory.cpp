@@ -19,9 +19,9 @@
 #include "Design.h"
 
 #include <ophidian/floorplan/FloorplanFactory.h>
-#include <ophidian/placement/Def2Placement.h>
-#include <ophidian/circuit/Def2LibraryMapping.h>
-#include <ophidian/circuit/Verilog2Netlist.h>
+#include <ophidian/placement/PlacementFactory.h>
+#include <ophidian/circuit/Def2Netlist.h>
+#include <ophidian/circuit/NetlistFactory.h>
 #include <ophidian/placement/Lef2Library.h>
 
 namespace ophidian
@@ -34,14 +34,13 @@ namespace design
         {
             auto design = Design{};
 
-            placement::def2placement(def, design.placement(), design.netlist());
+//            placement::def2placement(def, design.placement(), design.netlist());
             design.floorplan() = floorplan::factory::make_floorplan(lef, def);
             placement::lef2Library(lef, design.library(), design.standard_cells());
-            circuit::def2LibraryMapping(
-                def,
-                design.netlist(),
-                design.standard_cells(),
-                design.library_mapping());
+//            circuit::def2Netlist(
+//                def,
+//                design.netlist(),
+//                design.standard_cells());
 
             return design;
         }
@@ -52,8 +51,8 @@ namespace design
 
             placement::lef2Library(lef, design.library(), design.standard_cells());
             design.floorplan() = floorplan::factory::make_floorplan(lef, def);
-            placement::def2placement(def, design.placement(), design.netlist());
-            circuit::verilog2Netlist(verilog, design.netlist());
+//            placement::def2placement(def, design.placement(), design.netlist());
+//            circuit::verilog2Netlist(verilog, design.netlist());
 
             return design;
         }

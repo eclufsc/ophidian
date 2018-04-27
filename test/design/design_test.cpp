@@ -10,11 +10,11 @@ Design design;
 
 TEST_CASE("Design: testing netlist.", "[design]")
 {
-	auto cell = design.netlist().add(ophidian::circuit::Cell(), "cell");
-	auto pin = design.netlist().add(ophidian::circuit::Pin(), "pin");
+	auto cell = design.netlist().add(ophidian::circuit::CellInstance(), "cell");
+	auto pin = design.netlist().add(ophidian::circuit::PinInstance(), "pin");
 	auto net = design.netlist().add(ophidian::circuit::Net(), "net");
-	REQUIRE(design.netlist().size(ophidian::circuit::Cell()) == 1);
-	REQUIRE(design.netlist().size(ophidian::circuit::Pin()) == 1);
+	REQUIRE(design.netlist().size(ophidian::circuit::CellInstance()) == 1);
+	REQUIRE(design.netlist().size(ophidian::circuit::PinInstance()) == 1);
 	REQUIRE(design.netlist().size(ophidian::circuit::Net()) == 1);
 	REQUIRE(design.netlist().size(ophidian::circuit::Input()) == 0 );
 	REQUIRE(design.netlist().size(ophidian::circuit::Output()) == 0 );
@@ -44,8 +44,8 @@ TEST_CASE("Design: testing floorplan.", "[design]")
 
 TEST_CASE("Design: testing placement.", "[design]")
 {
-	auto cell1 = design.netlist().add(ophidian::circuit::Cell(), "cell1");
-	auto cell2 = design.netlist().add(ophidian::circuit::Cell(), "cell2");
+	auto cell1 = design.netlist().add(ophidian::circuit::CellInstance(), "cell1");
+	auto cell2 = design.netlist().add(ophidian::circuit::CellInstance(), "cell2");
 
 	auto cell1Location = ophidian::util::LocationDbu{ dbu_t{10}, dbu_t{20}};
 	auto cell2Location = ophidian::util::LocationDbu{ dbu_t{20}, dbu_t{10}};
@@ -61,8 +61,8 @@ TEST_CASE("Design: testing placement.", "[design]")
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 {
-	auto cell1 = design.standard_cells().add(ophidian::standard_cell::Cell(), "cell1");
-	auto cell2 = design.standard_cells().add(ophidian::standard_cell::Cell(), "cell2");
+    auto cell1 = design.standard_cells().add(ophidian::circuit::Cell(), "cell1");
+    auto cell2 = design.standard_cells().add(ophidian::circuit::Cell(), "cell2");
 
 	std::vector<ophidian::geometry::Box<dbu_t>> cell1Boxes = {
         ophidian::geometry::Box<dbu_t>{ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}}, ophidian::geometry::Point<dbu_t>{dbu_t{10}, dbu_t{10}}}
