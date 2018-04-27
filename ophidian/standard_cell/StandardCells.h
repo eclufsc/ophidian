@@ -51,24 +51,23 @@ namespace standard_cell
     class StandardCells
     {
     public:
-        using CellsIterator = entity_system::EntitySystem<Cell>::const_iterator;
-        using PinsIterator = entity_system::EntitySystem<Pin>::const_iterator;
+        // Class member types
+        using size_type = std::size_t;
+        using cell_type = Cell;
+        using cell_name_type = std::string;
+        using cell_const_iterator = entity_system::EntitySystem<cell_type>::const_iterator;
+
+        using pin_type = Pin;
+        using pin_name_type = std::string;
+        using pin_direction_type = PinDirection;
+        using pin_const_iterator = entity_system::EntitySystem<pin_type>::const_iterator;
 
         //! StandardCell Constructor
-
-        /*!
-           \brief Constructs an empty system with no Cells and Pins.
-         */
         StandardCells() = default;
 
         StandardCells(const StandardCells&) = delete;
         StandardCells& operator=(const StandardCells&) = delete;
 
-        //! StandardCell Move Constructor
-
-        /*!
-            \brief Move the entity system and its properties.
-         */
         StandardCells(StandardCells&&) = default;
         StandardCells& operator=(StandardCells&&) = default;
 
@@ -81,7 +80,7 @@ namespace standard_cell
            \param name Name of the cell, used to identify it.
            \return A handler for the created/existing Cell.
          */
-        Cell add(Cell, const std::string & name);
+        cell_type add(cell_type, const cell_name_type& name);
 
         //! Erase Cell
 
@@ -89,7 +88,7 @@ namespace standard_cell
            \param cell A handler for the Cell to erase.
            \brief Erases a Cell instance.
          */
-        void erase(const Cell & cell);
+        void erase(const cell_type& cell);
 
         //! Allocate space for storing Cell entities
 
@@ -97,7 +96,7 @@ namespace standard_cell
            \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the standard cells.
            \param size Minimum capacity for the cell container.
          */
-        void reserve(Cell, uint32_t size);
+        void reserve(cell_type, size_type size);
 
         //! Size of Cell's System
 
@@ -105,14 +104,14 @@ namespace standard_cell
            \brief Returns the number of Cells.
            \return The number of Cells.
          */
-        uint32_t size(Cell) const;
+        size_type size(cell_type) const;
 
         //! Capacity of the Cell's System
 
         /*!
            \return The capacity of the Cell EntitySystem.
          */
-        uint32_t capacity(Cell) const;
+        size_type capacity(cell_type) const;
 
         //! Find a cell
 
@@ -121,14 +120,14 @@ namespace standard_cell
            \param The cell name.
            \return Return a cell handler by cell's name.
          */
-        Cell find(Cell, std::string cellName);
+        cell_type find(cell_type, cell_name_type cellName);
 
         //! Cells iterator
 
         /*!
            \return Range iterator for the cells.
          */
-        ophidian::util::Range<StandardCells::CellsIterator> range(Cell) const;
+        ophidian::util::Range<cell_const_iterator> range(cell_type) const;
 
         //! Cell name getter
 
@@ -137,7 +136,7 @@ namespace standard_cell
            \param cell Cell entity to get the name.
            \return Name of the cell
          */
-        std::string name(const Cell & cell) const;
+        cell_name_type name(const cell_type & cell) const;
 
         //! Pins of a Cell
 
@@ -146,7 +145,7 @@ namespace standard_cell
            \param cell A handler for the Cell we want to get the Pins.
            \return Container Wrapper for the Pins of a Cell.
          */
-        entity_system::Association<Cell, Pin>::Parts pins(const Cell & cell) const;
+        entity_system::Association<cell_type, pin_type>::Parts pins(const cell_type & cell) const;
 
         //! Make Cell Property
 
@@ -156,9 +155,9 @@ namespace standard_cell
            \return An Cell => \p Value Map.
          */
         template <typename Value>
-        entity_system::Property<Cell, Value> makeProperty(Cell) const
+        entity_system::Property<cell_type, Value> makeProperty(cell_type) const
         {
-            return entity_system::Property<Cell, Value>(mCells);
+            return entity_system::Property<cell_type, Value>(mCells);
         }
 
         //--------------------------- Pins -------------------------------//
@@ -170,15 +169,15 @@ namespace standard_cell
            \param name Name of the pin, used to identify it.
            \return A handler for the created/existing pin.
          */
-        Pin add(Pin, const std::string & name, PinDirection direction);
+        pin_type add(pin_type, const pin_name_type& name, PinDirection direction);
 
         //! Erase Pin
 
         /*!
            \param pin A handler for the pin to erase.
-           \brief Erases a Pin instance.
+           \brief Erases a pin_type instance.
          */
-        void erase(const Pin & pin);
+        void erase(const pin_type & pin);
 
         //! Allocate space for storing pin entities
 
@@ -186,7 +185,7 @@ namespace standard_cell
            \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the standard cells.
            \param size Minimum capacity for the Pin container.
          */
-        void reserve(Pin, uint32_t size);
+        void reserve(pin_type, size_type size);
 
         //! Size of Pin's System
 
@@ -194,14 +193,14 @@ namespace standard_cell
            \brief Returns the number of pins.
            \return The number of pins.
          */
-        uint32_t size(Pin) const;
+        size_type size(pin_type) const;
 
         //! Capacity of the Pin's System
 
         /*!
            \return The capacity of the Pin EntitySystem.
          */
-        uint32_t capacity(Pin) const;
+        size_type capacity(pin_type) const;
 
         //! Find a pin
 
@@ -210,7 +209,7 @@ namespace standard_cell
            \param The pin name.
            \return Return a pin handler by pin's name.
          */
-        Pin find(Pin, std::string pinName);
+        pin_type find(pin_type, pin_name_type pinName);
 
         //! Pin name getter
 
@@ -219,7 +218,7 @@ namespace standard_cell
            \param pin Pin entity to get the name.
            \return Name of the pin
          */
-        std::string name(const Pin & pin) const;
+        pin_name_type name(const pin_type & pin) const;
 
         //! Pin direction getter
 
@@ -228,7 +227,7 @@ namespace standard_cell
            \param pin Pin entity to get the direction.
            \return Direction of the pin
          */
-        PinDirection direction(const Pin & pin);
+        PinDirection direction(const pin_type & pin);
 
         //! Pin owner getter
 
@@ -237,14 +236,14 @@ namespace standard_cell
            \param pin Pin entity to get the owner.
            \return Owner of the pin
          */
-        Cell owner(const Pin & pin);
+        cell_type owner(const pin_type & pin);
 
         //! Pins iterator
 
         /*!
            \return Range iterator for the Pins.
          */
-        ophidian::util::Range<StandardCells::PinsIterator> range(Pin) const;
+        ophidian::util::Range<pin_const_iterator> range(pin_type) const;
 
         //! Make Pin Property
 
@@ -254,9 +253,9 @@ namespace standard_cell
            \return An Pin => \p Value Map.
          */
         template <typename Value>
-        entity_system::Property<Pin, Value> makeProperty(Pin) const
+        entity_system::Property<pin_type, Value> makeProperty(pin_type) const
         {
-            return entity_system::Property<Pin, Value>(mPins);
+            return entity_system::Property<pin_type, Value>(mPins);
         }
 
         //--------------------------- Association -------------------------------//
@@ -270,25 +269,25 @@ namespace standard_cell
          */
 
         //Maybe rename to create_association or associate...
-        void add(const Cell & cell, const Pin & pin);
+        void add(const cell_type & cell, const pin_type & pin);
 
     private:
 
         //cells entity system and properties
-        entity_system::EntitySystem<Cell>          mCells{};
-        entity_system::Property<Cell, std::string> mCellNames{mCells};
+        entity_system::EntitySystem<cell_type>          mCells{};
+        entity_system::Property<cell_type, cell_name_type> mCellNames{mCells};
 
         //pins entity system and properties
-        entity_system::EntitySystem<Pin>           mPins{};
-        entity_system::Property<Pin, std::string>  mPinNames{mPins};
-        entity_system::Property<Pin, PinDirection> mPinDirections{mPins};
+        entity_system::EntitySystem<pin_type>           mPins{};
+        entity_system::Property<pin_type, pin_name_type>  mPinNames{mPins};
+        entity_system::Property<pin_type, PinDirection> mPinDirections{mPins};
 
         //composition and aggregation relations
-        entity_system::Composition<Cell, Pin> mCellPins{mCells, mPins};
+        entity_system::Composition<cell_type, pin_type> mCellPins{mCells, mPins};
 
         //std_cell and pin mapping
-        std::unordered_map<std::string, Cell> mName2Cell{};
-        std::unordered_map<std::string, Pin>  mName2Pin{};
+        std::unordered_map<cell_name_type, cell_type> mName2Cell{};
+        std::unordered_map<pin_name_type, pin_type>  mName2Pin{};
     };
 }     //namespace ophidian
 }     //namespace standard_cell
