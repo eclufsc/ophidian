@@ -425,7 +425,7 @@ Liberty::LUT Liberty::Timing::find(Liberty::LUT::lutInformation info)
     return Liberty::LUT();
 }
 
-double Liberty::LUT::compute(double rv, double cv)
+double Liberty::LUT::compute(const double rv, const double cv)
 {
     if (values.size() == 1)
         if (values.front().size() == 1)

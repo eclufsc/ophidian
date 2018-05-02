@@ -145,11 +145,6 @@ namespace ophidian
             return mName2Pin[pinName];
         }
 
-        Pin StandardCells::find(Pin, std::string pinName) const
-        {
-            return mName2Pin.at(pinName);
-        }
-
         std::string StandardCells::name(const Pin & pin) const
         {
             return mPinNames[pin];

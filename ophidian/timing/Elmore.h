@@ -20,6 +20,7 @@
 #ifndef OPHIDIAN_TIMING_ELMORE_H
 #define OPHIDIAN_TIMING_ELMORE_H
 
+#include <ophidian/util/Units.h>
 #include <ophidian/timingdriven_placement/RCTree.h>
 
 namespace ophidian
@@ -30,26 +31,61 @@ namespace timing
 class Elmore
 {
 public:
-    using GraphRCTreeType = timingdriven_placement::RCTree::GraphType;
-    using CapacitorRCTree = timingdriven_placement::RCTree::Capacitor;
-    using ResistorRCTree = timingdriven_placement::RCTree::Resistor;
+    using time_unit_type                        = util::second_t;
+    using capacitance_unit_type                 = util::farad_t;
+    template <class T> using container_type     = std::vector<T>;
+    template <class U, class T> using pair_type = std::pair<U, T>;
 
-    Elmore(const timingdriven_placement::RCTree & tree, const CapacitorRCTree & source);
+    using graph_type                            = timingdriven_placement::RCTree::GraphType;
+    using capacitor_type                        = timingdriven_placement::RCTree::Capacitor;
+    using resistor_type                         = timingdriven_placement::RCTree::Resistor;
+
+    using time_map_type                         = graph_type::NodeMap<time_unit_type>;
+    using capacitance_map_type                  = graph_type::NodeMap<capacitance_unit_type>;
+    using predecessor_map_type                  = graph_type::NodeMap<pair_type<capacitor_type, resistor_type>>;
+    using order_container_type                  = container_type<capacitor_type>;
+
+    Elmore(const timingdriven_placement::RCTree & tree, const capacitor_type & source);
     virtual ~Elmore();
 
     void update();
 
-    util::second_t at(const CapacitorRCTree cap) const;
-    const GraphRCTreeType::NodeMap<std::pair<CapacitorRCTree, ResistorRCTree>> & pred() const;
-    const std::vector<CapacitorRCTree> & order() const;
+    time_unit_type at(const capacitor_type & cap) const;
+    const predecessor_map_type & pred() const;
+    const order_container_type & order() const;
 
 private:
-    const timingdriven_placement::RCTree & mTree;
-    GraphRCTreeType::NodeMap<util::second_t> mElmoreDelay;
-    GraphRCTreeType::NodeMap<util::farad_t> mDownstreamCapacitance;
-    GraphRCTreeType::NodeMap<std::pair<CapacitorRCTree, ResistorRCTree>> mPred;
-    std::vector<CapacitorRCTree> mOrder;
-    const CapacitorRCTree mSource;
+    const timingdriven_placement::RCTree & m_tree;
+    time_map_type                          m_elmore_delay;
+    capacitance_map_type                   m_downstream_capacitance;
+    predecessor_map_type                   m_pred;
+    order_container_type                   m_order;
+    const capacitor_type                   m_source;
+};
+
+class ElmoreSecondMoment
+{
+public:
+    using square_time_unit = util::square_second_t;
+
+    using graph_type       = timingdriven_placement::RCTree::GraphType;
+    using capacitor_type   = timingdriven_placement::RCTree::Capacitor;
+    using resistor_type    = timingdriven_placement::RCTree::Resistor;
+
+    ElmoreSecondMoment(const timingdriven_placement::RCTree & tree, const Elmore & e);
+
+    virtual ~ElmoreSecondMoment();
+
+    square_time_unit at(const capacitor_type & capacitor) const;
+
+private:
+    using capacitance_time_unit = units::unit_t<units::compound_unit<units::capacitance::farads, units::time::seconds>>;
+    using square_time_map_type  = graph_type::NodeMap<square_time_unit>;
+
+    const Elmore&                         m_elmore;
+    const timingdriven_placement::RCTree& m_tree;
+    square_time_map_type                  m_second_moment;
+    void update();
 };
 
 }   // namespace timing

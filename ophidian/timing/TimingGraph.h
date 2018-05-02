@@ -72,21 +72,21 @@ public:
        \brief Get the netlist.
        \return Netlist.
      */
-    const GraphType & graph();
+    const GraphType & graph() const;
 
     //! Size of nodes
     /*!
        \brief Returns the number of Nodes.
        \return The number of nodes.
      */
-    size_t size(NodeType);
+    size_t size(NodeType) const;
 
     //! Size of edges
     /*!
        \brief Returns the number of Edges.
        \return The number of edges.
      */
-    size_t size(ArcType);
+    size_t size(ArcType) const;
 
     //! Create a Rise Node
     /*!
@@ -96,13 +96,14 @@ public:
      */
     NodeType riseNodeCreate(const circuit::Pin & pin);
 
+
     //! Rise Node getter
     /*!
        \brief Take the node associated with a pin.
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    NodeType riseNode(const circuit::Pin & pin);
+    NodeType riseNode(const circuit::Pin & pin) const;
 
     //! Create a Fall Node
     /*!
@@ -112,13 +113,13 @@ public:
      */
     NodeType fallNodeCreate(const circuit::Pin & pin);
 
-    //! Fall Node getter
+    //! Fall Node getter const
     /*!
        \brief Take the node associated with a pin.
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    NodeType fallNode(const circuit::Pin & pin);
+    NodeType fallNode(const circuit::Pin & pin) const;
 
     //! Create a Arc
     /*!
@@ -146,7 +147,7 @@ public:
        \param node A node of the graph.
        \return The property of the node.
      */
-    NodeProperty property(const NodeType & node);
+    NodeProperty property(const NodeType & node) const;
 
     //! Arc Property Getter
     /*!
@@ -154,7 +155,7 @@ public:
        \param node A arc of the graph.
        \return The property of the arc.
      */
-    ArcProperty property(const ArcType & arc);
+    ArcProperty property(const ArcType & arc) const;
 
     //! Source Node Getter
     /*!
@@ -162,7 +163,7 @@ public:
        \param arc A arc of the graph.
        \return The source node.
      */
-    NodeType source(const ArcType & arc);
+    NodeType source(const ArcType & arc) const;
 
     //! Change the source node
     /*!
@@ -178,7 +179,7 @@ public:
        \param arc A arc of the graph.
        \return The target node.
      */
-    NodeType target(const ArcType & arc);
+    NodeType target(const ArcType & arc) const;
 
     //! Output edges of a node.
     /*!
@@ -186,7 +187,7 @@ public:
        \param node A node of the graph.
        \return iterator of output edges.
      */
-    GraphType::OutArcIt outArc(const NodeType & node);
+    GraphType::OutArcIt outArc(const NodeType & node) const;
 
     //! Input edges of a node.
     /*!
@@ -194,7 +195,7 @@ public:
        \param node A node of the graph.
        \return iterator of input edges.
      */
-    GraphType::InArcIt inArc(const NodeType & node);
+    GraphType::InArcIt inArc(const NodeType & node) const;
 
     //! Node's Pin Getter
     /*!
@@ -202,7 +203,7 @@ public:
        \param node A node of the graph.
        \return A pin of the circuit.
      */
-    circuit::Pin entity(const NodeType & node);
+    circuit::Pin entity(const NodeType & node) const;
 
     //! Net's Arc Getter
     /*!
@@ -210,7 +211,7 @@ public:
        \param arc A arc of the graph.
        \return A net of the circuit.
      */
-    circuit::Net entity(circuit::Net, const ArcType & arc);
+    circuit::Net entity(circuit::Net, const ArcType & arc) const;
 
     //! TimingArc's Arc Getter
     /*!
@@ -218,7 +219,7 @@ public:
        \param arc A arc of the graph.
        \return A TimingArc.
      */
-    TimingArc entity(TimingArc, const ArcType & arc);
+    TimingArc entity(TimingArc, const ArcType & arc) const;
 
     //! Arc's Arc Getter
     /*!
@@ -226,31 +227,7 @@ public:
        \param arc A arc of the graph.
        \return A Arc.
      */
-    Arc entity(Arc, const ArcType & arc);
-
-    //! Make Node Map
-    /*!
-       \brief Creates a map for the Graph's nodes.
-       \tparam Value value type of the map.
-       \return NodeMap the map.
-     */
-    template <typename Value>
-    GraphType::NodeMap<Value> makeNodeMap()
-    {
-        return GraphType::NodeMap<Value>(mGraph);
-    }
-
-    //! Make Arc Map
-    /*!
-       \brief Creates a map for the Graph's arcs.
-       \tparam Value value type of the map.
-       \return ArcMap the map.
-     */
-    template <typename Value>
-    GraphType::ArcMap<Value> makeArcMap()
-    {
-        return GraphType::ArcMap<Value>(mGraph);
-    }
+    Arc entity(Arc, const ArcType & arc) const;
 
     //! Remove Node or Edges
     /*!
@@ -274,14 +251,15 @@ private:
        \param map The Pin's property of the netlist.
        \return The node created.
      */
-    NodeType nodeCreate(const circuit::Pin & pin, const NodeProperty & prop, entity_system::Property<circuit::Pin, NodeType> & map);
+    NodeType nodeCreate(const circuit::Pin & pin,
+                        const NodeProperty & prop,
+                        entity_system::Property<circuit::Pin, NodeType> & map);
 
-    GraphType mGraph;
-    NodeType mDefaultNode;
+    GraphType                        mGraph;
     GraphType::NodeMap<circuit::Pin> mPins;
     GraphType::NodeMap<NodeProperty> mNodeProperties;
-    GraphType::ArcMap<Arc> mArcs;
-    GraphType::ArcMap<ArcProperty> mArcProperties;
+    GraphType::ArcMap<Arc>           mArcs;
+    GraphType::ArcMap<ArcProperty>   mArcProperties;
 
     entity_system::Property<circuit::Pin, NodeType> mRiseNodes;
     entity_system::Property<circuit::Pin, NodeType> mFallNodes;

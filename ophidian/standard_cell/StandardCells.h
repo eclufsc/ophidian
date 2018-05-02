@@ -215,14 +215,6 @@ namespace ophidian
              */
             Pin find(Pin, std::string pinName);
 
-            //! Find a pin const
-            /*!
-              \brief Using the mapping, return a pin handler by pin's name.
-              \param The pin name.
-              \return Return a pin handler by pin's name.
-            */
-            Pin find(Pin, std::string pinName) const;
-
             //! Pin name getter
 
             /*!

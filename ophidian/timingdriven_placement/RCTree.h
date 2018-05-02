@@ -22,6 +22,8 @@
 
 #include <unordered_map>
 #include <lemon/list_graph.h>
+#include <lemon/euler.h>
+#include <lemon/connectivity.h>
 #include <ophidian/util/Units.h>
 
 namespace ophidian
@@ -36,10 +38,18 @@ namespace timingdriven_placement
 class RCTree
 {
 public:
-    using GraphType = lemon::ListGraph;
-    using Capacitor = GraphType::Node;
-    using Resistor = GraphType::Edge;
-    using ResistorIt = GraphType::OutArcIt;
+    template <class T> using container_type     = std::vector<T>;
+    template <class T, class U> using map_type  = std::unordered_map<T, U>;
+
+    using capacitance_type                      = util::farad_t;
+    using resistance_type                       = util::ohm_t;
+
+    using GraphType                             = lemon::ListDigraph;
+    using Capacitor                             = GraphType::Node;
+    using Resistor                              = GraphType::Arc;
+    using ResistorIt                            = GraphType::OutArcIt;
+    template <class T> using capacitor_map_type = GraphType::NodeMap<T>;
+    template <class T> using resistor_map_type  = GraphType::ArcMap<T>;
 
     //! RCTree Constructor
     /*!
@@ -51,13 +61,13 @@ public:
     /*!
        \brief Constructs a RCTree with of another RCTree.
      */
-    RCTree(const RCTree & other);
+    RCTree(const RCTree & other) = delete;
 
     //! RCTree Assignment Operator
     /*!
        \brief Copia as propriedades e atributos de outra RCTree.
      */
-    RCTree & operator=(const RCTree & other);
+    RCTree & operator=(const RCTree & other) = delete;
 
     //! RCTree Destructor
     /*!
@@ -81,7 +91,7 @@ public:
        \param res The resistance value of the resistor.
        \return The handler to the resistor.
      */
-    Resistor addResistor(const Capacitor & u, const Capacitor & v, const util::ohm_t res);
+    Resistor addResistor(const Capacitor & u, const Capacitor & v, const resistance_type res);
 
     //! Insert a Tap.
     /*!
@@ -138,7 +148,7 @@ public:
        \param cap The handler to the capacitor.
        \param value The capacitance value.
      */
-    void capacitance(const Capacitor & cap, const util::farad_t value);
+    void capacitance(const Capacitor & cap, const capacitance_type value);
 
     //! Capacitance's value.
     /*!
@@ -146,7 +156,7 @@ public:
        \param cap The handler to the capacitor.
        \return The capacitance value.
      */
-    util::farad_t capacitance(const Capacitor & cap) const;
+    capacitance_type capacitance(const Capacitor & cap) const;
 
     //! Resistance's value.
     /*!
@@ -154,7 +164,21 @@ public:
        \param res The handler to the resistor.
        \return The resistance value.
      */
-    util::ohm_t resistance(const Resistor & res) const;
+    resistance_type resistance(const Resistor & res) const;
+
+    //! Capacitor's predecessor.
+    /*!
+       \brief Finds the predecessor of a capacitor.
+       \return Cap's predecessor.
+     */
+    Capacitor pred(const Capacitor& cap);
+
+    //! Topological order
+    /*!
+       \brief Returns the topological order of the tree.
+       \return Container with the topological order.
+     */
+    const container_type<Capacitor>& order();
 
     //! Capacitor's size.
     /*!
@@ -175,7 +199,21 @@ public:
        \brief Returns the sum of the capacitance of all capacitors in the RC Tree.
        \return The RC Tree's lumped capacitance.
      */
-    util::farad_t lumped() const;
+    capacitance_type lumped() const;
+
+    //! Set RCTree's source.
+    /*!
+       \brief Sets a new source for the tree;
+       \return The source of the tree.
+     */
+    void source(const Capacitor & cap);
+
+    //! RCTree's source.
+    /*!
+       \brief If the graph are connected returns the source of the tree, else return invalid;
+       \return The source of the tree.
+     */
+    Capacitor source() const;
 
     //! RCTree's graph.
     /*!
@@ -195,13 +233,21 @@ public:
     }
 
 private:
-    GraphType mGraph;
-    GraphType::NodeMap<std::string> mNames;
-    GraphType::NodeMap<util::farad_t> mCapacitances;
-    GraphType::EdgeMap<util::ohm_t> mResistances;
-    std::vector<Capacitor> mTaps;
-    std::unordered_map<std::string, Capacitor> mName2Capacitor;
-    util::farad_t mLumpedCapacitance;
+    void topology_updates();
+
+    GraphType                            mGraph;
+    capacitor_map_type<std::string>      mNames;
+    capacitor_map_type<capacitance_type> mCapacitances;
+    resistor_map_type<resistance_type>   mResistances;
+
+    container_type<Capacitor>            mTaps;
+    map_type<std::string, Capacitor>     mName2Capacitor;
+    capacitance_type                     mLumpedCapacitance;
+
+    capacitor_map_type<Resistor>         mPred;
+    container_type<Capacitor>            mOrder;
+    Capacitor                            mSource;
+    bool                                 mValidPred;
 };
 
 }   // namespace timingdriven_placement

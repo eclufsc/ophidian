@@ -34,7 +34,7 @@ public:
         std::vector<double> index_2;
         std::vector<std::vector<double>> values;
 
-        double compute(double rv, double cv);
+        double compute(const double rv, const double cv);
     };
     /**
      * A structure to represent a Timing information

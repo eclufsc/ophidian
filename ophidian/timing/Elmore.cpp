@@ -1,40 +1,39 @@
 #include "Elmore.h"
 
-
 namespace ophidian
 {
 namespace timing
 {
 
-Elmore::Elmore(const timingdriven_placement::RCTree & tree, const CapacitorRCTree & source) :
-    mTree(tree),
-    mElmoreDelay(tree.g()),
-    mDownstreamCapacitance(tree.g()),
-    mPred(tree.g()),
-    mSource(source)
+Elmore::Elmore(const timingdriven_placement::RCTree & tree, const capacitor_type & source) :
+    m_tree(tree),
+    m_elmore_delay(tree.g()),
+    m_downstream_capacitance(tree.g()),
+    m_pred(tree.g()),
+    m_source(source)
 {
-    std::deque<CapacitorRCTree> toProcess;
-    std::set<CapacitorRCTree> reached;
-    mPred[mSource] = std::make_pair(lemon::INVALID, lemon::INVALID);
-    reached.insert(mSource);
-    toProcess.push_back(mSource);
+    std::deque<capacitor_type> toProcess;
+    std::set<capacitor_type> reached;
+    m_pred[m_source] = std::make_pair(lemon::INVALID, lemon::INVALID);
+    reached.insert(m_source);
+    toProcess.push_back(m_source);
     while (!toProcess.empty())
     {
         auto element = toProcess.front();
         toProcess.pop_front();
-        mOrder.push_back(element);
-        for (auto it = mTree.resistors(element); it != mTree.invalid(); ++it)
+        m_order.push_back(element);
+        for (auto it = m_tree.resistors(element); it != m_tree.invalid(); ++it)
         {
-            auto other = mTree.oppositeCapacitor(element, it);
+            auto other = m_tree.oppositeCapacitor(element, it);
             if (reached.insert(other).second)
             {
-                mPred[other] = std::make_pair(element, it);
+                m_pred[other] = std::make_pair(element, it);
                 toProcess.push_back(other);
             }
         }
     }
 
-    assert(mOrder.size() == mTree.size(CapacitorRCTree()));
+    assert(m_order.size() == m_tree.size(capacitor_type()));
 
     update();
 }
@@ -46,33 +45,72 @@ Elmore::~Elmore()
 
 void Elmore::update()
 {
-    for (auto c : mOrder)
-        mDownstreamCapacitance[c] = mTree.capacitance(c);
+    for (auto c : m_order)
+        m_downstream_capacitance[c] = m_tree.capacitance(c);
 
-    for (auto it = mOrder.rbegin(); it != mOrder.rend(); ++it)
-        if (mPred[*it].first != lemon::INVALID)
-            mDownstreamCapacitance[mPred[*it].first] += mDownstreamCapacitance[*it];
+    for (auto it = m_order.rbegin(); it != m_order.rend(); ++it)
+        if (m_pred[*it].first != lemon::INVALID)
+            m_downstream_capacitance[m_pred[*it].first] += m_downstream_capacitance[*it];
 
-    mElmoreDelay[mSource] = util::second_t(0.0);
+    m_elmore_delay[m_source] = time_unit_type(0.0);
 
-    for (auto c : mOrder)
-        if (mPred[c].first != lemon::INVALID)
-            mElmoreDelay[c] = mElmoreDelay[mPred[c].first] + mTree.resistance(mPred[c].second) * mDownstreamCapacitance[c];
+    for (auto c : m_order)
+        if (m_pred[c].first != lemon::INVALID)
+            m_elmore_delay[c] = m_elmore_delay[m_pred[c].first] + m_tree.resistance(m_pred[c].second) * m_downstream_capacitance[c];
 }
 
-util::second_t Elmore::at(const CapacitorRCTree cap) const
+Elmore::time_unit_type Elmore::at(const capacitor_type & cap) const
 {
-    return mElmoreDelay[cap];
+    return m_elmore_delay[cap];
 }
 
-const Elmore::GraphRCTreeType::NodeMap<std::pair<Elmore::CapacitorRCTree, Elmore::ResistorRCTree>> & Elmore::pred() const
+const Elmore::graph_type::NodeMap<std::pair<Elmore::capacitor_type, Elmore::resistor_type>> & Elmore::pred() const
 {
-    return mPred;
+    return m_pred;
 }
 
-const std::vector<Elmore::CapacitorRCTree> & Elmore::order() const
+const std::vector<Elmore::capacitor_type> & Elmore::order() const
 {
-    return mOrder;
+    return m_order;
+}
+
+ElmoreSecondMoment::ElmoreSecondMoment(const timingdriven_placement::RCTree & tree, const Elmore & e) :
+    m_elmore(e),
+    m_tree(tree),
+    m_second_moment(tree.g())
+{
+    update();
+}
+
+ElmoreSecondMoment::~ElmoreSecondMoment()
+{
+
+}
+
+ElmoreSecondMoment::square_time_unit ElmoreSecondMoment::at(const capacitor_type & capacitor) const
+{
+    return m_second_moment[capacitor];
+}
+
+void ElmoreSecondMoment::update()
+{
+    graph_type::NodeMap<capacitance_time_unit> m_downstream_capacitance(m_tree.g());
+
+    const auto & order = m_elmore.order();
+
+    for (auto c : order)
+        m_downstream_capacitance[c] = m_tree.capacitance(c) * m_elmore.at(c);
+
+    for (auto it = order.rbegin(); it != order.rend(); ++it)
+        if (m_elmore.pred()[*it].first != lemon::INVALID)
+            m_downstream_capacitance[m_elmore.pred()[*it].first] += m_downstream_capacitance[*it];
+
+
+    m_second_moment[order.front()] = square_time_unit(0.0);
+    for (auto c : order)
+        if (m_elmore.pred()[c].first != lemon::INVALID)
+            m_second_moment[c] = m_second_moment[m_elmore.pred()[c].first]
+                               + m_tree.resistance(m_elmore.pred()[c].second) * m_downstream_capacitance[c];
 }
 
 }   // namespace timing

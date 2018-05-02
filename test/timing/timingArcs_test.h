@@ -1,5 +1,0 @@
-#ifndef TIMINGARCS_TEST_H
-#define TIMINGARCS_TEST_H
-
-
-#endif // TIMINGARCS_TEST_H

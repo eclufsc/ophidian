@@ -115,6 +115,9 @@ find_package(Flute REQUIRED)
 # Find Verilog-parser
 find_package(verilog-parser REQUIRED)
 
+# Find libetyParser
+find_package(libertyParser REQUIRED)
+
 IF(OPHIDIAN_GUI)
     # Find SFML
     find_package(SFML 2 REQUIRED graphics window system)

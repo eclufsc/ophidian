@@ -5,9 +5,7 @@ namespace ophidian
 namespace timing
 {
 
-
 TimingGraph::TimingGraph(const circuit::Netlist & netlist) :
-    mDefaultNode(mGraph.addNode()),
     mPins(mGraph, circuit::Pin()),
     mNodeProperties(mGraph),
     mArcs(mGraph, Arc()),
@@ -23,17 +21,17 @@ TimingGraph::~TimingGraph()
 
 }
 
-const TimingGraph::GraphType & TimingGraph::graph()
+const TimingGraph::GraphType & TimingGraph::graph() const
 {
     return mGraph;
 }
 
-size_t TimingGraph::size(NodeType)
+size_t TimingGraph::size(NodeType) const
 {
-    return lemon::countNodes(mGraph) - 1;
+    return lemon::countNodes(mGraph);
 }
 
-size_t TimingGraph::size(ArcType)
+size_t TimingGraph::size(ArcType) const
 {
     return lemon::countArcs(mGraph);
 }
@@ -62,8 +60,8 @@ TimingGraph::NodeType TimingGraph::nodeCreate(const circuit::Pin & pin, const No
     NodeType newNode = mGraph.addNode();
 
     // Overrides the node only if the map does not have a valid associated pin or first node on graph.
-    if (mGraph.id(map[pin]) == mGraph.id(mDefaultNode)) {
-        map[pin] = newNode;
+    if (mGraph.id(map[pin]) >= size(NodeType()) || mGraph.id(map[pin]) < 0) {
+            map[pin] = newNode;
     }
 
     mPins[newNode] = pin;
@@ -77,7 +75,7 @@ TimingGraph::NodeType TimingGraph::riseNodeCreate(const circuit::Pin & pin)
     return nodeCreate(pin, NodeProperty::Rise, mRiseNodes);
 }
 
-TimingGraph::NodeType TimingGraph::riseNode(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::riseNode(const circuit::Pin & pin) const
 {
     return mRiseNodes[pin];
 }
@@ -87,7 +85,7 @@ TimingGraph::NodeType TimingGraph::fallNodeCreate(const circuit::Pin & pin)
     return nodeCreate(pin, NodeProperty::Fall, mFallNodes);
 }
 
-TimingGraph::NodeType TimingGraph::fallNode(const circuit::Pin & pin)
+TimingGraph::NodeType TimingGraph::fallNode(const circuit::Pin & pin) const
 {
     return mFallNodes[pin];
 }
@@ -110,17 +108,17 @@ TimingGraph::ArcType TimingGraph::arcCreate(const NodeType & from, const NodeTyp
     return graphArc;
 }
 
-TimingGraph::NodeProperty TimingGraph::property(const NodeType & node)
+TimingGraph::NodeProperty TimingGraph::property(const NodeType & node) const
 {
     return mNodeProperties[node];
 }
 
-TimingGraph::ArcProperty TimingGraph::property(const ArcType & arc)
+TimingGraph::ArcProperty TimingGraph::property(const ArcType & arc) const
 {
     return mArcProperties[arc];
 }
 
-TimingGraph::NodeType TimingGraph::source(const ArcType & arc)
+TimingGraph::NodeType TimingGraph::source(const ArcType & arc) const
 {
     return mGraph.source(arc);
 }
@@ -130,27 +128,27 @@ void TimingGraph::source(const ArcType & arc, const NodeType & newSource)
     mGraph.changeSource(arc, newSource);
 }
 
-TimingGraph::NodeType TimingGraph::target(const ArcType & arc)
+TimingGraph::NodeType TimingGraph::target(const ArcType & arc) const
 {
     return mGraph.target(arc);
 }
 
-TimingGraph::GraphType::OutArcIt TimingGraph::outArc(const NodeType & node)
+TimingGraph::GraphType::OutArcIt TimingGraph::outArc(const NodeType & node) const
 {
     return GraphType::OutArcIt(mGraph, node);
 }
 
-TimingGraph::GraphType::InArcIt TimingGraph::inArc(const NodeType & node)
+TimingGraph::GraphType::InArcIt TimingGraph::inArc(const NodeType & node) const
 {
     return GraphType::InArcIt(mGraph, node);
 }
 
-circuit::Pin TimingGraph::entity(const NodeType & node)
+circuit::Pin TimingGraph::entity(const NodeType & node) const
 {
     return mPins[node];
 }
 
-circuit::Net TimingGraph::entity(circuit::Net, const ArcType & arc)
+circuit::Net TimingGraph::entity(circuit::Net, const ArcType & arc) const
 {
     if (mArcProperties[arc] != ArcProperty::Net)
         throw std::logic_error("Incompatible conversion. It is not a net!");
@@ -158,7 +156,7 @@ circuit::Net TimingGraph::entity(circuit::Net, const ArcType & arc)
     return mArcs[arc];
 }
 
-TimingArc TimingGraph::entity(TimingArc, const ArcType & arc)
+TimingArc TimingGraph::entity(TimingArc, const ArcType & arc) const
 {
     if (mArcProperties[arc] != ArcProperty::TimingArc)
         throw std::logic_error("Incompatible conversion. It is not a timing arc!");
@@ -166,7 +164,7 @@ TimingArc TimingGraph::entity(TimingArc, const ArcType & arc)
     return mArcs[arc];
 }
 
-TimingGraph::Arc TimingGraph::entity(Arc, const ArcType & arc)
+TimingGraph::Arc TimingGraph::entity(Arc, const ArcType & arc) const
 {
     return mArcs[arc];
 }

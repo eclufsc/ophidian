@@ -63,6 +63,8 @@ namespace ophidian
         using millisecond_t = units::time::millisecond_t;
         using second_t = units::time::second_t;
 
+        using square_second_t = units::unit_t<units::squared<units::time::seconds>>;
+
 //!Capacitance Units
         using femtofarad_t = units::capacitance::femtofarad_t;
         using picofarad_t = units::capacitance::picofarad_t;

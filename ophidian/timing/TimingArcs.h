@@ -176,8 +176,8 @@ public:
        \return An Cell => \p Value Map.
      */
     template <typename Value>
-    entity_system::Property<TimingArc, Value> makeProperty()
-    const {
+    entity_system::Property<TimingArc, Value> makeProperty() const
+    {
         return entity_system::Property<TimingArc, Value>(mArcs);
     }
 

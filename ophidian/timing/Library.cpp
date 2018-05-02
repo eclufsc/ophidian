@@ -54,10 +54,13 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
                 arcs.to(arc, stdCells.find(standard_cell::Pin(), nameToPin));
                 mTimingSenses[arc] = tmg.timingSense;
                 mTimingTypes[arc] = tmg.timingType;
-                mRiseDelays[arc] = tmg.find(LUT::CELL_RISE);
-                mFallDelays[arc] = tmg.find(LUT::CELL_FALL);
-                mRiseSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::RISE_CONSTRAINT : LUT::RISE_TRANSITION);
-                mFallSlews[arc] = tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT? LUT::FALL_CONSTRAINT : LUT::FALL_TRANSITION);
+                auto temporario = tmg.find(ParserLUT::CELL_RISE);
+                mRiseDelays[arc] = LUT(temporario);
+                mFallDelays[arc] = LUT(tmg.find(ParserLUT::CELL_FALL));
+                mRiseSlews[arc] = LUT(tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT?
+                                                   ParserLUT::RISE_CONSTRAINT : ParserLUT::RISE_TRANSITION));
+                mFallSlews[arc] = LUT(tmg.find(pin.pinDirection == parser::Liberty::Pin::INPUT?
+                                                   ParserLUT::FALL_CONSTRAINT : ParserLUT::FALL_TRANSITION));
             }
 
             standard_cell::Pin stdPin = stdCells.find(standard_cell::Pin(), cell.name+":"+pin.name);
@@ -69,22 +72,22 @@ Library::Library(const parser::Liberty & liberty, standard_cell::StandardCells &
     }
 }
 
-double Library::computeRiseDelay(const TimingArc & arc, double rv, double cv)
+util::second_t Library::computeRiseDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const
 {
     return mRiseDelays[arc].compute(rv, cv);
 }
 
-double Library::computeFallDelay(const TimingArc & arc, double rv, double cv)
+util::second_t Library::computeFallDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const
 {
     return mFallDelays[arc].compute(rv, cv);
 }
 
-double Library::computeRiseSlews(const TimingArc & arc, double rv, double cv)
+util::second_t Library::computeRiseSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const
 {
     return mRiseSlews[arc].compute(rv, cv);
 }
 
-double Library::computeFallSlews(const TimingArc & arc, double rv, double cv)
+util::second_t Library::computeFallSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const
 {
     return mFallSlews[arc].compute(rv, cv);
 }

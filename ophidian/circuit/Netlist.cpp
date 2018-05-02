@@ -187,11 +187,6 @@ namespace ophidian
             return mName2Cell[cellName];
         }
 
-        Pin Netlist::find(Pin, std::string pinName) const
-        {
-            return mName2Pin.at(pinName);
-        }
-
         std::string Netlist::name(const Cell & cell) const
         {
             return mCellNames[cell];

@@ -10,7 +10,12 @@ TimingGraphBuilder::TimingGraphBuilder()
 
 }
 
-std::shared_ptr<TimingGraph> TimingGraphBuilder::build(const circuit::Netlist & netlist, const standard_cell::StandardCells & stdCells, const circuit::LibraryMapping & libraryMapping, const TimingArcs & timingArcs, const Library & timingLibrary, const parser::DesignConstraints & dc)
+std::shared_ptr<TimingGraph> TimingGraphBuilder::build(circuit::Netlist & netlist,
+                                                       standard_cell::StandardCells & stdCells,
+                                                       const circuit::LibraryMapping & libraryMapping,
+                                                       const TimingArcs & timingArcs,
+                                                       const Library & timingLibrary,
+                                                       const parser::DesignConstraints & dc)
 {
     std::shared_ptr<TimingGraph> graph = std::make_shared<TimingGraph>(netlist);
 

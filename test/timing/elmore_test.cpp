@@ -16,7 +16,6 @@ specific language governing permissions and limitations
 under the License.
  */
 
-#include "elmore_test.h"
 #include <catch.hpp>
 
 #include <ophidian/timing/Elmore.h>

@@ -1,5 +1,0 @@
-#ifndef TIMINGGRAPH_TEST_H
-#define TIMINGGRAPH_TEST_H
-
-
-#endif // TIMINGGRAPH_TEST_H

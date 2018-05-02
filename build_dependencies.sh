@@ -134,11 +134,12 @@ install_LIBERTY_PARSER()
 {
     echo "installing libertyParser"
     cd $SOURCE_ROOT/3rdparty/libertyParser
-    make CXXFLAGS="-fPIC -O3 -w" all
-    install -D -m 644 bin/* $DEPENDENCIES_BIN_PATH
-    install -D -m 644 lib/* $DEPENDENCIES_LIB_PATH
-    install -D -m 644 include/* $DEPENDENCIES_INCLUDE_PATH
-    make clean
+    mkdir build
+    cd build
+    cmake -DCMAKE_C_FLAGS="-fPIC -O3 -w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cd ..
+    rm -rf build
 }
 
 run_install()
@@ -156,6 +157,7 @@ run_install()
     install_LEMON
     install_UNITS
     install_LIBERTY_PARSER
+    
 }
 
 run_install

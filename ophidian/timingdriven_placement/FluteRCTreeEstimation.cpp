@@ -1,6 +1,6 @@
 #include "FluteRCTreeEstimation.h"
 
-#include <Flute/flute.h>
+#include <flute.h>
 
 namespace ophidian
 {
@@ -23,7 +23,7 @@ typedef boost::geometry::index::rtree<RTreeNode, boost::geometry::index::rstar<1
 
 FluteRCTreeBuilder::FluteRCTreeBuilder(double maxSegmentLength)
 {
-    readLUT(); // flute.h
+    readLUT();
     mParameters.mMaxSegmentLength = maxSegmentLength;
     mParameters.mCapacitancePerMicron = util::farad_t(1.6e-16);
     mParameters.mResistancePerMicron = util::ohm_t(2.535);
@@ -49,7 +49,14 @@ void FluteRCTreeBuilder::capacitancePerMicron(const util::farad_t capacitance)
     mParameters.mCapacitancePerMicron = capacitance;
 }
 
-FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::PlacementMapping & placementMap, const circuit::LibraryMapping & libraryMapping, const circuit::Netlist & netlist, const timing::Library & library, const parser::Lef & lef, const circuit::Net net, RCTree & rctree, const circuit::Pin source)
+FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::PlacementMapping & placementMap,
+                                                           const circuit::LibraryMapping & libraryMapping,
+                                                           const circuit::Netlist & netlist,
+                                                           const timing::Library & library,
+                                                           const parser::Lef & lef,
+                                                           const circuit::Net net,
+                                                           RCTree & rctree,
+                                                           const circuit::Pin source)
 {
     auto netPins = netlist.pins(net);
     RCTree::Capacitor sourceCap;
@@ -77,6 +84,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
         for(auto t : taps)
             rctree.insertTap(t);
 
+        rctree.source(sourceCap);
         return sourceCap;
     }
 
@@ -103,8 +111,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             {
                 double localLength = std::min(remaining, mParameters.mMaxSegmentLength);
 
-                auto test_1 = rctree.capacitance(previous) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
-                rctree.capacitance(previous, test_1);
+                auto previousCap = rctree.capacitance(previous) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
+                rctree.capacitance(previous, previousCap);
 
                 RCTree::Capacitor next;
                 if(j != numberOfSlicedSegments-1)
@@ -112,8 +120,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
                 else
                     next = capV;
 
-                auto test_2 = rctree.capacitance(next) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
-                rctree.capacitance(next, test_2);
+                auto nextCap = rctree.capacitance(next) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
+                rctree.capacitance(next, nextCap);
                 rctree.addResistor(previous, next, (localLength) * mParameters.mResistancePerMicron);
 
                 previous = next;
@@ -142,11 +150,12 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
         //tap_mapping[pinU] = tapU;
         taps.insert(tapU);
         rctree.capacitance(tapU, library.capacitance(libraryMapping.pinStdCell(pinU)));
-        rctree.addResistor(capU, tapU, (0.0 * util::ohm_t()));
+        rctree.addResistor(capU, tapU, util::ohm_t(0.0));
 
         for(auto t : taps)
             rctree.insertTap(t);
 
+        rctree.source(sourceCap);
         return sourceCap;
     }
 
@@ -166,11 +175,13 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     FluteRTree::RTree tapIndexing;
     std::vector<FluteRTree::RTreeNode> nodes(netPins.size());
     nodes.resize(0);
+
     int i = 0;
     for (auto p : netPins) {
         nodes.push_back( { geometry::Point(X[i], Y[i]), p });
         i++;
     }
+
     tapIndexing.insert(nodes.begin(), nodes.end());
 
     std::vector<bool> tapCreated(numBranches, false);
@@ -285,6 +296,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
     }
 
+    rctree.source(sourceCap);
     return sourceCap;
 }
 

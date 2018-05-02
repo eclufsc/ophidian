@@ -1,4 +1,21 @@
-#include "rctree_test.h"
+/*
+ * Copyright 2017 Ophidian
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+ */
+
 #include <catch.hpp>
 
 #include <ophidian/timingdriven_placement/RCTree.h>
@@ -10,7 +27,7 @@ TEST_CASE("RCTree: empty RCTree", "[timingdriven_placement][RCTree]")
     RCTree tree;
     REQUIRE(tree.size(RCTree::Capacitor()) == 0);
     REQUIRE(tree.size(RCTree::Resistor()) == 0);
-    REQUIRE(tree.lumped() == (0.0 * ophidian::util::farad_t()));
+    REQUIRE(tree.lumped() == ophidian::util::farad_t(0.0));
 }
 
 TEST_CASE("RCTree: add Capacitor", "[timingdriven_placement][RCTree]")
@@ -19,16 +36,16 @@ TEST_CASE("RCTree: add Capacitor", "[timingdriven_placement][RCTree]")
     tree.addCapacitor("cap");
     REQUIRE(tree.size(RCTree::Capacitor()) == 1);
     REQUIRE(tree.size(RCTree::Resistor()) == 0);
-    REQUIRE(tree.lumped() == (0.0 * ophidian::util::farad_t()));
+    REQUIRE(tree.lumped() == ophidian::util::farad_t(0.0));
 }
 
 TEST_CASE("RCTree: add Capacitance of the capacitor", "[timingdriven_placement][RCTree]")
 {
     RCTree tree;
     auto cap = tree.addCapacitor("cap");
-    tree.capacitance(cap, 1.0 * ophidian::util::farad_t());
+    tree.capacitance(cap, ophidian::util::farad_t(1.0));
     REQUIRE(tree.size(RCTree::Capacitor()) == 1);
-    REQUIRE(tree.lumped() == (1.0 * ophidian::util::farad_t()));
+    REQUIRE(tree.lumped() == ophidian::util::farad_t(1.0));
 }
 
 TEST_CASE("RCTree: add the same capacitor twice", "[timingdriven_placement][RCTree]")
@@ -44,10 +61,10 @@ TEST_CASE("RCTree: add Resistor", "[timingdriven_placement][RCTree]")
     RCTree tree;
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
-    auto res = tree.addResistor(capU, capV, 1.1 * ophidian::util::ohm_t());
+    auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
     REQUIRE(tree.size(RCTree::Capacitor()) == 2);
     REQUIRE(tree.size(RCTree::Resistor()) == 1);
-    REQUIRE(tree.resistance(res) == 1.1 * ophidian::util::ohm_t());
+    REQUIRE(tree.resistance(res) == ophidian::util::ohm_t(1.1));
 }
 
 TEST_CASE("RCTree: name of capacitor", "[timingdriven_placement][RCTree]")
@@ -69,7 +86,7 @@ TEST_CASE("RCTree: find resistor by two capacitors", "[timingdriven_placement][R
     RCTree tree;
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
-    auto res = tree.addResistor(capU, capV, 1.1 * ophidian::util::ohm_t());
+    auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
     REQUIRE(tree.resistor(capU, capV) == res);
     REQUIRE(tree.resistor(capV, capU) == res);
     REQUIRE(tree.resistor(capU, RCTree::Capacitor()) == lemon::INVALID);
@@ -81,7 +98,7 @@ TEST_CASE("RCTree: find opposite capacitor", "[timingdriven_placement][RCTree]")
     RCTree tree;
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
-    auto res = tree.addResistor(capU, capV, 1.1 * ophidian::util::ohm_t());
+    auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
     REQUIRE(tree.oppositeCapacitor(capU, res) == capV);
     REQUIRE(tree.oppositeCapacitor(capV, res) == capU);
 }
@@ -91,23 +108,30 @@ TEST_CASE("RCTree: resitor iterator", "[timingdriven_placement][RCTree]")
     RCTree tree;
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
-    auto res = tree.addResistor(capU, capV, 1.1 * ophidian::util::ohm_t());
-    REQUIRE(tree.g().u(tree.resistors(capV)) == tree.g().u(res));
-    REQUIRE(tree.g().v(tree.resistors(capV)) == tree.g().v(res));
+    auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
+
+    REQUIRE(tree.g().id(tree.g().source(tree.resistors(capV))) == tree.g().id(tree.g().source(res)));
+    REQUIRE(tree.g().id(tree.g().target(tree.resistors(capV))) == tree.g().id(tree.g().target(res)));
     REQUIRE(tree.invalid() == lemon::INVALID);
 }
 
-TEST_CASE("RCTree: Copy constructor", "[timingdriven_placement][RCTree]")
+TEST_CASE("RCTree: Predecessors", "[timingdriven_placement][RCTree]")
 {
-    RCTree tree;
-    auto capU = tree.addCapacitor("capU");
-    auto capV = tree.addCapacitor("capV");
-    auto capT = tree.addCapacitor("capT");
-    auto res = tree.addResistor(capU, capV, 1.1 * ophidian::util::ohm_t());
-    REQUIRE(tree.size(RCTree::Capacitor()) == 3);
-    REQUIRE(tree.size(RCTree::Resistor()) == 1);
+    //  s -> a -> c
+    //    -> b -> c
 
-    RCTree copy(tree);
-    REQUIRE(copy.size(RCTree::Capacitor()) == 3);
-    REQUIRE(copy.size(RCTree::Resistor()) == 1);
+    RCTree tree;
+    auto s = tree.addCapacitor("s");
+    auto a = tree.addCapacitor("a");
+    auto b = tree.addCapacitor("b");
+    auto c = tree.addCapacitor("c");
+    auto s_a = tree.addResistor(s, a, ophidian::util::ohm_t(1.1));
+    auto s_b = tree.addResistor(s, b, ophidian::util::ohm_t(1.1));
+    auto a_c = tree.addResistor(a, c, ophidian::util::ohm_t(1.1));
+    auto b_c = tree.addResistor(b, c, ophidian::util::ohm_t(1.1));
+
+    REQUIRE(tree.name(tree.pred(a)) == "s");
+    REQUIRE(tree.name(tree.pred(b)) == "s");
+    REQUIRE(tree.name(tree.pred(c)) == "b");
+    REQUIRE(tree.name(tree.pred(s)) == "Invalid");
 }

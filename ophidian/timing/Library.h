@@ -23,6 +23,7 @@
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/parser/LibertyParser.h>
+#include <ophidian/timing/LookupTable.h>
 #include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/standard_cell/StandardCells.h>
 #include <ophidian/timing/TimingArcs.h>
@@ -58,7 +59,7 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    double computeRiseDelay(const TimingArc & arc, double rv, double cv);
+    util::second_t computeRiseDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
 
     //! Compute Fall Delay
     /*!
@@ -68,7 +69,7 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    double computeFallDelay(const TimingArc & arc, double rv, double cv);
+    util::second_t computeFallDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
 
     //! Compute Rise Slews
     /*!
@@ -78,7 +79,7 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    double computeRiseSlews(const TimingArc & arc, double rv, double cv);
+    util::second_t computeRiseSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
 
     //! Compute Fall Slews
     /*!
@@ -88,7 +89,7 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    double computeFallSlews(const TimingArc & arc, double rv, double cv);
+    util::second_t computeFallSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
 
     //! Unateness Getter
     /*!
@@ -131,7 +132,9 @@ public:
     bool cellSequential(const standard_cell::Cell & cell) const;
 
 private:
-    using LUT = parser::Liberty::LUT;
+    using ParserLUT = parser::Liberty::LUT;
+//    using LUT = LookupTable<util::farad_t, util::second_t, util::second_t>;
+    using LUT = LookupTable<util::farad_t, util::second_t, util::second_t>;
 
     entity_system::Property<TimingArc, LUT> mRiseDelays;
     entity_system::Property<TimingArc, LUT> mFallDelays;
