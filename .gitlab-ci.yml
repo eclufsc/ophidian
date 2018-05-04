@@ -38,6 +38,19 @@ variables:
 stages:
     - build
 
+gitlab_pages:
+    image: alpine
+    stage: build
+    before_script: 
+        - apk update
+        - apk add doxygen
+    script:
+        - doxygen doc/Doxyfile
+        - mv doc/documentation/html/ public/
+    artifacts:
+        paths:
+            - public
+
 build_on_debian-buster:
     image: debian:buster
     stage: build

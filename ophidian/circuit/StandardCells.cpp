@@ -144,13 +144,6 @@ namespace circuit
 
     //--------------------------- Association -------------------------------//
 
-    //! Add Pin into Cell
-
-    /*!
-       \brief Adds a Pin to a given Cell.
-       \param cell A handler for the Cell we want to add a Pin.
-       \param pin A handler for the Pin we want to add in \p cell.
-     */
     void StandardCells::add(const StandardCells::cell_type& cell, const StandardCells::pin_type& pin)
     {
         mCellPins.addAssociation(cell, pin);
