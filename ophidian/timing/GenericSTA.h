@@ -122,7 +122,7 @@ class GenericSTA
 public:
     // Class member types
     template <class T> using container_type   = std::vector<T>;
-    template <class T> using node_mapper_type = timingdriven_placement::RCTree::GraphType::NodeMap<T>;
+    template <class T> using node_mapper_type = timingdriven_placement::RCTree::graph_type::NodeMap<T>;
 
     using slew_type                           = util::second_t;
     using pico_slew_type                      = util::picosecond_t;
@@ -302,9 +302,9 @@ public:
         }
     }
 
-    lemon::Path<TimingGraph::GraphType> criticalPath() const
+    lemon::Path<TimingGraph::graph_type> criticalPath() const
     {
-        lemon::Path<TimingGraph::GraphType> cp;
+        lemon::Path<TimingGraph::graph_type> cp;
         slew_type worstSlack = std::numeric_limits<slew_type>::max();
         TimingGraph::NodeType worst_PO;
 

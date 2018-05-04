@@ -129,7 +129,7 @@ TEST_CASE_METHOD(TimingGraphFixture, "TimingGraph: edges of a node", "[timing][T
 
     REQUIRE(graph.size(TimingGraph::ArcType()) == 2);
 
-    const TimingGraph::GraphType & g = graph.graph();
+    const TimingGraph::graph_type & g = graph.graph();
 
     REQUIRE(graph.inArc(n1) == lemon::INVALID);
     REQUIRE(g.id(graph.outArc(n1)) == g.id(timingArc));

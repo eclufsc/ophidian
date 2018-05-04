@@ -21,7 +21,7 @@ TimingGraph::~TimingGraph()
 
 }
 
-const TimingGraph::GraphType & TimingGraph::graph() const
+const TimingGraph::graph_type & TimingGraph::graph() const
 {
     return mGraph;
 }
@@ -133,14 +133,14 @@ TimingGraph::NodeType TimingGraph::target(const ArcType & arc) const
     return mGraph.target(arc);
 }
 
-TimingGraph::GraphType::OutArcIt TimingGraph::outArc(const NodeType & node) const
+TimingGraph::graph_type::OutArcIt TimingGraph::outArc(const NodeType & node) const
 {
-    return GraphType::OutArcIt(mGraph, node);
+    return graph_type::OutArcIt(mGraph, node);
 }
 
-TimingGraph::GraphType::InArcIt TimingGraph::inArc(const NodeType & node) const
+TimingGraph::graph_type::InArcIt TimingGraph::inArc(const NodeType & node) const
 {
-    return GraphType::InArcIt(mGraph, node);
+    return graph_type::InArcIt(mGraph, node);
 }
 
 circuit::Pin TimingGraph::entity(const NodeType & node) const

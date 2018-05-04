@@ -183,11 +183,11 @@ public:
 
 private:
     //Arcs entity system and properties
-    entity_system::EntitySystem<TimingArc> mArcs;
-    entity_system::Property<TimingArc, standard_cell::Pin> mFrom;
-    entity_system::Property<TimingArc, standard_cell::Pin> mTo;
-    entity_system::Property<TimingArc, std::string> mArcNames;
-    std::unordered_map<std::string, TimingArc> mName2Arc;
+    entity_system::EntitySystem<TimingArc>                              mArcs;
+    entity_system::Property<TimingArc, standard_cell::Pin>              mFrom;
+    entity_system::Property<TimingArc, standard_cell::Pin>              mTo;
+    entity_system::Property<TimingArc, std::string>                     mArcNames;
+    std::unordered_map<std::string, TimingArc>                          mName2Arc;
     entity_system::Property<standard_cell::Pin, std::vector<TimingArc>> mPin2TimingArcs;
 };
 

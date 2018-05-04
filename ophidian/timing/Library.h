@@ -133,18 +133,17 @@ public:
 
 private:
     using ParserLUT = parser::Liberty::LUT;
-//    using LUT = LookupTable<util::farad_t, util::second_t, util::second_t>;
     using LUT = LookupTable<util::farad_t, util::second_t, util::second_t>;
 
-    entity_system::Property<TimingArc, LUT> mRiseDelays;
-    entity_system::Property<TimingArc, LUT> mFallDelays;
-    entity_system::Property<TimingArc, LUT> mRiseSlews;
-    entity_system::Property<TimingArc, LUT> mFallSlews;
-    entity_system::Property<TimingArc, unateness_t> mTimingSenses;
-    entity_system::Property<TimingArc, timing_type_t> mTimingTypes;
+    entity_system::Property<TimingArc, LUT>                    mRiseDelays;
+    entity_system::Property<TimingArc, LUT>                    mFallDelays;
+    entity_system::Property<TimingArc, LUT>                    mRiseSlews;
+    entity_system::Property<TimingArc, LUT>                    mFallSlews;
+    entity_system::Property<TimingArc, unateness_t>            mTimingSenses;
+    entity_system::Property<TimingArc, timing_type_t>          mTimingTypes;
     entity_system::Property<standard_cell::Pin, util::farad_t> mPinCapacitance;
-    entity_system::Property<standard_cell::Pin, bool> mClock;
-    entity_system::Property<standard_cell::Cell, bool> mSequential;
+    entity_system::Property<standard_cell::Pin, bool>          mClock;
+    entity_system::Property<standard_cell::Cell, bool>         mSequential;
 
 };
 

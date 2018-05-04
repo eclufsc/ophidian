@@ -35,7 +35,7 @@ namespace timingdriven_placement
 class FluteRCTreeBuilder
 {
 public:
-    using SourceRCTree = RCTree::Capacitor;
+    using SourceRCTree = RCTree::capacitor_type;
 
     FluteRCTreeBuilder(double maxSegmentLength = 100.0);
     virtual ~FluteRCTreeBuilder();

@@ -50,9 +50,9 @@ public:
 
     class Arc : public TimingArc, public circuit::Net { };
 
-    using GraphType = lemon::ListDigraph;
-    using NodeType = GraphType::Node;
-    using ArcType = GraphType::Arc;
+    using graph_type = lemon::ListDigraph;
+    using NodeType = graph_type::Node;
+    using ArcType = graph_type::Arc;
 
     //! TimingGraph Constructor
     /*!
@@ -72,7 +72,7 @@ public:
        \brief Get the netlist.
        \return Netlist.
      */
-    const GraphType & graph() const;
+    const graph_type & graph() const;
 
     //! Size of nodes
     /*!
@@ -187,7 +187,7 @@ public:
        \param node A node of the graph.
        \return iterator of output edges.
      */
-    GraphType::OutArcIt outArc(const NodeType & node) const;
+    graph_type::OutArcIt outArc(const NodeType & node) const;
 
     //! Input edges of a node.
     /*!
@@ -195,7 +195,7 @@ public:
        \param node A node of the graph.
        \return iterator of input edges.
      */
-    GraphType::InArcIt inArc(const NodeType & node) const;
+    graph_type::InArcIt inArc(const NodeType & node) const;
 
     //! Node's Pin Getter
     /*!
@@ -255,11 +255,11 @@ private:
                         const NodeProperty & prop,
                         entity_system::Property<circuit::Pin, NodeType> & map);
 
-    GraphType                        mGraph;
-    GraphType::NodeMap<circuit::Pin> mPins;
-    GraphType::NodeMap<NodeProperty> mNodeProperties;
-    GraphType::ArcMap<Arc>           mArcs;
-    GraphType::ArcMap<ArcProperty>   mArcProperties;
+    graph_type                                      mGraph;
+    graph_type::NodeMap<circuit::Pin>               mPins;
+    graph_type::NodeMap<NodeProperty>               mNodeProperties;
+    graph_type::ArcMap<Arc>                         mArcs;
+    graph_type::ArcMap<ArcProperty>                 mArcProperties;
 
     entity_system::Property<circuit::Pin, NodeType> mRiseNodes;
     entity_system::Property<circuit::Pin, NodeType> mFallNodes;

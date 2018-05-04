@@ -36,9 +36,9 @@ public:
     template <class T> using container_type     = std::vector<T>;
     template <class U, class T> using pair_type = std::pair<U, T>;
 
-    using graph_type                            = timingdriven_placement::RCTree::GraphType;
-    using capacitor_type                        = timingdriven_placement::RCTree::Capacitor;
-    using resistor_type                         = timingdriven_placement::RCTree::Resistor;
+    using graph_type                            = timingdriven_placement::RCTree::graph_type;
+    using capacitor_type                        = timingdriven_placement::RCTree::capacitor_type;
+    using resistor_type                         = timingdriven_placement::RCTree::resistor_type;
 
     using time_map_type                         = graph_type::NodeMap<time_unit_type>;
     using capacitance_map_type                  = graph_type::NodeMap<capacitance_unit_type>;
@@ -68,9 +68,9 @@ class ElmoreSecondMoment
 public:
     using square_time_unit = util::square_second_t;
 
-    using graph_type       = timingdriven_placement::RCTree::GraphType;
-    using capacitor_type   = timingdriven_placement::RCTree::Capacitor;
-    using resistor_type    = timingdriven_placement::RCTree::Resistor;
+    using graph_type       = timingdriven_placement::RCTree::graph_type;
+    using capacitor_type   = timingdriven_placement::RCTree::capacitor_type;
+    using resistor_type    = timingdriven_placement::RCTree::resistor_type;
 
     ElmoreSecondMoment(const timingdriven_placement::RCTree & tree, const Elmore & e);
 

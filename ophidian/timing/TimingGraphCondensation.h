@@ -46,10 +46,10 @@ public:
     const ophidian::util::farad_t load(NodeType node) const;
 
 private:
-    TimingGraph::GraphType::NodeMap<util::second_t> mArrivals;
-    TimingGraph::GraphType::NodeMap<util::second_t> mSlews;
-    TimingGraph::GraphType::NodeMap<util::second_t> mRequireds;
-    TimingGraph::GraphType::NodeMap<util::farad_t>  mLoads;
+    TimingGraph::graph_type::NodeMap<util::second_t> mArrivals;
+    TimingGraph::graph_type::NodeMap<util::second_t> mSlews;
+    TimingGraph::graph_type::NodeMap<util::second_t> mRequireds;
+    TimingGraph::graph_type::NodeMap<util::farad_t>  mLoads;
 };
 
 
@@ -68,8 +68,8 @@ public:
     const ophidian::util::second_t slew(ArcType arc) const;
 
 private:
-    TimingGraph::GraphType::ArcMap<util::second_t> mDelays;
-    TimingGraph::GraphType::ArcMap<util::second_t> mSlews;
+    TimingGraph::graph_type::ArcMap<util::second_t> mDelays;
+    TimingGraph::graph_type::ArcMap<util::second_t> mSlews;
 };
 
 }   // namespace timing

@@ -44,12 +44,12 @@ public:
     using capacitance_type                      = util::farad_t;
     using resistance_type                       = util::ohm_t;
 
-    using GraphType                             = lemon::ListDigraph;
-    using Capacitor                             = GraphType::Node;
-    using Resistor                              = GraphType::Arc;
-    using ResistorIt                            = GraphType::OutArcIt;
-    template <class T> using capacitor_map_type = GraphType::NodeMap<T>;
-    template <class T> using resistor_map_type  = GraphType::ArcMap<T>;
+    using graph_type                            = lemon::ListGraph;
+    using capacitor_type                        = graph_type::Node;
+    using resistor_type                         = graph_type::Edge;
+    using resistor_iterator_type                = graph_type::OutArcIt;
+    template <class T> using capacitor_map_type = graph_type::NodeMap<T>;
+    template <class T> using resistor_map_type  = graph_type::EdgeMap<T>;
 
     //! RCTree Constructor
     /*!
@@ -61,13 +61,13 @@ public:
     /*!
        \brief Constructs a RCTree with of another RCTree.
      */
-    RCTree(const RCTree & other) = delete;
+    RCTree(const RCTree & other);
 
     //! RCTree Assignment Operator
     /*!
        \brief Copia as propriedades e atributos de outra RCTree.
      */
-    RCTree & operator=(const RCTree & other) = delete;
+    RCTree & operator=(const RCTree & other);
 
     //! RCTree Destructor
     /*!
@@ -77,36 +77,36 @@ public:
 
     //! Add a capacitor.
     /*!
-       \brief Create a new Capacitor if don't exist.
+       \brief Create a new capacitor_type if don't exist.
        \param name The name of the capacitor. The names must be unique.
        \return The handler to the capacitor.
      */
-    Capacitor addCapacitor(const std::string name);
+    capacitor_type addCapacitor(const std::string name);
 
     //! Add a resistor.
     /*!
-       \brief Create a new Resistor if don't exist.
+       \brief Create a new resistor_type if don't exist.
        \param u Handler to the first capacitor.
        \param v Handler to the second capacitor.
        \param res The resistance value of the resistor.
        \return The handler to the resistor.
      */
-    Resistor addResistor(const Capacitor & u, const Capacitor & v, const resistance_type res);
+    resistor_type addResistor(const capacitor_type & u, const capacitor_type & v, const resistance_type res);
 
     //! Insert a Tap.
     /*!
        \brief Set a capacitor as a tap node of the RC Tree.
        \param cap The handler to the capacitor.
      */
-    void insertTap(const Capacitor & cap);
+    void insertTap(const capacitor_type & cap);
 
-    //! Capacitor's name
+    //! capacitor_type's name
     /*!
        \brief Returns the name of a capacitor.
        \param cap The handler to the capacitor.
        \return The name of the capacitor cap.
      */
-    std::string name(const Capacitor & cap) const;
+    std::string name(const capacitor_type & cap) const;
 
     //! Name's capacitor
     /*!
@@ -114,33 +114,33 @@ public:
        \param name The name of the capacitor.
        \return The handler to the capacitor.
      */
-    Capacitor capacitor(const std::string name);
+    capacitor_type capacitor(const std::string name);
 
-    //! Opposite Capacitor
+    //! Opposite capacitor_type
     /*!
        \brief Returns the opposite capacitor of an edge.
        \param u The handler to the capacitor.
        \param res The handler to the resistor.
        \return The opposite capacitor v.
      */
-    Capacitor oppositeCapacitor(const Capacitor & u, const Resistor & res) const;
+    capacitor_type oppositeCapacitor(const capacitor_type & u, const resistor_type & res) const;
 
-    //! Resistor Getter
+    //! resistor_type Getter
     /*!
        \brief Returns the resistor associed with to capacitors.
        \param u The handler to the capacitor.
        \param v The handler to the capacitor.
        \return The handler to the resistor.
      */
-    Resistor resistor(const Capacitor & u, const Capacitor & v) const;
+    resistor_type resistor(const capacitor_type & u, const capacitor_type & v) const;
 
-    //! Resistor iterator
+    //! resistor_type iterator
     /*!
        \brief Returns the iterator's resistor of a capacitor.
        \param cap The handler to the capacitor.
        \return The Iterator handler.
      */
-    ResistorIt resistors(const Capacitor & cap) const;
+    resistor_iterator_type resistors(const capacitor_type & cap) const;
 
     //! Capacitance assignment.
     /*!
@@ -148,7 +148,7 @@ public:
        \param cap The handler to the capacitor.
        \param value The capacitance value.
      */
-    void capacitance(const Capacitor & cap, const capacitance_type value);
+    void capacitance(const capacitor_type & cap, const capacitance_type value);
 
     //! Capacitance's value.
     /*!
@@ -156,7 +156,7 @@ public:
        \param cap The handler to the capacitor.
        \return The capacitance value.
      */
-    capacitance_type capacitance(const Capacitor & cap) const;
+    capacitance_type capacitance(const capacitor_type & cap) const;
 
     //! Resistance's value.
     /*!
@@ -164,35 +164,35 @@ public:
        \param res The handler to the resistor.
        \return The resistance value.
      */
-    resistance_type resistance(const Resistor & res) const;
+    resistance_type resistance(const resistor_type & res) const;
 
-    //! Capacitor's predecessor.
+    //! capacitor_type's predecessor.
     /*!
        \brief Finds the predecessor of a capacitor.
        \return Cap's predecessor.
      */
-    Capacitor pred(const Capacitor& cap);
+    capacitor_type pred(const capacitor_type& cap);
 
     //! Topological order
     /*!
        \brief Returns the topological order of the tree.
        \return Container with the topological order.
      */
-    const container_type<Capacitor>& order();
+    const container_type<capacitor_type>& order();
 
-    //! Capacitor's size.
+    //! capacitor_type's size.
     /*!
        \brief Returns the amount of capacitors.
        \return The amount of capacitors.
      */
-    std::size_t size(Capacitor) const;
+    std::size_t size(capacitor_type) const;
 
-    //! Resistor's size.
+    //! resistor_type's size.
     /*!
        \brief Returns the amount of resistor.
        \return The amount of resistor.
      */
-    std::size_t size(Resistor) const;
+    std::size_t size(resistor_type) const;
 
     //! Returns the lumped capacitance.
     /*!
@@ -206,28 +206,28 @@ public:
        \brief Sets a new source for the tree;
        \return The source of the tree.
      */
-    void source(const Capacitor & cap);
+    void source(const capacitor_type & cap);
 
     //! RCTree's source.
     /*!
        \brief If the graph are connected returns the source of the tree, else return invalid;
        \return The source of the tree.
      */
-    Capacitor source() const;
+    capacitor_type source() const;
 
     //! RCTree's graph.
     /*!
        \brief Returns the graph of the RCTree
        \return The graph of the RCTree.
      */
-    const GraphType & g() const;
+    const graph_type & g() const;
 
     //! Invalid iterator
     /*!
        \brief Assists in the seamless use of RCTree.
        \return The constant invalid.
      */
-    static ResistorIt invalid()
+    static resistor_iterator_type invalid()
     {
         return lemon::INVALID;
     }
@@ -235,19 +235,19 @@ public:
 private:
     void topology_updates();
 
-    GraphType                            mGraph;
-    capacitor_map_type<std::string>      mNames;
-    capacitor_map_type<capacitance_type> mCapacitances;
-    resistor_map_type<resistance_type>   mResistances;
+    graph_type                            mGraph;
+    capacitor_map_type<std::string>       mNames;
+    capacitor_map_type<capacitance_type>  mCapacitances;
+    resistor_map_type<resistance_type>    mResistances;
 
-    container_type<Capacitor>            mTaps;
-    map_type<std::string, Capacitor>     mName2Capacitor;
-    capacitance_type                     mLumpedCapacitance;
+    container_type<capacitor_type>        mTaps;
+    map_type<std::string, capacitor_type> mName2Capacitor;
+    capacitance_type                      mLumpedCapacitance;
 
-    capacitor_map_type<Resistor>         mPred;
-    container_type<Capacitor>            mOrder;
-    Capacitor                            mSource;
-    bool                                 mValidPred;
+    capacitor_map_type<resistor_type>     mPred;
+    container_type<capacitor_type>        mOrder;
+    capacitor_type                        mSource;
+    bool                                  mValidPred;
 };
 
 }   // namespace timingdriven_placement

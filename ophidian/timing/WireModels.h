@@ -22,6 +22,7 @@
 
 #include <ophidian/util/Units.h>
 #include <ophidian/timingdriven_placement/RCTree.h>
+#include <ophidian/timing/Elmore.h>
 
 namespace ophidian
 {
@@ -30,7 +31,7 @@ namespace timing
 namespace wiremodel
 {
 
-template <class T> using node_mapper_type = timingdriven_placement::RCTree::GraphType::NodeMap<T>;
+template <class T> using node_mapper_type = timingdriven_placement::RCTree::graph_type::NodeMap<T>;
 
 using slew_type                           = util::second_t;
 using capacitance_type                    = util::farad_t;
@@ -158,26 +159,20 @@ public:
 
 
         capacitance_type lumped;
-        for(timingdriven_placement::RCTree::GraphType::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
+        for(timingdriven_placement::RCTree::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
             lumped += tree.capacitance(it);
 
         auto source_slew = slew_calculator(lumped);
 
-//        packed_elmore delay;
-//        delay.tree(tree);
-//        delay.run();
+        Elmore delay(tree);
+        ElmoreSecondMoment second_moment(delay);
 
-//        packed_elmore_second_moment second_moment;
-//        second_moment.elmore(delay);
-//        second_moment.tree(tree);
-//        second_moment.run();
-
-//        for(std::size_t i = 0; i < tree.node_count(); ++i)
-//        {
-//            delays[i] = delay.at(i);
-//            auto step_slew = boost::units::sqrt( second_moment.at(i)*2.0 - boost::units::pow<2>(delay.at(i)) );
-//            slews[i] = boost::units::sqrt(boost::units::pow<2>(source_slew) + boost::units::pow<2>(step_slew));
-//        }
+        for(timingdriven_placement::RCTree::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
+        {
+            delays[it] = delay.at(it);
+            auto step_slew = units::math::sqrt(second_moment.at(it) * 2.0 - units::math::pow<2>(delay.at(it)));
+            slews[it] = units::math::sqrt(units::math::pow<2>(source_slew) + units::math::pow<2>(step_slew));
+        }
 
         return lumped;
     }

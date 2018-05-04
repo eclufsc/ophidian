@@ -22,14 +22,14 @@ namespace timing
         mSorted(mGraph.size(TimingGraph::NodeType())),
         mSortedDrivers(mGraph.size(TimingGraph::NodeType()))
     {
-        using GraphType = TimingGraph::GraphType;
+        using graph_type = TimingGraph::graph_type;
 
-        GraphType::NodeMap<int> order(mGraph.graph());
+        graph_type::NodeMap<int> order(mGraph.graph());
         lemon::topologicalSort(mGraph.graph(), order);
 
-        GraphType::NodeMap<int> level(mGraph.graph());
+        graph_type::NodeMap<int> level(mGraph.graph());
 
-        for(GraphType::NodeIt it(mGraph.graph()); it != lemon::INVALID; ++it)
+        for(graph_type::NodeIt it(mGraph.graph()); it != lemon::INVALID; ++it)
         {
             level[it] = std::numeric_limits<int>::max();
             mSorted[ order[it] ] = it;
@@ -44,7 +44,7 @@ namespace timing
             if(lemon::countInArcs(mGraph.graph(), node) > 0)
             {
                 int maxLevel = std::numeric_limits<int>::min();
-                for(GraphType::InArcIt arc(mGraph.graph(), node); arc != lemon::INVALID; ++arc)
+                for(graph_type::InArcIt arc(mGraph.graph(), node); arc != lemon::INVALID; ++arc)
                     maxLevel = std::max(maxLevel, level[mGraph.source(arc)]);
                 level[node] = maxLevel + 1;
                 numLevels = std::max(numLevels, maxLevel + 1);
@@ -73,7 +73,7 @@ namespace timing
         (
             mSortedDrivers.begin(),
             mSortedDrivers.end(),
-            [this, &stdCells, &libraryMapping](GraphType::Node node)->bool
+            [this, &stdCells, &libraryMapping](graph_type::Node node)->bool
             {
                 return stdCells.direction(libraryMapping.pinStdCell(mGraph.entity(node))) == standard_cell::PinDirection::OUTPUT;
             }
