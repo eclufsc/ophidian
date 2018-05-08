@@ -30,46 +30,57 @@ namespace timing
 class GraphNodesTiming
 {
 public:
-    using NodeType = TimingGraph::NodeType;
+    using time_unit_type                      = util::second_t;
+    using capacitance_unit_type               = util::farad_t;
 
-    GraphNodesTiming(const TimingGraph & graph);
+    using timing_graph_type                   = TimingGraph;
+    using node_type                           = timing_graph_type::node_type;
+    using timing_node_to_time_map_type        = timing_graph_type::graph_type::NodeMap<time_unit_type>;
+    using timing_node_to_capacitance_map_type = timing_graph_type::graph_type::NodeMap<capacitance_unit_type>;
+
+    GraphNodesTiming(const timing_graph_type & graph);
     virtual ~GraphNodesTiming();
 
-    void arrival(NodeType node, util::second_t arrival);
-    void slew(NodeType node, util::second_t slew);
-    void required(NodeType node, util::second_t required);
-    void load(NodeType node, util::farad_t load);
+    void arrival(node_type node, time_unit_type arrival);
+    void slew(node_type node, time_unit_type slew);
+    void required(node_type node, time_unit_type required);
+    void load(node_type node, capacitance_unit_type load);
 
-    const ophidian::util::second_t arrival(NodeType node) const;
-    const ophidian::util::second_t slew(NodeType node) const;
-    const ophidian::util::second_t required(NodeType node) const;
-    const ophidian::util::farad_t load(NodeType node) const;
+    const time_unit_type arrival(node_type node) const;
+    const time_unit_type slew(node_type node) const;
+    const time_unit_type required(node_type node) const;
+    const capacitance_unit_type load(node_type node) const;
 
 private:
-    TimingGraph::graph_type::NodeMap<util::second_t> mArrivals;
-    TimingGraph::graph_type::NodeMap<util::second_t> mSlews;
-    TimingGraph::graph_type::NodeMap<util::second_t> mRequireds;
-    TimingGraph::graph_type::NodeMap<util::farad_t>  mLoads;
+    timing_node_to_time_map_type        mArrivals;
+    timing_node_to_time_map_type        mSlews;
+    timing_node_to_time_map_type        mRequireds;
+    timing_node_to_capacitance_map_type mLoads;
 };
 
 
 class GraphArcsTiming
 {
 public:
-    using ArcType = TimingGraph::ArcType;
 
-    GraphArcsTiming(const TimingGraph & graph);
+    using time_unit_type              = util::second_t;
+
+    using timing_graph_type           = TimingGraph;
+    using arc_type                    = TimingGraph::arc_type;
+    using timing_arc_to_time_map_type = timing_graph_type::graph_type::ArcMap<time_unit_type>;
+
+    GraphArcsTiming(const timing_graph_type & graph);
     virtual ~GraphArcsTiming();
 
-    void delay(ArcType arc, const util::second_t delay);
-    void slew(ArcType arc, const util::second_t delay);
+    void delay(arc_type arc, const time_unit_type delay);
+    void slew(arc_type arc, const time_unit_type delay);
 
-    const ophidian::util::second_t delay(ArcType arc) const;
-    const ophidian::util::second_t slew(ArcType arc) const;
+    const time_unit_type delay(arc_type arc) const;
+    const time_unit_type slew(arc_type arc) const;
 
 private:
-    TimingGraph::graph_type::ArcMap<util::second_t> mDelays;
-    TimingGraph::graph_type::ArcMap<util::second_t> mSlews;
+    timing_arc_to_time_map_type mDelays;
+    timing_arc_to_time_map_type mSlews;
 };
 
 }   // namespace timing

@@ -5,11 +5,11 @@ namespace ophidian
 namespace timing
 {
 
-TimingArcs::TimingArcs(const standard_cell::StandardCells & stdCells) :
-    mFrom(makeProperty<standard_cell::Pin>()),
-    mTo(makeProperty<standard_cell::Pin>()),
-    mArcNames(makeProperty<std::string>()),
-    mPin2TimingArcs(stdCells.makeProperty<std::vector<TimingArc>>(standard_cell::Pin()))
+TimingArcs::TimingArcs(const standard_cells_type & stdCells) :
+    mFrom(makeProperty<standard_pin_entity_type>()),
+    mTo(makeProperty<standard_pin_entity_type>()),
+    mArcNames(makeProperty<timing_arc_name_type>()),
+    mPin2TimingArcs(stdCells.makeProperty<timing_arc_vector_type>(standard_pin_entity_type()))
 {
 }
 
@@ -18,7 +18,7 @@ TimingArcs::~TimingArcs()
 
 }
 
-TimingArc TimingArcs::add(const std::string & arcName)
+TimingArcs::timing_arc_entity_type TimingArcs::add(const timing_arc_name_type & arcName)
 {
     if(mName2Arc.find(arcName) == mName2Arc.end())
     {
@@ -32,19 +32,19 @@ TimingArc TimingArcs::add(const std::string & arcName)
     }
 }
 
-void TimingArcs::from(const TimingArc & arc, const standard_cell::Pin & from_)
+void TimingArcs::from(const timing_arc_entity_type & arc, const standard_pin_entity_type & from_)
 {
     mFrom[arc] = from_;
     mPin2TimingArcs[from_].push_back(arc);
 }
 
-void TimingArcs::to(const TimingArc & arc, const standard_cell::Pin & to_)
+void TimingArcs::to(const timing_arc_entity_type & arc, const standard_pin_entity_type & to_)
 {
     mTo[arc] = to_;
     mPin2TimingArcs[to_].push_back(arc);
 }
 
-void TimingArcs::erase(const TimingArc & arc)
+void TimingArcs::erase(const timing_arc_entity_type & arc)
 {
     mName2Arc.erase(mArcNames[arc]);
     mArcs.erase(arc);
@@ -75,27 +75,32 @@ uint32_t TimingArcs::capacity() const
     return mArcs.capacity();
 }
 
-TimingArc TimingArcs::find(const std::string & arcName)
+TimingArcs::timing_arc_entity_type TimingArcs::find(const timing_arc_name_type & arcName)
 {
     return mName2Arc[arcName];
 }
 
-ophidian::util::Range<TimingArcs::ArcsIterator> TimingArcs::range() const
+TimingArcs::timing_arc_name_type TimingArcs::name(const timing_arc_entity_type & arc)
 {
-    return ophidian::util::Range<TimingArcs::ArcsIterator>(mArcs.begin(), mArcs.end());
+    return mArcNames[arc];
 }
 
-standard_cell::Pin TimingArcs::from(const TimingArc & arc) const
+TimingArcs::timing_arc_range_type TimingArcs::range() const
+{
+    return timing_arc_range_type(mArcs.begin(), mArcs.end());
+}
+
+TimingArcs::standard_pin_entity_type TimingArcs::from(const timing_arc_entity_type & arc) const
 {
     return mFrom[arc];
 }
 
-standard_cell::Pin TimingArcs::to(const TimingArc & arc) const
+TimingArcs::standard_pin_entity_type TimingArcs::to(const timing_arc_entity_type & arc) const
 {
     return mTo[arc];
 }
 
-const std::vector<TimingArc> & TimingArcs::pinArcs(const standard_cell::Pin & pin) const
+const TimingArcs::timing_arc_vector_type & TimingArcs::pinArcs(const standard_pin_entity_type & pin) const
 {
     return mPin2TimingArcs[pin];
 }

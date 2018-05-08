@@ -38,6 +38,15 @@ namespace timing
 class TimingGraph
 {
 public:
+    using graph_type = lemon::ListDigraph;
+    using node_type = graph_type::Node;
+    using arc_type = graph_type::Arc;
+
+    using netlist_type           = circuit::Netlist;
+    using pin_entity_type        = circuit::Pin;
+    using net_entity_type        = circuit::Net;
+    using timing_arc_entity_type = TimingArcs::timing_arc_entity_type;
+
     enum class NodeProperty
     {
         Rise, Fall
@@ -48,18 +57,16 @@ public:
         TimingArc, Net
     };
 
-    class Arc : public TimingArc, public circuit::Net { };
+    class Arc : public timing_arc_entity_type, public net_entity_type { };
 
-    using graph_type = lemon::ListDigraph;
-    using NodeType = graph_type::Node;
-    using ArcType = graph_type::Arc;
+    using arc_entity_type = Arc;
 
     //! TimingGraph Constructor
     /*!
        \brief Constructs a TimingGraph with properties from the netlist.
        \param netlist The Netlist of the circuit
      */
-    TimingGraph(const circuit::Netlist & netlist);
+    TimingGraph(const netlist_type & netlist);
 
     //! Design Destructor
     /*!
@@ -79,14 +86,14 @@ public:
        \brief Returns the number of Nodes.
        \return The number of nodes.
      */
-    size_t size(NodeType) const;
+    size_t size(node_type) const;
 
     //! Size of edges
     /*!
        \brief Returns the number of Edges.
        \return The number of edges.
      */
-    size_t size(ArcType) const;
+    size_t size(arc_type) const;
 
     //! Create a Rise Node
     /*!
@@ -94,7 +101,7 @@ public:
        \param pin A pin of the circuit.
        \return The node created.
      */
-    NodeType riseNodeCreate(const circuit::Pin & pin);
+    node_type riseNodeCreate(const pin_entity_type & pin);
 
 
     //! Rise Node getter
@@ -103,7 +110,7 @@ public:
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    NodeType riseNode(const circuit::Pin & pin) const;
+    node_type riseNode(const pin_entity_type & pin) const;
 
     //! Create a Fall Node
     /*!
@@ -111,7 +118,7 @@ public:
        \param pin A pin of the circuit.
        \return The node created.
      */
-    NodeType fallNodeCreate(const circuit::Pin & pin);
+    node_type fallNodeCreate(const pin_entity_type & pin);
 
     //! Fall Node getter const
     /*!
@@ -119,7 +126,7 @@ public:
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    NodeType fallNode(const circuit::Pin & pin) const;
+    node_type fallNode(const pin_entity_type & pin) const;
 
     //! Create a Arc
     /*!
@@ -129,7 +136,7 @@ public:
        \param timingArc The TimingArc entity associated.
        \return The arc created.
      */
-    ArcType arcCreate(const NodeType & from, const NodeType & to, TimingArc timingArc);
+    arc_type arcCreate(const node_type & from, const node_type & to, timing_arc_entity_type timingArc);
 
     //! Create a Arc
     /*!
@@ -139,7 +146,7 @@ public:
        \param net The net entity associated.
        \return The arc created.
      */
-    ArcType arcCreate(const NodeType & from, const NodeType & to, circuit::Net net);
+    arc_type arcCreate(const node_type & from, const node_type & to, net_entity_type net);
 
     //! Node Property Getter
     /*!
@@ -147,7 +154,7 @@ public:
        \param node A node of the graph.
        \return The property of the node.
      */
-    NodeProperty property(const NodeType & node) const;
+    NodeProperty property(const node_type & node) const;
 
     //! Arc Property Getter
     /*!
@@ -155,7 +162,7 @@ public:
        \param node A arc of the graph.
        \return The property of the arc.
      */
-    ArcProperty property(const ArcType & arc) const;
+    ArcProperty property(const arc_type & arc) const;
 
     //! Source Node Getter
     /*!
@@ -163,7 +170,7 @@ public:
        \param arc A arc of the graph.
        \return The source node.
      */
-    NodeType source(const ArcType & arc) const;
+    node_type source(const arc_type & arc) const;
 
     //! Change the source node
     /*!
@@ -171,7 +178,7 @@ public:
        \param arc A arc of the graph.
        \param newSource The new source.
      */
-    void source(const ArcType & arc, const NodeType & newSource);
+    void source(const arc_type & arc, const node_type & newSource);
 
     //! Target Node Getter
     /*!
@@ -179,7 +186,7 @@ public:
        \param arc A arc of the graph.
        \return The target node.
      */
-    NodeType target(const ArcType & arc) const;
+    node_type target(const arc_type & arc) const;
 
     //! Output edges of a node.
     /*!
@@ -187,7 +194,7 @@ public:
        \param node A node of the graph.
        \return iterator of output edges.
      */
-    graph_type::OutArcIt outArc(const NodeType & node) const;
+    graph_type::OutArcIt outArc(const node_type & node) const;
 
     //! Input edges of a node.
     /*!
@@ -195,7 +202,7 @@ public:
        \param node A node of the graph.
        \return iterator of input edges.
      */
-    graph_type::InArcIt inArc(const NodeType & node) const;
+    graph_type::InArcIt inArc(const node_type & node) const;
 
     //! Node's Pin Getter
     /*!
@@ -203,7 +210,7 @@ public:
        \param node A node of the graph.
        \return A pin of the circuit.
      */
-    circuit::Pin entity(const NodeType & node) const;
+    pin_entity_type entity(const node_type & node) const;
 
     //! Net's Arc Getter
     /*!
@@ -211,7 +218,7 @@ public:
        \param arc A arc of the graph.
        \return A net of the circuit.
      */
-    circuit::Net entity(circuit::Net, const ArcType & arc) const;
+    net_entity_type entity(net_entity_type, const arc_type & arc) const;
 
     //! TimingArc's Arc Getter
     /*!
@@ -219,7 +226,7 @@ public:
        \param arc A arc of the graph.
        \return A TimingArc.
      */
-    TimingArc entity(TimingArc, const ArcType & arc) const;
+    timing_arc_entity_type entity(timing_arc_entity_type, const arc_type & arc) const;
 
     //! Arc's Arc Getter
     /*!
@@ -227,7 +234,7 @@ public:
        \param arc A arc of the graph.
        \return A Arc.
      */
-    Arc entity(Arc, const ArcType & arc) const;
+    arc_entity_type entity(arc_entity_type, const arc_type & arc) const;
 
     //! Remove Node or Edges
     /*!
@@ -251,18 +258,18 @@ private:
        \param map The Pin's property of the netlist.
        \return The node created.
      */
-    NodeType nodeCreate(const circuit::Pin & pin,
+    node_type nodeCreate(const pin_entity_type & pin,
                         const NodeProperty & prop,
-                        entity_system::Property<circuit::Pin, NodeType> & map);
+                        entity_system::Property<pin_entity_type, node_type> & map);
 
-    graph_type                                      mGraph;
-    graph_type::NodeMap<circuit::Pin>               mPins;
-    graph_type::NodeMap<NodeProperty>               mNodeProperties;
-    graph_type::ArcMap<Arc>                         mArcs;
-    graph_type::ArcMap<ArcProperty>                 mArcProperties;
+    graph_type                                          mGraph;
+    graph_type::NodeMap<pin_entity_type>                mPins;
+    graph_type::NodeMap<NodeProperty>                   mNodeProperties;
+    graph_type::ArcMap<arc_entity_type>                 mArcs;
+    graph_type::ArcMap<ArcProperty>                     mArcProperties;
 
-    entity_system::Property<circuit::Pin, NodeType> mRiseNodes;
-    entity_system::Property<circuit::Pin, NodeType> mFallNodes;
+    entity_system::Property<pin_entity_type, node_type> mRiseNodes;
+    entity_system::Property<pin_entity_type, node_type> mFallNodes;
 };
 
 } // namespace timing

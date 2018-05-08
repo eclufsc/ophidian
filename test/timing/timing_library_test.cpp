@@ -54,108 +54,110 @@ public:
 };
 } // namespace
 
-TEST_CASE_METHOD(LibraryFixture, "Library: info about timing arcs in late mode", "[timing][library]")
+TEST_CASE_METHOD(LibraryFixture, "Library: init", "[timing][library]")
 {
-
-    REQUIRE(mArcs.size() == 0);
-    timing::Library lib(*mLiberty.get(), mStdCells, mArcs, false);
-    REQUIRE(mArcs.size() == 3);
-
-    REQUIRE(!lib.cellSequential(mStdCells.find(standard_cell::Cell(), "INV_X1")));
-    REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "INV_X1:a")));
-    REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "INV_X1:o")));
-
-    REQUIRE(lib.cellSequential(mStdCells.find(standard_cell::Cell(), "DFF_X80")));
-    REQUIRE(lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:ck")));
-    REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:d")));
-    REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:q")));
-
-    int i = 0;
-    for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
+    SECTION("Library: info about timing arcs in late mode", "[timing][library]")
     {
-        auto arc = *arcIt;
-        switch (i) {
-        case 0:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
-            REQUIRE(lib.unateness(arc) == timing::Library::unateness_t::NEGATIVE_UNATE);
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::COMBINATIONAL);
-            REQUIRE(lib.computeRiseDelay(arc, util::farad_t(1.5),  util::second_t(20.0))  == util::second_t(28.116));
-            REQUIRE(lib.computeFallDelay(arc, util::farad_t(0.75), util::second_t(325.0)) == util::second_t(71.244375));
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(18.5), util::second_t(18.5))  == util::second_t(153.75));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(8.0),  util::second_t(300.0)) == util::second_t(106.536));
-            REQUIRE(lib.capacitance(mArcs.from(arc)) == util::farad_t(1.0));
-            REQUIRE(lib.capacitance(mArcs.to(arc)) == util::farad_t(0.0));
-            break;
-        case 1:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
-            REQUIRE(lib.unateness(arc) == timing::Library::unateness_t::NON_UNATE);
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::RISING_EDGE);
-            REQUIRE(lib.computeRiseDelay(arc, util::farad_t(128.0), util::second_t(30.0)) == util::second_t(25.2));
-            REQUIRE(lib.computeFallDelay(arc, util::farad_t(2048.0), util::second_t(300.0)) == util::second_t(115.2));
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(512.0), util::second_t(200.0)) == util::second_t(43.2));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(32.0), util::second_t(32.0)) == util::second_t(20.7));
-            REQUIRE(lib.capacitance(mArcs.from(arc)) == util::farad_t(1.5));
-            REQUIRE(lib.capacitance(mArcs.to(arc)) == util::farad_t(0.0));
-            break;
-        case 2:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::SETUP_RISING);
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(1.5));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(2.5));
-            REQUIRE(lib.capacitance(mArcs.from(arc)) ==  util::farad_t(1.5));
-            REQUIRE(lib.capacitance(mArcs.to(arc)) ==  util::farad_t(3.49));
-            break;
-        default:
-            break;
+        REQUIRE(mArcs.size() == 0);
+        timing::Library lib(*mLiberty.get(), mStdCells, mArcs, false);
+        REQUIRE(mArcs.size() == 3);
+
+        REQUIRE(!lib.cellSequential(mStdCells.find(standard_cell::Cell(), "INV_X1")));
+        REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "INV_X1:a")));
+        REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "INV_X1:o")));
+
+        REQUIRE(lib.cellSequential(mStdCells.find(standard_cell::Cell(), "DFF_X80")));
+        REQUIRE(lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:ck")));
+        REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:d")));
+        REQUIRE(!lib.pinClock(mStdCells.find(standard_cell::Pin(), "DFF_X80:q")));
+
+        int i = 0;
+        for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
+        {
+            auto arc = *arcIt;
+            switch (i) {
+            case 0:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
+                REQUIRE(lib.unateness(arc) == timing::Library::unateness_type::NEGATIVE_UNATE);
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::COMBINATIONAL);
+                REQUIRE(lib.computeRiseDelay(arc, util::farad_t(1.5),  util::second_t(20.0))  == util::second_t(28.116));
+                REQUIRE(lib.computeFallDelay(arc, util::farad_t(0.75), util::second_t(325.0)) == util::second_t(71.244375));
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(18.5), util::second_t(18.5))  == util::second_t(153.75));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(8.0),  util::second_t(300.0)) == util::second_t(106.536));
+                REQUIRE(lib.capacitance(mArcs.from(arc)) == util::farad_t(1.0));
+                REQUIRE(lib.capacitance(mArcs.to(arc)) == util::farad_t(0.0));
+                break;
+            case 1:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
+                REQUIRE(lib.unateness(arc) == timing::Library::unateness_type::NON_UNATE);
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::RISING_EDGE);
+                REQUIRE(lib.computeRiseDelay(arc, util::farad_t(128.0), util::second_t(30.0)) == util::second_t(25.2));
+                REQUIRE(lib.computeFallDelay(arc, util::farad_t(2048.0), util::second_t(300.0)) == util::second_t(115.2));
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(512.0), util::second_t(200.0)) == util::second_t(43.2));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(32.0), util::second_t(32.0)) == util::second_t(20.7));
+                REQUIRE(lib.capacitance(mArcs.from(arc)) == util::farad_t(1.5));
+                REQUIRE(lib.capacitance(mArcs.to(arc)) == util::farad_t(0.0));
+                break;
+            case 2:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::SETUP_RISING);
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(1.5));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(2.5));
+                REQUIRE(lib.capacitance(mArcs.from(arc)) ==  util::farad_t(1.5));
+                REQUIRE(lib.capacitance(mArcs.to(arc)) ==  util::farad_t(3.49));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    SECTION("Library: info about timing arcs in early mode", "[timing][library]")
+    {
+        REQUIRE(mArcs.size() == 0);
+        timing::Library lib(*mLiberty.get(), mStdCells, mArcs, true);
+        REQUIRE(mArcs.size() == 3);
+
+        int i = 0;
+        for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
+        {
+            auto arc = *arcIt;
+            switch (i) {
+            case 0:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
+                REQUIRE(lib.unateness(arc) == timing::Library::unateness_type::NEGATIVE_UNATE);
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::COMBINATIONAL);
+                REQUIRE(lib.computeRiseDelay(arc, util::farad_t(1.5), util::second_t(20.0)) == util::second_t(28.116));
+                REQUIRE(lib.computeFallDelay(arc, util::farad_t(0.75), util::second_t(325.0)) == util::second_t(71.244375));
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(18.5), util::second_t(18.5)) == util::second_t(153.75));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(8.0), util::second_t(300.0)) == util::second_t(106.536));
+                break;
+            case 1:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
+                REQUIRE(lib.unateness(arc) == timing::Library::unateness_type::NON_UNATE);
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::RISING_EDGE);
+                REQUIRE(lib.computeRiseDelay(arc, util::farad_t(128.0), util::second_t(30.0)) == util::second_t(25.2));
+                REQUIRE(lib.computeFallDelay(arc, util::farad_t(2048.0), util::second_t(300.0)) == util::second_t(115.2));
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(512.0), util::second_t(200.0)) == util::second_t(43.2));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(32.0), util::second_t(32.0)) == util::second_t(20.7));
+                break;
+            case 2:
+                REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
+                REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
+                REQUIRE(lib.type(arc) == timing::Library::timing_edge_type::HOLD_RISING);
+                REQUIRE(lib.computeRiseSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(3.5));
+                REQUIRE(lib.computeFallSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(4.5));
+                break;
+            default:
+                break;
+            }
         }
     }
 }
 
-
-TEST_CASE_METHOD(LibraryFixture, "Library: info about timing arcs in early mode", "[timing][library]")
-{
-    REQUIRE(mArcs.size() == 0);
-    timing::Library lib(*mLiberty.get(), mStdCells, mArcs, true);
-    REQUIRE(mArcs.size() == 3);
-
-    int i = 0;
-    for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
-    {
-        auto arc = *arcIt;
-        switch (i) {
-        case 0:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
-            REQUIRE(lib.unateness(arc) == timing::Library::unateness_t::NEGATIVE_UNATE);
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::COMBINATIONAL);
-            REQUIRE(lib.computeRiseDelay(arc, util::farad_t(1.5), util::second_t(20.0)) == util::second_t(28.116));
-            REQUIRE(lib.computeFallDelay(arc, util::farad_t(0.75), util::second_t(325.0)) == util::second_t(71.244375));
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(18.5), util::second_t(18.5)) == util::second_t(153.75));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(8.0), util::second_t(300.0)) == util::second_t(106.536));
-            break;
-        case 1:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
-            REQUIRE(lib.unateness(arc) == timing::Library::unateness_t::NON_UNATE);
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::RISING_EDGE);
-            REQUIRE(lib.computeRiseDelay(arc, util::farad_t(128.0), util::second_t(30.0)) == util::second_t(25.2));
-            REQUIRE(lib.computeFallDelay(arc, util::farad_t(2048.0), util::second_t(300.0)) == util::second_t(115.2));
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(512.0), util::second_t(200.0)) == util::second_t(43.2));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(32.0), util::second_t(32.0)) == util::second_t(20.7));
-            break;
-        case 2:
-            REQUIRE(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-            REQUIRE(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
-            REQUIRE(lib.type(arc) == timing::Library::timing_type_t::HOLD_RISING);
-            REQUIRE(lib.computeRiseSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(3.5));
-            REQUIRE(lib.computeFallSlews(arc, util::farad_t(1), util::second_t(1)) == util::second_t(4.5));
-            break;
-        default:
-            break;
-        }
-    }
-}
 

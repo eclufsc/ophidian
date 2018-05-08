@@ -31,25 +31,31 @@ template<class RowType, class ColumnType, class ValueType>
 class LookupTable
 {
 public:
+    template <class T> using container_type = std::vector<T>;
+
+    using lut_type                          = parser::Liberty::LUT;
+    using container_row_type                = container_type<RowType>;
+    using container_column_type             = container_type<ColumnType>;
+    using container_value_type              = container_type<container_type<ValueType>>;
 
     LookupTable()
     {
     }
 
-    LookupTable(const parser::Liberty::LUT & lut) :
-        mRowValues(lut.index_1.size()),
-        mColumnValues(lut.index_2.size()),
-        mValues(lut.values.size())
+    LookupTable(const lut_type & lut) :
+        m_row_values(lut.index_1.size()),
+        m_column_values(lut.index_2.size()),
+        m_values(lut.values.size())
     {
         for (int i = 0; i < lut.index_1.size(); ++i)
-            mRowValues[i] = RowType(lut.index_1[i]);
+            m_row_values[i] = RowType(lut.index_1[i]);
 
         for (int i = 0; i < lut.index_2.size(); ++i)
-            mColumnValues[i] = ColumnType(lut.index_2[i]);
+            m_column_values[i] = ColumnType(lut.index_2[i]);
 
         for (int i = 0; i < lut.values.size(); ++i)
             for (int j = 0; j < lut.values[0].size(); ++j)
-                mValues[i].push_back(ValueType(lut.values[i][j]));
+                m_values[i].push_back(ValueType(lut.values[i][j]));
     }
 
     ~LookupTable()
@@ -58,50 +64,50 @@ public:
 
     ValueType compute(const RowType & rv, const ColumnType & cv) const
     {
-        if (mValues.size() == 1)
-            if (mValues.front().size() == 1)
-                return mValues.front().front();
+        if (m_values.size() == 1)
+            if (m_values.front().size() == 1)
+                return m_values.front().front();
 
         RowType y1, y2;
-        auto wLoad = RowType(0) / RowType(0);
+        auto wLoad = RowType(0) / RowType(1);
         ColumnType x1, x2;
-        auto wTransition = ColumnType(0) / ColumnType(0);
+        auto wTransition = ColumnType(0) / ColumnType(1);
         ValueType t[2][2];
         std::size_t row1, row2, column1, column2;
 
-        row1 = mRowValues.size() - 2;
-        row2 = mRowValues.size() - 1;
-        y1 = mRowValues[row1];
-        y2 = mRowValues[row2];
+        row1 = m_row_values.size() - 2;
+        row2 = m_row_values.size() - 1;
+        y1 = m_row_values[row1];
+        y2 = m_row_values[row2];
 
         // loads -- rows
-        for (size_t i = 0; i < mRowValues.size() - 1; i++) {
-            if (rv >= mRowValues[i] && rv <= mRowValues[i + 1]) {
+        for (size_t i = 0; i < m_row_values.size() - 1; i++) {
+            if (rv >= m_row_values[i] && rv <= m_row_values[i + 1]) {
                 row1 = i;
                 row2 = i + 1;
-                y1 = mRowValues[row1];
-                y2 = mRowValues[row2];
+                y1 = m_row_values[row1];
+                y2 = m_row_values[row2];
             }
         }
 
         // transitions -- columns
-        if (cv < mColumnValues[0]) {
+        if (cv < m_column_values[0]) {
             column1 = 0;
             column2 = 1;
-            x1 = mColumnValues[column1];
-            x2 = mColumnValues[column2];
-        } else if (cv > mColumnValues[mColumnValues.size() - 1]) {
-            column1 = mColumnValues.size() - 2;
-            column2 = mColumnValues.size() - 1;
-            x1 = mColumnValues[column1];
-            x2 = mColumnValues[column2];
+            x1 = m_column_values[column1];
+            x2 = m_column_values[column2];
+        } else if (cv > m_column_values[m_column_values.size() - 1]) {
+            column1 = m_column_values.size() - 2;
+            column2 = m_column_values.size() - 1;
+            x1 = m_column_values[column1];
+            x2 = m_column_values[column2];
         } else {
-            for (size_t i = 0; i < mColumnValues.size() - 1; i++) {
-                if (cv >= mColumnValues[i] && cv <= mColumnValues[i + 1]) {
+            for (size_t i = 0; i < m_column_values.size() - 1; i++) {
+                if (cv >= m_column_values[i] && cv <= m_column_values[i + 1]) {
                     column1 = i;
                     column2 = i + 1;
-                    x1 = mColumnValues[column1];
-                    x2 = mColumnValues[column2];
+                    x1 = m_column_values[column1];
+                    x2 = m_column_values[column2];
                 }
             }
         }
@@ -110,10 +116,10 @@ public:
         wTransition = (cv - x1) / (x2 - x1);
         wLoad = (rv - y1) / (y2 - y1);
 
-        t[0][0] = mValues[row1][column1];
-        t[0][1] = mValues[row1][column2];
-        t[1][0] = mValues[row2][column1];
-        t[1][1] = mValues[row2][column2];
+        t[0][0] = m_values[row1][column1];
+        t[0][1] = m_values[row1][column2];
+        t[1][0] = m_values[row2][column1];
+        t[1][1] = m_values[row2][column2];
 
 
         return ((1 - wTransition) * (1 - wLoad) * t[0][0])
@@ -123,9 +129,9 @@ public:
     }
 
 private:
-    std::vector<RowType>                mRowValues;
-    std::vector<ColumnType>             mColumnValues;
-    std::vector<std::vector<ValueType>> mValues;
+    container_row_type    m_row_values;
+    container_column_type m_column_values;
+    container_value_type  m_values;
 };
 
 } // namespace timing

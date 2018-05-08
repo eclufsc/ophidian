@@ -57,8 +57,8 @@ TEST_CASE_METHOD(TimingGraphBuilderFixture, "TimingGraphBuilder: init", "[timing
 
     auto graph = builder.build(mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping(), mTimingArcs, mTimingLibrary, *mDC);
 
-    REQUIRE(graph->size(timing::TimingGraph::NodeType()) == 42);
-    REQUIRE(graph->size(timing::TimingGraph::ArcType()) == 40);
+    REQUIRE(graph->size(timing::TimingGraph::node_type()) == 42);
+    REQUIRE(graph->size(timing::TimingGraph::arc_type()) == 40);
 
     auto u1_a = mDesign.netlist().find(circuit::Pin(), "u1:a");
     auto u1_o = mDesign.netlist().find(circuit::Pin(), "u1:o");
@@ -74,7 +74,7 @@ TEST_CASE_METHOD(TimingGraphBuilderFixture, "TimingGraphBuilder: init", "[timing
 
     REQUIRE(graph->graph().id(graph->target(graph->outArc(riseU1_a))) == graph->graph().id(fallU1_o));
     REQUIRE(graph->property(graph->outArc(riseU1_a)) == timing::TimingGraph::ArcProperty::TimingArc);
-    REQUIRE(graph->entity(timing::TimingArc(), graph->outArc(riseU1_a)) == timingArcU1);
+    REQUIRE(graph->entity(timing::TimingArcs::timing_arc_entity_type(), graph->outArc(riseU1_a)) == timingArcU1);
 
     REQUIRE(graph->graph().id(graph->target(graph->outArc(riseU1_o))) == graph->graph().id(riseU2_a));
     REQUIRE(graph->property(graph->outArc(riseU1_o)) == timing::TimingGraph::ArcProperty::Net);

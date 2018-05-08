@@ -71,13 +71,13 @@ RCTree::capacitor_type RCTree::addCapacitor(const std::string name)
 
     mName2Capacitor[name] = newCap;
     mNames[newCap] = name;
-    mCapacitances[newCap] = capacitance_type(0.0);
+    mCapacitances[newCap] = capacitance_unit_type(0.0);
     mValidPred = false;
 
     return newCap;
 }
 
-RCTree::resistor_type RCTree::addResistor(const capacitor_type & u, const capacitor_type & v, const resistance_type res)
+RCTree::resistor_type RCTree::addResistor(const capacitor_type & u, const capacitor_type & v, const resistance_unit_type res)
 {
     resistor_type resUV;
 
@@ -105,10 +105,10 @@ std::string RCTree::name(const capacitor_type & cap) const
     return "Invalid";
 }
 
-RCTree::capacitor_type RCTree::capacitor(const std::string name)
+RCTree::capacitor_type RCTree::capacitor(const std::string name) const
 {
     if (mName2Capacitor.find(name) != mName2Capacitor.end())
-        return mName2Capacitor[name];
+        return mName2Capacitor.at(name);
 
     return lemon::INVALID;
 }
@@ -135,19 +135,19 @@ RCTree::resistor_iterator_type RCTree::resistors(const capacitor_type & cap) con
     return graph_type::OutArcIt(mGraph, cap);
 }
 
-void RCTree::capacitance(const capacitor_type & cap, const capacitance_type value)
+void RCTree::capacitance(const capacitor_type & cap, const capacitance_unit_type value)
 {
     mLumpedCapacitance -= mCapacitances[cap];
     mCapacitances[cap] = value;
     mLumpedCapacitance += mCapacitances[cap];
 }
 
-RCTree::capacitance_type RCTree::capacitance(const capacitor_type & cap) const
+RCTree::capacitance_unit_type RCTree::capacitance(const capacitor_type & cap) const
 {
     return mCapacitances[cap];
 }
 
-RCTree::resistance_type RCTree::resistance(const resistor_type & res) const
+RCTree::resistance_unit_type RCTree::resistance(const resistor_type & res) const
 {
     return mResistances[res];
 }
@@ -187,7 +187,7 @@ std::size_t RCTree::size(resistor_type) const
     return lemon::countEdges(mGraph);
 }
 
-RCTree::capacitance_type RCTree::lumped() const
+RCTree::capacitance_unit_type RCTree::lumped() const
 {
     return mLumpedCapacitance;
 }

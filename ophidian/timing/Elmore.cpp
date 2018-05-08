@@ -5,12 +5,12 @@ namespace ophidian
 namespace timing
 {
 
-Elmore::Elmore(const timingdriven_placement::RCTree & tree, const capacitor_type & source) :
+Elmore::Elmore(const timingdriven_placement::RCTree & tree) :
     m_tree(tree),
     m_elmore_delay(tree.g()),
     m_downstream_capacitance(tree.g()),
     m_pred(tree.g()),
-    m_source(source)
+    m_source(tree.source())
 {
     std::deque<capacitor_type> toProcess;
     std::set<capacitor_type> reached;
@@ -74,10 +74,10 @@ const std::vector<Elmore::capacitor_type> & Elmore::order() const
     return m_order;
 }
 
-ElmoreSecondMoment::ElmoreSecondMoment(const timingdriven_placement::RCTree & tree, const Elmore & e) :
+ElmoreSecondMoment::ElmoreSecondMoment(const Elmore & e) :
     m_elmore(e),
-    m_tree(tree),
-    m_second_moment(tree.g())
+    m_tree(e.m_tree),
+    m_second_moment(m_tree.g())
 {
     update();
 }
@@ -94,7 +94,7 @@ ElmoreSecondMoment::square_time_unit ElmoreSecondMoment::at(const capacitor_type
 
 void ElmoreSecondMoment::update()
 {
-    graph_type::NodeMap<capacitance_time_unit> m_downstream_capacitance(m_tree.g());
+    graph_type::NodeMap<capacitance_per_time_unit> m_downstream_capacitance(m_tree.g());
 
     const auto & order = m_elmore.order();
 

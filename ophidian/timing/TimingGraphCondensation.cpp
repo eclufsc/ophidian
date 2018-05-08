@@ -23,7 +23,7 @@ namespace ophidian
 {
 namespace timing
 {
-    GraphNodesTiming::GraphNodesTiming(const TimingGraph & graph) :
+    GraphNodesTiming::GraphNodesTiming(const timing_graph_type & graph) :
         mArrivals(graph.graph()),
         mSlews(graph.graph()),
         mRequireds(graph.graph()),
@@ -35,49 +35,49 @@ namespace timing
     {
     }
 
-    void GraphNodesTiming::arrival(NodeType node, util::second_t arrival)
+    void GraphNodesTiming::arrival(node_type node, time_unit_type arrival)
     {
         mArrivals[node] = arrival;
     }
 
-    void GraphNodesTiming::slew(NodeType node, util::second_t slew)
+    void GraphNodesTiming::slew(node_type node, time_unit_type slew)
     {
         mSlews[node] = slew;
     }
 
-    void GraphNodesTiming::required(NodeType node, util::second_t required)
+    void GraphNodesTiming::required(node_type node, time_unit_type required)
     {
         mRequireds[node] = required;
     }
 
-    void GraphNodesTiming::load(NodeType node, util::farad_t load)
+    void GraphNodesTiming::load(node_type node, capacitance_unit_type load)
     {
         mLoads[node] = load;
     }
 
-    const util::second_t GraphNodesTiming::arrival(NodeType node) const
+    const GraphNodesTiming::time_unit_type GraphNodesTiming::arrival(node_type node) const
     {
         return mArrivals[node];
     }
 
-    const util::second_t GraphNodesTiming::slew(NodeType node) const
+    const GraphNodesTiming::time_unit_type GraphNodesTiming::slew(node_type node) const
     {
         return mSlews[node];
     }
 
-    const util::second_t GraphNodesTiming::required(NodeType node) const
+    const GraphNodesTiming::time_unit_type GraphNodesTiming::required(node_type node) const
     {
         return mRequireds[node];
     }
 
-    const util::farad_t GraphNodesTiming::load(NodeType node) const
+    const GraphNodesTiming::capacitance_unit_type GraphNodesTiming::load(node_type node) const
     {
         return mLoads[node];
     }
 
 // ------------------------------------------------------------------------------
 
-    GraphArcsTiming::GraphArcsTiming(const TimingGraph & graph) :
+    GraphArcsTiming::GraphArcsTiming(const timing_graph_type & graph) :
         mDelays(graph.graph()),
         mSlews(graph.graph())
     {
@@ -87,21 +87,21 @@ namespace timing
     {
     }
 
-    void GraphArcsTiming::delay(ArcType arc, const util::second_t delay)
+    void GraphArcsTiming::delay(arc_type arc, const time_unit_type delay)
     {
         mDelays[arc] = delay;
     }
 
-    void GraphArcsTiming::slew(ArcType arc, const util::second_t slew)
+    void GraphArcsTiming::slew(arc_type arc, const time_unit_type slew)
     {
         mSlews[arc] = slew;
     }
 
-    const util::second_t GraphArcsTiming::delay(ArcType arc) const
+    const GraphArcsTiming::time_unit_type GraphArcsTiming::delay(arc_type arc) const
     {
         return mDelays[arc];
     }
-    const util::second_t GraphArcsTiming::slew(ArcType arc) const
+    const GraphArcsTiming::time_unit_type GraphArcsTiming::slew(arc_type arc) const
     {
         return mSlews[arc];
     }

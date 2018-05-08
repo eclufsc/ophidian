@@ -97,7 +97,7 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(circuit::Netlist & netlis
 
         for (auto from : inputPins)
         {
-            const std::vector<TimingArc> & arcs = timingArcs.pinArcs(libraryMapping.pinStdCell(from));
+            const std::vector<TimingArcs::timing_arc_entity_type> & arcs = timingArcs.pinArcs(libraryMapping.pinStdCell(from));
 
             for(const auto & arc : arcs)
             {
@@ -109,28 +109,28 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(circuit::Netlist & netlis
 
                 switch (timingLibrary.unateness(arc))
                 {
-                case Library::unateness_t::POSITIVE_UNATE:
+                case Library::unateness_type::POSITIVE_UNATE:
                     graph->arcCreate(graph->riseNode(from), graph->riseNode(to), arc);
-                    if(timingLibrary.type(arc) != Library::timing_type_t::RISING_EDGE)
+                    if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
                         graph->arcCreate(graph->fallNode(from), graph->fallNode(to), arc);
 
                     break;
 
-                case Library::unateness_t::NON_UNATE:
+                case Library::unateness_type::NON_UNATE:
                     graph->arcCreate(graph->riseNode(from), graph->riseNode(to), arc);
-                    if(timingLibrary.type(arc) != Library::timing_type_t::RISING_EDGE)
+                    if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
                         graph->arcCreate(graph->fallNode(from), graph->fallNode(to), arc);
 
                     graph->arcCreate(graph->riseNode(from), graph->fallNode(to), arc);
-                    if(timingLibrary.type(arc) != Library::timing_type_t::RISING_EDGE)
+                    if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
                         graph->arcCreate(graph->fallNode(from), graph->riseNode(to), arc);
 
                     break;
 
-                case Library::unateness_t::NEGATIVE_UNATE:
+                case Library::unateness_type::NEGATIVE_UNATE:
                 default:
                     graph->arcCreate(graph->riseNode(from), graph->fallNode(to), arc);
-                    if(timingLibrary.type(arc) != Library::timing_type_t::RISING_EDGE)
+                    if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
                         graph->arcCreate(graph->fallNode(from), graph->riseNode(to), arc);
 
                     break;
@@ -140,7 +140,7 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(circuit::Netlist & netlis
     }
 
     // Creating input drivers edges
-    std::vector<TimingGraph::ArcType> outRiseArcs, outFallArcs;
+    std::vector<TimingGraph::arc_type> outRiseArcs, outFallArcs;
 
     for (const parser::DesignConstraints::DrivingCell drivingCell : dc.mInputDrivers)
     {
@@ -162,22 +162,22 @@ std::shared_ptr<TimingGraph> TimingGraphBuilder::build(circuit::Netlist & netlis
         for (auto arc : outFallArcs)
             graph->source(arc, newFallNode);
 
-        const std::vector<TimingArc> & arcs = timingArcs.pinArcs(stdCells.find(standard_cell::Pin(), drivingCell.libCell + ":" + drivingCell.pinName));
+        const std::vector<TimingArcs::timing_arc_entity_type> & arcs = timingArcs.pinArcs(stdCells.find(standard_cell::Pin(), drivingCell.libCell + ":" + drivingCell.pinName));
         for (const auto & arc : arcs)
         {
             switch (timingLibrary.unateness(arc))
             {
-            case Library::unateness_t::POSITIVE_UNATE:
+            case Library::unateness_type::POSITIVE_UNATE:
                 graph->arcCreate(riseNode, newRiseNode, arc);
                 graph->arcCreate(fallNode, newFallNode, arc);
                 break;
-            case Library::unateness_t::NON_UNATE:
+            case Library::unateness_type::NON_UNATE:
                 graph->arcCreate(riseNode, newRiseNode, arc);
                 graph->arcCreate(fallNode, newFallNode, arc);
                 graph->arcCreate(riseNode, newFallNode, arc);
                 graph->arcCreate(fallNode, newRiseNode, arc);
                 break;
-            case Library::unateness_t::NEGATIVE_UNATE:
+            case Library::unateness_type::NEGATIVE_UNATE:
             default:
                 graph->arcCreate(riseNode, newFallNode, arc);
                 graph->arcCreate(fallNode, newRiseNode, arc);

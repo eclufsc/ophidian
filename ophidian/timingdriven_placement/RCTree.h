@@ -41,8 +41,8 @@ public:
     template <class T> using container_type     = std::vector<T>;
     template <class T, class U> using map_type  = std::unordered_map<T, U>;
 
-    using capacitance_type                      = util::farad_t;
-    using resistance_type                       = util::ohm_t;
+    using capacitance_unit_type                 = util::farad_t;
+    using resistance_unit_type                  = util::ohm_t;
 
     using graph_type                            = lemon::ListGraph;
     using capacitor_type                        = graph_type::Node;
@@ -91,7 +91,7 @@ public:
        \param res The resistance value of the resistor.
        \return The handler to the resistor.
      */
-    resistor_type addResistor(const capacitor_type & u, const capacitor_type & v, const resistance_type res);
+    resistor_type addResistor(const capacitor_type & u, const capacitor_type & v, const resistance_unit_type res);
 
     //! Insert a Tap.
     /*!
@@ -114,7 +114,7 @@ public:
        \param name The name of the capacitor.
        \return The handler to the capacitor.
      */
-    capacitor_type capacitor(const std::string name);
+    capacitor_type capacitor(const std::string name) const;
 
     //! Opposite capacitor_type
     /*!
@@ -148,7 +148,7 @@ public:
        \param cap The handler to the capacitor.
        \param value The capacitance value.
      */
-    void capacitance(const capacitor_type & cap, const capacitance_type value);
+    void capacitance(const capacitor_type & cap, const capacitance_unit_type value);
 
     //! Capacitance's value.
     /*!
@@ -156,7 +156,7 @@ public:
        \param cap The handler to the capacitor.
        \return The capacitance value.
      */
-    capacitance_type capacitance(const capacitor_type & cap) const;
+    capacitance_unit_type capacitance(const capacitor_type & cap) const;
 
     //! Resistance's value.
     /*!
@@ -164,7 +164,7 @@ public:
        \param res The handler to the resistor.
        \return The resistance value.
      */
-    resistance_type resistance(const resistor_type & res) const;
+    resistance_unit_type resistance(const resistor_type & res) const;
 
     //! capacitor_type's predecessor.
     /*!
@@ -199,7 +199,7 @@ public:
        \brief Returns the sum of the capacitance of all capacitors in the RC Tree.
        \return The RC Tree's lumped capacitance.
      */
-    capacitance_type lumped() const;
+    capacitance_unit_type lumped() const;
 
     //! Set RCTree's source.
     /*!
@@ -235,19 +235,19 @@ public:
 private:
     void topology_updates();
 
-    graph_type                            mGraph;
-    capacitor_map_type<std::string>       mNames;
-    capacitor_map_type<capacitance_type>  mCapacitances;
-    resistor_map_type<resistance_type>    mResistances;
+    graph_type                                mGraph;
+    capacitor_map_type<std::string>           mNames;
+    capacitor_map_type<capacitance_unit_type> mCapacitances;
+    resistor_map_type<resistance_unit_type>   mResistances;
 
-    container_type<capacitor_type>        mTaps;
-    map_type<std::string, capacitor_type> mName2Capacitor;
-    capacitance_type                      mLumpedCapacitance;
+    container_type<capacitor_type>            mTaps;
+    map_type<std::string, capacitor_type>     mName2Capacitor;
+    capacitance_unit_type                     mLumpedCapacitance;
 
-    capacitor_map_type<resistor_type>     mPred;
-    container_type<capacitor_type>        mOrder;
-    capacitor_type                        mSource;
-    bool                                  mValidPred;
+    capacitor_map_type<resistor_type>         mPred;
+    container_type<capacitor_type>            mOrder;
+    capacitor_type                            mSource;
+    bool                                      mValidPred;
 };
 
 }   // namespace timingdriven_placement

@@ -31,13 +31,14 @@ namespace timing
 namespace wiremodel
 {
 
-template <class T> using node_mapper_type = timingdriven_placement::RCTree::graph_type::NodeMap<T>;
+using rctree_type                         = timingdriven_placement::RCTree;
+template <class T> using node_mapper_type = rctree_type::graph_type::NodeMap<T>;
 
 using slew_type                           = util::second_t;
-using capacitance_type                    = util::farad_t;
+using capacitance_unit_type               = util::farad_t;
 using precicion_type                      = double;
-using slew_mapper_type                    = node_mapper_type<slew_type>;
-using capacitance_mapper_type             = node_mapper_type<capacitance_type>;
+using slew_map_type                       = node_mapper_type<slew_type>;
+using capacitance_map_type                = node_mapper_type<capacitance_unit_type>;
 
 class EffectiveCapacitance
 {
@@ -48,39 +49,38 @@ public:
 
     void precision(precicion_type epsilon);
 
-    void slews(node_mapper_type<slew_type>& sm);
-    const node_mapper_type<slew_type>& slews() const;
+    void slews(slew_map_type& sm);
+    const slew_map_type& slews() const;
 
-    void delays(node_mapper_type<slew_type>& dm);
-    const node_mapper_type<slew_type>& delays() const;
+    void delays(slew_map_type& dm);
+    const slew_map_type& delays() const;
 
-    void ceff(node_mapper_type<capacitance_type> &cm);
-    const node_mapper_type<capacitance_type>& ceff() const;
+    void ceff(capacitance_map_type &cm);
+    const capacitance_map_type& ceff() const;
 
     template <class SlewCalculator>
-    capacitance_type simulate(const SlewCalculator& slew_calculator, timingdriven_placement::RCTree& tree)
+    capacitance_unit_type simulate(const SlewCalculator& slew_calculator, rctree_type& tree)
     {
         if(!m_slews)
-            m_slews = new node_mapper_type<slew_type>(tree.g());
+            m_slews = new slew_map_type(tree.g());
         if(!m_delays)
-            m_delays = new node_mapper_type<slew_type>(tree.g());
+            m_delays = new slew_map_type(tree.g());
         if(!m_ceff)
-            m_ceff = new node_mapper_type<capacitance_type>(tree.g());
+            m_ceff = new capacitance_map_type(tree.g());
 
-        node_mapper_type<slew_type>&        slews  = *m_slews;
-        node_mapper_type<slew_type>&        delays = *m_delays;
-        node_mapper_type<capacitance_type>& ceff   = *m_ceff;
+        slew_map_type&        slews  = *m_slews;
+        slew_map_type&        delays = *m_delays;
+        capacitance_map_type& ceff   = *m_ceff;
 
         precicion_type error = 1.0;
 
-        capacitance_type current_ceff;
+        capacitance_unit_type current_ceff;
         delays[tree.source()] = slew_type(0.0);
 
         while (error > m_precision) {
             current_ceff = ceff[tree.source()];
             slews[tree.source()] = slew_calculator(current_ceff);
 
-            //////  USAR ITERADOR SOBRE OS NOS DO GRAFO DA ARVORE
             for(auto current : tree.order())
             {
                 auto parent = tree.pred(current);
@@ -118,14 +118,14 @@ public:
     }
 
 private:
-    bool                     m_slews_owner;
-    bool                     m_delays_owner;
-    bool                     m_ceff_owner;
-    precicion_type           m_precision;
+    bool                  m_slews_owner;
+    bool                  m_delays_owner;
+    bool                  m_ceff_owner;
+    precicion_type        m_precision;
 
-    slew_mapper_type*        m_slews;
-    slew_mapper_type*        m_delays;
-    capacitance_mapper_type* m_ceff;
+    slew_map_type*        m_slews;
+    slew_map_type*        m_delays;
+    capacitance_map_type* m_ceff;
 };
 
 class LumpedCapacitance
@@ -134,32 +134,32 @@ public:
     LumpedCapacitance();
     virtual ~LumpedCapacitance();
 
-    void slews(node_mapper_type<slew_type>& sm);
-    const node_mapper_type<slew_type>& slews() const;
+    void slews(slew_map_type& sm);
+    const slew_map_type& slews() const;
 
-    void delays(node_mapper_type<slew_type>& dm);
-    const node_mapper_type<slew_type>& delays() const;
+    void delays(slew_map_type& dm);
+    const slew_map_type& delays() const;
 
-    void ceff(node_mapper_type<capacitance_type> &cm);
-    const node_mapper_type<capacitance_type>& ceff() const;
+    void ceff(capacitance_map_type &cm);
+    const capacitance_map_type& ceff() const;
 
     template <class SlewCalculator>
-    capacitance_type simulate(const SlewCalculator & slew_calculator, timingdriven_placement::RCTree& tree)
+    capacitance_unit_type simulate(const SlewCalculator & slew_calculator, const rctree_type& tree)
     {
         if(!m_slews)
-            m_slews = new node_mapper_type<slew_type>(tree.g());
+            m_slews = new slew_map_type(tree.g());
         if(!m_delays)
-            m_delays = new node_mapper_type<slew_type>(tree.g());
+            m_delays = new slew_map_type(tree.g());
         if(!m_ceff)
-            m_ceff = new node_mapper_type<capacitance_type>(tree.g());
+            m_ceff = new capacitance_map_type(tree.g());
 
-        node_mapper_type<slew_type>&        slews  = *m_slews;
-        node_mapper_type<slew_type>&        delays = *m_delays;
-        node_mapper_type<capacitance_type>& ceff   = *m_ceff;
+        slew_map_type&        slews  = *m_slews;
+        slew_map_type&        delays = *m_delays;
+        capacitance_map_type& ceff   = *m_ceff;
 
 
-        capacitance_type lumped;
-        for(timingdriven_placement::RCTree::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
+        capacitance_unit_type lumped;
+        for(rctree_type::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
             lumped += tree.capacitance(it);
 
         auto source_slew = slew_calculator(lumped);
@@ -167,7 +167,7 @@ public:
         Elmore delay(tree);
         ElmoreSecondMoment second_moment(delay);
 
-        for(timingdriven_placement::RCTree::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
+        for(rctree_type::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
         {
             delays[it] = delay.at(it);
             auto step_slew = units::math::sqrt(second_moment.at(it) * 2.0 - units::math::pow<2>(delay.at(it)));
@@ -178,12 +178,12 @@ public:
     }
 
 private:
-    bool                     m_slews_owner;
-    bool                     m_delays_owner;
-    bool                     m_ceff_owner;
-    slew_mapper_type*        m_slews;
-    slew_mapper_type*        m_delays;
-    capacitance_mapper_type* m_ceff;
+    bool                  m_slews_owner;
+    bool                  m_delays_owner;
+    bool                  m_ceff_owner;
+    slew_map_type*        m_slews;
+    slew_map_type*        m_delays;
+    capacitance_map_type* m_ceff;
 };
 
 }   // namespace WireModel

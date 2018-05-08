@@ -36,8 +36,24 @@ namespace timing
 class Library
 {
 public:
-    using unateness_t = ophidian::parser::Liberty::Timing::unateness;
-    using timing_type_t = ophidian::parser::Liberty::Timing::type;
+    using liberty_type           = parser::Liberty;
+    using standard_cells_type    = standard_cell::StandardCells;
+    using timing_arcs_type       = TimingArcs;
+
+    using time_unit_type         = util::second_t;
+    using capacitance_unit_type  = util::farad_t;
+    using unateness_type         = liberty_type::Timing::unateness;
+    using timing_edge_type       = liberty_type::Timing::type;
+
+    using pin_entity_type        = circuit::Pin;
+    using std_pin_entity_type    = standard_cell::Pin;
+    using std_cell_entity_type   = standard_cell::Cell;
+    using timing_arc_entity_type = TimingArc;
+
+    template <class K, class V> using property_type   = entity_system::Property<K, V>;
+    template <class V> using property_timing_arc_type = property_type<timing_arc_entity_type, V>;
+    template <class V> using property_std_pin_type    = property_type<std_pin_entity_type, V>;
+    template <class V> using property_std_cell_type   = property_type<std_cell_entity_type, V>;
 
     //! Library Constructor
     /*!
@@ -46,9 +62,9 @@ public:
        \param stdCells The Standard Cells's system of the circuit.
        \param arcs The Timing Arcs' system of the circuit.
      */
-    Library(const parser::Liberty & liberty,
-            standard_cell::StandardCells & stdCells,
-            TimingArcs & arcs,
+    Library(const liberty_type & liberty,
+            standard_cells_type & stdCells,
+            timing_arcs_type & arcs,
             bool early = false);
 
     //! Compute Rise Delay
@@ -59,7 +75,9 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    util::second_t computeRiseDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
+    time_unit_type computeRiseDelay(const timing_arc_entity_type & arc,
+                                    const capacitance_unit_type rv,
+                                    const time_unit_type cv) const;
 
     //! Compute Fall Delay
     /*!
@@ -69,7 +87,9 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    util::second_t computeFallDelay(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
+    time_unit_type computeFallDelay(const timing_arc_entity_type & arc,
+                                    const capacitance_unit_type rv,
+                                    const time_unit_type cv) const;
 
     //! Compute Rise Slews
     /*!
@@ -79,7 +99,9 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    util::second_t computeRiseSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
+    time_unit_type computeRiseSlews(const timing_arc_entity_type & arc,
+                                    const capacitance_unit_type rv,
+                                    const time_unit_type cv) const;
 
     //! Compute Fall Slews
     /*!
@@ -89,7 +111,9 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    util::second_t computeFallSlews(const TimingArc & arc, const util::farad_t rv, const util::second_t cv) const;
+    time_unit_type computeFallSlews(const timing_arc_entity_type & arc,
+                                    const capacitance_unit_type rv,
+                                    const time_unit_type cv) const;
 
     //! Unateness Getter
     /*!
@@ -97,7 +121,7 @@ public:
        \param arc The Timing TimingArc.
        \return TimingArc's unateness.
      */
-    unateness_t unateness(const TimingArc & arc) const;
+    unateness_type unateness(const timing_arc_entity_type & arc) const;
 
     //! type Getter
     /*!
@@ -105,7 +129,7 @@ public:
        \param arc The Timing TimingArc.
        \return TimingArc's timing type.
      */
-    timing_type_t type(const TimingArc & arc) const;
+    timing_edge_type type(const timing_arc_entity_type & arc) const;
 
     //! Capacitance Getter
     /*!
@@ -113,7 +137,7 @@ public:
        \param pin The Standard Pin.
        \return Pin's capacitance.
      */
-    util::farad_t capacitance(const standard_cell::Pin & pin) const;
+    capacitance_unit_type capacitance(const std_pin_entity_type & pin) const;
 
     //! Check clock pin
     /*!
@@ -121,7 +145,7 @@ public:
        \param pin The Standard Pin.
        \return True only if it is clock pin.
      */
-    bool pinClock(const standard_cell::Pin & pin) const;
+    bool pinClock(const std_pin_entity_type & pin) const;
 
     //! Check sequential cell
     /*!
@@ -129,21 +153,21 @@ public:
        \param cell The Standard Cell.
        \return True only if it is sequential.
      */
-    bool cellSequential(const standard_cell::Cell & cell) const;
+    bool cellSequential(const std_cell_entity_type & cell) const;
 
 private:
-    using ParserLUT = parser::Liberty::LUT;
-    using LUT = LookupTable<util::farad_t, util::second_t, util::second_t>;
+    using ParserLUT = liberty_type::LUT;
+    using LUT = LookupTable<capacitance_unit_type, time_unit_type, time_unit_type>;
 
-    entity_system::Property<TimingArc, LUT>                    mRiseDelays;
-    entity_system::Property<TimingArc, LUT>                    mFallDelays;
-    entity_system::Property<TimingArc, LUT>                    mRiseSlews;
-    entity_system::Property<TimingArc, LUT>                    mFallSlews;
-    entity_system::Property<TimingArc, unateness_t>            mTimingSenses;
-    entity_system::Property<TimingArc, timing_type_t>          mTimingTypes;
-    entity_system::Property<standard_cell::Pin, util::farad_t> mPinCapacitance;
-    entity_system::Property<standard_cell::Pin, bool>          mClock;
-    entity_system::Property<standard_cell::Cell, bool>         mSequential;
+    property_timing_arc_type<LUT>                m_rise_delays;
+    property_timing_arc_type<LUT>                m_fall_delays;
+    property_timing_arc_type<LUT>                m_rise_slews;
+    property_timing_arc_type<LUT>                m_fall_slews;
+    property_timing_arc_type<unateness_type>     m_timing_senses;
+    property_timing_arc_type<timing_edge_type>   m_timing_types;
+    property_std_pin_type<capacitance_unit_type> m_pin_capacitance;
+    property_std_pin_type<bool>                  m_clock;
+    property_std_cell_type<bool>                 m_sequential;
 
 };
 

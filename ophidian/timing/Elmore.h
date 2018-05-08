@@ -31,6 +31,8 @@ namespace timing
 class Elmore
 {
 public:
+    friend class ElmoreSecondMoment;
+
     using time_unit_type                        = util::second_t;
     using capacitance_unit_type                 = util::farad_t;
     template <class T> using container_type     = std::vector<T>;
@@ -45,7 +47,7 @@ public:
     using predecessor_map_type                  = graph_type::NodeMap<pair_type<capacitor_type, resistor_type>>;
     using order_container_type                  = container_type<capacitor_type>;
 
-    Elmore(const timingdriven_placement::RCTree & tree, const capacitor_type & source);
+    Elmore(const timingdriven_placement::RCTree & tree);
     virtual ~Elmore();
 
     void update();
@@ -72,14 +74,14 @@ public:
     using capacitor_type   = timingdriven_placement::RCTree::capacitor_type;
     using resistor_type    = timingdriven_placement::RCTree::resistor_type;
 
-    ElmoreSecondMoment(const timingdriven_placement::RCTree & tree, const Elmore & e);
+    ElmoreSecondMoment(const Elmore & e);
 
     virtual ~ElmoreSecondMoment();
 
     square_time_unit at(const capacitor_type & capacitor) const;
 
 private:
-    using capacitance_time_unit = units::unit_t<units::compound_unit<units::capacitance::farads, units::time::seconds>>;
+    using capacitance_per_time_unit = units::unit_t<units::compound_unit<units::capacitance::farads, units::time::seconds>>;
     using square_time_map_type  = graph_type::NodeMap<square_time_unit>;
 
     const Elmore&                         m_elmore;

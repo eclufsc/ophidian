@@ -43,14 +43,34 @@ public:
 class TimingArcs
 {
 public:
-    using ArcNotifier = entity_system::EntitySystem<TimingArc>::NotifierType;
-    using ArcsIterator = entity_system::EntitySystem<TimingArc>::const_iterator;
+    using timing_arc_entity_type             = TimingArc;
+
+    using ArcNotifier = entity_system::EntitySystem<timing_arc_entity_type>::NotifierType;
+    using ArcsIterator = entity_system::EntitySystem<timing_arc_entity_type>::const_iterator;
+
+    template <class T> using entity_container_type = entity_system::EntitySystem<T>;
+    template <class K, class V> using entity_property_type = entity_system::Property<K, V>;
+    template <class T> using vector_type       = std::vector<T>;
+    template <class K, class V> using map_type = std::unordered_map<K, V>;
+
+    using timing_arc_entity_container_type = entity_container_type<timing_arc_entity_type>;
+    using timing_arc_name_type             = std::string;
+
+    using standard_cells_type              = standard_cell::StandardCells;
+    using standard_pin_entity_type         = standard_cell::Pin;
+    using standard_cell_entity_type        = standard_cell::Cell;
+    using standard_pin_entity_vector_type  = vector_type<standard_pin_entity_type>;
+    using timing_arc_vector_type           = vector_type<timing_arc_entity_type>;
+    using timing_arc_range_type            = util::Range<ArcsIterator>;
+
+    template <class T> using timing_arc_property_type  = entity_property_type<timing_arc_entity_type, T>;
+    template <class T> using pin_property_type         = entity_property_type<standard_pin_entity_type, T>;
 
     //! TimingArcs Constructor
     /*!
        \brief Constructs an empty system with no Arcs.
      */
-    TimingArcs(const standard_cell::StandardCells & stdCells);
+    TimingArcs(const standard_cells_type & stdCells);
 
 
     //! TimingArcs Move Constructor
@@ -73,7 +93,7 @@ public:
        \param name Name of the arc, used to identify it.
        \return A handler for the created/existing Cell.
      */
-    TimingArc add(const std::string & name);
+    timing_arc_entity_type add(const timing_arc_name_type & name);
 
     //! Add Pin of origin of an arc
     /*!
@@ -81,7 +101,7 @@ public:
        \param arc A handler for the TimingArc we want to get the pin.
        \param from_ A handler for the pin of origin.
      */
-    void from(const TimingArc & arc, const standard_cell::Pin & from_);
+    void from(const timing_arc_entity_type & arc, const standard_pin_entity_type & from_);
 
     //! Add Target pin of an arc
     /*!
@@ -89,14 +109,14 @@ public:
        \param arc A handler for the TimingArc we want to get the pin.
        \param to_ A handler for the target pin.
      */
-    void to(const TimingArc & arc, const standard_cell::Pin & to_);
+    void to(const timing_arc_entity_type & arc, const standard_pin_entity_type & to_);
 
     //! Erase TimingArc
     /*!
        \param atc A handler for the TimingArc to erase.
        \brief Erases an TimingArc instance.
      */
-    void erase(const TimingArc & arc);
+    void erase(const timing_arc_entity_type & arc);
 
     //! Allocate space for storing TimingArc entities
     /*!
@@ -137,13 +157,21 @@ public:
        \param The arc name.
        \return Return a arc handler by arc's name.
      */
-    TimingArc find(const std::string & arcName);
+    timing_arc_entity_type find(const timing_arc_name_type & arcName);
+
+    //! Arc's name
+    /*!
+       \brief Return the name of a arc
+       \param The arc.
+       \return Return arc's name.
+     */
+    timing_arc_name_type name(const timing_arc_entity_type & arc);
 
     //! Arcs iterator
     /*!
        \return Range iterator for the arcs.
      */
-    ophidian::util::Range<TimingArcs::ArcsIterator> range() const;
+    timing_arc_range_type range() const;
 
     //! Pin of origin of an arc
     /*!
@@ -151,7 +179,7 @@ public:
        \param arc A handler for the TimingArc we want to get the pin.
        \return circuit::Pin Pin of origin
      */
-    standard_cell::Pin from(const TimingArc & arc) const;
+    standard_pin_entity_type from(const timing_arc_entity_type & arc) const;
 
     //! Target pin of an arc
     /*!
@@ -159,7 +187,7 @@ public:
        \param arc A handler for the TimingArc we want to get the pin.
        \return circuit::Pin Target pin
      */
-    standard_cell::Pin to(const TimingArc & arc) const;
+    standard_pin_entity_type to(const timing_arc_entity_type & arc) const;
 
     //! Arcs of a pin
     /*!
@@ -167,7 +195,7 @@ public:
        \param pin A handler for the Pin we want to get the Arcs.
        \return Vector for the Arcs of a Pin.
      */
-    const std::vector<TimingArc> & pinArcs(const standard_cell::Pin & pin) const;
+    const timing_arc_vector_type & pinArcs(const standard_pin_entity_type & pin) const;
 
     //! Make Cell Property
     /*!
@@ -176,19 +204,19 @@ public:
        \return An Cell => \p Value Map.
      */
     template <typename Value>
-    entity_system::Property<TimingArc, Value> makeProperty() const
+    timing_arc_property_type<Value> makeProperty() const
     {
-        return entity_system::Property<TimingArc, Value>(mArcs);
+        return timing_arc_property_type<Value>(mArcs);
     }
 
 private:
     //Arcs entity system and properties
-    entity_system::EntitySystem<TimingArc>                              mArcs;
-    entity_system::Property<TimingArc, standard_cell::Pin>              mFrom;
-    entity_system::Property<TimingArc, standard_cell::Pin>              mTo;
-    entity_system::Property<TimingArc, std::string>                     mArcNames;
-    std::unordered_map<std::string, TimingArc>                          mName2Arc;
-    entity_system::Property<standard_cell::Pin, std::vector<TimingArc>> mPin2TimingArcs;
+    timing_arc_entity_container_type                       mArcs;
+    timing_arc_property_type<standard_pin_entity_type>     mFrom;
+    timing_arc_property_type<standard_pin_entity_type>     mTo;
+    timing_arc_property_type<timing_arc_name_type>         mArcNames;
+    map_type<timing_arc_name_type, timing_arc_entity_type> mName2Arc;
+    pin_property_type<timing_arc_vector_type>              mPin2TimingArcs;
 };
 
 } // namespace timing
