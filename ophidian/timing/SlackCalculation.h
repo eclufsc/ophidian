@@ -20,12 +20,49 @@
 #ifndef OPHIDIAN_TIMING_TIMINGCALCULATION_H
 #define OPHIDIAN_TIMING_TIMINGCALCULATION_H
 
+#include <ophidian/circuit/Netlist.h>
+#include <ophidian/circuit/LibraryMapping.h>
+#include <ophidian/timing/Library.h>
 #include <ophidian/timing/GenericSTA.h>
 
 namespace ophidian
 {
 namespace timing
 {
+
+class EndPoints
+{
+public:
+    using netlist_type         = circuit::Netlist;
+    using library_mapping_type = circuit::LibraryMapping;
+    using standard_cells_type  = standard_cell::StandardCells;
+    using timing_library_type  = Library;
+    using pin_entity_type      = circuit::Pin;
+    using container_type       = std::vector<pin_entity_type>;
+
+    EndPoints() = default;
+
+    EndPoints(const EndPoints&) = delete;
+    EndPoints& operator=(const EndPoints&) = delete;
+
+    EndPoints(EndPoints&&) = default;
+    EndPoints& operator=(EndPoints&&) = default;
+
+    EndPoints(const netlist_type & netlist,
+              const library_mapping_type & lib_mapping,
+              standard_cells_type & std_cells,
+              const timing_library_type & lib);
+
+    virtual ~EndPoints();
+
+    container_type::const_iterator begin() const;
+    container_type::const_iterator end() const;
+    std::size_t size() const;
+    bool empty() const;
+
+private:
+    container_type m_endpoints;
+};
 
 class WorstNegativeSlack
 {

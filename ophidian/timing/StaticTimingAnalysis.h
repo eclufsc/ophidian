@@ -27,9 +27,7 @@
 #include <ophidian/timing/TimingGraph.h>
 #include <ophidian/timing/GenericSTA.h>
 #include <ophidian/timing/WireModels.h>
-#include <ophidian/timing/TimingCalculation.h>
-#include <ophidian/timing/EndPoints.h>
-
+#include <ophidian/timing/SlackCalculation.h>
 #include <ophidian/timingdriven_placement/FluteRCTreeEstimation.h>
 
 namespace ophidian
@@ -40,11 +38,12 @@ namespace timing
 class StaticTimingAnalysis
 {
 public:
+    template <class T>
+    using generic_sta_lumped_ptr       = std::unique_ptr<GenericSTA<wiremodel::LumpedCapacitance, T>>;
+    
     using time_unit_type               = util::second_t;
     using timing_data_ptr              = std::unique_ptr<TimingData>;
     using graph_and_topology_ptr       = std::unique_ptr<GraphAndTopology>;
-    template <class T>
-    using generic_sta_lumped_ptr       = std::unique_ptr<GenericSTA<wiremodel::LumpedCapacitance, T>>;
 
     using timing_graph_type            = TimingGraph;
     using net_to_rctrees_property_type = entity_system::Property<circuit::Net, timingdriven_placement::RCTree>;
@@ -54,6 +53,7 @@ public:
     using library_mapping_type         = circuit::LibraryMapping;
     using standard_cells_type          = standard_cell::StandardCells;
     using design_constraints_type      = parser::DesignConstraints;
+    using endpoints_type               = EndPoints;
 
     StaticTimingAnalysis() = default;
 
@@ -78,20 +78,20 @@ public:
     time_unit_type early_wns() const;
     time_unit_type late_tns() const;
     time_unit_type early_tns() const;
-    time_unit_type early_rise_slack(pin_entity_type p) const;
-    time_unit_type early_fall_slack(pin_entity_type p) const;
-    time_unit_type late_rise_slack(pin_entity_type p) const;
-    time_unit_type late_fall_slack(pin_entity_type p) const;
-    time_unit_type early_rise_arrival(pin_entity_type p) const;
-    time_unit_type early_fall_arrival(pin_entity_type p) const;
-    time_unit_type late_rise_arrival(pin_entity_type p) const;
-    time_unit_type late_fall_arrival(pin_entity_type p) const;
-    time_unit_type early_rise_slew(pin_entity_type p) const;
-    time_unit_type early_fall_slew(pin_entity_type p) const;
-    time_unit_type late_rise_slew(pin_entity_type p) const;
-    time_unit_type late_fall_slew(pin_entity_type p) const;
+    time_unit_type early_rise_slack(const pin_entity_type& p) const;
+    time_unit_type early_fall_slack(const pin_entity_type& p) const;
+    time_unit_type late_rise_slack(const pin_entity_type& p) const;
+    time_unit_type late_fall_slack(const pin_entity_type& p) const;
+    time_unit_type early_rise_arrival(const pin_entity_type& p) const;
+    time_unit_type early_fall_arrival(const pin_entity_type& p) const;
+    time_unit_type late_rise_arrival(const pin_entity_type& p) const;
+    time_unit_type late_fall_arrival(const pin_entity_type& p) const;
+    time_unit_type early_rise_slew(const pin_entity_type& p) const;
+    time_unit_type early_fall_slew(const pin_entity_type& p) const;
+    time_unit_type late_rise_slew(const pin_entity_type& p) const;
+    time_unit_type late_fall_slew(const pin_entity_type& p) const;
 
-    const EndPoints & timing_endpoints() const;
+    const endpoints_type & timing_endpoints() const;
 
 private:
     void init_timing_data();
@@ -114,7 +114,7 @@ private:
     graph_and_topology_ptr              m_topology;
     generic_sta_lumped_ptr<Pessimistic> m_late_sta;
     generic_sta_lumped_ptr<Optimistic>  m_early_sta;
-    EndPoints                           m_endpoints;
+    endpoints_type                      m_endpoints;
     time_unit_type                      m_lwns;
     time_unit_type                      m_ewns;
     time_unit_type                      m_ltns;

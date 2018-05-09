@@ -201,34 +201,34 @@ public:
         }
     }
 
-    slew_unit_type rise_arrival(const pin_entity_type pin) const
+    slew_unit_type rise_arrival(const pin_entity_type& pin) const
     {
         return m_timing_data.m_nodes_timing.arrival(m_topology->m_graph.riseNode(pin));
     }
 
-    slew_unit_type fall_arrival(const pin_entity_type pin) const
+    slew_unit_type fall_arrival(const pin_entity_type& pin) const
     {
         return m_timing_data.m_nodes_timing.arrival(m_topology->m_graph.fallNode(pin));
     }
 
-    slew_unit_type rise_slew(const pin_entity_type pin) const
+    slew_unit_type rise_slew(const pin_entity_type& pin) const
     {
         return m_timing_data.m_nodes_timing.slew(m_topology->m_graph.riseNode(pin));
     }
 
-    slew_unit_type fall_slew(const pin_entity_type pin) const
+    slew_unit_type fall_slew(const pin_entity_type& pin) const
     {
         return m_timing_data.m_nodes_timing.slew(m_topology->m_graph.fallNode(pin));
     }
 
-    slew_unit_type rise_slack(const pin_entity_type pin) const
+    slew_unit_type rise_slack(const pin_entity_type& pin) const
     {
         auto node = m_topology->m_graph.riseNode(pin);
         return MergeStrategy::slack_signal() *
                (m_timing_data.m_nodes_timing.required(node) - m_timing_data.m_nodes_timing.arrival(node));
     }
 
-    slew_unit_type fall_slack(const pin_entity_type pin) const
+    slew_unit_type fall_slack(const pin_entity_type& pin) const
     {
         auto node = m_topology->m_graph.fallNode(pin);
         return MergeStrategy::slack_signal() *

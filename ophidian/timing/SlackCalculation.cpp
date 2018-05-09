@@ -17,24 +17,24 @@
 
  */
 
-#include "EndPoints.h"
+#include "SlackCalculation.h"
 
 namespace ophidian
 {
 namespace timing
 {
 
-EndPoints::EndPoints(const circuit::Netlist & netlist,
-          const circuit::LibraryMapping & lib_mapping,
-          standard_cell::StandardCells & std_cells,
-          const Library & lib)
+EndPoints::EndPoints(const netlist_type & netlist,
+          const library_mapping_type & lib_mapping,
+          standard_cells_type & std_cells,
+          const timing_library_type & lib)
 {
     m_endpoints.resize(0);
 
     for(auto output = netlist.begin(circuit::Output()); output != netlist.end(circuit::Output()); ++output)
         m_endpoints.push_back(netlist.pin(*output));
 
-    for(auto pin = netlist.begin(circuit::Pin()); pin != netlist.end(circuit::Pin()); ++pin)
+    for(auto pin = netlist.begin(pin_entity_type()); pin != netlist.end(pin_entity_type()); ++pin)
     {
         auto pin_owner    = netlist.cell(*pin);
         auto pin_std_cell = lib_mapping.pinStdCell(*pin);
@@ -78,6 +78,26 @@ std::size_t EndPoints::size() const
 bool EndPoints::empty() const
 {
     return m_endpoints.empty();
+}
+
+TotalNegativeSlack::~TotalNegativeSlack()
+{
+
+}
+
+const TotalNegativeSlack::time_unit_type TotalNegativeSlack::value() const
+{
+    return m_value;
+}
+
+WorstNegativeSlack::~WorstNegativeSlack()
+{
+
+}
+
+const WorstNegativeSlack::time_unit_type WorstNegativeSlack::value() const
+{
+    return m_value;
 }
 
 }   // namespace timing

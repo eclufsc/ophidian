@@ -81,8 +81,6 @@ public:
      */
     ~TimingArcs();
 
-//--------------------------- Arcs -------------------------------//
-
     //! Add TimingArc
     /*!
        \brief Adds an arc instance. An arc has a name associated to it. If the arc already exist then just return the existing arc.

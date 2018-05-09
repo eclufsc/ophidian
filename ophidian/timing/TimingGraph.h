@@ -38,14 +38,18 @@ namespace timing
 class TimingGraph
 {
 public:
-    using graph_type = lemon::ListDigraph;
-    using node_type = graph_type::Node;
-    using arc_type = graph_type::Arc;
+    using graph_type                       = lemon::ListDigraph;
+    using node_type                        = graph_type::Node;
+    using arc_type                         = graph_type::Arc;
 
-    using netlist_type           = circuit::Netlist;
-    using pin_entity_type        = circuit::Pin;
-    using net_entity_type        = circuit::Net;
-    using timing_arc_entity_type = TimingArcs::timing_arc_entity_type;
+    template <class T> using node_map_type = graph_type::NodeMap<T>;
+    template <class T> using arc_map_type  = graph_type::ArcMap<T>;
+
+    using netlist_type                     = circuit::Netlist;
+    using pin_entity_type                  = circuit::Pin;
+    using net_entity_type                  = circuit::Net;
+    using timing_arc_entity_type           = TimingArcs::timing_arc_entity_type;
+    using pin_entity_to_node_property_type = entity_system::Property<pin_entity_type, node_type>;
 
     enum class NodeProperty
     {
@@ -260,16 +264,16 @@ private:
      */
     node_type nodeCreate(const pin_entity_type & pin,
                         const NodeProperty & prop,
-                        entity_system::Property<pin_entity_type, node_type> & map);
+                        pin_entity_to_node_property_type & map);
 
-    graph_type                                          mGraph;
-    graph_type::NodeMap<pin_entity_type>                mPins;
-    graph_type::NodeMap<NodeProperty>                   mNodeProperties;
-    graph_type::ArcMap<arc_entity_type>                 mArcs;
-    graph_type::ArcMap<ArcProperty>                     mArcProperties;
+    graph_type                       mGraph;
+    node_map_type<pin_entity_type>   mPins;
+    node_map_type<NodeProperty>      mNodeProperties;
+    arc_map_type<arc_entity_type>    mArcs;
+    arc_map_type<ArcProperty>        mArcProperties;
 
-    entity_system::Property<pin_entity_type, node_type> mRiseNodes;
-    entity_system::Property<pin_entity_type, node_type> mFallNodes;
+    pin_entity_to_node_property_type mRiseNodes;
+    pin_entity_to_node_property_type mFallNodes;
 };
 
 } // namespace timing

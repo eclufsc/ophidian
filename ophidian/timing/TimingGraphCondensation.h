@@ -32,11 +32,18 @@ class GraphNodesTiming
 public:
     using time_unit_type                      = util::second_t;
     using capacitance_unit_type               = util::farad_t;
-
     using timing_graph_type                   = TimingGraph;
     using node_type                           = timing_graph_type::node_type;
     using timing_node_to_time_map_type        = timing_graph_type::graph_type::NodeMap<time_unit_type>;
     using timing_node_to_capacitance_map_type = timing_graph_type::graph_type::NodeMap<capacitance_unit_type>;
+
+    GraphNodesTiming() = delete;
+
+    GraphNodesTiming(const GraphNodesTiming&) = delete;
+    GraphNodesTiming& operator=(const GraphNodesTiming&) = delete;
+
+    GraphNodesTiming(GraphNodesTiming&&) = default;
+    GraphNodesTiming& operator=(GraphNodesTiming&&) = default;
 
     GraphNodesTiming(const timing_graph_type & graph);
     virtual ~GraphNodesTiming();
@@ -62,12 +69,18 @@ private:
 class GraphArcsTiming
 {
 public:
-
     using time_unit_type              = util::second_t;
-
     using timing_graph_type           = TimingGraph;
     using arc_type                    = TimingGraph::arc_type;
     using timing_arc_to_time_map_type = timing_graph_type::graph_type::ArcMap<time_unit_type>;
+
+    GraphArcsTiming() = delete;
+
+    GraphArcsTiming(const GraphArcsTiming&) = delete;
+    GraphArcsTiming& operator=(const GraphArcsTiming&) = delete;
+
+    GraphArcsTiming(GraphArcsTiming&&) = default;
+    GraphArcsTiming& operator=(GraphArcsTiming&&) = default;
 
     GraphArcsTiming(const timing_graph_type & graph);
     virtual ~GraphArcsTiming();

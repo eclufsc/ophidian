@@ -21,13 +21,13 @@ under the License.
 #include <ophidian/design/DesignBuilder.h>
 #include <ophidian/parser/LibertyParser.h>
 #include <ophidian/circuit/LibraryMapping.h>
-#include <ophidian/timing/EndPoints.h>
+#include <ophidian/timing/SlackCalculation.h>
 
 using namespace ophidian;
 
 namespace
 {
-class EndPointsFixture
+class SlackCalculationFixture
 {
 public:
     design::ICCAD2015ContestDesignBuilder m_builder;
@@ -37,7 +37,7 @@ public:
     timing::TimingArcs m_timing_arcs;
     timing::Library m_timing_library;
 
-    EndPointsFixture() :
+    SlackCalculationFixture() :
         m_builder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
         m_design(m_builder.build()),
         m_liberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
@@ -49,7 +49,7 @@ public:
 };
 } // namespace
 
-TEST_CASE_METHOD(EndPointsFixture, "EndPoints: init", "[timing][endpoints]")
+TEST_CASE_METHOD(SlackCalculationFixture, "EndPoints: init", "[timing][endpoints]")
 {
     timing::EndPoints endpoints(m_design.netlist(), m_design.libraryMapping(), m_design.standardCells(), m_timing_library);
 

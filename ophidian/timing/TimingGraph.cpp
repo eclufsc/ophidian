@@ -37,7 +37,7 @@ size_t TimingGraph::size(arc_type) const
 }
 
 
-TimingGraph::node_type TimingGraph::nodeCreate(const pin_entity_type & pin, const NodeProperty & prop, entity_system::Property<pin_entity_type, node_type> & map)
+TimingGraph::node_type TimingGraph::nodeCreate(const pin_entity_type & pin, const NodeProperty & prop, pin_entity_to_node_property_type & map)
 {
 //    node_type newNode;
 

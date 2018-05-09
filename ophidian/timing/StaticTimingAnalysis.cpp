@@ -85,7 +85,7 @@ void StaticTimingAnalysis::init_timing_data()
     m_topology.reset(new GraphAndTopology(*m_timing_graph, *m_netlist, *m_std_cells, *m_lib_mappping));
     m_late_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Pessimistic>(*m_late_data, *m_topology, *m_rc_trees));
     m_early_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Optimistic>(*m_early_data, *m_topology, *m_rc_trees));
-    m_endpoints = EndPoints(*m_netlist, *m_lib_mappping, *m_std_cells, *m_late_lib);
+    m_endpoints = endpoints_type(*m_netlist, *m_lib_mappping, *m_std_cells, *m_late_lib);
 }
 
 void StaticTimingAnalysis::propagate_ats()
@@ -137,67 +137,67 @@ StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_tns() const
     return m_etns;
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slack(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slack(const pin_entity_type& p) const
 {
     return m_early_sta->rise_slack(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slack(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slack(const pin_entity_type& p) const
 {
     return m_early_sta->fall_slack(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slack(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slack(const pin_entity_type& p) const
 {
     return m_late_sta->rise_slack(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slack(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slack(const pin_entity_type& p) const
 {
     return m_late_sta->fall_slack(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_arrival(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_arrival(const pin_entity_type& p) const
 {
     return m_early_sta->rise_arrival(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_arrival(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_arrival(const pin_entity_type& p) const
 {
     return m_early_sta->fall_arrival(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_arrival(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_arrival(const pin_entity_type& p) const
 {
     return m_late_sta->rise_arrival(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_arrival(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_arrival(const pin_entity_type& p) const
 {
     return m_late_sta->fall_arrival(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slew(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slew(const pin_entity_type& p) const
 {
     return m_early_sta->rise_slew(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slew(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slew(const pin_entity_type& p) const
 {
     return m_early_sta->fall_slew(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slew(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slew(const pin_entity_type& p) const
 {
     return m_late_sta->rise_slew(p);
 }
 
-StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slew(pin_entity_type p) const
+StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slew(const pin_entity_type& p) const
 {
     return m_late_sta->fall_slew(p);
 }
 
-const EndPoints & StaticTimingAnalysis::timing_endpoints() const
+const StaticTimingAnalysis::endpoints_type & StaticTimingAnalysis::timing_endpoints() const
 {
     return m_endpoints;
 }
