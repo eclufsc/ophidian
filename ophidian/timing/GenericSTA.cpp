@@ -4,14 +4,6 @@ namespace ophidian
 {
 namespace timing
 {
-
-    TimingData::TimingData(const library_type& lib, const timing_graph_type& graph) :
-        m_library(lib),
-        m_nodes_timing(graph),
-        m_arcs_timing(graph)
-    {
-    }
-
     GraphAndTopology::GraphAndTopology(const timing_graph_type & graph,
                                        netlist_type & netlist,
                                        standard_cells_type & stdCells,

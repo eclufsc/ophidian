@@ -19,20 +19,26 @@ under the License.
 #include <catch.hpp>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/standard_cell/StandardCells.h>
-#include <ophidian/timing/TimingGraphCondensation.h>
+#include <ophidian/timing/Library.h>
+#include <ophidian/timing/TimingData.h>
 
 namespace
 {
 class TGCondensationFixture
 {
 public:
-    ophidian::circuit::Netlist              mNetlist;
-    ophidian::timing::TimingGraph           mGraph;
+    ophidian::circuit::Netlist               mNetlist;
+    ophidian::standard_cell::StandardCells   mStdCells;
+    ophidian::timing::TimingGraph            mGraph;
     ophidian::timing::TimingGraph::node_type mFrom, mTo;
     ophidian::timing::TimingGraph::arc_type  mArc;
+    ophidian::timing::TimingArcs             mTimingArcs;
+    ophidian::timing::Library                mLibrary;
 
     TGCondensationFixture() :
-        mGraph(mNetlist)
+        mGraph(mNetlist),
+        mTimingArcs(mStdCells),
+        mLibrary(ophidian::parser::Liberty(), mStdCells, mTimingArcs, true)
     {
         auto from = mNetlist.add(ophidian::circuit::Pin(), "from");
         auto to = mNetlist.add(ophidian::circuit::Pin(), "to");
@@ -50,30 +56,30 @@ TEST_CASE_METHOD(TGCondensationFixture, "TimingGraph Condensation","[timing][sta
 
     SECTION("TimingGraph Condensation: Values of nodes after creation","[timing][sta][condensation]")
     {
-        using time_unit_type = timing::GraphNodesTiming::time_unit_type;
-        using capacitance_unit_type = timing::GraphNodesTiming::capacitance_unit_type;
+        using time_unit_type = timing::TimingData::time_unit_type;
+        using capacitance_unit_type = timing::TimingData::capacitance_unit_type;
 
-        timing::GraphNodesTiming nodes(mGraph);
-        nodes.arrival(mFrom, time_unit_type(1.0));
-        nodes.slew(mFrom, time_unit_type(3.0));
-        nodes.required(mFrom, time_unit_type(5.0));
-        nodes.load(mFrom, capacitance_unit_type(6.0));
+        timing::TimingData data(mLibrary, mGraph);
+        data.arrival(mFrom, time_unit_type(1.0));
+        data.slew(mFrom, time_unit_type(3.0));
+        data.required(mFrom, time_unit_type(5.0));
+        data.load(mFrom, capacitance_unit_type(6.0));
 
-        REQUIRE(nodes.arrival(mFrom) == time_unit_type(1.0));
-        REQUIRE(nodes.slew(mFrom) == time_unit_type(3.0));
-        REQUIRE(nodes.required(mFrom) == time_unit_type(5.0));
-        REQUIRE(nodes.load(mFrom) == capacitance_unit_type(6.0));
+        REQUIRE(data.arrival(mFrom) == time_unit_type(1.0));
+        REQUIRE(data.slew(mFrom) == time_unit_type(3.0));
+        REQUIRE(data.required(mFrom) == time_unit_type(5.0));
+        REQUIRE(data.load(mFrom) == capacitance_unit_type(6.0));
     }
 
     SECTION("TimingGraph Condensation: Values of arcs after creation", "[timing][sta][condensation]")
     {
-        using time_unit_type = timing::GraphArcsTiming::time_unit_type;
+        using time_unit_type = timing::TimingData::time_unit_type;
 
-        timing::GraphArcsTiming arcs(mGraph);
-        arcs.delay(mArc, time_unit_type(10.0));
-        arcs.slew(mArc, time_unit_type(12.0));
+        timing::TimingData data(mLibrary, mGraph);
+        data.delay(mArc, time_unit_type(10.0));
+        data.slew(mArc, time_unit_type(12.0));
 
-        REQUIRE(arcs.delay(mArc) == time_unit_type(10.0));
-        REQUIRE(arcs.slew(mArc) == time_unit_type(12.0));
+        REQUIRE(data.delay(mArc) == time_unit_type(10.0));
+        REQUIRE(data.slew(mArc) == time_unit_type(12.0));
     }
 }
