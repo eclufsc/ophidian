@@ -50,10 +50,9 @@ public:
     using std_cell_entity_type   = standard_cell::Cell;
     using timing_arc_entity_type = TimingArc;
 
-    template <class K, class V> using property_type   = entity_system::Property<K, V>;
-    template <class V> using property_timing_arc_type = property_type<timing_arc_entity_type, V>;
-    template <class V> using property_std_pin_type    = property_type<std_pin_entity_type, V>;
-    template <class V> using property_std_cell_type   = property_type<std_cell_entity_type, V>;
+    template <class V> using property_timing_arc_type = entity_system::Property<timing_arc_entity_type, V>;
+    template <class V> using property_std_pin_type    = entity_system::Property<std_pin_entity_type, V>;
+    template <class V> using property_std_cell_type   = entity_system::Property<std_cell_entity_type, V>;
 
     //! Library Constructor
     /*!

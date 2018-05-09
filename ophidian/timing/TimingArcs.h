@@ -43,28 +43,24 @@ public:
 class TimingArcs
 {
 public:
-    using timing_arc_entity_type             = TimingArc;
+    template <class T> using entity_container_type    = entity_system::EntitySystem<T>;
+    template <class T> using vector_type              = std::vector<T>;
+    template <class K, class V> using map_type        = std::unordered_map<K, V>;
 
-    using ArcNotifier = entity_system::EntitySystem<timing_arc_entity_type>::NotifierType;
-    using ArcsIterator = entity_system::EntitySystem<timing_arc_entity_type>::const_iterator;
+    using timing_arc_name_type                        = std::string;
+    using timing_arc_entity_type                      = TimingArc;
+    using standard_cells_type                         = standard_cell::StandardCells;
+    using standard_pin_entity_type                    = standard_cell::Pin;
+    using standard_cell_entity_type                   = standard_cell::Cell;
+    using standard_pin_entity_vector_type             = vector_type<standard_pin_entity_type>;
+    using timing_arc_vector_type                      = vector_type<timing_arc_entity_type>;
+    using ArcNotifier                                 = entity_system::EntitySystem<timing_arc_entity_type>::NotifierType;
+    using ArcsIterator                                = entity_system::EntitySystem<timing_arc_entity_type>::const_iterator;
+    using timing_arc_range_type                       = util::Range<ArcsIterator>;
+    using timing_arc_entity_container_type            = entity_container_type<timing_arc_entity_type>;
 
-    template <class T> using entity_container_type = entity_system::EntitySystem<T>;
-    template <class K, class V> using entity_property_type = entity_system::Property<K, V>;
-    template <class T> using vector_type       = std::vector<T>;
-    template <class K, class V> using map_type = std::unordered_map<K, V>;
-
-    using timing_arc_entity_container_type = entity_container_type<timing_arc_entity_type>;
-    using timing_arc_name_type             = std::string;
-
-    using standard_cells_type              = standard_cell::StandardCells;
-    using standard_pin_entity_type         = standard_cell::Pin;
-    using standard_cell_entity_type        = standard_cell::Cell;
-    using standard_pin_entity_vector_type  = vector_type<standard_pin_entity_type>;
-    using timing_arc_vector_type           = vector_type<timing_arc_entity_type>;
-    using timing_arc_range_type            = util::Range<ArcsIterator>;
-
-    template <class T> using timing_arc_property_type  = entity_property_type<timing_arc_entity_type, T>;
-    template <class T> using pin_property_type         = entity_property_type<standard_pin_entity_type, T>;
+    template <class T> using timing_arc_property_type = entity_system::Property<timing_arc_entity_type, T>;
+    template <class T> using pin_property_type        = entity_system::Property<standard_pin_entity_type, T>;
 
     //! TimingArcs Constructor
     /*!

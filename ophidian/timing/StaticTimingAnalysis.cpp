@@ -197,7 +197,8 @@ StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slew(pin_en
     return m_late_sta->fall_slew(p);
 }
 
-const EndPoints & StaticTimingAnalysis::timing_endpoints() const {
+const EndPoints & StaticTimingAnalysis::timing_endpoints() const
+{
     return m_endpoints;
 }
 
