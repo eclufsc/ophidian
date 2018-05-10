@@ -135,5 +135,6 @@ TEST_CASE("RCTree: Predecessors", "[timingdriven_placement][RCTree]")
     REQUIRE(tree.name(tree.pred(a)) == "s");
     REQUIRE(tree.name(tree.pred(b)) == "s");
     REQUIRE(tree.name(tree.pred(c)) == "b");
-    REQUIRE(tree.name(tree.pred(s)) == "Invalid");
+    CHECK_THROWS(tree.name(tree.pred(s)));
+    CHECK_THROWS(tree.name(RCTree::capacitor_type()));
 }

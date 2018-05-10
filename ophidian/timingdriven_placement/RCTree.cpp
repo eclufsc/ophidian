@@ -99,10 +99,10 @@ void RCTree::insertTap(const capacitor_type & cap)
 
 std::string RCTree::name(const capacitor_type & cap) const
 {
-    if (mGraph.valid(cap))
-        return mNames[cap];
+    if (!mGraph.valid(cap))
+        throw std::invalid_argument("Capacitor Invalid");
 
-    return "Invalid";
+    return mNames[cap];
 }
 
 RCTree::capacitor_type RCTree::capacitor(const std::string name) const
@@ -154,7 +154,7 @@ RCTree::resistance_unit_type RCTree::resistance(const resistor_type & res) const
 
 RCTree::capacitor_type RCTree::pred(const capacitor_type& cap)
 {
-    if (!mGraph.valid(cap))
+    if (!mGraph.valid(cap) || mGraph.id(mSource) == mGraph.id(cap))
         return lemon::INVALID;
 
     if (!mValidPred)

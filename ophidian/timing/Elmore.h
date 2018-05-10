@@ -38,16 +38,18 @@ public:
     template <class T> using container_type     = std::vector<T>;
     template <class U, class T> using pair_type = std::pair<U, T>;
 
-    using graph_type                            = timingdriven_placement::RCTree::graph_type;
-    using capacitor_type                        = timingdriven_placement::RCTree::capacitor_type;
-    using resistor_type                         = timingdriven_placement::RCTree::resistor_type;
+    using rctree_type                           = timingdriven_placement::RCTree;
+    using graph_type                            = rctree_type::graph_type;
+    using capacitor_type                        = rctree_type::capacitor_type;
+    using resistor_type                         = rctree_type::resistor_type;
 
-    using time_map_type                         = graph_type::NodeMap<time_unit_type>;
-    using capacitance_map_type                  = graph_type::NodeMap<capacitance_unit_type>;
-    using predecessor_map_type                  = graph_type::NodeMap<pair_type<capacitor_type, resistor_type>>;
+    using time_map_type                         = rctree_type::capacitor_map_type<time_unit_type>;
+    using capacitance_map_type                  = rctree_type::capacitor_map_type<capacitance_unit_type>;
+    using resistance_unit_type                  = rctree_type::resistance_unit_type;
+    using predecessor_map_type                  = rctree_type::capacitor_map_type<pair_type<capacitor_type, resistor_type>>;
     using order_container_type                  = container_type<capacitor_type>;
 
-    Elmore(const timingdriven_placement::RCTree & tree);
+    Elmore(const rctree_type & tree);
     virtual ~Elmore();
 
     void update();
@@ -57,37 +59,39 @@ public:
     const order_container_type & order() const;
 
 private:
-    const timingdriven_placement::RCTree & m_tree;
-    time_map_type                          m_elmore_delay;
-    capacitance_map_type                   m_downstream_capacitance;
-    predecessor_map_type                   m_pred;
-    order_container_type                   m_order;
-    const capacitor_type                   m_source;
+    const rctree_type &  m_tree;
+    time_map_type        m_elmore_delay;
+    capacitance_map_type m_downstream_capacitance;
+    predecessor_map_type m_pred;
+    order_container_type m_order;
+    const capacitor_type m_source;
 };
 
 class ElmoreSecondMoment
 {
 public:
-    using square_time_unit = util::square_second_t;
+    using square_time_unit_type = util::square_second_t;
 
-    using graph_type       = timingdriven_placement::RCTree::graph_type;
-    using capacitor_type   = timingdriven_placement::RCTree::capacitor_type;
-    using resistor_type    = timingdriven_placement::RCTree::resistor_type;
+    using rctree_type      = Elmore::rctree_type;
+    using graph_type       = Elmore::graph_type;
+    using capacitor_type   = Elmore::capacitor_type;
+    using resistor_type    = Elmore::resistor_type;
 
     ElmoreSecondMoment(const Elmore & e);
 
     virtual ~ElmoreSecondMoment();
 
-    square_time_unit at(const capacitor_type & capacitor) const;
+    square_time_unit_type at(const capacitor_type & capacitor) const;
 
 private:
     using capacitance_per_time_unit = units::unit_t<units::compound_unit<units::capacitance::farads, units::time::seconds>>;
-    using square_time_map_type  = graph_type::NodeMap<square_time_unit>;
+    using square_time_map_type      = rctree_type::capacitor_map_type<square_time_unit_type>;
 
-    const Elmore&                         m_elmore;
-    const timingdriven_placement::RCTree& m_tree;
-    square_time_map_type                  m_second_moment;
     void update();
+
+    const Elmore&        m_elmore;
+    const rctree_type&   m_tree;
+    square_time_map_type m_second_moment;
 };
 
 }   // namespace timing

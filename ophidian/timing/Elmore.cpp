@@ -5,7 +5,7 @@ namespace ophidian
 namespace timing
 {
 
-Elmore::Elmore(const timingdriven_placement::RCTree & tree) :
+Elmore::Elmore(const rctree_type & tree) :
     m_tree(tree),
     m_elmore_delay(tree.g()),
     m_downstream_capacitance(tree.g()),
@@ -87,30 +87,30 @@ ElmoreSecondMoment::~ElmoreSecondMoment()
 
 }
 
-ElmoreSecondMoment::square_time_unit ElmoreSecondMoment::at(const capacitor_type & capacitor) const
+ElmoreSecondMoment::square_time_unit_type ElmoreSecondMoment::at(const capacitor_type & capacitor) const
 {
     return m_second_moment[capacitor];
 }
 
 void ElmoreSecondMoment::update()
 {
-    graph_type::NodeMap<capacitance_per_time_unit> m_downstream_capacitance(m_tree.g());
+    graph_type::NodeMap<capacitance_per_time_unit> downstream_capacitance(m_tree.g());
 
     const auto & order = m_elmore.order();
 
     for (auto c : order)
-        m_downstream_capacitance[c] = m_tree.capacitance(c) * m_elmore.at(c);
+        downstream_capacitance[c] = m_tree.capacitance(c) * m_elmore.at(c);
 
     for (auto it = order.rbegin(); it != order.rend(); ++it)
         if (m_elmore.pred()[*it].first != lemon::INVALID)
-            m_downstream_capacitance[m_elmore.pred()[*it].first] += m_downstream_capacitance[*it];
+            downstream_capacitance[m_elmore.pred()[*it].first] += downstream_capacitance[*it];
 
 
-    m_second_moment[order.front()] = square_time_unit(0.0);
+    m_second_moment[order.front()] = square_time_unit_type(0.0);
     for (auto c : order)
         if (m_elmore.pred()[c].first != lemon::INVALID)
             m_second_moment[c] = m_second_moment[m_elmore.pred()[c].first]
-                               + m_tree.resistance(m_elmore.pred()[c].second) * m_downstream_capacitance[c];
+                               + m_tree.resistance(m_elmore.pred()[c].second) * downstream_capacitance[c];
 }
 
 }   // namespace timing

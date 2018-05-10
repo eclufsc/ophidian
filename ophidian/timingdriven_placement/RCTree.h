@@ -46,6 +46,7 @@ public:
 
     using graph_type                            = lemon::ListGraph;
     using capacitor_type                        = graph_type::Node;
+    using capacitor_name_type                   = std::string;
     using resistor_type                         = graph_type::Edge;
     using resistor_iterator_type                = graph_type::OutArcIt;
     template <class T> using capacitor_map_type = graph_type::NodeMap<T>;
@@ -236,7 +237,7 @@ private:
     void topology_updates();
 
     graph_type                                mGraph;
-    capacitor_map_type<std::string>           mNames;
+    capacitor_map_type<capacitor_name_type>   mNames;
     capacitor_map_type<capacitance_unit_type> mCapacitances;
     resistor_map_type<resistance_unit_type>   mResistances;
 

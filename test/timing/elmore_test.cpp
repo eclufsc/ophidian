@@ -23,25 +23,36 @@ under the License.
 TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
 {
     using namespace ophidian;
-    using time_unit_type = timing::Elmore::time_unit_type;
-    using capacitance_unit_type = timingdriven_placement::RCTree::capacitance_unit_type;
-    using resistance_unit_type  = timingdriven_placement::RCTree::resistance_unit_type;
+    using rctree_type           = timing::Elmore::rctree_type;
+    using time_unit_type        = timing::Elmore::time_unit_type;
+    using capacitance_unit_type = timing::Elmore::capacitance_unit_type;
+    using resistance_unit_type  = timing::Elmore::resistance_unit_type;
+    using square_time_unit_type = timing::ElmoreSecondMoment::square_time_unit_type;
 
     SECTION("Elmore Delay: RCTree with 1 node", "[timing][RCTree][Elmore]")
     {
-        timingdriven_placement::RCTree rctree;
+        rctree_type rctree;
 
         auto cap = rctree.addCapacitor("cap1");
         rctree.source(cap);
 
         timing::Elmore delay(rctree);
 
-        REQUIRE(delay.at(cap) == time_unit_type(0.0));
+        SECTION("Elmore", "[timing][RCTree][Elmore]")
+        {
+            REQUIRE(delay.at(cap) == time_unit_type(0.0));
+        }
+
+        SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
+        {
+            timing::ElmoreSecondMoment second(delay);
+            REQUIRE(second.at(cap) == square_time_unit_type(0.0));
+        }
     }
 
     SECTION("Elmore Delay: RCTree with 2 nodes", "[timing][RCTree][Elmore]")
     {
-        timingdriven_placement::RCTree rctree;
+        rctree_type rctree;
 
         auto C0 = rctree.addCapacitor("C0");
         auto C1 = rctree.addCapacitor("C1");
@@ -53,7 +64,21 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
 
         timing::Elmore delay(rctree);
 
-        REQUIRE(delay.at(C1) == time_unit_type(util::picosecond_t((0.223 * 2.2))));
+        SECTION("Elmore", "[timing][RCTree][Elmore]")
+        {
+            REQUIRE(delay.at(C0) == time_unit_type(0.0));
+            REQUIRE(delay.at(C1) == time_unit_type(util::picosecond_t((0.223 * 2.2))));
+        }
+
+        SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
+        {
+            auto downstream_c1 = util::femtofarad_t(2.2) * delay.at(C1);
+            auto second_c1 = util::kiloohm_t(0.223) * downstream_c1;
+
+            timing::ElmoreSecondMoment second(delay);
+            REQUIRE(second.at(C0) == square_time_unit_type(0.0));
+            REQUIRE(second.at(C1) == second_c1);
+        }
     }
 
     SECTION("Elmore Delay: Simulating tap node", "[timing][RCTree][Elmore]")
@@ -70,11 +95,11 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
 
         */
 
-        timingdriven_placement::RCTree rctree;
+        rctree_type rctree;
 
         auto C0 = rctree.addCapacitor("C0");
-        rctree.source(C0);
         rctree.capacitance(C0, capacitance_unit_type(util::femtofarad_t(0.20)));
+        rctree.source(C0);
 
         auto C1 = rctree.addCapacitor("C1");
         rctree.capacitance(C1, capacitance_unit_type(util::femtofarad_t(0.20)));
@@ -90,11 +115,50 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
         auto R3 = rctree.addResistor(u1_a_tap, u1_a, resistance_unit_type(0.0));
 
         timing::Elmore delay(rctree);
-        time_unit_type golden_delay(
-                    rctree.resistance(R2) * (rctree.capacitance(u1_a_tap) + rctree.capacitance(u1_a)) +
-                    rctree.resistance(R1) * (rctree.capacitance(u1_a_tap) + rctree.capacitance(u1_a) + rctree.capacitance(C1)));
 
-        REQUIRE(delay.at(u1_a) == golden_delay);
+        SECTION("Elmore", "[timing][RCTree][Elmore]")
+        {
+            auto down_u1_a = rctree.capacitance(u1_a);
+            auto down_u1_a_tap = rctree.capacitance(u1_a_tap) + down_u1_a;
+            auto down_c1 = rctree.capacitance(C1) + down_u1_a_tap;
+            auto down_c0 = rctree.capacitance(C0) + down_c1;
+
+            auto delay_c0 = time_unit_type(0.0);
+            auto delay_c1 = delay_c0 + rctree.resistance(R1) * down_c1;
+            auto delay_u1_a_tap = delay_c1 + rctree.resistance(R2) * down_u1_a_tap;
+            auto delay_u1_a = delay_u1_a_tap + rctree.resistance(R3) * down_u1_a;
+
+            time_unit_type golden_delay(
+                        rctree.resistance(R2)
+                            * (rctree.capacitance(u1_a_tap) + rctree.capacitance(u1_a))
+                        + rctree.resistance(R1)
+                            * (rctree.capacitance(u1_a_tap) + rctree.capacitance(u1_a) + rctree.capacitance(C1)));
+
+            REQUIRE(delay.at(C0) == delay_c0);
+            REQUIRE(delay.at(C1) == delay_c1);
+            REQUIRE(delay.at(u1_a_tap) == delay_u1_a_tap);
+            REQUIRE(delay.at(u1_a) == golden_delay);
+        }
+
+        SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
+        {
+            timing::ElmoreSecondMoment second(delay);
+
+            auto down_u1_a = rctree.capacitance(u1_a) * delay.at(u1_a);
+            auto down_u1_a_tap = rctree.capacitance(u1_a_tap) * delay.at(u1_a_tap) + down_u1_a;
+            auto down_c1 = rctree.capacitance(C1) * delay.at(C1) + down_u1_a_tap;
+            auto down_c0 = rctree.capacitance(C0) * delay.at(C0) + down_c1;
+
+            auto second_c0 = square_time_unit_type(0.0);
+            auto second_c1 = second_c0 + rctree.resistance(R1) * down_c1;
+            auto second_u1_a_tap = second_c1 + rctree.resistance(R2) * down_u1_a_tap;
+            auto second_u1_a = second_u1_a_tap + rctree.resistance(R3) * down_u1_a;
+
+            REQUIRE(second.at(C0) == second_c0);
+            REQUIRE(second.at(C1) == second_c1);
+            REQUIRE(second.at(u1_a_tap) == second_u1_a_tap);
+            REQUIRE(second.at(u1_a) == second_u1_a);
+        }
     }
 }
 
