@@ -72,6 +72,9 @@ public:
      */
     TimingGraph(const netlist_type & netlist);
 
+    TimingGraph(TimingGraph&&) = default;
+    TimingGraph& operator=(TimingGraph&&) = default;
+
     //! Design Destructor
     /*!
        \brief Destroys the TimingGraph.

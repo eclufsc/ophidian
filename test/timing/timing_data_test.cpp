@@ -22,38 +22,46 @@ under the License.
 #include <ophidian/timing/Library.h>
 #include <ophidian/timing/TimingData.h>
 
+using namespace ophidian;
+
+using netlist_type        = circuit::Netlist;
+using standard_cells_type = standard_cell::StandardCells;
+using timing_graph_type   = timing::TimingGraph;
+using timing_arcs_type    = timing::TimingArcs;
+using timing_library_type = timing::Library;
+using node_type           = timing_graph_type::node_type;
+using arc_type            = timing_graph_type::arc_type;
+
 namespace
 {
-class TGCondensationFixture
+class TimingDataFixture
 {
 public:
-    ophidian::circuit::Netlist               mNetlist;
-    ophidian::standard_cell::StandardCells   mStdCells;
-    ophidian::timing::TimingGraph            mGraph;
-    ophidian::timing::TimingGraph::node_type mFrom, mTo;
-    ophidian::timing::TimingGraph::arc_type  mArc;
-    ophidian::timing::TimingArcs             mTimingArcs;
-    ophidian::timing::Library                mLibrary;
+    netlist_type        mNetlist;
+    standard_cells_type mStdCells;
+    timing_graph_type   mGraph;
+    node_type           mFrom, mTo;
+    arc_type            mArc;
+    timing_arcs_type    mTimingArcs;
+    timing_library_type mLibrary;
 
-    TGCondensationFixture() :
+    TimingDataFixture() :
         mGraph(mNetlist),
         mTimingArcs(mStdCells),
-        mLibrary(ophidian::parser::Liberty(), mStdCells, mTimingArcs, true)
+        mLibrary(parser::Liberty(), mStdCells, mTimingArcs, true)
     {
-        auto from = mNetlist.add(ophidian::circuit::Pin(), "from");
-        auto to = mNetlist.add(ophidian::circuit::Pin(), "to");
+        auto from = mNetlist.add(circuit::Pin(), "from");
+        auto to = mNetlist.add(circuit::Pin(), "to");
 
         mFrom = mGraph.riseNodeCreate(from);
         mTo = mGraph.riseNodeCreate(to);
-        mArc = mGraph.arcCreate(mFrom, mTo, ophidian::timing::TimingArcs::timing_arc_entity_type());
+        mArc = mGraph.arcCreate(mFrom, mTo, timing_arcs_type::timing_arc_entity_type());
     }
 };
 } // namespace
 
-TEST_CASE_METHOD(TGCondensationFixture, "TimingGraph Condensation","[timing][sta][condensation]")
+TEST_CASE_METHOD(TimingDataFixture, "TimingGraph Condensation","[timing][sta][condensation]")
 {
-    using namespace ophidian;
-
     SECTION("TimingGraph Condensation: Values of nodes after creation","[timing][sta][condensation]")
     {
         using time_unit_type = timing::TimingData::time_unit_type;

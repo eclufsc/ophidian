@@ -31,14 +31,14 @@ namespace timing
 namespace wiremodel
 {
 
-using rctree_type                         = timingdriven_placement::RCTree;
-template <class T> using node_mapper_type = rctree_type::graph_type::NodeMap<T>;
+using rctree_type                      = timingdriven_placement::RCTree;
+template <class T> using node_map_type = rctree_type::capacitor_map_type<T>;
 
-using slew_type                           = util::second_t;
-using capacitance_unit_type               = util::farad_t;
-using precicion_type                      = double;
-using slew_map_type                       = node_mapper_type<slew_type>;
-using capacitance_map_type                = node_mapper_type<capacitance_unit_type>;
+using slew_type                        = util::second_t;
+using capacitance_unit_type            = rctree_type::capacitance_unit_type;
+using precicion_type                   = double;
+using slew_map_type                    = node_map_type<slew_type>;
+using capacitance_map_type             = node_map_type<capacitance_unit_type>;
 
 class EffectiveCapacitance
 {
