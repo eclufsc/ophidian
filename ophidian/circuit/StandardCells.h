@@ -51,6 +51,7 @@ namespace circuit
     class StandardCells
     {
     public:
+        // Member types
         using size_type = std::size_t;
         using cell_type = Cell;
         using cell_name_type = std::string;
@@ -61,6 +62,7 @@ namespace circuit
         using pin_direction_type = PinDirection;
         using pin_const_iterator = entity_system::EntitySystem<pin_type>::const_iterator;
 
+        // Constructors
         StandardCells() = default;
 
         StandardCells(const StandardCells&) = delete;
@@ -69,63 +71,52 @@ namespace circuit
         StandardCells(StandardCells&&) = default;
         StandardCells& operator=(StandardCells&&) = default;
 
-        //--------------------------- Cells -------------------------------//
-
-        cell_type add(cell_type, const cell_name_type& name);
-
-        void erase(const cell_type& cell);
-
-        void reserve(cell_type, size_type size);
-
-        size_type size(cell_type) const;
-
-        size_type capacity(cell_type) const;
-
+        // Element access
         cell_type find(cell_type, cell_name_type cellName);
-
-        ophidian::util::Range<cell_const_iterator> range(cell_type) const;
+        pin_type find(pin_type, pin_name_type pinName);
 
         cell_name_type name(const cell_type & cell) const;
+        pin_name_type name(const pin_type & pin) const;
+        PinDirection direction(const pin_type & pin);
+
+        cell_type owner(const pin_type & pin);
 
         entity_system::Association<cell_type, pin_type>::Parts pins(const cell_type & cell) const;
 
+        // Iterators
+        ophidian::util::Range<cell_const_iterator> range(cell_type) const;
+        ophidian::util::Range<pin_const_iterator> range(pin_type) const;
+
+        // Capacity
+        void reserve(cell_type, size_type size);
+        void reserve(pin_type, size_type size);
+
+        size_type capacity(cell_type) const;
+        size_type capacity(pin_type) const;
+
+        size_type size(cell_type) const;
+        size_type size(pin_type) const;
+
+        // Modifiers
+        cell_type add(cell_type, const cell_name_type& name);
+        pin_type add(pin_type, const pin_name_type& name, PinDirection direction);
+
+        void add(const cell_type & cell, const pin_type & pin);
+
+        void erase(const cell_type& cell);
+        void erase(const pin_type & pin);
+        
         template <typename Value>
         entity_system::Property<cell_type, Value> makeProperty(cell_type) const
         {
             return entity_system::Property<cell_type, Value>(mCells);
         }
 
-        //--------------------------- Pins -------------------------------//
-
-        pin_type add(pin_type, const pin_name_type& name, PinDirection direction);
-
-        void erase(const pin_type & pin);
-
-        void reserve(pin_type, size_type size);
-
-        size_type size(pin_type) const;
-
-        size_type capacity(pin_type) const;
-
-        pin_type find(pin_type, pin_name_type pinName);
-
-        pin_name_type name(const pin_type & pin) const;
-
-        PinDirection direction(const pin_type & pin);
-
-        cell_type owner(const pin_type & pin);
-
-        ophidian::util::Range<pin_const_iterator> range(pin_type) const;
-
         template <typename Value>
         entity_system::Property<pin_type, Value> makeProperty(pin_type) const
         {
             return entity_system::Property<pin_type, Value>(mPins);
         }
-
-        //--------------------------- Association -------------------------------//
-
-        void add(const cell_type & cell, const pin_type & pin);
 
     private:
         //cells entity system and properties

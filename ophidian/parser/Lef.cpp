@@ -99,10 +99,8 @@ namespace parser
                                     type_name == "routing"){
                                 return Lef::layer_type::type_type::ROUTING;
                             }
-                            else {
-                                return Lef::layer_type::type_type::NOT_ASSIGNED;
-                            }
                         }
+                        return Lef::layer_type::type_type::NOT_ASSIGNED;
                     }(),
                     [&](){
                         if(l->hasDirection()){
@@ -118,9 +116,7 @@ namespace parser
                                 return Lef::layer_type::direction_type::VERTICAL;
                             }
                         }
-                        else {
-                            return Lef::layer_type::direction_type::NOT_ASSIGNED; 
-                        }
+                        return Lef::layer_type::direction_type::NOT_ASSIGNED; 
                     }(),
                     Lef::layer_type::micrometer_type{l->pitch()},
                     Lef::layer_type::micrometer_type{l->offset()},
@@ -225,9 +221,7 @@ namespace parser
                                 return Lef::macro_type::pin_type::direction_type::INOUT;
                             }
                         }
-                        else {
-                            return Lef::macro_type::pin_type::direction_type::NA;
-                        }
+                        return Lef::macro_type::pin_type::direction_type::NA;
                     }(),
                     std::move(ports)
                 );
