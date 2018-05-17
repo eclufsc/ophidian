@@ -19,6 +19,8 @@
 #ifndef OPHIDIAN_DESIGN_DESIGNFACTORY_H
 #define OPHIDIAN_DESIGN_DESIGNFACTORY_H
 
+#include "Design.h"
+
 #include <ophidian/parser/Verilog.h>
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/Lef.h>
@@ -29,6 +31,8 @@ namespace design
 {
     namespace factory 
     {
+        Design make_design(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+
         Design make_design_iccad2015(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
         Design make_design_iccad2017(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;

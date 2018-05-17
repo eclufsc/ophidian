@@ -22,16 +22,6 @@ namespace ophidian
 {
 namespace circuit
 {
-    Netlist::Netlist():
-            mNetPins(mNets, mPins),
-            mCellPins(mCells, mPins),
-            mPinInput(mPins, mInputs),
-            mPinOutput(mPins, mOutputs),
-            mCellNames(makeProperty<std::string>(CellInstance())),
-            mPinNames(makeProperty<std::string>(PinInstance())),
-            mNetNames(makeProperty<std::string>(Net()))
-    {
-    }
 
     CellInstance Netlist::add(CellInstance, std::string cellName)
     {
@@ -53,7 +43,7 @@ namespace circuit
         mCells.erase(c);
     }
 
-    uint32_t Netlist::size(CellInstance) const
+    Netlist::size_type Netlist::size(CellInstance) const
     {
         return mCells.size();
     }
@@ -78,7 +68,7 @@ namespace circuit
         mPins.erase(en);
     }
 
-    uint32_t Netlist::size(PinInstance) const
+    Netlist::size_type Netlist::size(PinInstance) const
     {
         return mPins.size();
     }
@@ -103,7 +93,7 @@ namespace circuit
         mNets.erase(en);
     }
 
-    uint32_t Netlist::size(Net) const
+    Netlist::size_type Netlist::size(Net) const
     {
         return mNets.size();
     }
@@ -127,13 +117,13 @@ namespace circuit
         return mPins.notifier();
     }
 
-    void Netlist::reserve(PinInstance, uint32_t size)
+    void Netlist::reserve(PinInstance, Netlist::size_type size)
     {
         mPins.reserve(size);
         mName2Pin.reserve(size);
     }
 
-    uint32_t Netlist::capacity(PinInstance) const
+    Netlist::size_type Netlist::capacity(PinInstance) const
     {
         return mPins.capacity();
     }
@@ -167,13 +157,13 @@ namespace circuit
         return mCells.notifier();
     }
 
-    void Netlist::reserve(CellInstance, uint32_t size)
+    void Netlist::reserve(CellInstance, Netlist::size_type size)
     {
         mCells.reserve(size);
         mName2Cell.reserve(size);
     }
 
-    uint32_t Netlist::capacity(CellInstance) const
+    Netlist::size_type Netlist::capacity(CellInstance) const
     {
         return mCells.capacity();
     }
@@ -222,13 +212,13 @@ namespace circuit
         return mNets.notifier();
     }
 
-    void Netlist::reserve(Net, uint32_t size)
+    void Netlist::reserve(Net, Netlist::size_type size)
     {
         mNets.reserve(size);
         mName2Net.reserve(size);
     }
 
-    uint32_t Netlist::capacity(Net) const
+    Netlist::size_type Netlist::capacity(Net) const
     {
         return mNets.capacity();
     }
@@ -248,7 +238,7 @@ namespace circuit
         return mNetPins.parts(net);
     }
 
-    uint32_t Netlist::size(Input) const
+    Netlist::size_type Netlist::size(Input) const
     {
         return mInputs.size();
     }
@@ -289,7 +279,7 @@ namespace circuit
         return mInputs.notifier();
     }
 
-    uint32_t Netlist::size(Output) const
+    Netlist::size_type Netlist::size(Output) const
     {
         return mOutputs.size();
     }

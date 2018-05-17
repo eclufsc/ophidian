@@ -72,6 +72,55 @@ namespace circuit
 
             return netlist;
         }
+
+        Netlist make_netlist(const parser::Verilog & verilog, StandardCells& std_cells) noexcept
+        {
+            auto netlist = Netlist{};
+
+            const auto& module = verilog.modules().front();
+
+            std::size_t sizePins = 0;
+            for(auto& instance : module.module_instances())
+            {
+                sizePins += instance.net_map().size();
+            }
+            sizePins += module.ports().size();
+
+            netlist.reserve(PinInstance(), sizePins);
+            netlist.reserve(Net(), module.nets().size());
+            netlist.reserve(CellInstance(), module.module_instances().size());
+
+            for(auto net : module.nets())
+            {
+                netlist.add(Net(), net.name());
+            }
+
+            for(auto port : module.ports())
+            {
+                auto pin = netlist.add(PinInstance(), port.name());
+                if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
+                    netlist.add(Input(), pin);
+                }
+                else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
+                    netlist.add(Output(), pin);
+                }
+                netlist.connect(netlist.find(Net(), port.name()), pin);
+            }
+
+            for(auto instance : module.module_instances())
+            {
+                auto cell = netlist.add(CellInstance(), instance.name());
+                
+                netlist.cellStdCell(cell, std_cells.find(Cell{}, instance.module()));
+                for(auto portMap : instance.net_map())
+                {
+                    auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
+                    netlist.add(cell, pin);
+                    netlist.connect(netlist.find(Net(), portMap.second), pin);
+                }
+            }
+            return netlist;
+        }
     }
 }     // namespace circuit
 }     // namespace ophidian

@@ -30,6 +30,8 @@ namespace circuit
     namespace factory
     {
         Netlist make_netlist(const parser::Verilog & verilog) noexcept;
+
+        Netlist make_netlist(const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
     }
 }     // namespace circuit
 }     // namespace ophidian

@@ -45,8 +45,10 @@ gitlab_pages:
         - apk update
         - apk add doxygen
     script:
-        - doxygen doc/Doxyfile
-        - mv doc/documentation/html/ public/
+        - cd doc
+        - doxygen Doxyfile
+        - cd ..
+        - cp doc/documentation/html/ public/
     artifacts:
         paths:
             - public
