@@ -17,10 +17,13 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
 * [Getting Started](#getting-started)
     * [Debian Family](#debian-family)
     * [Arch Linux](#arch-linux)
+    * [Others](#others)
 * [Hello World!](#hello-world)
 * [Contributing](#contributing)
     * [Project Structure](#project-structure)
     * [Build and Installation Guide](#build-and-installation-guide)
+    * [Build Dependencies](#build-dependencies)
+    * [Compiling Ophidian](#compiling-ophidian)
 * [Credits](#credits)
 
 # Getting Started!
@@ -35,7 +38,7 @@ $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ sudo apt install libophidian-dev
 ```
 
-### Debian buster (10) or newer:
+### Debian Sid:
 First you will need to add the **Launchpad PPA for eclufsc** gpg key:
 ```
 $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
@@ -90,6 +93,10 @@ ophidian
 |   |   +---floorplan
 |   |   ...
 |
++---apps
+|   |   CMakeLists.txt
+|   |   +---gui
+|
 +---test
     |    CMakeLists.txt
     |   main.cpp
@@ -100,32 +107,45 @@ ophidian
 
 ```
 
-### The main `ophidian/CMakeLists.txt` file:
+### The main [`ophidian/CMakeLists.txt`](CMakeLists.txt) file:
 This is the main Cmake file for the ophidian project, it's goals are set up project variables,
 handle dependencies and include the project subdirectories.
 
-### The `ophidian/build_dependencies.sh` script:
+### The [`ophidian/build_dependencies.sh`](build_dependencies.sh) script:
 This script serves as a c++ `npm`, `gem`, `pip`, equivalent.
 It will fetch all third party git submodules located at `ophidian/3rdparty`, 
 compile and install them to `ophidian/dependencies` by default.
 
-### The `ophidian/cmake` directory:
+### The [`ophidian/cmake`](cmake) directory:
 Here you will have all custom made **cmake modules** used by the `CMakeLists.txt` files.
 
-### The `ophidian/3rdparty` directory:
+### The [`ophidian/3rdparty`](3rdparty) directory:
 This directory holds the git submodules with the source code of ophidian's dependencies.
 
-### The `ophidian/ophidian` directory:
+### The [`ophidian/ophidian`](ophidian) directory:
 Here you will have directories for each library developed by the ophidian team.
 Each library directory will have its own `CMakeLists.txt` file with its own compilation instructions.
 
-### The `ophidian/ophidian/CMakeLists.txt` file:
+### The [`ophidian/ophidian/CMakeLists.txt`](ophidian/CMakeLists.txt) file:
 This file handles the installation rules for the ophidian library.
 
-### The `ophidian/test` directory:
+### The [`ophidian/apps`](apps) directory:
+Here you will have directories for each ophidian application developed by the ophidian team.
+Each application directory will have its own `CMakeLists.txt` file with its own compilation instructions.
+
+### The [`ophidian/apps/CMakeLists.txt`](apps/CMakeLists.txt) file:
+This file handles application directories.
+
+### The [`ophidian/apps/gui`](apps/gui) directory:
+Here you will find graphical user interface directories following the MVC model.
+
+### The [`ophidian/apps/gui/CMakeLists.txt`](apps/gui/CMakeLists.txt) file:
+This file handles the installation rules for the graphical user interface.
+
+### The [`ophidian/test`](test) directory:
 Here you will find directories for each ophidian library unit tests.
 
-### The `ophidian/test/CMakeLists.txt` file:
+### The [`ophidian/test/CMakeLists.txt`](test/CMakeLists.txt) file:
 This file handles the compilation instructions for the unit tests binary.
 
 
@@ -148,12 +168,18 @@ on any operational system, the others can be a hassle to have on your system.
 So you can try [building them yourself!](#build-dependencies) 
 
 ## Build Dependencies:
-First make shure you have all dependencies dependencies:
+First, make shure you have all dependencies dependencies:
 
 ### Dependencies Dependencies:
 * [zlib](https://www.zlib.net/)
 * [Bison](https://www.gnu.org/software/bison/)
 * [Flex](https://www.gnu.org/software/flex/)
+
+Second, if you are going to use the graphical user interface, make shure you have all gui's dependencies:
+
+### GUI Dependencies:
+* [SFML](https://www.sfml-dev.org/) (>= 2.0)
+* [QT](https://www.qt.io/) (>= 5.0)
 
 ### Using the [build_dependencies.sh](#the-ophidianbuild_dependenciessh-script) script:
 Run the provided script **build_dependencies.sh** located at the source root. 
@@ -179,6 +205,8 @@ make
 
 > **-DUNCRUSTIFY_CHECK=ON** will run check all files formating with uncrustify.
 
+> **-DOPHIDIAN_GUI=ON** will able building ophidian graphic user interface.
+
 In order to run the ophidian unity tests, inside the build directory, execute the folowing:
 
 ```
@@ -186,6 +214,13 @@ cd test
 ./ophidian_tests
 ```
 > **P.S.** ophidian_tests needs to be executed from the test directory due to the inputfile's path being hardcoded.
+
+In order to run the graphic user interface, inside the build directory, execute the folowing:
+
+```
+cd apps/gui
+./ophidian_gui
+```
 
 ## [optional] Install Dependencies on System:
 If you wish to install dependencies on your system run:
@@ -206,7 +241,6 @@ installed all [dependencies on your system](#optional-install-dependencies-on-sy
 
 This will install the Ophidian Library to the `/usr/local` directory.
 
-
 # Credits
 Currently, Ophidian has many collaborators in the same university that support its development.
 * [Bernardo Mendonça](http://tarberd.me)
@@ -214,6 +248,7 @@ Currently, Ophidian has many collaborators in the same university that support i
 * [José Güntzel](https://www.inf.ufsc.br/~j.guntzel/)
 * [Renan Netto](https://renannetto.github.io/)
 * Thiago Barbato
-* Tiago Fontana
+* [Tiago Augusto Fontana](https://tiagoafontana.github.io)
 * Sheiny Almeida
 * [Vinicius Livramento](http://vinilivramento.com)
+* João Vicente Souto

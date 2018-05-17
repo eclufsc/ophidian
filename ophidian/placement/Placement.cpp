@@ -22,7 +22,6 @@ namespace ophidian
 {
 namespace placement
 {
-
     Placement::Placement(const circuit::Netlist & netlist, const Library &library):
             mNetlist(netlist),
             mLibrary(library),
