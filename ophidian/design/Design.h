@@ -33,11 +33,11 @@ namespace design
     {
     public:
         //! Class member types
-        using netlist_type         = circuit::Netlist;
         using floorplan_type       = floorplan::Floorplan;
-        using placement_type       = placement::Placement;
         using standard_cell_type   = circuit::StandardCells;
+        using netlist_type         = circuit::Netlist;
         using library_type         = placement::Library;
+        using placement_type       = placement::Placement;
 
         //! Design Constructor
 
@@ -52,13 +52,13 @@ namespace design
         Design(Design&&) = default;
         Design& operator=(Design&&) = default;
 
-        template<class A1, class A2, class A3, class A4, class A5, class A6>
-        Design(A1&& netlist, A2&& floorplan, A3&& placement, A4&& standard_cells, A5&& library, A6&& library_mapping):
-            m_netlist{std::forward<A1>(netlist)},
-            m_floorplan{std::forward<A2>(floorplan)},
-            m_placement{std::forward<A3>(placement)},
-            m_standard_cells{std::forward<A4>(standard_cells)},
-            m_library{std::forward<A5>(library)}
+        template<class A1, class A2, class A3, class A4, class A5>
+        Design(A1&& floorplan, A2&& standard_cells, A3&& netlist, A4&& library, A5&& placement):
+            m_floorplan{std::forward<A1>(floorplan)},
+            m_standard_cells{std::forward<A2>(standard_cells)},
+            m_netlist{std::forward<A3>(netlist)},
+            m_library{std::forward<A4>(library)},
+            m_placement{std::forward<A5>(placement)}
         {}
 
         //! netlist getter
@@ -110,10 +110,11 @@ namespace design
         library_type& library() noexcept;
 
         const library_type& library() const noexcept;
+
     private:
-        netlist_type         m_netlist{};
         floorplan_type       m_floorplan{};
         standard_cell_type   m_standard_cells{};
+        netlist_type         m_netlist{};
         library_type         m_library{m_standard_cells};
         placement_type       m_placement{m_netlist, m_library};
     };

@@ -22,20 +22,20 @@ namespace ophidian
 {
 namespace placement
 {
-    // namespace factory
-    // {
-    //     Placement make_placement(const parser::Def & def) noexcept
-    //     {
-    //         auto placement = Placement{};
-    //
-    //         for(auto & component : def.components())
-    //         {
-    //             util::LocationDbu cellPosition{component.position()};
-    //             placement.placeCell(cell, cellPosition);
-    //         }
-    //
-    //         return placement;
-    //     }
-    // }
+    namespace factory
+    {
+        Placement make_placement(const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
+        {
+            auto placement = Placement{netlist, library};
+
+            for(auto & component : def.components())
+            {
+                auto cell = netlist.add(circuit::CellInstance{}, component.name());
+                placement.placeCell(cell, component.position());
+            }
+
+            return placement;
+        }
+    }
 }     // namespace placement
 }     // namespace ophidian

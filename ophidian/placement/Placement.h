@@ -35,37 +35,12 @@ namespace placement
     {
     public:
 
-        //! Placement Constructor
-
-        /*!
-           \brief Constructs a placement system with no properties.
-           \param netlist Circuit netlist.
-         */
         Placement(const circuit::Netlist & netlist, const Library & library);
 
-        //! Placement Destructor
-
-        /*!
-           \brief Destroys the placement system, including its properties.
-         */
         ~Placement();
 
-        //! Places a cell
-
-        /*!
-           \brief Places a cell by setting its location
-           \param cell Cell to be placed
-           \param location LocationDbu of the lower left corner of the cell.
-         */
         void placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location);
 
-        //! LocationDbu getter
-
-        /*!
-           \brief Get the location of a given cell.
-           \param cell Cell entity to get the location.
-           \return LocationDbu of the cell.
-         */
         util::LocationDbu cellLocation(const circuit::CellInstance & cell) const
         {
             return mCellLocations[cell];
@@ -79,22 +54,8 @@ namespace placement
 
         util::LocationDbu outputPadLocation(const circuit::Output & output) const;
 
-        //! Cell geometry getter
-
-        /*!
-           \brief Get the geometry of a cell in the circuit.
-           \param cell Cell entity to get the geometry.
-           \return Geometry of the cell.
-         */
         geometry::MultiBox<util::database_unit_t> geometry(const circuit::CellInstance & cell) const;
 
-        //! Pin location getter
-
-        /*!
-           \brief Get the location of a pin in the circuit.
-           \param cell Pin entity to get the location.
-           \return Location of the cell.
-         */
         util::LocationDbu location(const circuit::PinInstance &pin) const;
 
     private:

@@ -24,7 +24,7 @@ namespace floorplan
 {
     namespace factory
     {
-        Floorplan make_floorplan(const parser::Lef & lef, const parser::Def & def)
+        Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef)
         {
             auto floorplan = Floorplan{};
 

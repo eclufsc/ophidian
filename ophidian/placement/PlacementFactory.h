@@ -23,15 +23,16 @@
 #include <ophidian/circuit/Netlist.h>
 
 #include "Placement.h"
+#include "Library.h"
 
 namespace ophidian
 {
 namespace placement
 {
-    // namespace factory
-    // {
-    //     Placement make_placement(const parser::Def& def) noexcept;
-    // }
+    namespace factory
+    {
+        Placement make_placement(const parser::Def& def, circuit::Netlist& netlist, Library& library) noexcept;
+    }
 }     // namespace placement
 }     // namespace ophidian
 

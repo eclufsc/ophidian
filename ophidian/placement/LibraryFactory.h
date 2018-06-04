@@ -27,10 +27,10 @@ namespace ophidian
 {
 namespace placement
 {
-    void lef2Library(
-        const parser::Lef & lef,
-        Library & library,
-        circuit::StandardCells & stdCells);
+    namespace factory
+    {
+        Library make_library(const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
+    }
 }     // namespace placement
 }     // namespace ophidian
 

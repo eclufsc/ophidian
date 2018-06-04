@@ -53,7 +53,7 @@ gitlab_pages:
         - cd doc
         - doxygen Doxyfile
         - cd ..
-        - cp doc/documentation/html/ public/
+        - cp -r doc/documentation/html/ public/
     artifacts:
         paths:
             - public
