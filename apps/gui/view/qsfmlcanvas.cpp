@@ -25,7 +25,6 @@ myInitialized (false)
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
     setFocusPolicy(Qt::StrongFocus);
-    myTimer.setInterval(0);
 }
 
 QSFMLCanvas::QSFMLCanvas(QWidget * parent, const QPoint & position, const QSize & size, unsigned int frameTime) :
@@ -36,7 +35,6 @@ myInitialized (false)
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
     setFocusPolicy(Qt::StrongFocus);
-    myTimer.setInterval(frameTime);
 }
 
 QSFMLCanvas::~QSFMLCanvas()
@@ -66,8 +64,6 @@ void QSFMLCanvas::showEvent(QShowEvent*)
         sf::Window::create(winId());
         OnInit();
 
-        connect(&myTimer, SIGNAL(timeout()), this, SLOT(repaint()));
-        myTimer.start();
 
         myInitialized = true;
     }

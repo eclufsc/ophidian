@@ -38,7 +38,7 @@ void MainWindow::on_actionICCAD_2017_triggered()
     QObject::connect(&dialog, SIGNAL(buildICCAD2017(std::string, std::string , std::string)),
                      &mMainController, SLOT(buildICCAD2017(std::string, std::string , std::string)));
     dialog.exec();
-
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionICCAD_2015_triggered()
@@ -47,6 +47,7 @@ void MainWindow::on_actionICCAD_2015_triggered()
     QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string)),
                      &mMainController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
     dialog.exec();
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -79,6 +80,7 @@ void MainWindow::on_receive_circuitChanged(QString name, QString die, size_t cel
     ui->selectedCell_h_2->setText("");
     ui->selectedCell_x_2->setValue(0);
     ui->selectedCell_y_2->setValue(0);
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_receive_cellChanged(QString name, QString type, double width, double height, double x, double y)
@@ -96,6 +98,7 @@ void MainWindow::on_receive_cellChanged(QString name, QString type, double width
 
     ui->selectedCell_x_2->setValue(x);
     ui->selectedCell_y_2->setValue(y);
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_selectedCellButton_clicked()
@@ -103,24 +106,28 @@ void MainWindow::on_selectedCellButton_clicked()
     double x = ui->selectedCell_x_2->value();
     double y = ui->selectedCell_y_2->value();
     ui->MyCanvas->updatePositionQuad(ophidian::geometry::Point(x, y));
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionSlot_1_triggered()
 {
     mMainController.slot1();
     on_findNameButtonClear_clicked();
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionSlot_2_triggered()
 {
     mMainController.slot2();
     on_findNameButtonClear_clicked();
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionSlot_3_triggered()
 {
     mMainController.slot3();
     on_findNameButtonClear_clicked();
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_findNameButton_clicked()
@@ -131,12 +138,14 @@ void MainWindow::on_findNameButton_clicked()
         ui->findErro->setText("Cell found");
     else
         ui->findErro->setText("Cell not found");
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_findNameButtonClear_clicked()
 {
     ui->findName->clear();
     ui->findErro->clear();
+    ui->MyCanvas->OnUpdate();
 }
 
 void MainWindow::on_actionPNG_triggered()
