@@ -65,22 +65,24 @@ TEST_CASE("GenericSTA: Estimation", "[timing][sta]")
     SECTION("GenericSTA: Optimistic estimation", "[timing][sta][estimation]")
     {
         timing::Optimistic opt;
+        using time_unit_type = timing::Optimistic::time_unit_type;
 
-        REQUIRE(opt(util::second_t(1), util::second_t(2)) == util::second_t(1));
-        REQUIRE(opt.inverted(util::second_t(1), util::second_t(2)) == util::second_t(2));
-        REQUIRE(opt.best() == std::numeric_limits<util::second_t>::max());
-        REQUIRE(opt.worst() == -std::numeric_limits<util::second_t>::max());
+        REQUIRE(opt(time_unit_type(1), time_unit_type(2)) == time_unit_type(1));
+        REQUIRE(opt.inverted(time_unit_type(1), time_unit_type(2)) == time_unit_type(2));
+        REQUIRE(opt.best() == std::numeric_limits<time_unit_type>::max());
+        REQUIRE(opt.worst() == -std::numeric_limits<time_unit_type>::max());
         REQUIRE(opt.slack_signal() == -1.0);
     }
 
     SECTION("GenericSTA: Pessimistic estimation", "[timing][sta][estimation]")
     {
         timing::Pessimistic pes;
+        using time_unit_type = timing::Pessimistic::time_unit_type;
 
-        REQUIRE(pes(util::second_t(1), util::second_t(2)) == util::second_t(2));
-        REQUIRE(pes.inverted(util::second_t(1), util::second_t(2)) == util::second_t(1));
-        REQUIRE(pes.best() == -std::numeric_limits<util::second_t>::max());
-        REQUIRE(pes.worst() == std::numeric_limits<util::second_t>::max());
+        REQUIRE(pes(time_unit_type(1), time_unit_type(2)) == time_unit_type(2));
+        REQUIRE(pes.inverted(time_unit_type(1), time_unit_type(2)) == time_unit_type(1));
+        REQUIRE(pes.best() == -std::numeric_limits<time_unit_type>::max());
+        REQUIRE(pes.worst() == std::numeric_limits<time_unit_type>::max());
         REQUIRE(pes.slack_signal() == 1.0);
     }
 }
@@ -133,14 +135,14 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
                 else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u4:o")
                     l_u4 = l_u4 > i? l_u4 : i;
 
-        REQUIRE(s_u1 <  s_u2);
-        REQUIRE(s_u3 <  s_u4);
+        REQUIRE(s_u1 < s_u2);
+        REQUIRE(s_u3 < s_u4);
 
         REQUIRE(sd_u1 < sd_u2);
         REQUIRE(sd_u3 < sd_u4);
 
-        REQUIRE(l_u1 <  l_u2);
-        REQUIRE(l_u3 <  l_u4);
+        REQUIRE(l_u1 < l_u2);
+        REQUIRE(l_u3 < l_u4);
     }
 
     SECTION("Generic STA: Init", "[timing][sta]")

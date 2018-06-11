@@ -8,7 +8,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
   http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing,
+Unless CHECKd by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
 "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 KIND, either express or implied.  See the License for the
@@ -122,15 +122,15 @@ public:
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: init", "[timingdriven_placement][flute][rctree]")
 {
     FluteRCTreeBuilder builder;
-    REQUIRE(mNetlist.size(ophidian::circuit::Cell()) == 4);
-    REQUIRE(mStdCells.size(ophidian::standard_cell::Cell()) == 4);
-    REQUIRE(mLef.get()->databaseUnits() == 1000);
-    REQUIRE(mLef.get()->macros().front().name == "mStdCell_u1");
-    REQUIRE(mLiberty.get()->cells.size() == 4);
-    REQUIRE(mTimingLibrary->capacitance(mStdPin_u1o) == ophidian::util::farad_t(0.0));
-    REQUIRE(mTimingLibrary->capacitance(mStdPin_u2a) == ophidian::util::farad_t(1.0));
-    REQUIRE(mTimingLibrary->capacitance(mStdPin_u3a) == ophidian::util::farad_t(1.0));
-    REQUIRE(mTimingLibrary->capacitance(mStdPin_u4a) == ophidian::util::farad_t(1.0));
+    CHECK(mNetlist.size(ophidian::circuit::Cell()) == 4);
+    CHECK(mStdCells.size(ophidian::standard_cell::Cell()) == 4);
+    CHECK(mLef.get()->databaseUnits() == 1000);
+    CHECK(mLef.get()->macros().front().name == "mStdCell_u1");
+    CHECK(mLiberty.get()->cells.size() == 4);
+    CHECK(mTimingLibrary->capacitance(mStdPin_u1o) == ophidian::util::farad_t(0.0));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u2a) == ophidian::util::farad_t(1.0));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u3a) == ophidian::util::farad_t(1.0));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u4a) == ophidian::util::farad_t(1.0));
 }
 
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for one pins", "[timingdriven_placement][flute][rctree]")
@@ -144,12 +144,12 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for one pins", "[timi
 
     RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
-    REQUIRE(lemon::connected(rctree.g()));
-    REQUIRE(rctree.size(RCTree::capacitor_type()) == 2);
+    CHECK(lemon::connected(rctree.g()));
+    CHECK(rctree.size(RCTree::capacitor_type()) == 2);
 
-    REQUIRE(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.lumped() == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.resistance(rctree.resistors(sourceCap)) == ophidian::util::ohm_t(0.0));
+    CHECK(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.lumped() == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.resistance(rctree.resistors(sourceCap)) == ophidian::util::ohm_t(0.0));
 }
 
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for two pins", "[timingdriven_placement][flute][rctree]")
@@ -166,22 +166,22 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for two pins", "[timi
     REQUIRE(rctree.size(RCTree::capacitor_type()) == 4);
     REQUIRE(rctree.size(RCTree::resistor_type()) == 3);
 
-    REQUIRE(compare(rctree.lumped(), ophidian::util::farad_t(1.0) + ophidian::util::femtofarad_t(0.6)));
+    CHECK(compare(rctree.lumped(), ophidian::util::farad_t(1.0) + ophidian::util::femtofarad_t(0.6)));
 
     RCTree::capacitor_type cap_u1o = rctree.capacitor(mNetlist.name(mPin_u1o));
     RCTree::capacitor_type cap_u2a  = rctree.capacitor(mNetlist.name(mPin_u2a));
 
-    REQUIRE(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
+    CHECK(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
     auto capOpposite_u1o = rctree.oppositeCapacitor(cap_u1o, rctree.resistors(cap_u1o));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.3)));
+    CHECK(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.3)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
     auto capOpposite_u2a = rctree.oppositeCapacitor(cap_u2a, rctree.resistors(cap_u2a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.3)));
+    CHECK(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.3)));
 
 }
 
@@ -200,28 +200,28 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for three pins", "[ti
     REQUIRE(rctree.size(RCTree::resistor_type()) == 6);
     REQUIRE(lemon::connected(rctree.g()));
 
-    REQUIRE(compare(rctree.lumped(), ophidian::util::farad_t(2.0) + ophidian::util::femtofarad_t(1.2)));
+    CHECK(compare(rctree.lumped(), ophidian::util::farad_t(2.0) + ophidian::util::femtofarad_t(1.2)));
 
     RCTree::capacitor_type cap_u1o = rctree.capacitor(mNetlist.name(mPin_u1o));
     RCTree::capacitor_type cap_u2a  = rctree.capacitor(mNetlist.name(mPin_u2a));
     RCTree::capacitor_type cap_u3a  = rctree.capacitor(mNetlist.name(mPin_u3a));
 
-    REQUIRE(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
-    REQUIRE(rctree.capacitance(cap_u3a) == mTimingLibrary->capacitance(mStdPin_u3a));
+    CHECK(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
+    CHECK(rctree.capacitance(cap_u3a) == mTimingLibrary->capacitance(mStdPin_u3a));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
     auto capOpposite_u1o = rctree.oppositeCapacitor(cap_u1o, rctree.resistors(cap_u1o));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.1)));
+    CHECK(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.1)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
     auto capOpposite_u2a = rctree.oppositeCapacitor(cap_u2a, rctree.resistors(cap_u2a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.2)));
+    CHECK(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.2)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u3a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u3a) == 1);
     auto capOpposite_u3a = rctree.oppositeCapacitor(cap_u3a, rctree.resistors(cap_u3a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u3a), ophidian::util::femtofarad_t(0.3)));
+    CHECK(compare(rctree.capacitance(capOpposite_u3a), ophidian::util::femtofarad_t(0.3)));
 
 }
 
@@ -241,34 +241,34 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for four pins", "[tim
     REQUIRE(rctree.size(RCTree::capacitor_type()) ==  10);
     REQUIRE(rctree.size(RCTree::resistor_type()) == 9);
 
-    REQUIRE(compare(rctree.lumped(), ophidian::util::farad_t(3.0) + ophidian::util::femtofarad_t(1.8)));
+    CHECK(compare(rctree.lumped(), ophidian::util::farad_t(3.0) + ophidian::util::femtofarad_t(1.8)));
 
     RCTree::capacitor_type cap_u1o = rctree.capacitor(mNetlist.name(mPin_u1o));
     RCTree::capacitor_type cap_u2a  = rctree.capacitor(mNetlist.name(mPin_u2a));
     RCTree::capacitor_type cap_u3a  = rctree.capacitor(mNetlist.name(mPin_u3a));
     RCTree::capacitor_type cap_u4a  = rctree.capacitor(mNetlist.name(mPin_u4a));
 
-    REQUIRE(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
-    REQUIRE(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
-    REQUIRE(rctree.capacitance(cap_u3a) == mTimingLibrary->capacitance(mStdPin_u3a));
-    REQUIRE(rctree.capacitance(cap_u4a) == mTimingLibrary->capacitance(mStdPin_u4a));
+    CHECK(rctree.capacitance(sourceCap) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u1o) == mTimingLibrary->capacitance(mStdPin_u1o));
+    CHECK(rctree.capacitance(cap_u2a) == mTimingLibrary->capacitance(mStdPin_u2a));
+    CHECK(rctree.capacitance(cap_u3a) == mTimingLibrary->capacitance(mStdPin_u3a));
+    CHECK(rctree.capacitance(cap_u4a) == mTimingLibrary->capacitance(mStdPin_u4a));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u1o) == 1);
     auto capOpposite_u1o = rctree.oppositeCapacitor(cap_u1o, rctree.resistors(cap_u1o));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.3)));
+    CHECK(compare(rctree.capacitance(capOpposite_u1o), ophidian::util::femtofarad_t(0.3)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u2a) == 1);
     auto capOpposite_u2a = rctree.oppositeCapacitor(cap_u2a, rctree.resistors(cap_u2a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.2)));
+    CHECK(compare(rctree.capacitance(capOpposite_u2a), ophidian::util::femtofarad_t(0.2)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u3a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u3a) == 1);
     auto capOpposite_u3a = rctree.oppositeCapacitor(cap_u3a, rctree.resistors(cap_u3a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u3a), ophidian::util::femtofarad_t(0.1)));
+    CHECK(compare(rctree.capacitance(capOpposite_u3a), ophidian::util::femtofarad_t(0.1)));
 
-    REQUIRE(lemon::countOutArcs(rctree.g(), cap_u4a) == 1);
+    CHECK(lemon::countOutArcs(rctree.g(), cap_u4a) == 1);
     auto capOpposite_u4a = rctree.oppositeCapacitor(cap_u4a, rctree.resistors(cap_u4a));
-    REQUIRE(compare(rctree.capacitance(capOpposite_u4a), ophidian::util::femtofarad_t(0.1)));
+    CHECK(compare(rctree.capacitance(capOpposite_u4a), ophidian::util::femtofarad_t(0.1)));
 }
 
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with two points and no divisions", "[timingdriven_placement][flute][rctree]")
@@ -284,8 +284,8 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with two points and no
 
     RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
-    REQUIRE(rctree.size(RCTree::capacitor_type()) == 4);
     REQUIRE(lemon::connected(rctree.g()));
+    REQUIRE(rctree.size(RCTree::capacitor_type()) == 4);
 }
 
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with two points (different) and no divisions", "[timingdriven_placement][flute][rctree]")

@@ -64,12 +64,12 @@ Elmore::time_unit_type Elmore::at(const capacitor_type & cap) const
     return m_elmore_delay[cap];
 }
 
-const Elmore::graph_type::NodeMap<std::pair<Elmore::capacitor_type, Elmore::resistor_type>> & Elmore::pred() const
+const Elmore::predecessor_map_type & Elmore::pred() const
 {
     return m_pred;
 }
 
-const std::vector<Elmore::capacitor_type> & Elmore::order() const
+const Elmore::order_container_type & Elmore::order() const
 {
     return m_order;
 }

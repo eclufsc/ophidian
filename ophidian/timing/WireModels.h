@@ -34,10 +34,10 @@ namespace wiremodel
 using rctree_type                      = timingdriven_placement::RCTree;
 template <class T> using node_map_type = rctree_type::capacitor_map_type<T>;
 
-using slew_type                        = util::second_t;
+using slew_unit_type                   = util::second_t;
 using capacitance_unit_type            = rctree_type::capacitance_unit_type;
 using precicion_type                   = double;
-using slew_map_type                    = node_map_type<slew_type>;
+using slew_map_type                    = node_map_type<slew_unit_type>;
 using capacitance_map_type             = node_map_type<capacitance_unit_type>;
 
 class EffectiveCapacitance
@@ -75,19 +75,26 @@ public:
         precicion_type error = 1.0;
 
         capacitance_unit_type current_ceff;
-        delays[tree.source()] = slew_type(0.0);
+        delays[tree.source()] = slew_unit_type(0.0);
+
+        const auto & order = tree.order();
 
         while (error > m_precision) {
             current_ceff = ceff[tree.source()];
             slews[tree.source()] = slew_calculator(current_ceff);
 
-            for(auto current : tree.order())
+            for(auto current : order)
             {
+                if (tree.g().id(current) == tree.g().id(tree.source()))
+                    continue;
+
                 auto parent = tree.pred(current);
                 auto resistance_with_parent = tree.resistance(tree.resistor(parent, current));
 
                 slews[current] = slews[parent];
-                if(slews[parent] > slew_type(0.0)){
+
+                if(slews[parent] > slew_unit_type(0.0))
+                {
                     precicion_type x = resistance_with_parent * ceff[current] / slews[parent];
                     slews[current] = slews[parent] / (1 - x * (1 - std::exp(-1 / x)));
                 }
@@ -95,18 +102,19 @@ public:
                 delays[current] = delays[parent] + resistance_with_parent * ceff[current];
             }
 
-            const auto & order = tree.order();
-
             for(auto node : order)
                 ceff[node] = tree.capacitance(node);
 
             for(auto current = order.rbegin(); current != order.rend(); ++current)
             {
+                if (tree.g().id(*current) == tree.g().id(tree.source()))
+                    continue;
+
                 auto parent = tree.pred(*current);
                 auto resistance_with_parent = tree.resistance(tree.resistor(parent, *current));
                 precicion_type x = 2.0 * resistance_with_parent  * ceff[*current] / slews[parent];
                 precicion_type y = 1.0 - std::exp(-1.0 / x);
-                precicion_type shielding_factor = (slews[parent] > slew_type(0.0)? 1.0 - x * y : 1.0);
+                precicion_type shielding_factor = (slews[parent] > slew_unit_type(0.0)? 1.0 - x * y : 1.0);
                 ceff[parent] += shielding_factor * ceff[*current];
             }
 
@@ -156,7 +164,6 @@ public:
         slew_map_type&        slews  = *m_slews;
         slew_map_type&        delays = *m_delays;
         capacitance_map_type& ceff   = *m_ceff;
-
 
         capacitance_unit_type lumped;
         for(rctree_type::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)

@@ -17,61 +17,124 @@ under the License.
  */
 
 #include <catch.hpp>
-#include <ophidian/design/DesignBuilder.h>
-#include <ophidian/timing/Library.h>
-#include <ophidian/timing/TimingGraphBuilder.h>
-#include <ophidian/timing/TimingData.h>
-#include <ophidian/parser/SDCParser.h>
+#include <functional>
+#include <ophidian/timingdriven_placement/RCTree.h>
+#include <ophidian/timing/GenericSTA.h>
+#include <ophidian/timing/WireModels.h>
 
 using namespace ophidian;
 
-using design_type         = design::Design;
-using design_builder_type = design::ICCAD2015ContestDesignBuilder;
-using timing_arcs_type    = timing::TimingArcs;
-using timing_library_type = timing::Library;
-using timing_graph_type   = timing::TimingGraph;
-using graph_builder_type  = timing::TimingGraphBuilder;
-using node_type           = timing_graph_type::node_type;
-using arc_type            = timing_graph_type::arc_type;
-using timing_data_type    = timing::TimingData;
+using wiremodel_effective_type = timing::wiremodel::EffectiveCapacitance;
+using wiremodel_lumped_type    = timing::wiremodel::LumpedCapacitance;
+using tree_type                = timingdriven_placement::RCTree;
+using slew_unit_type           = timing::wiremodel::slew_unit_type;
+using capacitance_unit_type    = timing::wiremodel::capacitance_unit_type;
 
 namespace
 {
+
 class WiremodelFixture
 {
 public:
-    design::ICCAD2015ContestDesignBuilder mBuilder;
-    design::Design & mDesign;
+    std::function<slew_unit_type(capacitance_unit_type)> m_calculator;
 
-    std::shared_ptr<ophidian::parser::Liberty> mLiberty;
-    timing::TimingArcs mTimingArcs;
-    timing::Library mTimingLibrary;
-    std::shared_ptr<parser::DesignConstraints> mDC;
-
-    std::shared_ptr<timing::TimingGraph> mGraph;
+    template<class Value>
+    bool diff(const Value &a, const Value &b)
+    {
+        return units::math::abs(a - b) < Value(1.e-5);
+    }
 
     WiremodelFixture() :
-        mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
-        mDesign(mBuilder.build()),
-        mLiberty(ophidian::parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
-        mTimingArcs(mDesign.standardCells()),
-        mTimingLibrary(*mLiberty, mDesign.standardCells(), mTimingArcs, true),
-        mDC(parser::SDCSimple().constraints()),
-        mGraph(timing::TimingGraphBuilder().build(mDesign.netlist(),
-                                                  mDesign.standardCells(),
-                                                  mDesign.libraryMapping(),
-                                                  mTimingArcs,
-                                                  mTimingLibrary,
-                                                  *mDC))
+        m_calculator([](capacitance_unit_type) { return slew_unit_type(1.2);})
     {
 
     }
 };
 } // namespace
 
-TEST_CASE_METHOD(WiremodelFixture, "Wiremodel: init", "[timing][wiremodel]")
+TEST_CASE_METHOD(WiremodelFixture, "Wiremodel: effective capacitance", "[timing][wiremodel]")
 {
-    REQUIRE(mGraph->size(timing_graph_type::node_type()) == 42);
-    REQUIRE(mGraph->size(timing_graph_type::arc_type()) == 40);
+    CHECK(m_calculator(capacitance_unit_type(1)) == slew_unit_type(1.2));
+    CHECK(m_calculator(capacitance_unit_type(2)) == slew_unit_type(1.2));
+
+    tree_type tree;
+    auto a = tree.addCapacitor("a");
+    auto b = tree.addCapacitor("b");
+    auto c = tree.addCapacitor("c");
+    auto d = tree.addCapacitor("d");
+
+    tree.source(a);
+
+    tree.capacitance(a, ophidian::util::farad_t(0));
+    tree.capacitance(b, ophidian::util::farad_t(1.0));
+    tree.capacitance(c, ophidian::util::farad_t(1.5));
+    tree.capacitance(d, ophidian::util::farad_t(0));
+    auto ab = tree.addResistor(a, b, ophidian::util::ohm_t(0));
+    auto bc = tree.addResistor(b, c, ophidian::util::ohm_t(0.5));
+    auto cd = tree.addResistor(c, d, ophidian::util::ohm_t(0));
+
+    CHECK(tree.name(tree.source()) == "a");
+    auto it = tree.order().begin();
+    CHECK(tree.name(*it) == "a");
+    CHECK(tree.name(*(++it)) == "b");
+    CHECK(tree.name(*(++it)) == "c");
+    CHECK(tree.name(*(++it)) == "d");
+
+    wiremodel_effective_type model;
+
+    CHECK(diff(model.simulate(m_calculator, tree), capacitance_unit_type(1.46749)));
+    CHECK(model.slews()[a] == slew_unit_type(1.2));
+    CHECK(model.slews()[b] == slew_unit_type(1.2));
+    CHECK(diff(model.slews()[c], slew_unit_type(2.39432)));
+    CHECK(diff(model.slews()[d], slew_unit_type(2.39432)));
+    CHECK(model.delays()[a] == slew_unit_type(0));
+    CHECK(model.delays()[b] == slew_unit_type(0));
+    CHECK(model.delays()[c] == slew_unit_type(0.75));
+    CHECK(model.delays()[d] == slew_unit_type(0.75));
+    CHECK(diff(model.ceff()[a], capacitance_unit_type(1.46749)));
+    CHECK(diff(model.ceff()[b], capacitance_unit_type(1.46749)));
+    CHECK(model.ceff()[c] == capacitance_unit_type(1.5));
+    CHECK(model.ceff()[d] == capacitance_unit_type(0));
 }
 
+TEST_CASE_METHOD(WiremodelFixture, "Wiremodel: lumped capacitance", "[timing][wiremodel]")
+{
+    tree_type tree;
+    auto a = tree.addCapacitor("a");
+    auto b = tree.addCapacitor("b");
+    auto c = tree.addCapacitor("c");
+    auto d = tree.addCapacitor("d");
+
+    tree.source(a);
+
+    tree.capacitance(a, ophidian::util::farad_t(0));
+    tree.capacitance(b, ophidian::util::farad_t(1.0));
+    tree.capacitance(c, ophidian::util::farad_t(1.5));
+    tree.capacitance(d, ophidian::util::farad_t(0));
+    auto ab = tree.addResistor(a, b, ophidian::util::ohm_t(0));
+    auto bc = tree.addResistor(b, c, ophidian::util::ohm_t(0.5));
+    auto cd = tree.addResistor(c, d, ophidian::util::ohm_t(0));
+
+    CHECK(tree.name(tree.source()) == "a");
+    auto it = tree.order().begin();
+    CHECK(tree.name(*it) == "a");
+    CHECK(tree.name(*(++it)) == "b");
+    CHECK(tree.name(*(++it)) == "c");
+    CHECK(tree.name(*(++it)) == "d");
+
+    wiremodel_lumped_type model;
+
+    CHECK(model.simulate(m_calculator, tree) == capacitance_unit_type(2.5));
+    CHECK(model.slews()[a] == slew_unit_type(1.2));
+    CHECK(model.slews()[b] == slew_unit_type(1.2));
+    CHECK(diff(model.slews()[c], slew_unit_type(1.4151)));
+    CHECK(diff(model.slews()[d], slew_unit_type(1.4151)));
+    CHECK(model.delays()[a] == slew_unit_type(0));
+    CHECK(model.delays()[b] == slew_unit_type(0));
+    CHECK(model.delays()[c] == slew_unit_type(0.75));
+    CHECK(model.delays()[d] == slew_unit_type(0.75));
+    CHECK(model.ceff()[a] == capacitance_unit_type(0));
+    CHECK(model.ceff()[b] == capacitance_unit_type(0));
+    CHECK(model.ceff()[c] == capacitance_unit_type(0));
+    CHECK(model.ceff()[d] == capacitance_unit_type(0));
+}

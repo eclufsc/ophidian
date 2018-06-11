@@ -25,18 +25,18 @@ using namespace ophidian::timingdriven_placement;
 TEST_CASE("RCTree: empty RCTree", "[timingdriven_placement][RCTree]")
 {
     RCTree tree;
-    REQUIRE(tree.size(RCTree::capacitor_type()) == 0);
-    REQUIRE(tree.size(RCTree::resistor_type()) == 0);
-    REQUIRE(tree.lumped() == ophidian::util::farad_t(0.0));
+    CHECK(tree.size(RCTree::capacitor_type()) == 0);
+    CHECK(tree.size(RCTree::resistor_type()) == 0);
+    CHECK(tree.lumped() == ophidian::util::farad_t(0.0));
 }
 
 TEST_CASE("RCTree: add capacitor_type", "[timingdriven_placement][RCTree]")
 {
     RCTree tree;
     tree.addCapacitor("cap");
-    REQUIRE(tree.size(RCTree::capacitor_type()) == 1);
-    REQUIRE(tree.size(RCTree::resistor_type()) == 0);
-    REQUIRE(tree.lumped() == ophidian::util::farad_t(0.0));
+    CHECK(tree.size(RCTree::capacitor_type()) == 1);
+    CHECK(tree.size(RCTree::resistor_type()) == 0);
+    CHECK(tree.lumped() == ophidian::util::farad_t(0.0));
 }
 
 TEST_CASE("RCTree: add Capacitance of the capacitor", "[timingdriven_placement][RCTree]")
@@ -44,8 +44,8 @@ TEST_CASE("RCTree: add Capacitance of the capacitor", "[timingdriven_placement][
     RCTree tree;
     auto cap = tree.addCapacitor("cap");
     tree.capacitance(cap, ophidian::util::farad_t(1.0));
-    REQUIRE(tree.size(RCTree::capacitor_type()) == 1);
-    REQUIRE(tree.lumped() == ophidian::util::farad_t(1.0));
+    CHECK(tree.size(RCTree::capacitor_type()) == 1);
+    CHECK(tree.lumped() == ophidian::util::farad_t(1.0));
 }
 
 TEST_CASE("RCTree: add the same capacitor twice", "[timingdriven_placement][RCTree]")
@@ -53,7 +53,7 @@ TEST_CASE("RCTree: add the same capacitor twice", "[timingdriven_placement][RCTr
     RCTree tree;
     tree.addCapacitor("cap");
     tree.addCapacitor("cap");
-    REQUIRE(tree.size(RCTree::capacitor_type()) == 1);
+    CHECK(tree.size(RCTree::capacitor_type()) == 1);
 }
 
 TEST_CASE("RCTree: add resistor_type", "[timingdriven_placement][RCTree]")
@@ -62,23 +62,23 @@ TEST_CASE("RCTree: add resistor_type", "[timingdriven_placement][RCTree]")
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
     auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
-    REQUIRE(tree.size(RCTree::capacitor_type()) == 2);
-    REQUIRE(tree.size(RCTree::resistor_type()) == 1);
-    REQUIRE(tree.resistance(res) == ophidian::util::ohm_t(1.1));
+    CHECK(tree.size(RCTree::capacitor_type()) == 2);
+    CHECK(tree.size(RCTree::resistor_type()) == 1);
+    CHECK(tree.resistance(res) == ophidian::util::ohm_t(1.1));
 }
 
 TEST_CASE("RCTree: name of capacitor", "[timingdriven_placement][RCTree]")
 {
     RCTree tree;
     auto cap = tree.addCapacitor("cap");
-    REQUIRE(tree.name(cap) == "cap");
+    CHECK(tree.name(cap) == "cap");
 }
 
 TEST_CASE("RCTree: find capacitor by name", "[timingdriven_placement][RCTree]")
 {
     RCTree tree;
     auto cap = tree.addCapacitor("cap");
-    REQUIRE(tree.capacitor("cap") == cap);
+    CHECK(tree.capacitor("cap") == cap);
 }
 
 TEST_CASE("RCTree: find resistor by two capacitors", "[timingdriven_placement][RCTree]")
@@ -87,10 +87,10 @@ TEST_CASE("RCTree: find resistor by two capacitors", "[timingdriven_placement][R
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
     auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
-    REQUIRE(tree.g().id(tree.resistor(capU, capV)) == tree.g().id(res));
-    REQUIRE(tree.g().id(tree.resistor(capV, capU)) == tree.g().id(res));
-    REQUIRE(tree.resistor(capU, RCTree::capacitor_type()) == lemon::INVALID);
-    REQUIRE(tree.resistor(RCTree::capacitor_type(), capV) == lemon::INVALID);
+    CHECK(tree.g().id(tree.resistor(capU, capV)) == tree.g().id(res));
+    CHECK(tree.g().id(tree.resistor(capV, capU)) == tree.g().id(res));
+    CHECK(tree.resistor(capU, RCTree::capacitor_type()) == lemon::INVALID);
+    CHECK(tree.resistor(RCTree::capacitor_type(), capV) == lemon::INVALID);
 }
 
 TEST_CASE("RCTree: find opposite capacitor", "[timingdriven_placement][RCTree]")
@@ -99,8 +99,8 @@ TEST_CASE("RCTree: find opposite capacitor", "[timingdriven_placement][RCTree]")
     auto capU = tree.addCapacitor("capU");
     auto capV = tree.addCapacitor("capV");
     auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
-    REQUIRE(tree.oppositeCapacitor(capU, res) == capV);
-    REQUIRE(tree.oppositeCapacitor(capV, res) == capU);
+    CHECK(tree.oppositeCapacitor(capU, res) == capV);
+    CHECK(tree.oppositeCapacitor(capV, res) == capU);
 }
 
 TEST_CASE("RCTree: resitor iterator", "[timingdriven_placement][RCTree]")
@@ -110,31 +110,33 @@ TEST_CASE("RCTree: resitor iterator", "[timingdriven_placement][RCTree]")
     auto capV = tree.addCapacitor("capV");
     auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
 
-    REQUIRE(tree.oppositeCapacitor(capU, tree.resistors(capU)) == capV);
-    REQUIRE(tree.oppositeCapacitor(capV, tree.resistors(capV)) == capU);
-    REQUIRE(tree.invalid() == lemon::INVALID);
+    CHECK(tree.oppositeCapacitor(capU, tree.resistors(capU)) == capV);
+    CHECK(tree.oppositeCapacitor(capV, tree.resistors(capV)) == capU);
+    CHECK(tree.invalid() == lemon::INVALID);
 }
 
 TEST_CASE("RCTree: Predecessors", "[timingdriven_placement][RCTree]")
 {
     //  s -> a -> c
-    //    -> b -> c
+    //    -> b -> d
 
     RCTree tree;
     auto s = tree.addCapacitor("s");
     auto a = tree.addCapacitor("a");
     auto b = tree.addCapacitor("b");
     auto c = tree.addCapacitor("c");
+    auto d = tree.addCapacitor("d");
     auto s_a = tree.addResistor(s, a, ophidian::util::ohm_t(1.1));
     auto s_b = tree.addResistor(s, b, ophidian::util::ohm_t(1.1));
     auto a_c = tree.addResistor(a, c, ophidian::util::ohm_t(1.1));
-    auto b_c = tree.addResistor(b, c, ophidian::util::ohm_t(1.1));
+    auto b_d = tree.addResistor(b, d, ophidian::util::ohm_t(1.1));
 
     tree.source(s);
 
-    REQUIRE(tree.name(tree.pred(a)) == "s");
-    REQUIRE(tree.name(tree.pred(b)) == "s");
-    REQUIRE(tree.name(tree.pred(c)) == "b");
+    CHECK(tree.name(tree.pred(a)) == "s");
+    CHECK(tree.name(tree.pred(b)) == "s");
+    CHECK(tree.name(tree.pred(c)) == "a");
+    CHECK(tree.name(tree.pred(d)) == "b");
     CHECK_THROWS(tree.name(tree.pred(s)));
     CHECK_THROWS(tree.name(RCTree::capacitor_type()));
 }
