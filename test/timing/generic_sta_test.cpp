@@ -28,6 +28,8 @@ under the License.
 
 using namespace ophidian;
 
+using slew_type = timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic>::slew_unit_type;
+
 namespace
 {
 class GenericSTAFixture
@@ -43,6 +45,12 @@ public:
     std::unique_ptr<parser::Lef> mLef;
 
     std::shared_ptr<timing::TimingGraph> mGraph;
+
+    template<class Value>
+    bool diff(const Value &a, const Value &b)
+    {
+        return units::math::abs(a - b) < Value(1.e-10);
+    }
 
     GenericSTAFixture() :
         mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
@@ -166,7 +174,6 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
 
             for (auto pin : mDesign.netlist().pins(net))
             {
-                auto pin_name = mDesign.netlist().name(pin);
                 auto direct = mDesign.standardCells().direction(mDesign.libraryMapping().pinStdCell(pin));
                 if (direct == standard_cell::PinDirection::OUTPUT)
                 {
@@ -175,10 +182,168 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
                 }
             }
 
-            builder.build(mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
+            builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
 
+        REQUIRE(rctree_property[mDesign.netlist().find(circuit::Net(), "n2")].lumped() == timingdriven_placement::RCTree::capacitance_unit_type(0));
+
         timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
+        sta.constraints(*mDC, mDesign.libraryMapping());
+
+        sta.update_ats();
+        sta.update_rts();
+
+        auto pin = mDesign.netlist().find(circuit::Pin(), "inp1");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.54282e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(1.11228e-10)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "inp2");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.54282e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(1.11228e-10)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "iccad_clk");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1e-11)));
+        CHECK(sta.rise_slack(pin) == timing::Optimistic::best());
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.16079e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "out");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.86528e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.86528e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u1:a");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(sta.rise_slew(pin) == slew_type(0));
+        CHECK(sta.fall_slew(pin) == slew_type(0));
+        CHECK(diff(sta.rise_slack(pin), slew_type(1.11228e-10)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.54282e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u1:b");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(sta.rise_slew(pin) == slew_type(0));
+        CHECK(sta.fall_slew(pin) == slew_type(0));
+        CHECK(diff(sta.rise_slack(pin), slew_type(1.11228e-10)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.54282e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u1:o");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(1.82444e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.64877e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(2.18811e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(4.3784e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.54282e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(1.11228e-10)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u2:o");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(8.43065e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(5.15191e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(7.8364e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(3.9182e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(8.43953e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.16079e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u2:a");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(1.82515e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.64949e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(2.18811e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(4.3784e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.54282e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(1.11228e-10)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u2:b");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(1.62544e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(1.62544e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.16079e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(8.43953e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "f1:d");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(8.43953e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(5.16079e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(7.83641e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(3.91821e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(8.43953e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.16079e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "f1:ck");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(3.3589e-12)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.3589e-12)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(3.47935e-12)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(3.47935e-12)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.16079e-11)));
+        CHECK(sta.fall_slack(pin) == timing::Optimistic::best());
+
+        pin = mDesign.netlist().find(circuit::Pin(), "f1:q");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(1.62395e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(1.62395e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.16079e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u3:a");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(1.62576e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(1.62576e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.28806e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u3:o");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(3.39717e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.39717e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.81002e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.81002e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u4:a");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(3.39843e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.39843e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.81003e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.81003e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "u4:o");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(5.32251e-11)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(5.32251e-11)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(1.86528e-11)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(1.86528e-11)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.32484e-11)));
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.32484e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "lcb1:a");
+        CHECK(sta.rise_arrival(pin) == slew_type(0));
+        CHECK(sta.fall_arrival(pin) == slew_type(0));
+        CHECK(sta.rise_slew(pin) == slew_type(0));
+        CHECK(sta.fall_slew(pin) == slew_type(0));
+        CHECK(sta.rise_slack(pin) == timing::Optimistic::best());
+        CHECK(diff(sta.fall_slack(pin), slew_type(5.16079e-11)));
+
+        pin = mDesign.netlist().find(circuit::Pin(), "lcb1:o");
+        CHECK(diff(sta.rise_arrival(pin), slew_type(3.33128e-12)));
+        CHECK(diff(sta.fall_arrival(pin), slew_type(3.33128e-12)));
+        CHECK(diff(sta.rise_slew(pin), slew_type(3.47924e-12)));
+        CHECK(diff(sta.fall_slew(pin), slew_type(3.47924e-12)));
+        CHECK(diff(sta.rise_slack(pin), slew_type(5.16079e-11)));
+        CHECK(sta.fall_slack(pin) == timing::Optimistic::best());
     }
 }
 

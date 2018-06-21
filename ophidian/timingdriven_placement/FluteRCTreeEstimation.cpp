@@ -49,7 +49,8 @@ void FluteRCTreeBuilder::capacitancePerMicron(const util::farad_t capacitance)
     mParameters.mCapacitancePerMicron = capacitance;
 }
 
-FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::PlacementMapping & placementMap,
+FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Placement & placement,
+                                                           const placement::PlacementMapping & placementMap,
                                                            const circuit::LibraryMapping & libraryMapping,
                                                            const circuit::Netlist & netlist,
                                                            const timing::Library & library,
@@ -66,12 +67,24 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 //  mParameters& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_mParameters);
 //  //mParameters & param = m_mParameters;
 
+    std::function<util::LocationDbu(const circuit::Pin&)> get_location = [&](const circuit::Pin & pin) {
+        auto input = netlist.input(pin);
+        if (input != circuit::Input())
+            return placement.inputPadLocation(input);
+
+        auto output = netlist.output(pin);
+        if (output != circuit::Output())
+            return placement.outputPadLocation(output);
+
+        return placementMap.location(pin);
+    };
+
     std::set<RCTree::capacitor_type> taps;
 
     if(netPins.size() == 1)
     {
         circuit::Pin pinU = *netPins.begin();
-        //util::LocationDbu positionPinU = placementMap.location(pinU);
+        //util::LocationDbu positionPinU = get_location(pinU);
         RCTree::capacitor_type capU = rctree.addCapacitor("C0");
         RCTree::capacitor_type tapU = sourceCap = rctree.addCapacitor(netlist.name(pinU));
 
@@ -93,19 +106,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     {   
         circuit::Pin pinU = *netPins.begin();
         circuit::Pin pinV = *(++netPins.begin());
-
-        auto nameU = netlist.name(pinU);
-        auto nameV = netlist.name(pinV);
-
-
-        auto inV = netlist.input(pinV);
-        auto inU = netlist.input(pinU);
-        auto inp = circuit::Input();
-        bool boV = inV == inp;
-        bool boU = inU == inp;
-
-        util::LocationDbu positionPinU = placementMap.location(pinU);
-        util::LocationDbu positionPinV = placementMap.location(pinV);
+        util::LocationDbu positionPinU = get_location(pinU);
+        util::LocationDbu positionPinV = get_location(pinV);
 
 
         const RCTree::capacitor_type capU = rctree.addCapacitor("C0");
@@ -176,7 +178,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     X.resize(0);
     Y.resize(0);
     for (auto p : netPins) {
-        util::LocationDbu position = placementMap.location(p);
+        util::LocationDbu position = get_location(p);
         X.push_back(static_cast<unsigned>(position.x()));
         Y.push_back(static_cast<unsigned>(position.y()));
     }

@@ -19,6 +19,7 @@
 #ifndef OPHIDIAN_TIMINGDRIVEN_PLACEMENT_FLUTERCTREEESTIMATION_H
 #define OPHIDIAN_TIMINGDRIVEN_PLACEMENT_FLUTERCTREEESTIMATION_H
 
+#include <functional>
 #include <ophidian/util/Units.h>
 #include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/circuit/LibraryMapping.h>
@@ -44,7 +45,8 @@ public:
     void resistancePerMicrons(const util::ohm_t resistance);
     void capacitancePerMicron(const util::farad_t capacitance);
 
-    SourceRCTree build(const placement::PlacementMapping & placementMap,
+    SourceRCTree build(const placement::Placement & placement,
+                       const placement::PlacementMapping & placementMap,
                        const circuit::LibraryMapping & libraryMap,
                        const circuit::Netlist & netlist,
                        const timing::Library & library,

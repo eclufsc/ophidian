@@ -142,7 +142,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for one pins", "[timi
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     CHECK(lemon::connected(rctree.g()));
     CHECK(rctree.size(RCTree::capacitor_type()) == 2);
@@ -160,7 +160,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for two pins", "[timi
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(lemon::connected(rctree.g()));
     REQUIRE(rctree.size(RCTree::capacitor_type()) == 4);
@@ -194,7 +194,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for three pins", "[ti
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(rctree.size(RCTree::capacitor_type()) == 7);
     REQUIRE(rctree.size(RCTree::resistor_type()) == 6);
@@ -235,7 +235,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for four pins", "[tim
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(lemon::connected(rctree.g()));
     REQUIRE(rctree.size(RCTree::capacitor_type()) ==  10);
@@ -282,7 +282,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with two points and no
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(lemon::connected(rctree.g()));
     REQUIRE(rctree.size(RCTree::capacitor_type()) == 4);
@@ -299,7 +299,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with two points (diffe
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(lemon::connected(rctree.g()));
     REQUIRE(rctree.size(RCTree::capacitor_type()) == 5);
@@ -320,7 +320,7 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: Build with four points and n
     RCTree rctree;
     FluteRCTreeBuilder builder;
 
-    RCTree::capacitor_type sourceCap = builder.build(mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
+    RCTree::capacitor_type sourceCap = builder.build(mPlacement, mPlacementMapping, mLibraryMapping, mNetlist, *mTimingLibrary, *mLef.get(), mNet, rctree, mPin_u1o);
 
     REQUIRE(lemon::connected(rctree.g()));
     REQUIRE(rctree.size(RCTree::capacitor_type()) ==  14);
