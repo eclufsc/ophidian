@@ -90,11 +90,23 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
 
     if(netPins.size() == 2)
-    {
+    {   
         circuit::Pin pinU = *netPins.begin();
         circuit::Pin pinV = *(++netPins.begin());
+
+        auto nameU = netlist.name(pinU);
+        auto nameV = netlist.name(pinV);
+
+
+        auto inV = netlist.input(pinV);
+        auto inU = netlist.input(pinU);
+        auto inp = circuit::Input();
+        bool boV = inV == inp;
+        bool boU = inU == inp;
+
         util::LocationDbu positionPinU = placementMap.location(pinU);
         util::LocationDbu positionPinV = placementMap.location(pinV);
+
 
         const RCTree::capacitor_type capU = rctree.addCapacitor("C0");
 

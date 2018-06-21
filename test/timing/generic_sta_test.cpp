@@ -23,6 +23,8 @@ under the License.
 #include <ophidian/parser/LibertyParser.h>
 #include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/timing/TimingGraphBuilder.h>
+#include <ophidian/timing/WireModels.h>
+#include <ophidian/timingdriven_placement/FluteRCTreeEstimation.h>
 
 using namespace ophidian;
 
@@ -38,13 +40,14 @@ public:
     timing::TimingArcs mTimingArcs;
     timing::Library mTimingLibrary;
     std::shared_ptr<parser::DesignConstraints> mDC;
+    std::unique_ptr<parser::Lef> mLef;
 
     std::shared_ptr<timing::TimingGraph> mGraph;
 
     GenericSTAFixture() :
         mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
         mDesign(mBuilder.build()),
-        mLiberty(ophidian::parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
+        mLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mTimingArcs(mDesign.standardCells()),
         mTimingLibrary(*mLiberty, mDesign.standardCells(), mTimingArcs, true),
         mDC(parser::SDCSimple().constraints()),
@@ -55,7 +58,9 @@ public:
                                                   mTimingLibrary,
                                                   *mDC))
     {
-
+        mLef = std::make_unique<parser::Lef>();
+        parser::LefParser lef_parser;
+        lef_parser.readFile("input_files/simple/simple.lef", mLef);
     }
 };
 } // namespace
@@ -148,6 +153,32 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
     SECTION("Generic STA: Init", "[timing][sta]")
     {
         timing::GraphAndTopology topology(*mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        timing::TimingData data(mTimingLibrary, *mGraph);
+
+        auto rctree_property = mDesign.netlist().makeProperty<timingdriven_placement::RCTree>(circuit::Net());
+        timingdriven_placement::FluteRCTreeBuilder builder;
+
+        for (auto it = mDesign.netlist().begin(circuit::Net()); it != mDesign.netlist().end(circuit::Net()); ++it)
+        {
+            circuit::Pin source;
+            const circuit::Net & net = *it;
+            timingdriven_placement::RCTree & rctree = rctree_property[net];
+
+            for (auto pin : mDesign.netlist().pins(net))
+            {
+                auto pin_name = mDesign.netlist().name(pin);
+                auto direct = mDesign.standardCells().direction(mDesign.libraryMapping().pinStdCell(pin));
+                if (direct == standard_cell::PinDirection::OUTPUT)
+                {
+                    source = pin;
+                    break;
+                }
+            }
+
+            builder.build(mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
+        }
+
+        timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
     }
 }
 
