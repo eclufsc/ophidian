@@ -115,47 +115,45 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
         SortedDriverIndex sd_u1, sd_u2, sd_u3, sd_u4;
         LevelIndex        l_u1,  l_u2,  l_u3,  l_u4;
 
-        s_u1 = s_u2 = s_u3 = s_u4 = sd_u1 = sd_u2 = sd_u3 = sd_u4 = l_u1 = l_u2 = l_u3 = l_u4 = 0;
-
         for (SortedIndex i(0); i < topology.m_sorted.size(); ++i)
             if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u1:o")
-                s_u1 = s_u1 > i? s_u1 : i;
+                s_u1 = i;
             else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u2:o")
-                s_u2 = s_u2 > i? s_u2 : i;
+                s_u2 = i;
             else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u3:o")
-                s_u3 = s_u3 > i? s_u3 : i;
+                s_u3 = i;
             else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u4:o")
-                s_u4 = s_u4 > i? s_u4 : i;
+                s_u4 = i;
 
         for (SortedDriverIndex i(0); i < topology.m_sorted_drivers.size(); ++i)
-            if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u1:a")
-                sd_u1 = sd_u1 > i? sd_u1 : i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u2:a")
-                sd_u2 = sd_u2 > i? sd_u2 : i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u3:a")
-                sd_u3 = sd_u3 > i? sd_u3 : i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u4:a")
-                sd_u4 = sd_u4 > i? sd_u4 : i;
+            if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u1:o")
+                sd_u1 = i;
+            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u2:o")
+                sd_u2 = i;
+            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u3:o")
+                sd_u3 = i;
+            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u4:o")
+                sd_u4 = i;
 
         for (LevelIndex i(0); i < topology.m_levels.size(); ++i)
             for (auto n : topology.m_levels[i])
                 if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u1:o")
-                    l_u1 = l_u1 > i? l_u1 : i;
+                    l_u1 = i;
                 else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u2:o")
-                    l_u2 = l_u2 > i? l_u2 : i;
+                    l_u2 = i;
                 else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u3:o")
-                    l_u3 = l_u3 > i? l_u3 : i;
+                    l_u3 = i;
                 else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u4:o")
-                    l_u4 = l_u4 > i? l_u4 : i;
+                    l_u4 = i;
 
-        REQUIRE(s_u1 < s_u2);
-        REQUIRE(s_u3 < s_u4);
+        CHECK(s_u1 < s_u2);
+        CHECK(s_u3 < s_u4);
 
-        REQUIRE(sd_u1 < sd_u2);
-        REQUIRE(sd_u3 < sd_u4);
+        CHECK(sd_u1 < sd_u2);
+        CHECK(sd_u3 < sd_u4);
 
-        REQUIRE(l_u1 < l_u2);
-        REQUIRE(l_u3 < l_u4);
+        CHECK(l_u1 < l_u2);
+        CHECK(l_u3 < l_u4);
     }
 
     SECTION("Generic STA: Init", "[timing][sta]")
@@ -182,10 +180,10 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
                 }
             }
 
+            auto n = mDesign.netlist().name(net);
+
             builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
-
-        REQUIRE(rctree_property[mDesign.netlist().find(circuit::Net(), "n2")].lumped() == timingdriven_placement::RCTree::capacitance_unit_type(0));
 
         timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
         sta.constraints(*mDC, mDesign.libraryMapping());

@@ -42,20 +42,20 @@ public:
     {
     }
 
-    LookupTable(const lut_type & lut) :
+    LookupTable(const lut_type & lut, const RowType& row_factor, const ColumnType& column_factor, const ValueType& value_factor) :
         m_row_values(lut.index_1.size()),
         m_column_values(lut.index_2.size()),
         m_values(lut.values.size())
     {
         for (int i = 0; i < lut.index_1.size(); ++i)
-            m_row_values[i] = RowType(lut.index_1[i]);
+            m_row_values[i] = row_factor * lut.index_1[i];
 
         for (int i = 0; i < lut.index_2.size(); ++i)
-            m_column_values[i] = ColumnType(lut.index_2[i]);
+            m_column_values[i] = column_factor * lut.index_2[i];
 
         for (int i = 0; i < lut.values.size(); ++i)
             for (int j = 0; j < lut.values[0].size(); ++j)
-                m_values[i].push_back(ValueType(lut.values[i][j]));
+                m_values[i].push_back(value_factor * lut.values[i][j]);
     }
 
     ~LookupTable()

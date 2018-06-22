@@ -150,10 +150,10 @@ public:
     {
         m_timing_data.arrival(
                     m_topology->m_graph.riseNode(m_topology->m_netlist.find(pin_entity_type(), dc.mClock.portName)),
-                    slew_unit_type(0,0));
+                    slew_unit_type(0));
         m_timing_data.arrival(
                     m_topology->m_graph.fallNode(m_topology->m_netlist.find(pin_entity_type(), dc.mClock.portName)),
-                    slew_unit_type(0,0));
+                    slew_unit_type(0));
 
         for(auto & i : dc.mInputDelays)
         {

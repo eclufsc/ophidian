@@ -103,7 +103,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
 
     if(netPins.size() == 2)
-    {   
+    {
+//        circuit::Pin pinU = source;
+//        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
         circuit::Pin pinU = *netPins.begin();
         circuit::Pin pinV = *(++netPins.begin());
         util::LocationDbu positionPinU = get_location(pinU);
@@ -145,7 +147,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             RCTree::capacitor_type tapV = sourceCap = rctree.addCapacitor(netlist.name(pinV));
             //tap_mapping[pinV] = tapV;
             taps.insert(tapV);
-            rctree.capacitance(tapV, library.capacitance(libraryMapping.pinStdCell(pinV)));
+            auto cap_test = library.capacitance(libraryMapping.pinStdCell(pinV));
+            rctree.capacitance(tapV, cap_test);
             rctree.addResistor(capV, tapV, util::ohm_t(0.0));
 
         } else {

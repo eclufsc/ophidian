@@ -45,7 +45,8 @@ namespace timing
         m_levels.resize(num_levels+1);
 
         for(auto node : m_sorted)
-            if(stdCells.direction(libraryMapping.pinStdCell(m_graph.entity(node))) == standard_cell::PinDirection::OUTPUT)
+            if(stdCells.direction(libraryMapping.pinStdCell(m_graph.entity(node))) == standard_cell::PinDirection::OUTPUT
+                    && netlist.input(m_graph.entity(node)) == circuit::Input())
                 m_levels[level[node]].push_back(node);
 
         auto beg = std::remove_if
@@ -59,14 +60,13 @@ namespace timing
 
         m_levels.erase(beg, m_levels.end());
 
-
         auto begin = std::remove_if
         (
             m_sorted_drivers.begin(),
             m_sorted_drivers.end(),
             [this, &stdCells, &libraryMapping](graph_type::Node node)->bool
             {
-                return stdCells.direction(libraryMapping.pinStdCell(m_graph.entity(node))) == standard_cell::PinDirection::OUTPUT;
+                return stdCells.direction(libraryMapping.pinStdCell(m_graph.entity(node))) != standard_cell::PinDirection::OUTPUT;
             }
         );
 

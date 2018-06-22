@@ -128,9 +128,9 @@ TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: init", "[timingdriven_placem
     CHECK(mLef.get()->macros().front().name == "mStdCell_u1");
     CHECK(mLiberty.get()->cells.size() == 4);
     CHECK(mTimingLibrary->capacitance(mStdPin_u1o) == ophidian::util::farad_t(0.0));
-    CHECK(mTimingLibrary->capacitance(mStdPin_u2a) == ophidian::util::farad_t(1.0));
-    CHECK(mTimingLibrary->capacitance(mStdPin_u3a) == ophidian::util::farad_t(1.0));
-    CHECK(mTimingLibrary->capacitance(mStdPin_u4a) == ophidian::util::farad_t(1.0));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u2a) == ophidian::util::farad_t(1e-15));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u3a) == ophidian::util::farad_t(1e-15));
+    CHECK(mTimingLibrary->capacitance(mStdPin_u4a) == ophidian::util::farad_t(1e-15));
 }
 
 TEST_CASE_METHOD(FluteRCTreeFixture, "Flute RCTree: RCTree for one pins", "[timingdriven_placement][flute][rctree]")

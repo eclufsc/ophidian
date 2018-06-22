@@ -17,10 +17,13 @@ under the License.
  */
 
 #include <catch.hpp>
+#include <ophidian/design/DesignBuilder.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/standard_cell/StandardCells.h>
 #include <ophidian/timing/Library.h>
 #include <ophidian/timing/TimingData.h>
+#include <ophidian/parser/SDCParser.h>
+#include <ophidian/timing/TimingGraphBuilder.h>
 
 using namespace ophidian;
 
@@ -37,25 +40,38 @@ namespace
 class TimingDataFixture
 {
 public:
-    netlist_type        mNetlist;
-    standard_cells_type mStdCells;
-    timing_graph_type   mGraph;
-    node_type           mFrom, mTo;
-    arc_type            mArc;
-    timing_arcs_type    mTimingArcs;
-    timing_library_type mLibrary;
+    design::ICCAD2015ContestDesignBuilder mBuilder;
+    design::Design & mDesign;
+
+    std::shared_ptr<ophidian::parser::Liberty> mLiberty;
+    timing::TimingArcs mTimingArcs;
+    timing::Library mTimingLibrary;
+    std::shared_ptr<parser::DesignConstraints> mDC;
+    std::unique_ptr<parser::Lef> mLef;
+
+    std::shared_ptr<timing::TimingGraph> mGraph;
+
+    timing::TimingGraph::node_type mFrom, mTo;
+    timing::TimingGraph::arc_type mArc;
 
     TimingDataFixture() :
-        mGraph(mNetlist),
-        mTimingArcs(mStdCells),
-        mLibrary(parser::Liberty(), mStdCells, mTimingArcs, true)
+        mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
+        mDesign(mBuilder.build()),
+        mLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
+        mTimingArcs(mDesign.standardCells()),
+        mTimingLibrary(*mLiberty, mDesign.standardCells(), mTimingArcs, true),
+        mDC(parser::SDCSimple().constraints()),
+        mGraph(timing::TimingGraphBuilder().build(mDesign.netlist(),
+                                                  mDesign.standardCells(),
+                                                  mDesign.libraryMapping(),
+                                                  mTimingArcs,
+                                                  mTimingLibrary,
+                                                  *mDC))
     {
-        auto from = mNetlist.add(circuit::Pin(), "from");
-        auto to = mNetlist.add(circuit::Pin(), "to");
+        mFrom = mGraph->riseNode(mDesign.netlist().find(circuit::Pin(), "u1:o"));
+        mTo = mGraph->riseNode(mDesign.netlist().find(circuit::Pin(), "u2:a"));
 
-        mFrom = mGraph.riseNodeCreate(from);
-        mTo = mGraph.riseNodeCreate(to);
-        mArc = mGraph.arcCreate(mFrom, mTo, timing_arcs_type::timing_arc_entity_type());
+        mArc = mGraph->outArc(mFrom);
     }
 };
 } // namespace
@@ -67,7 +83,7 @@ TEST_CASE_METHOD(TimingDataFixture, "TimingGraph Condensation","[timing][sta][co
         using time_unit_type = timing::TimingData::time_unit_type;
         using capacitance_unit_type = timing::TimingData::capacitance_unit_type;
 
-        timing::TimingData data(mLibrary, mGraph);
+        timing::TimingData data(mTimingLibrary, *mGraph);
         data.arrival(mFrom, time_unit_type(1.0));
         data.slew(mFrom, time_unit_type(3.0));
         data.required(mFrom, time_unit_type(5.0));
@@ -83,7 +99,7 @@ TEST_CASE_METHOD(TimingDataFixture, "TimingGraph Condensation","[timing][sta][co
     {
         using time_unit_type = timing::TimingData::time_unit_type;
 
-        timing::TimingData data(mLibrary, mGraph);
+        timing::TimingData data(mTimingLibrary, *mGraph);
         data.delay(mArc, time_unit_type(10.0));
         data.slew(mArc, time_unit_type(12.0));
 

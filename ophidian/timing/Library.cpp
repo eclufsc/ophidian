@@ -35,6 +35,30 @@ Library::Library(const liberty_type & liberty, standard_cells_type & stdCells, t
     m_clock(stdCells.makeProperty<bool>(std_pin_entity_type())),
     m_sequential(stdCells.makeProperty<bool>(std_cell_entity_type()))
 {
+    capacitance_unit_type capacitive_load_unit;
+    if (liberty.capacitiveLoadUnit == "ff")
+        capacitive_load_unit = capacitance_unit_type(util::femtofarad_t(liberty.capacitiveLoadUnitValue));
+    else if (liberty.capacitiveLoadUnit == "pf")
+        capacitive_load_unit = capacitance_unit_type(util::picofarad_t(liberty.capacitiveLoadUnitValue));
+    else if (liberty.capacitiveLoadUnit == "nf")
+        capacitive_load_unit = capacitance_unit_type(units::capacitance::nanofarad_t(liberty.capacitiveLoadUnitValue));
+    else
+        assert(false);
+
+    time_unit_type time_unit;
+    if (liberty.timeUnit == "1ps")
+        time_unit = util::picosecond_t(1.0);
+    else if (liberty.timeUnit == "1ns")
+        time_unit = util::nanosecond_t(1.0);
+    else if (liberty.timeUnit == "1us")
+        time_unit = util::microsecond_t(1.0);
+    else if (liberty.timeUnit == "1ms")
+        time_unit = util::millisecond_t(1.0);
+    else if (liberty.timeUnit == "1s")
+        time_unit = util::second_t(1.0);
+    else
+        assert(false);
+
     for (auto cell : liberty.cells)
     {
         for (auto pin : cell.pins)
@@ -54,17 +78,18 @@ Library::Library(const liberty_type & liberty, standard_cells_type & stdCells, t
                 arcs.to(arc, stdCells.find(std_pin_entity_type(), nameToPin));
                 m_timing_senses[arc] = tmg.timingSense;
                 m_timing_types[arc] = tmg.timingType;
-                auto temporario = tmg.find(ParserLUT::CELL_RISE);
-                m_rise_delays[arc] = LUT(temporario);
-                m_fall_delays[arc] = LUT(tmg.find(ParserLUT::CELL_FALL));
+                m_rise_delays[arc] = LUT(tmg.find(ParserLUT::CELL_RISE), capacitive_load_unit, time_unit, time_unit);
+                m_fall_delays[arc] = LUT(tmg.find(ParserLUT::CELL_FALL), capacitive_load_unit, time_unit, time_unit);
                 m_rise_slews[arc] = LUT(tmg.find(pin.pinDirection == liberty_type::Pin::INPUT?
-                                                   ParserLUT::RISE_CONSTRAINT : ParserLUT::RISE_TRANSITION));
+                                                   ParserLUT::RISE_CONSTRAINT : ParserLUT::RISE_TRANSITION),
+                                        capacitive_load_unit, time_unit, time_unit);
                 m_fall_slews[arc] = LUT(tmg.find(pin.pinDirection == liberty_type::Pin::INPUT?
-                                                   ParserLUT::FALL_CONSTRAINT : ParserLUT::FALL_TRANSITION));
+                                                   ParserLUT::FALL_CONSTRAINT : ParserLUT::FALL_TRANSITION),
+                                        capacitive_load_unit, time_unit, time_unit);
             }
 
             std_pin_entity_type stdPin = stdCells.find(std_pin_entity_type(), cell.name+":"+pin.name);
-            m_pin_capacitance[stdPin] = capacitance_unit_type(pin.capacitance);
+            m_pin_capacitance[stdPin] = pin.capacitance * capacitive_load_unit;
             m_clock[stdPin] = pin.clock;
         }
 
