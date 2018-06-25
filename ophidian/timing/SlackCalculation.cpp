@@ -62,12 +62,12 @@ EndPoints::~EndPoints()
 
 EndPoints::container_type::const_iterator EndPoints::begin() const
 {
-    return m_endpoints.begin();
+    return m_endpoints.cbegin();
 }
 
 EndPoints::container_type::const_iterator EndPoints::end() const
 {
-    return m_endpoints.end();
+    return m_endpoints.cend();
 }
 
 std::size_t EndPoints::size() const
