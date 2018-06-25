@@ -422,5 +422,11 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     REQUIRE(sta.timing_endpoints().size() == 2);
     CHECK(mDesign.netlist().name(*sta.timing_endpoints().begin()) == "out");
     CHECK(mDesign.netlist().name(*(++sta.timing_endpoints().begin())) == "f1:d");
+
+    /* ---- WNS and TNS ---- */
+    CHECK(sta.early_tns() == slew_type(0));
+    CHECK(diff(sta.early_wns(), slew_type(4.20834e-11)));
+    CHECK(diff(sta.late_tns(), slew_type(-1.76628e-10)));
+    CHECK(diff(sta.late_wns(), slew_type(-9.19408e-11)));
 }
 
