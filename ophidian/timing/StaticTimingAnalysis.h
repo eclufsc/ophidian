@@ -64,7 +64,7 @@ public:
     StaticTimingAnalysis& operator=(StaticTimingAnalysis&&) = default;
 
     void graph(const timing_graph_type& g);
-    void rc_trees(const net_to_rctrees_property_type& trees);
+    void rc_trees(net_to_rctrees_property_type& trees);
     void late_lib(const timing_library_type& lib);
     void early_lib(const timing_library_type& lib);
     void netlist(netlist_type & netlist);
@@ -101,7 +101,7 @@ private:
     bool has_timing_data() const;
 
     const timing_graph_type*            m_timing_graph;
-    const net_to_rctrees_property_type* m_rc_trees;
+    net_to_rctrees_property_type*       m_rc_trees;
     const timing_library_type*          m_late_lib;
     const timing_library_type*          m_early_lib;
     netlist_type*                       m_netlist;

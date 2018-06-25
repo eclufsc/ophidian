@@ -29,7 +29,7 @@ void StaticTimingAnalysis::graph(const timing_graph_type& g)
     m_timing_graph = &g;
 }
 
-void StaticTimingAnalysis::rc_trees(const net_to_rctrees_property_type& trees)
+void StaticTimingAnalysis::rc_trees(net_to_rctrees_property_type& trees)
 {
     m_rc_trees = &trees;
 }

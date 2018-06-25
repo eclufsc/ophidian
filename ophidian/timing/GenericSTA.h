@@ -134,7 +134,7 @@ public:
 
     GenericSTA(timing_data_type & data,
                topology_type & topology,
-               const net_to_rctree_property_type & rctrees) :
+               net_to_rctree_property_type & rctrees) :
         m_timing_data(data),
         m_topology(&topology),
         m_rctrees(rctrees)
@@ -386,10 +386,10 @@ private:
         return worstSlew;
     }
 
-    timing_data_type&                  m_timing_data;
-    topology_type*                     m_topology;
-    const net_to_rctree_property_type& m_rctrees;
-    MergeStrategy                      m_merge;
+    timing_data_type&            m_timing_data;
+    topology_type*               m_topology;
+    net_to_rctree_property_type& m_rctrees;
+    MergeStrategy                m_merge;
 };
 
 }   // namespace timing

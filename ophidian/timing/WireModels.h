@@ -59,7 +59,7 @@ public:
     const capacitance_map_type& ceff() const;
 
     template <class SlewCalculator>
-    capacitance_unit_type simulate(const SlewCalculator& slew_calculator, rctree_type& tree)
+    capacitance_unit_type simulate(const SlewCalculator & slew_calculator, rctree_type& tree)
     {
         if(!m_slews)
             m_slews = new slew_map_type(tree.g());
