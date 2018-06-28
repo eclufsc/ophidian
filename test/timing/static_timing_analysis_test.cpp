@@ -134,7 +134,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(sta.early_fall_arrival(pin) == slew_type(0));
     CHECK(diff(sta.early_rise_slew(pin), slew_type(1e-11)));
     CHECK(diff(sta.early_fall_slew(pin), slew_type(1e-11)));
-    CHECK(diff(sta.early_rise_slack(pin), slew_type(3.35856e-12)));
+    CHECK(sta.early_rise_slack(pin) == timing::Optimistic::best());
     CHECK(diff(sta.early_fall_slack(pin), slew_type(5.16079e-11)));
 
     pin = mDesign.netlist().find(circuit::Pin(), "out");
@@ -207,7 +207,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(diff(sta.early_rise_slew(pin), slew_type(3.47935e-12)));
     CHECK(diff(sta.early_fall_slew(pin), slew_type(3.47935e-12)));
     CHECK(diff(sta.early_rise_slack(pin), slew_type(5.16079e-11)));
-    CHECK(diff(sta.early_fall_slack(pin), slew_type(3.35856e-12)));
+    CHECK(sta.early_fall_slack(pin) == timing::Optimistic::best());
 
     pin = mDesign.netlist().find(circuit::Pin(), "f1:q");
     CHECK(diff(sta.early_rise_arrival(pin), slew_type(1.62395e-11)));
@@ -254,7 +254,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(sta.early_fall_arrival(pin) == slew_type(0));
     CHECK(sta.early_rise_slew(pin) == slew_type(0));
     CHECK(sta.early_fall_slew(pin) == slew_type(0));
-    CHECK(diff(sta.early_rise_slack(pin), slew_type(3.35856e-12)));
+    CHECK(sta.early_rise_slack(pin) == timing::Optimistic::best());
     CHECK(diff(sta.early_fall_slack(pin), slew_type(5.16079e-11)));
 
     pin = mDesign.netlist().find(circuit::Pin(), "lcb1:o");
@@ -263,23 +263,23 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(diff(sta.early_rise_slew(pin), slew_type(3.47924e-12)));
     CHECK(diff(sta.early_fall_slew(pin), slew_type(3.47924e-12)));
     CHECK(diff(sta.early_rise_slack(pin), slew_type(5.16079e-11)));
-    CHECK(diff(sta.early_fall_slack(pin), slew_type(3.35856e-12)));
+    CHECK(sta.early_fall_slack(pin) == timing::Optimistic::best());
 
     /* ------- Late ---------*/
 
     pin = mDesign.netlist().find(circuit::Pin(), "inp1");
     CHECK(sta.late_rise_arrival(pin) == slew_type(0));
     CHECK(sta.late_fall_arrival(pin) == slew_type(0));
-    CHECK(sta.late_rise_slew(pin) == slew_type(0));
-    CHECK(sta.late_fall_slew(pin) == slew_type(0));
+    CHECK(diff(sta.late_rise_slew(pin), slew_type(1e-11)));
+    CHECK(diff(sta.late_fall_slew(pin), slew_type(1e-11)));
     CHECK(diff(sta.late_rise_slack(pin), slew_type(-5.56059e-12)));
     CHECK(diff(sta.late_fall_slack(pin), slew_type(-9.19408e-11)));
 
     pin = mDesign.netlist().find(circuit::Pin(), "inp2");
     CHECK(sta.late_rise_arrival(pin) == slew_type(0));
     CHECK(sta.late_fall_arrival(pin) == slew_type(0));
-    CHECK(sta.late_rise_slew(pin) == slew_type(0));
-    CHECK(sta.late_fall_slew(pin) == slew_type(0));
+    CHECK(diff(sta.late_rise_slew(pin), slew_type(1e-11)));
+    CHECK(diff(sta.late_fall_slew(pin), slew_type(1e-11)));
     CHECK(diff(sta.late_rise_slack(pin), slew_type(-5.56059e-12)));
     CHECK(diff(sta.late_fall_slack(pin), slew_type(-9.19408e-11)));
 
@@ -288,7 +288,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(sta.late_fall_arrival(pin) == slew_type(0));
     CHECK(sta.late_rise_slew(pin) == slew_type(0));
     CHECK(sta.late_fall_slew(pin) == slew_type(0));
-    CHECK(diff(sta.late_rise_slack(pin), slew_type(-5.02454e-12)));
+    CHECK(sta.late_rise_slack(pin) == timing::Optimistic::best());
     CHECK(diff(sta.late_fall_slack(pin), slew_type(-8.4687e-11)));
 
     pin = mDesign.netlist().find(circuit::Pin(), "out");
@@ -361,7 +361,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(diff(sta.late_rise_slew(pin), slew_type(5.21894e-12)));
     CHECK(diff(sta.late_fall_slew(pin), slew_type(5.21894e-12)));
     CHECK(diff(sta.late_rise_slack(pin), slew_type(-8.4687e-11)));
-    CHECK(diff(sta.late_fall_slack(pin), slew_type(-5.02454e-12)));
+    CHECK(sta.late_fall_slack(pin) == timing::Optimistic::best());
 
     pin = mDesign.netlist().find(circuit::Pin(), "f1:q");
     CHECK(diff(sta.late_rise_arrival(pin), slew_type(2.43455e-11)));
@@ -408,7 +408,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(sta.late_fall_arrival(pin) == slew_type(0));
     CHECK(sta.late_rise_slew(pin) == slew_type(0));
     CHECK(sta.late_fall_slew(pin) == slew_type(0));
-    CHECK(diff(sta.late_rise_slack(pin), slew_type(-5.02454e-12)));
+    CHECK(sta.late_rise_slack(pin) == timing::Optimistic::best());
     CHECK(diff(sta.late_fall_slack(pin), slew_type(-8.4687e-11)));
 
     pin = mDesign.netlist().find(circuit::Pin(), "lcb1:o");
@@ -417,7 +417,7 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
     CHECK(diff(sta.late_rise_slew(pin), slew_type(5.21887e-12)));
     CHECK(diff(sta.late_fall_slew(pin), slew_type(5.21887e-12)));
     CHECK(diff(sta.late_rise_slack(pin), slew_type(-8.4687e-11)));
-    CHECK(diff(sta.late_fall_slack(pin), slew_type(-5.02454e-12)));
+    CHECK(sta.late_fall_slack(pin) == timing::Optimistic::best());
 
     REQUIRE(sta.timing_endpoints().size() == 2);
     CHECK(mDesign.netlist().name(*sta.timing_endpoints().begin()) == "out");

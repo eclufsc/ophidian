@@ -86,6 +86,9 @@ void StaticTimingAnalysis::init_timing_data()
     m_late_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Pessimistic>(*m_late_data, *m_topology, *m_rc_trees));
     m_early_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Optimistic>(*m_early_data, *m_topology, *m_rc_trees));
     m_endpoints = endpoints_type(*m_netlist, *m_lib_mappping, *m_std_cells, *m_late_lib);
+
+    m_late_sta->constraints(m_dc, *m_lib_mappping);
+    m_early_sta->constraints(m_dc, *m_lib_mappping);
 }
 
 void StaticTimingAnalysis::propagate_ats()
