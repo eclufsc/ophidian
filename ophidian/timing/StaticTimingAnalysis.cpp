@@ -24,100 +24,73 @@ namespace ophidian
 namespace timing
 {
 
-void StaticTimingAnalysis::graph(const timing_graph_type& g)
+StaticTimingAnalysis::StaticTimingAnalysis(standard_cells_type& std_cells,
+                                           netlist_type& netlist,
+                                           library_mapping_type& lib_mapping,
+                                           placement_type& placement,
+                                           placment_library_type& placement_mapping,
+                                           const liberty_type& early,
+                                           const liberty_type& late,
+                                           const lef_type& lef,
+                                           const design_constraints_type& dc) :
+    m_timing_arcs(std_cells),
+    m_early_lib(early, std_cells, m_timing_arcs, true),
+    m_late_lib(late, std_cells, m_timing_arcs, false),
+    m_timing_graph(TimingGraphBuilder().build(netlist, std_cells, lib_mapping, m_timing_arcs, m_early_lib, dc)),
+    m_early_data(m_early_lib, *m_timing_graph),
+    m_late_data(m_late_lib, *m_timing_graph),
+    m_topology(*m_timing_graph, netlist, std_cells, lib_mapping),
+    m_rc_trees(netlist.makeProperty<rc_tree_type>(circuit::Net())),
+    m_early_sta(m_early_data, m_topology, m_rc_trees, dc, lib_mapping),
+    m_late_sta(m_late_data, m_topology, m_rc_trees, dc, lib_mapping),
+    m_endpoints(netlist, lib_mapping, std_cells, m_early_lib)
 {
-    m_timing_graph = &g;
-}
+    timingdriven_placement::FluteRCTreeBuilder builder;
 
-void StaticTimingAnalysis::rc_trees(net_to_rctrees_property_type& trees)
-{
-    m_rc_trees = &trees;
-}
+    for (auto it = netlist.begin(circuit::Net()); it != netlist.end(circuit::Net()); ++it)
+    {
+        circuit::Pin source;
+        const circuit::Net & net = *it;
+        timingdriven_placement::RCTree & rctree = m_rc_trees[net];
 
-void StaticTimingAnalysis::late_lib(const timing_library_type& lib)
-{
-    m_late_lib = &lib;
-}
+        for (auto pin : netlist.pins(net))
+            if (std_cells.direction(lib_mapping.pinStdCell(pin)) == standard_cell::PinDirection::OUTPUT)
+            {
+                source = pin;
+                break;
+            }
 
-void StaticTimingAnalysis::early_lib(const timing_library_type& lib)
-{
-    m_early_lib = &lib;
-}
+        builder.build(placement, placement_mapping, lib_mapping, netlist, m_early_lib, lef, net, rctree, source);
+    }
 
-void StaticTimingAnalysis::netlist(netlist_type & netlist)
-{
-    m_netlist = &netlist;
-}
-
-void StaticTimingAnalysis::lib_mapping(library_mapping_type & lib_mapping)
-{
-    m_lib_mappping = &lib_mapping;
-}
-
-void StaticTimingAnalysis::std_cells(standard_cells_type & std_cells)
-{
-    m_std_cells = &std_cells;
-}
-
-void StaticTimingAnalysis::constraints(const design_constraints_type & dc)
-{
-    m_dc = dc;
+    update_timing();
 }
 
 void StaticTimingAnalysis::update_timing()
 {
-    if(!has_timing_data())
-        init_timing_data();
-
     propagate_ats();
-
-    //m_test->compute_tests();
-
     propagate_rts();
-
     update_wns_and_tns();
-}
-
-void StaticTimingAnalysis::init_timing_data()
-{
-    m_late_data.reset(new TimingData(*m_late_lib, *m_timing_graph));
-    m_early_data.reset(new TimingData(*m_early_lib, *m_timing_graph));
-    m_topology.reset(new GraphAndTopology(*m_timing_graph, *m_netlist, *m_std_cells, *m_lib_mappping));
-    m_late_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Pessimistic>(*m_late_data, *m_topology, *m_rc_trees));
-    m_early_sta.reset(new GenericSTA<wiremodel::LumpedCapacitance, Optimistic>(*m_early_data, *m_topology, *m_rc_trees));
-    m_endpoints = endpoints_type(*m_netlist, *m_lib_mappping, *m_std_cells, *m_late_lib);
-
-    m_late_sta->constraints(m_dc, *m_lib_mappping);
-    m_early_sta->constraints(m_dc, *m_lib_mappping);
 }
 
 void StaticTimingAnalysis::propagate_ats()
 {
-    m_late_sta->update_ats();
-    m_early_sta->update_ats();
+    m_late_sta.update_ats();
+    m_early_sta.update_ats();
 }
 
 void StaticTimingAnalysis::propagate_rts()
 {
-    m_late_sta->update_rts();
-    m_early_sta->update_rts();
+    m_late_sta.update_rts();
+    m_early_sta.update_rts();
 }
 
 void StaticTimingAnalysis::update_wns_and_tns()
 {
-    m_lwns = WorstNegativeSlack(m_endpoints, *m_late_sta).value();
-    m_ewns = WorstNegativeSlack(m_endpoints, *m_early_sta).value();
-    m_ltns = TotalNegativeSlack(m_endpoints, *m_late_sta).value();
-    m_etns = TotalNegativeSlack(m_endpoints, *m_early_sta).value();
-}
-
-bool StaticTimingAnalysis::has_timing_data() const
-{
-    assert(m_rc_trees);
-    assert(m_timing_graph);
-    assert(m_late_lib && m_early_lib);
-    assert(m_netlist);
-    return m_late_sta && m_early_sta;
+    m_lwns = WorstNegativeSlack(m_endpoints, m_late_sta).value();
+    m_ewns = WorstNegativeSlack(m_endpoints, m_early_sta).value();
+    m_ltns = TotalNegativeSlack(m_endpoints, m_late_sta).value();
+    m_etns = TotalNegativeSlack(m_endpoints, m_early_sta).value();
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_wns() const
@@ -142,62 +115,62 @@ StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_tns() const
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slack(const pin_entity_type& p) const
 {
-    return m_early_sta->rise_slack(p);
+    return m_early_sta.rise_slack(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slack(const pin_entity_type& p) const
 {
-    return m_early_sta->fall_slack(p);
+    return m_early_sta.fall_slack(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slack(const pin_entity_type& p) const
 {
-    return m_late_sta->rise_slack(p);
+    return m_late_sta.rise_slack(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slack(const pin_entity_type& p) const
 {
-    return m_late_sta->fall_slack(p);
+    return m_late_sta.fall_slack(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_arrival(const pin_entity_type& p) const
 {
-    return m_early_sta->rise_arrival(p);
+    return m_early_sta.rise_arrival(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_arrival(const pin_entity_type& p) const
 {
-    return m_early_sta->fall_arrival(p);
+    return m_early_sta.fall_arrival(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_arrival(const pin_entity_type& p) const
 {
-    return m_late_sta->rise_arrival(p);
+    return m_late_sta.rise_arrival(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_arrival(const pin_entity_type& p) const
 {
-    return m_late_sta->fall_arrival(p);
+    return m_late_sta.fall_arrival(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_rise_slew(const pin_entity_type& p) const
 {
-    return m_early_sta->rise_slew(p);
+    return m_early_sta.rise_slew(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::early_fall_slew(const pin_entity_type& p) const
 {
-    return m_early_sta->fall_slew(p);
+    return m_early_sta.fall_slew(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_rise_slew(const pin_entity_type& p) const
 {
-    return m_late_sta->rise_slew(p);
+    return m_late_sta.rise_slew(p);
 }
 
 StaticTimingAnalysis::time_unit_type StaticTimingAnalysis::late_fall_slew(const pin_entity_type& p) const
 {
-    return m_late_sta->fall_slew(p);
+    return m_late_sta.fall_slew(p);
 }
 
 const StaticTimingAnalysis::endpoints_type & StaticTimingAnalysis::timing_endpoints() const

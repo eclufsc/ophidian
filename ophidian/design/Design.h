@@ -26,6 +26,7 @@
 #include <ophidian/circuit/LibraryMapping.h>
 #include <ophidian/placement/PlacementMapping.h>
 #include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/timing/StaticTimingAnalysis.h>
 
 namespace ophidian
 {
@@ -126,8 +127,7 @@ namespace ophidian
 			standard_cell::StandardCells mStandardCells;
 			placement::Library mLibrary;
 			circuit::LibraryMapping mLibraryMapping;
-			placement::PlacementMapping mPlacementMapping;
-
+            placement::PlacementMapping mPlacementMapping;
 		};
 
 	} //namespace design

@@ -183,8 +183,7 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
             builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
 
-        timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
-        sta.constraints(*mDC, mDesign.libraryMapping());
+        timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property, *mDC, mDesign.libraryMapping());
 
         sta.update_ats();
         sta.update_rts();
@@ -369,8 +368,7 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
             builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
 
-        timing::GenericSTA<timing::wiremodel::EffectiveCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
-        sta.constraints(*mDC, mDesign.libraryMapping());
+        timing::GenericSTA<timing::wiremodel::EffectiveCapacitance, timing::Optimistic> sta(data, topology, rctree_property, *mDC, mDesign.libraryMapping());
 
         sta.update_ats();
         sta.update_rts();

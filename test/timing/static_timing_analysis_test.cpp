@@ -39,12 +39,8 @@ public:
     design::Design & mDesign;
 
     std::shared_ptr<ophidian::parser::Liberty> mEarlyLiberty, mLateLiberty;
-    timing::TimingArcs mTimingArcs;
-    timing::Library mEarlyTimingLibrary, mLateTimingLibrary;
     std::shared_ptr<parser::DesignConstraints> mDC;
     std::unique_ptr<parser::Lef> mLef;
-
-    std::shared_ptr<timing::TimingGraph> mGraph;
 
     template<class Value>
     bool diff(const Value &a, const Value &b)
@@ -57,16 +53,7 @@ public:
         mDesign(mBuilder.build()),
         mEarlyLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mLateLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Late.lib")),
-        mTimingArcs(mDesign.standardCells()),
-        mEarlyTimingLibrary(*mEarlyLiberty, mDesign.standardCells(), mTimingArcs, true),
-        mLateTimingLibrary(*mLateLiberty, mDesign.standardCells(), mTimingArcs, false),
-        mDC(parser::SDCSimple().constraints()),
-        mGraph(timing::TimingGraphBuilder().build(mDesign.netlist(),
-                                                  mDesign.standardCells(),
-                                                  mDesign.libraryMapping(),
-                                                  mTimingArcs,
-                                                  mEarlyTimingLibrary,
-                                                  *mDC))
+        mDC(parser::SDCSimple().constraints())
     {
         mLef = std::make_unique<parser::Lef>();
         parser::LefParser lef_parser;
@@ -77,39 +64,16 @@ public:
 
 TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][sta]")
 {
-    auto rctree_property = mDesign.netlist().makeProperty<timingdriven_placement::RCTree>(circuit::Net());
-    timingdriven_placement::FluteRCTreeBuilder builder;
-
-    for (auto it = mDesign.netlist().begin(circuit::Net()); it != mDesign.netlist().end(circuit::Net()); ++it)
-    {
-        circuit::Pin source;
-        const circuit::Net & net = *it;
-        timingdriven_placement::RCTree & rctree = rctree_property[net];
-
-        for (auto pin : mDesign.netlist().pins(net))
-        {
-            auto direct = mDesign.standardCells().direction(mDesign.libraryMapping().pinStdCell(pin));
-            if (direct == standard_cell::PinDirection::OUTPUT)
-            {
-                source = pin;
-                break;
-            }
-        }
-
-        auto n = mDesign.netlist().name(net);
-
-        builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mEarlyTimingLibrary, *mLef, net, rctree, source);
-    }
-
-    timing::StaticTimingAnalysis sta;
-    sta.graph(*mGraph);
-    sta.rc_trees(rctree_property);
-    sta.late_lib(mLateTimingLibrary);
-    sta.early_lib(mEarlyTimingLibrary);
-    sta.netlist(mDesign.netlist());
-    sta.lib_mapping(mDesign.libraryMapping());
-    sta.std_cells(mDesign.standardCells());
-    sta.constraints(*mDC);
+    timing::StaticTimingAnalysis sta(
+                mDesign.standardCells(),
+                mDesign.netlist(),
+                mDesign.libraryMapping(),
+                mDesign.placement(),
+                mDesign.placementMapping(),
+                *mEarlyLiberty,
+                *mLateLiberty,
+                *mLef,
+                *mDC);
 
     sta.update_timing();
 

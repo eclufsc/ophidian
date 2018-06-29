@@ -28,6 +28,7 @@
 #include <ophidian/timing/GenericSTA.h>
 #include <ophidian/timing/WireModels.h>
 #include <ophidian/timing/SlackCalculation.h>
+#include <ophidian/timing/TimingGraphBuilder.h>
 #include <ophidian/timingdriven_placement/FluteRCTreeEstimation.h>
 
 namespace ophidian
@@ -39,23 +40,29 @@ class StaticTimingAnalysis
 {
 public:
     template <class T>
-    using generic_sta_lumped_ptr       = std::unique_ptr<GenericSTA<wiremodel::LumpedCapacitance, T>>;
-    
+    using generic_sta_type             = GenericSTA<wiremodel::LumpedCapacitance, T>;
+
     using time_unit_type               = util::second_t;
-    using timing_data_ptr              = std::unique_ptr<TimingData>;
-    using graph_and_topology_ptr       = std::unique_ptr<GraphAndTopology>;
+    using timing_data_type             = TimingData;
+    using graph_and_topology_type      = GraphAndTopology;
 
     using timing_graph_type            = TimingGraph;
+    using timing_arcs_type             = TimingArcs;
+    using rc_tree_type                 = timingdriven_placement::RCTree;
     using net_to_rctrees_property_type = entity_system::Property<circuit::Net, timingdriven_placement::RCTree>;
     using timing_library_type          = Library;
+    using placement_type               = placement::Placement;
+    using placment_library_type        = placement::PlacementMapping;
     using netlist_type                 = circuit::Netlist;
     using pin_entity_type              = circuit::Pin;
     using library_mapping_type         = circuit::LibraryMapping;
     using standard_cells_type          = standard_cell::StandardCells;
     using design_constraints_type      = parser::DesignConstraints;
+    using lef_type                     = parser::Lef;
+    using liberty_type                 = parser::Liberty;
     using endpoints_type               = EndPoints;
 
-    StaticTimingAnalysis() = default;
+    StaticTimingAnalysis() = delete;
 
     StaticTimingAnalysis(const StaticTimingAnalysis&) = delete;
     StaticTimingAnalysis& operator=(const StaticTimingAnalysis&) = delete;
@@ -63,14 +70,15 @@ public:
     StaticTimingAnalysis(StaticTimingAnalysis&&) = default;
     StaticTimingAnalysis& operator=(StaticTimingAnalysis&&) = default;
 
-    void graph(const timing_graph_type& g);
-    void rc_trees(net_to_rctrees_property_type& trees);
-    void late_lib(const timing_library_type& lib);
-    void early_lib(const timing_library_type& lib);
-    void netlist(netlist_type & netlist);
-    void lib_mapping(library_mapping_type & lib_mapping);
-    void std_cells(standard_cells_type & std_cells);
-    void constraints(const design_constraints_type & dc);
+    StaticTimingAnalysis(standard_cells_type& std_cells,
+                         netlist_type& netlist,
+                         library_mapping_type& lib_mapping,
+                         placement_type& placement,
+                         placment_library_type& placement_mapping,
+                         const liberty_type& early,
+                         const liberty_type& late,
+                         const lef_type& lef,
+                         const design_constraints_type& dc);
 
     void update_timing();
 
@@ -94,34 +102,25 @@ public:
     const endpoints_type & timing_endpoints() const;
 
 private:
-    void init_timing_data();
     void propagate_ats();
     void propagate_rts();
     void update_wns_and_tns();
-    bool has_timing_data() const;
 
-    const timing_graph_type*            m_timing_graph;
-    net_to_rctrees_property_type*       m_rc_trees;
-    const timing_library_type*          m_late_lib;
-    const timing_library_type*          m_early_lib;
-    netlist_type*                       m_netlist;
-    library_mapping_type*               m_lib_mappping;
-    standard_cells_type*                m_std_cells;
-    design_constraints_type             m_dc;
-
-    timing_data_ptr                     m_late_data;
-    timing_data_ptr                     m_early_data;
-    graph_and_topology_ptr              m_topology;
-    generic_sta_lumped_ptr<Pessimistic> m_late_sta;
-    generic_sta_lumped_ptr<Optimistic>  m_early_sta;
-    endpoints_type                      m_endpoints;
-    time_unit_type                      m_lwns;
-    time_unit_type                      m_ewns;
-    time_unit_type                      m_ltns;
-    time_unit_type                      m_etns;
-
-    // lazy pointers
-    //std::unique_ptr<test_calculator> m_test;
+    timing_arcs_type                   m_timing_arcs;
+    timing_library_type                m_early_lib;
+    timing_library_type                m_late_lib;
+    std::shared_ptr<timing_graph_type> m_timing_graph;
+    timing_data_type                   m_early_data;
+    timing_data_type                   m_late_data;
+    graph_and_topology_type            m_topology;
+    net_to_rctrees_property_type       m_rc_trees;
+    generic_sta_type<Optimistic>       m_early_sta;
+    generic_sta_type<Pessimistic>      m_late_sta;
+    endpoints_type                     m_endpoints;
+    time_unit_type                     m_lwns;
+    time_unit_type                     m_ewns;
+    time_unit_type                     m_ltns;
+    time_unit_type                     m_etns;
 };
 
 }   // namespace timing

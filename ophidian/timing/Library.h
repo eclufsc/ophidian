@@ -54,6 +54,8 @@ public:
     template <class V> using property_std_pin_type    = entity_system::Property<std_pin_entity_type, V>;
     template <class V> using property_std_cell_type   = entity_system::Property<std_cell_entity_type, V>;
 
+    Library() = default;
+
     //! Library Constructor
     /*!
        \brief Constructs a Library with properties.
