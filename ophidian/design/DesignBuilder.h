@@ -55,7 +55,10 @@ namespace ophidian
             ICCAD2017ContestDesignBuilder(
                 const std::string & cellLefFile,
                 const std::string & techLefFile,
-                const std::string & placedDefFile);
+                const std::string & placedDefFile,
+                const std::string & earlyLibFile,
+                const std::string & lateLibFile,
+                const std::string & designConstrainsFile);
 
             //! DesignBuilder Destructor
 
@@ -73,12 +76,18 @@ namespace ophidian
             Design & build();
 
         private:
-            design::Design                mDesign;
-            std::unique_ptr <parser::Lef> mLef;
-            std::unique_ptr <parser::Def> mDef;
-            std::string                   mCellLefFile;
-            std::string                   mTechLefFile;
-            std::string                   mPlacedDefFile;
+            design::Design                    mDesign;
+            std::unique_ptr <parser::Lef>     mLef;
+            std::unique_ptr <parser::Def>     mDef;
+            std::shared_ptr <parser::Liberty> mEarlyLiberty;
+            std::shared_ptr <parser::Liberty> mLateLiberty;
+            std::shared_ptr <parser::DesignConstraints> mDC;
+            std::string                       mCellLefFile;
+            std::string                       mTechLefFile;
+            std::string                       mPlacedDefFile;
+            std::string                       mEarlyLibFile;
+            std::string                       mLateLibFile;
+            std::string                       mDesignConstrainsFile;
         };
 
 
@@ -95,7 +104,10 @@ namespace ophidian
             ICCAD2015ContestDesignBuilder(
                 const std::string & lefFile,
                 const std::string & defFile,
-                const std::string & verilogFile);
+                const std::string & verilogFile,
+                const std::string & earlyLibFile,
+                const std::string & lateLibFile,
+                const std::string & designConstrainsFile);
 
             //! DesignBuilder Destructor
 
@@ -117,9 +129,15 @@ namespace ophidian
             std::unique_ptr <parser::Lef>     mLef;
             std::unique_ptr <parser::Def>     mDef;
             std::unique_ptr <parser::Verilog> mVerilog;
+            std::shared_ptr <parser::Liberty> mEarlyLiberty;
+            std::shared_ptr <parser::Liberty> mLateLiberty;
+            std::shared_ptr <parser::DesignConstraints> mDC;
             std::string                       mLefFile;
             std::string                       mDefFile;
             std::string                       mVerilogFile;
+            std::string                       mEarlyLibFile;
+            std::string                       mLateLibFile;
+            std::string                       mDesignConstrainsFile;
         };
     }     //namespace design
 }     //namespace ophidian

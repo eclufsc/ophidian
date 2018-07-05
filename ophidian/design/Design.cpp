@@ -32,7 +32,8 @@ Design::Design() :
     mStandardCells(),
     mLibrary(mStandardCells),
     mLibraryMapping(mNetlist),
-    mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping)
+    mPlacementMapping(mPlacement, mLibrary, mNetlist, mLibraryMapping),
+    mStaticTimingAnalysis(mStandardCells, mNetlist, mLibraryMapping, mPlacement, mPlacementMapping)
 {
 
 }

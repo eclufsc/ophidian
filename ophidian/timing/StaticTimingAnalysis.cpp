@@ -73,6 +73,8 @@ void StaticTimingAnalysis::init(const liberty_type& early, const liberty_type& l
 
         builder.build(m_placement, m_placement_mapping, m_topology.m_library_mapping, m_topology.m_netlist, m_early_lib, lef, net, rctree, source);
     }
+
+    update_timing();
 }
 
 void StaticTimingAnalysis::update_timing()

@@ -38,7 +38,7 @@ public:
     design::ICCAD2015ContestDesignBuilder mBuilder;
     design::Design & mDesign;
 
-    std::shared_ptr<ophidian::parser::Liberty> mEarlyLiberty, mLateLiberty;
+    std::shared_ptr<parser::Liberty> mEarlyLiberty, mLateLiberty;
     std::shared_ptr<parser::DesignConstraints> mDC;
     std::unique_ptr<parser::Lef> mLef;
 
@@ -49,7 +49,12 @@ public:
     }
 
     STAFixture() :
-        mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
+        mBuilder("./input_files/simple/simple.lef",
+                 "./input_files/simple/simple.def",
+                 "./input_files/simple/simple.v",
+                 "./input_files/simple/simple_Early.lib",
+                 "./input_files/simple/simple_Late.lib",
+                 "./input_files/simple/simple.sdc"),
         mDesign(mBuilder.build()),
         mEarlyLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mLateLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Late.lib")),
@@ -71,7 +76,6 @@ TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][s
                                      mDesign.placementMapping());
 
     sta.init(*mEarlyLiberty, *mLateLiberty, *mLef, *mDC);
-    sta.update_timing();
 
     auto pin = mDesign.netlist().find(circuit::Pin(), "inp1");
     CHECK(sta.early_rise_arrival(pin) == slew_type(0));

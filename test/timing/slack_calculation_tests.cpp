@@ -38,7 +38,12 @@ public:
     timing::Library m_timing_library;
 
     SlackCalculationFixture() :
-        m_builder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
+        m_builder("./input_files/simple/simple.lef",
+                  "./input_files/simple/simple.def",
+                  "./input_files/simple/simple.v",
+                  "./input_files/simple/simple_Early.lib",
+                  "./input_files/simple/simple_Late.lib",
+                  "./input_files/simple/simple.sdc"),
         m_design(m_builder.build()),
         m_liberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         m_timing_arcs(m_design.standardCells()),

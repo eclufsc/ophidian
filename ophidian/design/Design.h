@@ -119,6 +119,16 @@ namespace ophidian
 				return mPlacementMapping;
 			}
 
+            //! staticTimingAnalysis getter
+            /*!
+            \brief Get the placementMapping.
+            \return PlacementMapping.
+            */
+            timing::StaticTimingAnalysis & staticTimingAnalysis()
+            {
+                return mStaticTimingAnalysis;
+            }
+
 		private:
 
 			circuit::Netlist mNetlist;
@@ -128,6 +138,7 @@ namespace ophidian
 			placement::Library mLibrary;
 			circuit::LibraryMapping mLibraryMapping;
             placement::PlacementMapping mPlacementMapping;
+            timing::StaticTimingAnalysis mStaticTimingAnalysis;
 		};
 
 	} //namespace design

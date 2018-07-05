@@ -55,7 +55,12 @@ public:
     timing::TimingGraph::arc_type mArc;
 
     TimingDataFixture() :
-        mBuilder("./input_files/simple/simple.lef", "./input_files/simple/simple.def", "./input_files/simple/simple.v"),
+        mBuilder("./input_files/simple/simple.lef",
+                 "./input_files/simple/simple.def",
+                 "./input_files/simple/simple.v",
+                 "./input_files/simple/simple_Early.lib",
+                 "./input_files/simple/simple_Late.lib",
+                 "./input_files/simple/simple.sdc"),
         mDesign(mBuilder.build()),
         mLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mTimingArcs(mDesign.standardCells()),

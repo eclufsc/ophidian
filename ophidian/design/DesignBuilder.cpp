@@ -24,14 +24,25 @@ namespace ophidian
 namespace design
 {
 
-ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string & cellLefFile, const std::string & techLefFile, const std::string & placedDefFile) :
+ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string & cellLefFile,
+                                                             const std::string & techLefFile,
+                                                             const std::string & placedDefFile,
+                                                             const std::string & earlyLibFile,
+                                                             const std::string & lateLibFile,
+                                                             const std::string & designConstrainsFile) :
 
 	mDesign(),
 	mLef(),
 	mDef(),
+    mEarlyLiberty(),
+    mLateLiberty(),
+    mDC(),
 	mCellLefFile(cellLefFile),
 	mTechLefFile(techLefFile),
-	mPlacedDefFile(placedDefFile)
+    mPlacedDefFile(placedDefFile),
+    mEarlyLibFile(earlyLibFile),
+    mLateLibFile(lateLibFile),
+    mDesignConstrainsFile(designConstrainsFile)
 {
 
 }
@@ -45,6 +56,8 @@ Design & ICCAD2017ContestDesignBuilder::build()
 {
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
+    parser::LibertyParser libertyParser;
+    parser::SDCSimple SDCParser;
 
 	mLef =  std::make_unique<ophidian::parser::Lef>();
 	lefParser.readFile(mCellLefFile, mLef);
@@ -57,19 +70,39 @@ Design & ICCAD2017ContestDesignBuilder::build()
 	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
 	circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
 
+    if (!mEarlyLibFile.empty() && !mLateLibFile.empty())
+    {
+        mEarlyLiberty = libertyParser.readFile(mEarlyLibFile);
+        mLateLiberty = libertyParser.readFile(mLateLibFile);
+        mDC = SDCParser.constraints();
+
+        mDesign.staticTimingAnalysis().init(*mEarlyLiberty, *mLateLiberty, *mLef, *mDC);
+    }
+
     return mDesign;
 }
 
 
-ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(const std::string &lefFile, const std::string &defFile, const std::string &verilogFile) :
+ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(const std::string &lefFile,
+                                                             const std::string &defFile,
+                                                             const std::string &verilogFile,
+                                                             const std::string & earlyLibFile,
+                                                             const std::string & lateLibFile,
+                                                             const std::string & designConstrainsFile) :
 
 	mDesign(),
 	mLef(),
 	mDef(),
 	mVerilog(),
+    mEarlyLiberty(),
+    mLateLiberty(),
+    mDC(),
 	mLefFile(lefFile),
 	mDefFile(defFile),
-	mVerilogFile(verilogFile)
+    mVerilogFile(verilogFile),
+    mEarlyLibFile(earlyLibFile),
+    mLateLibFile(lateLibFile),
+    mDesignConstrainsFile(designConstrainsFile)
 {
 
 }
@@ -84,6 +117,8 @@ Design & ICCAD2015ContestDesignBuilder::build()
 	parser::LefParser lefParser;
 	parser::DefParser defParser;
 	parser::VerilogParser vParser;
+    parser::LibertyParser libertyParser;
+    parser::SDCSimple SDCParser;
 
 	mLef =  std::make_unique<ophidian::parser::Lef>();
 	lefParser.readFile(mLefFile, mLef);
@@ -92,12 +127,20 @@ Design & ICCAD2015ContestDesignBuilder::build()
 
 	mVerilog.reset(vParser.readFile(mVerilogFile));
 
-
 	placement::lef2Library(*mLef, mDesign.library(), mDesign.standardCells());
 	floorplan::lefDef2Floorplan(*mLef, *mDef, mDesign.floorplan());
 	placement::def2placement(*mDef, mDesign.placement(), mDesign.netlist());
 	circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
     circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+
+    if (mEarlyLibFile.empty() && !mLateLibFile.empty())
+    {
+        mEarlyLiberty = libertyParser.readFile(mEarlyLibFile);
+        mLateLiberty = libertyParser.readFile(mLateLibFile);
+        mDC = SDCParser.constraints();
+
+        mDesign.staticTimingAnalysis().init(*mEarlyLiberty, *mLateLiberty, *mLef, *mDC);
+    }
 
     return mDesign;
 }

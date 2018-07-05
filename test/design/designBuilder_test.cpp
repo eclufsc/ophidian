@@ -8,7 +8,10 @@ TEST_CASE("DesignBuilder: building a 2017 design.", "[design]")
 {
 	ICCAD2017ContestDesignBuilder ICCAD2017DesignBuilder("./input_files/pci_bridge32_a_md1/cells_modified.lef",
 														 "./input_files/pci_bridge32_a_md1/tech.lef",
-														 "./input_files/pci_bridge32_a_md1/placed.def");
+                                                         "./input_files/pci_bridge32_a_md1/placed.def",
+                                                         "",
+                                                         "",
+                                                         "");
     Design & design = ICCAD2017DesignBuilder.build();
 
     REQUIRE(design.netlist().size(ophidian::circuit::Cell()) == 29521);
@@ -19,7 +22,10 @@ TEST_CASE("DesignBuilder: build simple.", "[design]")
 {
 	ICCAD2015ContestDesignBuilder ICCAD2015DesignBuilder("./input_files/simple/simple.lef",
 														 "./input_files/simple/simple.def",
-														 "./input_files/simple/simple.v");
+                                                         "./input_files/simple/simple.v",
+                                                         "./input_files/simple/simple_Early.lib",
+                                                         "./input_files/simple/simple_Late.lib",
+                                                         "./input_files/simple/simple.sdc");
     Design & design = ICCAD2015DesignBuilder.build();
     REQUIRE(design.netlist().size(ophidian::circuit::Cell()) == 6);
     REQUIRE(design.netlist().size(ophidian::circuit::Pin()) == 19);
