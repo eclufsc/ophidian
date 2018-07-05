@@ -30,7 +30,7 @@ namespace placement
 
             for(auto& macro : lef.macros())
             {
-                auto stdCell = stdCells.add(circuit::Cell(), macro.name());
+                auto stdCell = stdCells.add_cell(macro.name());
                 auto layer2RectsM1 = macro.obstructions().find("metal1");
                 if(layer2RectsM1 != macro.obstructions().end()) {
                     geometry::MultiBox<util::database_unit_t> geometry;
@@ -64,10 +64,10 @@ namespace placement
 
                 for(auto& pin : macro.pins())
                 {
-                    auto stdPin = stdCells.add(circuit::Pin(),
+                    auto stdPin = stdCells.add_pin(
                         macro.name() + ":" + pin.name(),
                         circuit::PinDirection(pin.direction()));
-                    stdCells.add(stdCell, stdPin);
+                    stdCells.connect(stdCell, stdPin);
                     for(auto& port : pin.ports())
                     {
                         for(auto& rect : port.second)

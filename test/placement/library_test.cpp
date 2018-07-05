@@ -18,11 +18,11 @@ public:
 	StandardCells std_cells;
 
 	StandardCellsFixture() {
-        cell1 = std_cells.add(ophidian::circuit::Cell(), "cell1");
-        cell2 = std_cells.add(ophidian::circuit::Cell(), "cell2");
+        cell1 = std_cells.add_cell("cell1");
+        cell2 = std_cells.add_cell("cell2");
 
-		pin1 = std_cells.add(Pin(), "pin1", PinDirection::NA);
-		pin2 = std_cells.add(Pin(), "pin2", PinDirection::NA);
+		pin1 = std_cells.add_pin("pin1", PinDirection::NA);
+		pin2 = std_cells.add_pin("pin2", PinDirection::NA);
 	}
 };
 

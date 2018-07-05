@@ -23,8 +23,8 @@ namespace ophidian
 namespace placement
 {
     Library::Library(const circuit::StandardCells & std_cells):
-            mGeometries(std_cells.makeProperty<MultiBox>(circuit::Cell())),
-            mPinOffsets(std_cells.makeProperty<util::LocationDbu>(circuit::Pin()))
+            mGeometries(std_cells.make_property_cell<MultiBox>()),
+            mPinOffsets(std_cells.make_property_pin<util::LocationDbu>())
     {
     }
 

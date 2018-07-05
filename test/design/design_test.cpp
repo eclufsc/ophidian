@@ -61,8 +61,8 @@ TEST_CASE("Design: testing placement.", "[design]")
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 {
-    auto cell1 = design.standard_cells().add(ophidian::circuit::Cell(), "cell1");
-    auto cell2 = design.standard_cells().add(ophidian::circuit::Cell(), "cell2");
+    auto cell1 = design.standard_cells().add_cell("cell1");
+    auto cell2 = design.standard_cells().add_cell("cell2");
 
 	std::vector<ophidian::geometry::Box<dbu_t>> cell1Boxes = {
         ophidian::geometry::Box<dbu_t>{ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}}, ophidian::geometry::Point<dbu_t>{dbu_t{10}, dbu_t{10}}}

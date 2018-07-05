@@ -30,28 +30,28 @@ namespace circuit
 
             for(const auto& macro : lef.macros())
             {
-                auto cell = cells.add(Cell{}, macro.name());
+                auto cell = cells.add_cell(macro.name());
                 for(const auto& pin : macro.pins())
                 {
                     auto cell_pin = Pin{};
                     switch(pin.direction())
                     {
                         case parser::Lef::macro_type::pin_type::direction_type::INPUT:
-                            cell_pin = cells.add(Pin{}, pin.name(), PinDirection::INPUT);
+                            cell_pin = cells.add_pin(pin.name(), PinDirection::INPUT);
                             break;
                         case parser::Lef::macro_type::pin_type::direction_type::OUTPUT:
-                            cell_pin = cells.add(Pin{}, pin.name(), PinDirection::OUTPUT);
+                            cell_pin = cells.add_pin(pin.name(), PinDirection::OUTPUT);
                             break;
                         case parser::Lef::macro_type::pin_type::direction_type::INOUT:
-                            cell_pin = cells.add(Pin{}, pin.name(), PinDirection::INOUT);
+                            cell_pin = cells.add_pin(pin.name(), PinDirection::INOUT);
                             break;
                         case parser::Lef::macro_type::pin_type::direction_type::NA:
-                            cell_pin = cells.add(Pin{}, pin.name(), PinDirection::NA);
+                            cell_pin = cells.add_pin(pin.name(), PinDirection::NA);
                             break;
                         default:
                             break;
                     }
-                    cells.add(cell, cell_pin);
+                    cells.connect(cell, cell_pin);
                 }
             }
 

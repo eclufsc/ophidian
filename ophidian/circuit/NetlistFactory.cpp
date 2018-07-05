@@ -110,8 +110,8 @@ namespace circuit
             for(auto instance : module.module_instances())
             {
                 auto cell = netlist.add(CellInstance(), instance.name());
-                
-                netlist.cellStdCell(cell, std_cells.find(Cell{}, instance.module()));
+
+                netlist.cellStdCell(cell, std_cells.find_cell(instance.module()));
                 for(auto portMap : instance.net_map())
                 {
                     auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
