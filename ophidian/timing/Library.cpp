@@ -24,16 +24,23 @@ namespace ophidian
 namespace timing
 {
 
-Library::Library(const liberty_type & liberty, standard_cells_type & stdCells, timing_arcs_type & arcs, bool early) :
-    m_rise_delays(arcs.makeProperty<LUT>()),
-    m_fall_delays(arcs.makeProperty<LUT>()),
-    m_rise_slews(arcs.makeProperty<LUT>()),
-    m_fall_slews(arcs.makeProperty<LUT>()),
-    m_timing_senses(arcs.makeProperty<unateness_type>()),
-    m_timing_types(arcs.makeProperty<timing_edge_type>()),
-    m_pin_capacitance(stdCells.makeProperty<capacitance_unit_type>(std_pin_entity_type())),
-    m_clock(stdCells.makeProperty<bool>(std_pin_entity_type())),
-    m_sequential(stdCells.makeProperty<bool>(std_cell_entity_type()))
+Library::Library(standard_cells_type & std_cells, timing_arcs_type & timing_arcs) :
+    m_std_cells(std_cells),
+    m_timing_arcs(timing_arcs),
+    m_rise_delays(m_timing_arcs.makeProperty<LUT>()),
+    m_fall_delays(m_timing_arcs.makeProperty<LUT>()),
+    m_rise_slews(m_timing_arcs.makeProperty<LUT>()),
+    m_fall_slews(m_timing_arcs.makeProperty<LUT>()),
+    m_timing_senses(m_timing_arcs.makeProperty<unateness_type>()),
+    m_timing_types(m_timing_arcs.makeProperty<timing_edge_type>()),
+    m_pin_capacitance(m_std_cells.makeProperty<capacitance_unit_type>(std_pin_entity_type())),
+    m_clock(m_std_cells.makeProperty<bool>(std_pin_entity_type())),
+    m_sequential(m_std_cells.makeProperty<bool>(std_cell_entity_type()))
+{
+
+}
+
+void Library::init(const liberty_type & liberty, bool early)
 {
     capacitance_unit_type capacitive_load_unit;
     if (liberty.capacitiveLoadUnit == "ff")
@@ -73,9 +80,9 @@ Library::Library(const liberty_type & liberty, standard_cells_type & stdCells, t
                 std::string nameFromPin = cell.name+":"+relatedPin.name;
                 std::string nameToPin = cell.name+":"+pin.name;
 
-                auto arc = arcs.add(nameFromPin+"->"+nameToPin);
-                arcs.from(arc, stdCells.find(std_pin_entity_type(), nameFromPin));
-                arcs.to(arc, stdCells.find(std_pin_entity_type(), nameToPin));
+                auto arc = m_timing_arcs.add(nameFromPin+"->"+nameToPin);
+                m_timing_arcs.from(arc, m_std_cells.find(std_pin_entity_type(), nameFromPin));
+                m_timing_arcs.to(arc, m_std_cells.find(std_pin_entity_type(), nameToPin));
                 m_timing_senses[arc] = tmg.timingSense;
                 m_timing_types[arc] = tmg.timingType;
                 m_rise_delays[arc] = LUT(tmg.find(ParserLUT::CELL_RISE), capacitive_load_unit, time_unit, time_unit);
@@ -88,12 +95,12 @@ Library::Library(const liberty_type & liberty, standard_cells_type & stdCells, t
                                         capacitive_load_unit, time_unit, time_unit);
             }
 
-            std_pin_entity_type stdPin = stdCells.find(std_pin_entity_type(), cell.name+":"+pin.name);
+            std_pin_entity_type stdPin = m_std_cells.find(std_pin_entity_type(), cell.name+":"+pin.name);
             m_pin_capacitance[stdPin] = pin.capacitance * capacitive_load_unit;
             m_clock[stdPin] = pin.clock;
         }
 
-        m_sequential[stdCells.find(std_cell_entity_type(), cell.name)] = cell.sequential;
+        m_sequential[m_std_cells.find(std_cell_entity_type(), cell.name)] = cell.sequential;
     }
 }
 

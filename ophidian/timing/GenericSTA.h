@@ -103,8 +103,12 @@ struct GraphAndTopology
                      standard_cells_type& stdCells,
                      library_mapping_type& libraryMapping);
 
+    void init();
+
     const timing_graph_type&      m_graph;
     netlist_type&                 m_netlist;
+    standard_cells_type&          m_std_cells;
+    library_mapping_type&         m_library_mapping;
     sorted_container_type         m_sorted;
     levels_container_type         m_levels;
     sorted_drivers_container_type m_sorted_drivers;
@@ -119,7 +123,6 @@ public:
     template <class T> using node_map_type  = timingdriven_placement::RCTree::graph_type::NodeMap<T>;
 
     using design_constraints_type           = parser::DesignConstraints;
-    using library_mapping_type              = circuit::LibraryMapping;
     using timing_data_type                  = TimingData;
     using timing_graph_type                 = TimingGraph;
     using topology_type                     = GraphAndTopology;
@@ -134,14 +137,44 @@ public:
 
     GenericSTA(timing_data_type & data,
                topology_type & topology,
-               net_to_rctree_property_type & rctrees,
-               const design_constraints_type & dc,
-               const library_mapping_type & library_mapping) :
+               net_to_rctree_property_type & rctrees) :
         m_timing_data(data),
         m_topology(topology),
         m_rctrees(rctrees)
     {
-        constraints(dc, library_mapping);
+
+    }
+
+    void init(const design_constraints_type & dc)
+    {
+        m_timing_data.arrival(
+                    m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName)),
+                    slew_unit_type(0));
+        m_timing_data.arrival(
+                    m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName)),
+                    slew_unit_type(0));
+
+        for(auto & i : dc.mInputDelays)
+        {
+            auto pin = m_topology.m_netlist.find(pin_entity_type(), i.portName);
+            m_timing_data.arrival(m_topology.m_graph.riseNode(pin), slew_unit_type(pico_slew_unit_type(i.delay)));
+            m_timing_data.arrival(m_topology.m_graph.fallNode(pin), slew_unit_type(pico_slew_unit_type(i.delay)));
+        }
+
+        for(auto & i : dc.mInputDrivers)
+        {
+            auto pin = m_topology.m_netlist.find(pin_entity_type(), i.portName);
+            m_timing_data.slew(m_topology.m_graph.riseNode(pin), slew_unit_type(pico_slew_unit_type(i.slewRise)));
+            m_timing_data.slew(m_topology.m_graph.fallNode(pin), slew_unit_type(pico_slew_unit_type(i.slewFall)));
+        }
+
+        for(lemon::ListDigraph::NodeIt node(m_topology.m_graph.graph()); node != lemon::INVALID; ++node)
+        {
+            if(m_timing_data.library().pinClock(m_topology.m_library_mapping.pinStdCell(m_topology.m_graph.entity(node))))
+                m_timing_data.required(node, MergeStrategy::worst());
+            else if(lemon::countOutArcs(m_topology.m_graph.graph(), node) == 0)
+                m_timing_data.required(node, m_merge(slew_unit_type(0.0), slew_unit_type(pico_slew_unit_type(dc.mClock.period))));
+        }
     }
 
     slew_unit_type rise_arrival(const pin_entity_type& pin) const
@@ -201,7 +234,7 @@ public:
                     calculator.slews(slews);
                     calculator.ceff(ceffs);
 
-                    std::function<slew_unit_type(capacitance_unit_type)> sCalculator = std::bind(&GenericSTA::compute_slew, this, node, std::placeholders::_1);
+                    auto sCalculator = std::bind(&GenericSTA::compute_slew, this, node, std::placeholders::_1);
 
                     capacitance_unit_type load = calculator.simulate(sCalculator, tree);
 
@@ -321,38 +354,6 @@ public:
     }
 
 private:
-    void constraints(const design_constraints_type & dc, const library_mapping_type & libraryMapping)
-    {
-        m_timing_data.arrival(
-                    m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName)),
-                    slew_unit_type(0));
-        m_timing_data.arrival(
-                    m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName)),
-                    slew_unit_type(0));
-
-        for(auto & i : dc.mInputDelays)
-        {
-            auto pin = m_topology.m_netlist.find(pin_entity_type(), i.portName);
-            m_timing_data.arrival(m_topology.m_graph.riseNode(pin), slew_unit_type(pico_slew_unit_type(i.delay)));
-            m_timing_data.arrival(m_topology.m_graph.fallNode(pin), slew_unit_type(pico_slew_unit_type(i.delay)));
-        }
-
-        for(auto & i : dc.mInputDrivers)
-        {
-            auto pin = m_topology.m_netlist.find(pin_entity_type(), i.portName);
-            m_timing_data.slew(m_topology.m_graph.riseNode(pin), slew_unit_type(pico_slew_unit_type(i.slewRise)));
-            m_timing_data.slew(m_topology.m_graph.fallNode(pin), slew_unit_type(pico_slew_unit_type(i.slewFall)));
-        }
-
-        for(lemon::ListDigraph::NodeIt node(m_topology.m_graph.graph()); node != lemon::INVALID; ++node)
-        {
-            if(m_timing_data.library().pinClock(libraryMapping.pinStdCell(m_topology.m_graph.entity(node))))
-                m_timing_data.required(node, MergeStrategy::worst());
-            else if(lemon::countOutArcs(m_topology.m_graph.graph(), node) == 0)
-                m_timing_data.required(node, m_merge(slew_unit_type(0.0), slew_unit_type(pico_slew_unit_type(dc.mClock.period))));
-        }
-    }
-
     slew_unit_type compute_slew(timing_graph_type::node_type node, capacitance_unit_type load) const
     {
         slew_unit_type worstSlew = MergeStrategy::best();

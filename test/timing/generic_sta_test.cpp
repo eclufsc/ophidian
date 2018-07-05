@@ -44,7 +44,7 @@ public:
     std::shared_ptr<parser::DesignConstraints> mDC;
     std::unique_ptr<parser::Lef> mLef;
 
-    std::shared_ptr<timing::TimingGraph> mGraph;
+    timing::TimingGraph mGraph;
 
     template<class Value>
     bool diff(const Value &a, const Value &b)
@@ -57,15 +57,17 @@ public:
         mDesign(mBuilder.build()),
         mLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mTimingArcs(mDesign.standardCells()),
-        mTimingLibrary(*mLiberty, mDesign.standardCells(), mTimingArcs, true),
+        mTimingLibrary(mDesign.standardCells(), mTimingArcs),
         mDC(parser::SDCSimple().constraints()),
-        mGraph(timing::TimingGraphBuilder().build(mDesign.netlist(),
-                                                  mDesign.standardCells(),
-                                                  mDesign.libraryMapping(),
-                                                  mTimingArcs,
-                                                  mTimingLibrary,
-                                                  *mDC))
+        mGraph(mDesign.netlist())
     {
+        mTimingLibrary.init(*mLiberty, true);
+        timing::TimingGraphBuilder().build(mDesign.netlist(),
+                                           mDesign.standardCells(),
+                                           mDesign.libraryMapping(),
+                                           mTimingArcs,
+                                           mTimingLibrary,
+                                           *mDC, mGraph);
         mLef = std::make_unique<parser::Lef>();
         parser::LefParser lef_parser;
         lef_parser.readFile("input_files/simple/simple.lef", mLef);
@@ -105,7 +107,8 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
 {
     SECTION("Generic STA: GraphAndTopology", "[timing][sta][topology]")
     {
-        timing::GraphAndTopology topology(*mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        timing::GraphAndTopology topology(mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        topology.init();
 
         using SortedIndex       = std::size_t;
         using SortedDriverIndex = std::size_t;
@@ -116,34 +119,34 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
         LevelIndex        l_u1,  l_u2,  l_u3,  l_u4;
 
         for (SortedIndex i(0); i < topology.m_sorted.size(); ++i)
-            if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u1:o")
+            if (mDesign.netlist().name(mGraph.entity(topology.m_sorted[i])) == "u1:o")
                 s_u1 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u2:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted[i])) == "u2:o")
                 s_u2 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u3:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted[i])) == "u3:o")
                 s_u3 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted[i])) == "u4:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted[i])) == "u4:o")
                 s_u4 = i;
 
         for (SortedDriverIndex i(0); i < topology.m_sorted_drivers.size(); ++i)
-            if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u1:o")
+            if (mDesign.netlist().name(mGraph.entity(topology.m_sorted_drivers[i])) == "u1:o")
                 sd_u1 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u2:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted_drivers[i])) == "u2:o")
                 sd_u2 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u3:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted_drivers[i])) == "u3:o")
                 sd_u3 = i;
-            else if (mDesign.netlist().name(mGraph.get()->entity(topology.m_sorted_drivers[i])) == "u4:o")
+            else if (mDesign.netlist().name(mGraph.entity(topology.m_sorted_drivers[i])) == "u4:o")
                 sd_u4 = i;
 
         for (LevelIndex i(0); i < topology.m_levels.size(); ++i)
             for (auto n : topology.m_levels[i])
-                if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u1:o")
+                if (mDesign.netlist().name(mGraph.entity(n)) == "u1:o")
                     l_u1 = i;
-                else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u2:o")
+                else if (mDesign.netlist().name(mGraph.entity(n)) == "u2:o")
                     l_u2 = i;
-                else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u3:o")
+                else if (mDesign.netlist().name(mGraph.entity(n)) == "u3:o")
                     l_u3 = i;
-                else if (mDesign.netlist().name(mGraph.get()->entity(n)) == "u4:o")
+                else if (mDesign.netlist().name(mGraph.entity(n)) == "u4:o")
                     l_u4 = i;
 
         CHECK(s_u1 < s_u2);
@@ -158,8 +161,9 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
 
     SECTION("Generic STA: Lumped", "[timing][sta]")
     {
-        timing::GraphAndTopology topology(*mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
-        timing::TimingData data(mTimingLibrary, *mGraph);
+        timing::GraphAndTopology topology(mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        topology.init();
+        timing::TimingData data(mTimingLibrary, mGraph);
 
         auto rctree_property = mDesign.netlist().makeProperty<timingdriven_placement::RCTree>(circuit::Net());
         timingdriven_placement::FluteRCTreeBuilder builder;
@@ -183,7 +187,8 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
             builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
 
-        timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property, *mDC, mDesign.libraryMapping());
+        timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
+        sta.init(*mDC);
 
         sta.update_ats();
         sta.update_rts();
@@ -343,8 +348,9 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
 
     SECTION("Generic STA: Effective", "[timing][sta]")
     {
-        timing::GraphAndTopology topology(*mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
-        timing::TimingData data(mTimingLibrary, *mGraph);
+        timing::GraphAndTopology topology(mGraph, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
+        topology.init();
+        timing::TimingData data(mTimingLibrary, mGraph);
 
         auto rctree_property = mDesign.netlist().makeProperty<timingdriven_placement::RCTree>(circuit::Net());
         timingdriven_placement::FluteRCTreeBuilder builder;
@@ -368,7 +374,8 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
             builder.build(mDesign.placement(), mDesign.placementMapping(), mDesign.libraryMapping(), mDesign.netlist(), mTimingLibrary, *mLef, net, rctree, source);
         }
 
-        timing::GenericSTA<timing::wiremodel::EffectiveCapacitance, timing::Optimistic> sta(data, topology, rctree_property, *mDC, mDesign.libraryMapping());
+        timing::GenericSTA<timing::wiremodel::EffectiveCapacitance, timing::Optimistic> sta(data, topology, rctree_property);
+        sta.init(*mDC);
 
         sta.update_ats();
         sta.update_rts();

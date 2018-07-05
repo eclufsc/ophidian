@@ -85,7 +85,8 @@ TEST_CASE_METHOD(LibraryFixture, "Library: init", "[timing][library]")
     SECTION("Library: info about timing arcs in late mode", "[timing][library]")
     {
         CHECK(mArcs.size() == 0);
-        timing::Library lib(*mLiberty.get(), mStdCells, mArcs, false);
+        timing::Library lib(mStdCells, mArcs);
+        lib.init(*mLiberty.get(), false);
         CHECK(mArcs.size() == 3);
 
         CHECK(!lib.cellSequential(mStdCells.find(std_cell_entity_type(), "INV_X1")));
@@ -144,7 +145,8 @@ TEST_CASE_METHOD(LibraryFixture, "Library: init", "[timing][library]")
     SECTION("Library: info about timing arcs in early mode", "[timing][library]")
     {
         CHECK(mArcs.size() == 0);
-        timing::Library lib(*mLiberty.get(), mStdCells, mArcs, true);
+        timing::Library lib(mStdCells, mArcs);
+        lib.init(*mLiberty.get(), true);
         CHECK(mArcs.size() == 3);
 
         int i = 0;

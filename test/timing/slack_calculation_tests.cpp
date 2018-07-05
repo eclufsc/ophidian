@@ -42,9 +42,9 @@ public:
         m_design(m_builder.build()),
         m_liberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         m_timing_arcs(m_design.standardCells()),
-        m_timing_library(*m_liberty, m_design.standardCells(), m_timing_arcs, true)
+        m_timing_library(m_design.standardCells(), m_timing_arcs)
     {
-
+        m_timing_library.init(*m_liberty, true);
     }
 };
 } // namespace
@@ -52,6 +52,7 @@ public:
 TEST_CASE_METHOD(SlackCalculationFixture, "EndPoints: init", "[timing][endpoints]")
 {
     timing::EndPoints endpoints(m_design.netlist(), m_design.libraryMapping(), m_design.standardCells(), m_timing_library);
+    endpoints.init();
 
     auto out  = m_design.netlist().find(circuit::Pin(), "out");
     auto f1_d = m_design.netlist().find(circuit::Pin(), "f1:d");

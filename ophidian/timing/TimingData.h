@@ -50,6 +50,7 @@ public:
     TimingData& operator=(TimingData&&) = default;
 
     TimingData(const timing_library_type& lib, const timing_graph_type& graph);
+
     ~TimingData() = default;
 
     const timing_library_type& library();

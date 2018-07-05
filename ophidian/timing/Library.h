@@ -63,10 +63,9 @@ public:
        \param stdCells The Standard Cells's system of the circuit.
        \param arcs The Timing Arcs' system of the circuit.
      */
-    Library(const liberty_type & liberty,
-            standard_cells_type & stdCells,
-            timing_arcs_type & arcs,
-            bool early = false);
+    Library(standard_cells_type & std_cells, timing_arcs_type & timing_arcs);
+
+    void init(const liberty_type & liberty, bool early = false);
 
     //! Compute Rise Delay
     /*!
@@ -159,6 +158,9 @@ public:
 private:
     using ParserLUT = liberty_type::LUT;
     using LUT = LookupTable<capacitance_unit_type, time_unit_type, time_unit_type>;
+
+    standard_cells_type& m_std_cells;
+    timing_arcs_type& m_timing_arcs;
 
     property_timing_arc_type<LUT>                m_rise_delays;
     property_timing_arc_type<LUT>                m_fall_delays;

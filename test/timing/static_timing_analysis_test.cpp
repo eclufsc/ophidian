@@ -64,17 +64,13 @@ public:
 
 TEST_CASE_METHOD(STAFixture, "StaticTimingAnalysis: generals tests", "[timing][sta]")
 {
-    timing::StaticTimingAnalysis sta(
-                mDesign.standardCells(),
-                mDesign.netlist(),
-                mDesign.libraryMapping(),
-                mDesign.placement(),
-                mDesign.placementMapping(),
-                *mEarlyLiberty,
-                *mLateLiberty,
-                *mLef,
-                *mDC);
+    timing::StaticTimingAnalysis sta(mDesign.standardCells(),
+                                     mDesign.netlist(),
+                                     mDesign.libraryMapping(),
+                                     mDesign.placement(),
+                                     mDesign.placementMapping());
 
+    sta.init(*mEarlyLiberty, *mLateLiberty, *mLef, *mDC);
     sta.update_timing();
 
     auto pin = mDesign.netlist().find(circuit::Pin(), "inp1");

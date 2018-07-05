@@ -28,42 +28,51 @@ StaticTimingAnalysis::StaticTimingAnalysis(standard_cells_type& std_cells,
                                            netlist_type& netlist,
                                            library_mapping_type& lib_mapping,
                                            placement_type& placement,
-                                           placment_library_type& placement_mapping,
-                                           const liberty_type& early,
-                                           const liberty_type& late,
-                                           const lef_type& lef,
-                                           const design_constraints_type& dc) :
+                                           placment_library_type& placement_mapping) :
+    m_placement(placement),
+    m_placement_mapping(placement_mapping),
     m_timing_arcs(std_cells),
-    m_early_lib(early, std_cells, m_timing_arcs, true),
-    m_late_lib(late, std_cells, m_timing_arcs, false),
-    m_timing_graph(TimingGraphBuilder().build(netlist, std_cells, lib_mapping, m_timing_arcs, m_early_lib, dc)),
-    m_early_data(m_early_lib, *m_timing_graph),
-    m_late_data(m_late_lib, *m_timing_graph),
-    m_topology(*m_timing_graph, netlist, std_cells, lib_mapping),
+    m_early_lib(std_cells, m_timing_arcs),
+    m_late_lib(std_cells, m_timing_arcs),
+    m_timing_graph(netlist),
+    m_early_data(m_early_lib, m_timing_graph),
+    m_late_data(m_late_lib, m_timing_graph),
+    m_topology(m_timing_graph, netlist, std_cells, lib_mapping),
     m_rc_trees(netlist.makeProperty<rc_tree_type>(circuit::Net())),
-    m_early_sta(m_early_data, m_topology, m_rc_trees, dc, lib_mapping),
-    m_late_sta(m_late_data, m_topology, m_rc_trees, dc, lib_mapping),
+    m_early_sta(m_early_data, m_topology, m_rc_trees),
+    m_late_sta(m_late_data, m_topology, m_rc_trees),
     m_endpoints(netlist, lib_mapping, std_cells, m_early_lib)
 {
+
+}
+
+void StaticTimingAnalysis::init(const liberty_type& early, const liberty_type& late, const lef_type& lef, const design_constraints_type& dc)
+{
+    m_early_lib.init(early, true);
+    m_late_lib.init(late, false);
+    TimingGraphBuilder().build(m_topology.m_netlist, m_topology.m_std_cells, m_topology.m_library_mapping, m_timing_arcs, m_early_lib, dc, m_timing_graph);
+    m_topology.init();
+    m_early_sta.init(dc);
+    m_late_sta.init(dc);
+    m_endpoints.init();
+
     timingdriven_placement::FluteRCTreeBuilder builder;
 
-    for (auto it = netlist.begin(circuit::Net()); it != netlist.end(circuit::Net()); ++it)
+    for (auto it = m_topology.m_netlist.begin(circuit::Net()); it != m_topology.m_netlist.end(circuit::Net()); ++it)
     {
         circuit::Pin source;
         const circuit::Net & net = *it;
         timingdriven_placement::RCTree & rctree = m_rc_trees[net];
 
-        for (auto pin : netlist.pins(net))
-            if (std_cells.direction(lib_mapping.pinStdCell(pin)) == standard_cell::PinDirection::OUTPUT)
+        for (auto pin : m_topology.m_netlist.pins(net))
+            if (m_topology.m_std_cells.direction(m_topology.m_library_mapping.pinStdCell(pin)) == standard_cell::PinDirection::OUTPUT)
             {
                 source = pin;
                 break;
             }
 
-        builder.build(placement, placement_mapping, lib_mapping, netlist, m_early_lib, lef, net, rctree, source);
+        builder.build(m_placement, m_placement_mapping, m_topology.m_library_mapping, m_topology.m_netlist, m_early_lib, lef, net, rctree, source);
     }
-
-    update_timing();
 }
 
 void StaticTimingAnalysis::update_timing()

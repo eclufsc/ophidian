@@ -49,7 +49,7 @@ public:
     std::shared_ptr<parser::DesignConstraints> mDC;
     std::unique_ptr<parser::Lef> mLef;
 
-    std::shared_ptr<timing::TimingGraph> mGraph;
+    timing::TimingGraph mGraph;
 
     timing::TimingGraph::node_type mFrom, mTo;
     timing::TimingGraph::arc_type mArc;
@@ -59,19 +59,21 @@ public:
         mDesign(mBuilder.build()),
         mLiberty(parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
         mTimingArcs(mDesign.standardCells()),
-        mTimingLibrary(*mLiberty, mDesign.standardCells(), mTimingArcs, true),
+        mTimingLibrary(mDesign.standardCells(), mTimingArcs),
         mDC(parser::SDCSimple().constraints()),
-        mGraph(timing::TimingGraphBuilder().build(mDesign.netlist(),
-                                                  mDesign.standardCells(),
-                                                  mDesign.libraryMapping(),
-                                                  mTimingArcs,
-                                                  mTimingLibrary,
-                                                  *mDC))
+        mGraph(mDesign.netlist())
     {
-        mFrom = mGraph->riseNode(mDesign.netlist().find(circuit::Pin(), "u1:o"));
-        mTo = mGraph->riseNode(mDesign.netlist().find(circuit::Pin(), "u2:a"));
+        mTimingLibrary.init(*mLiberty, true),
+        timing::TimingGraphBuilder().build(mDesign.netlist(),
+                                           mDesign.standardCells(),
+                                           mDesign.libraryMapping(),
+                                           mTimingArcs,
+                                           mTimingLibrary,
+                                           *mDC, mGraph);
+        mFrom = mGraph.riseNode(mDesign.netlist().find(circuit::Pin(), "u1:o"));
+        mTo = mGraph.riseNode(mDesign.netlist().find(circuit::Pin(), "u2:a"));
 
-        mArc = mGraph->outArc(mFrom);
+        mArc = mGraph.outArc(mFrom);
     }
 };
 } // namespace
@@ -83,7 +85,7 @@ TEST_CASE_METHOD(TimingDataFixture, "TimingGraph Condensation","[timing][sta][co
         using time_unit_type = timing::TimingData::time_unit_type;
         using capacitance_unit_type = timing::TimingData::capacitance_unit_type;
 
-        timing::TimingData data(mTimingLibrary, *mGraph);
+        timing::TimingData data(mTimingLibrary, mGraph);
         data.arrival(mFrom, time_unit_type(1.0));
         data.slew(mFrom, time_unit_type(3.0));
         data.required(mFrom, time_unit_type(5.0));
@@ -99,7 +101,7 @@ TEST_CASE_METHOD(TimingDataFixture, "TimingGraph Condensation","[timing][sta][co
     {
         using time_unit_type = timing::TimingData::time_unit_type;
 
-        timing::TimingData data(mTimingLibrary, *mGraph);
+        timing::TimingData data(mTimingLibrary, mGraph);
         data.delay(mArc, time_unit_type(10.0));
         data.slew(mArc, time_unit_type(12.0));
 

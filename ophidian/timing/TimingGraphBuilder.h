@@ -38,12 +38,13 @@ class TimingGraphBuilder
 public:
     TimingGraphBuilder();
 
-    std::shared_ptr<TimingGraph> build(circuit::Netlist & netlist,
-                                       standard_cell::StandardCells & stdCells,
-                                       const circuit::LibraryMapping & libraryMapping,
-                                       const TimingArcs & timingArcs,
-                                       const Library & timingLibrary,
-                                       const parser::DesignConstraints & dc);
+    void build(circuit::Netlist & netlist,
+               standard_cell::StandardCells & stdCells,
+               const circuit::LibraryMapping & libraryMapping,
+               const TimingArcs & timingArcs,
+               const Library & timingLibrary,
+               const parser::DesignConstraints & dc,
+               TimingGraph & graph);
 };
 
 }   // namespace timing

@@ -38,7 +38,7 @@ public:
     using standard_cells_type  = standard_cell::StandardCells;
     using timing_library_type  = Library;
     using pin_entity_type      = circuit::Pin;
-    using container_type       = std::vector<pin_entity_type>;
+    using container_pin_type   = std::vector<pin_entity_type>;
 
     EndPoints() = default;
 
@@ -49,19 +49,25 @@ public:
     EndPoints& operator=(EndPoints&&) = default;
 
     EndPoints(const netlist_type & netlist,
-              const library_mapping_type & lib_mapping,
+              const library_mapping_type & library_mapping,
               standard_cells_type & std_cells,
-              const timing_library_type & lib);
+              const timing_library_type & timing_library);
+
+    void init();
 
     virtual ~EndPoints();
 
-    container_type::const_iterator begin() const;
-    container_type::const_iterator end() const;
+    container_pin_type::const_iterator begin() const;
+    container_pin_type::const_iterator end() const;
     std::size_t size() const;
     bool empty() const;
 
 private:
-    container_type m_endpoints;
+    container_pin_type          m_endpoints;
+    const netlist_type&         m_netlist;
+    const library_mapping_type& m_library_mapping;
+    standard_cells_type&        m_std_cells;
+    const timing_library_type&  m_timing_library;
 };
 
 class WorstNegativeSlack

@@ -61,13 +61,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 {
     auto netPins = netlist.pins(net);
     RCTree::capacitor_type sourceCap;
-//  std::unordered_map<entity_system::entity, interconnection::rc_tree::capacitor_id> tap_mapping;
 
-//  mParameters dummy{10.0, 0.0*si::ohms, 0.0*si::farads};
-//  mParameters& param = (placement.netlist().net_name(net)=="iccad_clk"?dummy:m_mParameters);
-//  //mParameters & param = m_mParameters;
-
-    std::function<util::LocationDbu(const circuit::Pin&)> get_location = [&](const circuit::Pin & pin) {
+    auto get_location = [&](const circuit::Pin & pin)
+    {
         auto input = netlist.input(pin);
         if (input != circuit::Input())
             return placement.inputPadLocation(input);
@@ -84,11 +80,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     if(netPins.size() == 1)
     {
         circuit::Pin pinU = *netPins.begin();
-        //util::LocationDbu positionPinU = get_location(pinU);
         RCTree::capacitor_type capU = rctree.addCapacitor("C0");
         RCTree::capacitor_type tapU = sourceCap = rctree.addCapacitor(netlist.name(pinU));
 
-        //tap_mapping[pinU] = tapU;
         taps.insert(tapU);
 
         rctree.capacitance(tapU, library.capacitance(libraryMapping.pinStdCell(pinU)));
@@ -104,16 +98,15 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
     if(netPins.size() == 2)
     {
-//        circuit::Pin pinU = source;
-//        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
-        circuit::Pin pinU = *netPins.begin();
-        circuit::Pin pinV = *(++netPins.begin());
+        circuit::Pin pinU = source; //! pin u precisa ser o source mesmo?
+        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
+//        circuit::Pin pinU = *netPins.begin();  //! original
+//        circuit::Pin pinV = *(++netPins.begin());
         util::LocationDbu positionPinU = get_location(pinU);
         util::LocationDbu positionPinV = get_location(pinV);
 
 
         const RCTree::capacitor_type capU = rctree.addCapacitor("C0");
-
         double length = geometry::ManhattanDistance()(positionPinU.toPoint(), positionPinV.toPoint()) / lef.databaseUnits();
 
         if(length > 0)
@@ -123,6 +116,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             const RCTree::capacitor_type capV = rctree.addCapacitor("C1");
             RCTree::capacitor_type previous = capU;
             double remaining = length;
+
             for(int j = 0; j < numberOfSlicedSegments; ++j)
             {
                 double localLength = std::min(remaining, mParameters.mMaxSegmentLength);
@@ -145,26 +139,22 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             }
 
             RCTree::capacitor_type tapV = sourceCap = rctree.addCapacitor(netlist.name(pinV));
-            //tap_mapping[pinV] = tapV;
             taps.insert(tapV);
             auto cap_test = library.capacitance(libraryMapping.pinStdCell(pinV));
             rctree.capacitance(tapV, cap_test);
             rctree.addResistor(capV, tapV, util::ohm_t(0.0));
 
-        } else {
-
+        }
+        else
+        {
             RCTree::capacitor_type tapV = sourceCap = rctree.addCapacitor(netlist.name(pinV));
-            //tap_mapping[pinV] = tapV;
             taps.insert(tapV);
             rctree.capacitance(tapV, library.capacitance(libraryMapping.pinStdCell(pinV)));
             rctree.addResistor(capU, tapV, util::ohm_t(0.0));
         }
 
-
-
         RCTree::capacitor_type tapU = rctree.addCapacitor(netlist.name(pinU));
         sourceCap = pinU == source? tapU : sourceCap;
-        //tap_mapping[pinU] = tapU;
         taps.insert(tapU);
         rctree.capacitance(tapU, library.capacitance(libraryMapping.pinStdCell(pinU)));
         rctree.addResistor(capU, tapU, util::ohm_t(0.0));
@@ -180,7 +170,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     std::vector<unsigned> Y(netPins.size());
     X.resize(0);
     Y.resize(0);
-    for (auto p : netPins) {
+
+    for (auto p : netPins)
+    {
         util::LocationDbu position = get_location(p);
         X.push_back(static_cast<unsigned>(position.x()));
         Y.push_back(static_cast<unsigned>(position.y()));
@@ -194,7 +186,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     nodes.resize(0);
 
     int i = 0;
-    for (auto p : netPins) {
+    for (auto p : netPins)
+    {
         nodes.push_back( { geometry::Point(X[i], Y[i]), p });
         i++;
     }
@@ -204,7 +197,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
     std::vector<bool> tapCreated(numBranches, false);
     std::map<std::pair<unsigned, unsigned>, int> branchMap;
 
-    for (std::size_t i = 0; i < numBranches; ++i) {
+    for (std::size_t i = 0; i < numBranches; ++i)
+    {
         std::size_t n = static_cast<std::size_t>(fluteTree.branch[i].n);
 
         if (n == i)
@@ -221,6 +215,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
         std::string fromName = "C_" + std::to_string(i);
         auto fromPositionPair = std::make_pair(fluteTree.branch[i].x, fluteTree.branch[i].y);
         auto cached = branchMap.find(fromPositionPair);
+
         if(cached != branchMap.end())
         {
             fromI = cached->second;
@@ -232,6 +227,7 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
         std::string toName = "C_" + std::to_string(n);
         auto toPositionPair = std::make_pair(fluteTree.branch[n].x, fluteTree.branch[n].y);
         cached = branchMap.find(toPositionPair);
+
         if(cached != branchMap.end())
         {
             toI = cached->second;
@@ -240,18 +236,15 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
         else
             branchMap[toPositionPair] = n;
 
-        // capacitor_type U
         const RCTree::capacitor_type capFrom = rctree.addCapacitor(fromName);
 
         if(fromI != toI)
         {
-            // capacitor_type V
             const RCTree::capacitor_type capTo = rctree.addCapacitor(toName);
-
             int numPIs = std::ceil(length / mParameters.mMaxSegmentLength);
-
             RCTree::capacitor_type previous = capFrom;
             double remaining = length;
+
             for(int j = 0; j < numPIs; ++j)
             {
                 double localLength = std::min(remaining, mParameters.mMaxSegmentLength);
@@ -276,14 +269,14 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             tapIndexing.query(boost::geometry::index::nearest(to, 1), std::back_inserter(nearest));
 
             bool toIsTap = !nearest.empty() && boost::geometry::equals(to, nearest.front().first);
-            if (toIsTap && !tapCreated[toI]) {
+            if (toIsTap && !tapCreated[toI])
+            {
                 circuit::Pin pin = nearest.front().second;
 
                 RCTree::capacitor_type tapCap = rctree.addCapacitor(netlist.name(pin));
 
-                //tap_mapping[pin] = tapCap;
                 rctree.insertTap(tapCap);
-                rctree.capacitance(tapCap, library.capacitance(libraryMapping.pinStdCell(pin))); // tap pin capacitance
+                rctree.capacitance(tapCap, library.capacitance(libraryMapping.pinStdCell(pin)));
                 rctree.addResistor(capTo, tapCap, util::ohm_t(0.0));
 
                 tapCreated[toI]  = true;
@@ -297,14 +290,13 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
         bool fromIsTap = !nearest.empty() && boost::geometry::equals(from, nearest.front().first);
 
-        if (fromIsTap && !tapCreated[fromI]) {
+        if (fromIsTap && !tapCreated[fromI])
+        {
             circuit::Pin pin = nearest.front().second;
-
             RCTree::capacitor_type tapCap = rctree.addCapacitor(netlist.name(pin));
 
-            //tap_mapping[pin] = tapCap;
             rctree.insertTap(tapCap);
-            rctree.capacitance(tapCap, library.capacitance(libraryMapping.pinStdCell(pin))); // tap pin capacitance
+            rctree.capacitance(tapCap, library.capacitance(libraryMapping.pinStdCell(pin)));
             rctree.addResistor(capFrom, tapCap, util::ohm_t(0.0));
 
             tapCreated[fromI]  = true;

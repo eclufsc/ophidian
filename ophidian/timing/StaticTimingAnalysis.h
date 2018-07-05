@@ -74,11 +74,9 @@ public:
                          netlist_type& netlist,
                          library_mapping_type& lib_mapping,
                          placement_type& placement,
-                         placment_library_type& placement_mapping,
-                         const liberty_type& early,
-                         const liberty_type& late,
-                         const lef_type& lef,
-                         const design_constraints_type& dc);
+                         placment_library_type& placement_mapping);
+
+    void init(const liberty_type& early, const liberty_type& late, const lef_type& lef, const design_constraints_type& dc);
 
     void update_timing();
 
@@ -106,21 +104,23 @@ private:
     void propagate_rts();
     void update_wns_and_tns();
 
-    timing_arcs_type                   m_timing_arcs;
-    timing_library_type                m_early_lib;
-    timing_library_type                m_late_lib;
-    std::shared_ptr<timing_graph_type> m_timing_graph;
-    timing_data_type                   m_early_data;
-    timing_data_type                   m_late_data;
-    graph_and_topology_type            m_topology;
-    net_to_rctrees_property_type       m_rc_trees;
-    generic_sta_type<Optimistic>       m_early_sta;
-    generic_sta_type<Pessimistic>      m_late_sta;
-    endpoints_type                     m_endpoints;
-    time_unit_type                     m_lwns;
-    time_unit_type                     m_ewns;
-    time_unit_type                     m_ltns;
-    time_unit_type                     m_etns;
+    placement_type&               m_placement;
+    placment_library_type&        m_placement_mapping;
+    timing_arcs_type              m_timing_arcs;
+    timing_library_type           m_early_lib;
+    timing_library_type           m_late_lib;
+    timing_graph_type             m_timing_graph;
+    timing_data_type              m_early_data;
+    timing_data_type              m_late_data;
+    graph_and_topology_type       m_topology;
+    net_to_rctrees_property_type  m_rc_trees;
+    generic_sta_type<Optimistic>  m_early_sta;
+    generic_sta_type<Pessimistic> m_late_sta;
+    endpoints_type                m_endpoints;
+    time_unit_type                m_lwns;
+    time_unit_type                m_ewns;
+    time_unit_type                m_ltns;
+    time_unit_type                m_etns;
 };
 
 }   // namespace timing

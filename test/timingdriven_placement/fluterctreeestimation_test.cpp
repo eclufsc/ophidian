@@ -113,7 +113,8 @@ public:
         mPlacement.placeCell(mCell_u3, ophidian::util::LocationDbu(5000 - pinXInputOffset, 1000 - pinYInputOffset));
         mPlacement.placeCell(mCell_u4, ophidian::util::LocationDbu(5000 - pinXInputOffset, 5000 - pinYInputOffset));
 
-        mTimingLibrary.reset(new ophidian::timing::Library(*mLiberty, mStdCells, mTimingArcs, false));
+        mTimingLibrary.reset(new ophidian::timing::Library(mStdCells, mTimingArcs));
+        mTimingLibrary->init(*mLiberty, false);
     }
 
 };

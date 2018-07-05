@@ -75,6 +75,9 @@ public:
     TimingGraph(TimingGraph&&) = default;
     TimingGraph& operator=(TimingGraph&&) = default;
 
+    TimingGraph(const TimingGraph&) = delete;
+    TimingGraph& operator=(const TimingGraph&) = delete;
+
     //! Design Destructor
     /*!
        \brief Destroys the TimingGraph.

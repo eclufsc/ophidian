@@ -25,30 +25,39 @@ namespace timing
 {
 
 EndPoints::EndPoints(const netlist_type & netlist,
-          const library_mapping_type & lib_mapping,
+          const library_mapping_type & library_mapping,
           standard_cells_type & std_cells,
-          const timing_library_type & lib)
+          const timing_library_type & timing_library) :
+    m_netlist(netlist),
+    m_library_mapping(library_mapping),
+    m_std_cells(std_cells),
+    m_timing_library(timing_library)
+{
+    init();
+}
+
+void EndPoints::init()
 {
     m_endpoints.resize(0);
 
-    for(auto output = netlist.begin(circuit::Output()); output != netlist.end(circuit::Output()); ++output)
-        m_endpoints.push_back(netlist.pin(*output));
+    for(auto output = m_netlist.begin(circuit::Output()); output != m_netlist.end(circuit::Output()); ++output)
+        m_endpoints.push_back(m_netlist.pin(*output));
 
-    for(auto pin = netlist.begin(pin_entity_type()); pin != netlist.end(pin_entity_type()); ++pin)
+    for(auto pin = m_netlist.begin(pin_entity_type()); pin != m_netlist.end(pin_entity_type()); ++pin)
     {
-        auto pin_owner    = netlist.cell(*pin);
-        auto pin_std_cell = lib_mapping.pinStdCell(*pin);
+        auto pin_owner    = m_netlist.cell(*pin);
+        auto pin_std_cell = m_library_mapping.pinStdCell(*pin);
 
         if(pin_owner == circuit::Cell())
             continue;
 
-        auto owner_std_cell = lib_mapping.cellStdCell(pin_owner);
+        auto owner_std_cell = m_library_mapping.cellStdCell(pin_owner);
 
-        if(!lib.cellSequential(owner_std_cell))
+        if(!m_timing_library.cellSequential(owner_std_cell))
             continue;
-        else if(std_cells.direction(pin_std_cell) != standard_cell::PinDirection::INPUT)
+        else if(m_std_cells.direction(pin_std_cell) != standard_cell::PinDirection::INPUT)
             continue;
-        else if(lib.pinClock(pin_std_cell))
+        else if(m_timing_library.pinClock(pin_std_cell))
             continue;
 
         m_endpoints.push_back(*pin);
@@ -60,12 +69,12 @@ EndPoints::~EndPoints()
 
 }
 
-EndPoints::container_type::const_iterator EndPoints::begin() const
+EndPoints::container_pin_type::const_iterator EndPoints::begin() const
 {
     return m_endpoints.cbegin();
 }
 
-EndPoints::container_type::const_iterator EndPoints::end() const
+EndPoints::container_pin_type::const_iterator EndPoints::end() const
 {
     return m_endpoints.cend();
 }
