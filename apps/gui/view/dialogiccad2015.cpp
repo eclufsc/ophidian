@@ -6,6 +6,7 @@ DialogICCAD2015::DialogICCAD2015(QWidget *parent) :
     ui(new Ui::DialogICCAD2015)
 {
     ui->setupUi(this);
+    ui->erro->setText("Por enquanto os arquivos da Lib e SDC são opcionais. (\"\")");
 }
 
 DialogICCAD2015::~DialogICCAD2015()
@@ -84,7 +85,12 @@ void DialogICCAD2015::on_okButton_clicked()
         ui->verilog->setStyleSheet(color);
 
     } else {
-        emit buildICCAD2015(ui->lefLine->text().toStdString(), ui->defLine->text().toStdString(), ui->verilogLine->text().toStdString());
+        emit buildICCAD2015(ui->lefLine->text().toStdString(),
+                            ui->defLine->text().toStdString(),
+                            ui->verilogLine->text().toStdString(),
+                            ui->early_lib_line->text().toStdString(),
+                            ui->late_lib_line->text().toStdString(),
+                            ui->sdc_line->text().toStdString());
         this->close();
     }
 }
@@ -94,3 +100,36 @@ void DialogICCAD2015::on_cancelButton_clicked()
     this->close();
 }
 
+
+void DialogICCAD2015::on_choose_early_lib_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("Lib Files (*.lib)"));
+
+    if (!fileName.isEmpty()) {
+        ui->early_lib_line->setText(fileName);
+        ui->early_lib->setStyleSheet("color: rgb(0, 0, 0);");
+    }
+}
+
+void DialogICCAD2015::on_choose_late_lib_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("Lib Files (*.lib)"));
+
+    if (!fileName.isEmpty()) {
+        ui->late_lib_line->setText(fileName);
+        ui->late_lib->setStyleSheet("color: rgb(0, 0, 0);");
+    }
+}
+
+void DialogICCAD2015::on_choose_sdc_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("SDC Files (*.sdc)"));
+
+    if (!fileName.isEmpty()) {
+        ui->sdc_line->setText(fileName);
+        ui->sdc->setStyleSheet("color: rgb(0, 0, 0);");
+    }
+}

@@ -35,8 +35,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionICCAD_2017_triggered()
 {
     DialogICCAD2017 dialog(this);
-    QObject::connect(&dialog, SIGNAL(buildICCAD2017(std::string, std::string , std::string)),
-                     &mMainController, SLOT(buildICCAD2017(std::string, std::string , std::string)));
+    QObject::connect(&dialog, SIGNAL(buildICCAD2017(std::string, std::string , std::string, std::string, std::string , std::string)),
+                     &mMainController, SLOT(buildICCAD2017(std::string, std::string , std::string, std::string, std::string , std::string)));
     dialog.exec();
     ui->MyCanvas->OnUpdate();
 }
@@ -44,8 +44,8 @@ void MainWindow::on_actionICCAD_2017_triggered()
 void MainWindow::on_actionICCAD_2015_triggered()
 {
     DialogICCAD2015 dialog(this);
-    QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string)),
-                     &mMainController, SLOT(buildICCAD2015(std::string, std::string , std::string)));
+    QObject::connect(&dialog, SIGNAL(buildICCAD2015(std::string, std::string , std::string, std::string, std::string , std::string)),
+                     &mMainController, SLOT(buildICCAD2015(std::string, std::string , std::string, std::string, std::string , std::string)));
     dialog.exec();
     ui->MyCanvas->OnUpdate();
 }

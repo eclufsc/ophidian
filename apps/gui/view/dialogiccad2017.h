@@ -62,6 +62,12 @@ private slots:
      */
     void on_cancelButton_clicked();
 
+    void on_cells_choose_2_clicked();
+
+    void on_choose_late_clicked();
+
+    void on_choose_sdc_clicked();
+
 signals:
     //! Send files information
     /*!
@@ -70,7 +76,7 @@ signals:
        \param tech_lef Tech file location.
        \param placed_def Placed file location.
      */
-    void buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def);
+    void buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def, std::string early, std::string late, std::string sdc);
 
 private:
     Ui::DialogICCAD2017 *ui;

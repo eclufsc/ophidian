@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>174</height>
+    <height>272</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>130</y>
+     <y>231</y>
      <width>80</width>
      <height>25</height>
     </rect>
@@ -31,7 +31,7 @@
     <rect>
      <x>20</x>
      <y>55</y>
-     <width>31</width>
+     <width>40</width>
      <height>21</height>
     </rect>
    </property>
@@ -42,9 +42,9 @@
   <widget class="QLineEdit" name="defLine">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>55</y>
-     <width>351</width>
+     <width>340</width>
      <height>25</height>
     </rect>
    </property>
@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>130</y>
+     <y>233</y>
      <width>321</width>
      <height>21</height>
     </rect>
@@ -78,9 +78,9 @@
   <widget class="QLineEdit" name="lefLine">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>20</y>
-     <width>351</width>
+     <width>340</width>
      <height>25</height>
     </rect>
    </property>
@@ -103,7 +103,7 @@
     <rect>
      <x>20</x>
      <y>18</y>
-     <width>31</width>
+     <width>40</width>
      <height>30</height>
     </rect>
    </property>
@@ -114,9 +114,9 @@
   <widget class="QLineEdit" name="verilogLine">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>90</y>
-     <width>351</width>
+     <width>340</width>
      <height>25</height>
     </rect>
    </property>
@@ -126,7 +126,7 @@
     <rect>
      <x>20</x>
      <y>90</y>
-     <width>61</width>
+     <width>70</width>
      <height>21</height>
     </rect>
    </property>
@@ -151,13 +151,121 @@
    <property name="geometry">
     <rect>
      <x>450</x>
-     <y>130</y>
+     <y>231</y>
      <width>80</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="choose_early_lib">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>124</y>
+     <width>80</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Choose...</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="early_lib_line">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>124</y>
+     <width>340</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="early_lib">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>124</y>
+     <width>70</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Early Lib:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="late_lib_line">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>159</y>
+     <width>340</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="choose_late_lib">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>159</y>
+     <width>80</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Choose...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="late_lib">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>159</y>
+     <width>70</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Late Lib:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="choose_sdc">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>193</y>
+     <width>80</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Choose...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sdc">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>193</y>
+     <width>70</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;SDC:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sdc_line">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>193</y>
+     <width>340</width>
+     <height>25</height>
+    </rect>
    </property>
   </widget>
  </widget>

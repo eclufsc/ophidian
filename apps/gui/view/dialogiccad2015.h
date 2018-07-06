@@ -62,6 +62,12 @@ private slots:
      */
     void on_cancelButton_clicked();
 
+    void on_choose_early_lib_clicked();
+
+    void on_choose_late_lib_clicked();
+
+    void on_choose_sdc_clicked();
+
 signals:
     //! Send files information
     /*!
@@ -70,7 +76,7 @@ signals:
        \param def Deffile location.
        \param verilog Verilog file location.
      */
-    void buildICCAD2015(std::string lef, std::string def, std::string verilog);
+    void buildICCAD2015(std::string lef, std::string def, std::string verilog, std::string early, std::string late, std::string sdc);
 
 private:
     Ui::DialogICCAD2015 *ui;

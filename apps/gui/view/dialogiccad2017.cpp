@@ -6,6 +6,7 @@ DialogICCAD2017::DialogICCAD2017(QWidget *parent) :
     ui(new Ui::DialogICCAD2017)
 {
     ui->setupUi(this);
+    ui->erro->setText("Por enquanto os arquivos da Lib e SDC são opcionais. (\"\")");
 }
 
 DialogICCAD2017::~DialogICCAD2017()
@@ -84,7 +85,12 @@ void DialogICCAD2017::on_okButton_clicked()
         ui->placed_def->setStyleSheet(color);
 
     } else {
-        emit buildICCAD2017(ui->cells_lef_2->text().toStdString(), ui->tech_lef_2->text().toStdString(), ui->placed_def_2->text().toStdString());
+        emit buildICCAD2017(ui->cells_lef_2->text().toStdString(),
+                            ui->tech_lef_2->text().toStdString(),
+                            ui->placed_def_2->text().toStdString(),
+                            ui->early_lib_line->text().toStdString(),
+                            ui->late_lib_line->text().toStdString(),
+                            ui->sdc_line->text().toStdString());
         this->close();
     }
 }
@@ -92,4 +98,37 @@ void DialogICCAD2017::on_okButton_clicked()
 void DialogICCAD2017::on_cancelButton_clicked()
 {
     this->close();
+}
+
+void DialogICCAD2017::on_cells_choose_2_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("Lib Files (*.lib)"));
+
+    if (!fileName.isEmpty()) {
+        ui->early_lib_line->setText(fileName);
+        ui->early_lib->setStyleSheet("color: rgb(0, 0, 0);");
+    }
+}
+
+void DialogICCAD2017::on_choose_late_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("Lib Files (*.lib)"));
+
+    if (!fileName.isEmpty()) {
+        ui->late_lib_line->setText(fileName);
+        ui->late_lib->setStyleSheet("color: rgb(0, 0, 0);");
+    }
+}
+
+void DialogICCAD2017::on_choose_sdc_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+                                                    tr("SDC Files (*.sdc)"));
+
+    if (!fileName.isEmpty()) {
+        ui->sdc_line->setText(fileName);
+        ui->sdc->setStyleSheet("color: rgb(0, 0, 0);");
+    }
 }

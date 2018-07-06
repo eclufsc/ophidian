@@ -73,6 +73,35 @@ target_link_libraries(ophidian_gui PUBLIC
     PRIVATE ophidian_parser
     PRIVATE ophidian_placement
     PRIVATE ophidian_standard_cell
+    PRIVATE ophidian_timing_static
+    PRIVATE ophidian_timingdriven_placement_static
+)
+
+################################################################################
+# Prepare gui input environment.
+################################################################################
+
+find_file(POWV9 "POWV9.dat" PATHS
+    "/usr/share/Flute"
+    "/usr/local/share/Flute"
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
+find_file(PORT9 "PORT9.dat" PATHS
+    "/usr/share/Flute"
+    "/usr/local/share/Flute"
+    "${ophidian_source_dir}/dependencies/share/Flute"
+)
+
+message("Creating symlink FLUTE LUTs for GUI")
+execute_process(
+    COMMAND ln -f -s ${POWV9} ${ophidian_install_bin_dir}/.
+    COMMAND ln -f -s ${POWV9} ${CMAKE_CURRENT_BINARY_DIR}/.
+    RESULT_VARIABLE result
+)
+execute_process(
+    COMMAND ln -f -s ${POWV9} ${ophidian_install_bin_dir}/.
+    COMMAND ln -f -s ${PORT9} ${CMAKE_CURRENT_BINARY_DIR}/.
+    RESULT_VARIABLE result
 )
 
 ################################################################################

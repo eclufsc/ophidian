@@ -39,7 +39,7 @@ void MainController::mouseMove(const ophidian::geometry::Point & p)
     emit on_send_cellChanged("moving", "moving", -1, -1, p.x(), p.y());
 }
 
-void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def)
+void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def, std::string early, std::string late, std::string sdc)
 {
     if (mBuilder != nullptr)
     {
@@ -47,11 +47,11 @@ void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef,
         mCanvas->clear();
     }
 
-    mBuilder = new ophidian::design::ICCAD2017ContestDesignBuilder(cells_lef, tech_lef, placed_def);
+    mBuilder = new ophidian::design::ICCAD2017ContestDesignBuilder(cells_lef, tech_lef, placed_def, early, late, sdc);
     init();
 }
 
-void MainController::buildICCAD2015(std::string lef, std::string def, std::string verilog)
+void MainController::buildICCAD2015(std::string lef, std::string def, std::string verilog, std::string early, std::string late, std::string sdc)
 {
     if (mBuilder != nullptr)
     {
@@ -59,7 +59,7 @@ void MainController::buildICCAD2015(std::string lef, std::string def, std::strin
         mCanvas->clear();
     }
 
-    mBuilder = new ophidian::design::ICCAD2015ContestDesignBuilder(lef, def, verilog);
+    mBuilder = new ophidian::design::ICCAD2015ContestDesignBuilder(lef, def, verilog, early, late, sdc);
     init();
 }
 
