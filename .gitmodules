@@ -18,4 +18,4 @@
 	url = https://gitlab.com/eclufsc/eda/units.git
 [submodule "3rdparty/libertyParser"]
 	path = 3rdparty/libertyParser
-	url = https://github.com/eclufsc/libertyParser.git
+	url = https://gitlab.com/eclufsc/eda/libertyParser.git
