@@ -43,26 +43,6 @@ variables:
 stages:
     - build
 
-build_on_debian-buster:
-    image: debian:buster
-    stage: build
-    before_script:
-        - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
-        - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL
-    script:
-        - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-                -DCMAKE_BUILD_TYPE=Release 
-                ..
-        - make -j2
-        - cd test
-        - ./ophidian_tests
-    artifacts:
-        paths:
-          - build/
-
 build_on_debian-sid:
     image: debian:sid
     stage: build
@@ -70,11 +50,12 @@ build_on_debian-sid:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
         - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
         - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL
+        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
+                -DOPHIDIAN_GUI=ON 
                 ..
         - make -j2
         - cd test
@@ -89,11 +70,12 @@ build_on_ubuntu-artful:
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
         - add-apt-repository -y -u ppa:eclufsc/ophidian
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL
+        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release 
+                -DOPHIDIAN_GUI=ON 
                 ..
         - make -j2
         - cd test
@@ -108,11 +90,12 @@ build_on_ubuntu-bionic:
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
         - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC
+        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-                -DCMAKE_BUILD_TYPE=Release 
+                -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON 
                 ..
         - make -j2
         - cd test
@@ -125,12 +108,13 @@ build_using_dependencies_script_on_source:
     image: ubuntu:artful
     stage: build
     before_script:
-        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES
+        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
     script:
         - echo "y" | bash build_dependencies.sh
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON 
                 ..
         - make -j2
         - cd test
@@ -143,31 +127,13 @@ build_using_dependencies_script_on_sistem:
     image: ubuntu:artful
     stage: build
     before_script:
-        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES
+        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
     script:
         - echo y | bash build_dependencies.sh --install_to /usr/local
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr 
                 -DCMAKE_BUILD_TYPE=Release
-                ..
-        - make -j2
-        - cd test
-        - ./ophidian_tests
-    artifacts:
-        paths:
-            - build/
-
-build_using_dependencies_for_gui:
-    image: ubuntu:artful
-    stage: build
-    before_script:
-        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
-    script:
-        - echo "y" | bash build_dependencies.sh
-        - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr
-                -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
+                -DOPHIDIAN_GUI=ON 
                 ..
         - make -j2
         - cd test

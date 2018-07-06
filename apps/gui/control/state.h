@@ -3,13 +3,9 @@
 
 #include <QWheelEvent>
 #include <QKeyEvent>
-
 #include <ophidian/geometry/Models.h>
 #include "control/maincontroller.h"
 #include "model/forms.h"
-
-
-//#include "view/mysfmlcanvas.h"
 
 class MySFMLCanvas;
 

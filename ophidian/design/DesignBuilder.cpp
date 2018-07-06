@@ -30,7 +30,6 @@ ICCAD2017ContestDesignBuilder::ICCAD2017ContestDesignBuilder(const std::string &
                                                              const std::string & earlyLibFile,
                                                              const std::string & lateLibFile,
                                                              const std::string & designConstrainsFile) :
-
 	mDesign(),
 	mLef(),
 	mDef(),
@@ -89,7 +88,6 @@ ICCAD2015ContestDesignBuilder::ICCAD2015ContestDesignBuilder(const std::string &
                                                              const std::string & earlyLibFile,
                                                              const std::string & lateLibFile,
                                                              const std::string & designConstrainsFile) :
-
 	mDesign(),
 	mLef(),
 	mDef(),
@@ -133,7 +131,7 @@ Design & ICCAD2015ContestDesignBuilder::build()
 	circuit::verilog2Netlist(*mVerilog, mDesign.netlist());
     circuit::def2LibraryMapping(*mDef, mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping());
 
-    if (mEarlyLibFile.empty() && !mLateLibFile.empty())
+    if (!mEarlyLibFile.empty() && !mLateLibFile.empty())
     {
         mEarlyLiberty = libertyParser.readFile(mEarlyLibFile);
         mLateLiberty = libertyParser.readFile(mLateLibFile);

@@ -42,6 +42,13 @@ set(ophidian_uncrustify_config ${ophidian_source_dir}/uncrustify.cfg)
 # Build graphic user interface of ophidian
 OPTION(OPHIDIAN_GUI OFF)
 
+# Enable applications' build
+IF(OPHIDIAN_GUI)
+    set(OPHIDIAN_APPS ON)
+ELSE(OPHIDIAN_GUI)
+    set(OPHIDIAN_APPS OFF)
+ENDIF(OPHIDIAN_GUI)
+
 ################################################################################
 # Set up installation variables
 ################################################################################
@@ -118,6 +125,7 @@ find_package(verilog-parser REQUIRED)
 # Find libetyParser
 find_package(libertyParser REQUIRED)
 
+# Find GUI Dependencies
 IF(OPHIDIAN_GUI)
     # Find SFML
     find_package(SFML 2 REQUIRED graphics window system)
@@ -135,6 +143,6 @@ add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
 
-IF(OPHIDIAN_GUI)
+IF(OPHIDIAN_APPS)
     add_subdirectory(apps)
-ENDIF(OPHIDIAN_GUI)
+ENDIF(OPHIDIAN_APPS)

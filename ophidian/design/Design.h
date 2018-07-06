@@ -121,8 +121,8 @@ namespace ophidian
 
             //! staticTimingAnalysis getter
             /*!
-            \brief Get the placementMapping.
-            \return PlacementMapping.
+            \brief Get the staticTimingAnalysis.
+            \return staticTimingAnalysis.
             */
             timing::StaticTimingAnalysis & staticTimingAnalysis()
             {
