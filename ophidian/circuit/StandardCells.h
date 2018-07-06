@@ -53,15 +53,15 @@ namespace circuit
     public:
         // Member types
         using cell_type = Cell;
-        using cell_container_type = entity_system::EntitySystem<cell_type>;
         using cell_name_type = std::string;
-        using cell_const_iterator = cell_container_type::const_iterator;
+        using cell_container_type = entity_system::EntitySystem<cell_type>;
 
         using pin_type = Pin;
-        using pin_container_type = entity_system::EntitySystem<pin_type>;
         using pin_name_type = std::string;
         using pin_direction_type = PinDirection;
-        using pin_const_iterator = pin_container_type::const_iterator;
+        using pin_container_type = entity_system::EntitySystem<pin_type>;
+
+        using cell_pins_view_type = entity_system::Association<cell_type, pin_type>::Parts;
 
         // Constructors
         StandardCells() = default;
@@ -73,10 +73,8 @@ namespace circuit
         StandardCells& operator=(StandardCells&&) = default;
 
         // Element access
-        cell_type find_cell(cell_name_type cellName);
         const cell_type& find_cell(cell_name_type cellName) const;
 
-        pin_type find_pin(pin_name_type pinName);
         const pin_type& find_pin(pin_name_type pinName) const;
 
         cell_name_type& name(const cell_type & cell);
@@ -85,16 +83,16 @@ namespace circuit
         pin_name_type& name(const pin_type & pin);
         const pin_name_type& name(const pin_type & pin) const;
 
-        PinDirection& direction(const pin_type & pin);
-        const PinDirection& direction(const pin_type & pin) const;
+        pin_direction_type& direction(const pin_type & pin);
+        const pin_direction_type& direction(const pin_type & pin) const;
 
-        cell_type owner(const pin_type & pin) const;
+        cell_type cell(const pin_type & pin) const;
 
-        entity_system::Association<cell_type, pin_type>::Parts pins(const cell_type & cell) const;
+        cell_pins_view_type pins(const cell_type & cell) const;
 
         // Iterators
-        ophidian::util::Range<cell_const_iterator> range_cell() const;
-        ophidian::util::Range<pin_const_iterator> range_pin() const;
+        ophidian::util::Range<cell_container_type::const_iterator> range_cell() const;
+        ophidian::util::Range<pin_container_type::const_iterator> range_pin() const;
 
         // Capacity
         void reserve_cell(cell_container_type::size_type size);

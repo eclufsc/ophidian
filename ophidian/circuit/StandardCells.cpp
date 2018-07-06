@@ -22,19 +22,9 @@ namespace ophidian
 {
 namespace circuit
 {
-    StandardCells::cell_type StandardCells::find_cell(StandardCells::cell_name_type cellName)
-    {
-        return mName2Cell[cellName];
-    }
-
     const StandardCells::cell_type& StandardCells::find_cell(StandardCells::cell_name_type cellName) const
     {
         return mName2Cell.at(cellName);
-    }
-
-    StandardCells::pin_type StandardCells::find_pin(StandardCells::pin_name_type pinName)
-    {
-        return mName2Pin[pinName];
     }
 
     const StandardCells::pin_type& StandardCells::find_pin(StandardCells::pin_name_type pinName) const
@@ -72,7 +62,7 @@ namespace circuit
         return mPinDirections[pin];
     }
 
-    StandardCells::cell_type StandardCells::owner(const StandardCells::pin_type& pin) const
+    StandardCells::cell_type StandardCells::cell(const StandardCells::pin_type& pin) const
     {
         return mCellPins.whole(pin);
     }
@@ -82,14 +72,14 @@ namespace circuit
         return mCellPins.parts(cell);
     }
 
-    ophidian::util::Range<StandardCells::cell_const_iterator> StandardCells::range_cell() const
+    ophidian::util::Range<StandardCells::cell_container_type::const_iterator> StandardCells::range_cell() const
     {
-        return ophidian::util::Range<StandardCells::cell_const_iterator>(mCells.begin(), mCells.end());
+        return ophidian::util::Range<StandardCells::cell_container_type::const_iterator>(mCells.begin(), mCells.end());
     }
 
-    ophidian::util::Range<StandardCells::pin_const_iterator> StandardCells::range_pin() const
+    ophidian::util::Range<StandardCells::pin_container_type::const_iterator> StandardCells::range_pin() const
     {
-        return ophidian::util::Range<StandardCells::pin_const_iterator>(mPins.begin(), mPins.end());
+        return ophidian::util::Range<StandardCells::pin_container_type::const_iterator>(mPins.begin(), mPins.end());
     }
 
     void StandardCells::reserve_cell(StandardCells::cell_container_type::size_type size)

@@ -102,7 +102,7 @@ TEST_CASE_METHOD(StandardCellsFixture, "Standard cells: associating pin to net",
 
 	stdCells.connect(cell1, pin1);
 
-	REQUIRE(stdCells.owner(pin1) == cell1);
+	REQUIRE(stdCells.cell(pin1) == cell1);
 	REQUIRE(stdCells.pins(cell1).size() == 1);
 	REQUIRE(std::count(stdCells.pins(cell1).begin(), stdCells.pins(cell1).end(), pin1) == 1);
 }

@@ -72,17 +72,14 @@ namespace circuit
         using PinNotifier = entity_system::EntitySystem<PinInstance>::NotifierType;
         using NetNotifier = entity_system::EntitySystem<Net>::NotifierType;
 
-        template <class T> using entity_container_type = entity_system::EntitySystem<T>;
 
         using size_type = std::size_t;
 
         using cell_entity_type = CellInstance;
-        using cell_entity_container_type = entity_container_type<cell_entity_type>;
 
         using cell_name_type   = std::string;
 
         using net_entity_type = Net;
-        using net_name_type   = std::string;
 
         using pin_entity_type = PinInstance;
         using pin_name_type   = std::string;
@@ -92,6 +89,32 @@ namespace circuit
 
         using output_pad_entity_type = Output;
         using output_pad_name_type   = std::string;
+
+        using cell_instance_type = CellInstance;
+        using cell_instance_name_type = std::string;
+        using cell_instance_container_type = entity_system::EntitySystem<cell_instance_type>;
+
+        using pin_instance_type = PinInstance;
+        using pin_instance_name_type = std::string;
+        using pin_instance_container_type = entity_system::EntitySystem<pin_instance_type>;
+
+        using net_type = Net;
+        using net_name_type = std::string;
+        using net_container_type = entity_system::EntitySystem<net_type>;
+
+        using input_pad_type = Input;
+        using input_pad_container_type = entity_system::EntitySystem<Input>;
+
+        using output_pad_type = Output;
+        using output_pad_container_type = entity_system::EntitySystem<Output>;
+
+        using cell_instance_pins_view_type = entity_system::Association<CellInstance, PinInstance>::Parts;
+
+        using net_pins_view_type = entity_system::Association<Net, PinInstance>::Parts;
+
+        using std_cell_type = StandardCells::cell_type;
+
+        using std_cell_pin_type = StandardCells::pin_type;
 
         //! Construct Netlist
         Netlist() = default;
@@ -105,46 +128,56 @@ namespace circuit
         Netlist& operator=(Netlist &&) = default;
 
         // Element access
-        CellInstance find(CellInstance, std::string cellName);
-        PinInstance find(PinInstance, std::string pinName);
-        Net find(Net, std::string netName);
+        const cell_instance_type& find_cell_instance(const cell_instance_name_type& cellName) const;
 
-        std::string name(const CellInstance & cell) const;
-        std::string name(const PinInstance & pin) const;
-        std::string name(const Net & net) const;
+        const pin_instance_type& find_pin_instance(const pin_instance_name_type& pinName) const;
 
-        entity_system::Association<CellInstance, PinInstance>::Parts pins(const CellInstance & cell) const;
-        entity_system::Association<Net, PinInstance>::Parts pins(const Net & net) const;
-        Net net(const PinInstance & pin) const;
+        const net_type& find_net(const net_name_type& netName) const;
 
-        CellInstance cell(const PinInstance & pin) const;
+        cell_instance_name_type& name(const cell_instance_type& cell);
+        const cell_instance_name_type& name(const cell_instance_type& cell) const;
 
-        PinInstance pin(const Input & input) const;
+        pin_instance_name_type& name(const pin_instance_type& pin);
+        const pin_instance_name_type& name(const pin_instance_type& pin) const;
 
-        Input input(const PinInstance & pin) const;
+        net_name_type& name(const net_type& net);
+        const net_name_type& name(const net_type& net) const;
 
-        PinInstance pin(const Output & output) const;
+        cell_instance_type cell(const pin_instance_type& pin) const;
 
-        Output output(const PinInstance & pin) const;
+        cell_instance_pins_view_type pins(const cell_instance_type& cell) const;
 
-        Cell cellStdCell(const CellInstance & cell) const;
-        Pin pinStdCell(const PinInstance & pin) const;
+        net_pins_view_type pins(const net_type& net) const;
+
+        pin_instance_type pin(const input_pad_type& input) const;
+
+        pin_instance_type pin(const output_pad_type& output) const;
+
+        net_type net(const pin_instance_type& pin) const;
+
+        input_pad_type input(const pin_instance_type& pin) const;
+
+        output_pad_type output(const pin_instance_type& pin) const;
+
+        std_cell_type std_cell(const cell_instance_type& cell) const;
+
+        std_cell_pin_type std_cell_pin(const pin_instance_type& pin) const;
 
         // Iterators
-        cell_entity_container_type::const_iterator begin(cell_entity_type) const;
-        cell_entity_container_type::const_iterator end(cell_entity_type) const;
+        cell_instance_container_type::const_iterator begin_cell_instance() const noexcept;
+        cell_instance_container_type::const_iterator end_cell_instance() const noexcept;
 
-        entity_system::EntitySystem<PinInstance>::const_iterator begin(PinInstance) const;
-        entity_system::EntitySystem<PinInstance>::const_iterator end(PinInstance) const;
+        pin_instance_container_type::const_iterator begin_pin_instance() const noexcept;
+        pin_instance_container_type::const_iterator end_pin_instance() const noexcept;
 
-        entity_system::EntitySystem<Net>::const_iterator begin(Net) const;
-        entity_system::EntitySystem<Net>::const_iterator end(Net) const;
+        net_container_type::const_iterator begin_net() const noexcept;
+        net_container_type::const_iterator end_net() const noexcept;
 
-        entity_system::EntitySystem<Input>::const_iterator begin(Input) const;
-        entity_system::EntitySystem<Input>::const_iterator end(Input) const;
+        input_pad_container_type::const_iterator begin_input_pad() const noexcept;
+        input_pad_container_type::const_iterator end_input_pad() const noexcept;
         
-        entity_system::EntitySystem<Output>::const_iterator begin(Output) const;
-        entity_system::EntitySystem<Output>::const_iterator end(Output) const;
+        output_pad_container_type::const_iterator begin_output_pad() const noexcept;
+        output_pad_container_type::const_iterator end_output_pad() const noexcept;
 
         // Capacity
         size_type size(cell_entity_type) const;
@@ -181,7 +214,6 @@ namespace circuit
         Input add(Input, const PinInstance &pin);
         Output add(Output, const PinInstance &pin);
         
-
         template <typename Value>
         entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
         {
@@ -231,6 +263,7 @@ namespace circuit
         std::unordered_map<std::string, PinInstance>          mName2Pin{};
         std::unordered_map<std::string, Net>                  mName2Net{};
         entity_system::Aggregation<Net, PinInstance>          mNetPins{mNets, mPins};
+
         entity_system::Composition<CellInstance, PinInstance> mCellPins{mCells, mPins};
         entity_system::Composition<PinInstance, Input>        mPinInput{mPins, mInputs};
         entity_system::Composition<PinInstance, Output>       mPinOutput{mPins, mOutputs};

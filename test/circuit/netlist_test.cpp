@@ -39,7 +39,7 @@ TEST_CASE("Netlist: Cell mapping.", "[circuit][Netlist]")
 {
 	Netlist nl;
     nl.add(CellInstance(), "cell");
-    auto cell = nl.find(CellInstance(), "cell");
+    auto cell = nl.find_cell_instance("cell");
 	nl.erase(cell);
     REQUIRE(nl.size(CellInstance()) == 0);
     REQUIRE(nl.size(PinInstance()) == 0);
@@ -80,7 +80,7 @@ TEST_CASE("Netlist: Pin mapping.", "[circuit][Netlist]")
 {
 	Netlist nl;
     nl.add(PinInstance(), "pin");
-    auto pin = nl.find(PinInstance(), "pin");
+    auto pin = nl.find_pin_instance("pin");
 	nl.erase(pin);
     REQUIRE(nl.size(CellInstance()) == 0);
     REQUIRE(nl.size(PinInstance()) == 0);
@@ -122,7 +122,7 @@ TEST_CASE("Netlist: Net mapping.", "[circuit][Netlist]")
 {
 	Netlist nl;
 	nl.add(Net(), "net");
-	auto net = nl.find(Net(), "net");
+	auto net = nl.find_net("net");
 	nl.erase(net);
     REQUIRE(nl.size(CellInstance()) == 0);
     REQUIRE(nl.size(PinInstance()) == 0);
@@ -299,8 +299,8 @@ TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
     PinInstance p1, p2;
     auto inp = nl.add(Input(), p1 = nl.add(PinInstance(), "p1"));
     auto out = nl.add(Output(), p2 = nl.add(PinInstance(), "p2"));
-	REQUIRE(std::count(nl.begin(Input()), nl.end(Input()), inp) == 1);
-	REQUIRE(std::count(nl.begin(Output()), nl.end(Output()), out) == 1);
+	REQUIRE(std::count(nl.begin_input_pad(), nl.end_input_pad(), inp) == 1);
+	REQUIRE(std::count(nl.begin_output_pad(), nl.end_output_pad(), out) == 1);
 }
 
 TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")

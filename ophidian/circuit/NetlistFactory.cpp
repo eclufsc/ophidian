@@ -56,7 +56,7 @@ namespace circuit
                 else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
                     netlist.add(Output(), pin);
                 }
-                netlist.connect(netlist.find(Net(), port.name()), pin);
+                netlist.connect(netlist.find_net(port.name()), pin);
             }
 
             for(auto instance : module.module_instances())
@@ -66,7 +66,7 @@ namespace circuit
                 {
                     auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
                     netlist.add(cell, pin);
-                    netlist.connect(netlist.find(Net(), portMap.second), pin);
+                    netlist.connect(netlist.find_net(portMap.second), pin);
                 }
             }
 
@@ -104,7 +104,7 @@ namespace circuit
                 else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
                     netlist.add(Output(), pin);
                 }
-                netlist.connect(netlist.find(Net(), port.name()), pin);
+                netlist.connect(netlist.find_net(port.name()), pin);
             }
 
             for(auto instance : module.module_instances())
@@ -116,7 +116,7 @@ namespace circuit
                 {
                     auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
                     netlist.add(cell, pin);
-                    netlist.connect(netlist.find(Net(), portMap.second), pin);
+                    netlist.connect(netlist.find_net(portMap.second), pin);
                 }
             }
             return netlist;

@@ -37,7 +37,7 @@ TEST_CASE("Netlist: Profiling", "[Netlist][Profiling]")
 	}
 
     std::list<CellInstance> cellsWithoutTheExpectedPins;
-    std::for_each(nl.begin(CellInstance()), nl.end(CellInstance()), [&cellsPins, &nl, &cellsWithoutTheExpectedPins](const CellInstance & cell){
+    std::for_each(nl.begin_cell_instance(), nl.end_cell_instance(), [&cellsPins, &nl, &cellsWithoutTheExpectedPins](const CellInstance & cell){
 		auto const & pins = cellsPins[cell];
 		auto nlCellPins = nl.pins(cell);
 		bool insert = false;

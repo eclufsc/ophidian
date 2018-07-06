@@ -64,7 +64,7 @@ namespace placement
 
     geometry::MultiBox<util::database_unit_t> Placement::geometry(const circuit::CellInstance & cell) const
     {
-        auto stdCell = mNetlist.cellStdCell(cell);
+        auto stdCell = mNetlist.std_cell(cell);
         auto stdCellGeometry = mLibrary.geometry(stdCell);
         auto location = cellLocation(cell);
 
@@ -75,7 +75,7 @@ namespace placement
 
     util::LocationDbu Placement::location(const circuit::PinInstance & pin) const
     {
-        auto stdCellPin = mNetlist.pinStdCell(pin);
+        auto stdCellPin = mNetlist.std_cell_pin(pin);
         auto pinOwner = mNetlist.cell(pin);
         auto location = cellLocation(pinOwner);
         auto pinOffset = mLibrary.pinOffset(stdCellPin);
