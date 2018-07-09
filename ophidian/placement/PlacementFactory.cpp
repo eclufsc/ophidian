@@ -30,7 +30,7 @@ namespace placement
 
             for(auto & component : def.components())
             {
-                auto cell = netlist.add(circuit::CellInstance{}, component.name());
+                auto& cell = netlist.add_cell_instance(component.name());
                 placement.placeCell(cell, component.position());
             }
 

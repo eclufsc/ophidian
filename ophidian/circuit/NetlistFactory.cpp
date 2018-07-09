@@ -37,35 +37,34 @@ namespace circuit
             }
             sizePins += module.ports().size();
 
-            netlist.reserve(PinInstance(), sizePins);
-            netlist.reserve(Net(), module.nets().size());
-            netlist.reserve(CellInstance(), module.module_instances().size());
-
+            netlist.reserve_pin_instance(sizePins);
+            netlist.reserve_net(module.nets().size());
+            netlist.reserve_cell_instance(module.module_instances().size());
 
             for(auto net : module.nets())
             {
-                netlist.add(Net(), net.name());
+                netlist.add_net(net.name());
             }
 
             for(auto port : module.ports())
             {
-                auto pin = netlist.add(PinInstance(), port.name());
+                auto pin = netlist.add_pin_instance(port.name());
                 if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
-                    netlist.add(Input(), pin);
+                    netlist.add_input_pad(pin);
                 }
                 else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
-                    netlist.add(Output(), pin);
+                    netlist.add_output_pad(pin);
                 }
                 netlist.connect(netlist.find_net(port.name()), pin);
             }
 
             for(auto instance : module.module_instances())
             {
-                auto cell = netlist.add(CellInstance(), instance.name());
+                auto cell = netlist.add_cell_instance(instance.name());
                 for(auto portMap : instance.net_map())
                 {
-                    auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
-                    netlist.add(cell, pin);
+                    auto pin = netlist.add_pin_instance(instance.name() + ":" + portMap.first);
+                    netlist.connect(cell, pin);
                     netlist.connect(netlist.find_net(portMap.second), pin);
                 }
             }
@@ -86,36 +85,36 @@ namespace circuit
             }
             sizePins += module.ports().size();
 
-            netlist.reserve(PinInstance(), sizePins);
-            netlist.reserve(Net(), module.nets().size());
-            netlist.reserve(CellInstance(), module.module_instances().size());
+            netlist.reserve_pin_instance(sizePins);
+            netlist.reserve_net(module.nets().size());
+            netlist.reserve_cell_instance(module.module_instances().size());
 
             for(auto net : module.nets())
             {
-                netlist.add(Net(), net.name());
+                netlist.add_net(net.name());
             }
 
             for(auto port : module.ports())
             {
-                auto pin = netlist.add(PinInstance(), port.name());
+                auto pin = netlist.add_pin_instance(port.name());
                 if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
-                    netlist.add(Input(), pin);
+                    netlist.add_input_pad(pin);
                 }
                 else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
-                    netlist.add(Output(), pin);
+                    netlist.add_output_pad(pin);
                 }
                 netlist.connect(netlist.find_net(port.name()), pin);
             }
 
             for(auto instance : module.module_instances())
             {
-                auto cell = netlist.add(CellInstance(), instance.name());
+                auto cell = netlist.add_cell_instance(instance.name());
 
-                netlist.cellStdCell(cell, std_cells.find_cell(instance.module()));
+                netlist.connect(cell, std_cells.find_cell(instance.module()));
                 for(auto portMap : instance.net_map())
                 {
-                    auto pin = netlist.add(PinInstance(), instance.name() + ":" + portMap.first);
-                    netlist.add(cell, pin);
+                    auto pin = netlist.add_pin_instance(instance.name() + ":" + portMap.first);
+                    netlist.connect(cell, pin);
                     netlist.connect(netlist.find_net(portMap.second), pin);
                 }
             }

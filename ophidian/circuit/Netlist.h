@@ -180,40 +180,44 @@ namespace circuit
         output_pad_container_type::const_iterator end_output_pad() const noexcept;
 
         // Capacity
-        size_type size(cell_entity_type) const;
-        size_type size(PinInstance) const;
-        size_type size(Net) const;
-        size_type size(Input) const;
-        size_type size(Output) const;
+        cell_instance_container_type::size_type size_cell_instance() const noexcept;
+        pin_instance_container_type::size_type size_pin_instance() const noexcept;
+        net_container_type::size_type size_net() const noexcept;
+        input_pad_container_type::size_type size_input_pad() const noexcept;
+        output_pad_container_type::size_type size_output_pad() const noexcept;
 
-        void reserve(CellInstance, size_type size);
-        void reserve(PinInstance, size_type size);
-        void reserve(Net, size_type size);
+        cell_instance_container_type::size_type capacity_cell_instance() const noexcept;
+        pin_instance_container_type::size_type capacity_pin_instance() const noexcept;
+        net_container_type::size_type capacity_net() const noexcept;
 
-        void shrinkToFit();
+        void reserve_cell_instance(cell_instance_container_type::size_type size);
+        void reserve_pin_instance(pin_instance_container_type::size_type size);
+        void reserve_net(net_container_type::size_type size);
 
-        size_type capacity(CellInstance) const;
-        size_type capacity(PinInstance) const;
-        size_type capacity(Net) const;
+        void shrink_to_fit();
 
         // Modifiers
-        void erase(const cell_entity_type& cell);
-        void erase(const PinInstance & pin);
-        void erase(const Net & net);
+        const cell_instance_type& add_cell_instance(const cell_instance_name_type& cellName);
 
-        void disconnect(const PinInstance & pin);
-        void connect(const Net & net, const PinInstance & pin);
+        const pin_instance_type& add_pin_instance(const pin_instance_name_type& pinName);
 
-        void add(const CellInstance & cell, const PinInstance & pin);
-        void cellStdCell(const CellInstance & cell, const Cell & stdCell);
-        void pinStdCell(const PinInstance & pin, const Pin & stdCell);
+        const net_type& add_net(const net_name_type& netName);
 
-        cell_entity_type add(cell_entity_type, cell_name_type cellName);
-        Net add(Net, std::string netName);
-        PinInstance add(PinInstance, std::string pinName);
-        Input add(Input, const PinInstance &pin);
-        Output add(Output, const PinInstance &pin);
+        input_pad_type add_input_pad(const pin_instance_type& pin);
+
+        output_pad_type add_output_pad(const pin_instance_type& pin);
         
+        void erase(const cell_instance_type& cell);
+        void erase(const pin_instance_type& pin);
+        void erase(const net_type& net);
+
+        void connect(const net_type& net, const pin_instance_type& pin);
+        void connect(const cell_instance_type& cell, const pin_instance_type& pin);
+        void connect(const cell_instance_type& cell, const std_cell_type& stdCell);
+        void connect(const pin_instance_type& pin, const std_cell_pin_type& stdCell);
+
+        void disconnect(const pin_instance_type& pin);
+
         template <typename Value>
         entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
         {

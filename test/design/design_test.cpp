@@ -10,14 +10,14 @@ Design design;
 
 TEST_CASE("Design: testing netlist.", "[design]")
 {
-	auto cell = design.netlist().add(ophidian::circuit::CellInstance(), "cell");
-	auto pin = design.netlist().add(ophidian::circuit::PinInstance(), "pin");
-	auto net = design.netlist().add(ophidian::circuit::Net(), "net");
-	REQUIRE(design.netlist().size(ophidian::circuit::CellInstance()) == 1);
-	REQUIRE(design.netlist().size(ophidian::circuit::PinInstance()) == 1);
-	REQUIRE(design.netlist().size(ophidian::circuit::Net()) == 1);
-	REQUIRE(design.netlist().size(ophidian::circuit::Input()) == 0 );
-	REQUIRE(design.netlist().size(ophidian::circuit::Output()) == 0 );
+	auto cell = design.netlist().add_cell_instance("cell");
+	auto pin = design.netlist().add_pin_instance("pin");
+	auto net = design.netlist().add_net("net");
+	REQUIRE(design.netlist().size_cell_instance() == 1);
+	REQUIRE(design.netlist().size_pin_instance() == 1);
+	REQUIRE(design.netlist().size_net() == 1);
+	REQUIRE(design.netlist().size_input_pad() == 0 );
+	REQUIRE(design.netlist().size_output_pad() == 0 );
 
 }
 
@@ -44,8 +44,8 @@ TEST_CASE("Design: testing floorplan.", "[design]")
 
 TEST_CASE("Design: testing placement.", "[design]")
 {
-	auto cell1 = design.netlist().add(ophidian::circuit::CellInstance(), "cell1");
-	auto cell2 = design.netlist().add(ophidian::circuit::CellInstance(), "cell2");
+	auto cell1 = design.netlist().add_cell_instance("cell1");
+	auto cell2 = design.netlist().add_cell_instance("cell2");
 
 	auto cell1Location = ophidian::util::LocationDbu{ dbu_t{10}, dbu_t{20}};
 	auto cell2Location = ophidian::util::LocationDbu{ dbu_t{20}, dbu_t{10}};
@@ -82,6 +82,5 @@ TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 	REQUIRE(cell1Geometry == design.library().geometry(cell1));
 	REQUIRE(cell2Geometry == design.library().geometry(cell2));
 	REQUIRE(design.library().geometry(cell1) != design.library().geometry(cell2));
-
 }
 
