@@ -72,24 +72,6 @@ namespace circuit
         using PinNotifier = entity_system::EntitySystem<PinInstance>::NotifierType;
         using NetNotifier = entity_system::EntitySystem<Net>::NotifierType;
 
-
-        using size_type = std::size_t;
-
-        using cell_entity_type = CellInstance;
-
-        using cell_name_type   = std::string;
-
-        using net_entity_type = Net;
-
-        using pin_entity_type = PinInstance;
-        using pin_name_type   = std::string;
-
-        using input_pad_entity_type = Input;
-        using input_pad_name_type   = std::string;
-
-        using output_pad_entity_type = Output;
-        using output_pad_name_type   = std::string;
-
         using cell_instance_type = CellInstance;
         using cell_instance_name_type = std::string;
         using cell_instance_container_type = entity_system::EntitySystem<cell_instance_type>;
@@ -103,9 +85,11 @@ namespace circuit
         using net_container_type = entity_system::EntitySystem<net_type>;
 
         using input_pad_type = Input;
+        using input_pad_name_type   = std::string;
         using input_pad_container_type = entity_system::EntitySystem<Input>;
 
         using output_pad_type = Output;
+        using output_pad_name_type   = std::string;
         using output_pad_container_type = entity_system::EntitySystem<Output>;
 
         using cell_instance_pins_view_type = entity_system::Association<CellInstance, PinInstance>::Parts;
@@ -113,7 +97,6 @@ namespace circuit
         using net_pins_view_type = entity_system::Association<Net, PinInstance>::Parts;
 
         using std_cell_type = StandardCells::cell_type;
-
         using std_cell_pin_type = StandardCells::pin_type;
 
         //! Construct Netlist
