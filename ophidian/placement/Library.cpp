@@ -23,17 +23,36 @@ namespace ophidian
 namespace placement
 {
     Library::Library(const circuit::StandardCells & std_cells):
-            mGeometries(std_cells.make_property_cell<MultiBox>()),
-            mPinOffsets(std_cells.make_property_pin<util::LocationDbu>())
+            mGeometries{std_cells.make_property_cell<Library::std_cell_geometry_type>()},
+            mPinOffsets{std_cells.make_property_pin<Library::offset_type>()}
+    {}
+
+    Library::std_cell_geometry_type& Library::geometry(const Library::std_cell_type& cell)
     {
+        return mGeometries[cell];
     }
 
-    void Library::geometry(const circuit::Cell & cell, const MultiBox & geometry)
+    const Library::std_cell_geometry_type& Library::geometry(const Library::std_cell_type& cell) const
+    {
+        return mGeometries[cell];
+    }
+
+    Library::offset_type& Library::offset(const Library::std_cell_pin_type& pin)
+    {
+        return mPinOffsets[pin];
+    }
+
+    const Library::offset_type& Library::offset(const Library::std_cell_pin_type& pin) const
+    {
+        return mPinOffsets[pin];
+    }
+
+    void Library::connect(const std_cell_type& cell, const std_cell_geometry_type& geometry)
     {
         mGeometries[cell] = geometry;
     }
 
-    void Library::pinOffset(const circuit::Pin & pin, const util::LocationDbu & offset)
+    void Library::connect(const std_cell_pin_type& pin, const offset_type& offset)
     {
         mPinOffsets[pin] = offset;
     }

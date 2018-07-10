@@ -17,6 +17,7 @@
  */
 
 #include "Placement.h"
+#include <ophidian/geometry/Operations.h>
 
 namespace ophidian
 {
@@ -68,7 +69,7 @@ namespace placement
         auto stdCellGeometry = mLibrary.geometry(stdCell);
         auto location = cellLocation(cell);
 
-        geometry::MultiBox<util::database_unit_t> cellGeometry = stdCellGeometry.translate(location);
+        geometry::MultiBox<util::database_unit_t> cellGeometry = geometry::translate(stdCellGeometry, location);
 
         return cellGeometry;
     }
@@ -78,7 +79,7 @@ namespace placement
         auto stdCellPin = mNetlist.std_cell_pin(pin);
         auto pinOwner = mNetlist.cell(pin);
         auto location = cellLocation(pinOwner);
-        auto pinOffset = mLibrary.pinOffset(stdCellPin);
+        auto pinOffset = mLibrary.offset(stdCellPin);
 
         util::LocationDbu pinLocation(location.x() + pinOffset.x(),
             location.y() + pinOffset.y());

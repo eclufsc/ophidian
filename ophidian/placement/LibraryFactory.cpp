@@ -44,7 +44,7 @@ namespace placement
                          rect.max_corner().y() * lef.micrometer_to_dbu_ratio()};
                         geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
                     }
-                    library.geometry(stdCell, geometry);
+                    library.connect(stdCell, geometry);
                 }
                 else {
                     geometry::Point<util::database_unit_t> pmin =
@@ -57,7 +57,7 @@ namespace placement
                             macro.size().x() * lef.micrometer_to_dbu_ratio(),
                             macro.size().y() * lef.micrometer_to_dbu_ratio()
                         };
-                    library.geometry(stdCell,
+                    library.connect(stdCell,
                         geometry::MultiBox<util::database_unit_t>{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
                 }
                 util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
@@ -72,7 +72,7 @@ namespace placement
                     {
                         for(auto& rect : port.second)
                         {
-                            library.pinOffset(
+                            library.connect(
                                 stdPin,
                                 util::LocationDbu(0.5 *
                                     (dbuConverter.convert(rect.min_corner().x()) +

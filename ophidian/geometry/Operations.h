@@ -22,6 +22,8 @@
 #include <boost/geometry/algorithms/intersection.hpp>
 
 #include "Models.h"
+#include "MultiBox.h"
+
 
 namespace ophidian
 {
@@ -35,17 +37,34 @@ namespace geometry
      * \param translationPoint Point representing the translation to be applied to geometry
      * \param result Geometry representing the translated geometry
      */
-    template <template <typename> class Geometry, class T>
-    Geometry<T> translate(const Geometry<T> & geometry, Point<T> & translationPoint)
+    template <template <typename> class Geometry, template <typename> class Point_, class T>
+    Geometry<Point_<T>> translate(const Geometry<Point_<T>> & geometry, Point_<T> & translationPoint)
     {
-        Geometry<T> result;
+        namespace bg = boost::geometry;
 
-        boost::geometry::strategy::transform::translate_transformer<T, 2, 2> translate(
-            translationPoint.x(),
-            translationPoint.y());
-        boost::geometry::transform(geometry, result, translate);
+        auto result = Geometry<Point_<T>>{};
+
+        auto translate = bg::strategy::transform::translate_transformer<T, 2, 2>{translationPoint.x(), translationPoint.y()};
+        bg::transform(geometry, result, translate);
 
         return result;
+    }
+
+    template <typename T>
+    MultiBox<T> translate(const MultiBox<T> & geometry, Point<T> translation_point)
+    {
+        auto translated_boxes = std::vector<Box<T>>{};
+
+        translated_boxes.reserve(geometry.size());
+
+        for(const auto & box : geometry)
+        {
+            auto translated_box = translate(box, translation_point);
+
+            translated_boxes.push_back(std::move(translated_box));
+        }
+
+        return MultiBox<T>{std::move(translated_boxes)};
     }
 
     //! Scaling operation
@@ -56,18 +75,18 @@ namespace geometry
      * \param scalingPoint Point representing the scaling to be applied to geometry
      * \param result Geometry representing the scaled geometry
      */
-    template <class Geometry, class T>
-    Geometry scale(const Geometry & geometry, Point<T> & scalingPoint)
-    {
-        Geometry result;
-
-        boost::geometry::strategy::transform::scale_transformer<T, 2, 2> scale(
-            scalingPoint.x(),
-            scalingPoint.y());
-        boost::geometry::transform(geometry, result, scale);
-
-        return result;
-    }
+    // template <class Geometry, class T>
+    // Geometry scale(const Geometry & geometry, Point<T> & scalingPoint)
+    // {
+    //     Geometry result;
+    //
+    //     boost::geometry::strategy::transform::scale_transformer<T, 2, 2> scale(
+    //         scalingPoint.x(),
+    //         scalingPoint.y());
+    //     boost::geometry::transform(geometry, result, scale);
+    //
+    //     return result;
+    // }
 
     //! Rotate operation
 
@@ -77,13 +96,13 @@ namespace geometry
      * \param degree Amount of rotation degrees
      * \param result Geometry representing the rotated geometry
      */
-    template <class Geometry>
-    void rotate(const Geometry & geometry, double degree, Geometry & result)
-    {
-        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2,
-            2> rotate(degree);
-        boost::geometry::transform(geometry, result, rotate);
-    }
+    // template <class Geometry>
+    // void rotate(const Geometry & geometry, double degree, Geometry & result)
+    // {
+    //     boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2,
+    //         2> rotate(degree);
+    //     boost::geometry::transform(geometry, result, rotate);
+    // }
 
     //! Intersection operation
 
@@ -93,14 +112,14 @@ namespace geometry
      * \param geometry2 Second geometry to calculate the intersection
      * \param result Geometry representing the intersection of geometry1 and geometry2. Should be a collection of geometries, a multi geometry or a Box in the case of Box intersection
      */
-    template <class Geometry1, class Geometry2, class GeometryOut>
-    void intersection(
-        const Geometry1 & geometry1,
-        const Geometry2 & geometry2,
-        GeometryOut & result)
-    {
-        boost::geometry::intersection(geometry1, geometry2, result);
-    }
+    // template <class Geometry1, class Geometry2, class GeometryOut>
+    // void intersection(
+    //     const Geometry1 & geometry1,
+    //     const Geometry2 & geometry2,
+    //     GeometryOut & result)
+    // {
+    //     boost::geometry::intersection(geometry1, geometry2, result);
+    // }
 }     // namespace geometry
 }     // namespace ophidian
 

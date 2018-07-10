@@ -68,7 +68,7 @@ TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
         ophidian::geometry::Box<dbu_t>{ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}}, ophidian::geometry::Point<dbu_t>{dbu_t{10}, dbu_t{10}}}
     };
 	ophidian::geometry::MultiBox<dbu_t> cell1Geometry(cell1Boxes);
-	design.library().geometry(cell1, cell1Geometry);
+	design.library().connect(cell1, cell1Geometry);
 
 	std::vector<ophidian::geometry::Box<dbu_t>> cell2Boxes = {
         ophidian::geometry::Box<dbu_t>{
@@ -77,7 +77,7 @@ TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
         }
     };
 	ophidian::geometry::MultiBox<dbu_t> cell2Geometry(cell2Boxes);
-	design.library().geometry(cell2, cell2Geometry);
+	design.library().connect(cell2, cell2Geometry);
 
 	REQUIRE(cell1Geometry == design.library().geometry(cell1));
 	REQUIRE(cell2Geometry == design.library().geometry(cell2));

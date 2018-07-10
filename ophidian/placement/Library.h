@@ -32,60 +32,44 @@ namespace placement
     class Library
     {
     public:
-        using MultiBox = geometry::MultiBox<util::database_unit_t>;
+        using offset_type = util::LocationDbu;
 
-        //! Library Copy Constructor
+        using std_cell_type = circuit::StandardCells::cell_type;
 
-        /*!
-           \brief Constructs a placement library.
-         */
+        using std_cell_pin_type = circuit::StandardCells::pin_type;
+
+        using std_cell_geometry_type = geometry::MultiBox<util::database_unit_t>;
+
+        // Constructors
+        Library() = delete;
+
+        Library(const Library&) = delete;
+        Library& operator=(const Library&) = delete;
+
+        Library(Library&&) = default;
+        Library& operator=(Library&&) = default;
+
         Library(const circuit::StandardCells & std_cells);
 
-        //! Cell geometry getter
+        // Element access
+        std_cell_geometry_type& geometry(const std_cell_type& cell);
+        const std_cell_geometry_type& geometry(const std_cell_type& cell) const;
 
-        /*!
-           \brief Gets the geometry of a cell.
-           \param cell Cell entity to get the geometry.
-           \return Geometry of the cell.
-         */
-        MultiBox geometry(const circuit::Cell & cell) const
-        {
-            return mGeometries[cell];
-        }
+        offset_type& offset(const std_cell_pin_type& pin);
+        const offset_type& offset(const std_cell_pin_type& pin) const;
 
-        //! Cell geometry setter
+        // Iterators
 
-        /*!
-           \brief Set the geometry of a cell.
-           \param cell Cell entity to set the geometry.
-           \param geometry Gehmetry to assign to cell.
-         */
-        void geometry(const circuit::Cell & cell, const MultiBox & geometry);
+        // Capacity
 
-        //! Pin offset getter
+        // Modifiers
+        void connect(const std_cell_type& cell, const std_cell_geometry_type& geometry);
 
-        /*!
-           \brief Gets the offset of a pin.
-           \param pin Pin entity to get the offset.
-           \return Offset of the pin.
-         */
-        util::LocationDbu pinOffset(const circuit::Pin & pin) const
-        {
-            return mPinOffsets[pin];
-        }
-
-        //! Pin offset setter
-
-        /*!
-           \brief Sets the offset of a pin.
-           \param pin Pin entity to set the offset.
-           \param offset Offset to assign to pin.
-         */
-        void pinOffset(const circuit::Pin & pin, const util::LocationDbu & offset);
+        void connect(const std_cell_pin_type& pin, const offset_type& offset);
 
     private:
-        entity_system::Property<circuit::Cell, MultiBox> mGeometries;
-        entity_system::Property<circuit::Pin, util::LocationDbu>   mPinOffsets;
+        entity_system::Property<std_cell_type, std_cell_geometry_type> mGeometries;
+        entity_system::Property<std_cell_pin_type, offset_type>   mPinOffsets;
     };
 }     // namespace placement
 }     // namespace ophidian

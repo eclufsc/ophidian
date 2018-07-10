@@ -1,105 +1,109 @@
 #ifndef MULTIBOX_H
 #define MULTIBOX_H
 
-#include <ophidian/geometry/Operations.h>
+#include <vector>
+
+#include "Models.h"
 
 namespace ophidian {
 namespace geometry {
-//!Class multibox using geometry::Box
-template <typename T>
-class MultiBox
-{
-public:
 
-    //!Standar Constructors
-    MultiBox() = default;
-    MultiBox(const MultiBox<T> &) = default;
-    MultiBox(MultiBox<T> &&) = default;
-    MultiBox<T>& operator= ( const MultiBox<T> & ) = default;
-    MultiBox<T>& operator= ( MultiBox<T> && ) = default;
-
-    //!Constructor receiving a vector of geometry::Box
-    MultiBox(const std::vector<geometry::Box<T>> & boxes):
-            mBoxes(boxes)
+    template <typename T>
+    class MultiBox
     {
-    }
+    public:
+        // Member types
+        using value_type = Box<T>;
 
-    //!Push back a geometry::Box
-    void push_back(const Box<T> & box)
-    {
-        mBoxes.push_back(box);
-    }
+        // Constructors
+        MultiBox() = default;
 
-    //!Non-const iterator begin
-    typename
-    std::vector<Box<T>>::iterator begin()
-    {
-        return mBoxes.begin();
-    }
+        MultiBox(const MultiBox<T> &) = default;
+        MultiBox<T>& operator= ( const MultiBox<T> & ) = default;
 
-    //!Non-const iterator end
-    typename
-    std::vector<Box<T>>::iterator end()
-    {
-        return mBoxes.end();
-    }
+        MultiBox(MultiBox<T> &&) = default;
+        MultiBox<T>& operator= ( MultiBox<T> && ) = default;
 
-    //!Const iterator begin
-    typename
-    std::vector<Box<T>>::const_iterator begin() const
-    {
-        return mBoxes.begin();
-    }
+        // template <class Vector>
+        // MultiBox(Vector&& boxes):
+        //     m_boxes{std::forward<Vector>(boxes)}
+        // { }
 
-    //!Const iterator end
-    typename
-    std::vector<Box<T>>::const_iterator end() const
-    {
-        return mBoxes.end();
-    }
+        MultiBox(const std::vector<Box<T>>& boxes):
+            m_boxes{boxes}
+        {}
 
-    //!Operator overloading for comparison of two multibox objects
-    bool operator==(const MultiBox & other) const
-    {
-        for(auto box1 : this->mBoxes)
+        MultiBox(std::vector<Box<T>>&& boxes):
+            m_boxes{std::move(boxes)}
+        {}
+
+        // Element access
+
+        // Iterators
+        typename
+        std::vector<Box<T>>::iterator begin()
         {
-            for(auto box2 : other.mBoxes)
-            {
-                bool comparison = (box1.min_corner().x() == box2.min_corner().x()) &&
-                                  (box1.min_corner().y() == box2.min_corner().y()) &&
-                                  (box1.max_corner().x() == box2.max_corner().x()) &&
-                                  (box1.max_corner().y() == box2.max_corner().y());
-                if(!comparison) {
-                    return false;
-                }
-            }
+            return m_boxes.begin();
         }
 
-        return true;
-    }
+        typename
+        std::vector<Box<T>>::iterator end()
+        {
+            return m_boxes.end();
+        }
 
-    //!Operator overload for difference between two multibox objects
-    bool operator!=(const MultiBox<T> & other) const
-    {
-        return !(*this == other);
-    }
+        typename
+        std::vector<Box<T>>::const_iterator begin() const
+        {
+            return m_boxes.begin();
+        }
 
-    MultiBox<T> translate(Point<T> translationPoint)
-    {
-        std::vector<Box<T>> translatedBoxes;
-        translatedBoxes.reserve(mBoxes.size());
-//        for(auto box : mBoxes)
-//        {
-//            Box<T> translatedBox = geometry::translate(box, translationPoint);
-//            translatedBoxes.push_back(translatedBox);
-//        }
+        typename
+        std::vector<Box<T>>::const_iterator end() const
+        {
+            return m_boxes.end();
+        }
 
-        return MultiBox{translatedBoxes};
-    }
+        // Capacity
+        typename
+        std::vector<Box<T>>::size_type size() const noexcept
+        {
+            return m_boxes.size();
+        }
 
-private:
-    std::vector<Box<T>> mBoxes;
-};
+        // Modifiers
+        void push_back(const Box<T> & box)
+        {
+            m_boxes.push_back(box);
+        }
+
+        bool operator==(const MultiBox & other) const noexcept
+        {
+            for(auto box1 : m_boxes)
+            {
+                for(auto box2 : other.mBoxes)
+                {
+                    bool comparison = (box1.min_corner().x() == box2.min_corner().x()) &&
+                                      (box1.min_corner().y() == box2.min_corner().y()) &&
+                                      (box1.max_corner().x() == box2.max_corner().x()) &&
+                                      (box1.max_corner().y() == box2.max_corner().y());
+                    if(!comparison) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        bool operator!=(const MultiBox<T> & other) const noexcept
+        {
+            return !(*this == other);
+        }
+
+    private:
+        std::vector<Box<T>> m_boxes;
+    };
 }
 }
 

@@ -7,8 +7,6 @@ using namespace ophidian::placement;
 using namespace ophidian::circuit;
 using namespace ophidian::geometry;
 
-namespace
-{
 class StandardCellsFixture
 {
 public:
@@ -25,16 +23,12 @@ public:
 		pin2 = std_cells.add_pin("pin2", PinDirection::NA);
 	}
 };
-
-} // namespace
-  //
-
-
+//
 // TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]")
 // {
-//     Library library(std_cells);
+//     Library library{std_cells};
 //
-//     std::vector<Box> cell1Boxes = {Box(Point(0, 0), Point(10, 10))};
+//     std::vector<Box<int>> cell1Boxes = {Box<int>(Point<int>(0, 0), Point<int>(10, 10))};
 //     MultiBox cell1Geometry(cell1Boxes);
 //     library.geometry(cell1, cell1Geometry);
 //
@@ -46,7 +40,7 @@ public:
 //     REQUIRE(cell2Geometry == library.geometry(cell2));
 //     REQUIRE(library.geometry(cell1) != library.geometry(cell2));
 // }
-
+//
 // TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]")
 // {
 //     Library library(std_cells);

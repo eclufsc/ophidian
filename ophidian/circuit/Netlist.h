@@ -103,8 +103,8 @@ namespace circuit
         Netlist() = default;
 
         //! Delete coppy constructor
-        Netlist(const Netlist & nl) = delete;
-        Netlist & operator =(const Netlist & nl) = delete;
+        Netlist(const Netlist &) = delete;
+        Netlist & operator =(const Netlist &) = delete;
 
         //! Move Constructor
         Netlist(Netlist &&) = default;

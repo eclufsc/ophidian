@@ -1,0 +1,38 @@
+
+        //! Library Copy Constructor
+
+        /*!
+           \brief Constructs a placement library.
+         */
+
+        //! Cell geometry getter
+
+        /*!
+           \brief Gets the geometry of a cell.
+           \param cell Cell entity to get the geometry.
+           \return Geometry of the cell.
+         */
+
+        //! Cell geometry setter
+
+        /*!
+           \brief Set the geometry of a cell.
+           \param cell Cell entity to set the geometry.
+           \param geometry Gehmetry to assign to cell.
+         */
+
+        //! Pin offset getter
+
+        /*!
+           \brief Gets the offset of a pin.
+           \param pin Pin entity to get the offset.
+           \return Offset of the pin.
+         */
+
+        //! Pin offset setter
+
+        /*!
+           \brief Sets the offset of a pin.
+           \param pin Pin entity to set the offset.
+           \param offset Offset to assign to pin.
+         */
