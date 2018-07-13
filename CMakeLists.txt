@@ -22,7 +22,7 @@ project(ophidian)
 set(ophidian_VERSION 0.1)
 
 # Set c++14 globally
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})

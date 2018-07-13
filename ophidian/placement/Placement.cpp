@@ -17,7 +17,6 @@
  */
 
 #include "Placement.h"
-#include <ophidian/geometry/Operations.h>
 
 namespace ophidian
 {
@@ -63,13 +62,13 @@ namespace placement
         return mOutputLocations[output];
     }
 
-    geometry::MultiBox<util::database_unit_t> Placement::geometry(const circuit::CellInstance & cell) const
+    geometry::CellGeometry Placement::geometry(const circuit::CellInstance & cell) const
     {
         auto stdCell = mNetlist.std_cell(cell);
         auto stdCellGeometry = mLibrary.geometry(stdCell);
         auto location = cellLocation(cell);
 
-        geometry::MultiBox<util::database_unit_t> cellGeometry = geometry::translate(stdCellGeometry, location);
+        auto cellGeometry = geometry::translate(stdCellGeometry, location);
 
         return cellGeometry;
     }

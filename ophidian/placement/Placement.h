@@ -25,7 +25,7 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/placement/Library.h>
-#include <ophidian/geometry/MultiBox.h>
+#include <ophidian/geometry/CellGeometry.h>
 
 namespace ophidian
 {
@@ -54,7 +54,7 @@ namespace placement
 
         util::LocationDbu outputPadLocation(const circuit::Output & output) const;
 
-        geometry::MultiBox<util::database_unit_t> geometry(const circuit::CellInstance & cell) const;
+        geometry::CellGeometry geometry(const circuit::CellInstance & cell) const;
 
         util::LocationDbu location(const circuit::PinInstance &pin) const;
 

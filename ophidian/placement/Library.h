@@ -21,7 +21,7 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-#include <ophidian/geometry/MultiBox.h>
+#include <ophidian/geometry/CellGeometry.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/StandardCells.h>
 
@@ -38,7 +38,7 @@ namespace placement
 
         using std_cell_pin_type = circuit::StandardCells::pin_type;
 
-        using std_cell_geometry_type = geometry::MultiBox<util::database_unit_t>;
+        using std_cell_geometry_type = geometry::CellGeometry;
 
         // Constructors
         Library() = delete;

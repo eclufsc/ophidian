@@ -33,7 +33,7 @@ namespace placement
                 auto stdCell = stdCells.add_cell(macro.name());
                 auto layer2RectsM1 = macro.obstructions().find("metal1");
                 if(layer2RectsM1 != macro.obstructions().end()) {
-                    geometry::MultiBox<util::database_unit_t> geometry;
+                    auto geometry = geometry::CellGeometry{};
                     for(auto& rect : layer2RectsM1->second)
                     {
                         geometry::Point<util::database_unit_t> pmin =
@@ -58,7 +58,7 @@ namespace placement
                             macro.size().y() * lef.micrometer_to_dbu_ratio()
                         };
                     library.connect(stdCell,
-                        geometry::MultiBox<util::database_unit_t>{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
+                        geometry::CellGeometry{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
                 }
                 util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
 
