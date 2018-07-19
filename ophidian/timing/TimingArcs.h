@@ -198,9 +198,9 @@ public:
        \return An Cell => \p Value Map.
      */
     template <typename Value>
-    timing_arc_property_type<Value> makeProperty() const
+    timing_arc_property_type<Value> makeProperty(Value default_value = Value()) const
     {
-        return timing_arc_property_type<Value>(mArcs);
+        return timing_arc_property_type<Value>(mArcs, default_value);
     }
 
 private:

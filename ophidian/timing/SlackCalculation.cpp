@@ -33,7 +33,6 @@ EndPoints::EndPoints(const netlist_type & netlist,
     m_std_cells(std_cells),
     m_timing_library(timing_library)
 {
-    init();
 }
 
 void EndPoints::init()

@@ -89,8 +89,9 @@ TEST_CASE("RCTree: find resistor by two capacitors", "[timingdriven_placement][R
     auto res = tree.addResistor(capU, capV, ophidian::util::ohm_t(1.1));
     CHECK(tree.g().id(tree.resistor(capU, capV)) == tree.g().id(res));
     CHECK(tree.g().id(tree.resistor(capV, capU)) == tree.g().id(res));
-    CHECK(tree.resistor(capU, RCTree::capacitor_type()) == lemon::INVALID);
-    CHECK(tree.resistor(RCTree::capacitor_type(), capV) == lemon::INVALID);
+
+    CHECK(tree.resistor(capU, lemon::INVALID) == lemon::INVALID);
+    CHECK(tree.resistor(lemon::INVALID, capV) == lemon::INVALID);
 }
 
 TEST_CASE("RCTree: find opposite capacitor", "[timingdriven_placement][RCTree]")

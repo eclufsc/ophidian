@@ -137,9 +137,9 @@ namespace ophidian
    \return An Cell => \p Value Map.
  */
             template <typename Value>
-            entity_system::Property <Cell, Value> makeProperty(Cell) const
+            entity_system::Property <Cell, Value> makeProperty(Cell, Value default_value = Value()) const
             {
-                return entity_system::Property <Cell, Value>(mCells);
+                return entity_system::Property <Cell, Value>(mCells, default_value);
             }
 
 //! Get the Cell Notifier
@@ -250,9 +250,9 @@ namespace ophidian
    \return An Pin => \p Value Map.
  */
             template <typename Value>
-            entity_system::Property <Pin, Value> makeProperty(Pin) const
+            entity_system::Property <Pin, Value> makeProperty(Pin, Value default_value = Value()) const
             {
-                return entity_system::Property <Pin, Value>(mPins);
+                return entity_system::Property <Pin, Value>(mPins, default_value);
             }
 
 //! Get the Pin Notifier
@@ -372,9 +372,9 @@ namespace ophidian
    \return An Net => \p Value Map.
  */
             template <typename Value>
-            entity_system::Property <Net, Value> makeProperty(Net) const
+            entity_system::Property <Net, Value> makeProperty(Net, Value default_value = Value()) const
             {
-                return entity_system::Property <Net, Value>(mNets);
+                return entity_system::Property <Net, Value>(mNets, default_value);
             }
 
 //! Get the Net Notifier
@@ -496,9 +496,9 @@ namespace ophidian
                \return An Input => \p Value Map.
              */
             template <typename Value>
-            entity_system::Property <Input, Value> makeProperty(Input) const
+            entity_system::Property <Input, Value> makeProperty(Input, Value default_value = Value()) const
             {
-                return entity_system::Property <Input, Value>(mInputs);
+                return entity_system::Property <Input, Value>(mInputs, default_value);
             }
 
             //! Get the Input Notifier
@@ -569,9 +569,9 @@ namespace ophidian
                \return An Output => \p Value Map.
              */
             template <typename Value>
-            entity_system::Property <Output, Value> makeProperty(Output) const
+            entity_system::Property <Output, Value> makeProperty(Output, Value default_value = Value()) const
             {
-                return entity_system::Property <Output, Value>(mOutputs);
+                return entity_system::Property <Output, Value>(mOutputs, default_value);
             }
 
             //! Get the Output Notifier

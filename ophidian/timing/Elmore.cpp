@@ -7,9 +7,9 @@ namespace timing
 
 Elmore::Elmore(const rctree_type & tree) :
     m_tree(tree),
-    m_elmore_delay(tree.g()),
-    m_downstream_capacitance(tree.g()),
-    m_pred(tree.g()),
+    m_elmore_delay(tree.g(), time_unit_type(0)),
+    m_downstream_capacitance(tree.g(), capacitance_unit_type(0)),
+    m_pred(tree.g(), std::make_pair(lemon::INVALID, lemon::INVALID)),
     m_source(tree.source())
 {
     std::deque<capacitor_type> toProcess;

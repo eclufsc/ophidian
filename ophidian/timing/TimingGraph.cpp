@@ -10,8 +10,8 @@ TimingGraph::TimingGraph(const netlist_type & netlist) :
     mNodeProperties(mGraph),
     mArcs(mGraph, Arc()),
     mArcProperties(mGraph),
-    mRiseNodes(netlist.makeProperty<node_type>(pin_entity_type())),
-    mFallNodes(netlist.makeProperty<node_type>(pin_entity_type()))
+    mRiseNodes(netlist.makeProperty<node_type>(pin_entity_type(), lemon::INVALID)),
+    mFallNodes(netlist.makeProperty<node_type>(pin_entity_type(), lemon::INVALID))
 {
 
 }
@@ -39,29 +39,10 @@ size_t TimingGraph::size(arc_type) const
 
 TimingGraph::node_type TimingGraph::nodeCreate(const pin_entity_type & pin, const NodeProperty & prop, pin_entity_to_node_property_type & map)
 {
-//    node_type newNode;
-
-//    if (mGraph.valid(map[pin]))
-//        if (mPins[map[pin]] == pin)
-//            newNode = map[pin];
-//        else
-//            newNode = mGraph.addNode();
-//    else
-//        newNode = mGraph.addNode();
-
-//    map[pin] = newNode;
-//    mPins[newNode] = pin;
-//    mNodeProperties[newNode] = prop;
-
-
-    // Algorithm uses more than one node per pin?
-    // It changes the source of the input arcs of the circuit.
-    // You need to create tests to see if it works correctly.
     node_type newNode = mGraph.addNode();
 
-    // Overrides the node only if the map does not have a valid associated pin or first node on graph.
-    if (mGraph.id(map[pin]) >= size(node_type()) || mGraph.id(map[pin]) < 0) {
-            map[pin] = newNode;
+    if (map[pin] == lemon::INVALID) {
+        map[pin] = newNode;
     }
 
     mPins[newNode] = pin;

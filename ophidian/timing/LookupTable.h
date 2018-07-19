@@ -69,9 +69,7 @@ public:
                 return m_values.front().front();
 
         RowType y1, y2;
-        auto wLoad = RowType(0) / RowType(1);
         ColumnType x1, x2;
-        auto wTransition = ColumnType(0) / ColumnType(1);
         ValueType t[2][2];
         std::size_t row1, row2, column1, column2;
 
@@ -113,8 +111,8 @@ public:
         }
 
         //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
-        wTransition = (cv - x1) / (x2 - x1);
-        wLoad = (rv - y1) / (y2 - y1);
+        auto wTransition = (cv - x1) / (x2 - x1);
+        auto wLoad = (rv - y1) / (y2 - y1);
 
         t[0][0] = m_values[row1][column1];
         t[0][1] = m_values[row1][column2];

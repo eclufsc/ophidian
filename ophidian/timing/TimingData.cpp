@@ -25,12 +25,12 @@ namespace timing
 {
     TimingData::TimingData(const timing_library_type& lib, const timing_graph_type& graph) :
         m_library(lib),
-        m_node_arrivals(graph.graph()),
-        m_node_slews(graph.graph()),
-        m_node_requireds(graph.graph()),
-        m_node_loads(graph.graph()),
-        m_arc_delays(graph.graph()),
-        m_arc_slews(graph.graph())
+        m_node_arrivals(graph.graph(), time_unit_type(0)),
+        m_node_slews(graph.graph(), time_unit_type(0)),
+        m_node_requireds(graph.graph(), time_unit_type(0)),
+        m_node_loads(graph.graph(), capacitance_unit_type(0)),
+        m_arc_delays(graph.graph(), time_unit_type(0)),
+        m_arc_slews(graph.graph(), time_unit_type(0))
     {
     }
 

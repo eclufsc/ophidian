@@ -52,8 +52,8 @@ void StaticTimingAnalysis::init(const liberty_type& early, const liberty_type& l
     m_late_lib.init(late, false);
     TimingGraphBuilder().build(m_topology.m_netlist, m_topology.m_std_cells, m_topology.m_library_mapping, m_timing_arcs, m_early_lib, dc, m_timing_graph);
     m_topology.init();
-    m_early_sta.init(dc);
     m_late_sta.init(dc);
+    m_early_sta.init(dc);
     m_endpoints.init();
 
     timingdriven_placement::FluteRCTreeBuilder builder;
@@ -61,17 +61,15 @@ void StaticTimingAnalysis::init(const liberty_type& early, const liberty_type& l
     for (auto it = m_topology.m_netlist.begin(circuit::Net()); it != m_topology.m_netlist.end(circuit::Net()); ++it)
     {
         circuit::Pin source;
-        const circuit::Net & net = *it;
-        timingdriven_placement::RCTree & rctree = m_rc_trees[net];
 
-        for (auto pin : m_topology.m_netlist.pins(net))
+        for (auto pin : m_topology.m_netlist.pins(*it))
             if (m_topology.m_std_cells.direction(m_topology.m_library_mapping.pinStdCell(pin)) == standard_cell::PinDirection::OUTPUT)
             {
                 source = pin;
                 break;
             }
 
-        builder.build(m_placement, m_placement_mapping, m_topology.m_library_mapping, m_topology.m_netlist, m_early_lib, lef, net, rctree, source);
+        builder.build(m_placement, m_placement_mapping, m_topology.m_library_mapping, m_topology.m_netlist, m_early_lib, lef, *it, m_rc_trees[*it], source);
     }
 
     update_timing();

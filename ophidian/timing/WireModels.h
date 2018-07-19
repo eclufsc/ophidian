@@ -62,11 +62,11 @@ public:
     capacitance_unit_type simulate(const SlewCalculator & slew_calculator, rctree_type& tree)
     {
         if(!m_slews)
-            m_slews = new slew_map_type(tree.g());
+            m_slews = new slew_map_type(tree.g(), slew_unit_type(0));
         if(!m_delays)
-            m_delays = new slew_map_type(tree.g());
+            m_delays = new slew_map_type(tree.g(), slew_unit_type(0));
         if(!m_ceff)
-            m_ceff = new capacitance_map_type(tree.g());
+            m_ceff = new capacitance_map_type(tree.g(), capacitance_unit_type(0));
 
         slew_map_type&        slews  = *m_slews;
         slew_map_type&        delays = *m_delays;
@@ -155,17 +155,17 @@ public:
     capacitance_unit_type simulate(const SlewCalculator & slew_calculator, const rctree_type& tree)
     {
         if(!m_slews)
-            m_slews = new slew_map_type(tree.g());
+            m_slews = new slew_map_type(tree.g(), slew_unit_type(0));
         if(!m_delays)
-            m_delays = new slew_map_type(tree.g());
+            m_delays = new slew_map_type(tree.g(), slew_unit_type(0));
         if(!m_ceff)
-            m_ceff = new capacitance_map_type(tree.g());
+            m_ceff = new capacitance_map_type(tree.g(), capacitance_unit_type(0));
 
         slew_map_type&        slews  = *m_slews;
         slew_map_type&        delays = *m_delays;
         capacitance_map_type& ceff   = *m_ceff;
 
-        capacitance_unit_type lumped;
+        capacitance_unit_type lumped(0);
         for(rctree_type::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
             lumped += tree.capacitance(it);
 
@@ -174,11 +174,11 @@ public:
         Elmore delay(tree);
         ElmoreSecondMoment second_moment(delay);
 
-        for(rctree_type::graph_type::NodeIt it(tree.g()); it != lemon::INVALID; ++it)
+        for(auto it = delay.order().cbegin(); it != delay.order().cend(); ++it)
         {
-            delays[it] = delay.at(it);
-            auto step_slew = units::math::sqrt(second_moment.at(it) * 2.0 - units::math::pow<2>(delay.at(it)));
-            slews[it] = units::math::sqrt(units::math::pow<2>(source_slew) + units::math::pow<2>(step_slew));
+            delays[*it] = delay.at(*it);
+            auto step_slew = units::math::sqrt(second_moment.at(*it) * 2.0 - units::math::pow<2>(delay.at(*it)));
+            slews[*it] = units::math::sqrt(units::math::pow<2>(source_slew) + units::math::pow<2>(step_slew));
         }
 
         return lumped;
