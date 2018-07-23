@@ -19,7 +19,53 @@
 #include "CellGeometry.h"
 
 namespace ophidian::geometry {
+
+    CellGeometry::CellGeometry(const CellGeometry::box_container_type& boxes):
+        m_boxes{boxes}
+    {}
+
+    CellGeometry::CellGeometry(CellGeometry::box_container_type&& boxes):
+        m_boxes{std::move(boxes)}
+    {}
+
+    // Iterators
+    CellGeometry::box_container_type::iterator CellGeometry::begin()
+    {
+        return m_boxes.begin();
+    }
+
+    CellGeometry::box_container_type::iterator CellGeometry::end()
+    {
+        return m_boxes.end();
+    }
+
+    CellGeometry::box_container_type::const_iterator CellGeometry::begin() const
+    {
+        return m_boxes.begin();
+    }
+
+    CellGeometry::box_container_type::const_iterator CellGeometry::end() const
+    {
+        return m_boxes.end();
+    }
+
+    // Capacity
+    CellGeometry::box_container_type::size_type CellGeometry::size() const noexcept
+    {
+        return m_boxes.size();
+    }
     
+    // Modifiers
+    void CellGeometry::push_back(const CellGeometry::box_type & box)
+    {
+        m_boxes.push_back(box);
+    }
+
+    void CellGeometry::push_back(CellGeometry::box_type && box)
+    {
+        m_boxes.push_back(std::move(box));
+    }
+
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept
     {
         auto translated_boxes = CellGeometry::box_container_type{};

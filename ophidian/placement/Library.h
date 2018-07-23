@@ -32,6 +32,8 @@ namespace placement
     class Library
     {
     public:
+        using unit_type = util::database_unit_t;
+
         using offset_type = util::LocationDbu;
 
         using std_cell_type = circuit::StandardCells::cell_type;

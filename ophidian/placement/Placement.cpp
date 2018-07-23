@@ -31,10 +31,6 @@ namespace placement
     {
     }
 
-    Placement::~Placement()
-    {
-    }
-
     void Placement::placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location)
     {
         mCellLocations[cell] = location;

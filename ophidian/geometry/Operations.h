@@ -23,7 +23,6 @@
 
 #include "Models.h"
 
-
 namespace ophidian
 {
 namespace geometry

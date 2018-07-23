@@ -35,9 +35,16 @@ namespace placement
     {
     public:
 
-        Placement(const circuit::Netlist & netlist, const Library & library);
+        // Constructors
+        Placement() = delete;
 
-        ~Placement();
+        Placement(const Placement&) = default;
+        Placement& operator=(const Placement&) = default;
+
+        Placement(Placement&&) = default;
+        Placement& operator=(Placement&&) = default;
+
+        Placement(const circuit::Netlist & netlist, const Library & library);
 
         void placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location);
 

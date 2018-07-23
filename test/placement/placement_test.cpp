@@ -7,41 +7,39 @@
 using namespace ophidian::placement;
 using namespace ophidian::circuit;
 
-// namespace {
-// class NetlistFixture {
-// public:
-//     Cell cell1, cell2;
-//
-//     Pin pin1, pin2, pin3, pin4;
-//
-//     Input input1, input2;
-//
-//     Output output1, output2;
-//
-//     Netlist netlist;
-//
-//     NetlistFixture() {
-//         cell1 = netlist.add(Cell(), "cell1");
-//         cell2 = netlist.add(Cell(), "cell2");
-//
-//         pin1 = netlist.add(Pin(), "pin1");
-//         pin2 = netlist.add(Pin(), "pin2");
-//         pin3 = netlist.add(Pin(), "pin3");
-//         pin4 = netlist.add(Pin(), "pin4");
-//
-//         input1 = netlist.add(Input(), pin1);
-//         input2 = netlist.add(Input(), pin2);
-//
-//         output1 = netlist.add(Output(), pin3);
-//         output2 = netlist.add(Output(), pin4);
-//     }
-// };
-// }
-//
+class NetlistFixture {
+public:
+    CellInstance cell1, cell2;
+
+    PinInstance pin1, pin2, pin3, pin4;
+
+    Input input1, input2;
+
+    Output output1, output2;
+
+    Netlist netlist;
+
+    NetlistFixture() {
+        cell1 = netlist.add_cell_instance("cell1");
+        cell2 = netlist.add_cell_instance("cell2");
+
+        pin1 = netlist.add_pin_instance("pin1");
+        pin2 = netlist.add_pin_instance("pin2");
+        pin3 = netlist.add_pin_instance("pin3");
+        pin4 = netlist.add_pin_instance("pin4");
+
+        input1 = netlist.add_input_pad(pin1);
+        input2 = netlist.add_input_pad(pin2);
+
+        output1 = netlist.add_output_pad(pin3);
+        output2 = netlist.add_output_pad(pin4);
+    }
+};
+
 // TEST_CASE_METHOD(NetlistFixture, "Placement: placing a cell", "[placement]") {
-//     Placement placement(netlist);
+//     auto placement = Placement{netlist};
 //
-//     ophidian::util::LocationDbu cell1Location(10, 20);
+//     auto cell1Location = ophidian::util::LocationDbu(10, 20);
 //     placement.placeCell(cell1, cell1Location);
 //
 //     ophidian::util::LocationDbu cell2Location(20, 10);

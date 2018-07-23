@@ -23,35 +23,60 @@ public:
 		pin2 = std_cells.add_pin("pin2", PinDirection::NA);
 	}
 };
-//
-// TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]")
-// {
-//     Library library{std_cells};
-//
-//     std::vector<Box<int>> cell1Boxes = {Box<int>(Point<int>(0, 0), Point<int>(10, 10))};
-//     MultiBox cell1Geometry(cell1Boxes);
-//     library.geometry(cell1, cell1Geometry);
-//
-//     std::vector<Box> cell2Boxes = {Box(Point(0, 0), Point(20, 10))};
-//     MultiBox cell2Geometry(cell2Boxes);
-//     library.geometry(cell2, cell2Geometry);
-//
-//     REQUIRE(cell1Geometry == library.geometry(cell1));
-//     REQUIRE(cell2Geometry == library.geometry(cell2));
-//     REQUIRE(library.geometry(cell1) != library.geometry(cell2));
-// }
-//
-// TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]")
-// {
-//     Library library(std_cells);
-//
-//     ophidian::util::LocationDbu pin1Offset(5, 5);
-//     library.pinOffset(pin1, pin1Offset);
-//
-//     ophidian::util::LocationDbu pin2Offset(3, 3);
-//     library.pinOffset(pin2, pin2Offset);
-//
-//     REQUIRE(pin1Offset == library.pinOffset(pin1));
-//     REQUIRE(pin2Offset == library.pinOffset(pin2));
-//     REQUIRE(library.pinOffset(pin1) != library.pinOffset(pin2));
-// }
+
+TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]")
+{
+    auto library = Library{std_cells};
+
+    auto cell1Boxes = CellGeometry::box_container_type{
+        {
+            {CellGeometry::unit_type{0}, CellGeometry::unit_type{0}},
+            {CellGeometry::unit_type{10}, CellGeometry::unit_type{10}}
+        }
+    };
+
+    auto cell1Geometry = CellGeometry{std::move(cell1Boxes)};
+
+    library.connect(cell1, cell1Geometry);
+
+    auto cell2Boxes = CellGeometry::box_container_type{
+        {
+            {CellGeometry::unit_type{0}, CellGeometry::unit_type{0}},
+            {CellGeometry::unit_type{20}, CellGeometry::unit_type{10}}
+        }
+    };
+
+    auto cell2Geometry = CellGeometry{std::move(cell2Boxes)};
+
+    library.connect(cell2, cell2Geometry);
+
+    REQUIRE(cell1Geometry == library.geometry(cell1));
+    REQUIRE(cell2Geometry == library.geometry(cell2));
+    REQUIRE(library.geometry(cell1) != library.geometry(cell2));
+}
+
+TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[placement][library]")
+{
+    auto library = Library{std_cells};
+
+    auto pin1Offset = Library::offset_type{
+        Library::unit_type{5},
+        Library::unit_type{5}
+    };
+
+    library.connect(pin1, pin1Offset);
+
+    auto pin2Offset = Library::offset_type{
+        Library::unit_type{3},
+        Library::unit_type{3}
+    };
+
+    library.connect(pin2, pin2Offset);
+
+    REQUIRE(pin1Offset.x() == library.offset(pin1).x());
+    REQUIRE(pin1Offset.y() == library.offset(pin1).y());
+    REQUIRE(pin2Offset.x() == library.offset(pin2).x());
+    REQUIRE(pin2Offset.y() == library.offset(pin2).y());
+    REQUIRE(library.offset(pin1).x() != library.offset(pin2).x());
+    REQUIRE(library.offset(pin1).y() != library.offset(pin2).y());
+}

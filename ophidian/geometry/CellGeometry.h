@@ -45,53 +45,28 @@ namespace geometry {
         CellGeometry(CellGeometry &&) = default;
         CellGeometry& operator= ( CellGeometry && ) = default;
 
-        CellGeometry(const box_container_type& boxes):
-            m_boxes{boxes}
-        {}
+        CellGeometry(const box_container_type& boxes);
 
-        CellGeometry(box_container_type&& boxes):
-            m_boxes{std::move(boxes)}
-        {}
+        CellGeometry(box_container_type&& boxes);
 
         // Element access
 
         // Iterators
-        box_container_type::iterator begin()
-        {
-            return m_boxes.begin();
-        }
+        box_container_type::iterator begin();
 
-        box_container_type::iterator end()
-        {
-            return m_boxes.end();
-        }
+        box_container_type::iterator end();
 
-        box_container_type::const_iterator begin() const
-        {
-            return m_boxes.begin();
-        }
+        box_container_type::const_iterator begin() const;
 
-        box_container_type::const_iterator end() const
-        {
-            return m_boxes.end();
-        }
+        box_container_type::const_iterator end() const;
 
         // Capacity
-        box_container_type::size_type size() const noexcept
-        {
-            return m_boxes.size();
-        }
+        box_container_type::size_type size() const noexcept;
 
         // Modifiers
-        void push_back(const box_type & box)
-        {
-            m_boxes.push_back(box);
-        }
+        void push_back(const box_type & box);
 
-        void push_back(box_type && box)
-        {
-            m_boxes.push_back(std::move(box));
-        }
+        void push_back(box_type && box);
 
         bool operator==(const CellGeometry & other) const noexcept
         {
