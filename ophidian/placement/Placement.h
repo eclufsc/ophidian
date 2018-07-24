@@ -34,6 +34,19 @@ namespace placement
     class Placement
     {
     public:
+        using unit_type = util::database_unit_t;
+
+        using point_type = util::LocationDbu;
+
+        using cell_type = circuit::Netlist::cell_instance_type;
+
+        using pin_type = circuit::Netlist::pin_instance_type;
+
+        using input_pad_type = circuit::Netlist::input_pad_type;
+
+        using output_pad_type = circuit::Netlist::output_pad_type;
+
+        using cell_geometry_type = geometry::CellGeometry;
 
         // Constructors
         Placement() = delete;
@@ -46,32 +59,35 @@ namespace placement
 
         Placement(const circuit::Netlist & netlist, const Library & library);
 
-        void placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location);
+        // Element access
+        const point_type& location(const cell_type& cell) const;
 
-        util::LocationDbu cellLocation(const circuit::CellInstance & cell) const
-        {
-            return mCellLocations[cell];
-        }
+        point_type location(const pin_type& pin) const;
 
-        void placeInputPad(const circuit::Input & input, const util::LocationDbu & location);
+        const point_type& location(const input_pad_type& input) const;
 
-        util::LocationDbu inputPadLocation(const circuit::Input & input) const;
+        const point_type& location(const output_pad_type& output) const;
 
-        void placeOutputPad(const circuit::Output & output, const util::LocationDbu & location);
+        cell_geometry_type geometry(const cell_type& cell) const;
 
-        util::LocationDbu outputPadLocation(const circuit::Output & output) const;
+        // Iterators
 
-        geometry::CellGeometry geometry(const circuit::CellInstance & cell) const;
+        // Capacity
 
-        util::LocationDbu location(const circuit::PinInstance &pin) const;
+        // Modifiers
+        void place(const cell_type& cell, const point_type& location);
+
+        void place(const input_pad_type& input, const point_type & location);
+
+        void place(const output_pad_type& output, const point_type & location);
 
     private:
         const circuit::Netlist & mNetlist;
         const Library & mLibrary;
 
-        entity_system::Property<circuit::CellInstance, util::LocationDbu>   mCellLocations;
-        entity_system::Property<circuit::Input, util::LocationDbu>  mInputLocations;
-        entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
+        entity_system::Property<cell_type, point_type>   mCellLocations;
+        entity_system::Property<input_pad_type, point_type>  mInputLocations;
+        entity_system::Property<output_pad_type, point_type> mOutputLocations;
     };
 }     //namespace placement
 }     //namespace ophidian

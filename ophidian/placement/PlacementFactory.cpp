@@ -31,7 +31,7 @@ namespace placement
             for(auto & component : def.components())
             {
                 auto& cell = netlist.add_cell_instance(component.name());
-                placement.placeCell(cell, component.position());
+                placement.place(cell, component.position());
             }
 
             return placement;

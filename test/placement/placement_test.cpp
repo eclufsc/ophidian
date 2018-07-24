@@ -18,6 +18,7 @@ public:
     Output output1, output2;
 
     Netlist netlist;
+    Library library{StandardCells{}};
 
     NetlistFixture() {
         cell1 = netlist.add_cell_instance("cell1");
@@ -36,46 +37,85 @@ public:
     }
 };
 
-// TEST_CASE_METHOD(NetlistFixture, "Placement: placing a cell", "[placement]") {
-//     auto placement = Placement{netlist};
-//
-//     auto cell1Location = ophidian::util::LocationDbu(10, 20);
-//     placement.placeCell(cell1, cell1Location);
-//
-//     ophidian::util::LocationDbu cell2Location(20, 10);
-//     placement.placeCell(cell2, cell2Location);
-//
-//     ophidian::util::LocationDbu placedCell1Location = placement.cellLocation(cell1);
-//     ophidian::util::LocationDbu placedCell2Location = placement.cellLocation(cell2);
-//     REQUIRE(cell1Location == placedCell1Location);
-//     REQUIRE(cell2Location == placedCell2Location);
-//     REQUIRE(!(placedCell1Location == placedCell2Location));
-// }
-//
-// TEST_CASE_METHOD(NetlistFixture, "Placement: placing an input pad", "[placement]") {
-//     Placement placement(netlist);
-//
-//     ophidian::util::LocationDbu input1Location(10, 20);
-//     placement.placeInputPad(input1, input1Location);
-//
-//     ophidian::util::LocationDbu input2Location(20, 10);
-//     placement.placeInputPad(input2, input2Location);
-//
-//     REQUIRE(placement.inputPadLocation(input1) == input1Location);
-//     REQUIRE(placement.inputPadLocation(input2) == input2Location);
-//     REQUIRE(placement.inputPadLocation(input1) != placement.inputPadLocation(input2));
-// }
-//
-// TEST_CASE_METHOD(NetlistFixture, "Placement: placing an output pad", "[placement]") {
-//     Placement placement(netlist);
-//
-//     ophidian::util::LocationDbu output1Location(10, 20);
-//     placement.placeOutputPad(output1, output1Location);
-//
-//     ophidian::util::LocationDbu output2Location(20, 10);
-//     placement.placeOutputPad(output2, output2Location);
-//
-//     REQUIRE(placement.outputPadLocation(output1) == output1Location);
-//     REQUIRE(placement.outputPadLocation(output2) == output2Location);
-//     REQUIRE(placement.outputPadLocation(output1) != placement.outputPadLocation(output2));
-// }
+TEST_CASE_METHOD(NetlistFixture, "Placement: placing a cell", "[placement]") {
+    auto placement = Placement{netlist, library};
+
+    auto cell1_location = Placement::point_type{
+        Placement::unit_type{10},
+        Placement::unit_type{20}
+    };
+
+    placement.place(cell1, cell1_location);
+
+    auto placed_cell1_location = placement.location(cell1);
+
+    REQUIRE(cell1_location.x() == placed_cell1_location.x());
+    REQUIRE(cell1_location.y() == placed_cell1_location.y());
+
+    auto cell2_location = Placement::point_type{
+        Placement::unit_type{5},
+        Placement::unit_type{15}
+    };
+    placement.place(cell2, cell2_location);
+
+    auto placed_cell2_location = placement.location(cell2);
+
+    REQUIRE(cell2_location.x() == placed_cell2_location.x());
+    REQUIRE(cell2_location.y() == placed_cell2_location.y());
+
+    REQUIRE(placed_cell1_location.x() != placed_cell2_location.x());
+    REQUIRE(placed_cell1_location.y() != placed_cell2_location.y());
+}
+
+TEST_CASE_METHOD(NetlistFixture, "Placement: placing an input pad", "[placement]") {
+    auto placement = Placement{netlist, library};
+
+    auto input1Location = Placement::point_type{
+        Placement::unit_type{10},
+        Placement::unit_type{20}
+    };
+    placement.place(input1, input1Location);
+
+    REQUIRE(placement.location(input1).x() == input1Location.x());
+    REQUIRE(placement.location(input1).y() == input1Location.y());
+
+    auto input2Location = Placement::point_type{
+        Placement::unit_type{5},
+        Placement::unit_type{15}
+    };
+
+    placement.place(input2, input2Location);
+
+    REQUIRE(placement.location(input2).x() == input2Location.x());
+    REQUIRE(placement.location(input2).y() == input2Location.y());
+
+    REQUIRE(placement.location(input1).x() != placement.location(input2).x());
+    REQUIRE(placement.location(input1).y() != placement.location(input2).y());
+}
+
+TEST_CASE_METHOD(NetlistFixture, "Placement: placing an output pad", "[placement]") {
+    auto placement = Placement{netlist, library};
+
+    auto output1Location = Placement::point_type{
+        Placement::unit_type{10},
+        Placement::unit_type{20}
+    };
+
+    placement.place(output1, output1Location);
+
+    REQUIRE(placement.location(output1).x() == output1Location.x());
+    REQUIRE(placement.location(output1).y() == output1Location.y());
+
+    auto output2Location = Placement::point_type{
+        Placement::unit_type{5},
+        Placement::unit_type{15}
+    };
+
+    placement.place(output2, output2Location);
+
+    REQUIRE(placement.location(output2).x() == output2Location.x());
+    REQUIRE(placement.location(output2).y() == output2Location.y());
+
+    REQUIRE(placement.location(output1).x() != placement.location(output2).x());
+    REQUIRE(placement.location(output1).y() != placement.location(output2).y());
+}

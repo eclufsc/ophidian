@@ -31,55 +31,63 @@ namespace placement
     {
     }
 
-    void Placement::placeCell(const circuit::CellInstance & cell, const util::LocationDbu & location)
+    // Element access
+    const Placement::point_type& Placement::location(const Placement::cell_type& cell) const
     {
-        mCellLocations[cell] = location;
+        return mCellLocations[cell];
     }
 
-    void Placement::placeInputPad(const circuit::Input & input, const util::LocationDbu & location)
+    Placement::point_type Placement::location(const Placement::pin_type& pin) const
     {
-        mInputLocations[input] = location;
+        auto stdCellPin = mNetlist.std_cell_pin(pin);
+        auto pinOwner = mNetlist.cell(pin);
+        auto cell_location = location(pinOwner);
+        auto pinOffset = mLibrary.offset(stdCellPin);
+
+        auto pin_location = Placement::point_type{
+            cell_location.x() + pinOffset.x(),
+            cell_location.y() + pinOffset.y()
+        };
+
+        return pin_location;
     }
 
-    util::LocationDbu Placement::inputPadLocation(const circuit::Input & input) const
+    const Placement::point_type& Placement::location(const Placement::input_pad_type& input) const
     {
         return mInputLocations[input];
     }
 
-    void Placement::placeOutputPad(
-        const circuit::Output & output,
-        const util::LocationDbu & location)
-    {
-        mOutputLocations[output] = location;
-    }
-
-    util::LocationDbu Placement::outputPadLocation(const circuit::Output & output) const
+    const Placement::point_type& Placement::location(const Placement::output_pad_type& output) const
     {
         return mOutputLocations[output];
     }
 
-    geometry::CellGeometry Placement::geometry(const circuit::CellInstance & cell) const
+
+    Placement::cell_geometry_type Placement::geometry(const Placement::cell_type& cell) const
     {
         auto stdCell = mNetlist.std_cell(cell);
         auto stdCellGeometry = mLibrary.geometry(stdCell);
-        auto location = cellLocation(cell);
+        auto cell_location = location(cell);
 
-        auto cellGeometry = geometry::translate(stdCellGeometry, location);
+        auto cellGeometry = geometry::translate(stdCellGeometry, cell_location);
 
         return cellGeometry;
     }
 
-    util::LocationDbu Placement::location(const circuit::PinInstance & pin) const
+    // Modifiers
+    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
     {
-        auto stdCellPin = mNetlist.std_cell_pin(pin);
-        auto pinOwner = mNetlist.cell(pin);
-        auto location = cellLocation(pinOwner);
-        auto pinOffset = mLibrary.offset(stdCellPin);
+        mCellLocations[cell] = location;
+    }
 
-        util::LocationDbu pinLocation(location.x() + pinOffset.x(),
-            location.y() + pinOffset.y());
+    void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
+    {
+        mInputLocations[input] = location;
+    }
 
-        return pinLocation;
+    void Placement::place(const Placement::output_pad_type& output, const Placement::point_type & location)
+    {
+        mOutputLocations[output] = location;
     }
 }     //namespace placement
 }     //namespace ophidian
