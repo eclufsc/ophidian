@@ -23,22 +23,23 @@ TEST_CASE("Design: testing netlist.", "[design]")
 
 TEST_CASE("Design: testing floorplan.", "[design]")
 {
-	REQUIRE(design.floorplan().chipOrigin().x() == dbu_t{0.0});
-	REQUIRE(design.floorplan().chipOrigin().y() == dbu_t{0.0});
-	REQUIRE(design.floorplan().chipUpperRightCorner().x() == dbu_t{0.0});
-	REQUIRE(design.floorplan().chipUpperRightCorner().y() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chip_origin().x() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chip_origin().y() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chip_upper_right_corner().x() == dbu_t{0.0});
+	REQUIRE(design.floorplan().chip_upper_right_corner().y() == dbu_t{0.0});
 	REQUIRE(design.floorplan().sitesRange().empty());
 	REQUIRE(design.floorplan().rowsRange().empty());
 
 	auto origin = ophidian::util::LocationDbu{dbu_t{2.0}, dbu_t{3.0}};
 	auto boundaries = ophidian::util::LocationDbu{dbu_t{4000.0}, dbu_t{3000.0}};
 
-	design.floorplan().chipOrigin(origin);
-	design.floorplan().chipUpperRightCorner(boundaries);
-	REQUIRE(design.floorplan().chipOrigin().x() == dbu_t{2.0});
-	REQUIRE(design.floorplan().chipOrigin().y() == dbu_t{3.0});
-	REQUIRE(design.floorplan().chipUpperRightCorner().x() == dbu_t{4000.0});
-	REQUIRE(design.floorplan().chipUpperRightCorner().y() == dbu_t{3000.0});
+	design.floorplan().chip_origin() = origin;
+	design.floorplan().chip_upper_right_corner() = boundaries;
+
+	REQUIRE(design.floorplan().chip_origin().x() == dbu_t{2.0});
+	REQUIRE(design.floorplan().chip_origin().y() == dbu_t{3.0});
+	REQUIRE(design.floorplan().chip_upper_right_corner().x() == dbu_t{4000.0});
+	REQUIRE(design.floorplan().chip_upper_right_corner().y() == dbu_t{3000.0});
 
 }
 

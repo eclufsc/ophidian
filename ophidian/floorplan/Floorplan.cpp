@@ -23,6 +23,84 @@ namespace ophidian
 {
 namespace floorplan
 {
+    // Element access
+    util::LocationDbu Floorplan::origin(const Row & row) const
+    {
+        return mOrigins[row];
+    }
+
+    util::LocationDbu& Floorplan::chip_upper_right_corner() noexcept
+    {
+        return mChipUpperRightCorner;
+    }
+
+    const util::LocationDbu& Floorplan::chip_upper_right_corner() const noexcept
+    {
+        return mChipUpperRightCorner;
+    }
+
+    util::LocationDbu& Floorplan::chip_origin() noexcept
+    {
+        return mChipOrigin;
+    }
+
+    const util::LocationDbu& Floorplan::chip_origin() const noexcept
+    {
+        return mChipOrigin;
+    }
+
+    std::string& Floorplan::name(const Site & site)
+    {
+        return mNames[site];
+    }
+
+    const std::string& Floorplan::name(const Site & site) const
+    {
+        return mNames[site];
+    }
+
+    util::LocationDbu& Floorplan::site_upper_right_corner(const Site & site)
+    {
+        return mDimensions[site];
+    }
+
+    const util::LocationDbu& Floorplan::site_upper_right_corner(const Site & site) const
+    {
+        return mDimensions[site];
+    }
+
+    Site Floorplan::find(const std::string& siteName) const
+    {
+        return mName2Site.at(siteName);
+    }
+
+    util::database_unit_scalar_t& Floorplan::number_of_sites(const Row & row)
+    {
+        return mNumberOfSites[row];
+    }
+
+    const util::database_unit_scalar_t& Floorplan::number_of_sites(const Row & row) const
+    {
+        return mNumberOfSites[row];
+    }
+
+    Site Floorplan::site(const Row & row) const
+    {
+        return mSiteTypeOfRow[row];
+    }
+
+    util::LocationDbu Floorplan::row_upper_right_corner(const Row & row) const
+    {
+        auto site = mSiteTypeOfRow[row];
+
+        util::database_unit_scalar_t numSites = mNumberOfSites[row];
+
+        util::LocationDbu uRCorner = mDimensions[site];
+
+        return util::LocationDbu{uRCorner.x() * numSites, uRCorner.y()};
+    }
+
+    // Iterators
     void Floorplan::chipOrigin(const util::LocationDbu & loc)
     {
         mChipOrigin = loc;
@@ -70,15 +148,5 @@ namespace floorplan
         mRows.erase(row);
     }
 
-    util::LocationDbu Floorplan::rowUpperRightCorner(const Row & row) const
-    {
-        auto site = mSiteTypeOfRow[row];
-
-        util::database_unit_scalar_t numSites = mNumberOfSites[row];
-
-        util::LocationDbu uRCorner = mDimensions[site];
-
-        return util::LocationDbu{uRCorner.x() * numSites, uRCorner.y()};
-    }
 }     //namespace floorplan
 }     //namespace ophidian
