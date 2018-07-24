@@ -29,6 +29,7 @@ under the License.
 
 using namespace ophidian;
 
+using capacitance_type = timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic>::capacitance_unit_type;
 using slew_type = timing::GenericSTA<timing::wiremodel::LumpedCapacitance, timing::Optimistic>::slew_unit_type;
 
 namespace
@@ -165,6 +166,19 @@ TEST_CASE_METHOD(GenericSTAFixture, "GenericSTA: generals tests", "[timing][sta]
 
         CHECK(l_u1 < l_u2);
         CHECK(l_u3 < l_u4);
+    }
+
+    SECTION("Generic STA: AAAAAAAA", "[timing][sta][topology]")
+    {
+        auto pin_a = mDesign.netlist().find(circuit::Pin(), "lcb1:a");
+        auto std_a = mDesign.libraryMapping().pinStdCell(pin_a);
+        auto arc = *mTimingArcs.pinArcs(std_a).begin();
+
+        std::cout << mTimingArcs.name(arc) << std::endl;
+        auto x = mTimingLibrary.computeRiseDelay(arc, capacitance_type(1.1), slew_type(0.5));
+
+        CHECK(x == slew_type(55.4));
+        REQUIRE(false);
     }
 
     SECTION("Generic STA: Lumped", "[timing][sta]")

@@ -8,8 +8,8 @@ namespace timingdriven_placement
 
 RCTree::RCTree() :
     mNames(mGraph),
-    mCapacitances(mGraph),
-    mResistances(mGraph),
+    mCapacitances(mGraph, capacitance_unit_type(0)),
+    mResistances(mGraph, resistance_unit_type(0)),
     mLumpedCapacitance(0.0),
     mValidPred(false),
     mPred(mGraph),

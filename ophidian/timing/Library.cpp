@@ -42,17 +42,17 @@ Library::Library(standard_cells_type & std_cells, timing_arcs_type & timing_arcs
 
 void Library::init(const liberty_type & liberty, bool early)
 {
-    capacitance_unit_type capacitive_load_unit;
+    capacitance_unit_type capacitive_load_unit(0);
     if (liberty.capacitiveLoadUnit == "ff")
-        capacitive_load_unit = capacitance_unit_type(util::femtofarad_t(liberty.capacitiveLoadUnitValue));
+        capacitive_load_unit = util::femtofarad_t(liberty.capacitiveLoadUnitValue);
     else if (liberty.capacitiveLoadUnit == "pf")
-        capacitive_load_unit = capacitance_unit_type(util::picofarad_t(liberty.capacitiveLoadUnitValue));
+        capacitive_load_unit = util::picofarad_t(liberty.capacitiveLoadUnitValue);
     else if (liberty.capacitiveLoadUnit == "nf")
-        capacitive_load_unit = capacitance_unit_type(units::capacitance::nanofarad_t(liberty.capacitiveLoadUnitValue));
+        capacitive_load_unit = util::nanofarad_t(liberty.capacitiveLoadUnitValue);
     else
-        assert(false);
+        throw std::out_of_range("Capacitive load does not exist!");
 
-    time_unit_type time_unit;
+    time_unit_type time_unit(0);
     if (liberty.timeUnit == "1ps")
         time_unit = util::picosecond_t(1.0);
     else if (liberty.timeUnit == "1ns")
@@ -64,7 +64,7 @@ void Library::init(const liberty_type & liberty, bool early)
     else if (liberty.timeUnit == "1s")
         time_unit = util::second_t(1.0);
     else
-        assert(false);
+        throw std::out_of_range("Time unit does not exist!");
 
     for (auto cell : liberty.cells)
     {

@@ -121,7 +121,12 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             {
                 double localLength = std::min(remaining, mParameters.mMaxSegmentLength);
 
-                auto previousCap = rctree.capacitance(previous) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
+                auto x = rctree.capacitance(previous);
+                auto y = (localLength / 2.0);
+                auto z = mParameters.mCapacitancePerMicron;
+                auto w = y * z;
+
+                auto previousCap = x + w;
                 rctree.capacitance(previous, previousCap);
 
                 RCTree::capacitor_type next;
