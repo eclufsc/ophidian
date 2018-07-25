@@ -65,10 +65,10 @@ TEST_CASE_METHOD(WiremodelFixture, "Wiremodel: effective capacitance", "[timing]
 
     tree.source(a);
 
-    tree.capacitance(a, ophidian::util::farad_t(0));
-    tree.capacitance(b, ophidian::util::farad_t(1.0));
-    tree.capacitance(c, ophidian::util::farad_t(1.5));
-    tree.capacitance(d, ophidian::util::farad_t(0));
+    tree.capacitance(a, capacitance_unit_type(0));
+    tree.capacitance(b, capacitance_unit_type(1.0));
+    tree.capacitance(c, capacitance_unit_type(1.5));
+    tree.capacitance(d, capacitance_unit_type(0));
     auto ab = tree.addResistor(a, b, ophidian::util::ohm_t(0));
     auto bc = tree.addResistor(b, c, ophidian::util::ohm_t(0.5));
     auto cd = tree.addResistor(c, d, ophidian::util::ohm_t(0));
@@ -107,10 +107,10 @@ TEST_CASE_METHOD(WiremodelFixture, "Wiremodel: lumped capacitance", "[timing][wi
 
     tree.source(a);
 
-    tree.capacitance(a, ophidian::util::farad_t(0));
-    tree.capacitance(b, ophidian::util::farad_t(1.0));
-    tree.capacitance(c, ophidian::util::farad_t(1.5));
-    tree.capacitance(d, ophidian::util::farad_t(0));
+    tree.capacitance(a, capacitance_unit_type(0));
+    tree.capacitance(b, capacitance_unit_type(1.0));
+    tree.capacitance(c, capacitance_unit_type(1.5));
+    tree.capacitance(d, capacitance_unit_type(0));
     auto ab = tree.addResistor(a, b, ophidian::util::ohm_t(0));
     auto bc = tree.addResistor(b, c, ophidian::util::ohm_t(0.5));
     auto cd = tree.addResistor(c, d, ophidian::util::ohm_t(0));

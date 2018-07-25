@@ -98,10 +98,10 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
     if(netPins.size() == 2)
     {
-        circuit::Pin pinU = source; //! pin u precisa ser o source mesmo?
-        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
-//        circuit::Pin pinU = *netPins.begin();  //! original
-//        circuit::Pin pinV = *(++netPins.begin());
+//        circuit::Pin pinU = source; //! pin u precisa ser o source mesmo?
+//        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
+        circuit::Pin pinU = *netPins.begin();  //! original
+        circuit::Pin pinV = *(++netPins.begin());
         util::LocationDbu positionPinU = get_location(pinU);
         util::LocationDbu positionPinV = get_location(pinV);
 
