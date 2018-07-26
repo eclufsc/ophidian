@@ -24,96 +24,102 @@ namespace ophidian
 namespace floorplan
 {
     // Element access
-    util::LocationDbu Floorplan::origin(const Row & row) const
+    Floorplan::point_type& Floorplan::chip_origin() noexcept
+    {
+        return mChipOrigin;
+    }
+
+    const Floorplan::point_type& Floorplan::chip_origin() const noexcept
+    {
+        return mChipOrigin;
+    }
+
+    Floorplan::point_type& Floorplan::chip_upper_right_corner() noexcept
+    {
+        return mChipUpperRightCorner;
+    }
+
+    const Floorplan::point_type& Floorplan::chip_upper_right_corner() const noexcept
+    {
+        return mChipUpperRightCorner;
+    }
+
+    Floorplan::point_type& Floorplan::origin(const Floorplan::row_type & row)
     {
         return mOrigins[row];
     }
 
-    util::LocationDbu& Floorplan::chip_upper_right_corner() noexcept
+    const Floorplan::point_type& Floorplan::origin(const Floorplan::row_type & row) const
     {
-        return mChipUpperRightCorner;
+        return mOrigins[row];
     }
 
-    const util::LocationDbu& Floorplan::chip_upper_right_corner() const noexcept
-    {
-        return mChipUpperRightCorner;
-    }
-
-    util::LocationDbu& Floorplan::chip_origin() noexcept
-    {
-        return mChipOrigin;
-    }
-
-    const util::LocationDbu& Floorplan::chip_origin() const noexcept
-    {
-        return mChipOrigin;
-    }
-
-    std::string& Floorplan::name(const Site & site)
-    {
-        return mNames[site];
-    }
-
-    const std::string& Floorplan::name(const Site & site) const
-    {
-        return mNames[site];
-    }
-
-    util::LocationDbu& Floorplan::site_upper_right_corner(const Site & site)
-    {
-        return mDimensions[site];
-    }
-
-    const util::LocationDbu& Floorplan::site_upper_right_corner(const Site & site) const
-    {
-        return mDimensions[site];
-    }
-
-    Site Floorplan::find(const std::string& siteName) const
-    {
-        return mName2Site.at(siteName);
-    }
-
-    util::database_unit_scalar_t& Floorplan::number_of_sites(const Row & row)
-    {
-        return mNumberOfSites[row];
-    }
-
-    const util::database_unit_scalar_t& Floorplan::number_of_sites(const Row & row) const
-    {
-        return mNumberOfSites[row];
-    }
-
-    Site Floorplan::site(const Row & row) const
-    {
-        return mSiteTypeOfRow[row];
-    }
-
-    util::LocationDbu Floorplan::row_upper_right_corner(const Row & row) const
+    Floorplan::point_type Floorplan::upper_right_corner(const Floorplan::row_type & row) const
     {
         auto site = mSiteTypeOfRow[row];
 
         util::database_unit_scalar_t numSites = mNumberOfSites[row];
 
-        util::LocationDbu uRCorner = mDimensions[site];
+        Floorplan::point_type uRCorner = mDimensions[site];
 
-        return util::LocationDbu{uRCorner.x() * numSites, uRCorner.y()};
+        return Floorplan::point_type{uRCorner.x() * numSites + origin(row).x(), uRCorner.y() + origin(row).y()};
+    }
+
+    Floorplan::site_name_type& Floorplan::name(const Floorplan::site_type & site)
+    {
+        return mNames[site];
+    }
+
+    const Floorplan::site_name_type& Floorplan::name(const Floorplan::site_type & site) const
+    {
+        return mNames[site];
+    }
+
+    Floorplan::point_type& Floorplan::dimension(const Floorplan::site_type & site)
+    {
+        return mDimensions[site];
+    }
+
+    const Floorplan::point_type& Floorplan::dimension(const Floorplan::site_type & site) const
+    {
+        return mDimensions[site];
+    }
+
+    const Floorplan::site_type& Floorplan::find(const Floorplan::site_name_type& siteName) const
+    {
+        return mName2Site.at(siteName);
+    }
+
+    Floorplan::row_size_type& Floorplan::number_of_sites(const Floorplan::row_type & row)
+    {
+        return mNumberOfSites[row];
+    }
+
+    const Floorplan::row_size_type& Floorplan::number_of_sites(const Floorplan::row_type & row) const
+    {
+        return mNumberOfSites[row];
+    }
+
+    const Floorplan::site_type& Floorplan::site(const Floorplan::row_type & row) const
+    {
+        return mSiteTypeOfRow[row];
     }
 
     // Iterators
-    void Floorplan::chipOrigin(const util::LocationDbu & loc)
+    ophidian::util::Range<Floorplan::SitesIterator> Floorplan::range_site() const
     {
-        mChipOrigin = loc;
+        return ophidian::util::Range<Floorplan::SitesIterator>(mSites.begin(), mSites.end());
+    }
+    
+    ophidian::util::Range<Floorplan::RowsIterator> Floorplan::range_row() const
+    {
+        return util::Range<Floorplan::RowsIterator>(mRows.begin(), mRows.end());
     }
 
-    void Floorplan::chipUpperRightCorner(const util::LocationDbu & loc)
+    // Modifiers
+    const Floorplan::site_type& Floorplan::add_site(const Floorplan::site_name_type & name, const Floorplan::point_type & loc)
     {
-        mChipUpperRightCorner = loc;
-    }
-
-    Site Floorplan::add(Site, const std::string & name, const util::LocationDbu & loc)
-    {
-        auto site = mSites.add();
+        const auto& site = mSites.add();
 
         mNames[site] = name;
         mName2Site[name] = site;
@@ -122,19 +128,12 @@ namespace floorplan
         return site;
     }
 
-    void Floorplan::erase(Site site)
+    const Floorplan::row_type& Floorplan::add_row(
+        const Floorplan::point_type & loc,
+        const Floorplan::row_size_type& num,
+        const Floorplan::site_type & site)
     {
-        mName2Site.erase(name(site));
-        mSites.erase(site);
-    }
-
-    Row Floorplan::add(
-        Row,
-        const util::LocationDbu & loc,
-        util::database_unit_scalar_t num,
-        const Site & site)
-    {
-        auto row = mRows.add();
+        const auto& row = mRows.add();
 
         mOrigins[row] = loc;
         mNumberOfSites[row] = num;
@@ -143,7 +142,13 @@ namespace floorplan
         return row;
     }
 
-    void Floorplan::erase(const Row & row)
+    void Floorplan::erase(const Floorplan::site_type& site)
+    {
+        mName2Site.erase(name(site));
+        mSites.erase(site);
+    }
+
+    void Floorplan::erase(const Floorplan::row_type & row)
     {
         mRows.erase(row);
     }

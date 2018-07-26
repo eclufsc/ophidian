@@ -56,6 +56,7 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing a cell", "[placement]") {
         Placement::unit_type{5},
         Placement::unit_type{15}
     };
+
     placement.place(cell2, cell2_location);
 
     auto placed_cell2_location = placement.location(cell2);

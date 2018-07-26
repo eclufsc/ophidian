@@ -50,6 +50,14 @@ namespace floorplan
         using RowsIterator = entity_system::EntitySystem<Row>::const_iterator;
         using SitesIterator = entity_system::EntitySystem<Site>::const_iterator;
 
+        using point_type = util::LocationDbu;
+
+        using site_type = Site;
+        using site_name_type = std::string;
+
+        using row_type = Row;
+        using row_size_type = util::database_unit_scalar_t;
+
         // Constructors
         Floorplan() = default;
 
@@ -60,72 +68,60 @@ namespace floorplan
         Floorplan& operator=(Floorplan&&) = default;
 
         // Element access
-        util::LocationDbu origin(const Row & row) const;
-
-        util::LocationDbu& chip_upper_right_corner() noexcept;
-        const util::LocationDbu& chip_upper_right_corner() const noexcept;
-
-        util::LocationDbu& chip_origin() noexcept;
-        const util::LocationDbu& chip_origin() const noexcept;
+        point_type& chip_origin() noexcept;
+        const point_type& chip_origin() const noexcept;
         
-        std::string& name(const Site & site);
-        const std::string& name(const Site & site) const;
+        point_type& chip_upper_right_corner() noexcept;
+        const point_type& chip_upper_right_corner() const noexcept;
 
-        util::LocationDbu& site_upper_right_corner(const Site & site);
-        const util::LocationDbu& site_upper_right_corner(const Site & site) const;
+        point_type& origin(const row_type & row);
+        const point_type& origin(const row_type & row) const;
 
-        Site find(const std::string& siteName) const;
+        point_type upper_right_corner(const row_type & row) const;
 
-        util::database_unit_scalar_t& number_of_sites(const Row & row);
-        const util::database_unit_scalar_t& number_of_sites(const Row & row) const;
+        row_size_type& number_of_sites(const row_type & row);
+        const row_size_type& number_of_sites(const row_type & row) const;
 
-        Site site(const Row & row) const;
+        const site_type& site(const row_type & row) const;
 
-        util::LocationDbu row_upper_right_corner(const Row & row) const;
+        site_name_type& name(const site_type & site);
+        const site_name_type& name(const site_type & site) const;
+
+        point_type& dimension(const site_type & site);
+        const point_type& dimension(const site_type & site) const;
+
+        const site_type& find(const site_name_type& siteName) const;
 
         // Iterators
-        ophidian::util::Range<SitesIterator> sitesRange() const
-        {
-            return ophidian::util::Range<SitesIterator>(mSites.begin(), mSites.end());
-        }
+        ophidian::util::Range<SitesIterator> range_site() const;
 
-        ophidian::util::Range<RowsIterator> rowsRange() const
-        {
-            return util::Range<RowsIterator>(mRows.begin(), mRows.end());
-        }
+        ophidian::util::Range<RowsIterator> range_row() const;
 
         // Capacity
 
         // Modifiers
-        void chipOrigin(const util::LocationDbu & loc);
+        const site_type& add_site(const site_name_type & name, const point_type & loc);
 
-        void chipUpperRightCorner(const util::LocationDbu & loc);
+        const row_type& add_row(const point_type & loc, const row_size_type& num, const site_type &site);
 
-        Site add(Site, const std::string & name, const util::LocationDbu & loc);
+        void erase(const site_type& site);
 
-        void erase(Site site);
-
-        Row add(Row,
-            const util::LocationDbu & loc,
-            util::database_unit_scalar_t num,
-            const Site &site);
-
-        void erase(const Row & row);
+        void erase(const row_type & row);
 
     private:
-        entity_system::EntitySystem<Row>                           mRows{};
-        entity_system::Property<Row, util::LocationDbu>            mOrigins{mRows};
-        entity_system::Property<Row, util::database_unit_scalar_t> mNumberOfSites{mRows};
-        entity_system::Property<Row, Site>                         mSiteTypeOfRow{mRows};
+        entity_system::EntitySystem<row_type>                           mRows{};
+        entity_system::Property<row_type, point_type>            mOrigins{mRows};
+        entity_system::Property<row_type, util::database_unit_scalar_t> mNumberOfSites{mRows};
+        entity_system::Property<row_type, site_type>                         mSiteTypeOfRow{mRows};
 
-        entity_system::EntitySystem<Site>                mSites{};
-        entity_system::Property<Site, std::string>       mNames{mSites};
-        entity_system::Property<Site, util::LocationDbu> mDimensions{mSites};
+        entity_system::EntitySystem<site_type>                mSites{};
+        entity_system::Property<site_type, site_name_type>       mNames{mSites};
+        entity_system::Property<site_type, point_type> mDimensions{mSites};
 
-        util::LocationDbu mChipOrigin{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
-        util::LocationDbu mChipUpperRightCorner{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
+        point_type mChipOrigin{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
+        point_type mChipUpperRightCorner{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
 
-        std::unordered_map<std::string, Site> mName2Site{};
+        std::unordered_map<site_name_type, site_type> mName2Site{};
     };
 }
 }

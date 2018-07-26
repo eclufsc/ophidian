@@ -27,8 +27,8 @@ TEST_CASE("Design: testing floorplan.", "[design]")
 	REQUIRE(design.floorplan().chip_origin().y() == dbu_t{0.0});
 	REQUIRE(design.floorplan().chip_upper_right_corner().x() == dbu_t{0.0});
 	REQUIRE(design.floorplan().chip_upper_right_corner().y() == dbu_t{0.0});
-	REQUIRE(design.floorplan().sitesRange().empty());
-	REQUIRE(design.floorplan().rowsRange().empty());
+	REQUIRE(design.floorplan().range_site().empty());
+	REQUIRE(design.floorplan().range_row().empty());
 
 	auto origin = ophidian::util::LocationDbu{dbu_t{2.0}, dbu_t{3.0}};
 	auto boundaries = ophidian::util::LocationDbu{dbu_t{4000.0}, dbu_t{3000.0}};

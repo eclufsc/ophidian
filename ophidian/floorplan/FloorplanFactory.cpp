@@ -28,25 +28,24 @@ namespace floorplan
         {
             auto floorplan = Floorplan{};
 
-            floorplan.chipOrigin(def.die_area().min_corner());
-            floorplan.chipUpperRightCorner(def.die_area().max_corner());
+            floorplan.chip_origin() = def.die_area().min_corner();
+            floorplan.chip_upper_right_corner() = def.die_area().max_corner();
 
             for(const auto& site : lef.sites())
             {
-                floorplan.add(
-                    Site{},
+                floorplan.add_site(
                     site.name(),
-                    util::LocationDbu{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()}
+                    Floorplan::point_type{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()}
                 );
             }
 
             for(const auto & row : def.rows())
             {
-                floorplan.add(
-                    Row{},
+                floorplan.add_row(
                     row.origin(),
                     row.num().x(),
-                    floorplan.find(row.site()));
+                    floorplan.find(row.site())
+                );
             }
 
             return floorplan;
