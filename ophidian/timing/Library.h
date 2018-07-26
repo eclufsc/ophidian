@@ -51,8 +51,6 @@ public:
     using timing_arc_entity_type = TimingArc;
 
     template <class V> using property_timing_arc_type = entity_system::Property<timing_arc_entity_type, V>;
-    template <class V> using property_std_pin_type    = entity_system::Property<std_pin_entity_type, V>;
-    template <class V> using property_std_cell_type   = entity_system::Property<std_cell_entity_type, V>;
 
     Library() = default;
 
@@ -64,6 +62,12 @@ public:
        \param arcs The Timing Arcs' system of the circuit.
      */
     Library(standard_cells_type & std_cells, timing_arcs_type & timing_arcs);
+
+    Library(const Library&) = delete;
+    Library& operator=(const Library&) = delete;
+
+    Library(Library&&) = default;
+    Library& operator=(Library&&) = default;
 
     void init(const liberty_type & liberty, bool early = false);
 
@@ -156,6 +160,8 @@ public:
     bool cellSequential(const std_cell_entity_type & cell) const;
 
 private:
+    template <class V> using property_std_pin_type    = entity_system::Property<std_pin_entity_type, V>;
+    template <class V> using property_std_cell_type   = entity_system::Property<std_cell_entity_type, V>;
     using ParserLUT = liberty_type::LUT;
     using LUT = LookupTable<capacitance_unit_type, time_unit_type, time_unit_type>;
 

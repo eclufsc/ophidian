@@ -36,7 +36,6 @@ size_t TimingGraph::size(arc_type) const
     return lemon::countArcs(mGraph);
 }
 
-
 TimingGraph::node_type TimingGraph::nodeCreate(const pin_entity_type & pin, const NodeProperty & prop, pin_entity_to_node_property_type & map)
 {
     node_type newNode = mGraph.addNode();

@@ -147,7 +147,7 @@ run_install()
     install_LEMON
     install_UNITS
     install_LIBERTY_PARSER
-    
+    echo "Installation completed successfully"
 }
 
 run_install

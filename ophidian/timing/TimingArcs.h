@@ -62,24 +62,25 @@ public:
     template <class T> using timing_arc_property_type = entity_system::Property<timing_arc_entity_type, T>;
     template <class T> using pin_property_type        = entity_system::Property<standard_pin_entity_type, T>;
 
+    TimingArcs() = delete;
+
     //! TimingArcs Constructor
     /*!
        \brief Constructs an empty system with no Arcs.
      */
     TimingArcs(const standard_cells_type & stdCells);
 
+    TimingArcs(const TimingArcs&) = delete;
+    TimingArcs& operator=(const TimingArcs&) = delete;
 
-    //! TimingArcs Move Constructor
-    /*!
-        \brief Move the entity system and its properties.
-     */
-    //TimingArcs(const TimingArcs && timingArcs);
+    TimingArcs(TimingArcs&&) = default;
+    TimingArcs& operator=(TimingArcs&&) = default;
 
     //! TimingArcs Destructor
     /*!
        \brief Destroys the Arcs EntitySystem, including its properties.
      */
-    ~TimingArcs();
+    ~TimingArcs() = default;
 
     //! Add TimingArc
     /*!

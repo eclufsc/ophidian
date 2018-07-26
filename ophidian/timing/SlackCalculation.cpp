@@ -63,11 +63,6 @@ void EndPoints::init()
     }
 }
 
-EndPoints::~EndPoints()
-{
-
-}
-
 EndPoints::container_pin_type::const_iterator EndPoints::begin() const
 {
     return m_endpoints.cbegin();
@@ -88,19 +83,9 @@ bool EndPoints::empty() const
     return m_endpoints.empty();
 }
 
-TotalNegativeSlack::~TotalNegativeSlack()
-{
-
-}
-
 const TotalNegativeSlack::time_unit_type TotalNegativeSlack::value() const
 {
     return m_value;
-}
-
-WorstNegativeSlack::~WorstNegativeSlack()
-{
-
 }
 
 const WorstNegativeSlack::time_unit_type WorstNegativeSlack::value() const

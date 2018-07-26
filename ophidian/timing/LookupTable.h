@@ -38,9 +38,7 @@ public:
     using container_column_type             = container_type<ColumnType>;
     using container_value_type              = container_type<container_type<ValueType>>;
 
-    LookupTable()
-    {
-    }
+    LookupTable() = default;
 
     LookupTable(const lut_type & lut, const RowType& row_factor, const ColumnType& column_factor, const ValueType& value_factor) :
         m_row_values(lut.index_1.size()),
@@ -58,9 +56,13 @@ public:
                 m_values[i].push_back(value_factor * lut.values[i][j]);
     }
 
-    ~LookupTable()
-    {
-    }
+    LookupTable(const LookupTable&) = default;
+    LookupTable& operator=(const LookupTable&) = default;
+
+    LookupTable(LookupTable&&) = default;
+    LookupTable& operator=(LookupTable&&) = default;
+
+    ~LookupTable() = default;
 
     ValueType compute(const RowType & rv, const ColumnType & cv) const
     {

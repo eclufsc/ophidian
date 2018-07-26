@@ -85,13 +85,15 @@ void Library::init(const liberty_type & liberty, bool early)
                 m_timing_arcs.to(arc, m_std_cells.find(std_pin_entity_type(), nameToPin));
                 m_timing_senses[arc] = tmg.timingSense;
                 m_timing_types[arc] = tmg.timingType;
+                
                 m_rise_delays[arc] = LUT(tmg.find(ParserLUT::CELL_RISE), capacitive_load_unit, time_unit, time_unit);
                 m_fall_delays[arc] = LUT(tmg.find(ParserLUT::CELL_FALL), capacitive_load_unit, time_unit, time_unit);
-                m_rise_slews[arc] = LUT(tmg.find(pin.pinDirection == liberty_type::Pin::INPUT?
-                                                   ParserLUT::RISE_CONSTRAINT : ParserLUT::RISE_TRANSITION),
+
+                bool input_pin = pin.pinDirection == liberty_type::Pin::INPUT;
+
+                m_rise_slews[arc] = LUT(tmg.find(input_pin? ParserLUT::RISE_CONSTRAINT : ParserLUT::RISE_TRANSITION),
                                         capacitive_load_unit, time_unit, time_unit);
-                m_fall_slews[arc] = LUT(tmg.find(pin.pinDirection == liberty_type::Pin::INPUT?
-                                                   ParserLUT::FALL_CONSTRAINT : ParserLUT::FALL_TRANSITION),
+                m_fall_slews[arc] = LUT(tmg.find(input_pin? ParserLUT::FALL_CONSTRAINT : ParserLUT::FALL_TRANSITION),
                                         capacitive_load_unit, time_unit, time_unit);
             }
 

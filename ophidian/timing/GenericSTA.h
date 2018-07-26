@@ -147,31 +147,30 @@ public:
 
     void init(const design_constraints_type & dc)
     {
-        auto rise_node_clock = m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName));
-        auto fall_node_clock = m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName));
+        {
+            auto rise_node_clock = m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName));
+            auto fall_node_clock = m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), dc.mClock.portName));
 
-        m_timing_data.arrival(rise_node_clock, slew_unit_type(0));
-        m_timing_data.arrival(fall_node_clock, slew_unit_type(0));
+            m_timing_data.arrival(rise_node_clock, slew_unit_type(0));
+            m_timing_data.arrival(fall_node_clock, slew_unit_type(0));
+        }
 
         for(auto & i : dc.mInputDelays)
         {
             auto rise_node = m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), i.portName));
             auto fall_node = m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), i.portName));
-            auto slew_value = slew_unit_type(pico_slew_unit_type(i.delay));
 
-            m_timing_data.arrival(rise_node, slew_value);
-            m_timing_data.arrival(fall_node, slew_value);
+            m_timing_data.arrival(rise_node, slew_unit_type(pico_slew_unit_type(i.delay)));
+            m_timing_data.arrival(fall_node, slew_unit_type(pico_slew_unit_type(i.delay)));
         }
 
         for(auto & i : dc.mInputDrivers)
         {
             auto rise_node = m_topology.m_graph.riseNode(m_topology.m_netlist.find(pin_entity_type(), i.portName));
             auto fall_node = m_topology.m_graph.fallNode(m_topology.m_netlist.find(pin_entity_type(), i.portName));
-            auto rise_value = slew_unit_type(pico_slew_unit_type(i.slewRise));
-            auto fall_value = slew_unit_type(pico_slew_unit_type(i.slewFall));
 
-            m_timing_data.slew(rise_node, rise_value);
-            m_timing_data.slew(fall_node, fall_value);
+            m_timing_data.slew(rise_node, slew_unit_type(pico_slew_unit_type(i.slewRise)));
+            m_timing_data.slew(fall_node, slew_unit_type(pico_slew_unit_type(i.slewFall)));
         }
 
         for(lemon::ListDigraph::NodeIt node(m_topology.m_graph.graph()); node != lemon::INVALID; ++node)
@@ -209,30 +208,16 @@ public:
     {
         auto node = m_topology.m_graph.riseNode(pin);
 
-        auto merge_slack = MergeStrategy::slack_signal();
-        auto required_time = m_timing_data.required(node);
-        auto arrival_time = m_timing_data.arrival(node);
-        auto diff_time = required_time - arrival_time;
-        auto result = merge_slack * diff_time;
-
-        return result;
+        return MergeStrategy::slack_signal() *
+                (m_timing_data.required(node) - m_timing_data.arrival(node));
     }
 
     slew_unit_type fall_slack(const pin_entity_type& pin) const
     {
-//        auto node = m_topology.m_graph.fallNode(pin);
-//        return MergeStrategy::slack_signal() *
-//               (m_timing_data.required(node) - m_timing_data.arrival(node));
-
         auto node = m_topology.m_graph.fallNode(pin);
 
-        auto merge_slack = MergeStrategy::slack_signal();
-        auto required_time = m_timing_data.required(node);
-        auto arrival_time = m_timing_data.arrival(node);
-        auto diff_time = required_time - arrival_time;
-        auto result = merge_slack * diff_time;
-
-        return result;
+        return MergeStrategy::slack_signal() *
+                (m_timing_data.required(node) - m_timing_data.arrival(node));
     }
 
     void update_ats()
@@ -244,12 +229,7 @@ public:
                 const auto& node = level[i];
                 if(lemon::countInArcs(m_topology.m_graph.graph(), node) != 0)
                 {
-                    auto pin = m_topology.m_graph.entity(node);
-                    auto net = m_topology.m_netlist.net(pin);
-                    auto & tree = m_rctrees[net];
-
-                    auto pin_name = m_topology.m_netlist.name(pin);
-                    auto net_name = m_topology.m_netlist.name(net);
+                    auto & tree = m_rctrees[m_topology.m_netlist.net(m_topology.m_graph.entity(node))];
 
                     slew_map_type        slews(tree.g(), slew_unit_type(0));
                     slew_map_type        delays(tree.g(), slew_unit_type(0));
@@ -298,6 +278,7 @@ public:
                     }
 
                     m_timing_data.arrival(node, worstArrival);
+
                     for(lemon::ListDigraph::OutArcIt arc(m_topology.m_graph.graph(), node); arc != lemon::INVALID; ++arc)
                     {
                         auto arc_target = m_topology.m_graph.target(arc);
@@ -318,12 +299,6 @@ public:
         for(auto node_it = m_topology.m_sorted.rbegin(); node_it != m_topology.m_sorted.rend(); ++node_it)
         {
             auto node = *node_it;
-
-            auto pin = m_topology.m_graph.entity(node);
-            auto net = m_topology.m_netlist.net(pin);
-
-            auto pin_name = m_topology.m_netlist.name(pin);
-            auto net_name = m_topology.m_netlist.name(net);
 
             if(lemon::countOutArcs(m_topology.m_graph.graph(), node) > 0)
             {

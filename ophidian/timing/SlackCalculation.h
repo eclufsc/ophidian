@@ -55,7 +55,7 @@ public:
 
     void init();
 
-    virtual ~EndPoints();
+    ~EndPoints() = default;
 
     container_pin_type::const_iterator begin() const;
     container_pin_type::const_iterator end() const;
@@ -83,7 +83,7 @@ public:
             m_value = units::math::min(m_value, units::math::min(sta.rise_slack(PO), sta.fall_slack(PO)));
     }
 
-    virtual ~WorstNegativeSlack();
+    ~WorstNegativeSlack() = default;
 
     const time_unit_type value() const;
 
@@ -104,7 +104,7 @@ public:
             m_value += units::math::min(time_unit_type(0), units::math::min(sta.rise_slack(PO), sta.fall_slack(PO)));
     }
 
-    virtual ~TotalNegativeSlack();
+    ~TotalNegativeSlack() = default;
 
     const time_unit_type value() const;
 

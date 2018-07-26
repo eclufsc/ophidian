@@ -79,9 +79,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
     if(netPins.size() == 1)
     {
-        circuit::Pin pinU = *netPins.begin();
-        RCTree::capacitor_type capU = rctree.addCapacitor("C0");
-        RCTree::capacitor_type tapU = sourceCap = rctree.addCapacitor(netlist.name(pinU));
+        auto pinU = *netPins.begin();
+        auto capU = rctree.addCapacitor("C0");
+        auto tapU = sourceCap = rctree.addCapacitor(netlist.name(pinU));
 
         taps.insert(tapU);
 
@@ -98,35 +98,29 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
     if(netPins.size() == 2)
     {
-//        circuit::Pin pinU = source; //! pin u precisa ser o source mesmo?
-//        circuit::Pin pinV = *(source == *netPins.begin()? ++netPins.begin() : netPins.begin());
-        circuit::Pin pinU = *netPins.begin();  //! original
-        circuit::Pin pinV = *(++netPins.begin());
-        util::LocationDbu positionPinU = get_location(pinU);
-        util::LocationDbu positionPinV = get_location(pinV);
+        auto pinU = *netPins.begin();
+        auto pinV = *(++netPins.begin());
+        auto positionPinU = get_location(pinU);
+        auto positionPinV = get_location(pinV);
 
-
-        const RCTree::capacitor_type capU = rctree.addCapacitor("C0");
-        double length = geometry::ManhattanDistance()(positionPinU.toPoint(), positionPinV.toPoint()) / lef.databaseUnits();
+        const auto capU = rctree.addCapacitor("C0");
+        double length = geometry::ManhattanDistance()(positionPinU.toPoint(), positionPinV.toPoint())
+                        / lef.databaseUnits();
 
         if(length > 0)
         {
             int numberOfSlicedSegments = std::ceil(length / mParameters.mMaxSegmentLength);
 
-            const RCTree::capacitor_type capV = rctree.addCapacitor("C1");
-            RCTree::capacitor_type previous = capU;
+            const auto capV = rctree.addCapacitor("C1");
+            auto previous = capU;
             double remaining = length;
 
             for(int j = 0; j < numberOfSlicedSegments; ++j)
             {
                 double localLength = std::min(remaining, mParameters.mMaxSegmentLength);
 
-                auto x = rctree.capacitance(previous);
-                auto y = (localLength / 2.0);
-                auto z = mParameters.mCapacitancePerMicron;
-                auto w = y * z;
-
-                auto previousCap = x + w;
+                auto previousCap = rctree.capacitance(previous)
+                                 + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
                 rctree.capacitance(previous, previousCap);
 
                 RCTree::capacitor_type next;
@@ -135,7 +129,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
                 else
                     next = capV;
 
-                auto nextCap = rctree.capacitance(next) + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
+                auto nextCap = rctree.capacitance(next)
+                             + (localLength / 2.0) * mParameters.mCapacitancePerMicron;
                 rctree.capacitance(next, nextCap);
                 rctree.addResistor(previous, next, (localLength) * mParameters.mResistancePerMicron);
 
@@ -148,7 +143,6 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
             auto cap_test = library.capacitance(libraryMapping.pinStdCell(pinV));
             rctree.capacitance(tapV, cap_test);
             rctree.addResistor(capV, tapV, util::ohm_t(0.0));
-
         }
         else
         {
@@ -245,9 +239,9 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
         if(fromI != toI)
         {
-            const RCTree::capacitor_type capTo = rctree.addCapacitor(toName);
+            const auto capTo = rctree.addCapacitor(toName);
             int numPIs = std::ceil(length / mParameters.mMaxSegmentLength);
-            RCTree::capacitor_type previous = capFrom;
+            auto previous = capFrom;
             double remaining = length;
 
             for(int j = 0; j < numPIs; ++j)
@@ -297,8 +291,8 @@ FluteRCTreeBuilder::SourceRCTree FluteRCTreeBuilder::build(const placement::Plac
 
         if (fromIsTap && !tapCreated[fromI])
         {
-            circuit::Pin pin = nearest.front().second;
-            RCTree::capacitor_type tapCap = rctree.addCapacitor(netlist.name(pin));
+            auto pin = nearest.front().second;
+            auto tapCap = rctree.addCapacitor(netlist.name(pin));
 
             rctree.insertTap(tapCap);
             rctree.capacitance(tapCap, library.capacitance(libraryMapping.pinStdCell(pin)));

@@ -13,11 +13,6 @@ TimingArcs::TimingArcs(const standard_cells_type & stdCells) :
 {
 }
 
-TimingArcs::~TimingArcs()
-{
-
-}
-
 TimingArcs::timing_arc_entity_type TimingArcs::add(const timing_arc_name_type & arcName)
 {
     if(mName2Arc.find(arcName) == mName2Arc.end())

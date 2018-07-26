@@ -57,12 +57,11 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
         }
     }
 
-
     // Creating timing arc edges
     std::vector<circuit::Pin> inputPins;
 
-    using StdPinName = std::string;
-    std::unordered_map<StdPinName, circuit::Pin> outputPins;
+    using std_pin_name = std::string;
+    std::unordered_map<std_pin_name, circuit::Pin> outputPins;
 
     for (auto cellIt = netlist.begin(circuit::Cell()); cellIt != netlist.end(circuit::Cell()); ++cellIt)
     {
@@ -89,7 +88,7 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
 
         for (auto from : inputPins)
         {
-            const std::vector<TimingArcs::timing_arc_entity_type> & arcs = timingArcs.pinArcs(libraryMapping.pinStdCell(from));
+            const auto & arcs = timingArcs.pinArcs(libraryMapping.pinStdCell(from));
 
             for(const auto & arc : arcs)
             {

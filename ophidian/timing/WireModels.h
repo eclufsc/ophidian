@@ -45,7 +45,7 @@ class EffectiveCapacitance
 public:
 
     EffectiveCapacitance();
-    virtual ~EffectiveCapacitance();
+    ~EffectiveCapacitance();
 
     void precision(precicion_type epsilon);
 
@@ -140,7 +140,7 @@ class LumpedCapacitance
 {
 public:
     LumpedCapacitance();
-    virtual ~LumpedCapacitance();
+    ~LumpedCapacitance();
 
     void slews(slew_map_type& sm);
     const slew_map_type& slews() const;

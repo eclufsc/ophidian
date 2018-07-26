@@ -65,6 +65,8 @@ public:
 
     using arc_entity_type = Arc;
 
+    TimingGraph() = delete;
+
     //! TimingGraph Constructor
     /*!
        \brief Constructs a TimingGraph with properties from the netlist.
