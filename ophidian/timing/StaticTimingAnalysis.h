@@ -62,14 +62,18 @@ public:
     using liberty_type                 = parser::Liberty;
     using endpoints_type               = EndPoints;
 
+    //! Deleted Default Constructor
     StaticTimingAnalysis() = delete;
 
+    //! Copy Constructor
     StaticTimingAnalysis(const StaticTimingAnalysis&) = delete;
     StaticTimingAnalysis& operator=(const StaticTimingAnalysis&) = delete;
 
+    //! Move Constructor
     StaticTimingAnalysis(StaticTimingAnalysis&&) = default;
     StaticTimingAnalysis& operator=(StaticTimingAnalysis&&) = default;
 
+    //! StaticTimingAnalysis Constructor
     StaticTimingAnalysis(standard_cells_type& std_cells,
                          netlist_type& netlist,
                          library_mapping_type& lib_mapping,

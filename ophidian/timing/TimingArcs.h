@@ -70,9 +70,11 @@ public:
      */
     TimingArcs(const standard_cells_type & stdCells);
 
+    //! Copy Constructor
     TimingArcs(const TimingArcs&) = delete;
     TimingArcs& operator=(const TimingArcs&) = delete;
 
+    //! Move Constructor
     TimingArcs(TimingArcs&&) = default;
     TimingArcs& operator=(TimingArcs&&) = default;
 

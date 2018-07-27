@@ -63,9 +63,11 @@ public:
      */
     Library(standard_cells_type & std_cells, timing_arcs_type & timing_arcs);
 
+    //! Deleted Copy Constructor
     Library(const Library&) = delete;
     Library& operator=(const Library&) = delete;
 
+    //! Move Constructor
     Library(Library&&) = default;
     Library& operator=(Library&&) = default;
 

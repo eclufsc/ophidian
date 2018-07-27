@@ -36,6 +36,7 @@ namespace timing
 class TimingGraphBuilder
 {
 public:
+    //! Default Contructor
     TimingGraphBuilder();
 
     void build(circuit::Netlist & netlist,

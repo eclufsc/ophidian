@@ -90,14 +90,18 @@ struct GraphAndTopology
     using levels_container_type         = container_type<container_type<timing_graph_type::node_type>>;
     using sorted_drivers_container_type = container_type<timing_graph_type::node_type>;
 
+    //! Deleted Default Constructor
     GraphAndTopology() = delete;
 
+    //! Deleted Copy Constructor
     GraphAndTopology(const GraphAndTopology&) = delete;
     GraphAndTopology& operator=(const GraphAndTopology&) = delete;
 
+    //! Move Constructor
     GraphAndTopology(GraphAndTopology&&) = default;
     GraphAndTopology& operator=(GraphAndTopology&&) = default;
 
+    //! GraphAndTopology Constructor
     GraphAndTopology(const timing_graph_type& graph,
                      netlist_type& netlist,
                      standard_cells_type& stdCells,
@@ -135,6 +139,7 @@ public:
     using slew_map_type                     = node_map_type<slew_unit_type>;
     using capacitance_map_type              = node_map_type<capacitance_unit_type>;
 
+    //! GenericSTA Constructor
     GenericSTA(timing_data_type & data,
                topology_type & topology,
                net_to_rctree_property_type & rctrees) :
@@ -142,7 +147,10 @@ public:
         m_topology(topology),
         m_rctrees(rctrees)
     {
+    }
 
+    ~GenericSTA()
+    {
     }
 
     void init(const design_constraints_type & dc)

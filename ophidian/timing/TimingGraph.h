@@ -74,9 +74,11 @@ public:
      */
     TimingGraph(const netlist_type & netlist);
 
+    //! Move Constructor
     TimingGraph(TimingGraph&&) = default;
     TimingGraph& operator=(TimingGraph&&) = default;
 
+    //! Copy Constructor
     TimingGraph(const TimingGraph&) = delete;
     TimingGraph& operator=(const TimingGraph&) = delete;
 

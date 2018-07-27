@@ -40,22 +40,26 @@ public:
     using pin_entity_type      = circuit::Pin;
     using container_pin_type   = std::vector<pin_entity_type>;
 
+    //! Default Constructor
     EndPoints() = default;
 
+    //! Copy Constructor
     EndPoints(const EndPoints&) = delete;
     EndPoints& operator=(const EndPoints&) = delete;
 
+    //! Move Constructor
     EndPoints(EndPoints&&) = default;
     EndPoints& operator=(EndPoints&&) = default;
 
+    //! EndPoints Constructor
     EndPoints(const netlist_type & netlist,
               const library_mapping_type & library_mapping,
               standard_cells_type & std_cells,
               const timing_library_type & timing_library);
 
-    void init();
-
     ~EndPoints() = default;
+    
+    void init();
 
     container_pin_type::const_iterator begin() const;
     container_pin_type::const_iterator end() const;

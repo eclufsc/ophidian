@@ -43,8 +43,9 @@ using capacitance_map_type             = node_map_type<capacitance_unit_type>;
 class EffectiveCapacitance
 {
 public:
-
+    //! Default Constructor
     EffectiveCapacitance();
+
     ~EffectiveCapacitance();
 
     void precision(precicion_type epsilon);
@@ -139,7 +140,10 @@ private:
 class LumpedCapacitance
 {
 public:
+
+    //! Default Constructor
     LumpedCapacitance();
+    
     ~LumpedCapacitance();
 
     void slews(slew_map_type& sm);

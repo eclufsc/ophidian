@@ -41,14 +41,18 @@ public:
     using node_to_capacitance_map_type = timing_graph_type::node_map_type<capacitance_unit_type>;
     using arc_to_time_map_type         = timing_graph_type::arc_map_type<time_unit_type>;
 
+    //! Deleted Default Constructor
     TimingData() = delete;
 
+    //! Copy Constructor
     TimingData(const TimingData&) = delete;
     TimingData& operator=(const TimingData&) = delete;
 
+    //! Move Constructor
     TimingData(TimingData&&) = default;
     TimingData& operator=(TimingData&&) = default;
 
+    //! TimingData Constructor
     TimingData(const timing_library_type& lib, const timing_graph_type& graph);
 
     ~TimingData() = default;

@@ -33,8 +33,6 @@ class Elmore
 public:
     friend class ElmoreSecondMoment;
 
-    using time_unit_type                        = util::second_t;
-    using capacitance_unit_type                 = util::farad_t;
     template <class T> using container_type     = std::vector<T>;
     template <class U, class T> using pair_type = std::pair<U, T>;
 
@@ -43,9 +41,12 @@ public:
     using capacitor_type                        = rctree_type::capacitor_type;
     using resistor_type                         = rctree_type::resistor_type;
 
+    using time_unit_type                        = util::second_t;
+    using capacitance_unit_type                 = rctree_type::capacitance_unit_type;
+    using resistance_unit_type                  = rctree_type::resistance_unit_type;
+
     using time_map_type                         = rctree_type::capacitor_map_type<time_unit_type>;
     using capacitance_map_type                  = rctree_type::capacitor_map_type<capacitance_unit_type>;
-    using resistance_unit_type                  = rctree_type::resistance_unit_type;
     using predecessor_map_type                  = rctree_type::capacitor_map_type<pair_type<capacitor_type, resistor_type>>;
     using order_container_type                  = container_type<capacitor_type>;
 
@@ -78,7 +79,6 @@ public:
     using resistor_type    = Elmore::resistor_type;
 
     ElmoreSecondMoment(const Elmore & e);
-
     virtual ~ElmoreSecondMoment();
 
     square_time_unit_type at(const capacitor_type & capacitor) const;

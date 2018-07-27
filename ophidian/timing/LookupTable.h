@@ -38,8 +38,10 @@ public:
     using container_column_type             = container_type<ColumnType>;
     using container_value_type              = container_type<container_type<ValueType>>;
 
+    //! Default Constructor
     LookupTable() = default;
 
+    //! LookupTable Constructor
     LookupTable(const lut_type & lut, const RowType& row_factor, const ColumnType& column_factor, const ValueType& value_factor) :
         m_row_values(lut.index_1.size()),
         m_column_values(lut.index_2.size()),
@@ -56,9 +58,11 @@ public:
                 m_values[i].push_back(value_factor * lut.values[i][j]);
     }
 
+    //! Copy Constructor
     LookupTable(const LookupTable&) = default;
     LookupTable& operator=(const LookupTable&) = default;
 
+    //! Move Constructor
     LookupTable(LookupTable&&) = default;
     LookupTable& operator=(LookupTable&&) = default;
 
@@ -112,7 +116,6 @@ public:
             }
         }
 
-        //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
         auto wTransition = (cv - x1) / (x2 - x1);
         auto wLoad = (rv - y1) / (y2 - y1);
 
@@ -121,6 +124,8 @@ public:
         t[1][0] = m_values[row2][column1];
         t[1][1] = m_values[row2][column2];
 
+        //! Equation for interpolation
+        //! (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
 
         return ((1 - wTransition) * (1 - wLoad) * t[0][0])
                 + (wTransition * (1 - wLoad) * t[0][1])
