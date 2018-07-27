@@ -52,23 +52,23 @@ void EndPoints::init()
 
         auto owner_std_cell = m_library_mapping.cellStdCell(pin_owner);
 
-        if(!m_timing_library.cellSequential(owner_std_cell))
+        if(!m_timing_library.cell_sequential(owner_std_cell))
             continue;
         else if(m_std_cells.direction(pin_std_cell) != standard_cell::PinDirection::INPUT)
             continue;
-        else if(m_timing_library.pinClock(pin_std_cell))
+        else if(m_timing_library.pin_clock(pin_std_cell))
             continue;
 
         m_endpoints.push_back(*pin);
     }
 }
 
-EndPoints::container_pin_type::const_iterator EndPoints::begin() const
+EndPoints::pin_container_type::const_iterator EndPoints::begin() const
 {
     return m_endpoints.cbegin();
 }
 
-EndPoints::container_pin_type::const_iterator EndPoints::end() const
+EndPoints::pin_container_type::const_iterator EndPoints::end() const
 {
     return m_endpoints.cend();
 }

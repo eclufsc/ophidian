@@ -42,9 +42,9 @@ namespace
 class LibraryFixture
 {
 public:
-    standard_cells_type mStdCells;
-    timing_arcs_type mArcs;
-    std::shared_ptr<liberty_type> mLiberty;
+    standard_cells_type m_std_cells;
+    timing_arcs_type m_arcs;
+    std::shared_ptr<liberty_type> m_liberty;
 
     template<class Value>
     bool diff_E_max(const Value &a, const Value &b)
@@ -59,23 +59,23 @@ public:
     }
 
     LibraryFixture() :
-        mStdCells(),
-        mLiberty(parser::LibertyParser().readFile("./input_files/sample2_Late.lib")),
-        mArcs(mStdCells)
+        m_std_cells(),
+        m_arcs(m_std_cells),
+        m_liberty(parser::LibertyParser().readFile("./input_files/sample2_Late.lib"))
     {
-        auto inv = mStdCells.add(std_cell_entity_type(), "INV_X1");
-        auto invIn = mStdCells.add(std_pin_entity_type(), "INV_X1:a", standard_cell::PinDirection::INPUT);
-        auto invOut = mStdCells.add(std_pin_entity_type(), "INV_X1:o", standard_cell::PinDirection::OUTPUT);
-        mStdCells.add(inv, invIn);
-        mStdCells.add(inv, invOut);
+        auto inv = m_std_cells.add(std_cell_entity_type(), "INV_X1");
+        auto invIn = m_std_cells.add(std_pin_entity_type(), "INV_X1:a", standard_cell::PinDirection::INPUT);
+        auto invOut = m_std_cells.add(std_pin_entity_type(), "INV_X1:o", standard_cell::PinDirection::OUTPUT);
+        m_std_cells.add(inv, invIn);
+        m_std_cells.add(inv, invOut);
 
-        auto ff = mStdCells.add(std_cell_entity_type(), "DFF_X80");
-        auto ffCk = mStdCells.add(std_pin_entity_type(), "DFF_X80:ck", standard_cell::PinDirection::INOUT);
-        auto ffIn = mStdCells.add(std_pin_entity_type(), "DFF_X80:d", standard_cell::PinDirection::INPUT);
-        auto ffOut = mStdCells.add(std_pin_entity_type(), "DFF_X80:q", standard_cell::PinDirection::OUTPUT);
-        mStdCells.add(ff, ffCk);
-        mStdCells.add(ff, ffIn);
-        mStdCells.add(ff, ffOut);
+        auto ff = m_std_cells.add(std_cell_entity_type(), "DFF_X80");
+        auto ffCk = m_std_cells.add(std_pin_entity_type(), "DFF_X80:ck", standard_cell::PinDirection::INOUT);
+        auto ffIn = m_std_cells.add(std_pin_entity_type(), "DFF_X80:d", standard_cell::PinDirection::INPUT);
+        auto ffOut = m_std_cells.add(std_pin_entity_type(), "DFF_X80:q", standard_cell::PinDirection::OUTPUT);
+        m_std_cells.add(ff, ffCk);
+        m_std_cells.add(ff, ffIn);
+        m_std_cells.add(ff, ffOut);
     }
 };
 } // namespace
@@ -84,57 +84,57 @@ TEST_CASE_METHOD(LibraryFixture, "Library: init", "[timing][library]")
 {
     SECTION("Library: info about timing arcs in late mode", "[timing][library]")
     {
-        CHECK(mArcs.size() == 0);
-        timing::Library lib(mStdCells, mArcs);
-        lib.init(*mLiberty.get(), false);
-        CHECK(mArcs.size() == 3);
+        CHECK(m_arcs.size() == 0);
+        timing::Library lib(m_std_cells, m_arcs);
+        lib.init(*m_liberty.get(), false);
+        CHECK(m_arcs.size() == 3);
 
-        CHECK(!lib.cellSequential(mStdCells.find(std_cell_entity_type(), "INV_X1")));
-        CHECK(!lib.pinClock(mStdCells.find(std_pin_entity_type(), "INV_X1:a")));
-        CHECK(!lib.pinClock(mStdCells.find(std_pin_entity_type(), "INV_X1:o")));
+        CHECK(!lib.cell_sequential(m_std_cells.find(std_cell_entity_type(), "INV_X1")));
+        CHECK(!lib.pin_clock(m_std_cells.find(std_pin_entity_type(), "INV_X1:a")));
+        CHECK(!lib.pin_clock(m_std_cells.find(std_pin_entity_type(), "INV_X1:o")));
 
-        CHECK(lib.cellSequential(mStdCells.find(std_cell_entity_type(), "DFF_X80")));
-        CHECK(lib.pinClock(mStdCells.find(std_pin_entity_type(), "DFF_X80:ck")));
-        CHECK(!lib.pinClock(mStdCells.find(std_pin_entity_type(), "DFF_X80:d")));
-        CHECK(!lib.pinClock(mStdCells.find(std_pin_entity_type(), "DFF_X80:q")));
+        CHECK(lib.cell_sequential(m_std_cells.find(std_cell_entity_type(), "DFF_X80")));
+        CHECK(lib.pin_clock(m_std_cells.find(std_pin_entity_type(), "DFF_X80:ck")));
+        CHECK(!lib.pin_clock(m_std_cells.find(std_pin_entity_type(), "DFF_X80:d")));
+        CHECK(!lib.pin_clock(m_std_cells.find(std_pin_entity_type(), "DFF_X80:q")));
 
         int i = 0;
-        for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
+        for (auto arcIt = m_arcs.begin(); arcIt != m_arcs.end(); arcIt++, i++)
         {
             auto arc = *arcIt;
             switch (i) {
             case 0:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "INV_X1:a");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "INV_X1:o");
                 CHECK(lib.unateness(arc) == unateness_type::NEGATIVE_UNATE);
                 CHECK(lib.type(arc) == timing_edge_type::COMBINATIONAL);
-                CHECK(diff_E_max(lib.computeRiseDelay(arc, capacitance_unit_type(1.5),  time_unit_type(20.0)) , time_unit_type(1.1565e+14)));
-                CHECK(diff_E_max(lib.computeFallDelay(arc, capacitance_unit_type(0.75), time_unit_type(325.0)), time_unit_type(9.39656e+14)));
-                CHECK(diff_E_max(lib.computeRiseSlews(arc, capacitance_unit_type(18.5), time_unit_type(18.5)), time_unit_type(-1.36301e+15)));
-                CHECK(diff_E_max(lib.computeFallSlews(arc, capacitance_unit_type(8.0),  time_unit_type(300.0)), time_unit_type(-9.558e+15)));
-                CHECK(diff_E_min(lib.capacitance(mArcs.from(arc)), capacitance_unit_type(1e-15)));
-                CHECK(lib.capacitance(mArcs.to(arc)) == capacitance_unit_type(0.0));
+                CHECK(diff_E_max(lib.compute_rise_delay(arc, capacitance_unit_type(1.5),  time_unit_type(20.0)) , time_unit_type(1.1565e+14)));
+                CHECK(diff_E_max(lib.compute_fall_delay(arc, capacitance_unit_type(0.75), time_unit_type(325.0)), time_unit_type(9.39656e+14)));
+                CHECK(diff_E_max(lib.compute_rise_slews(arc, capacitance_unit_type(18.5), time_unit_type(18.5)), time_unit_type(-1.36301e+15)));
+                CHECK(diff_E_max(lib.compute_fall_slews(arc, capacitance_unit_type(8.0),  time_unit_type(300.0)), time_unit_type(-9.558e+15)));
+                CHECK(diff_E_min(lib.capacitance(m_arcs.from(arc)), capacitance_unit_type(1e-15)));
+                CHECK(lib.capacitance(m_arcs.to(arc)) == capacitance_unit_type(0.0));
                 break;
             case 1:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "DFF_X80:ck");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "DFF_X80:q");
                 CHECK(lib.unateness(arc) == unateness_type::NON_UNATE);
                 CHECK(lib.type(arc) == timing_edge_type::RISING_EDGE);
-                CHECK(lib.computeRiseDelay(arc, capacitance_unit_type(128.0), time_unit_type(30.0)) == time_unit_type(6000));
-                CHECK(lib.computeFallDelay(arc, capacitance_unit_type(2048.0), time_unit_type(300.0)) == time_unit_type(96000));
-                CHECK(lib.computeRiseSlews(arc, capacitance_unit_type(512.0), time_unit_type(200.0)) == time_unit_type(24000));
-                CHECK(lib.computeFallSlews(arc, capacitance_unit_type(32.0), time_unit_type(32.0)) == time_unit_type(1500));
-                CHECK(diff_E_min(lib.capacitance(mArcs.from(arc)), capacitance_unit_type(1.5e-15)));
-                CHECK(lib.capacitance(mArcs.to(arc)) == capacitance_unit_type(0.0));
+                CHECK(lib.compute_rise_delay(arc, capacitance_unit_type(128.0), time_unit_type(30.0)) == time_unit_type(6000));
+                CHECK(lib.compute_fall_delay(arc, capacitance_unit_type(2048.0), time_unit_type(300.0)) == time_unit_type(96000));
+                CHECK(lib.compute_rise_slews(arc, capacitance_unit_type(512.0), time_unit_type(200.0)) == time_unit_type(24000));
+                CHECK(lib.compute_fall_slews(arc, capacitance_unit_type(32.0), time_unit_type(32.0)) == time_unit_type(1500));
+                CHECK(diff_E_min(lib.capacitance(m_arcs.from(arc)), capacitance_unit_type(1.5e-15)));
+                CHECK(lib.capacitance(m_arcs.to(arc)) == capacitance_unit_type(0.0));
                 break;
             case 2:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "DFF_X80:ck");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "DFF_X80:d");
                 CHECK(lib.type(arc) == timing_edge_type::SETUP_RISING);
-                CHECK(diff_E_min(lib.computeRiseSlews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(1.5e-12)));
-                CHECK(diff_E_min(lib.computeFallSlews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(2.5e-12)));
-                CHECK(diff_E_min(lib.capacitance(mArcs.from(arc)), capacitance_unit_type(1.5e-15)));
-                CHECK(diff_E_min(lib.capacitance(mArcs.to(arc)), capacitance_unit_type(3.49e-15)));
+                CHECK(diff_E_min(lib.compute_rise_slews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(1.5e-12)));
+                CHECK(diff_E_min(lib.compute_fall_slews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(2.5e-12)));
+                CHECK(diff_E_min(lib.capacitance(m_arcs.from(arc)), capacitance_unit_type(1.5e-15)));
+                CHECK(diff_E_min(lib.capacitance(m_arcs.to(arc)), capacitance_unit_type(3.49e-15)));
                 break;
             default:
                 break;
@@ -144,42 +144,42 @@ TEST_CASE_METHOD(LibraryFixture, "Library: init", "[timing][library]")
 
     SECTION("Library: info about timing arcs in early mode", "[timing][library]")
     {
-        CHECK(mArcs.size() == 0);
-        timing::Library lib(mStdCells, mArcs);
-        lib.init(*mLiberty.get(), true);
-        CHECK(mArcs.size() == 3);
+        CHECK(m_arcs.size() == 0);
+        timing::Library lib(m_std_cells, m_arcs);
+        lib.init(*m_liberty.get(), true);
+        CHECK(m_arcs.size() == 3);
 
         int i = 0;
-        for (auto arcIt = mArcs.begin(); arcIt != mArcs.end(); arcIt++, i++)
+        for (auto arcIt = m_arcs.begin(); arcIt != m_arcs.end(); arcIt++, i++)
         {
             auto arc = *arcIt;
             switch (i) {
             case 0:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "INV_X1:a");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "INV_X1:o");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "INV_X1:a");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "INV_X1:o");
                 CHECK(lib.unateness(arc) == unateness_type::NEGATIVE_UNATE);
                 CHECK(lib.type(arc) == timing_edge_type::COMBINATIONAL);
-                CHECK(diff_E_max(lib.computeRiseDelay(arc, capacitance_unit_type(1.5), time_unit_type(20.0)), time_unit_type(1.1565e+14)));
-                CHECK(diff_E_max(lib.computeFallDelay(arc, capacitance_unit_type(0.75), time_unit_type(325.0)), time_unit_type(9.39656e+14)));
-                CHECK(diff_E_max(lib.computeRiseSlews(arc, capacitance_unit_type(18.5), time_unit_type(18.5)), time_unit_type(-1.36301e+15)));
-                CHECK(diff_E_max(lib.computeFallSlews(arc, capacitance_unit_type(8.0), time_unit_type(300.0)), time_unit_type(-9.558e+15)));
+                CHECK(diff_E_max(lib.compute_rise_delay(arc, capacitance_unit_type(1.5), time_unit_type(20.0)), time_unit_type(1.1565e+14)));
+                CHECK(diff_E_max(lib.compute_fall_delay(arc, capacitance_unit_type(0.75), time_unit_type(325.0)), time_unit_type(9.39656e+14)));
+                CHECK(diff_E_max(lib.compute_rise_slews(arc, capacitance_unit_type(18.5), time_unit_type(18.5)), time_unit_type(-1.36301e+15)));
+                CHECK(diff_E_max(lib.compute_fall_slews(arc, capacitance_unit_type(8.0), time_unit_type(300.0)), time_unit_type(-9.558e+15)));
                 break;
             case 1:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "DFF_X80:q");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "DFF_X80:ck");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "DFF_X80:q");
                 CHECK(lib.unateness(arc) == unateness_type::NON_UNATE);
                 CHECK(lib.type(arc) == timing_edge_type::RISING_EDGE);
-                CHECK(lib.computeRiseDelay(arc, capacitance_unit_type(128.0), time_unit_type(30.0)) == time_unit_type(6000));
-                CHECK(lib.computeFallDelay(arc, capacitance_unit_type(2048.0), time_unit_type(300.0)) == time_unit_type(96000));
-                CHECK(lib.computeRiseSlews(arc, capacitance_unit_type(512.0), time_unit_type(200.0)) == time_unit_type(24000));
-                CHECK(lib.computeFallSlews(arc, capacitance_unit_type(32.0), time_unit_type(32.0)) == time_unit_type(1500));
+                CHECK(lib.compute_rise_delay(arc, capacitance_unit_type(128.0), time_unit_type(30.0)) == time_unit_type(6000));
+                CHECK(lib.compute_fall_delay(arc, capacitance_unit_type(2048.0), time_unit_type(300.0)) == time_unit_type(96000));
+                CHECK(lib.compute_rise_slews(arc, capacitance_unit_type(512.0), time_unit_type(200.0)) == time_unit_type(24000));
+                CHECK(lib.compute_fall_slews(arc, capacitance_unit_type(32.0), time_unit_type(32.0)) == time_unit_type(1500));
                 break;
             case 2:
-                CHECK(mStdCells.name(mArcs.from(arc)) == "DFF_X80:ck");
-                CHECK(mStdCells.name(mArcs.to(arc)) == "DFF_X80:d");
+                CHECK(m_std_cells.name(m_arcs.from(arc)) == "DFF_X80:ck");
+                CHECK(m_std_cells.name(m_arcs.to(arc)) == "DFF_X80:d");
                 CHECK(lib.type(arc) == timing_edge_type::HOLD_RISING);
-                CHECK(diff_E_min(lib.computeRiseSlews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(3.5e-12)));
-                CHECK(diff_E_min(lib.computeFallSlews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(4.5e-12)));
+                CHECK(diff_E_min(lib.compute_rise_slews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(3.5e-12)));
+                CHECK(diff_E_min(lib.compute_fall_slews(arc, capacitance_unit_type(1), time_unit_type(1)), time_unit_type(4.5e-12)));
                 break;
             default:
                 break;

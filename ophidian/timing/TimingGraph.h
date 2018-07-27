@@ -67,13 +67,6 @@ public:
 
     TimingGraph() = delete;
 
-    //! TimingGraph Constructor
-    /*!
-       \brief Constructs a TimingGraph with properties from the netlist.
-       \param netlist The Netlist of the circuit
-     */
-    TimingGraph(const netlist_type & netlist);
-
     //! Move Constructor
     TimingGraph(TimingGraph&&) = default;
     TimingGraph& operator=(TimingGraph&&) = default;
@@ -81,6 +74,13 @@ public:
     //! Copy Constructor
     TimingGraph(const TimingGraph&) = delete;
     TimingGraph& operator=(const TimingGraph&) = delete;
+
+    //! TimingGraph Constructor
+    /*!
+       \brief Constructs a TimingGraph with properties from the netlist.
+       \param netlist The Netlist of the circuit
+     */
+    TimingGraph(const netlist_type & netlist);
 
     //! Design Destructor
     /*!
@@ -115,7 +115,7 @@ public:
        \param pin A pin of the circuit.
        \return The node created.
      */
-    node_type riseNodeCreate(const pin_entity_type & pin);
+    node_type rise_node_create(const pin_entity_type & pin);
 
 
     //! Rise Node getter
@@ -124,7 +124,7 @@ public:
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    node_type riseNode(const pin_entity_type & pin) const;
+    node_type rise_node(const pin_entity_type & pin) const;
 
     //! Create a Fall Node
     /*!
@@ -132,7 +132,7 @@ public:
        \param pin A pin of the circuit.
        \return The node created.
      */
-    node_type fallNodeCreate(const pin_entity_type & pin);
+    node_type fall_node_create(const pin_entity_type & pin);
 
     //! Fall Node getter const
     /*!
@@ -140,7 +140,7 @@ public:
        \param pin A pin of the circuit.
        \return The node of a pin.
      */
-    node_type fallNode(const pin_entity_type & pin) const;
+    node_type fall_node(const pin_entity_type & pin) const;
 
     //! Create a Arc
     /*!
@@ -150,7 +150,7 @@ public:
        \param timingArc The TimingArc entity associated.
        \return The arc created.
      */
-    arc_type arcCreate(const node_type & from, const node_type & to, timing_arc_entity_type timingArc);
+    arc_type arc_create(const node_type & from, const node_type & to, timing_arc_entity_type timingArc);
 
     //! Create a Arc
     /*!
@@ -160,7 +160,7 @@ public:
        \param net The net entity associated.
        \return The arc created.
      */
-    arc_type arcCreate(const node_type & from, const node_type & to, net_entity_type net);
+    arc_type arc_create(const node_type & from, const node_type & to, net_entity_type net);
 
     //! Node Property Getter
     /*!
@@ -208,7 +208,7 @@ public:
        \param node A node of the graph.
        \return iterator of output edges.
      */
-    graph_type::OutArcIt outArc(const node_type & node) const;
+    graph_type::OutArcIt out_arc_iterator(const node_type & node) const;
 
     //! Input edges of a node.
     /*!
@@ -216,7 +216,7 @@ public:
        \param node A node of the graph.
        \return iterator of input edges.
      */
-    graph_type::InArcIt inArc(const node_type & node) const;
+    graph_type::InArcIt in_arc_iterator(const node_type & node) const;
 
     //! Node's Pin Getter
     /*!
@@ -260,7 +260,7 @@ public:
     void destroy(const Iterator begin, const Iterator end)
     {
         for(Iterator it{begin}; it != end; ++it)
-            mGraph.erase(*it);
+            m_graph.erase(*it);
     }
 
 private:
@@ -272,18 +272,18 @@ private:
        \param map The Pin's property of the netlist.
        \return The node created.
      */
-    node_type nodeCreate(const pin_entity_type & pin,
+    node_type node_create(const pin_entity_type & pin,
                         const NodeProperty & prop,
                         pin_entity_to_node_property_type & map);
 
-    graph_type                       mGraph;
-    node_map_type<pin_entity_type>   mPins;
-    node_map_type<NodeProperty>      mNodeProperties;
-    arc_map_type<arc_entity_type>    mArcs;
-    arc_map_type<ArcProperty>        mArcProperties;
+    graph_type                       m_graph;
+    node_map_type<pin_entity_type>   m_pins;
+    node_map_type<NodeProperty>      m_node_properties;
+    arc_map_type<arc_entity_type>    m_arcs;
+    arc_map_type<ArcProperty>        m_arc_properties;
 
-    pin_entity_to_node_property_type mRiseNodes;
-    pin_entity_to_node_property_type mFallNodes;
+    pin_entity_to_node_property_type m_rise_nodes;
+    pin_entity_to_node_property_type m_fall_nodes;
 };
 
 } // namespace timing

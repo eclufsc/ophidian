@@ -36,9 +36,28 @@ namespace timing
 class TimingGraphBuilder
 {
 public:
-    //! Default Contructor
+    //! TimingGraphBuilder Constructor
+    /*!
+       \brief Constructs a TimingGraphBuilder object.
+     */
     TimingGraphBuilder();
 
+    //! TimingGraphBuilder Destructor
+    /*!
+       \brief Destroys the TimingGraphBuilder object
+     */
+    ~TimingGraphBuilder() = default;
+
+    //! Build the graph of the circuit
+    /*!
+       \brief Build the graph of the circuit
+       \param netlist Netlist of the circuit
+       \param stdCells Standard Cells of the circuit
+       \param libraryMapping Library Mapping of the circuit
+       \param timingArcs Timing arcs of the circuit
+       \param dc Desing constraints
+       \param graph Empty timing graph
+     */
     void build(circuit::Netlist & netlist,
                standard_cell::StandardCells & stdCells,
                const circuit::LibraryMapping & libraryMapping,

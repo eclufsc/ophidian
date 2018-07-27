@@ -40,27 +40,27 @@ class StaticTimingAnalysis
 {
 public:
     template <class T>
-    using generic_sta_type             = GenericSTA<wiremodel::LumpedCapacitance, T>;
+    using generic_sta_type        = GenericSTA<wiremodel::LumpedCapacitance, T>;
 
-    using time_unit_type               = util::second_t;
-    using timing_data_type             = TimingData;
-    using graph_and_topology_type      = GraphAndTopology;
+    using time_unit_type          = util::second_t;
+    using timing_data_type        = TimingData;
+    using graph_and_topology_type = GraphAndTopology;
 
-    using timing_graph_type            = TimingGraph;
-    using timing_arcs_type             = TimingArcs;
-    using rc_tree_type                 = timingdriven_placement::RCTree;
-    using net_to_rctrees_property_type = entity_system::Property<circuit::Net, timingdriven_placement::RCTree>;
-    using timing_library_type          = Library;
-    using placement_type               = placement::Placement;
-    using placment_library_type        = placement::PlacementMapping;
-    using netlist_type                 = circuit::Netlist;
-    using pin_entity_type              = circuit::Pin;
-    using library_mapping_type         = circuit::LibraryMapping;
-    using standard_cells_type          = standard_cell::StandardCells;
-    using design_constraints_type      = parser::DesignConstraints;
-    using lef_type                     = parser::Lef;
-    using liberty_type                 = parser::Liberty;
-    using endpoints_type               = EndPoints;
+    using timing_graph_type       = TimingGraph;
+    using timing_arcs_type        = TimingArcs;
+    using rc_tree_type            = timingdriven_placement::RCTree;
+    using rctrees_property_type   = entity_system::Property<circuit::Net, timingdriven_placement::RCTree>;
+    using timing_library_type     = Library;
+    using placement_type          = placement::Placement;
+    using placment_library_type   = placement::PlacementMapping;
+    using netlist_type            = circuit::Netlist;
+    using pin_entity_type         = circuit::Pin;
+    using library_mapping_type    = circuit::LibraryMapping;
+    using standard_cells_type     = standard_cell::StandardCells;
+    using design_constraints_type = parser::DesignConstraints;
+    using lef_type                = parser::Lef;
+    using liberty_type            = parser::Liberty;
+    using endpoints_type          = EndPoints;
 
     //! Deleted Default Constructor
     StaticTimingAnalysis() = delete;
@@ -74,16 +74,36 @@ public:
     StaticTimingAnalysis& operator=(StaticTimingAnalysis&&) = default;
 
     //! StaticTimingAnalysis Constructor
+    /*!
+       \brief Constructs the object.
+       \param std_cells Standard Cells of the circuit
+       \param netlist Netlist of the circuit
+       \param placement Placement of the circuit
+       \param placement_mapping Library Mapping of the circuit
+     */
     StaticTimingAnalysis(standard_cells_type& std_cells,
                          netlist_type& netlist,
                          library_mapping_type& lib_mapping,
                          placement_type& placement,
                          placment_library_type& placement_mapping);
 
+    //! Initializes StaticTimingAnalysis default values
+    /*!
+       \brief Initializes all components of the STA
+       \param early Liberty on early time mode
+       \param late Liberty on late time mode
+       \param lef LEF of the circuit
+       \param dc Design Constrains
+     */
     void init(const liberty_type& early, const liberty_type& late, const lef_type& lef, const design_constraints_type& dc);
 
+    //! Updates delay values
+    /*!
+       \brief Performs all of the algorithms' STA.
+     */
     void update_timing();
 
+    //! Main functions
     time_unit_type late_wns() const;
     time_unit_type early_wns() const;
     time_unit_type late_tns() const;
@@ -101,9 +121,15 @@ public:
     time_unit_type late_rise_slew(const pin_entity_type& p) const;
     time_unit_type late_fall_slew(const pin_entity_type& p) const;
 
+    //! EndPoints getter
+    /*!
+       \brief Retrieve the endpoins of the circuit
+       \return Endpoints of the circuit
+     */
     const endpoints_type & timing_endpoints() const;
 
 private:
+    //! Auxiliary Functions
     void propagate_ats();
     void propagate_rts();
     void update_wns_and_tns();
@@ -117,7 +143,7 @@ private:
     timing_data_type              m_early_data;
     timing_data_type              m_late_data;
     graph_and_topology_type       m_topology;
-    net_to_rctrees_property_type  m_rc_trees;
+    rctrees_property_type         m_rc_trees;
     generic_sta_type<Optimistic>  m_early_sta;
     generic_sta_type<Pessimistic> m_late_sta;
     endpoints_type                m_endpoints;

@@ -62,8 +62,6 @@ void StaticTimingAnalysis::init(const liberty_type& early, const liberty_type& l
     {
         circuit::Pin source;
 
-        auto name = m_topology.m_netlist.name(*it);
-
         for (auto pin : m_topology.m_netlist.pins(*it))
             if (m_topology.m_std_cells.direction(m_topology.m_library_mapping.pinStdCell(pin)) == standard_cell::PinDirection::OUTPUT)
             {

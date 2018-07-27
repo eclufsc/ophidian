@@ -23,11 +23,15 @@ under the License.
 TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
 {
     using namespace ophidian;
-    using rctree_type           = timing::Elmore::rctree_type;
-    using time_unit_type        = timing::Elmore::time_unit_type;
-    using capacitance_unit_type = timing::Elmore::capacitance_unit_type;
-    using resistance_unit_type  = timing::Elmore::resistance_unit_type;
-    using square_time_unit_type = timing::ElmoreSecondMoment::square_time_unit_type;
+
+    using elmore_type           = timing::Elmore;
+    using rctree_type           = elmore_type::rctree_type;
+    using time_unit_type        = elmore_type::time_unit_type;
+    using capacitance_unit_type = elmore_type::capacitance_unit_type;
+    using resistance_unit_type  = elmore_type::resistance_unit_type;
+
+    using elmore_second_moment_type = timing::ElmoreSecondMoment;
+    using square_time_unit_type     = elmore_second_moment_type::square_time_unit_type;
 
     SECTION("Elmore Delay: RCTree with 1 node", "[timing][RCTree][Elmore]")
     {
@@ -36,7 +40,7 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
         auto cap = rctree.addCapacitor("cap1");
         rctree.source(cap);
 
-        timing::Elmore delay(rctree);
+        elmore_type delay(rctree);
 
         SECTION("Elmore", "[timing][RCTree][Elmore]")
         {
@@ -45,7 +49,7 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
 
         SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
         {
-            timing::ElmoreSecondMoment second(delay);
+            elmore_second_moment_type second(delay);
             REQUIRE(second.at(cap) == square_time_unit_type(0.0));
         }
     }
@@ -62,7 +66,7 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
         rctree.capacitance(C0, capacitance_unit_type(util::femtofarad_t(1.1)));
         rctree.capacitance(C1, capacitance_unit_type(util::femtofarad_t(2.2)));
 
-        timing::Elmore delay(rctree);
+        elmore_type delay(rctree);
 
         SECTION("Elmore", "[timing][RCTree][Elmore]")
         {
@@ -70,12 +74,12 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
             REQUIRE(delay.at(C1) == time_unit_type(util::picosecond_t((0.223 * 2.2))));
         }
 
-        SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
+        SECTION("Elmore Second Moment", "[timing][RCTree][elmore_second_moment_type]")
         {
             auto downstream_c1 = util::femtofarad_t(2.2) * delay.at(C1);
             auto second_c1 = util::kiloohm_t(0.223) * downstream_c1;
 
-            timing::ElmoreSecondMoment second(delay);
+            elmore_second_moment_type second(delay);
             REQUIRE(second.at(C0) == square_time_unit_type(0.0));
             REQUIRE(second.at(C1) == second_c1);
         }
@@ -114,7 +118,7 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
         auto R2 = rctree.addResistor(C1, u1_a_tap, resistance_unit_type(util::kiloohm_t(0.440)));
         auto R3 = rctree.addResistor(u1_a_tap, u1_a, resistance_unit_type(0.0));
 
-        timing::Elmore delay(rctree);
+        elmore_type delay(rctree);
 
         SECTION("Elmore", "[timing][RCTree][Elmore]")
         {
@@ -140,9 +144,9 @@ TEST_CASE("Elmore Delay", "[timing][RCTree][Elmore]")
             REQUIRE(delay.at(u1_a) == golden_delay);
         }
 
-        SECTION("Elmore Second Moment", "[timing][RCTree][ElmoreSecondMoment]")
+        SECTION("Elmore Second Moment", "[timing][RCTree][elmore_second_moment_type]")
         {
-            timing::ElmoreSecondMoment second(delay);
+            elmore_second_moment_type second(delay);
 
             auto down_u1_a = rctree.capacitance(u1_a) * delay.at(u1_a);
             auto down_u1_a_tap = rctree.capacitance(u1_a_tap) * delay.at(u1_a_tap) + down_u1_a;

@@ -56,7 +56,8 @@ void Elmore::update()
 
     for (auto c : m_order)
         if (m_pred[c].first != lemon::INVALID)
-            m_elmore_delay[c] = m_elmore_delay[m_pred[c].first] + m_tree.resistance(m_pred[c].second) * m_downstream_capacitance[c];
+            m_elmore_delay[c] = m_elmore_delay[m_pred[c].first]
+                    + m_tree.resistance(m_pred[c].second) * m_downstream_capacitance[c];
 }
 
 Elmore::time_unit_type Elmore::at(const capacitor_type & cap) const
@@ -69,10 +70,12 @@ const Elmore::predecessor_map_type & Elmore::pred() const
     return m_pred;
 }
 
-const Elmore::order_container_type & Elmore::order() const
+const Elmore::sorted_container_type & Elmore::order() const
 {
     return m_order;
 }
+
+//! ---------------------------------------------------------------------------------
 
 ElmoreSecondMoment::ElmoreSecondMoment(const Elmore & e) :
     m_elmore(e),
@@ -110,7 +113,7 @@ void ElmoreSecondMoment::update()
     for (auto c : order)
         if (m_elmore.pred()[c].first != lemon::INVALID)
             m_second_moment[c] = m_second_moment[m_elmore.pred()[c].first]
-                               + m_tree.resistance(m_elmore.pred()[c].second) * downstream_capacitance[c];
+                    + m_tree.resistance(m_elmore.pred()[c].second) * downstream_capacitance[c];
 }
 
 }   // namespace timing

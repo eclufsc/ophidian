@@ -34,60 +34,70 @@ namespace parser
 class DesignConstraints
 {
 public:
+    template <class T> using container_type = std::vector<T>;
+    using string_type = std::string;
+
     struct Clock {
         double period;
-        std::string name;
-        std::string portName;
+        string_type name;
+        string_type port_name;
     };
 
     struct InputDelays {
         double delay;
-        std::string clock;
-        std::string portName;
+        string_type clock;
+        string_type port_name;
     };
 
     struct DrivingCell {
-        std::string portName;
-        std::string libCell;
-        std::string pinName;
-        double slewFall;
-        double slewRise;
+        string_type port_name;
+        string_type lib_cell;
+        string_type pin_name;
+        double slew_fall;
+        double slew_rise;
     };
 
     struct OutputDelay {
         double delay;
-        std::string clock;
-        std::string portName;
+        string_type clock;
+        string_type port_name;
     };
 
     struct OutputLoad {
-        double pinLoad;
-        std::string portName;
+        double pin_load;
+        string_type port_name;
     };
 
-    DesignConstraints();
-    ~DesignConstraints();
+    using clock_type        = Clock;
+    using input_delays_type = InputDelays;
+    using driving_cell_type = DrivingCell;
+    using output_delay_type = OutputDelay;
+    using output_load_type  = OutputLoad;
 
-//private: ???
-    Clock mClock;
-    std::vector<InputDelays> mInputDelays;
-    std::vector<DrivingCell> mInputDrivers;
-    std::vector<OutputDelay> mOutputDelays;
-    std::vector<OutputLoad> mOutputLoads;
+    DesignConstraints() = default;
+    ~DesignConstraints() = default;
+
+    clock_type                        m_clock;
+    container_type<input_delays_type> m_input_delays;
+    container_type<driving_cell_type> m_input_drivers;
+    container_type<output_delay_type> m_output_delays;
+    container_type<output_load_type>  m_output_loads;
 };
 
 class SDCSimple
 {
 public:
-    SDCSimple();
+    SDCSimple() = default;
+    ~SDCSimple() = default;
+
     std::shared_ptr<DesignConstraints> constraints() const;
 };
 
 class SDCParser
 {
 public:
-    SDCParser();
-    ~SDCParser();
+    SDCParser() = default;
+    ~SDCParser() = default;
 
     std::shared_ptr<DesignConstraints> readFile(const std::string & filename) const throw(InexistentFile);
 };

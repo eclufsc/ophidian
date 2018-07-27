@@ -64,9 +64,9 @@ void GraphAndTopology::init()
     m_levels.erase(beg, m_levels.end());
 
     auto begin = std::remove_if(m_sorted_drivers.begin(), m_sorted_drivers.end(),
-        [&](const graph_type::Node& node)->bool{
-            return m_std_cells.direction(m_library_mapping.pinStdCell(m_graph.entity(node))) != standard_cell::PinDirection::OUTPUT;
-        }
+                                [&](const graph_type::Node& node)->bool{
+        return m_std_cells.direction(m_library_mapping.pinStdCell(m_graph.entity(node))) != standard_cell::PinDirection::OUTPUT;
+    }
     );
 
     m_sorted_drivers.erase(begin, m_sorted_drivers.end());

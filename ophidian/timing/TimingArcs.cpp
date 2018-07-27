@@ -22,9 +22,8 @@ TimingArcs::timing_arc_entity_type TimingArcs::add(const timing_arc_name_type & 
         mName2Arc[arcName] = arc;
         return arc;
     }
-    else {
-        return mName2Arc[arcName];
-    }
+
+    return mName2Arc[arcName];
 }
 
 void TimingArcs::from(const timing_arc_entity_type & arc, const standard_pin_entity_type & from_)
@@ -95,7 +94,7 @@ TimingArcs::standard_pin_entity_type TimingArcs::to(const timing_arc_entity_type
     return mTo[arc];
 }
 
-const TimingArcs::timing_arc_vector_type & TimingArcs::pinArcs(const standard_pin_entity_type & pin) const
+const TimingArcs::timing_arc_vector_type & TimingArcs::pin_arcs(const standard_pin_entity_type & pin) const
 {
     return mPin2TimingArcs[pin];
 }

@@ -192,7 +192,7 @@ public:
        \param pin A handler for the Pin we want to get the Arcs.
        \return Vector for the Arcs of a Pin.
      */
-    const timing_arc_vector_type & pinArcs(const standard_pin_entity_type & pin) const;
+    const timing_arc_vector_type & pin_arcs(const standard_pin_entity_type & pin) const;
 
     //! Make Cell Property
     /*!

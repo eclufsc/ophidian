@@ -23,18 +23,21 @@ under the License.
 
 using namespace ophidian;
 
+using standard_cells_type = standard_cell::StandardCells;
+using standard_pin_type   = standard_cell::Pin;
+
 namespace
 {
 class TimingArcFixture
 {
 public:
-    standard_cell::StandardCells mStdCells;
-    standard_cell::Pin mFrom, mTo;
+    standard_cells_type m_std_cells;
+    standard_pin_type m_from, m_to;
 
     TimingArcFixture()
     {
-        mFrom = mStdCells.add(standard_cell::Pin(), "from", standard_cell::PinDirection::OUTPUT);
-        mTo = mStdCells.add(standard_cell::Pin(), "to", standard_cell::PinDirection::INPUT);
+        m_from = m_std_cells.add(standard_pin_type(), "from", standard_cell::PinDirection::OUTPUT);
+        m_to = m_std_cells.add(standard_pin_type(), "to", standard_cell::PinDirection::INPUT);
     }
 };
 } // namespace
@@ -43,21 +46,21 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 {
     SECTION("TimingArcs: Brand-new TimingArcs must be empty.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         REQUIRE(arcs.size() == 0);
         REQUIRE(arcs.begin() == arcs.end());
     }
 
     SECTION("TimingArcs: Add TimingArc.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         auto arc = arcs.add("arc");
         REQUIRE(arcs.size() == 1);
     }
 
     SECTION("TimingArcs: Erase TimingArc.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         auto arc = arcs.add("arc");
         arcs.erase(arc);
         REQUIRE(arcs.size() == 0);
@@ -65,7 +68,7 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 
     SECTION("TimingArcs: TimingArc mapping.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         arcs.add("arc");
         auto arc = arcs.find("arc");
         arcs.erase(arc);
@@ -74,7 +77,7 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 
     SECTION("TimingArcs: Try add the same arc twice.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         arcs.add("arc");
         arcs.add("arc");
         REQUIRE(arcs.size() == 1);
@@ -82,7 +85,7 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 
     SECTION("TimingArcs: Finding a TimingArc.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         auto arc1 = arcs.add("arc1");
         auto arc2 = arcs.add("arc2");
         REQUIRE(arcs.size() == 2);
@@ -92,18 +95,18 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 
     SECTION("TimingArcs: Add from and to of an arc.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         auto arc = arcs.add("arc");
-        arcs.from(arc, mFrom);
-        arcs.to(arc, mTo);
+        arcs.from(arc, m_from);
+        arcs.to(arc, m_to);
 
-        REQUIRE(arcs.from(arc) == mFrom);
-        REQUIRE(arcs.to(arc) == mTo);
+        REQUIRE(arcs.from(arc) == m_from);
+        REQUIRE(arcs.to(arc) == m_to);
     }
 
     SECTION("TimingArcs: Make TimingArc Property.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
         auto arc1 = arcs.add("arc1");
         auto arc2 = arcs.add("arc2");
         auto delay = arcs.makeProperty<double>();
@@ -115,18 +118,18 @@ TEST_CASE_METHOD(TimingArcFixture, "TimingArcs tests", "[Timing][TimingArcs]")
 
     SECTION("TimingArcs: Check association between arcs and a pin.", "[Timing][TimingArcs]")
     {
-        timing::TimingArcs arcs(mStdCells);
+        timing::TimingArcs arcs(m_std_cells);
 
-        auto to2 = mStdCells.add(standard_cell::Pin(), "to2", standard_cell::PinDirection::INPUT);
+        auto to2 = m_std_cells.add(standard_pin_type(), "to2", standard_cell::PinDirection::INPUT);
         auto arc1 = arcs.add("arc1");
         auto arc2 = arcs.add("arc2");
-        arcs.from(arc1, mFrom);
-        arcs.to(arc1, mTo);
-        arcs.from(arc2, mTo);
+        arcs.from(arc1, m_from);
+        arcs.to(arc1, m_to);
+        arcs.from(arc2, m_to);
         arcs.to(arc2, to2);
 
-        REQUIRE(arcs.pinArcs(mTo).size() == 2);
-        REQUIRE(arcs.pinArcs(mTo).front() == arc1);
-        REQUIRE(arcs.pinArcs(mTo).back() == arc2);
+        REQUIRE(arcs.pin_arcs(m_to).size() == 2);
+        REQUIRE(arcs.pin_arcs(m_to).front() == arc1);
+        REQUIRE(arcs.pin_arcs(m_to).back() == arc2);
     }
 }

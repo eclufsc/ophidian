@@ -38,7 +38,7 @@ public:
     using standard_cells_type  = standard_cell::StandardCells;
     using timing_library_type  = Library;
     using pin_entity_type      = circuit::Pin;
-    using container_pin_type   = std::vector<pin_entity_type>;
+    using pin_container_type   = std::vector<pin_entity_type>;
 
     //! Default Constructor
     EndPoints() = default;
@@ -52,22 +52,37 @@ public:
     EndPoints& operator=(EndPoints&&) = default;
 
     //! EndPoints Constructor
+    /*!
+       \brief Constructs the object.
+       \param netlist Netlist of the circuit
+       \param library_mapping Library Mapping of the circuit
+       \param std_cells Standard Cells of the circuit
+       \param timing_library Timing library of the circuit
+     */
     EndPoints(const netlist_type & netlist,
               const library_mapping_type & library_mapping,
               standard_cells_type & std_cells,
               const timing_library_type & timing_library);
 
+    //! EndPoints Destructor
+    /*!
+       \brief Destroys the EndPoints object
+     */
     ~EndPoints() = default;
     
+    //! Initializes Endpoints values
+    /*!
+       \brief Find the endpoints of the circuit
+     */
     void init();
 
-    container_pin_type::const_iterator begin() const;
-    container_pin_type::const_iterator end() const;
+    pin_container_type::const_iterator begin() const;
+    pin_container_type::const_iterator end() const;
     std::size_t size() const;
     bool empty() const;
 
 private:
-    container_pin_type          m_endpoints;
+    pin_container_type          m_endpoints;
     const netlist_type&         m_netlist;
     const library_mapping_type& m_library_mapping;
     standard_cells_type&        m_std_cells;
@@ -79,6 +94,12 @@ class WorstNegativeSlack
 public:
     using time_unit_type = util::second_t;
 
+    //! GenericSTA Constructor
+    /*!
+       \brief Constructs the object.
+       \param POs Output pins container
+       \param sta Generic sta of the circuit
+     */
     template <class POsContainer, class WireDelayModel, class MergeStrategy>
     WorstNegativeSlack(const POsContainer& POs, const GenericSTA<WireDelayModel, MergeStrategy> & sta) :
         m_value(std::numeric_limits<time_unit_type>::max())
@@ -87,6 +108,10 @@ public:
             m_value = units::math::min(m_value, units::math::min(sta.rise_slack(PO), sta.fall_slack(PO)));
     }
 
+    //! WorstNegativeSlack Destructor
+    /*!
+       \brief Destroys the WorstNegativeSlack object
+     */
     ~WorstNegativeSlack() = default;
 
     const time_unit_type value() const;
@@ -100,6 +125,12 @@ class TotalNegativeSlack
 public:
     using time_unit_type = util::second_t;
 
+    //! GenericSTA Constructor
+    /*!
+       \brief Constructs the object.
+       \param POs Output pins container
+       \param sta Generic sta of the circuit
+     */
     template <class POsContainer, class WireDelayModel, class MergeStrategy>
     TotalNegativeSlack(const POsContainer& POs, const GenericSTA<WireDelayModel, MergeStrategy> & sta) :
         m_value(0.0)
@@ -108,6 +139,10 @@ public:
             m_value += units::math::min(time_unit_type(0), units::math::min(sta.rise_slack(PO), sta.fall_slack(PO)));
     }
 
+    //! TotalNegativeSlack Destructor
+    /*!
+       \brief Destroys the TotalNegativeSlack object
+     */
     ~TotalNegativeSlack() = default;
 
     const time_unit_type value() const;

@@ -52,32 +52,50 @@ public:
     TimingData(TimingData&&) = default;
     TimingData& operator=(TimingData&&) = default;
 
-    //! TimingData Constructor
+    //! Timing Constructor
+    /*!
+       \brief Constructs a class timing data for a given lib.
+       \param lib Timing liberty
+       \param graph Timing graph
+     */
     TimingData(const timing_library_type& lib, const timing_graph_type& graph);
 
+    //! TimingDataDestructor
+    /*!
+       \brief Destroys the TimingData object
+     */
     ~TimingData() = default;
 
+    //! Library getter
+    /*!
+       \brief Get the library object of timing data
+       \return Timing library
+     */
     const timing_library_type& library();
 
     /* ------------------   nodes   ------------------ */
 
-    void arrival(node_type node, time_unit_type arrival);
-    void slew(node_type node, time_unit_type slew);
-    void required(node_type node, time_unit_type required);
-    void load(node_type node, capacitance_unit_type load);
+    //! Setters
+    void arrival(const node_type& node, const time_unit_type& arrival);
+    void slew(const node_type& node, const time_unit_type& slew);
+    void required(const node_type& node, const time_unit_type& required);
+    void load(const node_type& node, const capacitance_unit_type& load);
 
-    const time_unit_type arrival(node_type node) const;
-    const time_unit_type slew(node_type node) const;
-    const time_unit_type required(node_type node) const;
-    const capacitance_unit_type load(node_type node) const;
+    //! Getters
+    const time_unit_type& arrival(const node_type& node) const;
+    const time_unit_type& slew(const node_type& node) const;
+    const time_unit_type& required(const node_type& node) const;
+    const capacitance_unit_type& load(const node_type& node) const;
 
     /* ------------------   arcs   ------------------ */
 
-    void delay(arc_type arc, const time_unit_type delay);
-    void slew(arc_type arc, const time_unit_type slew);
+    //! Setters
+    void delay(const arc_type& arc, const time_unit_type& delay);
+    void slew(const arc_type& arc, const time_unit_type& slew);
 
-    const time_unit_type delay(arc_type arc) const;
-    const time_unit_type slew(arc_type arc) const;
+    //! Getters
+    const time_unit_type& delay(const arc_type& arc) const;
+    const time_unit_type& slew(const arc_type& arc) const;
 
 private:
     const timing_library_type&   m_library;

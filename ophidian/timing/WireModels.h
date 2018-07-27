@@ -43,22 +43,41 @@ using capacitance_map_type             = node_map_type<capacitance_unit_type>;
 class EffectiveCapacitance
 {
 public:
-    //! Default Constructor
+    //! EffectiveCapacitance Constructor
+    /*!
+       \brief Constructs effective capacitance calculator.
+     */
     EffectiveCapacitance();
 
+    //! EffectiveCapacitance Destructor
+    /*!
+       \brief Destroys the EffectiveCapacitance object
+     */
     ~EffectiveCapacitance();
 
-    void precision(precicion_type epsilon);
-
+    //! Setters
     void slews(slew_map_type& sm);
-    const slew_map_type& slews() const;
-
     void delays(slew_map_type& dm);
-    const slew_map_type& delays() const;
-
     void ceff(capacitance_map_type &cm);
+
+    //! Getters
+    const slew_map_type& slews() const;
+    const slew_map_type& delays() const;
     const capacitance_map_type& ceff() const;
 
+    //! Precision Setter
+    /*!
+       \brief Set the precision on effective simulation
+       \param epsilon Precision value
+     */
+    void precision(precicion_type epsilon);
+
+    //! Executes effective simulation
+    /*!
+       \brief Performs the effective simulation on tree
+       \param slew_calculator Slew calculator
+       \param tree RC tree of a net
+     */
     template <class SlewCalculator>
     capacitance_unit_type simulate(const SlewCalculator & slew_calculator, rctree_type& tree)
     {
@@ -140,21 +159,34 @@ private:
 class LumpedCapacitance
 {
 public:
-
-    //! Default Constructor
+    //! LumpedCapacitance Constructor
+    /*!
+       \brief Constructs lumped capacitance calculator.
+     */
     LumpedCapacitance();
     
+    //! LumpedCapacitance Destructor
+    /*!
+       \brief Destroys the LumpedCapacitance object
+     */
     ~LumpedCapacitance();
 
+    //! Setters
     void slews(slew_map_type& sm);
-    const slew_map_type& slews() const;
-
     void delays(slew_map_type& dm);
-    const slew_map_type& delays() const;
-
     void ceff(capacitance_map_type &cm);
+
+    //! Getters
+    const slew_map_type& delays() const;
+    const slew_map_type& slews() const;
     const capacitance_map_type& ceff() const;
 
+    //! Executes lumped simulation
+    /*!
+       \brief Performs the lumped simulation on tree
+       \param slew_calculator Slew calculator
+       \param tree RC tree of a net
+     */
     template <class SlewCalculator>
     capacitance_unit_type simulate(const SlewCalculator & slew_calculator, const rctree_type& tree)
     {
@@ -165,8 +197,8 @@ public:
         if(!m_ceff)
             m_ceff = new capacitance_map_type(tree.g(), capacitance_unit_type(0));
 
-        slew_map_type&        slews  = *m_slews;
-        slew_map_type&        delays = *m_delays;
+        slew_map_type& slews  = *m_slews;
+        slew_map_type& delays = *m_delays;
         capacitance_map_type& ceff   = *m_ceff;
 
         capacitance_unit_type lumped(0);

@@ -34,15 +34,25 @@ public:
     template <class T> using container_type = std::vector<T>;
 
     using lut_type                          = parser::Liberty::LUT;
-    using container_row_type                = container_type<RowType>;
-    using container_column_type             = container_type<ColumnType>;
-    using container_value_type              = container_type<container_type<ValueType>>;
+    using row_container_type                = container_type<RowType>;
+    using column_container_type             = container_type<ColumnType>;
+    using value_container_type              = container_type<container_type<ValueType>>;
 
     //! Default Constructor
     LookupTable() = default;
 
     //! LookupTable Constructor
-    LookupTable(const lut_type & lut, const RowType& row_factor, const ColumnType& column_factor, const ValueType& value_factor) :
+    /*!
+       \brief Converts the LUT table using the scale factors.
+       \param lut LookupTable from liberty parser
+       \param row_factor Row scale factor
+       \param column_factor Column scale factor
+       \param value_factor value scale factor
+     */
+    LookupTable(const lut_type & lut,
+                const RowType& row_factor,
+                const ColumnType& column_factor,
+                const ValueType& value_factor) :
         m_row_values(lut.index_1.size()),
         m_column_values(lut.index_2.size()),
         m_values(lut.values.size())
@@ -66,8 +76,18 @@ public:
     LookupTable(LookupTable&&) = default;
     LookupTable& operator=(LookupTable&&) = default;
 
+    //! LookupTable Destructor
+    /*!
+       \brief Destroys the LookupTable object
+     */
     ~LookupTable() = default;
 
+    //! Compute slew
+    /*!
+       \brief Equation for interpolation ISPD Contest 2012 (http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf)
+       \param rv Row index
+       \param cv Column index
+     */
     ValueType compute(const RowType & rv, const ColumnType & cv) const
     {
         if (m_values.size() == 1)
@@ -124,9 +144,6 @@ public:
         t[1][0] = m_values[row2][column1];
         t[1][1] = m_values[row2][column2];
 
-        //! Equation for interpolation
-        //! (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
-
         return ((1 - wTransition) * (1 - wLoad) * t[0][0])
                 + (wTransition * (1 - wLoad) * t[0][1])
                 + ((1 - wTransition) * wLoad * t[1][0])
@@ -134,9 +151,9 @@ public:
     }
 
 private:
-    container_row_type    m_row_values;
-    container_column_type m_column_values;
-    container_value_type  m_values;
+    row_container_type    m_row_values;
+    column_container_type m_column_values;
+    value_container_type  m_values;
 };
 
 } // namespace timing

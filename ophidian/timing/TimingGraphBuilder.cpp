@@ -21,8 +21,8 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
     // Creating two nodes for each pin
     for (auto pinIt = netlist.begin(circuit::Pin()); pinIt != netlist.end(circuit::Pin()); ++pinIt)
     {
-        graph.riseNodeCreate(*pinIt);
-        graph.fallNodeCreate(*pinIt);
+        graph.rise_node_create(*pinIt);
+        graph.fall_node_create(*pinIt);
     }
 
     // Creating net edges
@@ -31,10 +31,11 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
         auto netPins = netlist.pins(*netIt);
         circuit::Pin source;
 
-        for (auto pin : netPins) {
-            //std::string pin_name = netlist.pin_name(pin);
+        for (auto pin : netPins)
+        {
             standard_cell::PinDirection direction = stdCells.direction(libraryMapping.pinStdCell(pin));
-            switch (direction) {
+            switch (direction)
+            {
             case standard_cell::PinDirection::INPUT:
                 break;
             case standard_cell::PinDirection::OUTPUT:
@@ -44,16 +45,16 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
             }
         }
 
-        // É necessário separar esses dois for's???
-        assert(!(source == circuit::Pin()));
+        if (source == circuit::Pin())
+            throw std::out_of_range("Graph building: source not find!");
 
         for (auto pin : netPins)
         {
             if (pin == source)
                 continue;
 
-            graph.arcCreate(graph.riseNode(source), graph.riseNode(pin), *netIt);
-            graph.arcCreate(graph.fallNode(source), graph.fallNode(pin), *netIt);
+            graph.arc_create(graph.rise_node(source), graph.rise_node(pin), *netIt);
+            graph.arc_create(graph.fall_node(source), graph.fall_node(pin), *netIt);
         }
     }
 
@@ -86,9 +87,9 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
             }
         }
 
-        for (auto from : inputPins)
+        for (const auto & from : inputPins)
         {
-            const auto & arcs = timingArcs.pinArcs(libraryMapping.pinStdCell(from));
+            const auto & arcs = timingArcs.pin_arcs(libraryMapping.pinStdCell(from));
 
             for(const auto & arc : arcs)
             {
@@ -101,28 +102,28 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
                 switch (timingLibrary.unateness(arc))
                 {
                 case Library::unateness_type::POSITIVE_UNATE:
-                    graph.arcCreate(graph.riseNode(from), graph.riseNode(to), arc);
+                    graph.arc_create(graph.rise_node(from), graph.rise_node(to), arc);
                     if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
-                        graph.arcCreate(graph.fallNode(from), graph.fallNode(to), arc);
+                        graph.arc_create(graph.fall_node(from), graph.fall_node(to), arc);
 
                     break;
 
                 case Library::unateness_type::NON_UNATE:
-                    graph.arcCreate(graph.riseNode(from), graph.riseNode(to), arc);
+                    graph.arc_create(graph.rise_node(from), graph.rise_node(to), arc);
                     if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
-                        graph.arcCreate(graph.fallNode(from), graph.fallNode(to), arc);
+                        graph.arc_create(graph.fall_node(from), graph.fall_node(to), arc);
 
-                    graph.arcCreate(graph.riseNode(from), graph.fallNode(to), arc);
+                    graph.arc_create(graph.rise_node(from), graph.fall_node(to), arc);
                     if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
-                        graph.arcCreate(graph.fallNode(from), graph.riseNode(to), arc);
+                        graph.arc_create(graph.fall_node(from), graph.rise_node(to), arc);
 
                     break;
 
                 case Library::unateness_type::NEGATIVE_UNATE:
                 default:
-                    graph.arcCreate(graph.riseNode(from), graph.fallNode(to), arc);
+                    graph.arc_create(graph.rise_node(from), graph.fall_node(to), arc);
                     if(timingLibrary.type(arc) != Library::timing_edge_type::RISING_EDGE)
-                        graph.arcCreate(graph.fallNode(from), graph.riseNode(to), arc);
+                        graph.arc_create(graph.fall_node(from), graph.rise_node(to), arc);
 
                     break;
                 }
@@ -133,45 +134,45 @@ void TimingGraphBuilder::build(circuit::Netlist & netlist,
     // Creating input drivers edges
     std::vector<TimingGraph::arc_type> outRiseArcs, outFallArcs;
 
-    for (const parser::DesignConstraints::DrivingCell drivingCell : dc.mInputDrivers)
+    for (const auto & drivingCell : dc.m_input_drivers)
     {
         outRiseArcs.resize(0);
         outFallArcs.resize(0);
-        auto PI_pin = netlist.find(circuit::Pin(), drivingCell.portName);
-        auto riseNode = graph.riseNode(PI_pin);
-        auto fallNode = graph.fallNode(PI_pin);
-        auto newRiseNode = graph.riseNodeCreate(PI_pin);
-        auto newFallNode = graph.fallNodeCreate(PI_pin);
+        auto PI_pin = netlist.find(circuit::Pin(), drivingCell.port_name);
+        auto rise_node = graph.rise_node(PI_pin);
+        auto fall_node = graph.fall_node(PI_pin);
+        auto newrise_node = graph.rise_node_create(PI_pin);
+        auto newfall_node = graph.fall_node_create(PI_pin);
 
-        for (lemon::ListDigraph::OutArcIt out(graph.outArc(riseNode)); out != lemon::INVALID; ++out)
+        for (auto out = graph.out_arc_iterator(rise_node); out != lemon::INVALID; ++out)
             outRiseArcs.push_back(out);
-        for (lemon::ListDigraph::OutArcIt out(graph.outArc(fallNode)); out != lemon::INVALID; ++out)
+        for (auto out = graph.out_arc_iterator(fall_node); out != lemon::INVALID; ++out)
             outFallArcs.push_back(out);
 
         for (auto arc : outRiseArcs)
-            graph.source(arc, newRiseNode);
+            graph.source(arc, newrise_node);
         for (auto arc : outFallArcs)
-            graph.source(arc, newFallNode);
+            graph.source(arc, newfall_node);
 
-        const std::vector<TimingArcs::timing_arc_entity_type> & arcs = timingArcs.pinArcs(stdCells.find(standard_cell::Pin(), drivingCell.libCell + ":" + drivingCell.pinName));
+        const auto & arcs = timingArcs.pin_arcs(stdCells.find(standard_cell::Pin(), drivingCell.lib_cell + ":" + drivingCell.pin_name));
         for (const auto & arc : arcs)
         {
             switch (timingLibrary.unateness(arc))
             {
             case Library::unateness_type::POSITIVE_UNATE:
-                graph.arcCreate(riseNode, newRiseNode, arc);
-                graph.arcCreate(fallNode, newFallNode, arc);
+                graph.arc_create(rise_node, newrise_node, arc);
+                graph.arc_create(fall_node, newfall_node, arc);
                 break;
             case Library::unateness_type::NON_UNATE:
-                graph.arcCreate(riseNode, newRiseNode, arc);
-                graph.arcCreate(fallNode, newFallNode, arc);
-                graph.arcCreate(riseNode, newFallNode, arc);
-                graph.arcCreate(fallNode, newRiseNode, arc);
+                graph.arc_create(rise_node, newrise_node, arc);
+                graph.arc_create(fall_node, newfall_node, arc);
+                graph.arc_create(rise_node, newfall_node, arc);
+                graph.arc_create(fall_node, newrise_node, arc);
                 break;
             case Library::unateness_type::NEGATIVE_UNATE:
             default:
-                graph.arcCreate(riseNode, newFallNode, arc);
-                graph.arcCreate(fallNode, newRiseNode, arc);
+                graph.arc_create(rise_node, newfall_node, arc);
+                graph.arc_create(fall_node, newrise_node, arc);
                 break;
             }
         }

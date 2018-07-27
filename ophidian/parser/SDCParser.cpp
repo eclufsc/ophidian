@@ -5,74 +5,49 @@ namespace ophidian
 namespace parser
 {
 
-DesignConstraints::DesignConstraints()
-{
-    
-}
-
-DesignConstraints::~DesignConstraints()
-{
-    
-}
-
-SDCParser::SDCParser()
-{
-    
-}
-
-SDCParser::~SDCParser()
-{
-    
-}
-
 std::shared_ptr<DesignConstraints> SDCParser::readFile(const std::string & filename) const throw(InexistentFile)
 {
     return std::make_shared<DesignConstraints>();
-}
-
-SDCSimple::SDCSimple()
-{
-
 }
 
 std::shared_ptr<DesignConstraints> SDCSimple::constraints() const
 {
     std::shared_ptr<DesignConstraints> dc = std::make_shared<DesignConstraints>();
 
-    dc->mClock.name = "mclk";
-    dc->mClock.period = 80.0;
-    dc->mClock.portName = "iccad_clk";
+    dc->m_clock.name = "mclk";
+    dc->m_clock.period = 80.0;
+    dc->m_clock.port_name = "iccad_clk";
 
-    DesignConstraints::InputDelays input;
+    DesignConstraints::input_delays_type input;
     input.delay = 0.0;
-    input.portName = "inp1";
+    input.port_name = "inp1";
     input.clock = "mclk";
-    dc->mInputDelays.push_back(input);
+    dc->m_input_delays.push_back(input);
 
-    input.portName = "inp2";
-    dc->mInputDelays.push_back(input);
+    input.port_name = "inp2";
+    dc->m_input_delays.push_back(input);
 
-    DesignConstraints::DrivingCell cell;
-    cell.libCell = "INV_X80";
-    cell.pinName = "o";
-    cell.portName = "inp1";
-    cell.slewFall = 10.0;
-    cell.slewRise = 10.0;
-    dc->mInputDrivers.push_back(cell);
+    DesignConstraints::driving_cell_type cell;
+    cell.lib_cell = "INV_X80";
+    cell.pin_name = "o";
+    cell.port_name = "inp1";
+    cell.slew_fall = 10.0;
+    cell.slew_rise = 10.0;
+    dc->m_input_drivers.push_back(cell);
 
-    cell.portName = "inp2";
-    dc->mInputDrivers.push_back(cell);
+    cell.port_name = "inp2";
+    dc->m_input_drivers.push_back(cell);
 
-    DesignConstraints::OutputDelay output;
+    DesignConstraints::output_delay_type output;
     output.delay = 0.0;
-    output.portName = "out";
+    output.port_name = "out";
     output.clock = "mclk";
-    dc->mOutputDelays.push_back(output);
+    dc->m_output_delays.push_back(output);
 
-    DesignConstraints::OutputLoad load;
-    load.pinLoad = 4.0;
-    load.portName = "out";
-    dc->mOutputLoads.push_back(load);
+    DesignConstraints::output_load_type load;
+    load.pin_load = 4.0;
+    load.port_name = "out";
+    dc->m_output_loads.push_back(load);
 
     return dc;
 }

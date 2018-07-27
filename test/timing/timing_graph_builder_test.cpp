@@ -30,28 +30,28 @@ namespace
 class TimingGraphBuilderFixture
 {
 public:
-    design::ICCAD2015ContestDesignBuilder mBuilder;
-    design::Design & mDesign;
+    design::ICCAD2015ContestDesignBuilder m_builder;
+    design::Design & m_design;
 
-    std::shared_ptr<ophidian::parser::Liberty> mLiberty;
-    timing::TimingArcs mTimingArcs;
-    timing::Library mTimingLibrary;
-    std::shared_ptr<parser::DesignConstraints> mDC;
+    std::shared_ptr<ophidian::parser::Liberty> m_liberty;
+    timing::TimingArcs m_timing_arcs;
+    timing::Library m_timing_library;
+    std::shared_ptr<parser::DesignConstraints> m_dc;
 
     TimingGraphBuilderFixture() :
-        mBuilder("./input_files/simple/simple.lef",
+        m_builder("./input_files/simple/simple.lef",
                  "./input_files/simple/simple.def",
                  "./input_files/simple/simple.v",
                  "./input_files/simple/simple_Early.lib",
                  "./input_files/simple/simple_Late.lib",
                  "./input_files/simple/simple.sdc"),
-        mDesign(mBuilder.build()),
-        mLiberty(ophidian::parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
-        mTimingArcs(mDesign.standardCells()),
-        mTimingLibrary(mDesign.standardCells(), mTimingArcs),
-        mDC(parser::SDCSimple().constraints())
+        m_design(m_builder.build()),
+        m_liberty(ophidian::parser::LibertyParser().readFile("./input_files/simple/simple_Early.lib")),
+        m_timing_arcs(m_design.standardCells()),
+        m_timing_library(m_design.standardCells(), m_timing_arcs),
+        m_dc(parser::SDCSimple().constraints())
     {
-        mTimingLibrary.init(*mLiberty, true);
+        m_timing_library.init(*m_liberty, true);
     }
 };
 } // namespace
@@ -59,30 +59,30 @@ public:
 TEST_CASE_METHOD(TimingGraphBuilderFixture, "TimingGraphBuilder: init", "[timing][TimingGraphBuilder]")
 {
     timing::TimingGraphBuilder builder;
-    timing::TimingGraph graph(mDesign.netlist());
+    timing::TimingGraph graph(m_design.netlist());
 
-    builder.build(mDesign.netlist(), mDesign.standardCells(), mDesign.libraryMapping(), mTimingArcs, mTimingLibrary, *mDC, graph);
+    builder.build(m_design.netlist(), m_design.standardCells(), m_design.libraryMapping(), m_timing_arcs, m_timing_library, *m_dc, graph);
 
     REQUIRE(graph.size(timing::TimingGraph::node_type()) == 42);
     REQUIRE(graph.size(timing::TimingGraph::arc_type()) == 40);
 
-    auto u1_a = mDesign.netlist().find(circuit::Pin(), "u1:a");
-    auto u1_o = mDesign.netlist().find(circuit::Pin(), "u1:o");
-    auto u2_a = mDesign.netlist().find(circuit::Pin(), "u2:a");
+    auto u1_a = m_design.netlist().find(circuit::Pin(), "u1:a");
+    auto u1_o = m_design.netlist().find(circuit::Pin(), "u1:o");
+    auto u2_a = m_design.netlist().find(circuit::Pin(), "u2:a");
 
-    auto riseU1_a = graph.riseNode(u1_a);
-    auto riseU1_o = graph.riseNode(u1_o);
-    auto fallU1_o = graph.fallNode(u1_o);
-    auto riseU2_a = graph.riseNode(u2_a);
+    auto riseU1_a = graph.rise_node(u1_a);
+    auto riseU1_o = graph.rise_node(u1_o);
+    auto fallU1_o = graph.fall_node(u1_o);
+    auto riseU2_a = graph.rise_node(u2_a);
 
-    auto timingArcU1 = mTimingArcs.find("NAND2_X1:a->NAND2_X1:o");
-    auto netU1ToU2 = mDesign.netlist().find(circuit::Net(), "n1");
+    auto timingArcU1 = m_timing_arcs.find("NAND2_X1:a->NAND2_X1:o");
+    auto netU1ToU2 = m_design.netlist().find(circuit::Net(), "n1");
 
-    REQUIRE(graph.graph().id(graph.target(graph.outArc(riseU1_a))) == graph.graph().id(fallU1_o));
-    REQUIRE(graph.property(graph.outArc(riseU1_a)) == timing::TimingGraph::ArcProperty::TimingArc);
-    REQUIRE(graph.entity(timing::TimingArcs::timing_arc_entity_type(), graph.outArc(riseU1_a)) == timingArcU1);
+    REQUIRE(graph.graph().id(graph.target(graph.out_arc_iterator(riseU1_a))) == graph.graph().id(fallU1_o));
+    REQUIRE(graph.property(graph.out_arc_iterator(riseU1_a)) == timing::TimingGraph::ArcProperty::TimingArc);
+    REQUIRE(graph.entity(timing::TimingArcs::timing_arc_entity_type(), graph.out_arc_iterator(riseU1_a)) == timingArcU1);
 
-    REQUIRE(graph.graph().id(graph.target(graph.outArc(riseU1_o))) == graph.graph().id(riseU2_a));
-    REQUIRE(graph.property(graph.outArc(riseU1_o)) == timing::TimingGraph::ArcProperty::Net);
-    REQUIRE(graph.entity(circuit::Net(), graph.outArc(riseU1_o)) == netU1ToU2);
+    REQUIRE(graph.graph().id(graph.target(graph.out_arc_iterator(riseU1_o))) == graph.graph().id(riseU2_a));
+    REQUIRE(graph.property(graph.out_arc_iterator(riseU1_o)) == timing::TimingGraph::ArcProperty::Net);
+    REQUIRE(graph.entity(circuit::Net(), graph.out_arc_iterator(riseU1_o)) == netU1ToU2);
 }

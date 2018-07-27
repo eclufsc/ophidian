@@ -71,6 +71,12 @@ public:
     Library(Library&&) = default;
     Library& operator=(Library&&) = default;
 
+    //! Initializes Library values
+    /*!
+       \brief Build the timing arcs and yours properties
+       \param liberty Liberty object
+       \param early Early mode time
+     */
     void init(const liberty_type & liberty, bool early = false);
 
     //! Compute Rise Delay
@@ -81,7 +87,7 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    time_unit_type computeRiseDelay(const timing_arc_entity_type & arc,
+    time_unit_type compute_rise_delay(const timing_arc_entity_type & arc,
                                     const capacitance_unit_type rv,
                                     const time_unit_type cv) const;
 
@@ -93,7 +99,7 @@ public:
        \param cv Capacitance
        \return Delay's value.
      */
-    time_unit_type computeFallDelay(const timing_arc_entity_type & arc,
+    time_unit_type compute_fall_delay(const timing_arc_entity_type & arc,
                                     const capacitance_unit_type rv,
                                     const time_unit_type cv) const;
 
@@ -105,7 +111,7 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    time_unit_type computeRiseSlews(const timing_arc_entity_type & arc,
+    time_unit_type compute_rise_slews(const timing_arc_entity_type & arc,
                                     const capacitance_unit_type rv,
                                     const time_unit_type cv) const;
 
@@ -117,7 +123,7 @@ public:
        \param cv Capacitance
        \return Slew's value.
      */
-    time_unit_type computeFallSlews(const timing_arc_entity_type & arc,
+    time_unit_type compute_fall_slews(const timing_arc_entity_type & arc,
                                     const capacitance_unit_type rv,
                                     const time_unit_type cv) const;
 
@@ -151,7 +157,7 @@ public:
        \param pin The Standard Pin.
        \return True only if it is clock pin.
      */
-    bool pinClock(const std_pin_entity_type & pin) const;
+    bool pin_clock(const std_pin_entity_type & pin) const;
 
     //! Check sequential cell
     /*!
@@ -159,7 +165,7 @@ public:
        \param cell The Standard Cell.
        \return True only if it is sequential.
      */
-    bool cellSequential(const std_cell_entity_type & cell) const;
+    bool cell_sequential(const std_cell_entity_type & cell) const;
 
 private:
     template <class V> using property_std_pin_type    = entity_system::Property<std_pin_entity_type, V>;
@@ -179,7 +185,6 @@ private:
     property_std_pin_type<capacitance_unit_type> m_pin_capacitance;
     property_std_pin_type<bool>                  m_clock;
     property_std_cell_type<bool>                 m_sequential;
-
 };
 
 } // namespace timing

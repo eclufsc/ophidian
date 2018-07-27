@@ -39,63 +39,63 @@ namespace timing
         return m_library;
     }
 
-    void TimingData::arrival(node_type node, time_unit_type arrival)
+    void TimingData::arrival(const node_type& node, const time_unit_type& arrival)
     {
         m_node_arrivals[node] = arrival;
     }
 
-    void TimingData::slew(node_type node, time_unit_type slew)
+    void TimingData::slew(const node_type& node, const time_unit_type& slew)
     {
         m_node_slews[node] = slew;
     }
 
-    void TimingData::required(node_type node, time_unit_type required)
+    void TimingData::required(const node_type& node, const time_unit_type& required)
     {
         m_node_requireds[node] = required;
     }
 
-    void TimingData::load(node_type node, capacitance_unit_type load)
+    void TimingData::load(const node_type& node, const capacitance_unit_type& load)
     {
         m_node_loads[node] = load;
     }
 
-    const TimingData::time_unit_type TimingData::arrival(node_type node) const
+    const TimingData::time_unit_type& TimingData::arrival(const node_type& node) const
     {
         return m_node_arrivals[node];
     }
 
-    const TimingData::time_unit_type TimingData::slew(node_type node) const
+    const TimingData::time_unit_type& TimingData::slew(const node_type& node) const
     {
         return m_node_slews[node];
     }
 
-    const TimingData::time_unit_type TimingData::required(node_type node) const
+    const TimingData::time_unit_type& TimingData::required(const node_type& node) const
     {
         return m_node_requireds[node];
     }
 
-    const TimingData::capacitance_unit_type TimingData::load(node_type node) const
+    const TimingData::capacitance_unit_type& TimingData::load(const node_type& node) const
     {
         return m_node_loads[node];
     }
 
 // ------------------------------------------------------------------------------
 
-    void TimingData::delay(arc_type arc, const time_unit_type delay)
+    void TimingData::delay(const arc_type& arc, const time_unit_type& delay)
     {
         m_arc_delays[arc] = delay;
     }
 
-    void TimingData::slew(arc_type arc, const time_unit_type slew)
+    void TimingData::slew(const arc_type& arc, const time_unit_type& slew)
     {
         m_arc_slews[arc] = slew;
     }
 
-    const TimingData::time_unit_type TimingData::delay(arc_type arc) const
+    const TimingData::time_unit_type& TimingData::delay(const arc_type& arc) const
     {
         return m_arc_delays[arc];
     }
-    const TimingData::time_unit_type TimingData::slew(arc_type arc) const
+    const TimingData::time_unit_type& TimingData::slew(const arc_type& arc) const
     {
         return m_arc_slews[arc];
     }

@@ -25,6 +25,8 @@ under the License.
 
 using namespace ophidian;
 
+using pin_type = circuit::Pin;
+
 namespace
 {
 class SlackCalculationFixture
@@ -59,8 +61,8 @@ TEST_CASE_METHOD(SlackCalculationFixture, "EndPoints: init", "[timing][endpoints
     timing::EndPoints endpoints(m_design.netlist(), m_design.libraryMapping(), m_design.standardCells(), m_timing_library);
     endpoints.init();
 
-    auto out  = m_design.netlist().find(circuit::Pin(), "out");
-    auto f1_d = m_design.netlist().find(circuit::Pin(), "f1:d");
+    auto out  = m_design.netlist().find(pin_type(), "out");
+    auto f1_d = m_design.netlist().find(pin_type(), "f1:d");
 
     CHECK(endpoints.size() == 2);
 

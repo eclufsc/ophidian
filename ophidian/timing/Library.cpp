@@ -72,8 +72,8 @@ void Library::init(const liberty_type & liberty, bool early)
         {
             for (auto tmg : pin.timing)
             {
-                if (!early && tmg.timingType == timing_edge_type::HOLD_RISING ||
-                     early && tmg.timingType == timing_edge_type::SETUP_RISING)
+                if ((!early && tmg.timingType == timing_edge_type::HOLD_RISING) ||
+                    (early && tmg.timingType == timing_edge_type::SETUP_RISING))
                     continue;
 
                 auto relatedPin = cell.find(tmg.relatedPin);
@@ -106,22 +106,22 @@ void Library::init(const liberty_type & liberty, bool early)
     }
 }
 
-Library::time_unit_type Library::computeRiseDelay(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
+Library::time_unit_type Library::compute_rise_delay(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
 {
     return m_rise_delays[arc].compute(rv, cv);
 }
 
-Library::time_unit_type Library::computeFallDelay(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
+Library::time_unit_type Library::compute_fall_delay(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
 {
     return m_fall_delays[arc].compute(rv, cv);
 }
 
-Library::time_unit_type Library::computeRiseSlews(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
+Library::time_unit_type Library::compute_rise_slews(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
 {
     return m_rise_slews[arc].compute(rv, cv);
 }
 
-Library::time_unit_type Library::computeFallSlews(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
+Library::time_unit_type Library::compute_fall_slews(const timing_arc_entity_type & arc, const capacitance_unit_type rv, const time_unit_type cv) const
 {
     return m_fall_slews[arc].compute(rv, cv);
 }
@@ -141,12 +141,12 @@ Library::capacitance_unit_type Library::capacitance(const std_pin_entity_type & 
     return m_pin_capacitance[pin];
 }
 
-bool Library::pinClock(const std_pin_entity_type & pin) const
+bool Library::pin_clock(const std_pin_entity_type & pin) const
 {
     return m_clock[pin];
 }
 
-bool Library::cellSequential(const std_cell_entity_type & cell) const
+bool Library::cell_sequential(const std_cell_entity_type & cell) const
 {
     return m_sequential[cell];
 }
