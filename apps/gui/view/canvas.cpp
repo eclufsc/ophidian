@@ -32,7 +32,7 @@ void Canvas::draw(sf::RenderTarget& target, sf::RenderStates states) const
     target.draw(mBoundaries, states);
 }
 
-void Canvas::alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points)
+void Canvas::alloc(Quad & quad, const std::vector<point_type> & points)
 {
     mQuads.alloc(quad, points);
 }
@@ -55,7 +55,7 @@ void Canvas::paint(const std::vector<Quad> & quads, const sf::Color color)
         mQuads.paint(q, color);
 }
 
-void Canvas::setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p)
+void Canvas::setPoint(const Quad & quad, std::size_t i, point_type & p)
 {
     mQuads.setPoint(quad, i, p);
 }
@@ -65,7 +65,7 @@ std::array<sf::Vertex, 4> Canvas::points(const Quad & quad)
     return mQuads.points(quad);
 }
 
-void Canvas::alloc(Line & line, const std::vector<ophidian::geometry::Point> & points)
+void Canvas::alloc(Line & line, const std::vector<point_type> & points)
 {
     mLines.alloc(line, points);
 }
@@ -88,7 +88,7 @@ void Canvas::paint(const std::vector<Line> & lines, const sf::Color color)
         mLines.paint(l, color);
 }
 
-void Canvas::setPoint(const Line & line, std::size_t i, const ophidian::geometry::Point p)
+void Canvas::setPoint(const Line & line, std::size_t i, const point_type p)
 {
     mLines.setPoint(line, i, p);
 }
@@ -98,15 +98,15 @@ std::array<sf::Vertex, 2> Canvas::points(const Line & line)
     return mLines.points(line);
 }
 
-void Canvas::createBoundaries(const ophidian::geometry::Point chipUpperRightCorner)
+void Canvas::createBoundaries(const point_type chipUpperRightCorner)
 {
     Line line;
-    std::vector<ophidian::geometry::Point> points;
+    std::vector<point_type> points;
 
-    ophidian::geometry::Point lowerLeft(0, 0);
-    ophidian::geometry::Point lowerRight(chipUpperRightCorner.x(), 0);
-    ophidian::geometry::Point upperRight(chipUpperRightCorner.x(), chipUpperRightCorner.y());
-    ophidian::geometry::Point upperLeft(0, chipUpperRightCorner.y());
+    point_type lowerLeft(0, 0);
+    point_type lowerRight(chipUpperRightCorner.x(), 0);
+    point_type upperRight(chipUpperRightCorner.x(), chipUpperRightCorner.y());
+    point_type upperLeft(0, chipUpperRightCorner.y());
 
     points.push_back(lowerLeft);
     points.push_back(lowerRight);
@@ -129,15 +129,15 @@ void Canvas::createBoundaries(const ophidian::geometry::Point chipUpperRightCorn
 
 }
 
-WireQuad Canvas::createWireQuad(const ophidian::circuit::Cell & cell, const ophidian::geometry::Point & origin, const ophidian::geometry::Point & size)
+WireQuad Canvas::createWireQuad(const ophidian::circuit::Cell & cell, const point_type & origin, const point_type & size)
 {
-    std::vector<ophidian::geometry::Point> points;
+    std::vector<point_type> points;
     std::array<Line, 4> lines;
 
-    ophidian::geometry::Point lowerLeft (origin.x()         , origin.y()         );
-    ophidian::geometry::Point lowerRight(origin.x()+size.x(), origin.y()         );
-    ophidian::geometry::Point upperRight(origin.x()+size.x(), origin.y()+size.y());
-    ophidian::geometry::Point upperLeft (origin.x()         , origin.y()+size.y());
+    point_type lowerLeft (origin.x()         , origin.y()         );
+    point_type lowerRight(origin.x()+size.x(), origin.y()         );
+    point_type upperRight(origin.x()+size.x(), origin.y()+size.y());
+    point_type upperLeft (origin.x()         , origin.y()+size.y());
 
     lines[0] = Line();
     points.push_back(lowerLeft);

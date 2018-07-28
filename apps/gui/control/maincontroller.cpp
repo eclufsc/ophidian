@@ -7,7 +7,6 @@ MainController::MainController()
 
 MainController::~MainController()
 {
-    delete mBuilder;
 }
 
 void MainController::setCanvas(Canvas * canvas)
@@ -15,18 +14,22 @@ void MainController::setCanvas(Canvas * canvas)
     mCanvas = canvas;
 }
 
-void MainController::selectedCell(const ophidian::circuit::Cell & cell)
+void MainController::selectedCell(const cell_type & cell)
 {
-    std::string name = mDesign->netlist().name(cell);
-    std::string type = mDesign->standardCells().name( mDesign->libraryMapping().cellStdCell(cell) );
-    ophidian::geometry::Point origin = mDesign->placement().cellLocation(cell).toPoint();
+    auto name = mDesign.netlist().name(cell);
+    auto type = mDesign.standard_cells().name( mDesign.netlist().std_cell(cell) );
+    auto origin = mDesign.placement().location(cell);
 
     auto size = cellSize(cell);
 
-    emit on_send_cellChanged(QString::fromStdString(name), QString::fromStdString(type), size.x(), size.y(), origin.x(), origin.y());
+    emit on_send_cellChanged(QString::fromStdString(name),
+                             QString::fromStdString(type),
+                             size.x(), size.y(),
+                             units::unit_cast<double>(origin.x()),
+                             units::unit_cast<double>(origin.y()));
 }
 
-void MainController::mousePress(const ophidian::geometry::Point & p)
+void MainController::mousePress(const point_type & p)
 {
     if (mIndex.hasQuad(p))
         selectedCell(mIndex.quadContaining(p).mCell);
@@ -34,234 +37,242 @@ void MainController::mousePress(const ophidian::geometry::Point & p)
         emit on_send_cellChanged("", "", 0, 0, p.x(), p.y());
 }
 
-void MainController::mouseMove(const ophidian::geometry::Point & p)
+void MainController::mouseMove(const point_type & p)
 {
     emit on_send_cellChanged("moving", "moving", -1, -1, p.x(), p.y());
 }
 
 void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef, std::string placed_def)
 {
-    if (mBuilder != nullptr)
-    {
-        delete mBuilder;
-        mCanvas->clear();
-    }
+    mCanvas->clear();
 
-    mBuilder = new ophidian::design::ICCAD2017ContestDesignBuilder(cells_lef, tech_lef, placed_def);
+    ophidian::parser::Def def(cells_lef);
+    ophidian::parser::Lef lef(tech_lef);
+    ophidian::parser::Verilog verilog(placed_def);
+
+    mDesign = ophidian::design::factory::make_design_iccad2017(def, lef, verilog);
     init();
 }
 
 void MainController::buildICCAD2015(std::string lef, std::string def, std::string verilog)
 {
-    if (mBuilder != nullptr)
-    {
-        delete mBuilder;
-        mCanvas->clear();
-    }
+    mCanvas->clear();
+    
+    ophidian::parser::Def def(cells_lef);
+    ophidian::parser::Lef lef(tech_lef);
+    ophidian::parser::Verilog verilog(verilog);
 
-    mBuilder = new ophidian::design::ICCAD2015ContestDesignBuilder(lef, def, verilog);
+    mDesign = ophidian::design::factory::make_design_iccad2015(def, lef, verilog);
     init();
 }
 
 void MainController::init()
 {
-    mDesign = & mBuilder->build();
+    // mCellToQuads = mDesign.netlist().makeProperty<std::vector<Quad>>(cell_type());
 
-    mCellToQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(ophidian::circuit::Cell());
+    // auto amountCells = mDesign.netlist().size_cell_instance();
+    // auto amountPins  = mDesign.netlist().size_pin_instance();
+    // auto amountNets  = mDesign.netlist().size_net();
 
-    size_t amountCells = mDesign->netlist().size(ophidian::circuit::Cell());
-    size_t amountPins = mDesign->netlist().size(ophidian::circuit::Pin());
-    size_t amountNets = mDesign->netlist().size(ophidian::circuit::Net());
+    // auto chipUpper = mDesign.floorplan().chip_upper_right_corner();
 
-    ophidian::geometry::Point chipUpper = mDesign->floorplan().chipUpperRightCorner().toPoint();
+    // std::stringstream concat;
+    // concat << units::unit_cast<double>(chipUpper.x()) << "μ X ";
+    // concat << units::unit_cast<double>(chipUpper.y()) << "μ";
+    // std::string dieArea = concat.str();
 
-    std::stringstream concat;
-    concat << chipUpper.x() << "μ X " << chipUpper.y() << "μ";
-    std::string dieArea = concat.str();
+    // emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), amountCells, amountPins, amountNets);
 
-    emit on_send_circuitChanged("Circuit", QString::fromStdString(dieArea), amountCells, amountPins, amountNets);
-
-    redraw();
+    // redraw();
 }
 
 void MainController::createQuads()
 {
-    mCanvas->createBoundaries(mDesign->floorplan().chipUpperRightCorner().toPoint());
+    // mCanvas->createBoundaries(mDesign.floorplan().chip_upper_right_corner());
 
-    for (auto cellIt = mDesign->netlist().begin(ophidian::circuit::Cell()); cellIt != mDesign->netlist().end(ophidian::circuit::Cell()); cellIt++)
-    {
+    // for (auto cellIt = mDesign.netlist().begin_cell_instance(); cellIt != mDesign.netlist().end_cell_instance(); ++cellIt)
+    // {
+    //     std::vector<Quad> quads;
 
-        std::vector<Quad> quads;
+    //     auto cellGeometry = mDesign.placement.geometry(*cellIt);
 
-        ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(*cellIt);
+    //     for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); ++cellBoxIt)
+    //     {
+    //         Quad quad(*cellIt);
+    //         std::vector<point_type> points(4);
 
-        for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++)
-        {
-            Quad quad(*cellIt);
-            std::vector<ophidian::geometry::Point> points;
+    //         point_type min{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
+    //                        units::unit_cast<double>((*cellBoxIt).min_corner().y())};
+    //         point_type max{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
+    //                        units::unit_cast<double>((*cellBoxIt).max_corner().y())};
 
-            points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).min_corner().y()) );
-            points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).min_corner().y()) );
-            points.push_back( ophidian::geometry::Point( (*cellBoxIt).max_corner().x(), (*cellBoxIt).max_corner().y()) );
-            points.push_back( ophidian::geometry::Point( (*cellBoxIt).min_corner().x(), (*cellBoxIt).max_corner().y()) );
+    //         points[0] = point_type(min.x(), min.y());
+    //         points[1] = point_type(max.x(), min.y());
+    //         points[2] = point_type(max.x(), max.y());
+    //         points[3] = point_type(min.x(), max.y());
 
-            mCanvas->alloc(quad, points);
-            mIndex.quadCreate(quad, *cellBoxIt);
+    //         mCanvas->alloc(quad, points);
+    //         mIndex.quadCreate(quad, *cellBoxIt);
 
-            quads.push_back(quad);
-        }
+    //         quads.push_back(quad);
+    //     }
 
-         mCellToQuads[*cellIt] = quads;
+    //      mCellToQuads[*cellIt] = quads;
 
-        if (isFixed(*cellIt))
-        {
-            mCanvas->paint(quads, sf::Color::Blue);
-        }
-        else
-        {
-            unsigned int random = rand();
-            mCanvas->paint(quads, sf::Color((random % 10 + 195), (random % 75), (random % 120 + 135)));
-        }
-    }
+    //     if (isFixed(*cellIt))
+    //     {
+    //         mCanvas->paint(quads, sf::Color::Blue);
+    //     }
+    //     else
+    //     {
+    //         unsigned int random = rand();
+    //         mCanvas->paint(quads, sf::Color((random % 10 + 195), (random % 75), (random % 120 + 135)));
+    //     }
+    // }
 }
 
-bool MainController::isFixed(const ophidian::circuit::Cell & cell)
+bool MainController::isFixed(const cell_type & cell)
 {
-    return mDesign->placement().isFixed(cell);
+    // return mDesign.placement().isFixed(cell);
+    return false;
 }
 
 bool MainController::hasCell(std::string name)
 {
-    if (mBuilder == nullptr)
-        return false;
+    auto cell = mDesign.netlist().find_cell_instance(name);
 
-    auto cell = mDesign->netlist().find(ophidian::circuit::Cell(), name);
-
-    try {
-        mDesign->placement().isFixed(cell);
-        return true;
-    } catch (const std::out_of_range & e) {
-        return false;
-    }
+    return cell != cell_type();
+    // try {
+    //     mDesign.placement().isFixed(cell);
+    //     return true;
+    // } catch (const std::out_of_range & e) {
+    //     return false;
+    // }
 }
 
-bool MainController::hasQuad(const ophidian::geometry::Point & p)
+bool MainController::hasQuad(const point_type & p)
 {
-    return mIndex.hasQuad(p);
+    // return mIndex.hasQuad(p);
 }
 
-Quad MainController::quadAt(const ophidian::geometry::Point & p)
+Quad MainController::quadAt(const point_type & p)
 {
-    return mIndex.quadContaining(p);
+    // return mIndex.quadContaining(p);
 }
 
-std::vector<Quad> MainController::quadsCell(const ophidian::circuit::Cell & cell)
+std::vector<Quad> MainController::quadsCell(const cell_type & cell)
 {
-    return mCellToQuads[cell];
+    // return mCellToQuads[cell];
 }
 
 std::vector<Quad> MainController::quadsCell(std::string name)
 {
-    if (mBuilder == nullptr)
-        return std::vector<Quad>();
+    // auto cell = mDesign.netlist().find_cell_instance(name);
 
-    auto cell = mDesign->netlist().find(ophidian::circuit::Cell(), name);
-
-    try {
-        return mCellToQuads[cell];
-    } catch (const std::out_of_range & e) {
-        return std::vector<Quad>();
-    }
+    // try {
+    //     return mCellToQuads[cell];
+    // } catch (const std::out_of_range & e) {
+    //     return std::vector<Quad>();
+    // }
 }
 
-WireQuad MainController::wireQuadOfCell(const ophidian::circuit::Cell & cell)
+WireQuad MainController::wireQuadOfCell(const cell_type & cell)
 {
-    return mCanvas->createWireQuad(cell, mDesign->placement().cellLocation(cell).toPoint(), cellSize(cell));
+    // auto local = mDesign.placement().location(cell);
+    // point_type point{units::unit_cast<double>(local.x()), units::unit_cast<double>(local.y())};
+
+    // return mCanvas->createWireQuad(cell, point, cellSize(cell));
 }
 
 void MainController::clear(WireQuad & wire)
 {
-    mCanvas->clear(wire);
+    // mCanvas->clear(wire);
 }
 
 void MainController::transform(Quad quad, const sf::Transform & trans)
 {
-    mCanvas->transform(mCellToQuads[quad.mCell], trans);
+    // mCanvas->transform(mCellToQuads[quad.mCell], trans);
 }
 
 void MainController::transform(WireQuad wire, const sf::Transform & trans)
 {
-    std::vector<Line> lines;
-    for (const auto & l : wire.mLines)
-        lines.push_back(l);
+    // std::vector<Line> lines;
+    // for (const auto & l : wire.mLines)
+    //     lines.push_back(l);
 
-    mCanvas->transform(lines, trans);
+    // mCanvas->transform(lines, trans);
 }
 
 void MainController::update(Quad quad)
 {
-    Quad first = mCellToQuads[quad.mCell].front();
-    auto newOrigin = mCanvas->points(first).front();
+    // Quad first = mCellToQuads[quad.mCell].front();
+    // auto newOrigin = mCanvas->points(first).front();
 
-    mDesign->placement().placeCell(first.mCell, ophidian::util::LocationDbu(newOrigin.position.x, newOrigin.position.y));
+    // mDesign.placement().place(first.mCell, ophidian::util::LocationDbu(newOrigin.position.x, newOrigin.position.y));
 
-    ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(first.mCell);
+    // auto cellGeometry = mDesign.placementMapping().geometry(first.mCell);
 
-    auto quadOfBox = mCellToQuads[first.mCell].begin();
-    for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++, quadOfBox++)
-    {
-        mIndex.quadRemove(*quadOfBox);
-        mIndex.quadCreate(*quadOfBox, *cellBoxIt);
-    }
+    // auto quadOfBox = mCellToQuads[first.mCell].begin();
+    // for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++, quadOfBox++)
+    // {
+    //     point_type min{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
+    //                     units::unit_cast<double>((*cellBoxIt).min_corner().y())};
+    //     point_type max{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
+    //                     units::unit_cast<double>((*cellBoxIt).max_corner().y())};
+
+    //     box_type new_box = ophidian::geometry::make<box_type>({min, max});
+
+    //     mIndex.quadRemove(*quadOfBox);
+    //     mIndex.quadCreate(*quadOfBox, *cellBoxIt);
+    // }
 }
 
 void MainController::remove(Quad quad, WireQuad wire)
 {
-    auto quads = mCellToQuads[quad.mCell];
-    mCanvas->desalloc(quads);
+    // auto quads = mCellToQuads[quad.mCell];
+    // mCanvas->desalloc(quads);
 
-    std::vector<Line> lines;
-    for (const auto & l : wire.mLines)
-        lines.push_back(l);
-    mCanvas->desalloc(lines);
+    // std::vector<Line> lines;
+    // for (const auto & l : wire.mLines)
+    //     lines.push_back(l);
+    // mCanvas->desalloc(lines);
 
-    auto quadsOfBox = mCellToQuads[quad.mCell];
-    for (auto quadIt = quadsOfBox.begin(); quadIt != quadsOfBox.end(); quadIt++)
-    {
-        mIndex.quadRemove(*quadIt);
-    }
+    // auto quadsOfBox = mCellToQuads[quad.mCell];
+    // for (auto quadIt = quadsOfBox.begin(); quadIt != quadsOfBox.end(); quadIt++)
+    // {
+    //     mIndex.quadRemove(*quadIt);
+    // }
 
-    mDesign->netlist().erase(quad.mCell);
+    // mDesign.netlist().erase(quad.mCell);
 
-    size_t cells = mDesign->netlist().size(ophidian::circuit::Cell());
-    size_t pins = mDesign->netlist().size(ophidian::circuit::Pin());
-    size_t nets = mDesign->netlist().size(ophidian::circuit::Net());
-    emit on_send_circuitChanged("removing", "removing", cells, pins, nets);
+    // auto cells = mDesign.netlist().size_cell_instance();
+    // auto pins = mDesign.netlist().size_pin_instance();
+    // auto nets = mDesign.netlist().size_net();
+    // emit on_send_circuitChanged("removing", "removing", cells, pins, nets);
 }
 
-ophidian::geometry::Point MainController::chipBoundaries()
+MainController::point_type MainController::chipBoundaries()
 {
-    if (mDesign == nullptr)
-        throw std::out_of_range("Design not exist.");
-    return mDesign->floorplan().chipUpperRightCorner().toPoint();
+    // auto point = mDesign.floorplan().chip_upper_right_corner();
+    // point_type result{units::unit_cast<double>(point.x()),
+    //                     units::unit_cast<double>(point.y())};
+
+    // return result;
 }
 
 void MainController::slot1()
 {
-    if (mBuilder != nullptr)
-        redraw();
+    redraw();
 }
 
 void MainController::slot2()
 {
-    if (mBuilder != nullptr)
-        redraw();
+    redraw();
 }
 
 void MainController::slot3()
 {
-    if (mBuilder != nullptr)
-        redraw();
+    redraw();
 }
 
 void MainController::redraw()
@@ -271,116 +282,121 @@ void MainController::redraw()
     createQuads();
 }
 
-ophidian::geometry::Point MainController::cellSize(const ophidian::circuit::Cell & cell)
+MainController::point_type MainController::cellSize(const cell_type & cell)
 {
-    unsigned int width = 0, height = 0;
-    ophidian::geometry::MultiBox cellGeometry = mDesign->placementMapping().geometry(cell);
-    for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++)
-    {
-        if (width < ((*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x()))
-            width = (*cellBoxIt).max_corner().x() - (*cellBoxIt).min_corner().x();
+    // unsigned int width = 0, height = 0;
+    // auto cellGeometry = mDesign.placement().geometry(cell);
+    // for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++)
+    // {
+    //     point_type min{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
+    //                     units::unit_cast<double>((*cellBoxIt).min_corner().y())};
+    //     point_type max{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
+    //                     units::unit_cast<double>((*cellBoxIt).max_corner().y())};
 
-        height += (*cellBoxIt).max_corner().y() - (*cellBoxIt).min_corner().y();
-    }
+    //     if (width < (max.x() - min.x()))
+    //         width = max.x() - min.x();
 
-    return ophidian::geometry::Point(width, height);
+    //     height += max.y() - min.y();
+    // }
+
+    // return point_type(width, height);
 }
 
 
-void MainController::drawSVG(SVGMapper & mapper, const ophidian::geometry::Box & viewBox)
+void MainController::drawSVG(SVGMapper & mapper, const box_type & viewBox)
 {
-    if (mDesign == nullptr)
-        return;
+    // if (mDesign.netlist().size_cell_instance() == 0)
+    //     return;
 
-    ophidian::geometry::Point chipUpper = mDesign->floorplan().chipUpperRightCorner().toPoint();
+    // auto chipUpper = mDesign.floorplan().chip_upper_right_corner();
 
-    std::vector<Quad> quadsInArea = mIndex.quadsContaining(viewBox);
+    // std::vector<Quad> quadsInArea = mIndex.quadsContaining(viewBox);
 
-    for (auto quadIt = quadsInArea.begin(); quadIt != quadsInArea.end(); quadIt++)
-    {
-        auto points = mCanvas->points(*quadIt);
+    // for (auto quadIt = quadsInArea.begin(); quadIt != quadsInArea.end(); quadIt++)
+    // {
+    //     auto points = mCanvas->points(*quadIt);
 
-        double yMin = points[0].position.y <= viewBox.min_corner().y() ? 0 : points[0].position.y - viewBox.min_corner().y();
-        double xMax = points[2].position.x - viewBox.min_corner().x() <= viewBox.max_corner().x() - viewBox.min_corner().x() ?
-                      points[2].position.x - viewBox.min_corner().x() : viewBox.max_corner().x() - viewBox.min_corner().x();
+    //     double yMin = points[0].position.y <= viewBox.min_corner().y() ? 0 : points[0].position.y - viewBox.min_corner().y();
+    //     double xMax = points[2].position.x - viewBox.min_corner().x() <= viewBox.max_corner().x() - viewBox.min_corner().x() ?
+    //                   points[2].position.x - viewBox.min_corner().x() : viewBox.max_corner().x() - viewBox.min_corner().x();
         
-        ophidian::geometry::Point min((points[0].position.x - viewBox.min_corner().x())/100, yMin/100);
-        ophidian::geometry::Point max(xMax/100, (points[2].position.y - viewBox.min_corner().y())/100);
-        ophidian::geometry::Box box(min, max);
+    //     point_type min((points[0].position.x - viewBox.min_corner().x())/100, yMin/100);
+    //     point_type max(xMax/100, (points[2].position.y - viewBox.min_corner().y())/100);
+    //     box_type box(min, max);
 
-        QString style;
-        if (isFixed(quadIt->mCell))
-        {
-            style += "fill:rgb(0,0,255)";
-        }
-        else
-        {
-            unsigned int random = rand();
-            style += "fill:rgb(";
-            style += QString::number((random % 10 + 195)) + ",";
-            style += QString::number((random % 75)) + ",";
-            style += QString::number((random % 120 + 135)) + ")";
-        }
+    //     QString style;
+    //     if (isFixed(quadIt->mCell))
+    //     {
+    //         style += "fill:rgb(0,0,255)";
+    //     }
+    //     else
+    //     {
+    //         unsigned int random = rand();
+    //         style += "fill:rgb(";
+    //         style += QString::number((random % 10 + 195)) + ",";
+    //         style += QString::number((random % 75)) + ",";
+    //         style += QString::number((random % 120 + 135)) + ")";
+    //     }
 
-        mapper.add(box);
-        mapper.map(box, style.toStdString());
-    }
+    //     mapper.add(box);
+    //     mapper.map(box, style.toStdString());
+    // }
 
-    // Left
-    if (viewBox.min_corner().x() <= 0)
-    {
-        double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
-        double uY = viewBox.max_corner().y() <= chipUpper.y() ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
-                                                                (chipUpper.y()-viewBox.min_corner().y())/100;
+    // // Left
+    // if (viewBox.min_corner().x() <= 0)
+    // {
+    //     double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
+    //     double uY = viewBox.max_corner().y() <= units::unit_cast<double>(chipUpper.y()) ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
+    //                                            (units::unit_cast<double>(chipUpper.y())-viewBox.min_corner().y())/100;
 
-        ophidian::geometry::Point bottomY(-viewBox.min_corner().x()/100, bY);
-        ophidian::geometry::Point upperY (-viewBox.min_corner().x()/100, uY);
+    //     point_type bottomY(-viewBox.min_corner().x()/100, bY);
+    //     point_type upperY (-viewBox.min_corner().x()/100, uY);
 
-        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
-        mapper.add(line);
-        mapper.map(line, "stroke:rgb(255,255,255)");
-    }
+    //     line_type line = ophidian::geometry::make<line_type>({bottomY, upperY});
+    //     mapper.add(line);
+    //     mapper.map(line, "stroke:rgb(255,255,255)");
+    // }
 
-    // Rigth
-    if (viewBox.max_corner().x() >= chipUpper.x())
-    {
-        double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
-        double uY = viewBox.max_corner().y() <= chipUpper.y() ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
-                                                                (chipUpper.y()-viewBox.min_corner().y())/100;
-        ophidian::geometry::Point bottomY((chipUpper.x()-viewBox.min_corner().x())/100, bY);
-        ophidian::geometry::Point upperY ((chipUpper.x()-viewBox.min_corner().x())/100, uY);
+    // // Rigth
+    // if (viewBox.max_corner().x() >= units::unit_cast<double>(chipUpper.x()))
+    // {
+    //     double bY = viewBox.min_corner().y() >= 0 ? 0 : -viewBox.min_corner().y()/100;
+    //     double uY = viewBox.max_corner().y() <= units::unit_cast<double>(chipUpper.y()) ? (viewBox.max_corner().y()-viewBox.min_corner().y())/100 :
+    //                                            (units::unit_cast<double>(chipUpper.y())-viewBox.min_corner().y())/100;
+    //     point_type bottomY((units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().x())/100, bY);
+    //     point_type upperY ((units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().x())/100, uY);
 
-        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
-        mapper.add(line);
-        mapper.map(line, "stroke:rgb(255,255,255)");
-    }
+    //     line_type line = ophidian::geometry::make<line_type>({bottomY, upperY});
+    //     mapper.add(line);
+    //     mapper.map(line, "stroke:rgb(255,255,255)");
+    // }
 
-    // Bottom
-    if (viewBox.min_corner().y() <= 0)
-    {
-        double lX = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
-        double rX = viewBox.max_corner().x() <= chipUpper.x() ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
-                                                                (chipUpper.x()-viewBox.min_corner().x())/100;
-        ophidian::geometry::Point leftX (lX, -viewBox.min_corner().y()/100);
-        ophidian::geometry::Point rigthX(rX, -viewBox.min_corner().y()/100);
+    // // Bottom
+    // if (viewBox.min_corner().y() <= 0)
+    // {
+    //     double lX = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
+    //     double rX = viewBox.max_corner().x() <= units::unit_cast<double>(chipUpper.x()) ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
+    //                                             (units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().x())/100;
+    //     point_type leftX (lX, -viewBox.min_corner().y()/100);
+    //     point_type rigthX(rX, -viewBox.min_corner().y()/100);
 
-        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({leftX, rigthX});
-        mapper.add(line);
-        mapper.map(line, "stroke:rgb(255,255,255)");
-    }
+    //     line_type line = ophidian::geometry::make<line_type>({leftX, rigthX});
+    //     mapper.add(line);
+    //     mapper.map(line, "stroke:rgb(255,255,255)");
+    // }
 
-    // Upper
-    if (viewBox.max_corner().y() >= chipUpper.y())
-    {
-        double bY = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
-        double uY = viewBox.max_corner().x() <= chipUpper.x() ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
-                                                                (chipUpper.x()-viewBox.min_corner().x())/100;
-        ophidian::geometry::Point bottomY(bY, (chipUpper.x()-viewBox.min_corner().y())/100);
-        ophidian::geometry::Point upperY (uY, (chipUpper.x()-viewBox.min_corner().y())/100);
+    // // Upper
+    // if (viewBox.max_corner().y() >= units::unit_cast<double>(chipUpper.y()))
+    // {
+    //     double bY = viewBox.min_corner().x() >= 0 ? 0 : -viewBox.min_corner().x()/100;
+    //     double uY = viewBox.max_corner().x() <= units::unit_cast<double>(chipUpper.x()) ? (viewBox.max_corner().x()-viewBox.min_corner().x())/100 :
+    //                                             (units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().x())/100;
+    //     point_type bottomY(bY, (units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().y())/100);
+    //     point_type upperY (uY, (units::unit_cast<double>(chipUpper.x())-viewBox.min_corner().y())/100);
 
-        ophidian::geometry::Linestring line = ophidian::geometry::make<ophidian::geometry::Linestring>({bottomY, upperY});
-        mapper.add(line);
-        mapper.map(line, "stroke:rgb(255,255,255)");
-    }
+    //     line_type line = ophidian::geometry::make<line_type>({bottomY, upperY});
+    //     mapper.add(line);
+    //     mapper.map(line, "stroke:rgb(255,255,255)");
+    // }
 
 }

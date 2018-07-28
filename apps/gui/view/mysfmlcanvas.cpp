@@ -23,7 +23,7 @@ void MySFMLCanvas::resizeEvent(QResizeEvent * e)
     sf::RenderWindow::create((sf::WindowHandle) winId());
 }
 
-void MySFMLCanvas::setSize(ophidian::geometry::Point size)
+void MySFMLCanvas::setSize(point_type size)
 {
     mCameraView.setSize(size.x(), size.y());
 }
@@ -108,12 +108,12 @@ bool MySFMLCanvas::findCellEvent(QString name)
     return mState->findCellEvent(name);
 }
 
-void MySFMLCanvas::centerViewOn(const ophidian::geometry::Point & p1)
+void MySFMLCanvas::centerViewOn(const point_type & p1)
 {
     mCameraView.setCenter(sf::Vector2f(p1.x(), p1.y()));
 }
 
-void MySFMLCanvas::viewSize(const ophidian::geometry::Point & size)
+void MySFMLCanvas::viewSize(const point_type & size)
 {
     mCameraView.setSize(sf::Vector2f(size.x(), -size.y()));
 }
@@ -123,14 +123,14 @@ void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
     mCanvas.reserveMinimumOfQuads(minimumOfQuads);
 }
 
-ophidian::geometry::Point MySFMLCanvas::mouseEventToPoint(QMouseEvent * e)
+MySFMLCanvas::point_type MySFMLCanvas::mouseEventToPoint(QMouseEvent * e)
 {
     sf::Vector2i pixelCoord{e->pos().x(), e->pos().y()};
     sf::Vector2f viewCoord{mapPixelToCoords(pixelCoord, mCameraView)};
-    return ophidian::geometry::Point(viewCoord.x, viewCoord.y);
+    return point_type(viewCoord.x, viewCoord.y);
 }
 
-void MySFMLCanvas::updatePositionQuad(const ophidian::geometry::Point & p)
+void MySFMLCanvas::updatePositionQuad(const point_type & p)
 {
     mState->mouseReleaseEvent(p);
 }
@@ -163,13 +163,13 @@ void MySFMLCanvas::saveToSVG(const std::string & filename)
         double centerY = mCameraView.getCenter().y;
         double width = mCameraView.getSize().x;
 
-        ophidian::geometry::Point min((centerX - width/2), (centerY - width/2));
-        ophidian::geometry::Point max((centerX + width/2), (centerY + width/2));
+        point_type min((centerX - width/2), (centerY - width/2));
+        point_type max((centerX + width/2), (centerY + width/2));
         ophidian::geometry::Box viewSize(min, max);
 
         std::ofstream svg(filename);
         SVGMapper mapper(svg, width/100, width/100);
-        ophidian::geometry::Box b(ophidian::geometry::Point(0,0), ophidian::geometry::Point(width/100,width/100));
+        ophidian::geometry::Box b(point_type(0,0), point_type(width/100,width/100));
         mapper.add(b);
         mapper.map(b, "fill:rgb(0,0,0);stroke:rgb(50,50,50)");
 

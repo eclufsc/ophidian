@@ -5,6 +5,7 @@
 
 class Form
 {
+
 public:
     //! Form Constructor
     /*!
@@ -45,6 +46,7 @@ public:
 
 class Quad : public Form {
 public:
+  using cell_type = ophidian::circuit::Netlist::cell_instance_type;
     //! Quad Constructor
     /*!
        \brief Constructs a Quad
@@ -56,7 +58,7 @@ public:
        \brief Constructs a Quad
        \param cell A circuit cell
      */
-    explicit Quad(const ophidian::circuit::Cell & cell);
+    explicit Quad(const cell_type & cell);
 
     //! Quad Constructor
     /*!
@@ -87,11 +89,12 @@ public:
      */
     bool operator!=(const Quad & o) const;
 
-    ophidian::circuit::Cell mCell;
+    cell_type mCell;
 };
 
 class WireQuad {
 public:
+  using cell_type = ophidian::circuit::Netlist::cell_instance_type;
     //! WireQuad Constructor
     /*!
        \brief Constructs a WireQuad
@@ -103,7 +106,7 @@ public:
        \brief Constructs a WireQuad
        \param cell A circuit cell
      */
-    explicit WireQuad(const ophidian::circuit::Cell & cell);
+    explicit WireQuad(const cell_type & cell);
 
     //! WireQuad Destructor
     /*!
@@ -112,7 +115,7 @@ public:
     ~WireQuad();
 
     std::array<Line, 4> mLines;
-    ophidian::circuit::Cell mCell;
+    cell_type mCell;
 };
 
 
