@@ -56,7 +56,6 @@ namespace interconnection
         template <class T>
         inline std::unique_ptr<SteinerTree> create(const T & container)
         {
-
             const uint32_t kSize = container.size();
 
             if(kSize == 1) {

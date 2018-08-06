@@ -4,6 +4,7 @@
 #include <ophidian/geometry/Models.h>
 #include <ophidian/geometry/Distance.h>
 #include <lemon/graph_to_eps.h>
+
 using namespace ophidian::interconnection;
 using namespace ophidian;
 
@@ -12,15 +13,14 @@ TEST_CASE("Flute singleton", "[interconnection]")
     REQUIRE_NOTHROW( Flute::instance() );
 }
 
-// TEST_CASE("Flute tree with one point", "[interconnection]")
-// {
-//     Flute & flute = Flute::instance();
-//     auto tree = flute.create(std::vector<geometry::Point<double>>{geometry::Point<double>{2.0, 2.0}});
-//     REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
-//     REQUIRE( tree->size(SteinerTree::Segment{}) == 0 );
-// }
-//
-//
+TEST_CASE("Flute tree with one point", "[interconnection]")
+{
+    auto& flute = Flute::instance();
+    // auto tree = flute.create(std::vector<geometry::Point<double>>{geometry::Point<double>{2.0, 2.0}});
+    // REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
+    // REQUIRE( tree->size(SteinerTree::Segment{}) == 0 );
+}
+
 // TEST_CASE("Flute tree with two point", "[interconnection]")
 // {
 //     Flute & flute = Flute::instance();

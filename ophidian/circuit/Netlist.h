@@ -196,8 +196,8 @@ namespace circuit
 
         void connect(const net_type& net, const pin_instance_type& pin);
         void connect(const cell_instance_type& cell, const pin_instance_type& pin);
-        void connect(const cell_instance_type& cell, const std_cell_type& stdCell);
-        void connect(const pin_instance_type& pin, const std_cell_pin_type& stdCell);
+        void connect(const cell_instance_type& cell, const std_cell_type& std_cell);
+        void connect(const pin_instance_type& pin, const std_cell_pin_type& std_cell);
 
         void disconnect(const pin_instance_type& pin);
 
