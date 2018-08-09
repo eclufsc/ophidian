@@ -29,10 +29,6 @@ namespace qsfml {
     {
     private :
         /**
-         * @brief Timer used to update the view
-         */
-        QTimer myTimer;
-        /**
          * @brief Tell whether the SFML window has been initialized or not
          */
         bool myInitialized;
