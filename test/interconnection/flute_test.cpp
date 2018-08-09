@@ -16,29 +16,39 @@ TEST_CASE("Flute singleton", "[interconnection]")
 TEST_CASE("Flute tree with one point", "[interconnection]")
 {
     auto& flute = Flute::instance();
-    // auto tree = flute.create(std::vector<geometry::Point<double>>{geometry::Point<double>{2.0, 2.0}});
-    // REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
-    // REQUIRE( tree->size(SteinerTree::Segment{}) == 0 );
+    auto tree = flute.create(std::vector{Flute::Point{Flute::dbu_t{2.0}, Flute::dbu_t{2.0}}});
+    REQUIRE( tree->size(SteinerTree::Point{}) == 1 );
+    REQUIRE( tree->size(SteinerTree::Segment{}) == 0 );
 }
 
-// TEST_CASE("Flute tree with two point", "[interconnection]")
-// {
-//     Flute & flute = Flute::instance();
-//     auto tree = flute.create(std::vector<geometry::Point<double>>{geometry::Point<double>{2.0, 2.0}, geometry::Point<double>{4.0, 4.0}});
-//     REQUIRE( tree->size(SteinerTree::Point{}) == 2 );
-//     REQUIRE( tree->size(SteinerTree::Segment{}) == 1 );
-// }
-//
-//
-// TEST_CASE("Flute tree with three points", "[interconnection]")
-// {
-//     Flute & flute = Flute::instance();
-//     auto tree = flute.create(std::vector<geometry::Point<double>>{geometry::Point<double>{2.0, 2.0}, geometry::Point<double>{2.0, 4.0}, geometry::Point<double>{4.0, 4.0}});
-//     REQUIRE( tree->size(SteinerTree::Point{}) == 3 );
-//     REQUIRE( tree->size(SteinerTree::Segment{}) == 2 );
-//     REQUIRE( Approx(tree->length()) == geometry::ManhattanDistance(geometry::Point<double>{2.0, 2.0}, geometry::Point<double>{4.0, 4.0}) );
-// }
-//
+TEST_CASE("Flute tree with two point", "[interconnection]")
+{
+    Flute & flute = Flute::instance();
+    auto tree = flute.create(
+        std::vector{
+            Flute::Point{Flute::dbu_t{2.0}, Flute::dbu_t{2.0}},
+            Flute::Point{Flute::dbu_t{4.0}, Flute::dbu_t{4.0}}
+        }
+    );
+    REQUIRE( tree->size(SteinerTree::Point{}) == 2 );
+    REQUIRE( tree->size(SteinerTree::Segment{}) == 1 );
+}
+
+TEST_CASE("Flute tree with three points", "[interconnection]")
+{
+    Flute & flute = Flute::instance();
+    auto tree = flute.create(
+        std::vector{
+            Flute::Point{Flute::dbu_t{2.0}, Flute::dbu_t{2.0}},
+            Flute::Point{Flute::dbu_t{2.0}, Flute::dbu_t{4.0}},
+            Flute::Point{Flute::dbu_t{4.0}, Flute::dbu_t{4.0}}
+        }
+    );
+    REQUIRE( tree->size(SteinerTree::Point{}) == 3 );
+    REQUIRE( tree->size(SteinerTree::Segment{}) == 2 );
+    REQUIRE( Approx(tree->length()) == geometry::ManhattanDistance(geometry::Point<double>{2.0, 2.0}, geometry::Point<double>{4.0, 4.0}) );
+}
+
 // #include <lemon/smart_graph.h>
 //
 // class Repeat {
