@@ -23,55 +23,55 @@
 
 namespace ophidian
 {
-    namespace entity_system
+namespace entity_system
+{
+    template <typename WholeEntity_, typename PartEntity_>
+    class Aggregation :
+        public Association<WholeEntity_, PartEntity_>
     {
-        template <typename WholeEntity_, typename PartEntity_>
-        class Aggregation :
-            public Association <WholeEntity_, PartEntity_>
+    public:
+        using Parent = Association<WholeEntity_, PartEntity_>;
+        using WholeSystem = typename Parent::WholeSystem;
+        using PartSystem = typename Parent::PartSystem;
+        using Whole = typename Parent::Whole;
+        using Part = typename Parent::Part;
+
+        Aggregation(const WholeSystem & whole, PartSystem & part):
+                Parent(whole, part)
         {
-        public:
-            using Parent = Association <WholeEntity_, PartEntity_>;
-            using WholeSystem = typename Parent::WholeSystem;
-            using PartSystem = typename Parent::PartSystem;
-            using Whole = typename Parent::Whole;
-            using Part = typename Parent::Part;
+            Parent::attach(*whole.notifier());
+        }
 
-            Aggregation(const WholeSystem & whole, PartSystem & part):
-                    Parent(whole, part)
+        ~Aggregation()
+        {
+            Parent::detach();
+        }
+
+        void erase(const Whole & whole) override
+        {
+            Part current = Parent::firstPart(whole);
+
+            while(current != Part())
             {
-                Parent::attach(*whole.notifier());
+                Part next = Parent::nextPart(current);
+                Parent::eraseAssociation(whole, current);
+                current = next;
             }
+            Parent::erase(whole);
+        }
 
-            ~Aggregation()
+        void clear() override
+        {
+            for(auto const & part : Parent::mPartSystem)
             {
-                Parent::detach();
+                Parent::eraseAssociation(Parent::whole(part), part);
             }
+            Parent::clear();
+        }
 
-            void erase(const Whole & whole) override
-            {
-                Part current = Parent::firstPart(whole);
-
-                while(current != Part())
-                {
-                    Part next = Parent::nextPart(current);
-                    Parent::eraseAssociation(whole, current);
-                    current = next;
-                }
-                Parent::erase(whole);
-            }
-
-            void clear() override
-            {
-                for(auto const & part : Parent::mPartSystem)
-                {
-                    Parent::eraseAssociation(Parent::whole(part), part);
-                }
-                Parent::clear();
-            }
-
-        private:
-        };
-    }     // namespace entity_system
+    private:
+    };
+}     // namespace entity_system
 }     // namespace ophidian
 
 #endif // OPHIDIAN_ENTITY_SYSTEM_AGGREGATION_H

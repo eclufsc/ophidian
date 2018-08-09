@@ -71,7 +71,6 @@ set_target_properties(ophidian_circuit PROPERTIES
 target_link_libraries(ophidian_design
     PUBLIC ophidian_circuit 
     PUBLIC ophidian_floorplan 
-    PUBLIC ophidian_standard_cell 
     PUBLIC ophidian_placement 
     PUBLIC ophidian_parser
 )
@@ -91,7 +90,6 @@ add_library(ophidian_design_static STATIC ${ophidian_design_source})
 target_link_libraries(ophidian_design_static
     PUBLIC ophidian_circuit_static 
     PUBLIC ophidian_floorplan_static
-    PUBLIC ophidian_standard_cell_static
     PUBLIC ophidian_placement_static
     PUBLIC ophidian_parser_static
 )

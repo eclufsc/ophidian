@@ -22,7 +22,7 @@ project(ophidian)
 set(ophidian_VERSION 0.1)
 
 # Set c++14 globally
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
@@ -96,10 +96,10 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 ################################################################################
 
 # Set Cmake module path for find_package
-set(CMAKE_MODULE_PATH ${ophidian_source_dir}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${ophidian_source_dir}/cmake")
 
 # Set Cmake prefix path for building with local dependencies
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ophidian_source_dir}/dependencies)
+list(APPEND CMAKE_PREFIX_PATH "${ophidian_source_dir}/dependencies")
 
 # Find Boost
 find_package(Boost 1.59 REQUIRED)

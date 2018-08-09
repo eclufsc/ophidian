@@ -21,48 +21,48 @@
 
 namespace ophidian
 {
-    namespace util
+namespace util
+{
+    template <class IteratorType>
+    class Range final
     {
-        template <class IteratorType>
-        class Range final
+    public:
+
+        Range(const IteratorType begin, const IteratorType end):
+                begin_(begin),
+                end_(end)
         {
-        public:
+        }
 
-            Range(const IteratorType begin, const IteratorType end):
-                    begin_(begin),
-                    end_(end)
-            {
-            }
+        ~Range()
+        {
+        }
 
-            ~Range()
-            {
-            }
+        inline IteratorType begin() const
+        {
+            return begin_;
+        }
 
-            inline IteratorType begin() const
-            {
-                return begin_;
-            }
+        inline IteratorType end() const
+        {
+            return end_;
+        }
 
-            inline IteratorType end() const
-            {
-                return end_;
-            }
+        inline typename IteratorType::difference_type size() const
+        {
+            return std::distance(begin(), end());
+        }
 
-            inline typename IteratorType::difference_type size() const
-            {
-                return std::distance(begin(), end());
-            }
+        inline bool empty() const
+        {
+            return size() == 0;
+        }
 
-            inline bool empty() const
-            {
-                return size() == 0;
-            }
-
-        private:
-            const IteratorType begin_;
-            const IteratorType end_;
-        };
-    }     // namespace util
+    private:
+        const IteratorType begin_;
+        const IteratorType end_;
+    };
+}     // namespace util
 }     // namespace ophidian
 
 #endif // OPHIDIAN_UTIL_RANGE_H

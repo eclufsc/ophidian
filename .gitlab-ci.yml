@@ -43,6 +43,21 @@ variables:
 stages:
     - build
 
+gitlab_pages:
+    image: alpine
+    stage: build
+    before_script: 
+        - apk update
+        - apk add doxygen
+    script:
+        - cd doc
+        - doxygen Doxyfile
+        - cd ..
+        - cp -r doc/documentation/html/ public/
+    artifacts:
+        paths:
+            - public
+
 build_on_debian-sid:
     image: debian:sid
     stage: build

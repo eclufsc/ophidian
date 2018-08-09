@@ -8,5 +8,5 @@
 .project
 .cproject
 /build
-/docs
+/doc/documentation
 .DS_Store

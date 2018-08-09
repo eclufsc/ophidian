@@ -16,23 +16,24 @@
    under the License.
  */
 
-#include "Def2Placement.h"
+#ifndef OPHIDIAN_CIRCUIT_VERILOGFACTORY_H
+#define OPHIDIAN_CIRCUIT_VERILOGFACTORY_H
+
+#include <ophidian/parser/Verilog.h>
+
+#include "Netlist.h"
 
 namespace ophidian
 {
-namespace placement
+namespace circuit
 {
-
-void def2placement(const parser::Def &def, placement::Placement &placement, circuit::Netlist &netlist)
-{
-    for (auto &component : def.components())
+    namespace factory
     {
-        util::LocationDbu cellPosition(component.position.x, component.position.y);
-        auto cell = netlist.add(circuit::Cell(), component.name);
-        placement.placeCell(cell, cellPosition);
-        placement.fixLocation(cell, component.fixed);
-    }
-}
+        Netlist make_netlist(const parser::Verilog & verilog) noexcept;
 
-} // namespace placement
-} // namespace ophidian
+        Netlist make_netlist(const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
+    }
+}     // namespace circuit
+}     // namespace ophidian
+
+#endif

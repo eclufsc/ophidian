@@ -12,7 +12,7 @@
 # Fetch test files recursevely
 file(GLOB_RECURSE ophidian_tests_source
     "*.cpp"
-    "*.h"
+    "main.cpp"
 )
 
 if(UNCRUSTIFY_IT)
@@ -39,7 +39,6 @@ target_link_libraries(ophidian_tests
     PRIVATE ophidian_interconnection_static
     PRIVATE ophidian_parser_static
     PRIVATE ophidian_placement_static
-    PRIVATE ophidian_standard_cell_static
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)

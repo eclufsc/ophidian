@@ -16,23 +16,28 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
-#define OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
+#ifndef OPHIDIAN_DESIGN_DESIGNFACTORY_H
+#define OPHIDIAN_DESIGN_DESIGNFACTORY_H
 
+#include "Design.h"
+
+#include <ophidian/parser/Verilog.h>
 #include <ophidian/parser/Def.h>
-#include <ophidian/circuit/Netlist.h>
-
-#include "Placement.h"
+#include <ophidian/parser/Lef.h>
 
 namespace ophidian
 {
-    namespace placement
+namespace design
+{
+    namespace factory 
     {
-        void def2placement(
-            const parser::Def & def,
-            placement::Placement & placement,
-            circuit::Netlist & netlist);
-    }     // namespace placement
-}     // namespace ophidian
+        Design make_design(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
-#endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H
+        Design make_design_iccad2015(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+
+        Design make_design_iccad2017(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+    }
+}
+}
+
+#endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H

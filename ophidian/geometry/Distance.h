@@ -20,59 +20,54 @@
 #define OPHIDIAN_GEOMETRY_DISTANCE_H
 
 #include "Models.h"
+#include <ophidian/util/Units.h>
 
 namespace ophidian
 {
-    namespace geometry
+namespace geometry
+{
+
+    /*!
+     * \brief Calculates the Manhattan distance between two points
+     * \param point1 First point to calculate the distance
+     * \param point2 Second point to calculate the distance
+     * \return Manhattan distance between point1 and point2
+     */
+    template <typename UnitType>
+    typename std::enable_if<units::traits::is_unit_t<UnitType>::value, UnitType>::type
+    ManhattanDistance(const Point<UnitType> & point1, const Point<UnitType> & point2)
     {
-        class ManhattanDistance
-        {
-        public:
+        auto distance = units::math::abs(point1.x() - point2.x()) + units::math::abs(point1.y() - point2.y());
 
-            //! Construct ManhattanDistance
+        return distance;
+    }
 
-            /*!
-             * \brief Empty default constructor
-             */
-            ManhattanDistance()
-            {
-            }
+    template <typename UnitType>
+    typename std::enable_if<std::is_arithmetic<UnitType>::value, UnitType>::type
+    ManhattanDistance(const Point<UnitType> & point1, const Point<UnitType> & point2)
+    {
+        auto distance = std::abs(point1.x() - point2.x()) + std::abs(point1.y() - point2.y());
 
-            //! Distance operator
+        return distance;
+    }
 
-            /*!
-             * \brief Calculates the Manhattan distance between two points
-             * \param point1 First point to calculate the distance
-             * \param point2 Second point to calculate the distance
-             * \return Manhattan distance between point1 and point2
-             */
-            double operator()(const Point & point1, const Point & point2);
-        };
+    /*!
+     * \brief Calculates the Euclidean distance between two points
+     * \param point1 First point to calculate the distance
+     * \param point2 Second point to calculate the distance
+     * \return Euclidean distance between point1 and point2
+     */
+    template <typename T>
+    T EuclideanDistance(const Point<T> & point1, const Point<T> & point2)
+    {
+        T distanceX = (point1.x() - point2.x()) * (point1.x() - point2.x());
+        T distanceY = (point1.y() - point2.y()) * (point1.y() - point2.y());
+        T distance = std::sqrt(distanceX + distanceY);
 
-        class EuclideanDistance
-        {
-        public:
+        return distance;
+    }
 
-            //! Construct EuclideanDistance
-
-            /*!
-             * \brief Empty default constructor
-             */
-            EuclideanDistance()
-            {
-            }
-
-            //! Distance operator
-
-            /*!
-             * \brief Calculates the Euclidean distance between two points
-             * \param point1 First point to calculate the distance
-             * \param point2 Second point to calculate the distance
-             * \return Euclidean distance between point1 and point2
-             */
-            double operator()(const Point & point1, const Point & point2);
-        };
-    }     // namespace geometry
+}     // namespace geometry
 }     // namespace ophidian
 
 #endif // OPHIDIAN_GEOMETRY_DISTANCE_H

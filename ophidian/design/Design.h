@@ -23,120 +23,102 @@
 #include <ophidian/floorplan/Floorplan.h>
 #include <ophidian/placement/Placement.h>
 #include <ophidian/placement/Library.h>
-#include <ophidian/circuit/LibraryMapping.h>
-#include <ophidian/placement/PlacementMapping.h>
-#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/circuit/StandardCells.h>
 
 namespace ophidian
 {
-/// Design describing a whole system
-    namespace design
+namespace design
+{
+    class Design
     {
-        class Design
-        {
-        public:
+    public:
+        //! Class member types
+        using floorplan_type       = floorplan::Floorplan;
+        using standard_cell_type   = circuit::StandardCells;
+        using netlist_type         = circuit::Netlist;
+        using library_type         = placement::Library;
+        using placement_type       = placement::Placement;
 
-            //! Design Constructor
+        //! Design Constructor
 
-            /*!
-                \brief Constructs a design system with no properties
-            */
-            Design();
+        /*!
+           \brief Constructs a design system with no properties
+         */
+        Design() = default;
+        
+        Design(const Design&) = delete;
+        Design& operator=(const Design&) = delete;
 
-            //! Design Destructor
+        Design(Design&&) = default;
+        Design& operator=(Design&&) = default;
 
-            /*!
-                \brief Destroys the design system, including its properties.
-            */
-            ~Design();
+        template<class A1, class A2, class A3, class A4, class A5>
+        Design(A1&& floorplan, A2&& standard_cells, A3&& netlist, A4&& library, A5&& placement):
+            m_floorplan{std::forward<A1>(floorplan)},
+            m_standard_cells{std::forward<A2>(standard_cells)},
+            m_netlist{std::forward<A3>(netlist)},
+            m_library{std::forward<A4>(library)},
+            m_placement{std::forward<A5>(placement)}
+        {}
 
-            //! netlist getter
+        //! netlist getter
 
-            /*!
-                \brief Get the netlist.
-                \return Netlist.
-            */
-            circuit::Netlist & netlist()
-            {
-                return mNetlist;
-            }
+        /*!
+           \brief Get the netlist.
+           \return Netlist.
+         */
+        netlist_type& netlist() noexcept;
 
-            //! floorplan getter
+        const netlist_type& netlist() const noexcept;
 
-            /*!
-                \brief Get the floorplan.
-                \return Floorplan.
-            */
-            floorplan::Floorplan & floorplan()
-            {
-                return mFloorplan;
-            }
+        //! floorplan getter
 
-            //! placement getter
+        /*!
+           \brief Get the floorplan.
+           \return Floorplan.
+         */
+        floorplan_type& floorplan() noexcept;
 
-            /*!
-                \brief Get the placement.
-                \return Placement.
-            */
-            placement::Placement & placement()
-            {
-                return mPlacement;
-            }
+        const floorplan_type& floorplan() const noexcept;
 
-            //! standardCells getter
+        //! placement getter
 
-            /*!
-                \brief Get standardCells.
-                \return StandardCells.
-            */
-            standard_cell::StandardCells & standardCells()
-            {
-                return mStandardCells;
-            }
+        /*!
+           \brief Get the placement.
+           \return Placement.
+         */
+        placement_type& placement() noexcept;
 
-            //! library getter
+        const placement_type& placement() const noexcept;
 
-            /*!
-                \brief Get the library.
-                \return Library.
-            */
-            placement::Library & library()
-            {
-                return mLibrary;
-            }
+        //! standardCells getter
 
-            //! libraryMapping getter
+        /*!
+           \brief Get standardCells.
+           \return StandardCells.
+         */
+        standard_cell_type& standard_cells() noexcept;
 
-            /*!
-                \brief Get the libraryMapping.
-                \return LibraryMapping.
-            */
-            circuit::LibraryMapping & libraryMapping()
-            {
-                return mLibraryMapping;
-            }
+        const standard_cell_type& standard_cells() const noexcept;
 
-            //! placementMapping getter
+        //! library getter
 
-            /*!
-                \brief Get the placementMapping.
-                \return PlacementMapping.
-            */
-            placement::PlacementMapping & placementMapping()
-            {
-                return mPlacementMapping;
-            }
+        /*!
+           \brief Get the library.
+           \return Library.
+         */
+        library_type& library() noexcept;
 
-        private:
-            circuit::Netlist             mNetlist;
-            floorplan::Floorplan         mFloorplan;
-            placement::Placement         mPlacement;
-            standard_cell::StandardCells mStandardCells;
-            placement::Library           mLibrary;
-            circuit::LibraryMapping      mLibraryMapping;
-            placement::PlacementMapping  mPlacementMapping;
-        };
-    } //namespace design
-} //namespace ophidian
+        const library_type& library() const noexcept;
+
+    private:
+        floorplan_type       m_floorplan{};
+        standard_cell_type   m_standard_cells{};
+        netlist_type         m_netlist{};
+        library_type         m_library{m_standard_cells};
+        placement_type       m_placement{m_netlist, m_library};
+    };
+}     //namespace design
+}     //namespace ophidian
 
 #endif // OPHIDIAN_DESIGN_DESIGN_H

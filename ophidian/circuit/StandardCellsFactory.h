@@ -16,22 +16,22 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
-#define OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
+#ifndef OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_FACTORY_H
+#define OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_FACTORY_H
 
 #include <ophidian/parser/Lef.h>
 
-#include "Library.h"
+#include "StandardCells.h"
 
 namespace ophidian
 {
-    namespace placement
+namespace circuit
+{
+    namespace factory
     {
-        void lef2Library(
-            const parser::Lef & lef,
-            Library & library,
-            standard_cell::StandardCells & stdCells);
-    }     // namespace placement
-}     // namespace ophidian
+        StandardCells make_standard_cells(const parser::Lef& lef) noexcept;
+    }
+}
+}
 
-#endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
+#endif

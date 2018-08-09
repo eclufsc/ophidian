@@ -16,34 +16,40 @@
    under the License.
  */
 
-#include "LefDef2Floorplan.h"
+#include "FloorplanFactory.h"
 
 namespace ophidian
 {
-    namespace floorplan
+namespace floorplan
+{
+    namespace factory
     {
-        void lefDef2Floorplan(
-            const parser::Lef & lef,
-            const parser::Def & def,
-            Floorplan & floorplan)
+        Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef)
         {
-            floorplan.chipOrigin(util::LocationDbu(def.die().lower.x, def.die().lower.y));
-            floorplan.chipUpperRightCorner(util::LocationDbu(def.die().upper.x, def.die().upper.y));
-            for(auto & site : lef.sites())
+            auto floorplan = Floorplan{};
+
+            floorplan.chip_origin() = def.die_area().min_corner();
+            floorplan.chip_upper_right_corner() = def.die_area().max_corner();
+
+            for(const auto& site : lef.sites())
             {
-                floorplan.add(
-                    Site(),
-                    site.name,
-                    util::LocationDbu(site.x * lef.databaseUnits(), site.y * lef.databaseUnits()));
+                floorplan.add_site(
+                    site.name(),
+                    Floorplan::point_type{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()}
+                );
             }
-            for(auto & row : def.rows())
+
+            for(const auto & row : def.rows())
             {
-                floorplan.add(
-                    Row(),
-                    util::LocationDbu(row.origin.x, row.origin.y),
-                    row.num.x,
-                    floorplan.find(row.site));
+                floorplan.add_row(
+                    row.origin(),
+                    row.num().x(),
+                    floorplan.find(row.site())
+                );
             }
+
+            return floorplan;
         }
-    }     // namespace floorplan
+    }
+}     // namespace floorplan
 }     // namespace ophidian

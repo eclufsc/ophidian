@@ -16,20 +16,26 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
-#define OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
-
-#include <ophidian/parser/VerilogParser.h>
-#include <unordered_map>
-
-#include "Netlist.h"
+#include "PlacementFactory.h"
 
 namespace ophidian
 {
-    namespace circuit
+namespace placement
+{
+    namespace factory
     {
-        void verilog2Netlist(const parser::Verilog & verilog, circuit::Netlist & netlist);
-    }     // namespace circuit
-}     // namespace ophidian
+        Placement make_placement(const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
+        {
+            auto placement = Placement{netlist, library};
 
-#endif // OPHIDIAN_CIRCUIT_VERILOG2NETLIST_H
+            for(auto & component : def.components())
+            {
+                auto& cell = netlist.add_cell_instance(component.name());
+                placement.place(cell, component.position());
+            }
+
+            return placement;
+        }
+    }
+}     // namespace placement
+}     // namespace ophidian

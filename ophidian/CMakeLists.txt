@@ -16,7 +16,7 @@ add_subdirectory(geometry)
 add_subdirectory(interconnection)
 add_subdirectory(parser)
 add_subdirectory(placement)
-add_subdirectory(standard_cell)
+#add_subdirectory(standard_cell)
 add_subdirectory(util)
 
 ################################################################################

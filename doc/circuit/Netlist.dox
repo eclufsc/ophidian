@@ -1,0 +1,456 @@
+
+        //! Add Cell
+
+        /*!
+           \param A cell name;
+           \brief Adds a Cell instance, if the cell already exist then just return the existing cell.
+           \return A handler for the created/existing Cell.
+         */
+
+        //! Erase Cell
+
+        /*!
+           \param cell A handler for the Cell to erase.
+           \brief Erases a Cell instance.
+         */
+
+        //! Size of Cell's System
+
+        /*!
+           \brief Returns the number of Cells.
+           \return The number of Cells.
+         */
+
+        //! Iterator to beginning
+
+        /*!
+           \brief Returns an iterator pointing to the first element in the Cell's EntitySystem.
+           \return Iterator to the first element in the Cell's EntitySystem.
+         */
+
+        //! Iterator to end
+
+        /*!
+           \brief Returns an iterator referring to the past-the-end element in the Cell's EntitySystem.
+           \return Iterator referring to the past-the-end element in the Cell's EntitySystem.
+         */
+
+        //! Make Cell Property
+
+        /*!
+           \brief Creates a Property for the Cell's Entity System.
+           \tparam Value value type of the Property.
+           \return An Cell => \p Value Map.
+         */
+
+        //! Get the Cell Notifier
+
+        /*!
+           \brief Returns a pointer to the AlterationNotifier of the Cell's EntitySystem.
+           \return A pointer to the AlterationNotifier of the Cell's EntitySystem.
+         */
+         
+        //! Allocate space for storing Cell entities
+
+        /*!
+           \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the netlist.
+           \param size Minimum capacity for the cell container.
+         */
+         
+        //! Capacity of the Cell's System
+
+        /*!
+           \return The capacity of the Cell EntitySystem.
+         */
+        
+        //! Find a cell
+
+        /*!
+           \brief Using the mapping, return a cell handler by cell's name.
+           \param The cell name.
+           \return Return a cell handler by cell's name.
+         */
+
+        //! Returns the name of the cell
+
+        /*!
+           \brief Returns the name of the cell.
+           \param A handler for the cell.
+           \return Return the cell's name.
+         */
+
+        //! Pins of a Cell
+
+        /*!
+           \brief Returns a Container Wrapper for the Pins of a Cell.
+           \param cell A handler for the Cell we want to get the Pins.
+           \return Container Wrapper for the Pins of a Cell.
+         */
+
+        //! Add Pin into Cell
+
+        /*!
+           \brief Adds a Pin to a given Cell.
+           \param cell A handler for the Cell we want to add a Pin.
+           \param pin A handler for the Pin we want to add in \p cell.
+         */
+
+        //! Add Pin
+
+        /*!
+           \param A pin name.
+           \brief Adds a Pin instance, if the pin already exist then just return the existing pin.
+           \return A handler for the created/existing Pin.
+         */
+
+        //! Erase Pin
+
+        /*!
+           \param pin A handler for the Pin to erase.
+           \brief Erases a Pin instance.
+         */
+         
+        //! Size of Pin's System
+
+        /*!
+           \brief Returns the number of Pins.
+           \return The number of Pins.
+         */
+
+        //! Iterator to beginning
+
+        /*!
+           \brief Returns an iterator pointing to the first element in the Pin's EntitySystem.
+           \return Iterator to the first element in the Pin's EntitySystem.
+         */
+         
+        //! Iterator to end
+
+        /*!
+           \brief Returns an iterator referring to the past-the-end element in the Pin's EntitySystem.
+           \return Iterator referring to the past-the-end element in the Pin's EntitySystem.
+         */
+
+        //! Make Pin Property
+
+        /*!
+           \brief Creates a Property for the Pin's Entity System.
+           \tparam Value value type of the Property.
+           \return An Pin => \p Value Map.
+         */
+
+        //! Get the Pin Notifier
+
+        /*!
+           \brief Returns a pointer to the AlterationNotifier of the Pin's EntitySystem.
+           \return A pointer to the AlterationNotifier of the Pin's EntitySystem.
+         */
+
+        //! Allocate space for storing Pin entities
+
+        /*!
+           \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the netlist.
+           \param size Minimum capacity for the Pin container.
+         */
+
+        //! Capacity of the Pin's System
+
+        /*!
+           \return The capacity of the Pin EntitySystem.
+         */
+
+        //! Find a pin
+
+        /*!
+           \brief Using the mapping, return a pin handler by pin's name.
+           \param The pin name.
+           \return Return a pin handler by pin's name.
+         */
+
+        //! Returns the name of the pin
+
+        /*!
+           \brief Returns the name of the pin.
+           \param A handler for the pin.
+           \return Return the pin's name.
+         */
+
+        //! Net of a Pin
+
+        /*!
+           \brief Returns the Net of a given Pin.
+           \param pin A handler for the Pin we want to get the Net.
+           \return A handler for the Net of \p pin.
+           \remark If \p pin is disconnected, returns Net().
+         */
+
+        //! Disconnect Pin
+
+        /*!
+           \brief Disconnects a pin from its net.
+           \param pin A handler for the Pin we want to disconnect.
+         */
+
+        //! Cell of a Pin
+
+        /*!
+           \brief Returns the Cell of a Pin.
+           \param pin A handler for the Pin we want to get the Cell.
+           \remark If \p pin doesn't have a Cell, returns Cell().
+         */
+
+        //! Add Net
+
+        /*!
+           \param A net name.
+           \brief Adds a Net instance, if the net already exist then just return the existing net.
+           \return A handler for the created/existing Net.
+         */
+
+        //! Erase Net
+
+        /*!
+           \param net A handler for the Net to erase.
+           \brief Erases a Net instance.
+         */
+
+        //! Size of Net's System
+
+        /*!
+           \brief Returns the number of Nets.
+           \return The number of Nets.
+         */
+
+        //! Iterator to beginning
+
+        /*!
+           \brief Returns an iterator pointing to the first element in the Net's EntitySystem.
+           \return Iterator to the first element in the Net's EntitySystem.
+         */
+
+        //! Iterator to end
+
+        /*!
+           \brief Returns an iterator referring to the past-the-end element in the Net's EntitySystem.
+           \return Iterator referring to the past-the-end element in the Net's EntitySystem.
+         */
+
+        //! Make Net Property
+
+        /*!
+           \brief Creates a Property for the Net's Entity System.
+           \tparam Value value type of the Property.
+           \return An Net => \p Value Map.
+         */
+
+        //! Get the Net Notifier
+
+        /*!
+           \brief Returns a pointer to the AlterationNotifier of the Net's EntitySystem.
+           \return A pointer to the AlterationNotifier of the Net's EntitySystem.
+         */
+
+        //! Allocate space for storing Net entities
+
+        /*!
+           \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions nets), then it is worth reserving space for this amount before starting to build the netlist.
+           \param size Minimum capacity for the Net container.
+         */
+
+        //! Capacity of the Net's System
+
+        /*!
+           \return The capacity of the Net EntitySystem.
+         */
+
+        //! Find a net
+
+        /*!
+           \brief Using the mapping, return a net handler by net's name.
+           \param The net name.
+           \return Return a net handler by net's name.
+         */
+
+        //! Returns the name of the net
+
+        /*!
+           \brief Returns the name of the net.
+           \param A handler for the net.
+           \return Return the net's name.
+         */
+
+        //! Pins of a Net
+
+        /*!
+           \brief Returns a Container Wrapper for the Pins of a Net.
+           \param net A handler for the Net we want to get the Pins.
+           \return Container Wrapper for the Pins of a Net.
+         */
+
+        //! Connect Pin on Net
+
+        /*!
+           \brief Connects a Pin
+           \param net A handler for the Net we want to connect \p pin.
+           \param pin A handler for the Pin we want to connect.
+         */
+
+        //! Number of Inputs
+
+        /*!
+           \brief Returns the number of Inputs.
+           \return The number of Inputs.
+         */
+
+        //! Create an Input
+
+        /*!
+           \brief Creates an Input for a given Pin.
+           \param pin The Pin we want to create an Input.
+           \return A handler for the created Input.
+         */
+
+        //! Pin of an Input
+
+        /*!
+           \brief Returns the Pin of a given Input.
+           \param input the Input we want the Pin.
+           \return A handler for the Pin of \p input.
+         */
+
+        //! Input of a Pin
+
+        /*!
+           \brief Returns the Input of a given Pin.
+           \param pin the Pin we want the Input.
+           \return A handler for the Input of \p pin.
+           \remark If \p pin isn't associated with any Input, returns Input().
+         */
+
+        //! Iterator to beginning
+
+        /*!
+           \brief Returns an iterator pointing to the first element in the Input's EntitySystem.
+           \return Iterator to the first element in the Input's EntitySystem.
+         */
+
+        //! Iterator to end
+
+        /*!
+           \brief Returns an iterator referring to the past-the-end element in the Input's EntitySystem.
+           \return Iterator referring to the past-the-end element in the Input's EntitySystem.
+         */
+
+        //! Make Input Property
+
+        /*!
+           \brief Creates a Property for the Input's Entity System.
+           \tparam Value value type of the Property.
+           \return An Input => \p Value Map.
+         */
+
+        //! Get the Input Notifier
+
+        /*!
+           \brief Returns a pointer to the AlterationNotifier of the Input's Entity System.
+           \return A pointer to the AlterationNotifier of the Input's Entity System.
+         */
+
+        //! Number of Outputs
+
+        /*!
+           \brief Returns the number of Outputs.
+           \return The number of Outputs.
+         */
+
+        //! Create an Output
+
+        /*!
+           \brief Creates an Output for a given Pin.
+           \param pin The Pin we want to create an Output.
+           \return A handler for the created Output.
+         */
+
+        //! Pin of an Output
+
+        /*!
+           \brief Returns the Pin of a given Output.
+           \param output the Output we want the Pin.
+           \return A handler for the Pin of \p output.
+         */
+
+        //! Output of a Pin
+
+        /*!
+           \brief Returns the Output of a given Pin
+           \param pin the Pin we want the Output.
+           \return A handler for the Output of \p pin.
+           \remark If pin isn't associated with any Output, returns Output().
+         */
+
+        //! Iterator to beginning
+
+        /*!
+           \brief Returns an iterator pointing to the first element in the Output's Entity System.
+           \return Iterator to the first element in the Output's Entity System.
+         */
+
+        //! Iterator to end
+
+        /*!
+           \brief Returns an iterator referring to the past-the-end element in the Output's Entity System.
+           \return Iterator referring to the past-the-end element in the Output's Entity System.
+         */
+
+        //! Make Output Property
+
+        /*!
+           \brief Creates a Property for the Output's Entity System.
+           \tparam Value value type of the Property.
+           \return An Output => \p Value Map.
+         */
+
+        //! Get the Output Notifier
+
+        /*!
+           \brief Returns a pointer to the AlterationNotifier of the Output's Entity System.
+           \return A pointer to the AlterationNotifier of the Output's Entity System.
+         */
+
+        //! Shrink Netlist
+
+        /*!
+           \brief Shrink each EntitySystem in order to improve the memory usage.
+         */
+
+        //! Cell standard cell getter
+
+        /*!
+           \brief Get the standard cell of a given cell.
+           \param cell Cell entity to get the standard cell.
+           \return Standard cell of the cell.
+         */
+
+        //! Sets cell standard cell
+
+        /*!
+           \brief Sets the standard cell of a cell.
+           \param cell Cell entity to be set.
+           \param stdCell Standard cell of the cell.
+         */
+
+        //! Pin standard cell getter
+
+        /*!
+           \brief Get the standard cell of a given pin.
+           \param pin Pin entity to get the standard cell.
+           \return Standard cell of the pin.
+         */
+
+        //! Sets pin standard cell
+
+        /*!
+           \brief Sets the standard cell of a pin.
+           \param pin Pin entity to be set.
+           \param stdCell Standard cell of the pin.
+         */

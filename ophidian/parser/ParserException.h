@@ -23,18 +23,31 @@
 
 namespace ophidian
 {
-    namespace parser
+namespace parser
+{
+namespace exceptions {
+
+    class InexistentFile :
+        public std::exception
     {
-        class InexistentFile :
-            public std::exception
+    public:
+        const char * what() const noexcept override
         {
-        public:
-            const char * what() const noexcept override
-            {
-                return "The given file was not found";
-            }
-        };
-    }     // namespace parser
+            return "The given file was not found";
+        }
+    };
+
+    class VerilogRuntimeException :
+        public std::exception
+    {
+    public:
+        const char * what() const noexcept override
+        {
+            return "Verilog runtime error";
+        }
+    };
+}
+}     // namespace parser
 }     // namespace ophidian
 
 #endif
