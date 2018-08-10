@@ -22,9 +22,7 @@
 #include "ToEps.h"
 #include <lemon/graph_to_eps.h>
 
-namespace ophidian
-{
-namespace interconnection
+namespace ophidian::interconnection
 {
     using dbu_t = util::database_unit_t;
     using DbuPoint = geometry::Point<dbu_t>;
@@ -41,12 +39,6 @@ namespace interconnection
             return {units::unit_cast<double>(p.x()), units::unit_cast<double>(p.y())};
         }
     }     // namespace
-
-    //
-    SteinerTree::SteinerTree():
-            mPosition(mGraph)
-    {
-    }
 
     uint32_t SteinerTree::size(Segment) const
     {
@@ -204,8 +196,7 @@ namespace
                 filename).coords(coords).nodeColors(lemon::composeMap(palette, color)).run();
         }
     };
-}     // namespace
-      //
+}
 
     template <>
     void ToEps::run<SteinerTree>(const SteinerTree & tree, const std::string & filename)
@@ -213,5 +204,13 @@ namespace
         SteinerTreeToEps::run(tree, filename);
     }
 
-}     // namespace interconnection
-}     // namespace ophidian
+    geometry::Segment<geometry::Point<dbu_t>> make_segment(
+        const interconnection::SteinerTree & tree,
+        const interconnection::SteinerTree::Segment & segment)
+    {
+        return geometry::make<geometry::Segment, geometry::Point, dbu_t>(
+            {tree.position(tree.u(segment)),
+             tree.position(tree.v(segment))});
+    }
+
+}

@@ -26,9 +26,7 @@
 #include "Lef.h"
 #include "ParserException.h"
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     Lef::Lef(const std::string& lef_file):
         m_sites{},
@@ -503,5 +501,4 @@ namespace parser
     {
         return m_ports;
     }
-}     /* namespace parser */
-}     /* namespace ophidian */
+}

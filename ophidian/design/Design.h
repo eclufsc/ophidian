@@ -25,9 +25,7 @@
 #include <ophidian/placement/Library.h>
 #include <ophidian/circuit/StandardCells.h>
 
-namespace ophidian
-{
-namespace design
+namespace ophidian::design
 {
     class Design
     {
@@ -118,7 +116,6 @@ namespace design
         library_type         m_library{m_standard_cells};
         placement_type       m_placement{m_netlist, m_library};
     };
-}     //namespace design
-}     //namespace ophidian
+}
 
 #endif // OPHIDIAN_DESIGN_DESIGN_H

@@ -29,9 +29,7 @@
 // external headers
 #include <ophidian/geometry/Models.h>
 
-namespace ophidian
-{
-namespace util
+namespace ophidian::util
 {
     //!Lenght Unit derived from micrometer to be used as internal length unit length (as commonly used in LEF/DEF library)
     //!To convert to/from micron, please use the DbuConverter Utility class
@@ -122,7 +120,6 @@ namespace util
     private:
         const database_unit_scalar_t m_dbu_factor;
     };
-}     //namespace util
 }     //namespace ophidian
 
 #endif // OPHIDIAN_UTIL_UNITS_H

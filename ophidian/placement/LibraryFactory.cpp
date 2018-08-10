@@ -18,75 +18,69 @@
 
 #include "LibraryFactory.h"
 
-namespace ophidian
+namespace ophidian::placement::factory
 {
-namespace placement
-{
-    namespace factory
+    Library make_library(const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept
     {
-        Library make_library(const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept
+        auto library = Library{stdCells};
+
+        for(auto& macro : lef.macros())
         {
-            auto library = Library{stdCells};
-
-            for(auto& macro : lef.macros())
-            {
-                auto stdCell = stdCells.add_cell(macro.name());
-                auto layer2RectsM1 = macro.obstructions().find("metal1");
-                if(layer2RectsM1 != macro.obstructions().end()) {
-                    auto geometry = geometry::CellGeometry{};
-                    for(auto& rect : layer2RectsM1->second)
-                    {
-                        geometry::Point<util::database_unit_t> pmin =
-                        {rect.min_corner().x() * lef.micrometer_to_dbu_ratio(),
-                         rect.min_corner().y() * lef.micrometer_to_dbu_ratio()};
-                        geometry::Point<util::database_unit_t> pmax =
-                        {rect.max_corner().x() * lef.micrometer_to_dbu_ratio(),
-                         rect.max_corner().y() * lef.micrometer_to_dbu_ratio()};
-                        geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
-                    }
-                    library.connect(stdCell, geometry);
-                }
-                else {
-                    geometry::Point<util::database_unit_t> pmin =
-                        {
-                            macro.origin().x() * lef.micrometer_to_dbu_ratio(),
-                            macro.origin().y() * lef.micrometer_to_dbu_ratio()
-                        };
-                    geometry::Point<util::database_unit_t> pmax =
-                        {
-                            macro.size().x() * lef.micrometer_to_dbu_ratio(),
-                            macro.size().y() * lef.micrometer_to_dbu_ratio()
-                        };
-                    library.connect(stdCell,
-                        geometry::CellGeometry{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
-                }
-                util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
-
-                for(auto& pin : macro.pins())
+            auto stdCell = stdCells.add_cell(macro.name());
+            auto layer2RectsM1 = macro.obstructions().find("metal1");
+            if(layer2RectsM1 != macro.obstructions().end()) {
+                auto geometry = geometry::CellGeometry{};
+                for(auto& rect : layer2RectsM1->second)
                 {
-                    auto stdPin = stdCells.add_pin(
-                        macro.name() + ":" + pin.name(),
-                        circuit::PinDirection(pin.direction()));
-                    stdCells.connect(stdCell, stdPin);
-                    for(auto& port : pin.ports())
+                    geometry::Point<util::database_unit_t> pmin =
+                    {rect.min_corner().x() * lef.micrometer_to_dbu_ratio(),
+                     rect.min_corner().y() * lef.micrometer_to_dbu_ratio()};
+                    geometry::Point<util::database_unit_t> pmax =
+                    {rect.max_corner().x() * lef.micrometer_to_dbu_ratio(),
+                     rect.max_corner().y() * lef.micrometer_to_dbu_ratio()};
+                    geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
+                }
+                library.connect(stdCell, geometry);
+            }
+            else {
+                geometry::Point<util::database_unit_t> pmin =
                     {
-                        for(auto& rect : port.second)
-                        {
-                            library.connect(
-                                stdPin,
-                                util::LocationDbu(0.5 *
-                                    (dbuConverter.convert(rect.min_corner().x()) +
-                                     dbuConverter.convert(rect.max_corner().x())),
-                                    0.5 *
-                                    (dbuConverter.convert(rect.min_corner().y()) +
-                                     dbuConverter.convert(rect.max_corner().y()))));
-                        }
+                        macro.origin().x() * lef.micrometer_to_dbu_ratio(),
+                        macro.origin().y() * lef.micrometer_to_dbu_ratio()
+                    };
+                geometry::Point<util::database_unit_t> pmax =
+                    {
+                        macro.size().x() * lef.micrometer_to_dbu_ratio(),
+                        macro.size().y() * lef.micrometer_to_dbu_ratio()
+                    };
+                library.connect(stdCell,
+                    geometry::CellGeometry{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
+            }
+            util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
+
+            for(auto& pin : macro.pins())
+            {
+                auto stdPin = stdCells.add_pin(
+                    macro.name() + ":" + pin.name(),
+                    circuit::PinDirection(pin.direction()));
+                stdCells.connect(stdCell, stdPin);
+                for(auto& port : pin.ports())
+                {
+                    for(auto& rect : port.second)
+                    {
+                        library.connect(
+                            stdPin,
+                            util::LocationDbu(0.5 *
+                                (dbuConverter.convert(rect.min_corner().x()) +
+                                 dbuConverter.convert(rect.max_corner().x())),
+                                0.5 *
+                                (dbuConverter.convert(rect.min_corner().y()) +
+                                 dbuConverter.convert(rect.max_corner().y()))));
                     }
                 }
             }
-
-            return library;
         }
+
+        return library;
     }
-}     // namespace placement
-}     // namespace ophidian
+}

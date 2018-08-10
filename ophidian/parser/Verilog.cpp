@@ -35,9 +35,7 @@ extern "C" {
 #include "Verilog.h"
 #include "ParserException.h"
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     Verilog::Verilog(const std::string& verilog_file):
         m_modules{}
@@ -294,5 +292,4 @@ namespace parser
     {
         return m_net_map;
     }
-}     // namespace parser
-}     // namespace ophidian
+}

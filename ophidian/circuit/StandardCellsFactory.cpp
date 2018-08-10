@@ -18,45 +18,39 @@
 
 #include "StandardCellsFactory.h"
 
-namespace ophidian
+namespace ophidian::circuit::factory
 {
-namespace circuit
-{
-    namespace factory
+    StandardCells make_standard_cells(const parser::Lef& lef) noexcept
     {
-        StandardCells make_standard_cells(const parser::Lef& lef) noexcept
+        auto cells = StandardCells{};
+
+        for(const auto& macro : lef.macros())
         {
-            auto cells = StandardCells{};
-
-            for(const auto& macro : lef.macros())
+            auto cell = cells.add_cell(macro.name());
+            for(const auto& pin : macro.pins())
             {
-                auto cell = cells.add_cell(macro.name());
-                for(const auto& pin : macro.pins())
+                auto cell_pin = Pin{};
+                switch(pin.direction())
                 {
-                    auto cell_pin = Pin{};
-                    switch(pin.direction())
-                    {
-                        case parser::Lef::macro_type::pin_type::direction_type::INPUT:
-                            cell_pin = cells.add_pin(pin.name(), PinDirection::INPUT);
-                            break;
-                        case parser::Lef::macro_type::pin_type::direction_type::OUTPUT:
-                            cell_pin = cells.add_pin(pin.name(), PinDirection::OUTPUT);
-                            break;
-                        case parser::Lef::macro_type::pin_type::direction_type::INOUT:
-                            cell_pin = cells.add_pin(pin.name(), PinDirection::INOUT);
-                            break;
-                        case parser::Lef::macro_type::pin_type::direction_type::NA:
-                            cell_pin = cells.add_pin(pin.name(), PinDirection::NA);
-                            break;
-                        default:
-                            break;
-                    }
-                    cells.connect(cell, cell_pin);
+                    case parser::Lef::macro_type::pin_type::direction_type::INPUT:
+                        cell_pin = cells.add_pin(pin.name(), PinDirection::INPUT);
+                        break;
+                    case parser::Lef::macro_type::pin_type::direction_type::OUTPUT:
+                        cell_pin = cells.add_pin(pin.name(), PinDirection::OUTPUT);
+                        break;
+                    case parser::Lef::macro_type::pin_type::direction_type::INOUT:
+                        cell_pin = cells.add_pin(pin.name(), PinDirection::INOUT);
+                        break;
+                    case parser::Lef::macro_type::pin_type::direction_type::NA:
+                        cell_pin = cells.add_pin(pin.name(), PinDirection::NA);
+                        break;
+                    default:
+                        break;
                 }
+                cells.connect(cell, cell_pin);
             }
-
-            return cells;
         }
+
+        return cells;
     }
-}
 }

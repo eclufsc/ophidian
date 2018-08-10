@@ -18,9 +18,7 @@
 
 #include "Library.h"
 
-namespace ophidian
-{
-namespace placement
+namespace ophidian::placement
 {
     Library::Library(const circuit::StandardCells & std_cells):
             mGeometries{std_cells.make_property_cell<Library::std_cell_geometry_type>()},
@@ -56,5 +54,4 @@ namespace placement
     {
         mPinOffsets[pin] = offset;
     }
-}     // namespace placement
-}     // namespace ophidian
+}

@@ -30,9 +30,7 @@
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     class Lef
     {
@@ -366,7 +364,6 @@ namespace parser
         direction_type m_direction;
         port_map_type  m_ports;
     };
-}     /* namespace parser */
-}     /* namespace ophidian */
+}
 
 #endif /* OPHIDIAN_PARSER_LEF_H */

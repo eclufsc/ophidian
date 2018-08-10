@@ -21,9 +21,7 @@
 #include "Def.h"
 #include "ParserException.h"
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     Def::Def(const std::string& def_file):
         m_die_area{},
@@ -292,5 +290,4 @@ namespace parser
 
         return os;
     }
-}     // namespace parser
-}     // namespace ophidian
+}

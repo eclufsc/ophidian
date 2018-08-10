@@ -24,9 +24,7 @@
 #include <vector>
 #include <memory>
 
-namespace ophidian
-{
-namespace interconnection
+namespace ophidian::interconnection
 {
     class SteinerTree;
 
@@ -37,9 +35,9 @@ namespace interconnection
      */
     class Flute final
     {
+    public:
         using dbu_t = util::database_unit_t;
         using Point = geometry::Point<dbu_t>;
-    public:
 
         //! Singleton instantiation
         static Flute & instance();
@@ -53,18 +51,17 @@ namespace interconnection
             \param container A container of geometry::Point.
             \return A std::unique_ptr to the created Steiner Tree.
          */
-        template <class T>
-        inline std::unique_ptr<SteinerTree> create(const T & container)
+        template <template <typename> class Container_type>
+        inline std::unique_ptr<SteinerTree> create(const Container_type<Point> & container)
         {
-
             const uint32_t kSize = container.size();
 
             if(kSize == 1) {
                 return trivialSteinerTree(*std::begin(container));
             }
             else if(kSize == 2) {
-                typename T::const_iterator it(container.begin());
-                typename T::const_iterator it2(it);
+                typename Container_type<Point>::const_iterator it(container.begin());
+                typename Container_type<Point>::const_iterator it2(it);
                 ++it2;
 
                 return singleSegment(*it, *it2);
@@ -74,7 +71,7 @@ namespace interconnection
             X.resize(0);
             Y.resize(0);
 
-            Point offset{dbu_t{0.0}, dbu_t{0.0}};
+            auto offset = Point{dbu_t{0.0}, dbu_t{0.0}};
 
             for(const auto & point : container)
             {
@@ -87,14 +84,11 @@ namespace interconnection
 
             for(const auto & point : container)
             {
-                X.push_back(static_cast<unsigned>(std::round(point.x() + offset.x())));
-                Y.push_back(static_cast<unsigned>(std::round(point.y() + offset.y())));
+                X.push_back(static_cast<unsigned>(std::round(units::unit_cast<double>(point.x()) + units::unit_cast<double>(offset.x()))));
+                Y.push_back(static_cast<unsigned>(std::round(units::unit_cast<double>(point.y()) + units::unit_cast<double>(offset.y()))));
             }
 
-            return callFlute(
-                X,
-                Y,
-                offset);
+            return callFlute(X, Y, offset);
         }
 
     private:
@@ -115,7 +109,6 @@ namespace interconnection
 
         Flute & operator=(const Flute & o) = delete;
     };
-}     // namespace interconnection
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_INTERCONNECTION_FLUTE_H

@@ -20,20 +20,15 @@
 #define OPHIDIAN_CIRCUIT_VERILOGFACTORY_H
 
 #include <ophidian/parser/Verilog.h>
+#include <ophidian/parser/Def.h>
 
 #include "Netlist.h"
 
-namespace ophidian
+namespace ophidian::circuit::factory
 {
-namespace circuit
-{
-    namespace factory
-    {
-        Netlist make_netlist(const parser::Verilog & verilog) noexcept;
+    Netlist make_netlist(const parser::Verilog & verilog) noexcept;
 
-        Netlist make_netlist(const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
-    }
-}     // namespace circuit
-}     // namespace ophidian
+    Netlist make_netlist(const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
+}
 
 #endif

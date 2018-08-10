@@ -21,6 +21,7 @@ void MySFMLCanvas::setController(MainController & controller)
 void MySFMLCanvas::resizeEvent(QResizeEvent * e)
 {
     sf::RenderWindow::create((sf::WindowHandle) winId());
+    OnUpdate();
 }
 
 void MySFMLCanvas::setSize(point_type size)
@@ -61,6 +62,7 @@ void MySFMLCanvas::wheelEvent(QWheelEvent * e)
         mCameraView.zoom(1.f/1.1f);
     else if(e->delta() < 0)
         mCameraView.zoom(1.1f);
+    OnUpdate();
 }
 
 void MySFMLCanvas::keyPressEvent(QKeyEvent * e)
@@ -86,11 +88,13 @@ void MySFMLCanvas::keyPressEvent(QKeyEvent * e)
     case Qt::Key::Key_Delete:
         mState->keyPressEvent(e);
     }
+    OnUpdate();
 }
 
 void MySFMLCanvas::mousePressEvent(QMouseEvent * e)
 {
     mState->mousePressEvent(mouseEventToPoint(e));
+    OnUpdate();
 }
 
 void MySFMLCanvas::mouseMoveEvent(QMouseEvent * e)
@@ -101,21 +105,25 @@ void MySFMLCanvas::mouseMoveEvent(QMouseEvent * e)
 void MySFMLCanvas::mouseReleaseEvent(QMouseEvent * e)
 {
     mState->mouseReleaseEvent(mouseEventToPoint(e));
+    OnUpdate();
 }
 
 bool MySFMLCanvas::findCellEvent(QString name)
 {
     return mState->findCellEvent(name);
+    OnUpdate();
 }
 
 void MySFMLCanvas::centerViewOn(const point_type & p1)
 {
     mCameraView.setCenter(sf::Vector2f(p1.x(), p1.y()));
+    OnUpdate();
 }
 
 void MySFMLCanvas::viewSize(const point_type & size)
 {
     mCameraView.setSize(sf::Vector2f(size.x(), -size.y()));
+    OnUpdate();
 }
 
 void MySFMLCanvas::reserveMinimumOfQuads(std::size_t minimumOfQuads)
