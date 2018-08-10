@@ -18,8 +18,8 @@
 
 #include "CellGeometry.h"
 
-namespace ophidian::geometry {
-
+namespace ophidian::geometry
+{
     CellGeometry::CellGeometry(const CellGeometry::box_container_type& boxes):
         m_boxes{boxes}
     {}

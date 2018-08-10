@@ -26,9 +26,7 @@
 #include <ophidian/entity_system/Composition.h>
 #include <ophidian/util/Range.h>
 
-namespace ophidian
-{
-namespace circuit
+namespace ophidian::circuit
 {
     class Pin :
         public entity_system::EntityBase
@@ -144,7 +142,6 @@ namespace circuit
         std::unordered_map<cell_name_type, cell_type> mName2Cell{};
         std::unordered_map<pin_name_type, pin_type>   mName2Pin{};
     };
-}     //namespace ophidian
-}     //namespace standard_cell
+}
 
 #endif // OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_H

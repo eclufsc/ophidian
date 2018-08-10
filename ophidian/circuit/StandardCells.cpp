@@ -18,9 +18,7 @@
 
 #include "StandardCells.h"
 
-namespace ophidian
-{
-namespace circuit
+namespace ophidian::circuit
 {
     const StandardCells::cell_type& StandardCells::find_cell(StandardCells::cell_name_type cellName) const
     {
@@ -157,5 +155,4 @@ namespace circuit
         mName2Pin.erase(name(pin));
         mPins.erase(pin);
     }
-}     //namespace ophidian
-}     //namespace standard_cell
+}

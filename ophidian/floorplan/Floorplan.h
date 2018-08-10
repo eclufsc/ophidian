@@ -26,9 +26,7 @@
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian
-{
-namespace floorplan
+namespace ophidian::floorplan
 {
     class Row :
         public entity_system::EntityBase
@@ -123,7 +121,6 @@ namespace floorplan
 
         std::unordered_map<site_name_type, site_type> mName2Site{};
     };
-}
 }
 
 #endif // OPHIDIAN_FLOORPLAN_FLOORPLAN_H

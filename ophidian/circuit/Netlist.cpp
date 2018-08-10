@@ -18,9 +18,7 @@
 
 #include "Netlist.h"
 
-namespace ophidian
-{
-namespace circuit
+namespace ophidian::circuit
 {
     const Netlist::cell_instance_type& Netlist::find_cell_instance(const Netlist::cell_instance_name_type& cellName) const
     {
@@ -363,5 +361,4 @@ namespace circuit
     entity_system::EntitySystem<Output>::NotifierType * Netlist::notifier(Output) const {
         return mOutputs.notifier();
     }
-}     // namespace circuit
-}     // namespace ophidian
+}

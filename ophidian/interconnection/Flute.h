@@ -24,9 +24,7 @@
 #include <vector>
 #include <memory>
 
-namespace ophidian
-{
-namespace interconnection
+namespace ophidian::interconnection
 {
     class SteinerTree;
 
@@ -111,7 +109,6 @@ namespace interconnection
 
         Flute & operator=(const Flute & o) = delete;
     };
-}     // namespace interconnection
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_INTERCONNECTION_FLUTE_H

@@ -19,9 +19,7 @@
 #include "Floorplan.h"
 #include "iostream"
 
-namespace ophidian
-{
-namespace floorplan
+namespace ophidian::floorplan
 {
     // Element access
     Floorplan::point_type& Floorplan::chip_origin() noexcept
@@ -152,6 +150,4 @@ namespace floorplan
     {
         mRows.erase(row);
     }
-
-}     //namespace floorplan
-}     //namespace ophidian
+}

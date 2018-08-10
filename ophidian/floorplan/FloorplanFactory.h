@@ -24,15 +24,9 @@
 
 #include "Floorplan.h"
 
-namespace ophidian
+namespace ophidian::floorplan::factory
 {
-namespace floorplan
-{
-    namespace factory
-    {
-        Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef);
-    }
-}     // namespace floorplan
-}     // namespace ophidian
+    Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef);
+}
 
 #endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H

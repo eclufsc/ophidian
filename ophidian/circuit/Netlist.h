@@ -25,9 +25,7 @@
 #include <ophidian/circuit/StandardCells.h>
 #include <unordered_map>
 
-namespace ophidian
-{
-namespace circuit
+namespace ophidian::circuit
 {
     class CellInstance :
         public entity_system::EntityBase
@@ -258,7 +256,6 @@ namespace circuit
         entity_system::Property<CellInstance, Cell> cells2StdCells_{};
         entity_system::Property<PinInstance, Pin>   pins2StdCells_{};
     };
-}     // namespace circuit
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_CIRCUIT_NETLIST_H

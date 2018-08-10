@@ -22,11 +22,8 @@
 #include <ophidian/geometry/Distance.h>
 #include <ophidian/geometry/Operations.h>
 
-namespace ophidian
+namespace ophidian::interconnection
 {
-namespace interconnection
-{
-
     Flute::Flute()
     {
         readLUT();
@@ -110,5 +107,4 @@ namespace interconnection
 
         return std::move(steiner);
     }
-}     // namespace interconnection
-}     // namespace ophidian
+}

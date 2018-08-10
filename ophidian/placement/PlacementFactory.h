@@ -25,15 +25,9 @@
 #include "Placement.h"
 #include "Library.h"
 
-namespace ophidian
+namespace ophidian::placement::factory
 {
-namespace placement
-{
-    namespace factory
-    {
-        Placement make_placement(const parser::Def& def, circuit::Netlist& netlist, Library& library) noexcept;
-    }
-}     // namespace placement
-}     // namespace ophidian
+    Placement make_placement(const parser::Def& def, circuit::Netlist& netlist, Library& library) noexcept;
+}
 
 #endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

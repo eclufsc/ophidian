@@ -27,9 +27,7 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/multi_polygon.hpp>
 
-namespace ophidian
-{
-namespace geometry
+namespace ophidian::geometry
 {
     template <typename T>
     using Point = boost::geometry::model::d2::point_xy<T>;
@@ -88,7 +86,6 @@ namespace geometry
 
         return multiGeometry;
     }
-}     //namespace geometry
-}     //namespace ophidian
+}
 
 #endif // OPHIDIAN_GEOMETRY_MODELS_H

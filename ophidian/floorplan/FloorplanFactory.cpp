@@ -18,38 +18,32 @@
 
 #include "FloorplanFactory.h"
 
-namespace ophidian
+namespace ophidian::floorplan::factory
 {
-namespace floorplan
-{
-    namespace factory
+    Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef)
     {
-        Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef)
+        auto floorplan = Floorplan{};
+
+        floorplan.chip_origin() = def.die_area().min_corner();
+        floorplan.chip_upper_right_corner() = def.die_area().max_corner();
+
+        for(const auto& site : lef.sites())
         {
-            auto floorplan = Floorplan{};
-
-            floorplan.chip_origin() = def.die_area().min_corner();
-            floorplan.chip_upper_right_corner() = def.die_area().max_corner();
-
-            for(const auto& site : lef.sites())
-            {
-                floorplan.add_site(
-                    site.name(),
-                    Floorplan::point_type{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()}
-                );
-            }
-
-            for(const auto & row : def.rows())
-            {
-                floorplan.add_row(
-                    row.origin(),
-                    row.num().x(),
-                    floorplan.find(row.site())
-                );
-            }
-
-            return floorplan;
+            floorplan.add_site(
+                site.name(),
+                Floorplan::point_type{site.width() * lef.micrometer_to_dbu_ratio(), site.height() * lef.micrometer_to_dbu_ratio()}
+            );
         }
+
+        for(const auto & row : def.rows())
+        {
+            floorplan.add_row(
+                row.origin(),
+                row.num().x(),
+                floorplan.find(row.site())
+            );
+        }
+
+        return floorplan;
     }
-}     // namespace floorplan
-}     // namespace ophidian
+}

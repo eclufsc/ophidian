@@ -24,9 +24,8 @@
 #include <ophidian/util/Units.h>
 #include "Models.h"
 
-namespace ophidian {
-namespace geometry {
-
+namespace ophidian::geometry
+{
     class CellGeometry
     {
     public:
@@ -97,7 +96,6 @@ namespace geometry {
     };
 
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept;
-}
 }
 
 #endif // MULTIBOX_H
