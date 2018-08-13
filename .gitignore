@@ -10,3 +10,4 @@
 /build
 /doc/documentation
 .DS_Store
+*.user

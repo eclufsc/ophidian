@@ -68,11 +68,15 @@ namespace parser
         // Class member functions
         void read_file(const std::string& guide_file);
 
+        const size_t size() const noexcept;
+
+        const net_container_type& nets() const noexcept;
+
     private:
         net_container_type m_nets;
     };
 
-    class Gruide::Net
+    class Guide::Net
     {
     public:
         template <class T> using container_type = std::vector<T>;
@@ -93,6 +97,8 @@ namespace parser
 
         const region_container_type& regions() const noexcept;
 
+        const size_t regions_size() const noexcept;
+
     private:
         string_type m_name;
         region_container_type m_regions;
@@ -102,8 +108,8 @@ namespace parser
     {
     public:
         // Class member types
-        template <class T> using point_type     = Guide::database_unit_point_type;
-        template <class T> using box_type       = Guide::database_unit_box_type;
+        using point_type                        = Guide::database_unit_point_type;
+        using box_type                          = Guide::database_unit_box_type;
         using string_type                       = std::string;
 
         // Class constructors
@@ -122,7 +128,7 @@ namespace parser
     private:
         string_type m_metal; ///metal layer of guide region
         box_type    m_region; /// rectangle of guide region
-    }
+    };
 
 }
 }
