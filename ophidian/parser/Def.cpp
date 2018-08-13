@@ -56,6 +56,25 @@ namespace parser
             }
         );
 
+        defrSetTrackCbk(
+            [](defrCallbackType_e, defiTrack *track, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+                that->m_tracks.emplace_back(
+                    [&]() -> Def::track_type::orientation_type {
+                        auto orientation_str = std::string(track->macro());
+                        if(orientation_str == "X") { return Def::track_type::orientation_type::X; }
+                        else { return Def::track_type::orientation_type::Y; }
+                     }(),
+                     Def::track_type::database_unit_type{static_cast<double>(track->x())},
+                     Def::track_type::scalar_type{static_cast<double>(track->xNum())},
+                     Def::track_type::database_unit_type{static_cast<double>(track->xStep())},
+                     track->layer(0)
+                     );
+                return 0;
+            }
+        );
+
         defrSetDieAreaCbk(
             [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -164,6 +183,11 @@ namespace parser
     const Def::scalar_type& Def::dbu_to_micrometer_ratio() const noexcept
     {
         return m_dbu_to_micrometer_ratio;
+    }
+
+    const Def::track_container_type& Def::tracks() const noexcept
+    {
+        return m_tracks;
     }
 
     const Def::Component::string_type& Def::Component::name() const noexcept
@@ -292,5 +316,35 @@ namespace parser
 
         return os;
     }
+
+    const Def::Track::Orientation& Def::Track::orientation() const noexcept
+    {
+        return m_orientation;
+    }
+
+    const Def::Track::database_unit_type& Def::Track::start() const noexcept
+    {
+        return m_start;
+    }
+
+    const Def::Track::database_unit_type& Def::Track::space() const noexcept
+    {
+        return m_space;
+    }
+
+    const Def::Track::string_type& Def::Track::layerName() const noexcept
+    {
+        return m_layerName;
+    }
+
+    const Def::Track::scalar_type& Def::Track::numtracks() const noexcept
+    {
+        return m_numtracks;
+    }
+
+
+
+
+
 }     // namespace parser
 }     // namespace ophidian

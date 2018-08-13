@@ -15,7 +15,7 @@ TEST_CASE("Guide: Try to load inexistent file", "[parser][Guide]")
     );
 }
 
-TEST_CASE("Def: Loading ispd_18_sample.input.guide", "[parser][Guide][sample]")
+TEST_CASE("Guide: Loading ispd18_sample.input.guide", "[parser][Guide][sample]")
 {
     Guide sample = Guide{"input_files/ispd18/ispd18_sample/ispd18_sample.input.guide"};
 

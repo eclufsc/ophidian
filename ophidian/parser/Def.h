@@ -46,6 +46,7 @@ namespace parser
         // Class member types
         class Row;
         class Component;
+        class Track;
 
         template <class T> using container_type = std::vector<T>;
         template <class T> using point_type     = geometry::Point<T>;
@@ -56,6 +57,9 @@ namespace parser
 
         using component_type                    = Component;
         using component_container_type          = container_type<component_type>;
+
+        using track_type                        = Track;
+        using track_container_type              = container_type<track_type>;
 
         using database_unit_type                = util::database_unit_t;
         using database_unit_point_type          = point_type<database_unit_type>;
@@ -88,11 +92,73 @@ namespace parser
 
         const scalar_type& dbu_to_micrometer_ratio() const noexcept;
 
+        const track_container_type& tracks() const noexcept;
+
     private:
         database_unit_box_type   m_die_area;
         row_container_type       m_rows;
         component_container_type m_components;
         scalar_type              m_dbu_to_micrometer_ratio;
+        track_container_type     m_tracks;
+    };
+
+    /**
+     * @brief Type to represent a circuit track.
+     *
+     * Defines the routing grid for a standard cell-based design.
+     * Typically, the routing grid is generated when the floorplan is initialized.
+     * The first track is located at an offset from the placement grid set by the
+     * OFFSET value for the layer in the LEF file. The track spacing is the PITCH
+     * value for the layer defined in LEF.
+     */
+    class Def::Track
+    {
+    public:
+        // Class member types
+        enum class Orientation : int {
+            X, Y
+        };
+        using string_type               = std::string;
+        using database_unit_type        = Def::database_unit_type;
+        using scalar_type               = Def::scalar_type;
+        using orientation_type         = Orientation;
+
+        // Class constructors
+
+        Track() = delete;
+
+        Track(const Track&) = default;
+        Track& operator=(const Track&) = default;
+
+        Track(Track&&) = default;
+        Track& operator=(Track&&) = default;
+
+        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
+        Track(Arg1&& orientation, Arg2&& start, Arg3&& numTracks, Arg4&& space, Arg5&& layer):
+            m_orientation{std::forward<Arg1>(orientation)},
+            m_start{std::forward<Arg2>(start)},
+            m_numtracks{std::forward<Arg3>(numTracks)},
+            m_space{std::forward<Arg4>(space)},
+            m_layerName{std::forward<Arg5>(layer)}
+        {}
+
+        // Class member functions
+        const Orientation& orientation() const noexcept;
+
+        const database_unit_type& start() const noexcept;
+
+        const scalar_type& numtracks() const noexcept;
+
+        const database_unit_type& space() const noexcept;
+
+        const string_type& layerName() const noexcept;
+
+    private:
+        Orientation m_orientation;///Specifies the location and direction of the first track defined. X indicates vertical lines; Y indicates horizontal lines.
+        database_unit_type m_start;/// is the X or Y coordinate of the first line.
+        scalar_type m_numtracks;///Specifies the number of tracks to create for the grid.
+        database_unit_type m_space;///Specifies the spacing between the tracks.
+        string_type m_layerName;///Specifies the routing layer used for the tracks.
     };
 
     /**
