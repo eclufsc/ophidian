@@ -170,6 +170,8 @@ namespace parser
             NOT_ASSIGNED
         };
 
+        class EndOfLine;
+
         using string_type     = std::string;
         using micrometer_type = Lef::micrometer_type;
         using type_type       = Type;
@@ -218,6 +220,39 @@ namespace parser
         micrometer_type m_pitch;
         micrometer_type m_offset;
         micrometer_type m_width;
+        //tiago
+        micrometer_type m_min_width;
+        micrometer_type m_area;
+        micrometer_type m_spacing;
+
+
+    };
+
+    class Lef::Layer::EndOfLine{
+        using micrometer_type = Lef::Layer::micrometer_type;
+
+        // Class constructors
+        EndOfLine() = delete;
+
+        EndOfLine(const EndOfLine&) = delete;
+        EndOfLine& operator=(const EndOfLine&) = delete;
+
+        EndOfLine(EndOfLine&&) = default;
+        EndOfLine& operator=(EndOfLine&&) = default;
+
+        template<class A1, class A2, class A3>
+        EndOfLine(A1&& space, A2&& width, A3&& within):
+            m_space{std::forward<A1>(space)},
+            m_width{std::forward<A2>(width)},
+            m_within{std::forward<A3>(within)}
+        {}
+
+        // Class member functions
+
+      private:
+        micrometer_type m_space;
+        micrometer_type m_width;
+        micrometer_type m_within;
     };
 
     class Lef::Macro
