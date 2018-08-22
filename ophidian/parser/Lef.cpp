@@ -120,7 +120,56 @@ namespace parser
                     }(),
                     Lef::layer_type::micrometer_type{l->pitch()},
                     Lef::layer_type::micrometer_type{l->offset()},
-                    Lef::layer_type::micrometer_type{l->width()}
+                    Lef::layer_type::micrometer_type{l->width()},
+
+//                tiago
+                    Lef::layer_type::micrometer_type{l->minwidth()},
+                    Lef::layer_type::micrometer_type{l->area()},
+                    [&](){
+                        int i = -1;
+                        for (int index = 0; index < l->numSpacing(); ++index) {
+                            if(!l->hasSpacingEndOfLine(index)){
+                                i = index;
+                                break;
+                            }
+                        }
+                    if(i >= 0){
+                        return Lef::layer_type::micrometer_type{l->spacing(i)};
+                    }else{
+                        return Lef::layer_type::micrometer_type{0.0};
+                    }
+                    }(),
+                    [&](){
+                        int i = -1;
+                        for (int index = 0; index < l->numSpacing(); ++index) {
+                            if(l->hasSpacingEndOfLine(index)){
+                                i = index;
+                                break;
+                            }
+                        }
+                    if(i >= 0){
+                        return Lef::layer_type::endOfLine_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
+                    }else{
+                        return Lef::layer_type::endOfLine_type{0.0, 0.0, 0.0};
+                    }
+                    }(),
+                    [&](){
+//                        parallelRunLength
+                        auto n = l->numSpacingTable();
+                        auto spacingTable = l->spacingTable(0);
+                        auto Influence = l->spacingTable(0)->isInfluence();
+                        auto Parallel = l->spacingTable(0)->isParallel();
+
+                        auto parallel = l->spacingTable(0)->parallel();
+                        auto numLength = parallel->numLength();
+                        auto numWidth = parallel->numWidth();
+
+                        auto width = parallel->width(2);
+                        auto length = parallel->length(0);
+                        auto x = parallel->widthSpacing(0, 2);
+
+                        return Lef::layer_type::parallelRunLength_type{0.0, 0.0};
+                    }()
                 );
 
                 return 0;
@@ -412,6 +461,26 @@ namespace parser
             m_width == rhs.m_width;
     }
 
+    const Lef::Layer::micrometer_type& Lef::Layer::min_width() const noexcept{
+        return m_min_width;
+    }
+
+    const Lef::Layer::micrometer_type& Lef::Layer::area() const noexcept{
+        return m_area;
+    }
+
+    const Lef::Layer::micrometer_type& Lef::Layer::spacing() const noexcept{
+        return m_spacing;
+    }
+
+    const Lef::Layer::endOfLine_type& Lef::Layer::EOL() const noexcept{
+        return m_eol;
+    }
+
+    const Lef::Layer::parallelRunLength_type& Lef::Layer::parallelRunLength() const noexcept{
+        return m_parallelRunLength;
+    }
+
     std::ostream& operator<<(std::ostream& os, const Lef::Layer& layer)
     {
         auto type_string = [&](){
@@ -503,5 +572,61 @@ namespace parser
     {
         return m_ports;
     }
+
+    const Lef::Layer::EndOfLine::micrometer_type & Lef::Layer::EndOfLine::space() const noexcept
+    {
+        return m_space;
+    }
+
+    const Lef::Layer::EndOfLine::micrometer_type & Lef::Layer::EndOfLine::width() const noexcept
+    {
+        return m_width;
+    }
+
+    const Lef::Layer::EndOfLine::micrometer_type & Lef::Layer::EndOfLine::within() const noexcept
+    {
+        return m_within;
+    }
+
+    void Lef::Layer::ParallelRunLength::add_length(Lef::Layer::ParallelRunLength::micrometer_type &length)
+    {
+        m_lengths.push_back(length);
+    }
+
+    void Lef::Layer::ParallelRunLength::add_width(Lef::Layer::ParallelRunLength::micrometer_type &width)
+    {
+        m_widths.push_back(width);
+    }
+
+    void Lef::Layer::ParallelRunLength::add_spacing(Lef::Layer::ParallelRunLength::micrometer_type width, Lef::Layer::ParallelRunLength::micrometer_type length, Lef::Layer::ParallelRunLength::micrometer_type spacing)
+    {
+        m_values.insert(std::make_pair(std::make_pair(width, length), spacing));
+    }
+
+    const Lef::Layer::ParallelRunLength::parallelRunLength_container_type& Lef::Layer::ParallelRunLength::values() const noexcept
+    {
+        return m_values;
+    }
+
+    const Lef::Layer::ParallelRunLength::micrometer_container_type& Lef::Layer::ParallelRunLength::widths() const noexcept
+    {
+        return m_widths;
+    }
+
+    const Lef::Layer::ParallelRunLength::micrometer_container_type& Lef::Layer::ParallelRunLength::lengths() const noexcept
+    {
+        return m_lengths;
+    }
+
+    int Lef::Layer::ParallelRunLength::numWidth() const noexcept
+    {
+        return m_numWidth;
+    }
+
+    int Lef::Layer::ParallelRunLength::numLength() const noexcept
+    {
+        return m_numLength;
+    }
+
 }     /* namespace parser */
 }     /* namespace ophidian */

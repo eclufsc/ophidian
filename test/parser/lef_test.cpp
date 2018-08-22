@@ -102,6 +102,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
 TEST_CASE("lef: ispd18_sample.input.lef parsing", "[parser][lef][sample][ispd18]")
 {
     auto simple = Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};
+//    auto test10 = Lef{"input_files/ispd18/ispd18_test10/ispd18_test10.input.lef"};
 
     int a = 0;
     a++;

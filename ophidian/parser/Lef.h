@@ -153,10 +153,90 @@ namespace parser
         symmetry_type   m_symmetry;
     };
 
+
+
     class Lef::Layer
     {
     public:
         // Class member types
+        class EndOfLine{
+        public:
+            using micrometer_type = Lef::micrometer_type;
+
+            // Class constructors
+            EndOfLine() = delete;
+
+            EndOfLine(const EndOfLine&) = delete;
+            EndOfLine& operator=(const EndOfLine&) = delete;
+
+            EndOfLine(EndOfLine&&) = default;
+            EndOfLine& operator=(EndOfLine&&) = default;
+
+            template<class A1, class A2, class A3>
+            EndOfLine(A1&& space, A2&& width, A3&& within):
+                m_space{std::forward<A1>(space)},
+                m_width{std::forward<A2>(width)},
+                m_within{std::forward<A3>(within)}
+            {}
+
+            // Class member functions
+            const micrometer_type & space() const noexcept;
+            const micrometer_type & width() const noexcept;
+            const micrometer_type & within() const noexcept;
+
+        private:
+            micrometer_type m_space;
+            micrometer_type m_width;
+            micrometer_type m_within;
+        };
+
+        class ParallelRunLength{
+        public:
+            template <class T> using container_type = std::vector<T>;
+
+            using micrometer_type                   = Lef::micrometer_type;
+            using micrometer_container_type         = container_type<micrometer_type>;
+
+            using parallelRunLength_container_type  = std::map<std::pair<micrometer_type, micrometer_type>, micrometer_type>;
+
+            ParallelRunLength() = delete;
+
+            ParallelRunLength(const ParallelRunLength&) = delete;
+            ParallelRunLength& operator=(const ParallelRunLength&) = delete;
+
+            ParallelRunLength(ParallelRunLength&&) = default;
+            ParallelRunLength& operator=(ParallelRunLength&&) = default;
+
+            template<class A1, class A2>
+            ParallelRunLength(A1&& length, A2&& width):
+                m_numLength{std::forward<A1>(length)},
+                m_numWidth{std::forward<A2>(width)}
+            {}
+
+            void add_length(micrometer_type& length);
+            void add_width(micrometer_type& width);
+            void add_spacing(micrometer_type width, micrometer_type length, micrometer_type spacing);
+
+
+
+            int numLength() const noexcept;
+
+            int numWidth() const noexcept;
+
+            const micrometer_container_type& lengths() const noexcept;
+
+            const micrometer_container_type& widths() const noexcept;
+
+            const parallelRunLength_container_type& values() const noexcept;
+
+        private:
+            int m_numLength;
+            int m_numWidth;
+            micrometer_container_type m_lengths;
+            micrometer_container_type m_widths;
+            parallelRunLength_container_type m_values; //map<pair<width, length>, spacing>
+        };
+
         enum class Type : int {
             MASTERSLICE,
             CUT,
@@ -170,12 +250,13 @@ namespace parser
             NOT_ASSIGNED
         };
 
-        class EndOfLine;
+        using string_type               = std::string;
+        using micrometer_type           = Lef::micrometer_type;
+        using type_type                 = Type;
+        using direction_type            = Direction;
 
-        using string_type     = std::string;
-        using micrometer_type = Lef::micrometer_type;
-        using type_type       = Type;
-        using direction_type  = Direction;
+        using endOfLine_type            = EndOfLine;
+        using parallelRunLength_type    = ParallelRunLength;
 
         // Class constructors
         Layer() = delete;
@@ -186,14 +267,20 @@ namespace parser
         Layer(Layer&&) = default;
         Layer& operator=(Layer&&) = default;
 
-        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
-        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& pitch, Arg5&& offset, Arg6&& width):
+        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class Arg11>
+        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& pitch, Arg5&& offset, Arg6&& width, Arg7&& min_width, Arg8&& area, Arg9&& spacing, Arg10&& eol, Arg11&& parallelRunLength):
             m_name{std::forward<Arg1>(name)},
             m_type{std::forward<Arg2>(type)},
             m_direction{std::forward<Arg3>(direction)},
             m_pitch{std::forward<Arg4>(pitch)},
             m_offset{std::forward<Arg5>(offset)},
-            m_width{std::forward<Arg6>(width)}
+            m_width{std::forward<Arg6>(width)},
+
+            m_min_width{std::forward<Arg7>(min_width)},
+            m_area{std::forward<Arg8>(area)},
+            m_spacing{std::forward<Arg9>(spacing)},
+            m_eol{std::forward<Arg10>(eol)},
+            m_parallelRunLength{std::forward<Arg11>(parallelRunLength)}
         {}
 
         // Class member functions
@@ -211,6 +298,11 @@ namespace parser
 
         bool operator ==(const Layer& rhs) const noexcept;
 
+        const micrometer_type& min_width() const noexcept;
+        const micrometer_type& area() const noexcept;
+        const micrometer_type& spacing() const noexcept;
+        const endOfLine_type& EOL() const noexcept;
+        const parallelRunLength_type& parallelRunLength() const noexcept;
         friend std::ostream& operator<<(std::ostream& os, const Layer& layer);
 
     private:
@@ -224,36 +316,10 @@ namespace parser
         micrometer_type m_min_width;
         micrometer_type m_area;
         micrometer_type m_spacing;
-
-
+        endOfLine_type  m_eol;
+        parallelRunLength_type m_parallelRunLength;
     };
 
-    class Lef::Layer::EndOfLine{
-        using micrometer_type = Lef::Layer::micrometer_type;
-
-        // Class constructors
-        EndOfLine() = delete;
-
-        EndOfLine(const EndOfLine&) = delete;
-        EndOfLine& operator=(const EndOfLine&) = delete;
-
-        EndOfLine(EndOfLine&&) = default;
-        EndOfLine& operator=(EndOfLine&&) = default;
-
-        template<class A1, class A2, class A3>
-        EndOfLine(A1&& space, A2&& width, A3&& within):
-            m_space{std::forward<A1>(space)},
-            m_width{std::forward<A2>(width)},
-            m_within{std::forward<A3>(within)}
-        {}
-
-        // Class member functions
-
-      private:
-        micrometer_type m_space;
-        micrometer_type m_width;
-        micrometer_type m_within;
-    };
 
     class Lef::Macro
     {
