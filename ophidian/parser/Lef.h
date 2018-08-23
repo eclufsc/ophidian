@@ -211,10 +211,13 @@ namespace parser
             ParallelRunLength(A1&& length, A2&& width):
                 m_numLength{std::forward<A1>(length)},
                 m_numWidth{std::forward<A2>(width)}
-            {}
+            {
+                m_lengths.reserve(m_numLength);
+                m_widths.reserve(m_numWidth);
+            }
 
-            void add_length(micrometer_type& length);
-            void add_width(micrometer_type& width);
+            void add_length(micrometer_type length);
+            void add_width(micrometer_type width);
             void add_spacing(micrometer_type width, micrometer_type length, micrometer_type spacing);
 
 

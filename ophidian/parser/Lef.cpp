@@ -122,7 +122,6 @@ namespace parser
                     Lef::layer_type::micrometer_type{l->offset()},
                     Lef::layer_type::micrometer_type{l->width()},
 
-//                tiago
                     Lef::layer_type::micrometer_type{l->minwidth()},
                     Lef::layer_type::micrometer_type{l->area()},
                     [&](){
@@ -154,21 +153,21 @@ namespace parser
                     }
                     }(),
                     [&](){
-//                        parallelRunLength
-                        auto n = l->numSpacingTable();
-                        auto spacingTable = l->spacingTable(0);
-                        auto Influence = l->spacingTable(0)->isInfluence();
-                        auto Parallel = l->spacingTable(0)->isParallel();
-
-                        auto parallel = l->spacingTable(0)->parallel();
-                        auto numLength = parallel->numLength();
-                        auto numWidth = parallel->numWidth();
-
-                        auto width = parallel->width(2);
-                        auto length = parallel->length(0);
-                        auto x = parallel->widthSpacing(0, 2);
-
-                        return Lef::layer_type::parallelRunLength_type{0.0, 0.0};
+                        if(l->spacingTable(0)->isParallel())
+                        {
+                            auto parallel = l->spacingTable(0)->parallel();
+                            Lef::layer_type::parallelRunLength_type parallelRunLength = Lef::layer_type::parallelRunLength_type{parallel->numLength(), parallel->numWidth()};
+                            for (int i = 0; i < parallel->numLength(); ++i) {
+                                parallelRunLength.add_length(micrometer_type{parallel->length(i)});
+                                for (int j = 0; j < parallel->numWidth(); ++j) {
+                                   parallelRunLength.add_width(micrometer_type{parallel->width(j)});
+                                   parallelRunLength.add_spacing(micrometer_type{parallel->width(j)}, micrometer_type{parallel->length(i)}, micrometer_type{parallel->widthSpacing(i, j)});
+                                }
+                            }
+                            return parallelRunLength;
+                        }else{
+                            return Lef::layer_type::parallelRunLength_type{0, 0};
+                        }
                     }()
                 );
 
@@ -588,12 +587,12 @@ namespace parser
         return m_within;
     }
 
-    void Lef::Layer::ParallelRunLength::add_length(Lef::Layer::ParallelRunLength::micrometer_type &length)
+    void Lef::Layer::ParallelRunLength::add_length(Lef::Layer::ParallelRunLength::micrometer_type length)
     {
         m_lengths.push_back(length);
     }
 
-    void Lef::Layer::ParallelRunLength::add_width(Lef::Layer::ParallelRunLength::micrometer_type &width)
+    void Lef::Layer::ParallelRunLength::add_width(Lef::Layer::ParallelRunLength::micrometer_type width)
     {
         m_widths.push_back(width);
     }
