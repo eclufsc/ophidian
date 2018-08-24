@@ -661,6 +661,11 @@ namespace parser
         return m_numLength;
     }
 
+    const Lef::Via::string_type& Lef::Via::name() const noexcept
+    {
+        return m_name;
+    }
+
     void Lef::Via::addLayer(Lef::Via::string_type layer, layer_container_type boxes) noexcept
     {
         m_layers.insert(std::make_pair(layer, boxes));

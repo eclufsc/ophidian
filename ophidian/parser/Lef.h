@@ -500,11 +500,16 @@ namespace parser
         Via(Via&&) = default;
         Via& operator=(Via&&) = default;
 
-        Via(string_type name):
+        Via(const string_type& name):
             m_name{name}
         {}
 
+        Via(string_type&& name):
+            m_name(std::move(name))
+        {}
+
         //class members
+        const string_type& name() const noexcept;
         void addLayer(string_type layer, layer_container_type boxes) noexcept;
 
         const layer_map_type& layers() const noexcept;
