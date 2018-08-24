@@ -318,6 +318,35 @@ namespace parser
             }
         );
 
+        lefrSetViaCbk(
+            [](lefrCallbackType_e, lefiVia* l, lefiUserData ud) -> int {
+                auto that = static_cast<Lef *>(ud);
+                Lef::Via via = Lef::Via{l->name()};
+
+                for (int i = 0; i < l->numLayers(); ++i) {
+//                    auto layerName = l->layerName(i);
+//                    auto numRects = l->numRects(i);
+//                    auto xl = l->xl(i, 0);
+//                    auto yl = l->yl(i, 0);
+//                    auto xh = l->xh(i, 0);
+//                    auto yh = l->yh(i, 0);
+                    Lef::via_type::layer_container_type boxes;
+                    boxes.reserve(l->numRects(i));
+                    for (int j = 0; j < l->numRects(i); ++j) {
+                        using micrometer = Lef::via_type::micrometer_type;
+                        using micrometerPoint = Lef::via_type::micrometer_point_type;
+                        auto pl = micrometerPoint{micrometer{l->xl(i, j)}, micrometer{l->yl(i, j)}};
+                        auto ph = micrometerPoint{micrometer{l->xh(i, j)}, micrometer{l->yh(i, j)}};
+                        auto box = Lef::via_type::micrometer_box_type{pl, ph};
+                        boxes.push_back(box);
+                    }
+                    via.addLayer(std::string(l->layerName(i)), boxes);
+                }
+                that->m_vias.emplace_back(via);
+                return 0;
+            }
+        );
+
         auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
             std::fopen(lef_file.c_str(), "r"),
             &std::fclose);
@@ -348,6 +377,11 @@ namespace parser
     const Lef::scalar_type& Lef::micrometer_to_dbu_ratio() const noexcept
     {
         return m_micrometer_to_dbu_ratio;
+    }
+
+    const Lef::via_container_type& Lef::vias() const noexcept
+    {
+        return m_vias;
     }
 
     const Lef::Site::string_type& Lef::Site::name() const noexcept
@@ -587,17 +621,17 @@ namespace parser
         return m_within;
     }
 
-    void Lef::Layer::ParallelRunLength::add_length(Lef::Layer::ParallelRunLength::micrometer_type length)
+    void Lef::Layer::ParallelRunLength::add_length(Lef::Layer::ParallelRunLength::micrometer_type length) noexcept
     {
         m_lengths.push_back(length);
     }
 
-    void Lef::Layer::ParallelRunLength::add_width(Lef::Layer::ParallelRunLength::micrometer_type width)
+    void Lef::Layer::ParallelRunLength::add_width(Lef::Layer::ParallelRunLength::micrometer_type width) noexcept
     {
         m_widths.push_back(width);
     }
 
-    void Lef::Layer::ParallelRunLength::add_spacing(Lef::Layer::ParallelRunLength::micrometer_type width, Lef::Layer::ParallelRunLength::micrometer_type length, Lef::Layer::ParallelRunLength::micrometer_type spacing)
+    void Lef::Layer::ParallelRunLength::add_spacing(Lef::Layer::ParallelRunLength::micrometer_type width, Lef::Layer::ParallelRunLength::micrometer_type length, Lef::Layer::ParallelRunLength::micrometer_type spacing) noexcept
     {
         m_values.insert(std::make_pair(std::make_pair(width, length), spacing));
     }
@@ -625,6 +659,16 @@ namespace parser
     int Lef::Layer::ParallelRunLength::numLength() const noexcept
     {
         return m_numLength;
+    }
+
+    void Lef::Via::addLayer(Lef::Via::string_type layer, layer_container_type boxes) noexcept
+    {
+        m_layers.insert(std::make_pair(layer, boxes));
+    }
+
+    const Lef::Via::layer_map_type &Lef::Via::layers() const noexcept
+    {
+        return m_layers;
     }
 
 }     /* namespace parser */

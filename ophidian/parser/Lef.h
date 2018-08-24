@@ -41,6 +41,7 @@ namespace parser
         class Site;
         class Layer;
         class Macro;
+        class Via;
 
         template <class T> using container_type = std::vector<T>;
 
@@ -55,6 +56,9 @@ namespace parser
 
         using macro_type                        = Macro;
         using macro_container_type              = container_type<macro_type>;
+
+        using via_type                          = Via;
+        using via_container_type                = container_type<via_type>;
 
         using micrometer_type                   = util::micrometer_t;
         using micrometer_point_type             = point_type<micrometer_type>;
@@ -87,10 +91,13 @@ namespace parser
 
         const scalar_type& micrometer_to_dbu_ratio() const noexcept;
 
+        const via_container_type& vias() const noexcept;
+
     private:
         site_container_type  m_sites;
         layer_container_type m_layers;
         macro_container_type m_macros;
+        via_container_type   m_vias;
         scalar_type          m_micrometer_to_dbu_ratio;
     };
     
@@ -216,11 +223,9 @@ namespace parser
                 m_widths.reserve(m_numWidth);
             }
 
-            void add_length(micrometer_type length);
-            void add_width(micrometer_type width);
-            void add_spacing(micrometer_type width, micrometer_type length, micrometer_type spacing);
-
-
+            void add_length(micrometer_type length) noexcept;
+            void add_width(micrometer_type width) noexcept;
+            void add_spacing(micrometer_type width, micrometer_type length, micrometer_type spacing) noexcept;
 
             int numLength() const noexcept;
 
@@ -315,7 +320,6 @@ namespace parser
         micrometer_type m_pitch;
         micrometer_type m_offset;
         micrometer_type m_width;
-        //tiago
         micrometer_type m_min_width;
         micrometer_type m_area;
         micrometer_type m_spacing;
@@ -469,6 +473,45 @@ namespace parser
         string_type    m_name;
         direction_type m_direction;
         port_map_type  m_ports;
+    };
+
+    class Lef::Via{
+    public:
+        template <class T> using container_type     = std::vector<T>;
+
+        template <class T> using point_type         = geometry::Point<T>;
+        template <class T> using box_type           = geometry::Box<T>;
+        template <class K, class V> using map_type  = Lef::Macro::map_type<K,V>;
+
+        using string_type                           = std::string;
+        using micrometer_type                       = Lef::micrometer_type;
+        using micrometer_point_type                 = point_type<micrometer_type>;
+        using micrometer_box_type                   = box_type<micrometer_type>;
+
+        using layer_container_type                  = container_type<micrometer_box_type>;
+        using layer_map_type                        = map_type<string_type, layer_container_type>;
+
+        // Class constructors
+        Via() = delete;
+
+        Via(const Via&) = default;
+        Via& operator=(const Via&) = default;
+
+        Via(Via&&) = default;
+        Via& operator=(Via&&) = default;
+
+        Via(string_type name):
+            m_name{name}
+        {}
+
+        //class members
+        void addLayer(string_type layer, layer_container_type boxes) noexcept;
+
+        const layer_map_type& layers() const noexcept;
+
+    private:
+        string_type m_name;
+        layer_map_type m_layers;
     };
 }     /* namespace parser */
 }     /* namespace ophidian */
