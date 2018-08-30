@@ -49,11 +49,11 @@ namespace ophidian::placement
         // Constructors
         Placement() = delete;
 
-        Placement(const Placement&) = default;
-        Placement& operator=(const Placement&) = default;
+        Placement(const Placement&) = delete;
+        Placement& operator=(const Placement&) = delete;
 
-        Placement(Placement&&) = default;
-        Placement& operator=(Placement&&) = default;
+        Placement(Placement&&) = delete;
+        Placement& operator=(Placement&&) = delete;
 
         Placement(const circuit::Netlist & netlist, const Library & library);
 

@@ -25,7 +25,7 @@
 
 namespace ophidian::circuit::factory
 {
-    StandardCells make_standard_cells(const parser::Lef& lef) noexcept;
+    void make_standard_cells(StandardCells& cells, const parser::Lef& lef) noexcept;
 }
 
 #endif

@@ -20,10 +20,8 @@
 
 namespace ophidian::circuit::factory
 {
-    Netlist make_netlist(const parser::Verilog & verilog) noexcept
+    void make_netlist(Netlist& netlist, const parser::Verilog & verilog) noexcept
     {
-        auto netlist = Netlist{};
-
         const parser::Verilog::Module & module = verilog.modules().front();
 
         std::size_t sizePins = 0;
@@ -64,14 +62,10 @@ namespace ophidian::circuit::factory
                 netlist.connect(netlist.find_net(portMap.second), pin);
             }
         }
-
-        return netlist;
     }
 
-    Netlist make_netlist(const parser::Verilog & verilog, StandardCells& std_cells) noexcept
+    void make_netlist(Netlist& netlist, const parser::Verilog & verilog, StandardCells& std_cells) noexcept
     {
-        auto netlist = Netlist{};
-
         const auto& module = verilog.modules().front();
 
         std::size_t sizePins = 0;
@@ -114,6 +108,5 @@ namespace ophidian::circuit::factory
                 netlist.connect(netlist.find_net(portMap.second), pin);
             }
         }
-        return netlist;
     }
 }

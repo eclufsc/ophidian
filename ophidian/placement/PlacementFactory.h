@@ -27,7 +27,7 @@
 
 namespace ophidian::placement::factory
 {
-    Placement make_placement(const parser::Def& def, circuit::Netlist& netlist, Library& library) noexcept;
+    void make_placement(Placement& placement, const parser::Def& def, circuit::Netlist& netlist, Library& library) noexcept;
 }
 
 #endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

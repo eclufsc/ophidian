@@ -25,7 +25,7 @@
 
 namespace ophidian::placement::factory
 {
-    Library make_library(const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
+    void make_library(Library& library, const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
 }
 
 #endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

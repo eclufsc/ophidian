@@ -59,11 +59,11 @@ namespace ophidian::floorplan
         // Constructors
         Floorplan() = default;
 
-        Floorplan(const Floorplan&) = default;
-        Floorplan& operator=(const Floorplan&) = default;
+        Floorplan(const Floorplan&) = delete;
+        Floorplan& operator=(const Floorplan&) = delete;
 
-        Floorplan(Floorplan&&) = default;
-        Floorplan& operator=(Floorplan&&) = default;
+        Floorplan(Floorplan&&) = delete;
+        Floorplan& operator=(Floorplan&&) = delete;
 
         // Element access
         point_type& chip_origin() noexcept;

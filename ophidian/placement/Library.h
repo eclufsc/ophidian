@@ -46,8 +46,8 @@ namespace ophidian::placement
         Library(const Library&) = delete;
         Library& operator=(const Library&) = delete;
 
-        Library(Library&&) = default;
-        Library& operator=(Library&&) = default;
+        Library(Library&&) = delete;
+        Library& operator=(Library&&) = delete;
 
         Library(const circuit::StandardCells & std_cells);
 

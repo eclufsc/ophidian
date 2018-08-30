@@ -105,8 +105,8 @@ namespace ophidian::circuit
         Netlist & operator =(const Netlist &) = delete;
 
         //! Move Constructor
-        Netlist(Netlist &&) = default;
-        Netlist& operator=(Netlist &&) = default;
+        Netlist(Netlist &&) = delete;
+        Netlist& operator=(Netlist &&) = delete;
 
         // Element access
         const cell_instance_type& find_cell_instance(const cell_instance_name_type& cellName) const;
