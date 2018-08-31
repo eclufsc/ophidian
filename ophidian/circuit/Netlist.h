@@ -109,11 +109,11 @@ namespace ophidian::circuit
         Netlist& operator=(Netlist &&) = delete;
 
         // Element access
-        const cell_instance_type& find_cell_instance(const cell_instance_name_type& cellName) const;
+        cell_instance_type find_cell_instance(const cell_instance_name_type& cellName) const;
 
-        const pin_instance_type& find_pin_instance(const pin_instance_name_type& pinName) const;
+        pin_instance_type find_pin_instance(const pin_instance_name_type& pinName) const;
 
-        const net_type& find_net(const net_name_type& netName) const;
+        net_type find_net(const net_name_type& netName) const;
 
         cell_instance_name_type& name(const cell_instance_type& cell);
         const cell_instance_name_type& name(const cell_instance_type& cell) const;
@@ -178,11 +178,11 @@ namespace ophidian::circuit
         void shrink_to_fit();
 
         // Modifiers
-        const cell_instance_type& add_cell_instance(const cell_instance_name_type& cellName);
+        cell_instance_type add_cell_instance(const cell_instance_name_type& cellName);
 
-        const pin_instance_type& add_pin_instance(const pin_instance_name_type& pinName);
+        pin_instance_type add_pin_instance(const pin_instance_name_type& pinName);
 
-        const net_type& add_net(const net_name_type& netName);
+        net_type add_net(const net_name_type& netName);
 
         input_pad_type add_input_pad(const pin_instance_type& pin);
 

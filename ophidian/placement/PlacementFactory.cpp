@@ -24,7 +24,7 @@ namespace ophidian::placement::factory
     {
         for(auto & component : def.components())
         {
-            auto& cell = netlist.add_cell_instance(component.name());
+            auto cell = netlist.add_cell_instance(component.name());
             placement.place(cell, component.position());
         }
     }
