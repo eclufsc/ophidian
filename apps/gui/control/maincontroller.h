@@ -276,7 +276,7 @@ private:
 
     Canvas * mCanvas{nullptr};
     SpatialIndex mIndex{};
-    ophidian::design::Design mDesign{};
+    ophidian::design::Design* mDesign{nullptr};
     ophidian::entity_system::Property<cell_type, std::vector<Quad>> mCellToQuads{};
 };
 
