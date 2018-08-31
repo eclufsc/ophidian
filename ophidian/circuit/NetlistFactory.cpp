@@ -64,7 +64,7 @@ namespace ophidian::circuit::factory
         }
     }
 
-    void make_netlist(Netlist& netlist, const parser::Verilog & verilog, StandardCells& std_cells) noexcept
+    void make_netlist(Netlist& netlist, const parser::Verilog & verilog, const StandardCells& std_cells) noexcept
     {
         const auto& module = verilog.modules().front();
 

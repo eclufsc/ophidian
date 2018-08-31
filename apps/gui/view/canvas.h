@@ -163,7 +163,7 @@ public:
        \param size Cell size.
        \return WireQuad where contains the contour of a cell.
      */
-    WireQuad createWireQuad(const ophidian::circuit::Cell & cell, const point_type & origin, const point_type & size);
+    WireQuad createWireQuad(const ophidian::circuit::CellInstance & cell, const point_type & origin, const point_type & size);
 
 private:
     DrawableBatch<4> mQuads;

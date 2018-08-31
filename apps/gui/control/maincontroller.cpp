@@ -46,23 +46,23 @@ void MainController::buildICCAD2017(std::string cells_lef, std::string tech_lef,
 {
     mCanvas->clear();
 
-    ophidian::parser::Def def(cells_lef);
-    ophidian::parser::Lef lef(tech_lef);
-    ophidian::parser::Verilog verilog(placed_def);
+    auto lef = ophidian::parser::Lef{cells_lef};
+    lef.read_file(tech_lef);
+    auto def = ophidian::parser::Def{placed_def};
 
-    mDesign = ophidian::design::factory::make_design_iccad2017(def, lef, verilog);
+    ophidian::design::factory::make_design_iccad2017(mDesign, def, lef);
     init();
 }
 
-void MainController::buildICCAD2015(std::string lef, std::string def, std::string verilog)
+void MainController::buildICCAD2015(std::string lef_file, std::string def_file, std::string verilog_file)
 {
     mCanvas->clear();
     
-    ophidian::parser::Def def(cells_lef);
-    ophidian::parser::Lef lef(tech_lef);
-    ophidian::parser::Verilog verilog(verilog);
+    auto def = ophidian::parser::Def{def_file};
+    auto lef = ophidian::parser::Lef{lef_file};
+    auto verilog = ophidian::parser::Verilog{verilog_file};
 
-    mDesign = ophidian::design::factory::make_design_iccad2015(def, lef, verilog);
+    ophidian::design::factory::make_design_iccad2015(mDesign, def, lef, verilog);
     init();
 }
 

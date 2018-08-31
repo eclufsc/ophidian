@@ -173,11 +173,11 @@ void MySFMLCanvas::saveToSVG(const std::string & filename)
 
         point_type min((centerX - width/2), (centerY - width/2));
         point_type max((centerX + width/2), (centerY + width/2));
-        ophidian::geometry::Box viewSize(min, max);
+        ophidian::geometry::Box<double> viewSize(min, max);
 
         std::ofstream svg(filename);
         SVGMapper mapper(svg, width/100, width/100);
-        ophidian::geometry::Box b(point_type(0,0), point_type(width/100,width/100));
+        ophidian::geometry::Box<double> b(point_type(0,0), point_type(width/100,width/100));
         mapper.add(b);
         mapper.map(b, "fill:rgb(0,0,0);stroke:rgb(50,50,50)");
 

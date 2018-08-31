@@ -72,7 +72,6 @@ target_link_libraries(ophidian_gui PUBLIC
     PRIVATE ophidian_interconnection
     PRIVATE ophidian_parser
     PRIVATE ophidian_placement
-    PRIVATE ophidian_standard_cell
 )
 
 ################################################################################

@@ -129,7 +129,7 @@ void Canvas::createBoundaries(const point_type chipUpperRightCorner)
 
 }
 
-WireQuad Canvas::createWireQuad(const ophidian::circuit::Cell & cell, const point_type & origin, const point_type & size)
+WireQuad Canvas::createWireQuad(const ophidian::circuit::CellInstance & cell, const point_type & origin, const point_type & size)
 {
     std::vector<point_type> points;
     std::array<Line, 4> lines;
@@ -162,7 +162,7 @@ WireQuad Canvas::createWireQuad(const ophidian::circuit::Cell & cell, const poin
     points.push_back(lowerLeft);
     mLines.alloc(lines[3], points);
 
-    WireQuad wire(cell);
+    auto wire = WireQuad{cell};
     wire.mLines = lines;
     return wire;
 }
