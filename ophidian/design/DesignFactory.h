@@ -27,11 +27,11 @@
 
 namespace ophidian::design::factory
 {
-    Design make_design(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+    void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
-    Design make_design_iccad2015(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+    void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
-    Design make_design_iccad2017(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
+    void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 }
 
 #endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H

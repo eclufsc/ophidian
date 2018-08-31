@@ -67,13 +67,13 @@ namespace ophidian::circuit
         StandardCells(const StandardCells&) = delete;
         StandardCells& operator=(const StandardCells&) = delete;
 
-        StandardCells(StandardCells&&) = default;
-        StandardCells& operator=(StandardCells&&) = default;
+        StandardCells(StandardCells&&) = delete;
+        StandardCells& operator=(StandardCells&&) = delete;
 
         // Element access
-        const cell_type& find_cell(cell_name_type cellName) const;
+        cell_type find_cell(cell_name_type cellName) const;
 
-        const pin_type& find_pin(pin_name_type pinName) const;
+        pin_type find_pin(pin_name_type pinName) const;
 
         cell_name_type& name(const cell_type & cell);
         const cell_name_type& name(const cell_type & cell) const;

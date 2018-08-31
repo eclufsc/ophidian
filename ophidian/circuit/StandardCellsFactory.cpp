@@ -20,10 +20,8 @@
 
 namespace ophidian::circuit::factory
 {
-    StandardCells make_standard_cells(const parser::Lef& lef) noexcept
+    void make_standard_cells(StandardCells& cells, const parser::Lef& lef) noexcept
     {
-        auto cells = StandardCells{};
-
         for(const auto& macro : lef.macros())
         {
             auto cell = cells.add_cell(macro.name());
@@ -50,7 +48,5 @@ namespace ophidian::circuit::factory
                 cells.connect(cell, cell_pin);
             }
         }
-
-        return cells;
     }
 }

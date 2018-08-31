@@ -26,7 +26,7 @@
 
 namespace ophidian::floorplan::factory
 {
-    Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef);
+    void make_floorplan(Floorplan& floorplan, const parser::Def & def, const parser::Lef & lef);
 }
 
 #endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H

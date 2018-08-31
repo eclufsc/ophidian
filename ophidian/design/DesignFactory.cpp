@@ -26,40 +26,32 @@
 
 namespace ophidian::design::factory
 {
-    Design make_design(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
+    void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
     {
-        auto floorplan = floorplan::factory::make_floorplan(def, lef);
+        floorplan::factory::make_floorplan(design.floorplan(), def, lef);
 
-        auto standard_cells = circuit::factory::make_standard_cells(lef);
+        circuit::factory::make_standard_cells(design.standard_cells(), lef);
 
-        auto netlist = circuit::factory::make_netlist(verilog, standard_cells);
+        circuit::factory::make_netlist(design.netlist(), verilog, design.standard_cells());
 
-        auto library = placement::factory::make_library(lef, standard_cells);
+        placement::factory::make_library(design.library(), lef, design.standard_cells());
 
-        auto placement = placement::factory::make_placement(def, netlist, library);
-
-        return Design{std::move(floorplan), std::move(standard_cells), std::move(netlist), std::move(library), std::move(placement)};
+        placement::factory::make_placement(design.placement(), def, design.netlist(), design.library());
     }
 
-    Design make_design_iccad2015(const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
+    void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
     {
-        return make_design(def, lef, verilog);
+        return make_design(design, def, lef, verilog);
     }
 
-    Design make_design_iccad2017(const parser::Def& def, const parser::Lef& lef) noexcept
+    void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept
     {
-        auto design = Design{};
+        floorplan::factory::make_floorplan(design.floorplan(), def, lef);
 
-        auto floorplan = floorplan::factory::make_floorplan(def, lef);
+        circuit::factory::make_standard_cells(design.standard_cells(), lef);
 
-        auto standard_cells = circuit::factory::make_standard_cells(lef);
+        placement::factory::make_library(design.library(), lef, design.standard_cells());
 
-        auto netlist = circuit::Netlist{};
-
-        auto library = placement::factory::make_library(lef, standard_cells);
-
-        auto placement = placement::factory::make_placement(def, netlist, library);
-
-        return Design{std::move(floorplan), std::move(standard_cells), std::move(netlist), std::move(library), std::move(placement)};
+        placement::factory::make_placement(design.placement(), def, design.netlist(), design.library());
     }
 }

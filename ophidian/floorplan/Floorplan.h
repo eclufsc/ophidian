@@ -59,11 +59,11 @@ namespace ophidian::floorplan
         // Constructors
         Floorplan() = default;
 
-        Floorplan(const Floorplan&) = default;
-        Floorplan& operator=(const Floorplan&) = default;
+        Floorplan(const Floorplan&) = delete;
+        Floorplan& operator=(const Floorplan&) = delete;
 
-        Floorplan(Floorplan&&) = default;
-        Floorplan& operator=(Floorplan&&) = default;
+        Floorplan(Floorplan&&) = delete;
+        Floorplan& operator=(Floorplan&&) = delete;
 
         // Element access
         point_type& chip_origin() noexcept;
@@ -80,7 +80,7 @@ namespace ophidian::floorplan
         row_size_type& number_of_sites(const row_type & row);
         const row_size_type& number_of_sites(const row_type & row) const;
 
-        const site_type& site(const row_type & row) const;
+        site_type site(const row_type & row) const;
 
         site_name_type& name(const site_type & site);
         const site_name_type& name(const site_type & site) const;
@@ -88,7 +88,7 @@ namespace ophidian::floorplan
         point_type& dimension(const site_type & site);
         const point_type& dimension(const site_type & site) const;
 
-        const site_type& find(const site_name_type& siteName) const;
+        site_type find(const site_name_type& siteName) const;
 
         // Iterators
         ophidian::util::Range<SitesIterator> range_site() const;
@@ -98,9 +98,9 @@ namespace ophidian::floorplan
         // Capacity
 
         // Modifiers
-        const site_type& add_site(const site_name_type & name, const point_type & loc);
+        site_type add_site(const site_name_type & name, const point_type & loc);
 
-        const row_type& add_row(const point_type & loc, const row_size_type& num, const site_type &site);
+        row_type add_row(const point_type & loc, const row_size_type& num, const site_type &site);
 
         void erase(const site_type& site);
 

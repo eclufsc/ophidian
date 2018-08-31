@@ -20,10 +20,8 @@
 
 namespace ophidian::floorplan::factory
 {
-    Floorplan make_floorplan(const parser::Def & def, const parser::Lef & lef)
+    void make_floorplan(Floorplan& floorplan, const parser::Def & def, const parser::Lef & lef)
     {
-        auto floorplan = Floorplan{};
-
         floorplan.chip_origin() = def.die_area().min_corner();
         floorplan.chip_upper_right_corner() = def.die_area().max_corner();
 
@@ -43,7 +41,5 @@ namespace ophidian::floorplan::factory
                 floorplan.find(row.site())
             );
         }
-
-        return floorplan;
     }
 }

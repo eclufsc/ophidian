@@ -20,16 +20,12 @@
 
 namespace ophidian::placement::factory
 {
-    Placement make_placement(const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
+    void make_placement(Placement& placement, const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
     {
-        auto placement = Placement{netlist, library};
-
         for(auto & component : def.components())
         {
-            auto& cell = netlist.add_cell_instance(component.name());
+            auto cell = netlist.add_cell_instance(component.name());
             placement.place(cell, component.position());
         }
-
-        return placement;
     }
 }
