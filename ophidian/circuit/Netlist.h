@@ -25,9 +25,7 @@
 #include <ophidian/circuit/StandardCells.h>
 #include <unordered_map>
 
-namespace ophidian
-{
-namespace circuit
+namespace ophidian::circuit
 {
     class CellInstance :
         public entity_system::EntityBase
@@ -107,15 +105,15 @@ namespace circuit
         Netlist & operator =(const Netlist &) = delete;
 
         //! Move Constructor
-        Netlist(Netlist &&) = default;
-        Netlist& operator=(Netlist &&) = default;
+        Netlist(Netlist &&) = delete;
+        Netlist& operator=(Netlist &&) = delete;
 
         // Element access
-        const cell_instance_type& find_cell_instance(const cell_instance_name_type& cellName) const;
+        cell_instance_type find_cell_instance(const cell_instance_name_type& cellName) const;
 
-        const pin_instance_type& find_pin_instance(const pin_instance_name_type& pinName) const;
+        pin_instance_type find_pin_instance(const pin_instance_name_type& pinName) const;
 
-        const net_type& find_net(const net_name_type& netName) const;
+        net_type find_net(const net_name_type& netName) const;
 
         cell_instance_name_type& name(const cell_instance_type& cell);
         const cell_instance_name_type& name(const cell_instance_type& cell) const;
@@ -180,11 +178,11 @@ namespace circuit
         void shrink_to_fit();
 
         // Modifiers
-        const cell_instance_type& add_cell_instance(const cell_instance_name_type& cellName);
+        cell_instance_type add_cell_instance(const cell_instance_name_type& cellName);
 
-        const pin_instance_type& add_pin_instance(const pin_instance_name_type& pinName);
+        pin_instance_type add_pin_instance(const pin_instance_name_type& pinName);
 
-        const net_type& add_net(const net_name_type& netName);
+        net_type add_net(const net_name_type& netName);
 
         input_pad_type add_input_pad(const pin_instance_type& pin);
 
@@ -196,8 +194,8 @@ namespace circuit
 
         void connect(const net_type& net, const pin_instance_type& pin);
         void connect(const cell_instance_type& cell, const pin_instance_type& pin);
-        void connect(const cell_instance_type& cell, const std_cell_type& stdCell);
-        void connect(const pin_instance_type& pin, const std_cell_pin_type& stdCell);
+        void connect(const cell_instance_type& cell, const std_cell_type& std_cell);
+        void connect(const pin_instance_type& pin, const std_cell_pin_type& std_cell);
 
         void disconnect(const pin_instance_type& pin);
 
@@ -258,7 +256,6 @@ namespace circuit
         entity_system::Property<CellInstance, Cell> cells2StdCells_{};
         entity_system::Property<PinInstance, Pin>   pins2StdCells_{};
     };
-}     // namespace circuit
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_CIRCUIT_NETLIST_H

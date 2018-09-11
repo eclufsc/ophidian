@@ -21,30 +21,18 @@
 
 #include <exception>
 
-namespace ophidian
+namespace ophidian::parser::exceptions
 {
-namespace parser
-{
-namespace exceptions {
-
-    class InexistentFile :
-        public std::exception
+    class InexistentFile : public std::exception
     {
     public:
-        const char * what() const noexcept override
-        {
-            return "The given file was not found";
-        }
+        const char * what() const noexcept override;
     };
 
-    class VerilogRuntimeException :
-        public std::exception
+    class VerilogRuntimeException : public std::exception
     {
     public:
-        const char * what() const noexcept override
-        {
-            return "Verilog runtime error";
-        }
+        const char * what() const noexcept override;
     };
 
     class GuideFileSyntaxError :
@@ -56,7 +44,5 @@ namespace exceptions {
         }
     };
 }
-}     // namespace parser
-}     // namespace ophidian
 
 #endif

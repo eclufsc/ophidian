@@ -23,15 +23,9 @@
 
 #include "StandardCells.h"
 
-namespace ophidian
+namespace ophidian::circuit::factory
 {
-namespace circuit
-{
-    namespace factory
-    {
-        StandardCells make_standard_cells(const parser::Lef& lef) noexcept;
-    }
-}
+    void make_standard_cells(StandardCells& cells, const parser::Lef& lef) noexcept;
 }
 
 #endif

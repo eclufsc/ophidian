@@ -25,9 +25,7 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/StandardCells.h>
 
-namespace ophidian
-{
-namespace placement
+namespace ophidian::placement
 {
     class Library
     {
@@ -48,8 +46,8 @@ namespace placement
         Library(const Library&) = delete;
         Library& operator=(const Library&) = delete;
 
-        Library(Library&&) = default;
-        Library& operator=(Library&&) = default;
+        Library(Library&&) = delete;
+        Library& operator=(Library&&) = delete;
 
         Library(const circuit::StandardCells & std_cells);
 
@@ -73,7 +71,6 @@ namespace placement
         entity_system::Property<std_cell_type, std_cell_geometry_type> mGeometries;
         entity_system::Property<std_cell_pin_type, offset_type>   mPinOffsets;
     };
-}     // namespace placement
-}     // namespace ophidian
+}
 
 #endif // LIBRARY_H

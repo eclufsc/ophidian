@@ -18,16 +18,14 @@
 
 #include "StandardCells.h"
 
-namespace ophidian
+namespace ophidian::circuit
 {
-namespace circuit
-{
-    const StandardCells::cell_type& StandardCells::find_cell(StandardCells::cell_name_type cellName) const
+    StandardCells::cell_type StandardCells::find_cell(StandardCells::cell_name_type cellName) const
     {
         return mName2Cell.at(cellName);
     }
 
-    const StandardCells::pin_type& StandardCells::find_pin(StandardCells::pin_name_type pinName) const
+    StandardCells::pin_type StandardCells::find_pin(StandardCells::pin_name_type pinName) const
     {
         return mName2Pin.at(pinName);
     }
@@ -157,5 +155,4 @@ namespace circuit
         mName2Pin.erase(name(pin));
         mPins.erase(pin);
     }
-}     //namespace ophidian
-}     //namespace standard_cell
+}

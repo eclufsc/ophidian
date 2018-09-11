@@ -27,9 +27,7 @@
 #include <ophidian/placement/Library.h>
 #include <ophidian/geometry/CellGeometry.h>
 
-namespace ophidian
-{
-namespace placement
+namespace ophidian::placement
 {
     class Placement
     {
@@ -51,11 +49,11 @@ namespace placement
         // Constructors
         Placement() = delete;
 
-        Placement(const Placement&) = default;
-        Placement& operator=(const Placement&) = default;
+        Placement(const Placement&) = delete;
+        Placement& operator=(const Placement&) = delete;
 
-        Placement(Placement&&) = default;
-        Placement& operator=(Placement&&) = default;
+        Placement(Placement&&) = delete;
+        Placement& operator=(Placement&&) = delete;
 
         Placement(const circuit::Netlist & netlist, const Library & library);
 
@@ -89,7 +87,6 @@ namespace placement
         entity_system::Property<input_pad_type, point_type>  mInputLocations;
         entity_system::Property<output_pad_type, point_type> mOutputLocations;
     };
-}     //namespace placement
-}     //namespace ophidian
+}
 
 #endif // OPHIDIAN_PLACEMENT_PLACEMENT_H

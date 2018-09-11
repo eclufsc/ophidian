@@ -27,17 +27,17 @@ void State::keyPressEvent(QKeyEvent * e)
 
 }
 
-void State::mousePressEvent(ophidian::geometry::Point pos)
+void State::mousePressEvent(State::point_type pos)
 {
 
 }
 
-void State::mouseMoveEvent(ophidian::geometry::Point pos)
+void State::mouseMoveEvent(State::point_type pos)
 {
 
 }
 
-void State::mouseReleaseEvent(ophidian::geometry::Point pos)
+void State::mouseReleaseEvent(State::point_type pos)
 {
 
 }
@@ -68,7 +68,7 @@ Idle::Idle(MySFMLCanvas * SFMLCanvas, MainController * controller) :
 //! This include is needed here for MySFMLCanvas see the idle constructor without circular including
 #include "view/mysfmlcanvas.h"
 
-void Idle::mousePressEvent(ophidian::geometry::Point pos)
+void Idle::mousePressEvent(State::point_type pos)
 {
     mMainController->mousePress(pos);
 
@@ -96,7 +96,7 @@ bool Idle::findCellEvent(QString name)
 
         auto origin = mSFMLCanvas->canvas()->points(selected).front();
         auto size = mMainController->cellSize(selected.mCell);
-        mSFMLCanvas->centerViewOn(ophidian::geometry::Point(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
+        mSFMLCanvas->centerViewOn(State::point_type(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
 
         mSFMLCanvas->setState(new Selected(mSFMLCanvas, mMainController, selected));
         delete this;
@@ -131,7 +131,7 @@ void Selected::keyPressEvent(QKeyEvent * e)
     }
 }
 
-void Selected::mousePressEvent(ophidian::geometry::Point pos)
+void Selected::mousePressEvent(State::point_type pos)
 {
     if(mMainController->hasQuad(pos))
     {
@@ -166,7 +166,7 @@ void Selected::mousePressEvent(ophidian::geometry::Point pos)
     }
 }
 
-void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
+void Selected::mouseReleaseEvent(State::point_type pos)
 {
     Quad first = mMainController->quadsCell(mQuad.mCell).front();
     auto origin = mSFMLCanvas->canvas()->points(first).front();
@@ -183,7 +183,7 @@ void Selected::mouseReleaseEvent(ophidian::geometry::Point pos)
 
         origin = mSFMLCanvas->canvas()->points(first).front();
         mMainController->update(mQuad);
-        mMainController->mouseMove(ophidian::geometry::Point(origin.position.x, origin.position.y));
+        mMainController->mouseMove(State::point_type(origin.position.x, origin.position.y));
     }
 }
 
@@ -203,7 +203,7 @@ bool Selected::findCellEvent(QString name)
 
         auto origin = mSFMLCanvas->canvas()->points(selected).front();
         auto size = mMainController->cellSize(selected.mCell);
-        mSFMLCanvas->centerViewOn(ophidian::geometry::Point(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
+        mSFMLCanvas->centerViewOn(State::point_type(origin.position.x + (size.x() / 2), origin.position.y + (size.y() / 2)));
 
         return true;
     }
@@ -211,7 +211,7 @@ bool Selected::findCellEvent(QString name)
     return false;
 }
 
-Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos) :
+Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const State::point_type & pos) :
     State(SFMLCanvas, controller),
     mQuad(quad),
     mWireQuad(controller->wireQuadOfCell(quad.mCell)),
@@ -221,7 +221,7 @@ Dragging::Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad 
 
 }
 
-void Dragging::mouseMoveEvent(ophidian::geometry::Point pos)
+void Dragging::mouseMoveEvent(State::point_type pos)
 {
     sf::Vector2f delta(pos.x() - mInitialPos.x(), pos.y() - mInitialPos.y());
     sf::Transform translation;
@@ -235,10 +235,10 @@ void Dragging::mouseMoveEvent(ophidian::geometry::Point pos)
 
     Quad first = mMainController->quadsCell(mQuad.mCell).front();
     auto newOrigin = mSFMLCanvas->canvas()->points(first).front();
-    mMainController->mouseMove(ophidian::geometry::Point(newOrigin.position.x, newOrigin.position.y));
+    mMainController->mouseMove(State::point_type(newOrigin.position.x, newOrigin.position.y));
 }
 
-void Dragging::mouseReleaseEvent(ophidian::geometry::Point pos)
+void Dragging::mouseReleaseEvent(State::point_type pos)
 {
     mMainController->clear(mWireQuad);
     if (mMoved)

@@ -18,21 +18,19 @@
 
 #include "Netlist.h"
 
-namespace ophidian
+namespace ophidian::circuit
 {
-namespace circuit
-{
-    const Netlist::cell_instance_type& Netlist::find_cell_instance(const Netlist::cell_instance_name_type& cellName) const
+    Netlist::cell_instance_type Netlist::find_cell_instance(const Netlist::cell_instance_name_type& cellName) const
     {
         return mName2Cell.at(cellName);
     }
 
-    const Netlist::pin_instance_type& Netlist::find_pin_instance(const Netlist::pin_instance_name_type& pinName) const
+    Netlist::pin_instance_type Netlist::find_pin_instance(const Netlist::pin_instance_name_type& pinName) const
     {
         return mName2Pin.at(pinName);
     }
 
-    const Netlist::net_type& Netlist::find_net(const Netlist::net_name_type& netName) const
+    Netlist::net_type Netlist::find_net(const Netlist::net_name_type& netName) const
     {
         return mName2Net.at(netName);
     }
@@ -234,10 +232,10 @@ namespace circuit
         mOutputs.shrinkToFit();
     }
 
-    const Netlist::cell_instance_type& Netlist::add_cell_instance(const Netlist::cell_instance_name_type& cellName)
+    Netlist::cell_instance_type Netlist::add_cell_instance(const Netlist::cell_instance_name_type& cellName)
     {
         if(mName2Cell.find(cellName) == mName2Cell.end()) {
-            const auto& cell = mCells.add();
+            auto cell = mCells.add();
             mCellNames[cell] = cellName;
             mName2Cell[cellName] = cell;
 
@@ -248,10 +246,10 @@ namespace circuit
         }
     }
 
-    const Netlist::pin_instance_type& Netlist::add_pin_instance(const Netlist::pin_instance_name_type& pinName)
+    Netlist::pin_instance_type Netlist::add_pin_instance(const Netlist::pin_instance_name_type& pinName)
     {
         if(mName2Pin.find(pinName) == mName2Pin.end()) {
-            const auto& pin = mPins.add();
+            auto pin = mPins.add();
             mPinNames[pin] = pinName;
             mName2Pin[pinName] = pin;
 
@@ -262,10 +260,10 @@ namespace circuit
         }
     }
 
-    const Netlist::net_type& Netlist::add_net(const Netlist::net_name_type& netName)
+    Netlist::net_type Netlist::add_net(const Netlist::net_name_type& netName)
     {
         if(mName2Net.find(netName) == mName2Net.end()) {
-            const auto& net = mNets.add();
+            auto net = mNets.add();
             mNetNames[net] = netName;
             mName2Net[netName] = net;
 
@@ -363,5 +361,4 @@ namespace circuit
     entity_system::EntitySystem<Output>::NotifierType * Netlist::notifier(Output) const {
         return mOutputs.notifier();
     }
-}     // namespace circuit
-}     // namespace ophidian
+}

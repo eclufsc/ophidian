@@ -19,9 +19,7 @@
 #ifndef OPHIDIAN_UTIL_RANGE_H
 #define OPHIDIAN_UTIL_RANGE_H
 
-namespace ophidian
-{
-namespace util
+namespace ophidian::util
 {
     template <class IteratorType>
     class Range final
@@ -62,7 +60,6 @@ namespace util
         const IteratorType begin_;
         const IteratorType end_;
     };
-}     // namespace util
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_UTIL_RANGE_H

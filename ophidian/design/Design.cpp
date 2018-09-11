@@ -18,9 +18,7 @@
 
 #include "Design.h"
 
-namespace ophidian
-{
-namespace design
+namespace ophidian::design
 {
     Design::netlist_type& Design::netlist() noexcept
     {
@@ -71,5 +69,4 @@ namespace design
     {
         return m_library;
     }
-}     //namespace design
-}     //namespace ophidian
+}

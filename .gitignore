@@ -11,3 +11,4 @@
 /doc/documentation
 .DS_Store
 *.user
+/test/input_files/ispd18/*

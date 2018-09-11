@@ -18,9 +18,7 @@
 
 #include "Placement.h"
 
-namespace ophidian
-{
-namespace placement
+namespace ophidian::placement
 {
     Placement::Placement(const circuit::Netlist & netlist, const Library &library):
             mNetlist(netlist),
@@ -89,5 +87,4 @@ namespace placement
     {
         mOutputLocations[output] = location;
     }
-}     //namespace placement
-}     //namespace ophidian
+}

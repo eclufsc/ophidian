@@ -63,8 +63,8 @@ void MainWindow::on_receive_circuitChanged(QString name, QString die, size_t cel
 
         ui->MyCanvas->reserveMinimumOfQuads(cells);
 
-        ophidian::geometry::Point boundaries = mMainController.chipBoundaries();
-        ophidian::geometry::Point centerView(boundaries.x()/2.0, boundaries.y()/2.0);
+        ophidian::geometry::Point<double> boundaries = mMainController.chipBoundaries();
+        ophidian::geometry::Point<double> centerView(boundaries.x()/2.0, boundaries.y()/2.0);
 
         ui->MyCanvas->centerViewOn(centerView);
         ui->MyCanvas->viewSize(boundaries);
@@ -105,7 +105,7 @@ void MainWindow::on_selectedCellButton_clicked()
 {
     double x = ui->selectedCell_x_2->value();
     double y = ui->selectedCell_y_2->value();
-    ui->MyCanvas->updatePositionQuad(ophidian::geometry::Point(x, y));
+    ui->MyCanvas->updatePositionQuad(ophidian::geometry::Point<double>(x, y));
     ui->MyCanvas->OnUpdate();
 }
 

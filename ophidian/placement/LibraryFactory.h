@@ -23,15 +23,9 @@
 
 #include "Library.h"
 
-namespace ophidian
+namespace ophidian::placement::factory
 {
-namespace placement
-{
-    namespace factory
-    {
-        Library make_library(const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
-    }
-}     // namespace placement
-}     // namespace ophidian
+    void make_library(Library& library, const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
+}
 
 #endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

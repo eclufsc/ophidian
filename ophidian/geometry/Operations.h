@@ -23,9 +23,7 @@
 
 #include "Models.h"
 
-namespace ophidian
-{
-namespace geometry
+namespace ophidian::geometry
 {
     template <template <typename> class Geometry, template <typename> class Point_, class T>
     Geometry<Point_<T>> translate(const Geometry<Point_<T>> & geometry, Point_<T> & translationPoint)
@@ -95,7 +93,6 @@ namespace geometry
     {
         boost::geometry::intersection(geometry1, geometry2, result);
     }
-}     // namespace geometry
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_GEOMETRY_OPERATIONS_H

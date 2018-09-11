@@ -25,9 +25,7 @@
 #include <ophidian/placement/Library.h>
 #include <ophidian/circuit/StandardCells.h>
 
-namespace ophidian
-{
-namespace design
+namespace ophidian::design
 {
     class Design
     {
@@ -49,17 +47,8 @@ namespace design
         Design(const Design&) = delete;
         Design& operator=(const Design&) = delete;
 
-        Design(Design&&) = default;
-        Design& operator=(Design&&) = default;
-
-        template<class A1, class A2, class A3, class A4, class A5>
-        Design(A1&& floorplan, A2&& standard_cells, A3&& netlist, A4&& library, A5&& placement):
-            m_floorplan{std::forward<A1>(floorplan)},
-            m_standard_cells{std::forward<A2>(standard_cells)},
-            m_netlist{std::forward<A3>(netlist)},
-            m_library{std::forward<A4>(library)},
-            m_placement{std::forward<A5>(placement)}
-        {}
+        Design(Design&&) = delete;
+        Design& operator=(Design&&) = delete;
 
         //! netlist getter
 
@@ -118,7 +107,6 @@ namespace design
         library_type         m_library{m_standard_cells};
         placement_type       m_placement{m_netlist, m_library};
     };
-}     //namespace design
-}     //namespace ophidian
+}
 
 #endif // OPHIDIAN_DESIGN_DESIGN_H

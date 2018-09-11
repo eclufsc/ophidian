@@ -5,7 +5,7 @@
 #include <ophidian/geometry/Models.h>
 #include <model/forms.h>
 
-typedef std::pair<ophidian::geometry::Box, Quad> RTreeNode;
+typedef std::pair<ophidian::geometry::Box<double>, Quad> RTreeNode;
 
 class RTreeNodeComparator
 {
@@ -29,6 +29,8 @@ typedef boost::geometry::index::rtree<
 class SpatialIndex
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
+    using box_type = ophidian::geometry::Box<double>;
     //! SpatialIndex Constructor
     /*!
        \brief Constructs a SpatialIndex
@@ -47,7 +49,7 @@ public:
        \param quad Quad of a Cell.
        \param box Box of the quad.
      */
-    void quadCreate(const Quad & quad, const ophidian::geometry::Box & box);
+    void quadCreate(const Quad & quad, const box_type & box);
 
     //! Removes a RTree node
     /*!
@@ -62,7 +64,7 @@ public:
        \param box A area of the circuit.
        \return Vector containing the quads in the area.
      */
-    std::vector<Quad> quadsContaining(const ophidian::geometry::Box & box) const;
+    std::vector<Quad> quadsContaining(const box_type & box) const;
 
     //! Quads from a point
     /*!
@@ -70,7 +72,7 @@ public:
        \param point A circuit coordinate.
        \return Vector containing the quads at intersection.
      */
-    std::vector<Quad> quadsContaining(const ophidian::geometry::Point & point) const;
+    std::vector<Quad> quadsContaining(const point_type & point) const;
 
     //! Quad from a point
     /*!
@@ -78,7 +80,7 @@ public:
        \param point A circuit coordinate.
        \return The Quad at intersection.
      */
-    Quad quadContaining(const ophidian::geometry::Point & point) const;
+    Quad quadContaining(const point_type & point) const;
 
     //! Is there a quad in this coordinate?
     /*!
@@ -86,7 +88,7 @@ public:
        \param p A circuit coordinate.
        \return True if the quad exist, otherwise false.
      */
-    bool hasQuad(const ophidian::geometry::Point & point) const;
+    bool hasQuad(const point_type & point) const;
 
 private:
     RTree mIndex;

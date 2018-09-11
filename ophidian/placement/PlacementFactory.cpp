@@ -18,24 +18,14 @@
 
 #include "PlacementFactory.h"
 
-namespace ophidian
+namespace ophidian::placement::factory
 {
-namespace placement
-{
-    namespace factory
+    void make_placement(Placement& placement, const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
     {
-        Placement make_placement(const parser::Def & def, circuit::Netlist& netlist, Library& library) noexcept
+        for(auto & component : def.components())
         {
-            auto placement = Placement{netlist, library};
-
-            for(auto & component : def.components())
-            {
-                auto& cell = netlist.add_cell_instance(component.name());
-                placement.place(cell, component.position());
-            }
-
-            return placement;
+            auto cell = netlist.add_cell_instance(component.name());
+            placement.place(cell, component.position());
         }
     }
-}     // namespace placement
-}     // namespace ophidian
+}

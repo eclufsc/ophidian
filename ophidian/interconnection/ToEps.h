@@ -21,9 +21,7 @@
 
 #include <string>
 
-namespace ophidian
-{
-namespace interconnection
+namespace ophidian::interconnection
 {
     //! Helper class to write a .eps file
     class ToEps
@@ -39,7 +37,6 @@ namespace interconnection
         template <class T>
         static void run(const T & el, const std::string & filename);
     };
-}     // namespace interconnection
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_INTERCONNECTION_TOEPS_H

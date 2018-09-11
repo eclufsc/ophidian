@@ -30,9 +30,7 @@
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     /**
      * This is an encapsulation of a Def object described
@@ -280,7 +278,6 @@ namespace parser
         database_unit_point_type m_step; ///< Specifies the spacing between sites in horizontal and vertical rows.
         scalar_point_type        m_num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
     };
-}
 }
 
 #endif /*OPHIDIAN_PARSER_DEF_H*/

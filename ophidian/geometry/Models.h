@@ -27,9 +27,7 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/multi_polygon.hpp>
 
-namespace ophidian
-{
-namespace geometry
+namespace ophidian::geometry
 {
     template <typename T>
     using Point = boost::geometry::model::d2::point_xy<T>;
@@ -38,7 +36,7 @@ namespace geometry
     using Box = boost::geometry::model::box<Point<T>>;
 
     template <typename T>
-    using Segment = boost::geometry::model::segment<Point<T>>;
+    using Segment = boost::geometry::model::segment<T>;
 
     template <typename T>
     using Linestring = boost::geometry::model::linestring<Point<T>>;
@@ -56,12 +54,12 @@ namespace geometry
      * \param points Vector of points of the geometry
      * \return The created geometry
      */
-    template <template <typename> class Geometry, typename T>
-    Geometry<T> make(const std::vector<Point<T>> & points)
+    template <template <typename> class Geometry, template <typename> class Point_, typename T>
+    Geometry<Point_<T>> make(const std::vector<Point_<T>> & points)
     {
-        Geometry<T> geometry;
+        Geometry<Point_<T>> geometry;
 
-        for(auto point : points)
+        for(auto& point : points)
         {
             boost::geometry::append(geometry, point);
         }
@@ -81,14 +79,13 @@ namespace geometry
     {
         MultiGeometry multiGeometry;
 
-        for(auto part : parts)
+        for(auto& part : parts)
         {
             multiGeometry.push_back(part);
         }
 
         return multiGeometry;
     }
-}     //namespace geometry
-}     //namespace ophidian
+}
 
 #endif // OPHIDIAN_GEOMETRY_MODELS_H

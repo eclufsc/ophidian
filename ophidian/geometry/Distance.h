@@ -22,11 +22,8 @@
 #include "Models.h"
 #include <ophidian/util/Units.h>
 
-namespace ophidian
+namespace ophidian::geometry
 {
-namespace geometry
-{
-
     /*!
      * \brief Calculates the Manhattan distance between two points
      * \param point1 First point to calculate the distance
@@ -66,8 +63,6 @@ namespace geometry
 
         return distance;
     }
-
-}     // namespace geometry
-}     // namespace ophidian
+}
 
 #endif // OPHIDIAN_GEOMETRY_DISTANCE_H

@@ -23,9 +23,7 @@
 #include <map>
 #include <istream>
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     class Verilog
     {
@@ -229,7 +227,6 @@ namespace parser
         string_type  m_module;
         net_map_type m_net_map;
     };
-}     // namespace parser
-}     // namespace ophidian
+}
 
 #endif // VERILOGPARSER_H

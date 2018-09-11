@@ -16,11 +16,17 @@
    under the License.
  */
 
-#include "Distance.h"
+#include "ParserException.h"
 
-namespace ophidian
+namespace ophidian::parser::exceptions
 {
-namespace geometry
-{
-}     // namespace geometry
-}     // namespace ophidian
+    const char * InexistentFile::what() const noexcept
+    {
+        return "The given file was not found";
+    }
+
+    const char * VerilogRuntimeException::what() const noexcept
+    {
+        return "Verilog runtime error";
+    }
+}

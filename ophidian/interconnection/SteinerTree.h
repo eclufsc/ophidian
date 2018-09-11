@@ -28,9 +28,7 @@
 #include <memory>
 #include <iterator>
 
-namespace ophidian
-{
-namespace interconnection
+namespace ophidian::interconnection
 {
     //! Rectilinear Steiner Tree
 
@@ -46,6 +44,8 @@ namespace interconnection
 
         using dbu_t = util::database_unit_t;
         using DbuPoint = geometry::Point<dbu_t>;
+        using segment_type = geometry::Segment<dbu_t>;
+
         //! Lemon Graph Element Wrapper
 
         /*!
@@ -408,13 +408,16 @@ namespace interconnection
         /*!
            \brief Constructs an empty Steiner Tree.
          */
-        SteinerTree();
+        SteinerTree() = default;
 
-        GraphType                                      mGraph;
-        GraphType::NodeMap<lemon::dim2::Point<double>> mPosition;
-        dbu_t                                         mLength {0.0};
+        GraphType                                      mGraph{};
+        GraphType::NodeMap<lemon::dim2::Point<double>> mPosition{mGraph};
+        dbu_t                                          mLength{0.0};
     };
-}     // namespace interconnection
-}     // namespace ophidian
+
+    geometry::Segment<geometry::Point<SteinerTree::dbu_t>> make_segment(
+        const interconnection::SteinerTree & tree,
+        const interconnection::SteinerTree::Segment & segment);
+}
 
 #endif // OPHIDIAN_INTERCONNECTION_STEINERTREE_H
