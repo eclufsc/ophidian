@@ -44,14 +44,4 @@ namespace ophidian::placement
     {
         return mPinOffsets[pin];
     }
-
-    void Library::connect(const std_cell_type& cell, const std_cell_geometry_type& geometry)
-    {
-        mGeometries[cell] = geometry;
-    }
-
-    void Library::connect(const std_cell_pin_type& pin, const offset_type& offset)
-    {
-        mPinOffsets[pin] = offset;
-    }
 }

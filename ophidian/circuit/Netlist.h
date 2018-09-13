@@ -241,9 +241,9 @@ namespace ophidian::circuit
         entity_system::EntitySystem<Net>                      mNets{};
         entity_system::EntitySystem<Input>                    mInputs{};
         entity_system::EntitySystem<Output>                   mOutputs{};
-        entity_system::Property<CellInstance, std::string>    mCellNames{makeProperty<std::string>(CellInstance())};
-        entity_system::Property<PinInstance, std::string>     mPinNames{makeProperty<std::string>(PinInstance())};
-        entity_system::Property<Net, std::string>             mNetNames{makeProperty<std::string>(Net())};
+        entity_system::Property<CellInstance, std::string>    mCellNames{mCells};
+        entity_system::Property<PinInstance, std::string>     mPinNames{mPins};
+        entity_system::Property<Net, std::string>             mNetNames{mNets};
         std::unordered_map<std::string, CellInstance>         mName2Cell{};
         std::unordered_map<std::string, PinInstance>          mName2Pin{};
         std::unordered_map<std::string, Net>                  mName2Net{};
@@ -253,8 +253,8 @@ namespace ophidian::circuit
         entity_system::Composition<PinInstance, Input>        mPinInput{mPins, mInputs};
         entity_system::Composition<PinInstance, Output>       mPinOutput{mPins, mOutputs};
 
-        entity_system::Property<CellInstance, Cell> cells2StdCells_{};
-        entity_system::Property<PinInstance, Pin>   pins2StdCells_{};
+        entity_system::Property<CellInstance, Cell> cells2StdCells_{mCells};
+        entity_system::Property<PinInstance, Pin>   pins2StdCells_{mPins};
     };
 }
 

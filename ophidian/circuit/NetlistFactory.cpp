@@ -79,12 +79,12 @@ namespace ophidian::circuit::factory
         netlist.reserve_net(module.nets().size());
         netlist.reserve_cell_instance(module.module_instances().size());
 
-        for(auto net : module.nets())
+        for(auto& net : module.nets())
         {
             netlist.add_net(net.name());
         }
 
-        for(auto port : module.ports())
+        for(auto& port : module.ports())
         {
             auto pin = netlist.add_pin_instance(port.name());
             if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
@@ -96,7 +96,7 @@ namespace ophidian::circuit::factory
             netlist.connect(netlist.find_net(port.name()), pin);
         }
 
-        for(auto instance : module.module_instances())
+        for(auto& instance : module.module_instances())
         {
             auto cell = netlist.add_cell_instance(instance.name());
 
@@ -105,6 +105,9 @@ namespace ophidian::circuit::factory
             {
                 auto pin = netlist.add_pin_instance(instance.name() + ":" + portMap.first);
                 netlist.connect(cell, pin);
+                
+                netlist.connect(pin, std_cells.find_pin(instance.module() + ":" + portMap.first));
+
                 netlist.connect(netlist.find_net(portMap.second), pin);
             }
         }

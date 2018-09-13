@@ -110,35 +110,45 @@ void MainController::createQuads()
 
     for (auto cellIt = mDesign->netlist().begin_cell_instance(); cellIt != mDesign->netlist().end_cell_instance(); ++cellIt)
     {
-        std::vector<Quad> quads;
+        auto quads = std::vector<Quad>{};
 
         auto cellGeometry = mDesign->placement().geometry(*cellIt);
 
         for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); ++cellBoxIt)
         {
-            Quad quad(*cellIt);
-            std::vector<point_type> points(4);
+            auto quad = Quad{*cellIt};
 
-            point_type min{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
-                           units::unit_cast<double>((*cellBoxIt).min_corner().y())};
-            point_type max{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
-                           units::unit_cast<double>((*cellBoxIt).max_corner().y())};
+            auto min = point_type{
+                units::unit_cast<double>((*cellBoxIt).min_corner().x()),
+                units::unit_cast<double>((*cellBoxIt).min_corner().y())
+            };
+            auto max = point_type{
+                units::unit_cast<double>((*cellBoxIt).max_corner().x()),
+                units::unit_cast<double>((*cellBoxIt).max_corner().y())
+            };
 
-            points[0] = point_type(min.x(), min.y());
-            points[1] = point_type(max.x(), min.y());
-            points[2] = point_type(max.x(), max.y());
-            points[3] = point_type(min.x(), max.y());
+            auto points = std::vector<point_type>{
+                point_type{min.x(), min.y()},
+                point_type{max.x(), min.y()},
+                point_type{max.x(), max.y()},
+                point_type{min.x(), max.y()}
+            };
+
+            for(auto& point : points)
+            {
+                std::cout <<"point: " << point.x() << " " << point.y() << std::endl;
+            }
 
             mCanvas->alloc(quad, points);
 
-            auto new_box = box_type{min,max};
+            auto new_box = box_type{max,min};
 
             mIndex.quadCreate(quad, new_box);
 
             quads.push_back(quad);
         }
 
-         mCellToQuads[*cellIt] = quads;
+        mCellToQuads[*cellIt] = quads;
 
         if (isFixed(*cellIt))
         {
@@ -241,9 +251,9 @@ void MainController::update(Quad quad)
     auto quadOfBox = mCellToQuads[first.mCell].begin();
     for (auto cellBoxIt = cellGeometry.begin(); cellBoxIt != cellGeometry.end(); cellBoxIt++, quadOfBox++)
     {
-        point_type min{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
+        auto min = point_type{units::unit_cast<double>((*cellBoxIt).min_corner().x()),
                         units::unit_cast<double>((*cellBoxIt).min_corner().y())};
-        point_type max{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
+        auto max = point_type{units::unit_cast<double>((*cellBoxIt).max_corner().x()),
                         units::unit_cast<double>((*cellBoxIt).max_corner().y())};
 
         auto new_box = box_type{min,max};

@@ -22,58 +22,35 @@ namespace ophidian::placement::factory
 {
     void make_library(Library& library, const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept
     {
-        for(auto& macro : lef.macros())
+        for(const auto& macro : lef.macros())
         {
-            auto stdCell = stdCells.add_cell(macro.name());
-            auto layer2RectsM1 = macro.obstructions().find("metal1");
-            if(layer2RectsM1 != macro.obstructions().end()) {
-                auto geometry = geometry::CellGeometry{};
-                for(auto& rect : layer2RectsM1->second)
-                {
-                    geometry::Point<util::database_unit_t> pmin =
-                    {rect.min_corner().x() * lef.micrometer_to_dbu_ratio(),
-                     rect.min_corner().y() * lef.micrometer_to_dbu_ratio()};
-                    geometry::Point<util::database_unit_t> pmax =
-                    {rect.max_corner().x() * lef.micrometer_to_dbu_ratio(),
-                     rect.max_corner().y() * lef.micrometer_to_dbu_ratio()};
-                    geometry.push_back(geometry::Box<util::database_unit_t>(pmin, pmax));
-                }
-                library.connect(stdCell, geometry);
-            }
-            else {
-                geometry::Point<util::database_unit_t> pmin =
-                    {
-                        macro.origin().x() * lef.micrometer_to_dbu_ratio(),
-                        macro.origin().y() * lef.micrometer_to_dbu_ratio()
-                    };
-                geometry::Point<util::database_unit_t> pmax =
-                    {
-                        macro.size().x() * lef.micrometer_to_dbu_ratio(),
-                        macro.size().y() * lef.micrometer_to_dbu_ratio()
-                    };
-                library.connect(stdCell,
-                    geometry::CellGeometry{std::vector<geometry::Box<util::database_unit_t>>{geometry::Box<util::database_unit_t>{pmin, pmax}}});
-            }
-            util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
+            auto stdCell = stdCells.find_cell(macro.name());
 
-            for(auto& pin : macro.pins())
+            auto pmin = geometry::CellGeometry::point_type{
+                macro.origin().x() * lef.micrometer_to_dbu_ratio(),
+                macro.origin().y() * lef.micrometer_to_dbu_ratio()
+            };
+            auto pmax = geometry::CellGeometry::point_type{
+                macro.size().x() * lef.micrometer_to_dbu_ratio(),
+                macro.size().y() * lef.micrometer_to_dbu_ratio()
+            };
+
+            library.geometry(stdCell) = geometry::CellGeometry{ {{pmin, pmax}} };
+
+            auto dbu_converter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
+
+            for(const auto& pin : macro.pins())
             {
-                auto stdPin = stdCells.add_pin(
-                    macro.name() + ":" + pin.name(),
-                    circuit::PinDirection(pin.direction()));
-                stdCells.connect(stdCell, stdPin);
-                for(auto& port : pin.ports())
+                auto stdPin = stdCells.find_pin(macro.name() + ":" + pin.name());
+
+                for(const auto& port : pin.ports())
                 {
-                    for(auto& rect : port.second)
+                    for(const auto& rect : port.second)
                     {
-                        library.connect(
-                            stdPin,
-                            util::LocationDbu(0.5 *
-                                (dbuConverter.convert(rect.min_corner().x()) +
-                                 dbuConverter.convert(rect.max_corner().x())),
-                                0.5 *
-                                (dbuConverter.convert(rect.min_corner().y()) +
-                                 dbuConverter.convert(rect.max_corner().y()))));
+                        library.offset(stdPin) = Library::offset_type{
+                            0.5 * (dbu_converter.convert(rect.min_corner().x()) + dbu_converter.convert(rect.max_corner().x())),
+                            0.5 * (dbu_converter.convert(rect.min_corner().y()) + dbu_converter.convert(rect.max_corner().y())),
+                        };
                     }
                 }
             }

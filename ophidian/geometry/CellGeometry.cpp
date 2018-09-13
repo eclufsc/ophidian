@@ -84,7 +84,7 @@ namespace ophidian::geometry
                 {units::unit_cast<double>(max_corner.x()), units::unit_cast<double>(max_corner.y())}
             };
 
-            auto result_box = Box<double>{{0,0},{0,0}};
+            auto result_box = Box<double>{{0.0,0.0},{0.0,0.0}};
 
             auto translate = bg::strategy::transform::translate_transformer<double, 2, 2>{
                 units::unit_cast<double>(translation_point.x()), 

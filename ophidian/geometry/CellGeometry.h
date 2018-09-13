@@ -32,6 +32,8 @@ namespace ophidian::geometry
         // Member types
         using unit_type = util::database_unit_t;
 
+        using point_type = Point<unit_type>;
+
         using box_type  = Box<unit_type>;
         using box_container_type = std::vector<box_type>;
 
