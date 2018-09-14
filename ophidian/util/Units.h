@@ -33,7 +33,7 @@ namespace ophidian::util
 {
     //!Lenght Unit derived from micrometer to be used as internal length unit length (as commonly used in LEF/DEF library)
     //!To convert to/from micron, please use the DbuConverter Utility class
-    using database_unit_base = units::unit<std::ratio<1>, units::category::length_unit>;
+    using database_unit_base = units::unit<std::ratio<1>, units::length::micrometers>;
     using database_unit_t = units::unit_t<database_unit_base, double, units::linear_scale>;
 
     using database_unit_scalar_base = units::unit<std::ratio<1>, units::category::scalar_unit>;

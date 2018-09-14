@@ -134,16 +134,9 @@ void MainController::createQuads()
                 point_type{min.x(), max.y()}
             };
 
-            for(auto& point : points)
-            {
-                std::cout <<"point: " << point.x() << " " << point.y() << std::endl;
-            }
-
             mCanvas->alloc(quad, points);
 
-            auto new_box = box_type{max,min};
-
-            mIndex.quadCreate(quad, new_box);
+            mIndex.quadCreate(quad, box_type{min,max});
 
             quads.push_back(quad);
         }

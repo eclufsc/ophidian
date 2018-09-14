@@ -28,6 +28,16 @@ namespace ophidian::geometry
         m_boxes{std::move(boxes)}
     {}
 
+    // Element access
+    CellGeometry::box_type& CellGeometry::front()
+    {
+        return m_boxes.front();
+    }
+    const CellGeometry::box_type& CellGeometry::front() const
+    {
+        return m_boxes.front();
+    }
+
     // Iterators
     CellGeometry::box_container_type::iterator CellGeometry::begin()
     {

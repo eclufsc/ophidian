@@ -32,6 +32,9 @@ TEST_CASE("Library factory: populate with simple lef.", "[circuit][Netlist][fact
 
     using micron_t = ophidian::parser::Lef::micrometer_type;
 
-    CHECK(first_box.max_corner().x() == dbu_t{ micron_t{1.140} * lef.micrometer_to_dbu_ratio()});
-    CHECK(first_box.max_corner().y() == dbu_t{ micron_t{1.71} * lef.micrometer_to_dbu_ratio()});
+    auto max_x = dbu_t{ micron_t{1.140} * lef.micrometer_to_dbu_ratio()};
+    auto max_y = dbu_t{ micron_t{1.71} * lef.micrometer_to_dbu_ratio()};
+
+    CHECK(first_box.max_corner().x() == max_x);
+    CHECK(first_box.max_corner().y() == max_y);
 }

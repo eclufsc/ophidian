@@ -51,6 +51,8 @@ namespace ophidian::geometry
         CellGeometry(box_container_type&& boxes);
 
         // Element access
+        box_type& front();
+        const box_type& front() const;
 
         // Iterators
         box_container_type::iterator begin();

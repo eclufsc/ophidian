@@ -36,7 +36,7 @@ namespace ophidian::design::factory
 
         placement::factory::make_library(design.library(), lef, design.standard_cells());
 
-        placement::factory::make_placement(design.placement(), def, design.netlist(), design.library());
+        placement::factory::make_placement(design.placement(), def, design.netlist());
     }
 
     void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
@@ -52,6 +52,6 @@ namespace ophidian::design::factory
 
         placement::factory::make_library(design.library(), lef, design.standard_cells());
 
-        placement::factory::make_placement(design.placement(), def, design.netlist(), design.library());
+        placement::factory::make_placement(design.placement(), def, design.netlist());
     }
 }
