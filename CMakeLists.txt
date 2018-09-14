@@ -13,16 +13,16 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.5.2)
-
-# Set project name
-project(ophidian)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Set project version
-set(ophidian_VERSION 0.1)
+set(ophidian_VERSION 0.1.1)
+
+# Set project name
+project(ophidian VERSION ${ophidian_VERSION})
 
 # Set c++14 globally
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
