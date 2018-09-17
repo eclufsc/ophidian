@@ -60,13 +60,23 @@ namespace ophidian::design
         return m_standard_cells;
     }
 
-    Design::library_type& Design::library() noexcept
+    Design::placement_library_type& Design::placement_library() noexcept
     {
-        return m_library;
+        return m_placement_library;
     }
 
-    const Design::library_type& Design::library() const noexcept
+    const Design::placement_library_type& Design::placement_library() const noexcept
     {
-        return m_library;
+        return m_placement_library;
+    }
+
+    Design::routing_library_type& Design::routing_library() noexcept
+    {
+        return m_routing_library;
+    }
+
+    const Design::routing_library_type& Design::routing_library() const noexcept
+    {
+        return m_routing_library;
     }
 }

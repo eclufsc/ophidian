@@ -237,6 +237,8 @@ namespace parser
 
             const parallelRunLength_container_type& values() const noexcept;
 
+            const micrometer_type& spacing(const micrometer_type width, const micrometer_type length) const noexcept;
+
         private:
             int m_numLength;
             int m_numWidth;

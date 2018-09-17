@@ -641,6 +641,11 @@ namespace parser
         return m_values;
     }
 
+    const Lef::Layer::ParallelRunLength::micrometer_type &Lef::Layer::ParallelRunLength::spacing(const Lef::Layer::ParallelRunLength::micrometer_type width, const Lef::Layer::ParallelRunLength::micrometer_type length) const noexcept
+    {
+        return m_values.at(std::make_pair(width, length));
+    }
+
     const Lef::Layer::ParallelRunLength::micrometer_container_type& Lef::Layer::ParallelRunLength::widths() const noexcept
     {
         return m_widths;

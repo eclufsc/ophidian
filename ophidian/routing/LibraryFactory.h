@@ -16,24 +16,23 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_DESIGN_DESIGNFACTORY_H
-#define OPHIDIAN_DESIGN_DESIGNFACTORY_H
+#ifndef OPHIDIAN_ROUTING_LIBRARY_FACTORY_H
+#define OPHIDIAN_ROUTING_LIBRARY_FACTORY_H
 
-#include "Design.h"
-
-#include <ophidian/parser/Verilog.h>
-#include <ophidian/parser/Def.h>
 #include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Def.h>
 
-namespace ophidian::design::factory
+#include "Library.h"
+
+namespace ophidian
 {
-    void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
-
-    void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
-
-    void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
-
-    void make_design_ispd2018(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
+namespace routing
+{
+namespace factory
+{
+    void make_library(Library& library, const parser::Lef& lef, const parser::Def & def) noexcept;
+}
+}
 }
 
-#endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H
+#endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H

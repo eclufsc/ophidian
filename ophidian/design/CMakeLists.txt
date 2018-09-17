@@ -73,6 +73,7 @@ target_link_libraries(ophidian_design
     PUBLIC ophidian_floorplan 
     PUBLIC ophidian_placement 
     PUBLIC ophidian_parser
+    PUBLIC ophidian_routing
 )
 
 # Tell cmake the path to look for include files for this target
@@ -92,6 +93,7 @@ target_link_libraries(ophidian_design_static
     PUBLIC ophidian_floorplan_static
     PUBLIC ophidian_placement_static
     PUBLIC ophidian_parser_static
+    PUBLIC ophidian_routing_static
 )
 
 # Tell cmake the path to look for include files for this target

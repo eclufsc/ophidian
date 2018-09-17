@@ -26,12 +26,61 @@ namespace routing
 
 
 
-    entity_system::EntitySystem<Layer>::NotifierType * Library::notifier(Layer) const {
+Library::layer_type Library::find_layer_instance(const std::string &layerName)
+{
+    return mName2Layer.at(layerName);
+}
+
+Library::layer_type Library::add_layer_instance(
+        const std::string &layerName,
+        const LayerType &type,
+        const LayerDirection &direction,
+        const Library::unit_type& pitch,
+        const Library::unit_type& offset,
+        const Library::unit_type& width,
+        const Library::unit_type& minWidth,
+        const Library::unit_type& area,
+        const Library::unit_type& spacing,
+        const Library::unit_type& EOLspace,
+        const Library::unit_type& EOLwidth,
+        const Library::unit_type& EOLwithin,
+        const Library::spacing_table_type spacingTable
+)
+{
+    if(mName2Layer.find(layerName) == mName2Layer.end()){
+        auto layer = mLayers.add();
+
+        mLayerName[layer] = layerName;
+        mName2Layer[layerName] = layer;
+        mLayerType[layer] = type;
+        mLayerDirection[layer] = direction;
+        mLayerPitch[layer] = pitch;
+        mLayerOffset[layer] = offset;
+        mLayerWidth[layer] = width;
+        mLayerMinWidth[layer] = minWidth;
+        mLayerArea[layer] = area;
+        mLayerSpacing[layer] = spacing;
+        mLayerEOLspace[layer] = EOLspace;
+        mLayerEOLwidth[layer] = EOLwidth;
+        mLayerEOLwithin[layer] = EOLwithin;
+        mLayerSpacingTable[layer] = spacingTable;
+
+        return layer;
+    }else{
+        return mName2Layer[layerName];
+    }
+}
+
+entity_system::EntitySystem<Library::layer_type>::NotifierType * Library::notifier(Library::layer_type) const {
         return mLayers.notifier();
     }
 
-    entity_system::EntitySystem<Via>::NotifierType * Library::notifier(Via) const {
+    entity_system::EntitySystem<Library::via_type>::NotifierType * Library::notifier(Library::via_type) const {
         return mVias.notifier();
+    }
+
+    entity_system::EntitySystem<Library::track_type>::NotifierType * Library::notifier(Library::track_type) const {
+        return mTracks.notifier();
     }
 
 } // namespace routing

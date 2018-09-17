@@ -39,6 +39,7 @@ target_link_libraries(ophidian_tests
     PRIVATE ophidian_interconnection_static
     PRIVATE ophidian_parser_static
     PRIVATE ophidian_placement_static
+    PRIVATE ophidian_routing_static
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)
