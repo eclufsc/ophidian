@@ -5,7 +5,6 @@ bool RTreeNodeComparator::operator()(const RTreeNode & node1, const RTreeNode & 
     return node1.second == node2.second;
 }
 
-
 SpatialIndex::SpatialIndex()
 {
 
@@ -16,7 +15,7 @@ void SpatialIndex::clear()
     mIndex.clear();
 }
 
-void SpatialIndex::quadCreate(const Quad & quad, const ophidian::geometry::Box & box)
+void SpatialIndex::quadCreate(const Quad & quad, const box_type & box)
 {
     mIndex.insert(RTreeNode(box, quad));
 }
@@ -36,7 +35,7 @@ void SpatialIndex::quadRemove(const Quad & quad)
     mIndex.remove(toRemove.begin(), toRemove.end());
 }
 
-std::vector<Quad> SpatialIndex::quadsContaining(const ophidian::geometry::Box & box) const
+std::vector<Quad> SpatialIndex::quadsContaining(const box_type & box) const
 {
     std::vector<RTreeNode> result;
 
@@ -52,7 +51,7 @@ std::vector<Quad> SpatialIndex::quadsContaining(const ophidian::geometry::Box & 
     return quads;
 }
 
-std::vector<Quad> SpatialIndex::quadsContaining(const ophidian::geometry::Point & point) const
+std::vector<Quad> SpatialIndex::quadsContaining(const point_type & point) const
 {
     std::vector<RTreeNode> result;
 
@@ -68,12 +67,12 @@ std::vector<Quad> SpatialIndex::quadsContaining(const ophidian::geometry::Point 
     return quads;
 }
 
-Quad SpatialIndex::quadContaining(const ophidian::geometry::Point & point) const
+Quad SpatialIndex::quadContaining(const point_type & point) const
 {
     return quadsContaining(point).front();
 }
 
-bool SpatialIndex::hasQuad(const ophidian::geometry::Point & point) const
+bool SpatialIndex::hasQuad(const point_type & point) const
 {
     return !quadsContaining(point).empty();
 }

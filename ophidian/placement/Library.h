@@ -21,72 +21,53 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-#include <ophidian/geometry/Models.h>
-#include <ophidian/standard_cell/StandardCells.h>
+#include <ophidian/geometry/CellGeometry.h>
 #include <ophidian/util/Units.h>
+#include <ophidian/circuit/StandardCells.h>
 
-namespace ophidian
+namespace ophidian::placement
 {
-    namespace placement
+    class Library
     {
-        class Library
-        {
-        public:
+    public:
+        using unit_type = util::database_unit_t;
 
-            //! Library Copy Constructor
+        using offset_type = util::LocationDbu;
 
-            /*!
-               \brief Constructs a placement library.
-             */
-            Library(const standard_cell::StandardCells & std_cells);
+        using std_cell_type = circuit::StandardCells::cell_type;
 
-            //! Cell geometry getter
+        using std_cell_pin_type = circuit::StandardCells::pin_type;
 
-            /*!
-               \brief Gets the geometry of a cell.
-               \param cell Cell entity to get the geometry.
-               \return Geometry of the cell.
-             */
-            geometry::MultiBox geometry(const standard_cell::Cell & cell) const
-            {
-                return mGeometries[cell];
-            }
+        using std_cell_geometry_type = geometry::CellGeometry;
 
-            //! Cell geometry setter
+        // Constructors
+        Library() = delete;
 
-            /*!
-               \brief Set the geometry of a cell.
-               \param cell Cell entity to set the geometry.
-               \param geometry Gehmetry to assign to cell.
-             */
-            void geometry(const standard_cell::Cell & cell, const geometry::MultiBox & geometry);
+        Library(const Library&) = delete;
+        Library& operator=(const Library&) = delete;
 
-            //! Pin offset getter
+        Library(Library&&) = delete;
+        Library& operator=(Library&&) = delete;
 
-            /*!
-               \brief Gets the offset of a pin.
-               \param pin Pin entity to get the offset.
-               \return Offset of the pin.
-             */
-            util::LocationDbu pinOffset(const standard_cell::Pin & pin) const
-            {
-                return mPinOffsets[pin];
-            }
+        Library(const circuit::StandardCells & std_cells);
 
-            //! Pin offset setter
+        // Element access
+        std_cell_geometry_type& geometry(const std_cell_type& cell);
+        const std_cell_geometry_type& geometry(const std_cell_type& cell) const;
 
-            /*!
-               \brief Sets the offset of a pin.
-               \param pin Pin entity to set the offset.
-               \param offset Offset to assign to pin.
-             */
-            void pinOffset(const standard_cell::Pin & pin, const util::LocationDbu & offset);
+        offset_type& offset(const std_cell_pin_type& pin);
+        const offset_type& offset(const std_cell_pin_type& pin) const;
 
-        private:
-            entity_system::Property <standard_cell::Cell, geometry::MultiBox> mGeometries;
-            entity_system::Property <standard_cell::Pin, util::LocationDbu>   mPinOffsets;
-        };
-    }     // namespace placement
-}     // namespace ophidian
+        // Iterators
+
+        // Capacity
+
+        // Modifiers
+
+    private:
+        entity_system::Property<std_cell_type, std_cell_geometry_type> mGeometries;
+        entity_system::Property<std_cell_pin_type, offset_type>   mPinOffsets;
+    };
+}
 
 #endif // LIBRARY_H

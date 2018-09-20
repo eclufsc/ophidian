@@ -14,6 +14,7 @@ template<std::size_t NumberOfVertices>
 class DrawableBatch : public sf::Drawable
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! DrawableBatch Constructor
     /*!
        \brief Constructs a DrawableBatch with no canvas
@@ -62,7 +63,7 @@ public:
        \param form A form to store your index in the container.
        \param points Vector with points of a form.
      */
-    void alloc(Form & form, const std::vector<ophidian::geometry::Point> & points);
+    void alloc(Form & form, const std::vector<point_type> & points);
 
     //! Desalloc a form
     /*!
@@ -94,7 +95,7 @@ public:
        \param i Index of the vertex.
        \param p New position of the vertex.
      */
-    void setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p);
+    void setPoint(const Form & form, std::size_t i, const point_type & p);
 
     //! Amount of vertices
     /*!
@@ -109,7 +110,11 @@ public:
        \param form The form to get index.
        \return Point of the vertex.
      */
-    ophidian::geometry::Point point(const Form & form, std::size_t i) const;
+    point_type point(const Form & form, std::size_t i) const
+    {
+        auto & verticesQuad = mVertices[form.mId];
+        return point_type(verticesQuad[i].position.x, verticesQuad[i].position.y);
+    }
 
     //! Vertices of a form
     /*!
@@ -161,7 +166,7 @@ const sf::Vertex DrawableBatch<NumberOfVertices>::operator[](const std::size_t i
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::alloc(Form & form, const std::vector<ophidian::geometry::Point> & points)
+void DrawableBatch<NumberOfVertices>::alloc(Form & form, const std::vector<point_type> & points)
 {
     form.mId = mVertices.size();
 
@@ -199,16 +204,9 @@ void DrawableBatch<NumberOfVertices>::paint(const Form & form, const sf::Color c
 }
 
 template<std::size_t NumberOfVertices>
-void DrawableBatch<NumberOfVertices>::setPoint(const Form & form, std::size_t i, const ophidian::geometry::Point & p)
+void DrawableBatch<NumberOfVertices>::setPoint(const Form & form, std::size_t i, const point_type & p)
 {
     mVertices[form.mId][i].position = sf::Vector2f(p.x(), p.y());
-}
-
-template<std::size_t NumberOfVertices>
-ophidian::geometry::Point DrawableBatch<NumberOfVertices>::point(const Form & form, std::size_t i) const
-{
-    auto & verticesQuad = mVertices[form.mId];
-    return ophidian::geometry::Point(verticesQuad[i].position.x, verticesQuad[i].position.y);
 }
 
 template<std::size_t NumberOfVertices>

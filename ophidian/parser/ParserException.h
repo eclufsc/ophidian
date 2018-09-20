@@ -21,20 +21,19 @@
 
 #include <exception>
 
-namespace ophidian
+namespace ophidian::parser::exceptions
 {
-    namespace parser
+    class InexistentFile : public std::exception
     {
-        class InexistentFile :
-            public std::exception
-        {
-        public:
-            const char * what() const noexcept override
-            {
-                return "The given file was not found";
-            }
-        };
-    }     // namespace parser
-}     // namespace ophidian
+    public:
+        const char * what() const noexcept override;
+    };
+
+    class VerilogRuntimeException : public std::exception
+    {
+    public:
+        const char * what() const noexcept override;
+    };
+}
 
 #endif

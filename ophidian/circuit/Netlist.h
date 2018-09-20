@@ -22,596 +22,240 @@
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Aggregation.h>
 #include <ophidian/entity_system/Composition.h>
+#include <ophidian/circuit/StandardCells.h>
 #include <unordered_map>
 
-namespace ophidian
+namespace ophidian::circuit
 {
-    namespace circuit
+    class CellInstance :
+        public entity_system::EntityBase
     {
-        class Cell :
-            public entity_system::EntityBase
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    class PinInstance :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    class Net :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    class Input :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    class Output :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    /*! A flatten Netlist */
+    class Netlist final
+    {
+    public:
+        using CellNotifier = entity_system::EntitySystem<CellInstance>::NotifierType;
+        using PinNotifier = entity_system::EntitySystem<PinInstance>::NotifierType;
+        using NetNotifier = entity_system::EntitySystem<Net>::NotifierType;
+
+        using cell_instance_type = CellInstance;
+        using cell_instance_name_type = std::string;
+        using cell_instance_container_type = entity_system::EntitySystem<cell_instance_type>;
+
+        using pin_instance_type = PinInstance;
+        using pin_instance_name_type = std::string;
+        using pin_instance_container_type = entity_system::EntitySystem<pin_instance_type>;
+
+        using net_type = Net;
+        using net_name_type = std::string;
+        using net_container_type = entity_system::EntitySystem<net_type>;
+
+        using input_pad_type = Input;
+        using input_pad_name_type   = std::string;
+        using input_pad_container_type = entity_system::EntitySystem<Input>;
+
+        using output_pad_type = Output;
+        using output_pad_name_type   = std::string;
+        using output_pad_container_type = entity_system::EntitySystem<Output>;
+
+        using cell_instance_pins_view_type = entity_system::Association<CellInstance, PinInstance>::Parts;
+
+        using net_pins_view_type = entity_system::Association<Net, PinInstance>::Parts;
+
+        using std_cell_type = StandardCells::cell_type;
+        using std_cell_pin_type = StandardCells::pin_type;
+
+        //! Construct Netlist
+        Netlist() = default;
+
+        //! Delete coppy constructor
+        Netlist(const Netlist &) = delete;
+        Netlist & operator =(const Netlist &) = delete;
+
+        //! Move Constructor
+        Netlist(Netlist &&) = delete;
+        Netlist& operator=(Netlist &&) = delete;
+
+        // Element access
+        cell_instance_type find_cell_instance(const cell_instance_name_type& cellName) const;
+
+        pin_instance_type find_pin_instance(const pin_instance_name_type& pinName) const;
+
+        net_type find_net(const net_name_type& netName) const;
+
+        cell_instance_name_type& name(const cell_instance_type& cell);
+        const cell_instance_name_type& name(const cell_instance_type& cell) const;
+
+        pin_instance_name_type& name(const pin_instance_type& pin);
+        const pin_instance_name_type& name(const pin_instance_type& pin) const;
+
+        net_name_type& name(const net_type& net);
+        const net_name_type& name(const net_type& net) const;
+
+        cell_instance_type cell(const pin_instance_type& pin) const;
+
+        cell_instance_pins_view_type pins(const cell_instance_type& cell) const;
+
+        net_pins_view_type pins(const net_type& net) const;
+
+        pin_instance_type pin(const input_pad_type& input) const;
+
+        pin_instance_type pin(const output_pad_type& output) const;
+
+        net_type net(const pin_instance_type& pin) const;
+
+        input_pad_type input(const pin_instance_type& pin) const;
+
+        output_pad_type output(const pin_instance_type& pin) const;
+
+        std_cell_type std_cell(const cell_instance_type& cell) const;
+
+        std_cell_pin_type std_cell_pin(const pin_instance_type& pin) const;
+
+        // Iterators
+        cell_instance_container_type::const_iterator begin_cell_instance() const noexcept;
+        cell_instance_container_type::const_iterator end_cell_instance() const noexcept;
+
+        pin_instance_container_type::const_iterator begin_pin_instance() const noexcept;
+        pin_instance_container_type::const_iterator end_pin_instance() const noexcept;
+
+        net_container_type::const_iterator begin_net() const noexcept;
+        net_container_type::const_iterator end_net() const noexcept;
+
+        input_pad_container_type::const_iterator begin_input_pad() const noexcept;
+        input_pad_container_type::const_iterator end_input_pad() const noexcept;
+        
+        output_pad_container_type::const_iterator begin_output_pad() const noexcept;
+        output_pad_container_type::const_iterator end_output_pad() const noexcept;
+
+        // Capacity
+        cell_instance_container_type::size_type size_cell_instance() const noexcept;
+        pin_instance_container_type::size_type size_pin_instance() const noexcept;
+        net_container_type::size_type size_net() const noexcept;
+        input_pad_container_type::size_type size_input_pad() const noexcept;
+        output_pad_container_type::size_type size_output_pad() const noexcept;
+
+        cell_instance_container_type::size_type capacity_cell_instance() const noexcept;
+        pin_instance_container_type::size_type capacity_pin_instance() const noexcept;
+        net_container_type::size_type capacity_net() const noexcept;
+
+        void reserve_cell_instance(cell_instance_container_type::size_type size);
+        void reserve_pin_instance(pin_instance_container_type::size_type size);
+        void reserve_net(net_container_type::size_type size);
+
+        void shrink_to_fit();
+
+        // Modifiers
+        cell_instance_type add_cell_instance(const cell_instance_name_type& cellName);
+
+        pin_instance_type add_pin_instance(const pin_instance_name_type& pinName);
+
+        net_type add_net(const net_name_type& netName);
+
+        input_pad_type add_input_pad(const pin_instance_type& pin);
+
+        output_pad_type add_output_pad(const pin_instance_type& pin);
+        
+        void erase(const cell_instance_type& cell);
+        void erase(const pin_instance_type& pin);
+        void erase(const net_type& net);
+
+        void connect(const net_type& net, const pin_instance_type& pin);
+        void connect(const cell_instance_type& cell, const pin_instance_type& pin);
+        void connect(const cell_instance_type& cell, const std_cell_type& std_cell);
+        void connect(const pin_instance_type& pin, const std_cell_pin_type& std_cell);
+
+        void disconnect(const pin_instance_type& pin);
+
+        template <typename Value>
+        entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
         {
-        public:
-            using entity_system::EntityBase::EntityBase;
-        };
+            return entity_system::Property<CellInstance, Value>(mCells);
+        }
 
-        class Pin :
-            public entity_system::EntityBase
+        template <typename Value>
+        entity_system::Property<PinInstance, Value> makeProperty(PinInstance) const
         {
-        public:
-            using entity_system::EntityBase::EntityBase;
-        };
+            return entity_system::Property<PinInstance, Value>(mPins);
+        }
 
-        class Net :
-            public entity_system::EntityBase
+        template <typename Value>
+        entity_system::Property<Net, Value> makeProperty(Net) const
         {
-        public:
-            using entity_system::EntityBase::EntityBase;
-        };
+            return entity_system::Property<Net, Value>(mNets);
+        }
 
-        class Input :
-            public entity_system::EntityBase
+        template <typename Value>
+        entity_system::Property<Input, Value> makeProperty(Input) const
         {
-        public:
-            using entity_system::EntityBase::EntityBase;
-        };
+            return entity_system::Property<Input, Value>(mInputs);
+        }
 
-        class Output :
-            public entity_system::EntityBase
+        template <typename Value>
+        entity_system::Property<Output, Value> makeProperty(Output) const
         {
-        public:
-            using entity_system::EntityBase::EntityBase;
-        };
-
-/*! A flatten Netlist */
-        class Netlist final
-        {
-        public:
-            using CellNotifier = entity_system::EntitySystem <Cell>::NotifierType;
-            using PinNotifier = entity_system::EntitySystem <Pin>::NotifierType;
-            using NetNotifier = entity_system::EntitySystem <Net>::NotifierType;
-
-            //! Construct Netlist
-
-            /*!
-               \brief Constructs an empty Netlist, with no Cells, Pins or Nets.
-             */
-            Netlist();
-
-            //! Move Constructor
-            Netlist(Netlist && nl) = default;
-
-            //! Netlist Destructor
-
-            /*!
-               \brief This destroy all Netlist's EntitySystems.
-             */
-            ~Netlist();
-
-//! Add Cell
-
-/*!
-   \param A cell name;
-   \brief Adds a Cell instance, if the cell already exist then just return the existing cell.
-   \return A handler for the created/existing Cell.
- */
-            Cell add(Cell, std::string cellName);
-
-//! Erase Cell
-
-/*!
-   \param cell A handler for the Cell to erase.
-   \brief Erases a Cell instance.
- */
-            void erase(const Cell & cell);
-
-//! Size of Cell's System
-
-/*!
-   \brief Returns the number of Cells.
-   \return The number of Cells.
- */
-            uint32_t size(Cell) const;
-
-//! Iterator to beginning
-
-/*!
-   \brief Returns an iterator pointing to the first element in the Cell's EntitySystem.
-   \return Iterator to the first element in the Cell's EntitySystem.
- */
-            entity_system::EntitySystem <Cell>::const_iterator begin(Cell) const;
-
-//! Iterator to end
-
-/*!
-   \brief Returns an iterator referring to the past-the-end element in the Cell's EntitySystem.
-   \return Iterator referring to the past-the-end element in the Cell's EntitySystem.
- */
-            entity_system::EntitySystem <Cell>::const_iterator end(Cell) const;
-
-//! Make Cell Property
-
-/*!
-   \brief Creates a Property for the Cell's Entity System.
-   \tparam Value value type of the Property.
-   \return An Cell => \p Value Map.
- */
-            template <typename Value>
-            entity_system::Property <Cell, Value> makeProperty(Cell) const
-            {
-                return entity_system::Property <Cell, Value>(mCells);
-            }
-
-//! Get the Cell Notifier
-
-/*!
-   \brief Returns a pointer to the AlterationNotifier of the Cell's EntitySystem.
-   \return A pointer to the AlterationNotifier of the Cell's EntitySystem.
- */
-            entity_system::EntitySystem <Cell>::NotifierType * notifier(Cell) const;
-
-//! Allocate space for storing Cell entities
-
-/*!
-   \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the netlist.
-   \param size Minimum capacity for the cell container.
- */
-            void reserve(Cell, uint32_t size);
-
-//! Capacity of the Cell's System
-
-/*!
-   \return The capacity of the Cell EntitySystem.
- */
-            uint32_t capacity(Cell) const;
-
-//! Find a cell
-
-/*!
-   \brief Using the mapping, return a cell handler by cell's name.
-   \param The cell name.
-   \return Return a cell handler by cell's name.
- */
-            Cell find(Cell, std::string cellName);
-
-//! Returns the name of the cell
-
-/*!
-   \brief Returns the name of the cell.
-   \param A handler for the cell.
-   \return Return the cell's name.
- */
-            std::string name(const Cell & cell) const;
-
-//! Pins of a Cell
-
-/*!
-   \brief Returns a Container Wrapper for the Pins of a Cell.
-   \param cell A handler for the Cell we want to get the Pins.
-   \return Container Wrapper for the Pins of a Cell.
- */
-            entity_system::Association <Cell, Pin>::Parts pins(const Cell & cell) const;
-
-//! Add Pin into Cell
-
-/*!
-   \brief Adds a Pin to a given Cell.
-   \param cell A handler for the Cell we want to add a Pin.
-   \param pin A handler for the Pin we want to add in \p cell.
- */
-            void add(const Cell & cell, const Pin & pin);
-
-//! Add Pin
-
-/*!
-   \param A pin name.
-   \brief Adds a Pin instance, if the pin already exist then just return the existing pin.
-   \return A handler for the created/existing Pin.
- */
-            Pin add(Pin, std::string pinName);
-
-//! Erase Pin
-
-/*!
-   \param pin A handler for the Pin to erase.
-   \brief Erases a Pin instance.
- */
-            void erase(const Pin & pin);
-
-//! Size of Pin's System
-
-/*!
-   \brief Returns the number of Pins.
-   \return The number of Pins.
- */
-            uint32_t size(Pin) const;
-
-//! Iterator to beginning
-
-/*!
-   \brief Returns an iterator pointing to the first element in the Pin's EntitySystem.
-   \return Iterator to the first element in the Pin's EntitySystem.
- */
-            entity_system::EntitySystem <Pin>::const_iterator begin(Pin) const;
-
-//! Iterator to end
-
-/*!
-   \brief Returns an iterator referring to the past-the-end element in the Pin's EntitySystem.
-   \return Iterator referring to the past-the-end element in the Pin's EntitySystem.
- */
-            entity_system::EntitySystem <Pin>::const_iterator end(Pin) const;
-
-//! Make Pin Property
-
-/*!
-   \brief Creates a Property for the Pin's Entity System.
-   \tparam Value value type of the Property.
-   \return An Pin => \p Value Map.
- */
-            template <typename Value>
-            entity_system::Property <Pin, Value> makeProperty(Pin) const
-            {
-                return entity_system::Property <Pin, Value>(mPins);
-            }
-
-//! Get the Pin Notifier
-
-/*!
-   \brief Returns a pointer to the AlterationNotifier of the Pin's EntitySystem.
-   \return A pointer to the AlterationNotifier of the Pin's EntitySystem.
- */
-            entity_system::EntitySystem <Pin>::NotifierType * notifier(Pin) const;
-
-//! Allocate space for storing Pin entities
-
-/*!
-   \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the netlist.
-   \param size Minimum capacity for the Pin container.
- */
-            void reserve(Pin, uint32_t size);
-
-//! Capacity of the Pin's System
-
-/*!
-   \return The capacity of the Pin EntitySystem.
- */
-            uint32_t capacity(Pin) const;
-
-//! Find a pin
-
-/*!
-   \brief Using the mapping, return a pin handler by pin's name.
-   \param The pin name.
-   \return Return a pin handler by pin's name.
- */
-            Pin find(Pin, std::string pinName);
-
-//! Returns the name of the pin
-
-/*!
-   \brief Returns the name of the pin.
-   \param A handler for the pin.
-   \return Return the pin's name.
- */
-            std::string name(const Pin & pin) const;
-
-//! Net of a Pin
-
-/*!
-   \brief Returns the Net of a given Pin.
-   \param pin A handler for the Pin we want to get the Net.
-   \return A handler for the Net of \p pin.
-   \remark If \p pin is disconnected, returns Net().
- */
-            Net net(const Pin & pin) const;
-
-//! Disconnect Pin
-
-/*!
-   \brief Disconnects a pin from its net.
-   \param pin A handler for the Pin we want to disconnect.
- */
-            void disconnect(const Pin & pin);
-
-//! Cell of a Pin
-
-/*!
-   \brief Returns the Cell of a Pin.
-   \param pin A handler for the Pin we want to get the Cell.
-   \remark If \p pin doesn't have a Cell, returns Cell().
- */
-            Cell cell(const Pin & pin) const;
-
-//! Add Net
-
-/*!
-   \param A net name.
-   \brief Adds a Net instance, if the net already exist then just return the existing net.
-   \return A handler for the created/existing Net.
- */
-            Net add(Net, std::string netName);
-
-//! Erase Net
-
-/*!
-   \param net A handler for the Net to erase.
-   \brief Erases a Net instance.
- */
-            void erase(const Net & net);
-
-//! Size of Net's System
-
-/*!
-   \brief Returns the number of Nets.
-   \return The number of Nets.
- */
-            uint32_t size(Net) const;
-
-//! Iterator to beginning
-
-/*!
-   \brief Returns an iterator pointing to the first element in the Net's EntitySystem.
-   \return Iterator to the first element in the Net's EntitySystem.
- */
-            entity_system::EntitySystem <Net>::const_iterator begin(Net) const;
-
-//! Iterator to end
-
-/*!
-   \brief Returns an iterator referring to the past-the-end element in the Net's EntitySystem.
-   \return Iterator referring to the past-the-end element in the Net's EntitySystem.
- */
-            entity_system::EntitySystem <Net>::const_iterator end(Net) const;
-
-//! Make Net Property
-
-/*!
-   \brief Creates a Property for the Net's Entity System.
-   \tparam Value value type of the Property.
-   \return An Net => \p Value Map.
- */
-            template <typename Value>
-            entity_system::Property <Net, Value> makeProperty(Net) const
-            {
-                return entity_system::Property <Net, Value>(mNets);
-            }
-
-//! Get the Net Notifier
-
-/*!
-   \brief Returns a pointer to the AlterationNotifier of the Net's EntitySystem.
-   \return A pointer to the AlterationNotifier of the Net's EntitySystem.
- */
-            entity_system::EntitySystem <Net>::NotifierType * notifier(Net) const;
-
-//! Allocate space for storing Net entities
-
-/*!
-   \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions nets), then it is worth reserving space for this amount before starting to build the netlist.
-   \param size Minimum capacity for the Net container.
- */
-            void reserve(Net, uint32_t size);
-
-//! Capacity of the Net's System
-
-/*!
-   \return The capacity of the Net EntitySystem.
- */
-            uint32_t capacity(Net) const;
-
-//! Find a net
-
-/*!
-   \brief Using the mapping, return a net handler by net's name.
-   \param The net name.
-   \return Return a net handler by net's name.
- */
-            Net find(Net, std::string netName);
-
-//! Returns the name of the net
-
-/*!
-   \brief Returns the name of the net.
-   \param A handler for the net.
-   \return Return the net's name.
- */
-            std::string name(const Net & net) const;
-
-//! Pins of a Net
-
-/*!
-   \brief Returns a Container Wrapper for the Pins of a Net.
-   \param net A handler for the Net we want to get the Pins.
-   \return Container Wrapper for the Pins of a Net.
- */
-            entity_system::Association <Net, Pin>::Parts pins(const Net & net) const;
-
-//! Connect Pin on Net
-
-/*!
-   \brief Connects a Pin
-   \param net A handler for the Net we want to connect \p pin.
-   \param pin A handler for the Pin we want to connect.
- */
-            void connect(const Net & net, const Pin & pin);
-
-            //! Number of Inputs
-
-            /*!
-               \brief Returns the number of Inputs.
-               \return The number of Inputs.
-             */
-            uint32_t size(Input) const;
-
-            //! Create an Input
-
-            /*!
-               \brief Creates an Input for a given Pin.
-               \param pin The Pin we want to create an Input.
-               \return A handler for the created Input.
-             */
-            Input add(Input, const Pin &pin);
-
-            //! Pin of an Input
-
-            /*!
-               \brief Returns the Pin of a given Input.
-               \param input the Input we want the Pin.
-               \return A handler for the Pin of \p input.
-             */
-            Pin pin(const Input & input) const;
-
-            //! Input of a Pin
-
-            /*!
-               \brief Returns the Input of a given Pin.
-               \param pin the Pin we want the Input.
-               \return A handler for the Input of \p pin.
-               \remark If \p pin isn't associated with any Input, returns Input().
-             */
-            Input input(const Pin & pin) const;
-
-            //! Iterator to beginning
-
-            /*!
-               \brief Returns an iterator pointing to the first element in the Input's EntitySystem.
-               \return Iterator to the first element in the Input's EntitySystem.
-             */
-            entity_system::EntitySystem <Input>::const_iterator begin(Input) const;
-
-            //! Iterator to end
-
-            /*!
-               \brief Returns an iterator referring to the past-the-end element in the Input's EntitySystem.
-               \return Iterator referring to the past-the-end element in the Input's EntitySystem.
-             */
-            entity_system::EntitySystem <Input>::const_iterator end(Input) const;
-
-            //! Make Input Property
-
-            /*!
-               \brief Creates a Property for the Input's Entity System.
-               \tparam Value value type of the Property.
-               \return An Input => \p Value Map.
-             */
-            template <typename Value>
-            entity_system::Property <Input, Value> makeProperty(Input) const
-            {
-                return entity_system::Property <Input, Value>(mInputs);
-            }
-
-            //! Get the Input Notifier
-
-            /*!
-               \brief Returns a pointer to the AlterationNotifier of the Input's Entity System.
-               \return A pointer to the AlterationNotifier of the Input's Entity System.
-             */
-            entity_system::EntitySystem <Input>::NotifierType * notifier(Input) const;
-
-            //! Number of Outputs
-
-            /*!
-               \brief Returns the number of Outputs.
-               \return The number of Outputs.
-             */
-            uint32_t size(Output) const;
-
-            //! Create an Output
-
-            /*!
-               \brief Creates an Output for a given Pin.
-               \param pin The Pin we want to create an Output.
-               \return A handler for the created Output.
-             */
-            Output add(Output, const Pin &pin);
-
-            //! Pin of an Output
-
-            /*!
-               \brief Returns the Pin of a given Output.
-               \param output the Output we want the Pin.
-               \return A handler for the Pin of \p output.
-             */
-            Pin pin(const Output & output) const;
-
-            //! Output of a Pin
-
-            /*!
-               \brief Returns the Output of a given Pin
-               \param pin the Pin we want the Output.
-               \return A handler for the Output of \p pin.
-               \remark If pin isn't associated with any Output, returns Output().
-             */
-            Output output(const Pin & pin) const;
-
-            //! Iterator to beginning
-
-            /*!
-               \brief Returns an iterator pointing to the first element in the Output's Entity System.
-               \return Iterator to the first element in the Output's Entity System.
-             */
-            entity_system::EntitySystem <Output>::const_iterator begin(Output) const;
-
-            //! Iterator to end
-
-            /*!
-               \brief Returns an iterator referring to the past-the-end element in the Output's Entity System.
-               \return Iterator referring to the past-the-end element in the Output's Entity System.
-             */
-            entity_system::EntitySystem <Output>::const_iterator end(Output) const;
-
-            //! Make Output Property
-
-            /*!
-               \brief Creates a Property for the Output's Entity System.
-               \tparam Value value type of the Property.
-               \return An Output => \p Value Map.
-             */
-            template <typename Value>
-            entity_system::Property <Output, Value> makeProperty(Output) const
-            {
-                return entity_system::Property <Output, Value>(mOutputs);
-            }
-
-            //! Get the Output Notifier
-
-            /*!
-               \brief Returns a pointer to the AlterationNotifier of the Output's Entity System.
-               \return A pointer to the AlterationNotifier of the Output's Entity System.
-             */
-            entity_system::EntitySystem <Output>::NotifierType * notifier(Output) const;
-
-            //! Shrink Netlist
-
-            /*!
-               \brief Shrink each EntitySystem in order to improve the memory usage.
-             */
-            void shrinkToFit();
-
-        private:
-
-            Netlist(const Netlist & nl) = delete;
-
-            Netlist & operator =(const Netlist & nl) = delete;
-
-            entity_system::EntitySystem <Cell>          mCells;
-            entity_system::EntitySystem <Pin>           mPins;
-            entity_system::EntitySystem <Net>           mNets;
-            entity_system::EntitySystem <Input>         mInputs;
-            entity_system::EntitySystem <Output>        mOutputs;
-            entity_system::Property <Cell, std::string> mCellNames;
-            entity_system::Property <Pin, std::string>  mPinNames;
-            entity_system::Property <Net, std::string>  mNetNames;
-            std::unordered_map <std::string, Cell>      mName2Cell;
-            std::unordered_map <std::string, Pin>       mName2Pin;
-            std::unordered_map <std::string, Net>       mName2Net;
-            entity_system::Aggregation <Net, Pin>       mNetPins;
-            entity_system::Composition <Cell, Pin>      mCellPins;
-            entity_system::Composition <Pin, Input>     mPinInput;
-            entity_system::Composition <Pin, Output>    mPinOutput;
-        };
-    }     // namespace circuit
-}     // namespace ophidian
+            return entity_system::Property<Output, Value>(mOutputs);
+        }
+
+        entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
+        entity_system::EntitySystem<PinInstance>::NotifierType * notifier(PinInstance) const;
+        entity_system::EntitySystem<Net>::NotifierType * notifier(Net) const;
+        entity_system::EntitySystem<Input>::NotifierType * notifier(Input) const;
+        entity_system::EntitySystem<Output>::NotifierType * notifier(Output) const;
+
+    private:
+        entity_system::EntitySystem<CellInstance>             mCells{};
+        entity_system::EntitySystem<PinInstance>              mPins{};
+        entity_system::EntitySystem<Net>                      mNets{};
+        entity_system::EntitySystem<Input>                    mInputs{};
+        entity_system::EntitySystem<Output>                   mOutputs{};
+        entity_system::Property<CellInstance, std::string>    mCellNames{mCells};
+        entity_system::Property<PinInstance, std::string>     mPinNames{mPins};
+        entity_system::Property<Net, std::string>             mNetNames{mNets};
+        std::unordered_map<std::string, CellInstance>         mName2Cell{};
+        std::unordered_map<std::string, PinInstance>          mName2Pin{};
+        std::unordered_map<std::string, Net>                  mName2Net{};
+        entity_system::Aggregation<Net, PinInstance>          mNetPins{mNets, mPins};
+
+        entity_system::Composition<CellInstance, PinInstance> mCellPins{mCells, mPins};
+        entity_system::Composition<PinInstance, Input>        mPinInput{mPins, mInputs};
+        entity_system::Composition<PinInstance, Output>       mPinOutput{mPins, mOutputs};
+
+        entity_system::Property<CellInstance, Cell> cells2StdCells_{mCells};
+        entity_system::Property<PinInstance, Pin>   pins2StdCells_{mPins};
+    };
+}
 
 #endif // OPHIDIAN_CIRCUIT_NETLIST_H

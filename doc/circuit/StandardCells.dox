@@ -1,0 +1,163 @@
+
+//! Add Cell
+
+/*!
+   \brief Adds a cell instance. A cell has a name associated to it. If the cell already exist then just return the existing cell.
+   \param name Name of the cell, used to identify it.
+   \return A handler for the created/existing Cell.
+ */
+
+//! Erase Cell
+
+/*!
+   \param cell A handler for the Cell to erase.
+   \brief Erases a Cell instance.
+*/
+
+//! Allocate space for storing Cell entities
+
+/*!
+   \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions cells), then it is worth reserving space for this amount before starting to build the standard cells.
+   \param size Minimum capacity for the cell container.
+ */
+
+//! Size of Cell's System
+
+/*!
+   \brief Returns the number of Cells.
+   \return The number of Cells.
+ */
+
+//! Capacity of the Cell's System
+
+/*!
+   \return The capacity of the Cell EntitySystem.
+ */
+
+//! Find a cell
+
+/*!
+   \brief Using the mapping, return a cell handler by cell's name.
+   \param The cell name.
+   \return Return a cell handler by cell's name.
+ */
+
+//! Cells iterator
+
+/*!
+   \return Range iterator for the cells.
+ */
+
+//! Cell name getter
+
+/*!
+   \brief Get the name of a given cell.
+   \param cell Cell entity to get the name.
+   \return Name of the cell
+ */
+
+//! Pins of a Cell
+
+/*!
+   \brief Returns a Container Wrapper for the Pins of a Cell.
+   \param cell A handler for the Cell we want to get the Pins.
+   \return Container Wrapper for the Pins of a Cell.
+ */
+
+//! Make Cell Property
+
+/*!
+   \brief Creates a Property for the Standard Cell's Entity System.
+   \tparam Value value type of the Property.
+   \return An Cell => \p Value Map.
+ */
+
+//! Add Pin
+
+/*!
+   \brief Adds a pin instance. A pin has a name and a direction associated to it.  If the pin already exist then just return the existing pin.
+   \param name Name of the pin, used to identify it.
+   \return A handler for the created/existing pin.
+ */
+
+//! Erase Pin
+
+/*!
+   \param pin A handler for the pin to erase.
+   \brief Erases a pin_type instance.
+ */
+
+//! Allocate space for storing pin entities
+
+/*!
+   \brief Using this function, it is possible to avoid superfluous memory allocation: if you know that the netlist you want to build will be large (e.g. it will contain millions pins), then it is worth reserving space for this amount before starting to build the standard cells.
+   \param size Minimum capacity for the Pin container.
+ */
+
+//! Size of Pin's System
+
+/*!
+   \brief Returns the number of pins.
+   \return The number of pins.
+ */
+
+//! Capacity of the Pin's System
+
+/*!
+   \return The capacity of the Pin EntitySystem.
+ */
+
+//! Find a pin
+
+/*!
+   \brief Using the mapping, return a pin handler by pin's name.
+   \param The pin name.
+   \return Return a pin handler by pin's name.
+ */
+
+//! Pin name getter
+
+/*!
+   \brief Get the name of a given pin.
+   \param pin Pin entity to get the name.
+   \return Name of the pin
+ */
+
+//! Pin direction getter
+
+/*!
+   \brief Get the direction of a given pin. A direction can be NOT_ASSIGNED, INPUT, OUTPUT or INOUT.
+   \param pin Pin entity to get the direction.
+   \return Direction of the pin
+ */
+
+//! Pin owner getter
+
+/*!
+   \brief Get the owner of a given pin.
+   \param pin Pin entity to get the owner.
+   \return Owner of the pin
+ */
+
+//! Pins iterator
+
+/*!
+   \return Range iterator for the Pins.
+ */
+
+//! Make Pin Property
+
+/*!
+   \brief Creates a Property for the Standard Cell's Entity System.
+   \tparam Value value type of the Property.
+   \return An Pin => \p Value Map.
+ */
+
+//! Add Pin into Cell
+
+/*!
+   \brief Adds a Pin to a given Cell.
+   \param cell A handler for the Cell we want to add a Pin.
+   \param pin A handler for the Pin we want to add in \p cell.
+ */
+

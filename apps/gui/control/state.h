@@ -12,6 +12,7 @@ class MySFMLCanvas;
 class State
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! State Constructor
     /*!
        \brief Constructs a State.
@@ -51,21 +52,21 @@ public:
        \brief Does not take any action.
        \param pos Click position.
      */
-    virtual void mousePressEvent(ophidian::geometry::Point pos);
+    virtual void mousePressEvent(point_type pos);
 
     //! Mouse move event
     /*!
        \brief Does not take any action.
        \param pos Last mouse position.
      */
-    virtual void mouseMoveEvent(ophidian::geometry::Point pos);
+    virtual void mouseMoveEvent(point_type pos);
 
     //! Mouse release event
     /*!
        \brief Does not take any action.
        \param pos Position where the mouse was released.
      */
-    virtual void mouseReleaseEvent(ophidian::geometry::Point pos);
+    virtual void mouseReleaseEvent(point_type pos);
 
     //! Find cell event
     /*!
@@ -101,6 +102,7 @@ public:
 class Idle : public State
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! Idle Constructor
     /*!
        \brief Constructs a Idle.
@@ -114,7 +116,7 @@ public:
        \brief Verify if there is a cell where it was clicked, then change its state.
        \param pos Click position.
      */
-    void mousePressEvent(ophidian::geometry::Point pos);
+    void mousePressEvent(point_type pos);
 
     //! Find cell event
     /*!
@@ -128,6 +130,7 @@ public:
 class Selected : public State
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! Selected Constructor
     /*!
        \brief Constructs a Selected.
@@ -155,14 +158,14 @@ public:
        \brief Verify if has been clicked on the same cell, if it is possible to move the cell and then change its state.
        \param pos Click position.
      */
-    void mousePressEvent(ophidian::geometry::Point pos);
+    void mousePressEvent(point_type pos);
 
     //! Mouse release event
     /*!
        \brief Used to move the cell to an absolute position.
        \param pos Position where the mouse was released.
      */
-    virtual void mouseReleaseEvent(ophidian::geometry::Point pos);
+    virtual void mouseReleaseEvent(point_type pos);
 
     //! Find cell event
     /*!
@@ -180,6 +183,7 @@ protected:
 class Dragging : public State
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! Selected Constructor
     /*!
        \brief Constructs a Selected.
@@ -188,26 +192,26 @@ public:
        \param quad Quad of a cell.
        \param pos Origin of the quad.
      */
-    Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const ophidian::geometry::Point & pos);
+    Dragging(MySFMLCanvas * SFMLCanvas, MainController * controller, Quad quad, const point_type & pos);
 
     //! Mouse move event
     /*!
        \brief Moves the quads of the cell.
        \param pos Last mouse position.
      */
-    void mouseMoveEvent(ophidian::geometry::Point pos);
+    void mouseMoveEvent(point_type pos);
 
     //! Mouse release event
     /*!
        \brief Removes the contour of the cell, updates the cell position and changes states.
        \param pos Position where the mouse was released.
      */
-    void mouseReleaseEvent(ophidian::geometry::Point pos);
+    void mouseReleaseEvent(point_type pos);
 
 protected:
     Quad mQuad;
     WireQuad mWireQuad;
-    ophidian::geometry::Point mInitialPos;
+    point_type mInitialPos;
     bool mMoved;
 };
 

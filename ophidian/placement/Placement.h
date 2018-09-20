@@ -24,67 +24,69 @@
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/Netlist.h>
+#include <ophidian/placement/Library.h>
+#include <ophidian/geometry/CellGeometry.h>
 
-namespace ophidian
+namespace ophidian::placement
 {
-    namespace placement
+    class Placement
     {
-        class Placement
-        {
-        public:
+    public:
+        using unit_type = util::database_unit_t;
 
-	//! Placement Constructor
-	/*!
-       \brief Constructs a placement system with no properties.
-       \param netlist Circuit netlist.
-	 */
-	Placement(const circuit::Netlist & netlist);
+        using point_type = util::LocationDbu;
 
-	//! Placement Destructor
-	/*!
-	   \brief Destroys the placement system, including its properties.
-	 */
-	~Placement();
+        using cell_type = circuit::Netlist::cell_instance_type;
 
-	//! Places a cell
-	/*!
-	   \brief Places a cell by setting its location
-	   \param cell Cell to be placed
-	   \param location LocationDbu of the lower left corner of the cell.
-	 */
-	void placeCell(const circuit::Cell & cell, const util::LocationDbu & location);
+        using pin_type = circuit::Netlist::pin_instance_type;
 
-	//! LocationDbu getter
-	/*!
-	   \brief Get the location of a given cell.
-	   \param cell Cell entity to get the location.
-	   \return LocationDbu of the cell.
-	 */
-    util::LocationDbu cellLocation(const circuit::Cell & cell) const {
-        return mCellLocations[cell];
-	}
+        using input_pad_type = circuit::Netlist::input_pad_type;
 
-    void placeInputPad(const circuit::Input & input, const util::LocationDbu & location);
+        using output_pad_type = circuit::Netlist::output_pad_type;
 
-    util::LocationDbu inputPadLocation(const circuit::Input & input) const;
+        using cell_geometry_type = geometry::CellGeometry;
 
-    void placeOutputPad(const circuit::Output & output, const util::LocationDbu &location);
+        // Constructors
+        Placement() = delete;
 
-    util::LocationDbu outputPadLocation(const circuit::Output & output) const;
+        Placement(const Placement&) = delete;
+        Placement& operator=(const Placement&) = delete;
 
-    void fixLocation(const circuit::Cell & cell, bool fixed);
+        Placement(Placement&&) = delete;
+        Placement& operator=(Placement&&) = delete;
 
-    bool isFixed(const circuit::Cell & cell) const;
+        Placement(const circuit::Netlist & netlist, const Library & library);
 
-private:
-    entity_system::Property<circuit::Cell, util::LocationDbu> mCellLocations;
-    entity_system::Property<circuit::Input, util::LocationDbu> mInputLocations;
-    entity_system::Property<circuit::Output, util::LocationDbu> mOutputLocations;
-    entity_system::Property<circuit::Cell, bool> mCellFixed;
-};
+        // Element access
+        const point_type& location(const cell_type& cell) const;
 
-} //namespace placement
+        point_type location(const pin_type& pin) const;
 
-} //namespace ophidian
+        const point_type& location(const input_pad_type& input) const;
+
+        const point_type& location(const output_pad_type& output) const;
+
+        cell_geometry_type geometry(const cell_type& cell) const;
+
+        // Iterators
+
+        // Capacity
+
+        // Modifiers
+        void place(const cell_type& cell, const point_type& location);
+
+        void place(const input_pad_type& input, const point_type & location);
+
+        void place(const output_pad_type& output, const point_type & location);
+
+    private:
+        const circuit::Netlist & mNetlist;
+        const Library & mLibrary;
+
+        entity_system::Property<cell_type, point_type>   mCellLocations;
+        entity_system::Property<input_pad_type, point_type>  mInputLocations;
+        entity_system::Property<output_pad_type, point_type> mOutputLocations;
+    };
+}
 
 #endif // OPHIDIAN_PLACEMENT_PLACEMENT_H

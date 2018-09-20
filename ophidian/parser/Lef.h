@@ -21,210 +21,349 @@
 #ifndef OPHIDIAN_PARSER_LEF_H
 #define OPHIDIAN_PARSER_LEF_H
 
+// std headers
 #include <string>
 #include <vector>
 #include <map>
-#include <memory>
 
+// ophidian headers
+#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian
+namespace ophidian::parser
 {
-    namespace parser
+    class Lef
     {
-/** @brief Lef reads a .lef file and stores its data.
- *
- * This is an encapsulation of the LEF library made by
- * Cadence Design Systems to present the sites, layers
- * and macros of a circuit
- */
-        class Lef
-        {
-        public:
+    public:
+        // Class member typer
+        class Site;
+        class Layer;
+        class Macro;
 
-            /**
-             * A structure to represent a site
-             */
-            struct site
-            {
-                /**
-                 * @brief An enumeration to represent all the possible symmetries in a site.
-                 * They are numbered 1, 2 and 4 to enable binary operations to combine
-                 * multiple symmetries
-                 */
-                enum symmetries {
-                    X=  1, Y=2, NINETY=4
-                };
+        template <class T> using container_type = std::vector<T>;
 
-                std::string name; ///< Name of the site
-                std::string mClass; ///< Class of the site
-                double      x; ///< Width of the site
-                double      y; ///< Height of the site
+        template <class T> using point_type     = geometry::Point<T>;
+        template <class T> using box_type       = geometry::Box<T>;
 
-                /// Stores the site's symmetry in accordance to the site::symmetries enumeration
-                char symmetry {0};
-                void setXsymmetry(); ///< Sets the X symmetry bit
+        using site_type                         = Site;
+        using site_container_type               = container_type<site_type>;
 
-                void setYsymmetry(); ///< Sets the Y symmetry bit
+        using layer_type                        = Layer;
+        using layer_container_type              = container_type<layer_type>;
 
-                void set90symmetry(); ///< Sets the R90 symmetry bit
+        using macro_type                        = Macro;
+        using macro_container_type              = container_type<macro_type>;
 
-                // void addRowPattern(const char* name, int orient);
-            };
+        using micrometer_type                   = util::micrometer_t;
+        using micrometer_point_type             = point_type<micrometer_type>;
+        using micrometer_box_type               = box_type<micrometer_type>;
 
-            /**
-             * A structure to represent a layer
-             */
-            struct layer
-            {
-                /// An enumeration to represent all the possible directions of a layer
-                enum directions {
-                    NOT_ASSIGNED, HORIZONTAL, VERTICAL
-                };
+        using scalar_type                       = util::database_unit_scalar_t;
+        using scalar_point_type                 = point_type<scalar_type>;
+        using scalar_box_type                   = box_type<scalar_type>;
 
-                std::string name; ///< Name of the layer
-                std::string type; ///< Type of the layer
-                directions  direction; ///< Direction of the layer
-                double      pitch; ///< Pitch of the layer
-                double      width; ///< Width of the layer
-            };
+        // Class constructors
+        Lef() = default;
 
-            /**
-             * A structure to represent a rectangle
-             */
-            struct rect
-            {
-                util::LocationMicron firstPoint; ///< coordinates of the first point
-                util::LocationMicron secondPoint; ///< coordinates of the second point
-            };
+        Lef(const Lef&) = delete;
+        Lef& operator=(const Lef&) = delete;
 
-            /**
-             * A structure to represent a port
-             */
-            struct port
-            {
-                std::vector <std::string> layers; ///< A vector with all the names of all the port layers
-                std::vector <rect>        rects; ///< A vector with all the rects of the port
-            };
+        Lef(Lef&&) = default;
+        Lef& operator=(Lef&&) = default;
+        
+        Lef(const std::string& lef_file);
+        Lef(const std::vector<std::string>& lef_files);
 
-            /**
-             * A structure to represent a pin
-             */
-            struct pin
-            {
-                /// An enumeration to represent all the possible directions of a pin
-                enum directions {
-                    INPUT, OUTPUT, INOUT, NA
-                };
+        //Class member functions
+        void read_file(const std::string& lef_file);
 
-                std::string        name; ///< The pin name
-                directions         direction {NA}; ///< The pin's direction in accordance to pin::directions
-                std::vector <port> ports; ///< A vector with all the pin ports
-            };
+        const site_container_type& sites() const noexcept;
 
-            /**
-             * A structure to represent the size of a macro
-             */
-            struct macro_size
-            {
-                double x; ///< Width of the macro
-                double y; ///< Height of the macro
-            };
+        const layer_container_type& layers() const noexcept;
 
-            /**
-             * A structure to represent the foreign property of a macro
-             */
-            struct macro_foreign
-            {
-                std::string name; ///< Foreign cell name
-                double      x; ///< Offset in the x coordinate
-                double      y; ///< Offset in the y coordinate
-            };
+        const macro_container_type& macros() const noexcept;
 
-            /**
-             * A structure to represent the macro obstructions
-             */
-            struct obs
-            {
-                /// Map with all the rectangles of obstruction
-                std::map <std::string, std::vector <rect>> layer2rects;
-            };
+        const scalar_type& micrometer_to_dbu_ratio() const noexcept;
 
-            /**
-             * A structure to represent a macro
-             */
-            struct macro
-            {
-                std::string       name; ///< Name of the macro
-                std::string       mClass; ///< Class of the macro
-                std::vector <pin> pins; ///< Vector with all the macro pins
-                macro_foreign     foreign; ///< Struct with the foreign propertiy
-                macro_size        size; ///< Struct with the size
-                std::string       site; ///< Site name
-                obs               obses; ///< Struct with the macro rectangle geometry
-                macro_size        origin; ///< Struct containing the origin property
-            };
+    private:
+        site_container_type  m_sites;
+        layer_container_type m_layers;
+        macro_container_type m_macros;
+        scalar_type          m_micrometer_to_dbu_ratio;
+    };
+    
+    class Lef::Site
+    {
+    public:
+        // Class member types
+        struct Symmetry; 
 
-        private:
-            struct Impl;
+        using string_type     = std::string;
+        using micrometer_type = Lef::micrometer_type;
+        using symmetry_type   = Symmetry;
 
-            const std::unique_ptr <Impl> mThis;
+        struct Symmetry {
+            bool is_x_symmetric;
+            bool is_y_symmetric;
+            bool is_90_symmetric;
 
-        public:
+            bool operator ==(const Symmetry& rhs) const noexcept;
+        }; 
 
-            /// Constructor.
+        // Class constructors
+        Site() = delete;
 
-            /**
-             * Parses a lef file
-             * \param filename path to a lef file. If the file does not exist the LEF
-             * library will generate a segmentation fault
-             */
-            Lef();
+        Site(const Site&) = default;
+        Site& operator=(const Site&) = default;
 
-            virtual ~Lef();
+        Site(Site&&) = default;
+        Site& operator=(Site&&) = default;
 
-            /// Returns the lef sites
+        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
+        Site(Arg1&& name, Arg2&& class_name, Arg3&& width, Arg4&& height, Arg5&& symmetry):
+            m_name{std::forward<Arg1>(name)},
+            m_class_name{std::forward<Arg2>(class_name)},
+            m_width{std::forward<Arg3>(width)},
+            m_height{std::forward<Arg4>(height)},
+            m_symmetry{std::forward<Arg5>(symmetry)}
+        {}
 
-            /**
-             * Returns a vector containing all the sites in the lef
-             */
-            const std::vector <site> & sites() const;
+        // Class member functions
+        const string_type& name() const noexcept;
 
-            /// Returns the lef layers
+        const string_type& class_name() const noexcept;
 
-            /**
-             * Returns a vector containing all the layers in the lef
-             */
-            const std::vector <layer> & layers() const;
+        const micrometer_type& width() const noexcept;
 
-            /// Returns the lef macros
+        const micrometer_type& height() const noexcept;
 
-            /**
-             * Returns a vector containing all the macros in the lef
-             */
-            const std::vector <macro> & macros() const;
+        const symmetry_type& symmetry() const noexcept;
 
-            /// Returns the database units
+        bool operator ==(const Site& rhs) const noexcept;
 
-            /**
-             * The return of this function is equivalent to one micron
-             */
-            double databaseUnits() const;
+        friend std::ostream& operator<<(std::ostream& os, const Site& site);
 
-            friend class LefParser;
+    private:
+        string_type     m_name;
+        string_type     m_class_name;
+        micrometer_type m_width;
+        micrometer_type m_height;
+        symmetry_type   m_symmetry;
+    };
+
+    class Lef::Layer
+    {
+    public:
+        // Class member types
+        enum class Type : int {
+            MASTERSLICE,
+            CUT,
+            ROUTING,
+            NOT_ASSIGNED
         };
 
-        class LefParser
-        {
-        public:
-
-            LefParser();
-
-            ~LefParser();
-
-            void readFile(const std::string & filename, std::unique_ptr <Lef> & inp);
+        enum class Direction : int {
+            HORIZONTAL,
+            VERTICAL,
+            NOT_ASSIGNED
         };
-    }     /* namespace parser */
-}     /* namespace ophidian */
+
+        using string_type     = std::string;
+        using micrometer_type = Lef::micrometer_type;
+        using type_type       = Type;
+        using direction_type  = Direction;
+
+        // Class constructors
+        Layer() = delete;
+
+        Layer(const Layer&) = default;
+        Layer& operator=(const Layer&) = default;
+
+        Layer(Layer&&) = default;
+        Layer& operator=(Layer&&) = default;
+
+        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
+        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& pitch, Arg5&& offset, Arg6&& width):
+            m_name{std::forward<Arg1>(name)},
+            m_type{std::forward<Arg2>(type)},
+            m_direction{std::forward<Arg3>(direction)},
+            m_pitch{std::forward<Arg4>(pitch)},
+            m_offset{std::forward<Arg5>(offset)},
+            m_width{std::forward<Arg6>(width)}
+        {}
+
+        // Class member functions
+        const string_type& name() const noexcept;
+
+        const type_type& type() const noexcept;
+
+        const direction_type& direction() const noexcept;
+
+        const micrometer_type& pitch() const noexcept;
+
+        const micrometer_type& offset() const noexcept;
+
+        const micrometer_type& width() const noexcept;
+
+        bool operator ==(const Layer& rhs) const noexcept;
+
+        friend std::ostream& operator<<(std::ostream& os, const Layer& layer);
+
+    private:
+        string_type     m_name;
+        type_type       m_type;
+        direction_type  m_direction;
+        micrometer_type m_pitch;
+        micrometer_type m_offset;
+        micrometer_type m_width;
+    };
+
+    class Lef::Macro
+    {
+    public:
+        // Class member types
+        struct Macro_foreign;
+        class Pin;
+
+        template <class T> using container_type    = Lef::container_type<T>;
+        template <class K, class V> using map_type = std::map<K,V>;
+
+        template <class T> using point_type     = Lef::point_type<T>;
+        template <class T> using box_type       = Lef::box_type<T>;
+
+        using micrometer_type                   = Lef::micrometer_type;
+        using micrometer_point_type             = Lef::micrometer_point_type;
+        using micrometer_box_type               = Lef::micrometer_box_type;
+
+        using string_type                       = std::string;
+
+        using foreign_type                      = Macro_foreign;
+
+        using pin_type                          = Pin;
+        using pin_container_type                = container_type<pin_type>;
+
+        using obstruction_type                  = micrometer_box_type;
+        using obstruction_container_type        = container_type<obstruction_type>;
+        using obstruction_map_key_type          = string_type;
+        using obstruction_map_mapped_type       = obstruction_container_type;
+        using obstruction_map_type              = map_type<obstruction_map_key_type, obstruction_map_mapped_type>;
+
+        struct Macro_foreign
+        {
+            string_type           name;
+            micrometer_point_type offset;
+        };
+
+        // Class constructors
+        Macro() = delete;
+
+        Macro(const Macro&) = delete;
+        Macro& operator=(const Macro&) = delete;
+
+        Macro(Macro&&) = default;
+        Macro& operator=(Macro&&) = default;
+
+        template<class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
+        Macro(A1&& name, A2&& class_name, A3&& foreign, A4&& origin, A5&& size, A6&& site, A7&& pins, A8&& obstructions):
+            m_name{std::forward<A1>(name)},
+            m_class_name{std::forward<A2>(class_name)},
+            m_foreign{std::forward<A3>(foreign)},
+            m_origin{std::forward<A4>(origin)},
+            m_size{std::forward<A5>(size)},
+            m_site{std::forward<A6>(site)},
+            m_pins{std::forward<A7>(pins)},
+            m_obstructions{std::forward<A8>(obstructions)}
+        {}
+
+        // Class member functions
+        const string_type& name() const noexcept;
+
+        const string_type& class_name() const noexcept;
+
+        const foreign_type& foreign() const noexcept;
+
+        const micrometer_point_type& origin() const noexcept;
+
+        const micrometer_point_type& size() const noexcept;
+
+        const string_type& site() const noexcept;
+
+        const pin_container_type& pins() const noexcept;
+
+        const obstruction_map_type& obstructions() const noexcept;
+
+    private:
+        string_type           m_name; ///< Name of the macro
+        string_type           m_class_name; ///< Class of the macro
+        foreign_type          m_foreign; ///< Struct with the foreign propertiy
+        micrometer_point_type m_origin; ///< Struct containing the origin property
+        micrometer_point_type m_size; ///< Struct with the size
+        string_type           m_site; ///< Site name
+        pin_container_type    m_pins; ///< Vector with all the macro pins
+        obstruction_map_type  m_obstructions; ///< Struct with the macro rectangle geometry
+
+        friend Lef;
+    };
+
+    class Lef::Macro::Pin
+    {
+    public:
+        // Class member types
+        enum class Direction : int {
+            INPUT,
+            OUTPUT,
+            INOUT,
+            NA
+        };
+
+        template <class T> using container_type = Lef::Macro::container_type<T>;
+        template <class K, class V> using map_type    = Lef::Macro::map_type<K,V>;
+
+        template <class T> using point_type     = Lef::Macro::point_type<T>;
+        template <class T> using box_type       = Lef::Macro::box_type<T>;
+
+        using micrometer_type                   = Lef::Macro::micrometer_type;
+        using micrometer_point_type             = Lef::Macro::micrometer_point_type;
+        using micrometer_box_type               = Lef::Macro::micrometer_box_type;
+
+        using string_type                       = std::string;
+
+        using direction_type                    = Direction;
+
+        using port_type                         = micrometer_box_type;
+        using port_container_type               = container_type<port_type>;
+        using port_map_key_type                 = string_type;
+        using port_map_mapped_type              = port_container_type;
+        using port_map_type                     = map_type<port_map_key_type, port_map_mapped_type>;
+
+        // Class constructors
+        Pin() = delete;
+
+        Pin(const Pin&) = delete;
+        Pin& operator=(const Pin&) = delete;
+
+        Pin(Pin&&) = default;
+        Pin& operator=(Pin&&) = default;
+
+        template<class A1, class A2, class A3>
+        Pin(A1&& name, A2&& direction, A3&& ports):
+            m_name{std::forward<A1>(name)},
+            m_direction{std::forward<A2>(direction)},
+            m_ports{std::forward<A3>(ports)}
+        {}
+
+        // Class member functions
+        const string_type& name() const noexcept;
+
+        const direction_type& direction() const noexcept;
+
+        const port_map_type& ports() const noexcept;
+
+    private:
+        string_type    m_name;
+        direction_type m_direction;
+        port_map_type  m_ports;
+    };
+}
 
 #endif /* OPHIDIAN_PARSER_LEF_H */

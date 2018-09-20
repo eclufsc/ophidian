@@ -25,6 +25,7 @@ class State;
 class MySFMLCanvas : public QSFMLCanvas
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! MySFMLCanvas Constructor
     /*!
        \brief Constructs a MySFMLCanvas.
@@ -118,14 +119,14 @@ public:
        \brief Updates the central coordinate of the camera view.
        \param pos New center position.
      */
-    void centerViewOn(const ophidian::geometry::Point & p1);
+    void centerViewOn(const point_type & p1);
 
     //! Updates camera view size
     /*!
        \brief Updates the size of the camera view.
        \param pos New center position.
      */
-    void viewSize(const ophidian::geometry::Point & size);
+    void viewSize(const point_type & size);
 
     //! Save the circuit in image with PNG format
     /*!
@@ -154,7 +155,7 @@ public slots:
        \brief Updates the size of the camera view.
        \param state New state.
      */
-    void setSize(ophidian::geometry::Point size);
+    void setSize(point_type size);
 
     //! Allocates space in canvas for the cells
     /*!
@@ -168,7 +169,7 @@ public slots:
        \brief Updates the position of the quad, that is, the cell associated with the quad.
        \param p New quad position.
      */
-    void updatePositionQuad(const ophidian::geometry::Point & p);
+    void updatePositionQuad(const point_type & p);
 
 private:
     //! Convert mouse event to point
@@ -176,9 +177,9 @@ private:
        \brief Get the point where the event occurred.
        \param pos Click ou move position.
      */
-    ophidian::geometry::Point mouseEventToPoint(QMouseEvent * e);
+    point_type mouseEventToPoint(QMouseEvent * e);
 
-    typedef boost::geometry::svg_mapper<ophidian::geometry::Point> SVGMapper;
+    typedef boost::geometry::svg_mapper<point_type> SVGMapper;
 
     MainController * mMainController;
     State * mState;

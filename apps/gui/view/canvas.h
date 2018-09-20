@@ -8,6 +8,7 @@
 class Canvas : public sf::Drawable
 {
 public:
+    using point_type = ophidian::geometry::Point<double>;
     //! Canvas Constructor
     /*!
        \brief Constructs a Canvas
@@ -55,7 +56,7 @@ public:
        \param quad A quad of the points.
        \param points Vector with points of the quad.
      */
-    void alloc(Quad & quad, const std::vector<ophidian::geometry::Point> & points);
+    void alloc(Quad & quad, const std::vector<point_type> & points);
 
     //! Desalloc quads of a cell
     /*!
@@ -87,7 +88,7 @@ public:
        \param i Index of the point.
        \param p New point.
      */
-    void setPoint(const Quad & quad, std::size_t i, ophidian::geometry::Point & p);
+    void setPoint(const Quad & quad, std::size_t i, point_type & p);
 
     //! Vertices of a quad
     /*!
@@ -104,7 +105,7 @@ public:
        \param line A line of the points.
        \param points Vector with points of the line.
      */
-    void alloc(Line & line, const std::vector<ophidian::geometry::Point> & points);
+    void alloc(Line & line, const std::vector<point_type> & points);
 
     //! Desalloc lines
     /*!
@@ -136,7 +137,7 @@ public:
        \param i Index of the point.
        \param p New point.
      */
-    void setPoint(const Line & line, std::size_t i, const ophidian::geometry::Point p);
+    void setPoint(const Line & line, std::size_t i, const point_type p);
 
     //! Vertices of a line
     /*!
@@ -152,7 +153,7 @@ public:
        \brief Creates a WireQuad to represent the chip boundaries.
        \param chipUpperRightCorner Point of the chip boundaries.
      */
-    void createBoundaries(const ophidian::geometry::Point chipUpperRightCorner);
+    void createBoundaries(const point_type chipUpperRightCorner);
 
     //! Create the contour of a cell
     /*!
@@ -162,7 +163,7 @@ public:
        \param size Cell size.
        \return WireQuad where contains the contour of a cell.
      */
-    WireQuad createWireQuad(const ophidian::circuit::Cell & cell, const ophidian::geometry::Point & origin, const ophidian::geometry::Point & size);
+    WireQuad createWireQuad(const ophidian::circuit::CellInstance & cell, const point_type & origin, const point_type & size);
 
 private:
     DrawableBatch<4> mQuads;

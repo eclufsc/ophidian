@@ -13,9 +13,12 @@
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Range.h>
 #include <ophidian/util/Units.h>
+#include <ophidian/parser/Def.h>
+#include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Verilog.h>
 #include <ophidian/design/Design.h>
-#include <ophidian/design/DesignBuilder.h>
-#include <ophidian/placement/PlacementMapping.h>
+#include <ophidian/placement/Placement.h>
+#include <ophidian/design/DesignFactory.h>
 #include <ophidian/entity_system/Property.h>
 
 #include "model/forms.h"
@@ -27,7 +30,12 @@ class MainController : public QObject
 {
     Q_OBJECT
 
-    typedef boost::geometry::svg_mapper<ophidian::geometry::Point> SVGMapper;
+    using cell_type = ophidian::circuit::Netlist::cell_instance_type;
+    using point_type = ophidian::geometry::Point<double>;
+    using box_type = ophidian::geometry::Box<double>;
+    using line_type = ophidian::geometry::Linestring<double>;
+
+    using SVGMapper = boost::geometry::svg_mapper<point_type>;
 
 public:
     //! MainController Constructor
@@ -54,21 +62,21 @@ public:
        \brief Transmits the cell information to the main window.
        \param cell Selected circuit cell.
      */
-    void selectedCell(const ophidian::circuit::Cell & cell);
+    void selectedCell(const cell_type & cell);
 
     //! Mouse press event
     /*!
        \brief Finds cell at corresponding point and transmits its information to main window.
        \param p Point where mouse was clicked.
      */
-    void mousePress(const ophidian::geometry::Point & p);
+    void mousePress(const point_type & p);
 
     //! Mouse move event
     /*!
        \brief Updates location information for the main window.
        \param p Point where the mouse is at the current time.
      */
-    void mouseMove(const ophidian::geometry::Point & p);
+    void mouseMove(const point_type & p);
 
     //! Is the cell fixed?
     /*!
@@ -76,7 +84,7 @@ public:
        \param cell A circuit cell.
        \return True if the cell is fixed, otherwise false.
      */
-    bool isFixed(const ophidian::circuit::Cell & cell);
+    bool isFixed(const cell_type & cell);
 
     //! Is there a cell with this name?
     /*!
@@ -84,7 +92,7 @@ public:
        \param name Cell name.
        \return True if the cell exists, otherwise false.
      */
-    bool hasQuad(const ophidian::geometry::Point & p);
+    bool hasQuad(const point_type & p);
 
     //! Is there a cell in this coordinate?
     /*!
@@ -100,7 +108,7 @@ public:
        \param p A circuit coordinate.
        \return The quad corresponding to that position.
      */
-    Quad quadAt(const ophidian::geometry::Point & p);
+    Quad quadAt(const point_type & p);
 
     //! Cell size
     /*!
@@ -108,7 +116,7 @@ public:
        \param cell Circuit cell.
        \return Point containing the width (x) and height (y).
      */
-    ophidian::geometry::Point cellSize(const ophidian::circuit::Cell & cell);
+    point_type cellSize(const cell_type & cell);
 
     //! Quads of a cell
     /*!
@@ -116,7 +124,7 @@ public:
        \param cell A circuit cell.
        \return Vector containing all cell quads.
      */
-    std::vector<Quad> quadsCell(const ophidian::circuit::Cell & cell);
+    std::vector<Quad> quadsCell(const cell_type & cell);
 
     //! Quads of a cell
     /*!
@@ -132,7 +140,7 @@ public:
        \param cell A circuit cell.
        \return WireQuad where contains the contour of a cell.
      */
-    WireQuad wireQuadOfCell(const ophidian::circuit::Cell & cell);
+    WireQuad wireQuadOfCell(const cell_type & cell);
 
     //! Modifies the position of a quad
     /*!
@@ -177,7 +185,7 @@ public:
        \brief Returns the limits of the chip.
        \return Point corresponding to the limits of the chip.
      */
-    ophidian::geometry::Point chipBoundaries();
+    point_type chipBoundaries();
 
     //! Draw the containers in svg
     /*!
@@ -185,7 +193,7 @@ public:
        \param svg Builder of the SVG image.
        \param viewBox Display area.
      */
-    void drawSVG(SVGMapper & mapper, const ophidian::geometry::Box & viewBox);
+    void drawSVG(SVGMapper & mapper, const box_type & viewBox);
 
     //! Extra function 1
     /*!
@@ -266,11 +274,10 @@ private:
      */
     void createQuads();
 
-    Canvas * mCanvas;
-    SpatialIndex mIndex;
-    ophidian::design::Design * mDesign{nullptr};
-    ophidian::design::DesignBuilder * mBuilder{nullptr};
-    ophidian::entity_system::Property<ophidian::circuit::Cell, std::vector<Quad>> mCellToQuads;
+    Canvas * mCanvas{nullptr};
+    SpatialIndex mIndex{};
+    ophidian::design::Design* mDesign{nullptr};
+    ophidian::entity_system::Property<cell_type, std::vector<Quad>> mCellToQuads{};
 };
 
 #endif // MAINCONTROLLER_H
