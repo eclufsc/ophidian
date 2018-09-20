@@ -37,7 +37,7 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[p
 
     auto cell1Geometry = CellGeometry{std::move(cell1Boxes)};
 
-    library.connect(cell1, cell1Geometry);
+    library.geometry(cell1) = cell1Geometry;
 
     auto cell2Boxes = CellGeometry::box_container_type{
         {
@@ -48,7 +48,7 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[p
 
     auto cell2Geometry = CellGeometry{std::move(cell2Boxes)};
 
-    library.connect(cell2, cell2Geometry);
+    library.geometry(cell2) = cell2Geometry;
 
     REQUIRE(cell1Geometry == library.geometry(cell1));
     REQUIRE(cell2Geometry == library.geometry(cell2));
@@ -64,14 +64,14 @@ TEST_CASE_METHOD(StandardCellsFixture, "Library: setting offset of pins", "[plac
         Library::unit_type{5}
     };
 
-    library.connect(pin1, pin1Offset);
+    library.offset(pin1) = pin1Offset;
 
     auto pin2Offset = Library::offset_type{
         Library::unit_type{3},
         Library::unit_type{3}
     };
 
-    library.connect(pin2, pin2Offset);
+    library.offset(pin2) = pin2Offset;
 
     REQUIRE(pin1Offset.x() == library.offset(pin1).x());
     REQUIRE(pin1Offset.y() == library.offset(pin1).y());

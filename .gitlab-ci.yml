@@ -50,13 +50,13 @@ gitlab_pages:
         - apk update
         - apk add doxygen
     script:
-        - cd doc
-        - doxygen Doxyfile
-        - cd ..
-        - cp -r doc/documentation/html/ public/
+        - doxygen doc/Doxyfile
+        - mv doc/documentation/html/ public/
     artifacts:
         paths:
             - public
+    only:
+        - master
 
 build_on_debian-sid:
     image: debian:sid

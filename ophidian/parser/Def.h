@@ -45,6 +45,7 @@ namespace ophidian::parser
         class Row;
         class Component;
         class Track;
+        class Net;
 
         template <class T> using container_type = std::vector<T>;
         template <class T> using point_type     = geometry::Point<T>;
@@ -58,6 +59,9 @@ namespace ophidian::parser
 
         using track_type                        = Track;
         using track_container_type              = container_type<track_type>;
+
+        using nets_type                         = Net;
+        using nets_container_type               = container_type<nets_type>;
 
         using database_unit_type                = util::database_unit_t;
         using database_unit_point_type          = point_type<database_unit_type>;
@@ -92,12 +96,51 @@ namespace ophidian::parser
 
         const track_container_type& tracks() const noexcept;
 
+        const nets_container_type& nets() const noexcept;
+
     private:
         database_unit_box_type   m_die_area;
         row_container_type       m_rows;
         component_container_type m_components;
         scalar_type              m_dbu_to_micrometer_ratio;
         track_container_type     m_tracks;
+        nets_container_type      m_nets;
+    };
+
+    class Def::Net
+    {
+    public:
+        using string_type               = std::string;
+        using scalar_type               = Def::scalar_type;
+        using pin_pair_type             = std::pair<string_type, string_type>; //pair<cell, pin>
+        using pin_container_type        = Def::container_type<pin_pair_type>;
+
+        // Class constructors
+
+        Net() = delete;
+
+        Net(const Net&) = default;
+        Net& operator=(const Net&) = default;
+
+        Net(Net&&) = default;
+        Net& operator=(Net&&) = default;
+
+        template<class Arg1, class Arg2>
+        Net(Arg1&& name, Arg2&& num_pins):
+            m_name{std::forward<Arg1>(name)},
+            m_numPins{std::forward<Arg2>(num_pins)}
+        {
+            m_pins.reserve(m_numPins);
+        }
+
+        const string_type& name() const noexcept;
+
+        void add_connection(const string_type cell, const string_type pin);
+
+    private:
+        string_type m_name;
+        scalar_type m_numPins;
+        pin_container_type m_pins;
     };
 
     /**

@@ -17,6 +17,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
     using table = LookupTable<unit_type, unit_type, unit_type, strategy>;
     using contents = tableContents<unit_type, unit_type, unit_type>;
 
+//    Def sample_def = ophidian::parser::Def{"input_files/ispd18/ispd18_test10/ispd18_test10.input.def"};
     Def sample_def = ophidian::parser::Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
     Lef sample_lef = ophidian::parser::Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};
 

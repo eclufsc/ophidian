@@ -28,21 +28,23 @@ namespace ophidian::circuit::factory
             for(const auto& pin : macro.pins())
             {
                 auto cell_pin = Pin{};
+                auto pin_name = macro.name() + ":" + pin.name();
                 switch(pin.direction())
                 {
                     case parser::Lef::macro_type::pin_type::direction_type::INPUT:
-                        cell_pin = cells.add_pin(pin.name(), PinDirection::INPUT);
+                        cell_pin = cells.add_pin(pin_name, PinDirection::INPUT);
                         break;
                     case parser::Lef::macro_type::pin_type::direction_type::OUTPUT:
-                        cell_pin = cells.add_pin(pin.name(), PinDirection::OUTPUT);
+                        cell_pin = cells.add_pin(pin_name, PinDirection::OUTPUT);
                         break;
                     case parser::Lef::macro_type::pin_type::direction_type::INOUT:
-                        cell_pin = cells.add_pin(pin.name(), PinDirection::INOUT);
+                        cell_pin = cells.add_pin(pin_name, PinDirection::INOUT);
                         break;
                     case parser::Lef::macro_type::pin_type::direction_type::NA:
-                        cell_pin = cells.add_pin(pin.name(), PinDirection::NA);
+                        cell_pin = cells.add_pin(pin_name, PinDirection::NA);
                         break;
                     default:
+                        cell_pin = cells.add_pin(pin_name, PinDirection::NA);
                         break;
                 }
                 cells.connect(cell, cell_pin);

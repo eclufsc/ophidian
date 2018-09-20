@@ -63,9 +63,6 @@ namespace ophidian::placement
         // Capacity
 
         // Modifiers
-        void connect(const std_cell_type& cell, const std_cell_geometry_type& geometry);
-
-        void connect(const std_cell_pin_type& pin, const offset_type& offset);
 
     private:
         entity_system::Property<std_cell_type, std_cell_geometry_type> mGeometries;

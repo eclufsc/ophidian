@@ -153,6 +153,32 @@ namespace parser
             }
         );
 
+        defrSetNetCbk(
+            [](defrCallbackType_e, defiNet *net, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+
+                auto numCone = net->numConnections();
+                auto pin_0 = net->pin(0);
+
+                auto instance_0 = net->instance(0);
+
+
+
+                auto a = 0;
+                a++;
+
+                auto m_net = Def::Net(net->name(), net->numConnections());
+
+                for (int i = 0; i < net->numConnections(); ++i) {
+                    m_net.add_connection(net->instance(i), net->pin(i));
+                }
+
+                that->m_nets.push_back(m_net);
+                return 0;
+            }
+        );
+
         auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
             std::fopen(def_file.c_str(), "r"),
             &std::fclose);
@@ -188,6 +214,11 @@ namespace parser
     const Def::track_container_type& Def::tracks() const noexcept
     {
         return m_tracks;
+    }
+
+    const Def::nets_container_type &Def::nets() const noexcept
+    {
+        return m_nets;
     }
 
     const Def::Component::string_type& Def::Component::name() const noexcept
@@ -317,6 +348,15 @@ namespace parser
         return os;
     }
 
+    const Def::Net::string_type& Def::Net::name() const noexcept
+    {
+        return m_name;
+    }
+
+    void Def::Net::add_connection(const Def::Net::string_type cell, const Def::Net::string_type pin){
+        m_pins.push_back(std::make_pair(cell, pin));
+    }
+
     const Def::Track::Orientation& Def::Track::orientation() const noexcept
     {
         return m_orientation;
@@ -348,3 +388,4 @@ namespace parser
 
 }     // namespace parser
 }     // namespace ophidian
+

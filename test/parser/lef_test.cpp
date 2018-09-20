@@ -1,10 +1,12 @@
 #include <catch.hpp>
 #include <algorithm>
 
+#include <ophidian/parser/Def.h>
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/ParserException.h>
 
 using ophidian::parser::Lef;
+using ophidian::parser::Def;
 using micron_t = ophidian::parser::Lef::micrometer_type;
 
 bool boxComparator(const Lef::via_type::layer_container_type::value_type& a, const Lef::via_type::layer_container_type::value_type& b)
@@ -32,6 +34,16 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
     SECTION("Database units are correct", "[parser][lef][simple][ratio]")
     {
         CHECK(simple.micrometer_to_dbu_ratio() == 2000.0);
+
+        auto x = Lef::micrometer_type{1.5};
+
+        auto microns = x * simple.micrometer_to_dbu_ratio();
+
+        CHECK(microns == Lef::micrometer_type{3000});
+
+        auto converted_to_dbu = Def::database_unit_type{3000};
+
+        CHECK(converted_to_dbu == Def::database_unit_type{x*simple.micrometer_to_dbu_ratio()});
     }
 
     SECTION("Sites are parsed correctly", "[parser][lef][simple][sites]")

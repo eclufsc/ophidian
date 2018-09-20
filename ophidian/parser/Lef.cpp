@@ -153,6 +153,9 @@ namespace parser
                     }
                     }(),
                     [&](){
+                        if(l->numSpacingTable() == 0){
+                            return Lef::layer_type::parallelRunLength_type{0, 0};
+                        }
                         if(l->spacingTable(0)->isParallel())
                         {
                             auto parallel = l->spacingTable(0)->parallel();
