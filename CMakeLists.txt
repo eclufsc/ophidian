@@ -13,7 +13,7 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.7.2)
 
 # Set project version
 set(ophidian_VERSION 0.1.1)
