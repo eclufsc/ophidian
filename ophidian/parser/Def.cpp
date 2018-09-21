@@ -134,6 +134,23 @@ namespace ophidian::parser
             }
         );
 
+        defrSetNetCbk(
+            [](defrCallbackType_e, defiNet *net, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+                using size_type = Def::net_type::pin_container_type::size_type;
+
+                auto pins = Def::net_type::pin_container_type{static_cast<size_type>(net->numConnections())};
+
+                for (int i = 0; i < net->numConnections(); ++i) {
+                    pins.emplace_back(net->instance(i), net->pin(i));
+                }
+
+                that->m_nets.emplace_back(net->name(), pins);
+                return 0;
+            }
+        );
+
         auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
             std::fopen(def_file.c_str(), "r"),
             &std::fclose);
