@@ -117,15 +117,27 @@ namespace ophidian::circuit::factory
     {
         for(const auto& component : def.components())
         {
-            netlist.add_cell_instance(component.name());
+            auto cell_instance = netlist.add_cell_instance(component.name());
+
+            netlist.connect(cell_instance, std_cells.find_cell(component.macro())); 
         }
 
         for(const auto& net : def.nets())
         {
-            netlist.add_net(net.name());
+            auto net_instance = netlist.add_net(net.name());
             for(const auto& pin : net.pins())
             {
-                netlist.add_pin_instance(pin.first + ":" + pin.second);
+                auto pin_instance = netlist.add_pin_instance(pin.first + ":" + pin.second);
+
+                netlist.connect(net_instance, pin_instance);
+
+                auto cell_instance = netlist.find_cell_instance(pin.first);
+
+                netlist.connect(cell_instance, pin_instance);
+
+                auto cell = netlist.std_cell(cell_instance);
+
+                netlist.connect(pin_instance, std_cells.find_pin(std_cells.name(cell) + ":" + pin.second));
             }
         }
     }
