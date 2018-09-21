@@ -44,6 +44,7 @@ namespace ophidian::parser
         // Class member types
         class Row;
         class Component;
+        class Net;
 
         template <class T> using container_type = std::vector<T>;
         template <class T> using point_type     = geometry::Point<T>;
@@ -54,6 +55,9 @@ namespace ophidian::parser
 
         using component_type                    = Component;
         using component_container_type          = container_type<component_type>;
+
+        using net_type                          = Net;
+        using net_container_type                = container_type<net_type>;
 
         using database_unit_type                = util::database_unit_t;
         using database_unit_point_type          = point_type<database_unit_type>;
@@ -66,8 +70,8 @@ namespace ophidian::parser
         // Class constructors
         Def() = default;
 
-        Def(const Def&) = delete;
-        Def& operator=(const Def&) = delete;
+        Def(const Def&) = default;
+        Def& operator=(const Def&) = default;
 
         Def(Def&&) = default;
         Def& operator=(Def&&) = default;
@@ -84,12 +88,15 @@ namespace ophidian::parser
 
         const component_container_type& components() const noexcept;
 
+        const net_container_type& nets() const noexcept;
+
         const scalar_type& dbu_to_micrometer_ratio() const noexcept;
 
     private:
         database_unit_box_type   m_die_area;
         row_container_type       m_rows;
         component_container_type m_components;
+        net_container_type       m_nets;
         scalar_type              m_dbu_to_micrometer_ratio;
     };
 
@@ -152,6 +159,38 @@ namespace ophidian::parser
         orientation_type         m_orientation; ///< Component's orientation.
         database_unit_point_type m_position; ///< Component's lower left corner.
         bool                     m_fixed; ///< This determines if the component's position is fixed in space, @c true for fixed.
+    };
+
+    class Def::Net
+    {
+    public:
+        // Class member types
+        using name_type = std::string;
+
+        using pin_container_type = std::vector<std::pair<std::string,std::string>>;
+
+        // Class constructors
+        Net() = delete;
+
+        Net(const Net &) = default;
+        Net & operator=(const Net &) = default;
+
+        Net(Net &&) = default;
+        Net & operator=(Net &&) = default;
+
+        template<class Arg1, class Arg2>
+        Net(Arg1&& name, Arg2&& pins):
+            m_name{std::forward<Arg1>(name)},
+            m_pins{std::forward<Arg2>(pins)}
+        { }
+
+        const name_type& name() const noexcept;
+
+        const pin_container_type& pins() const noexcept;
+
+    private:
+        name_type m_name;
+        pin_container_type m_pins;
     };
 
     /**
