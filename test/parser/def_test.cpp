@@ -91,3 +91,8 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def][simple]")
         CHECK(nets.empty());
     }
 }
+
+TEST_CASE("Def: Loading semple def ispd18", "[parser][Def][ispd18]")
+{
+    auto sample = Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
+}
