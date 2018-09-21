@@ -27,6 +27,7 @@ namespace ophidian::parser
         m_die_area{},
         m_rows{},
         m_components{},
+        m_nets{},
         m_dbu_to_micrometer_ratio{0}
     {
         read_file(def_file);
@@ -36,6 +37,7 @@ namespace ophidian::parser
         m_die_area{},
         m_rows{},
         m_components{},
+        m_nets{},
         m_dbu_to_micrometer_ratio{}
     {
         for(const auto& file : def_files){
@@ -152,6 +154,11 @@ namespace ophidian::parser
     const Def::component_container_type& Def::components() const noexcept
     {
         return m_components;
+    }
+
+    const Def::net_container_type& Def::nets() const noexcept
+    {
+        return m_nets;
     }
 
     const Def::row_container_type& Def::rows() const noexcept

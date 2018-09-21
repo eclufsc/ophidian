@@ -84,4 +84,10 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def][simple]")
         CHECK(last_row.num().x() == scalar_t{72.0});
         CHECK(last_row.num().y() == scalar_t{1.0});
     }
+
+    SECTION("Def: Checking Nets", "[parser][Def][simple][nets]"){
+        auto& nets = simple.nets();
+
+        CHECK(nets.empty());
+    }
 }
