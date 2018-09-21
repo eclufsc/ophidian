@@ -95,4 +95,12 @@ TEST_CASE("Def: Loading simple.def", "[parser][Def][simple]")
 TEST_CASE("Def: Loading semple def ispd18", "[parser][Def][ispd18]")
 {
     auto sample = Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
+
+    CHECK(sample.dbu_to_micrometer_ratio() == 2000.0);
+
+    CHECK(sample.components().size() == 22);
+
+    CHECK(sample.rows().size() == 5);
+
+    CHECK(sample.nets().size() == 11);
 }
