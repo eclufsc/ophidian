@@ -112,4 +112,21 @@ namespace ophidian::circuit::factory
             }
         }
     }
+
+    void make_netlist(Netlist& netlist, const parser::Def & def, const StandardCells& std_cells) noexcept
+    {
+        for(const auto& component : def.components())
+        {
+            netlist.add_cell_instance(component.name());
+        }
+
+        for(const auto& net : def.nets())
+        {
+            netlist.add_net(net.name());
+            for(const auto& pin : net.pins())
+            {
+                netlist.add_pin_instance(pin.first + ":" + pin.second);
+            }
+        }
+    }
 }

@@ -122,3 +122,26 @@ TEST_CASE("Netlist factory: populate with simple verilog and simple standard cel
 
     CHECK(pin_iterator == cell_u1_pins.end());
 }
+
+TEST_CASE("Netlist factory: populate with ispd18 sample def and sample standard cells.", "[circuit][Netlist][factory]")
+{
+    auto netlist = Netlist{};
+
+    auto std_cells = StandardCells{};
+
+    auto lef = ophidian::parser::Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};
+    auto def = ophidian::parser::Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
+
+    factory::make_standard_cells(std_cells, lef);
+    factory::make_netlist(netlist, def, std_cells);
+
+    CHECK(netlist.size_cell_instance() == 22);
+
+    CHECK(netlist.size_pin_instance() == 22);
+
+    CHECK(netlist.size_net() == 11);
+
+    CHECK(netlist.size_input_pad() == 0);
+
+    CHECK(netlist.size_output_pad() == 0);
+}
