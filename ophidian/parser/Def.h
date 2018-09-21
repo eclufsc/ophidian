@@ -114,10 +114,14 @@ namespace ophidian::parser
             N, S, W, E, FN, FS, FW, FE
         };
 
-        using string_type              = std::string;
+        using name_type                = std::string;
+
+        using macro_type               = std::string;
+
+        using orientation_type         = Orientation;
+
         using database_unit_type       = Def::database_unit_type;
         using database_unit_point_type = Def::database_unit_point_type;
-        using orientation_type         = Orientation;
 
         // Class constructors
 
@@ -139,9 +143,9 @@ namespace ophidian::parser
         {}
 
         // Class member functions
-        const string_type& name() const noexcept;
+        const name_type& name() const noexcept;
 
-        const string_type& macro() const noexcept;
+        const macro_type& macro() const noexcept;
 
         const orientation_type& orientation() const noexcept;
 
@@ -154,8 +158,8 @@ namespace ophidian::parser
         friend std::ostream& operator<<(std::ostream& os, const Component& component);
 
     private:
-        string_type              m_name; ///< Component's name for identification.
-        string_type              m_macro; ///< Component's type, like "NAND2_X1".
+        name_type                m_name; ///< Component's name for identification.
+        macro_type               m_macro; ///< Component's type, like "NAND2_X1".
         orientation_type         m_orientation; ///< Component's orientation.
         database_unit_point_type m_position; ///< Component's lower left corner.
         bool                     m_fixed; ///< This determines if the component's position is fixed in space, @c true for fixed.
@@ -167,7 +171,11 @@ namespace ophidian::parser
         // Class member types
         using name_type = std::string;
 
-        using pin_container_type = std::vector<std::pair<std::string,std::string>>;
+        using pin_name_type = std::string;
+
+        using pin_type = std::pair<Def::component_type::name_type, pin_name_type>;
+
+        using pin_container_type = std::vector<pin_type>;
 
         // Class constructors
         Net() = delete;
@@ -203,7 +211,9 @@ namespace ophidian::parser
     {
     public:
         // Class member types
-        using string_type              = std::string;
+        using name_type              = std::string;
+
+        using site_type              = std::string;
 
         using database_unit_type       = Def::database_unit_type;
         using database_unit_point_type = Def::database_unit_point_type;
@@ -230,9 +240,9 @@ namespace ophidian::parser
         {}
 
         // Class member functions
-        const string_type& name() const noexcept;
+        const name_type& name() const noexcept;
 
-        const string_type& site() const noexcept;
+        const site_type& site() const noexcept;
 
         const database_unit_point_type& origin() const noexcept;
 
@@ -245,8 +255,8 @@ namespace ophidian::parser
         friend std::ostream& operator<<(std::ostream& os, const Row& row);
 
     private:
-        string_type              m_name; ///< Row's name for identification.
-        string_type              m_site; ///< This is the site to be used by the row defined by a LEF file.
+        name_type              m_name; ///< Row's name for identification.
+        site_type              m_site; ///< This is the site to be used by the row defined by a LEF file.
         database_unit_point_type m_origin; ///< Specifies the location of the first site in the row.
         database_unit_point_type m_step; ///< Specifies the spacing between sites in horizontal and vertical rows.
         scalar_point_type        m_num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.

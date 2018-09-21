@@ -138,15 +138,13 @@ namespace ophidian::parser
             [](defrCallbackType_e, defiNet *net, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
 
-                using size_type = Def::net_type::pin_container_type::size_type;
-
-                auto pins = Def::net_type::pin_container_type{static_cast<size_type>(net->numConnections())};
+                auto pins = Def::net_type::pin_container_type{};
 
                 for (int i = 0; i < net->numConnections(); ++i) {
                     pins.emplace_back(net->instance(i), net->pin(i));
                 }
 
-                that->m_nets.emplace_back(net->name(), pins);
+                that->m_nets.emplace_back(net->name(), std::move(pins));
                 return 0;
             }
         );
@@ -188,12 +186,12 @@ namespace ophidian::parser
         return m_dbu_to_micrometer_ratio;
     }
 
-    const Def::Component::string_type& Def::Component::name() const noexcept
+    const Def::Component::name_type& Def::Component::name() const noexcept
     {
         return m_name;
     }
 
-    const Def::Component::string_type& Def::Component::macro() const noexcept
+    const Def::Component::macro_type& Def::Component::macro() const noexcept
     {
         return m_macro;
     }
@@ -263,12 +261,22 @@ namespace ophidian::parser
         return os;
     }
 
-    const Def::Row::string_type& Def::Row::name() const noexcept
+    const Def::Net::name_type& Def::Net::name() const noexcept
     {
         return m_name;
     }
 
-    const Def::Row::string_type& Def::Row::site() const noexcept
+    const Def::Net::pin_container_type& Def::Net::pins() const noexcept
+    {
+        return m_pins;
+    }
+
+    const Def::Row::name_type& Def::Row::name() const noexcept
+    {
+        return m_name;
+    }
+
+    const Def::Row::site_type& Def::Row::site() const noexcept
     {
         return m_site;
     }

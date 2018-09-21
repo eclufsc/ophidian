@@ -103,4 +103,39 @@ TEST_CASE("Def: Loading semple def ispd18", "[parser][Def][ispd18]")
     CHECK(sample.rows().size() == 5);
 
     CHECK(sample.nets().size() == 11);
+
+    SECTION("Net: test net names and pins", "[parser][Def][Net][ispd18]")
+    {
+        auto& first_net = sample.nets().front();
+
+        CHECK(first_net.name() == "net1237");
+
+        CHECK(first_net.pins().size() == 2);
+
+        auto& first_net_first_pin = first_net.pins().front();
+
+        CHECK(first_net_first_pin.first == "inst5638");
+        CHECK(first_net_first_pin.second == "A");
+
+        auto& first_net_last_pin = first_net.pins().back();
+
+        CHECK(first_net_last_pin.first == "inst4678");
+        CHECK(first_net_last_pin.second == "Y");
+
+        auto& last_net = sample.nets().back();
+
+        CHECK(last_net.name() == "net1230");
+
+        CHECK(last_net.pins().size() == 2);
+
+        auto& last_net_first_pin = last_net.pins().front();
+
+        CHECK(last_net_first_pin.first == "inst7234");
+        CHECK(last_net_first_pin.second == "Y");
+
+        auto& last_net_last_pin = last_net.pins().back();
+
+        CHECK(last_net_last_pin.first == "inst5195");
+        CHECK(last_net_last_pin.second == "C0");
+    }
 }
