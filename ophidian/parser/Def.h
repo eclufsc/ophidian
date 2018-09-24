@@ -137,6 +137,8 @@ namespace ophidian::parser
 
         void add_connection(const string_type cell, const string_type pin);
 
+        const pin_container_type& pins() const noexcept;
+
     private:
         string_type m_name;
         scalar_type m_numPins;

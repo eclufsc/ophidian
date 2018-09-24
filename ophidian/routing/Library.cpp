@@ -31,6 +31,131 @@ Library::layer_type Library::find_layer_instance(const std::string &layerName)
     return mName2Layer.at(layerName);
 }
 
+std::string& Library::name(const Library::layer_type &layer)
+{
+    return mLayerName[layer];
+}
+
+const std::string& Library::name(const Library::layer_type &layer) const
+{
+    return mLayerName[layer];
+}
+
+std::string& Library::name(const Library::via_type &via)
+{
+    return mViaName[via];
+}
+
+const std::string& Library::name(const Library::via_type &via) const
+{
+    return mViaName[via];
+}
+
+LayerType Library::type(const Library::layer_type &layer) const
+{
+    return mLayerType[layer];
+}
+
+LayerDirection Library::direction(const Library::layer_type &layer) const
+{
+    return mLayerDirection[layer];
+}
+
+Library::unit_type Library::pitch(const Library::layer_type &layer) const
+{
+    return mLayerPitch[layer];
+}
+
+Library::unit_type Library::offset(const Library::layer_type& layer) const
+{
+    return mLayerOffset[layer];
+}
+
+Library::unit_type Library::width(const Library::layer_type& layer) const
+{
+    return mLayerWidth[layer];
+}
+
+Library::unit_type Library::minWidth(const Library::layer_type& layer) const
+{
+    return mLayerMinWidth[layer];
+}
+
+Library::unit_type Library::area(const Library::layer_type& layer) const
+{
+    return mLayerArea[layer];
+}
+
+Library::unit_type Library::spacing(const Library::layer_type& layer) const
+{
+    return mLayerSpacing[layer];
+}
+
+Library::unit_type Library::EOLspace(const Library::layer_type& layer) const
+{
+    return mLayerEOLspace[layer];
+}
+
+Library::unit_type Library::EOLwidth(const Library::layer_type& layer) const
+{
+    return mLayerEOLwidth[layer];
+}
+
+Library::unit_type Library::EOLwithin(const Library::layer_type& layer) const
+{
+    return mLayerEOLwithin[layer];
+}
+
+const Library::spacing_table_type& Library::spacing_table(const Library::layer_type &layer) const
+{
+    return mLayerSpacingTable[layer];
+}
+
+Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
+{
+    return mLayers.begin();
+}
+
+Library::layer_container_type::const_iterator Library::end_layer() const noexcept
+{
+    return mLayers.end();
+}
+
+Library::via_container_type::const_iterator Library::begin_via() const noexcept
+{
+    return mVias.begin();
+}
+
+Library::via_container_type::const_iterator Library::end_via() const noexcept
+{
+    return mVias.end();
+}
+
+Library::track_container_type::const_iterator Library::begin_track() const noexcept
+{
+    return mTracks.begin();
+}
+
+Library::track_container_type::const_iterator Library::end_track() const noexcept
+{
+    return mTracks.end();
+}
+
+Library::layer_container_type::size_type Library::size_layer() const noexcept
+{
+    return mLayers.size();
+}
+
+Library::via_container_type::size_type Library::size_via() const noexcept
+{
+    return mVias.size();
+}
+
+Library::track_container_type::size_type Library::size_track() const noexcept
+{
+    return mTracks.size();
+}
+
 Library::layer_type Library::add_layer_instance(
         const std::string &layerName,
         const LayerType &type,

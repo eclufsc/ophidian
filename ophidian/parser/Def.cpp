@@ -353,6 +353,11 @@ namespace parser
         return m_name;
     }
 
+    const Def::Net::pin_container_type& Def::Net::pins() const noexcept
+    {
+        return m_pins;
+    }
+
     void Def::Net::add_connection(const Def::Net::string_type cell, const Def::Net::string_type pin){
         m_pins.push_back(std::make_pair(cell, pin));
     }

@@ -71,15 +71,15 @@ namespace factory
                 lTableContents.column_values.push_back(dbuConverter.convert(val));
             }
             lTableContents.values.reserve(layer.parallelRunLength().numLength());
-            for(auto& length : layer.parallelRunLength().lengths()){
+            for(auto& width : layer.parallelRunLength().widths()){
                 std::vector<Library::unit_type> v;
-                v.reserve(layer.parallelRunLength().numWidth());
-                for(auto& width : layer.parallelRunLength().widths()){
+                v.reserve(layer.parallelRunLength().numLength());
+                for(auto& length : layer.parallelRunLength().lengths()){
                     auto spacing = layer.parallelRunLength().spacing(width, length);
                     v.push_back(dbuConverter.convert(spacing));
                 }
                 lTableContents.values.push_back(v);
-            }            
+            }
             auto lTable = Library::spacing_table_type(lTableContents);
             auto l = library.add_layer_instance(
                         layer.name(),
@@ -99,6 +99,9 @@ namespace factory
 
 
         //creating vias
+
+
+        //creating tracks
 
 
 

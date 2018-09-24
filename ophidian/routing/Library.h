@@ -55,12 +55,15 @@ namespace routing
         using spacing_table_content_type = util::tableContents<unit_type, unit_type, unit_type>;
 
         using layer_type            = Layer;
-        using box_type              = geometry::Box<unit_type>;
-        using layer_pair_type       = std::pair<layer_type ,box_type>;
-        using layer_container_type  = std::vector<layer_pair_type>;
+//        using box_type              = geometry::Box<unit_type>;
+//        using layer_pair_type       = std::pair<layer_type ,box_type>;
+//        using layer_container_type  = std::vector<layer_pair_type>;
+        using layer_container_type  = std::vector<layer_type>;
 
         using via_type              = Via;
+        using via_container_type    = std::vector<via_type>;
         using track_type            = Track;
+        using track_container_type  = std::vector<track_type>;
 
         // Constructors
         //! Construct Netlist
@@ -76,9 +79,42 @@ namespace routing
 
         // Element access
         layer_type find_layer_instance(const std::string& layerName);
+
+        std::string& name(const layer_type& layer);
+        const std::string& name(const layer_type& layer) const;
+        LayerType type(const layer_type& layer) const;
+        LayerDirection direction(const layer_type& layer) const;
+        unit_type pitch(const layer_type& layer) const;
+        unit_type offset(const layer_type& layer) const;
+        unit_type width(const layer_type& layer) const;
+        unit_type minWidth(const layer_type& layer) const;
+        unit_type area(const layer_type& layer) const;
+        unit_type spacing(const layer_type& layer) const;
+        unit_type EOLspace(const layer_type& layer) const;
+        unit_type EOLwidth(const layer_type& layer) const;
+        unit_type EOLwithin(const layer_type& layer) const;
+        const spacing_table_type& spacing_table(const layer_type& layer) const;
+
+        std::string& name(const via_type& via);
+        const std::string& name(const via_type& via) const;
+
         // Iterators
+        layer_container_type::const_iterator begin_layer() const noexcept;
+        layer_container_type::const_iterator end_layer() const noexcept;
+
+        via_container_type::const_iterator begin_via() const noexcept;
+        via_container_type::const_iterator end_via() const noexcept;
+
+        track_container_type::const_iterator begin_track() const noexcept;
+        track_container_type::const_iterator end_track() const noexcept;
+
 
         // Capacity
+        layer_container_type::size_type size_layer() const noexcept;
+        via_container_type::size_type size_via() const noexcept;
+        track_container_type::size_type size_track() const noexcept;
+
+
 
         // Modifiers
         layer_type add_layer_instance(const std::string &name, const LayerType &type, const LayerDirection &direction,
