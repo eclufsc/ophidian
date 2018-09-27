@@ -59,4 +59,6 @@ TEST_CASE("Design factory: test design_factory_iccad17 with contest files", "[de
     auto design = ophidian::design::Design{};
 
     ophidian::design::factory::make_design_iccad2017(design, def, lef);
+
+    CHECK(design.netlist().size_cell_instance() == 29521);
 }
