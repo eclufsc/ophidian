@@ -107,6 +107,9 @@ find_package(Boost 1.59 REQUIRED)
 # Find Lemon
 find_package(Lemon REQUIRED)
 
+# Find OpenTimer
+find_package(OpenTimer REQUIRED)
+
 # Find Units
 find_package(units REQUIRED CONFIG)
 

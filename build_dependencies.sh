@@ -120,6 +120,24 @@ install_UNITS()
     rm -rf build
 }
 
+install_OPENTIMER()
+{
+    echo "installing opentimer"
+    cd $SOURCE_ROOT/3rdparty/OpenTimer
+    mkdir build_static
+    cd build_static
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cd ..
+    rm -rf build_static
+    mkdir build_shared
+    cd build_shared
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" -DBUILD_SHARED_LIBS=TRUE ..
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cd ..
+    rm -rf build_shared
+}
+
 run_install()
 {
     install -d $DEPENDENCIES_ROOT
@@ -134,6 +152,7 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
+    install_OPENTIMER
 }
 
 run_install
