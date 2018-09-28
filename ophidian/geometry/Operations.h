@@ -37,6 +37,19 @@ namespace ophidian::geometry
         return result;
     }
 
+    template <template <typename> class Point_, class T>
+    Point_<T> translate(const Point_<T> & geometry, Point_<T> & translationPoint)
+    {
+        namespace bg = boost::geometry;
+
+        auto result = Point_<T>{};
+
+        auto translate = bg::strategy::transform::translate_transformer<T, 2, 2>{translationPoint.x(), translationPoint.y()};
+        bg::transform(geometry, result, translate);
+
+        return result;
+    }
+
     //! Scaling operation
 
     /*!

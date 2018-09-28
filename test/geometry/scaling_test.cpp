@@ -24,8 +24,8 @@ TEST_CASE("Geometry: scaling a Box", "[geometry][operations]") {
 
     auto scaledBox = scale(box, scalingPoint);
 
-    REQUIRE(scaledBox.min_corner().x() == Approx(2.0));
-    REQUIRE(scaledBox.min_corner().y() == Approx(4.0));
-    REQUIRE(scaledBox.max_corner().x() == Approx(4.0));
-    REQUIRE(scaledBox.max_corner().y() == Approx(4.0));
+    CHECK(scaledBox.min_corner().x() == Approx(2.0));
+    CHECK(scaledBox.min_corner().y() == Approx(4.0));
+    CHECK(scaledBox.max_corner().x() == Approx(4.0));
+    CHECK(scaledBox.max_corner().y() == Approx(4.0));
 }
