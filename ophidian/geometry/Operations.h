@@ -76,6 +76,16 @@ namespace ophidian::geometry
         return result;
     }
 
+    template <template <typename> class Point_, class T>
+    Point_<T> rotate(const Point_<T> & geometry, double degree)
+    {
+        Point_<T> result;
+        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2,
+            2> rotate(degree);
+        boost::geometry::transform(geometry, result, rotate);
+        return result;
+    }
+
     //! Intersection operation
 
     /*!
