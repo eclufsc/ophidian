@@ -64,6 +64,12 @@ So you want to code? We make avaliable a [project template](https://gitlab.com/e
 
 
 # Contributing:
+Make shure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+
+For code style, try to keep very close to the [C++ Standard Library](https://en.cppreference.com/w/cpp).
+
+Feel free to fork Ophidian and create a merge request!
+
 So you want to push new code to Ophidian? First you should have an idea of the project structure:
 
 ## Project Structure:
