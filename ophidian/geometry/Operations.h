@@ -58,6 +58,19 @@ namespace ophidian::geometry
         return result;
     }
 
+    template <template <typename> class Point_, class T>
+    Point_<T> scale(const Point_<T> & geometry, Point_<T> & scalingPoint)
+    {
+        Point_<T> result;
+
+        boost::geometry::strategy::transform::scale_transformer<T, 2, 2> scale(
+            scalingPoint.x(),
+            scalingPoint.y());
+        boost::geometry::transform(geometry, result, scale);
+
+        return result;
+    }
+
     //! Rotate operation
 
     /*!
