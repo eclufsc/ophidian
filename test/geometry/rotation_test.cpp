@@ -1,6 +1,5 @@
 #include <catch.hpp>
 
-#include <ophidian/util/Units.h>
 #include <ophidian/geometry/Models.h>
 #include <ophidian/geometry/Operations.h>
 
@@ -11,8 +10,8 @@ void test_point_rotation(Point<T>&& point, double&& degree, Point<T>&& result)
 {
     auto rotated = rotate(point, degree);
 
-    REQUIRE(rotated.x() == Approx(result.x()) );
-    REQUIRE(rotated.y() == Approx(result.y()) );
+    CHECK(rotated.x() == Approx(result.x()) );
+    CHECK(rotated.y() == Approx(result.y()) );
 }
 
 TEST_CASE("Geometry: rotating a Point", "[geometry][operations]")
@@ -32,10 +31,10 @@ void test_box_rotation(Box<T>&& box, double&& degree, Box<T>&& result)
 {
     auto rotated = rotate(box, degree);
 
-    REQUIRE(rotated.min_corner().x() == Approx(result.min_corner().x()) );
-    REQUIRE(rotated.min_corner().y() == Approx(result.min_corner().y()) );
-    REQUIRE(rotated.max_corner().x() == Approx(result.max_corner().x()) );
-    REQUIRE(rotated.max_corner().y() == Approx(result.max_corner().y()) );
+    CHECK(rotated.min_corner().x() == Approx(result.min_corner().x()) );
+    CHECK(rotated.min_corner().y() == Approx(result.min_corner().y()) );
+    CHECK(rotated.max_corner().x() == Approx(result.max_corner().x()) );
+    CHECK(rotated.max_corner().y() == Approx(result.max_corner().y()) );
 }
 
 TEST_CASE("Geometry: rotating a Box", "[geometry][operations]")
