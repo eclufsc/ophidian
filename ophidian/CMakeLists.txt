@@ -17,6 +17,7 @@ add_subdirectory(interconnection)
 add_subdirectory(parser)
 add_subdirectory(placement)
 #add_subdirectory(standard_cell)
+add_subdirectory(timing)
 add_subdirectory(util)
 
 ################################################################################
