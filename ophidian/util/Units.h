@@ -86,7 +86,7 @@ namespace ophidian::util
         DbuConverter(const database_unit_scalar_t& dbu_factor):
             m_dbu_factor{dbu_factor}
         {}
-        
+
         //!Converts a value from micrometer_t to database_unit_t
         database_unit_t convert(micrometer_t value) const
         {
