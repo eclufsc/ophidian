@@ -16,3 +16,6 @@
 [submodule "3rdparty/units"]
 	path = 3rdparty/units
 	url = https://gitlab.com/eclufsc/eda/units.git
+[submodule "3rdparty/OpenTimer"]
+	path = 3rdparty/OpenTimer
+	url = https://github.com/OpenTimer/OpenTimer.git
