@@ -6,7 +6,7 @@
 using namespace ophidian::geometry;
 
 template <class T>
-void test_point_rotation(Point<T>&& point, double&& degree, Point<T>&& result)
+void test_point_rotation(Point<T>&& point, double&& degree, Point<T>&& result) noexcept
 {
     auto rotated = rotate(point, degree);
 
@@ -27,7 +27,7 @@ TEST_CASE("Geometry: rotating a Point", "[geometry][operations]")
 }
 
 template <class T>
-void test_box_rotation(Box<T>&& box, double&& degree, Box<T>&& result)
+void test_box_rotation(Box<T>&& box, double&& degree, Box<T>&& result) noexcept
 {
     auto rotated = rotate(box, degree);
 

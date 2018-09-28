@@ -6,7 +6,7 @@
 using namespace ophidian::geometry;
 
 template <typename T>
-void test_manhattan_distance(T&& x1, T&& y1, T&& x2, T&& y2, T&& result)
+void test_manhattan_distance(T&& x1, T&& y1, T&& x2, T&& y2, T&& result) noexcept
 {
     auto point_1 = Point<T>(x1, y1);
     auto point_2 = Point<T>(x2, y2);
@@ -38,7 +38,7 @@ TEST_CASE("Geometry: manhattan distance between two points", "[geometry][distanc
 }
 
 template <typename T>
-void test_euclidean_distance(T&& x1, T&& y1, T&& x2, T&& y2, T&& result)
+void test_euclidean_distance(T&& x1, T&& y1, T&& x2, T&& y2, T&& result) noexcept
 {
     auto point_1 = Point<T>(x1, y1);
     auto point_2 = Point<T>(x2, y2);
