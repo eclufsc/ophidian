@@ -156,7 +156,7 @@ namespace ophidian::circuit
 
         input_pad_container_type::const_iterator begin_input_pad() const noexcept;
         input_pad_container_type::const_iterator end_input_pad() const noexcept;
-        
+
         output_pad_container_type::const_iterator begin_output_pad() const noexcept;
         output_pad_container_type::const_iterator end_output_pad() const noexcept;
 
@@ -187,7 +187,7 @@ namespace ophidian::circuit
         input_pad_type add_input_pad(const pin_instance_type& pin);
 
         output_pad_type add_output_pad(const pin_instance_type& pin);
-        
+
         void erase(const cell_instance_type& cell);
         void erase(const pin_instance_type& pin);
         void erase(const net_type& net);
@@ -202,31 +202,31 @@ namespace ophidian::circuit
         template <typename Value>
         entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
         {
-            return entity_system::Property<CellInstance, Value>(mCells);
+            return entity_system::Property<CellInstance, Value>(m_cells);
         }
 
         template <typename Value>
         entity_system::Property<PinInstance, Value> makeProperty(PinInstance) const
         {
-            return entity_system::Property<PinInstance, Value>(mPins);
+            return entity_system::Property<PinInstance, Value>(m_pins);
         }
 
         template <typename Value>
         entity_system::Property<Net, Value> makeProperty(Net) const
         {
-            return entity_system::Property<Net, Value>(mNets);
+            return entity_system::Property<Net, Value>(m_nets);
         }
 
         template <typename Value>
         entity_system::Property<Input, Value> makeProperty(Input) const
         {
-            return entity_system::Property<Input, Value>(mInputs);
+            return entity_system::Property<Input, Value>(m_input_pads);
         }
 
         template <typename Value>
         entity_system::Property<Output, Value> makeProperty(Output) const
         {
-            return entity_system::Property<Output, Value>(mOutputs);
+            return entity_system::Property<Output, Value>(m_output_pads);
         }
 
         entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
@@ -236,25 +236,25 @@ namespace ophidian::circuit
         entity_system::EntitySystem<Output>::NotifierType * notifier(Output) const;
 
     private:
-        entity_system::EntitySystem<CellInstance>             mCells{};
-        entity_system::EntitySystem<PinInstance>              mPins{};
-        entity_system::EntitySystem<Net>                      mNets{};
-        entity_system::EntitySystem<Input>                    mInputs{};
-        entity_system::EntitySystem<Output>                   mOutputs{};
-        entity_system::Property<CellInstance, std::string>    mCellNames{mCells};
-        entity_system::Property<PinInstance, std::string>     mPinNames{mPins};
-        entity_system::Property<Net, std::string>             mNetNames{mNets};
-        std::unordered_map<std::string, CellInstance>         mName2Cell{};
-        std::unordered_map<std::string, PinInstance>          mName2Pin{};
-        std::unordered_map<std::string, Net>                  mName2Net{};
-        entity_system::Aggregation<Net, PinInstance>          mNetPins{mNets, mPins};
+        entity_system::EntitySystem<CellInstance>             m_cells{};
+        entity_system::EntitySystem<PinInstance>              m_pins{};
+        entity_system::EntitySystem<Net>                      m_nets{};
+        entity_system::EntitySystem<Input>                    m_input_pads{};
+        entity_system::EntitySystem<Output>                   m_output_pads{};
+        entity_system::Property<CellInstance, std::string>    m_cell_names{m_cells};
+        entity_system::Property<PinInstance, std::string>     m_pin_names{m_pins};
+        entity_system::Property<Net, std::string>             m_net_names{m_nets};
+        std::unordered_map<std::string, CellInstance>         m_name_to_cell{};
+        std::unordered_map<std::string, PinInstance>          m_name_to_pin{};
+        std::unordered_map<std::string, Net>                  m_name_to_net{};
+        entity_system::Aggregation<Net, PinInstance>          m_net_to_pins{m_nets, m_pins};
 
-        entity_system::Composition<CellInstance, PinInstance> mCellPins{mCells, mPins};
-        entity_system::Composition<PinInstance, Input>        mPinInput{mPins, mInputs};
-        entity_system::Composition<PinInstance, Output>       mPinOutput{mPins, mOutputs};
+        entity_system::Composition<CellInstance, PinInstance> m_cell_to_pins{m_cells, m_pins};
+        entity_system::Composition<PinInstance, Input>        m_pin_to_input_pad{m_pins, m_input_pads};
+        entity_system::Composition<PinInstance, Output>       m_pin_to_output_pad{m_pins, m_output_pads};
 
-        entity_system::Property<CellInstance, Cell> cells2StdCells_{mCells};
-        entity_system::Property<PinInstance, Pin>   pins2StdCells_{mPins};
+        entity_system::Property<CellInstance, Cell>           m_cell_instance_to_std_cell{m_cells};
+        entity_system::Property<PinInstance, Pin>             m_pin_instance_to_std_cell_pin{m_pins};
     };
 }
 

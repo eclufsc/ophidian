@@ -116,31 +116,31 @@ namespace ophidian::circuit
         template <typename Value>
         entity_system::Property<cell_type, Value> make_property_cell() const
         {
-            return entity_system::Property<cell_type, Value>(mCells);
+            return entity_system::Property<cell_type, Value>(m_std_cells);
         }
 
         template <typename Value>
         entity_system::Property<pin_type, Value> make_property_pin() const
         {
-            return entity_system::Property<pin_type, Value>(mPins);
+            return entity_system::Property<pin_type, Value>(m_std_pins);
         }
 
     private:
         //cells entity system and properties
-        cell_container_type                                mCells{};
-        entity_system::Property<cell_type, cell_name_type> mCellNames{mCells};
+        cell_container_type                                m_std_cells{};
+        entity_system::Property<cell_type, cell_name_type> m_std_cell_names{m_std_cells};
 
         //pins entity system and properties
-        pin_container_type                               mPins{};
-        entity_system::Property<pin_type, pin_name_type> mPinNames{mPins};
-        entity_system::Property<pin_type, PinDirection>  mPinDirections{mPins};
+        pin_container_type                               m_std_pins{};
+        entity_system::Property<pin_type, pin_name_type> m_std_pin_names{m_std_pins};
+        entity_system::Property<pin_type, PinDirection>  m_std_pin_directions{m_std_pins};
 
         //composition and aggregation relations
-        entity_system::Composition<cell_type, pin_type> mCellPins{mCells, mPins};
+        entity_system::Composition<cell_type, pin_type> m_std_cell_to_std_pins{m_std_cells, m_std_pins};
 
         //std_cell and pin mapping
-        std::unordered_map<cell_name_type, cell_type> mName2Cell{};
-        std::unordered_map<pin_name_type, pin_type>   mName2Pin{};
+        std::unordered_map<cell_name_type, cell_type> m_name_to_std_cell{};
+        std::unordered_map<pin_name_type, pin_type>   m_name_to_std_pin{};
     };
 }
 
