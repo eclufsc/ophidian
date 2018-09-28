@@ -20,8 +20,7 @@
 #define OPHIDIAN_GEOMETRY_OPERATIONS_H
 
 #include <boost/geometry/algorithms/intersection.hpp>
-
-#include "Models.h"
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 
 namespace ophidian::geometry
 {
