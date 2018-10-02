@@ -120,6 +120,18 @@ install_UNITS()
     rm -rf build
 }
 
+install_LIBERTY_PARSER()
+{
+    echo "installing liberty parser"
+    cd $SOURCE_ROOT/3rdparty/libertyparser
+    ./configure --prefix=""
+    make
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cp *.h $DEPENDENCIES_INCLUDE_PATH
+    git clean -f -d
+    cd ..
+}
+
 run_install()
 {
     install -d $DEPENDENCIES_ROOT
@@ -134,6 +146,7 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
+    install_LIBERTY_PARSER
 }
 
 run_install
