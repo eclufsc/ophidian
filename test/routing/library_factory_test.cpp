@@ -49,14 +49,26 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
         CHECK(spacing_table.compute(database_unit_t{1500}, database_unit_t{0}) == database_unit_t{200});
     }
 
-//    SECTION("Via are created correctly", "[routing][library][factory]")
-//    {
+    SECTION("Via are created correctly", "[routing][library][factory]")
+    {
+        CHECK(library.size_via() == 22);
+        auto via = library.find_via_instance("VIA12_1C_H");
+        auto box = library.geometry(via, "Metal2");
+        CHECK(box.min_corner().x() == database_unit_t{-130});
+        CHECK(box.min_corner().y() == database_unit_t{-70});
+        CHECK(box.max_corner().x() == database_unit_t{130});
+        CHECK(box.max_corner().y() == database_unit_t{70});
+    }
 
-//    }
-
-//    SECTION("Tracks are created correctly", "[routing][library][factory]")
-//    {
-
-//    }
+    SECTION("Tracks are created correctly", "[routing][library][factory]")
+    {
+        CHECK(library.size_track() == 18);
+        auto track = *library.begin_track();
+        CHECK(library.orientation(track) == ophidian::routing::TrackOrientation::X);
+        CHECK(library.start(track) == database_unit_t{83800});
+        CHECK(library.numTracs(track) == 52);
+        CHECK(library.space(track) == database_unit_t{400});
+        CHECK(library.name(library.layer(track)) == "Metal9");
+    }
 }
 

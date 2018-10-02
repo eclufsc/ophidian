@@ -23,9 +23,6 @@ namespace ophidian
 namespace routing
 {
 
-
-
-
 Library::layer_type Library::find_layer_instance(const std::string &layerName)
 {
     return mName2Layer.at(layerName);
@@ -41,6 +38,11 @@ const std::string& Library::name(const Library::layer_type &layer) const
     return mLayerName[layer];
 }
 
+Library::via_type Library::find_via_instance(const std::string &viaName)
+{
+    return mName2Via.at(viaName);
+}
+
 std::string& Library::name(const Library::via_type &via)
 {
     return mViaName[via];
@@ -49,6 +51,36 @@ std::string& Library::name(const Library::via_type &via)
 const std::string& Library::name(const Library::via_type &via) const
 {
     return mViaName[via];
+}
+
+const Library::box_type& Library::geometry(const Library::via_type &via, const std::string &layer)
+{
+    return  mViaLayers[via].find(layer)->second;
+}
+
+const TrackOrientation Library::orientation(const Library::track_type &track) const
+{
+    return mTrackOrientation[track];
+}
+
+const Library::unit_type Library::start(const Library::track_type& track) const
+{
+    return mTrackStart[track];
+}
+
+const Library::scalar_type Library::numTracs(const Library::track_type& track) const
+{
+    return mNumberOfTracks[track];
+}
+
+const Library::unit_type Library::space(const Library::track_type& track) const
+{
+    return mTrackSpace[track];
+}
+
+const Library::layer_type Library::layer(const Library::track_type& track) const
+{
+    return mLayerOfTrack[track];
 }
 
 LayerType Library::type(const Library::layer_type &layer) const
@@ -194,6 +226,29 @@ Library::layer_type Library::add_layer_instance(
     }else{
         return mName2Layer[layerName];
     }
+}
+
+Library::via_type Library::add_via_instance(const std::string &viaName, const via_layer_map_type &layers)
+{
+    if(mName2Via.find(viaName) == mName2Via.end()){
+        auto via = mVias.add();
+
+        mViaName[via] = viaName;
+        mName2Via[viaName] = via;
+        mViaLayers[via] = layers;
+    }else{
+        return mName2Via[viaName];
+    }
+}
+
+Library::track_type Library::add_track_instance(const TrackOrientation &orientation, const unit_type &start, const scalar_type &numTracks, const unit_type &space, const std::string &layer)
+{
+    auto track = mTracks.add();
+    mTrackOrientation[track] = orientation;
+    mTrackStart[track] = start;
+    mNumberOfTracks[track] = numTracks;
+    mTrackSpace[track] = space;
+    mLayerOfTrack[track] = mName2Layer[layer];
 }
 
 entity_system::EntitySystem<Library::layer_type>::NotifierType * Library::notifier(Library::layer_type) const {

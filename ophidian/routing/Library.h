@@ -48,6 +48,8 @@ namespace routing
     class Library
     {
     public:
+        template <class K, class V> using map_type  = std::unordered_map<K,V>;
+
         using scalar_type           = int;
         using unit_type             = util::database_unit_t;
         using table_strategy_type   = util::floor_strategy<unit_type, unit_type, unit_type>;
@@ -55,13 +57,13 @@ namespace routing
         using spacing_table_content_type = util::tableContents<unit_type, unit_type, unit_type>;
 
         using layer_type            = Layer;
-//        using box_type              = geometry::Box<unit_type>;
-//        using layer_pair_type       = std::pair<layer_type ,box_type>;
-//        using layer_container_type  = std::vector<layer_pair_type>;
         using layer_container_type  = std::vector<layer_type>;
 
         using via_type              = Via;
         using via_container_type    = std::vector<via_type>;
+        using box_type              = geometry::Box<unit_type>;
+        using via_layer_map_type    = map_type<std::string, box_type>;
+
         using track_type            = Track;
         using track_container_type  = std::vector<track_type>;
 
@@ -95,8 +97,16 @@ namespace routing
         unit_type EOLwithin(const layer_type& layer) const;
         const spacing_table_type& spacing_table(const layer_type& layer) const;
 
+        via_type find_via_instance(const std::string& viaName);
         std::string& name(const via_type& via);
         const std::string& name(const via_type& via) const;
+        const box_type &geometry(const via_type& via, const std::string &layer);
+
+        const TrackOrientation orientation(const track_type& track) const;
+        const unit_type start(const track_type& track) const;
+        const scalar_type numTracs(const track_type& track) const;
+        const unit_type space(const track_type& track) const;
+        const layer_type layer(const track_type& track) const;
 
         // Iterators
         layer_container_type::const_iterator begin_layer() const noexcept;
@@ -117,11 +127,15 @@ namespace routing
 
 
         // Modifiers
-        layer_type add_layer_instance(const std::string &name, const LayerType &type, const LayerDirection &direction,
+        layer_type add_layer_instance(const std::string &layerName, const LayerType &type, const LayerDirection &direction,
                                       const Library::unit_type& pitch, const Library::unit_type& offset, const Library::unit_type& width,
                                       const Library::unit_type& minWidth, const Library::unit_type& area, const Library::unit_type& spacing,
                                       const Library::unit_type& EOLspace, const Library::unit_type& EOLwidth, const Library::unit_type& EOLwithin,
                                       const Library::spacing_table_type spacingTable);
+
+        via_type add_via_instance(const std::string &viaName, const via_layer_map_type & layers);
+
+        track_type add_track_instance(const TrackOrientation &orientation, const Library::unit_type &start, const Library::scalar_type &numTracks, const Library::unit_type &space, const std::string &layer);
 
         template <typename Value>
         entity_system::Property<layer_type, Value> makeProperty(layer_type) const
@@ -164,7 +178,8 @@ namespace routing
 
         entity_system::EntitySystem<via_type>    mVias{};
         entity_system::Property<via_type, std::string>          mViaName{mVias};
-        entity_system::Property<via_type, layer_container_type> mViaLayers{mVias};
+        std::unordered_map<std::string, via_type>               mName2Via{};
+        entity_system::Property<via_type, via_layer_map_type>   mViaLayers{mVias};
 
         entity_system::EntitySystem<track_type>    mTracks{};
         entity_system::Property<track_type, TrackOrientation>   mTrackOrientation{mTracks};

@@ -18,6 +18,7 @@
 
 #include "LibraryFactory.h"
 #include "ophidian/util/Units.h"
+#include <unordered_map>
 
 namespace ophidian
 {
@@ -97,12 +98,27 @@ namespace factory
                         lTable);
         }
 
-
         //creating vias
-
+         for(auto& via : lef.vias()){
+             auto map = Library::via_layer_map_type{};
+             for(auto layer_map : via.layers()){
+                 auto box_micron = layer_map.second.front();
+                 auto box_dbu = Library::box_type{dbuConverter.convert(box_micron.min_corner()), dbuConverter.convert(box_micron.max_corner())};
+                 map.emplace(layer_map.first, box_dbu);
+             }
+             library.add_via_instance(via.name(), map);
+         }
 
         //creating tracks
-
+         for(auto track : def.tracks()){
+            ophidian::routing::TrackOrientation orientation;
+            if(track.orientation() == ophidian::parser::Def::Track::Orientation::X){
+                orientation = ophidian::routing::TrackOrientation::X;
+            }else {
+                orientation = ophidian::routing::TrackOrientation::Y;
+            }
+            library.add_track_instance(orientation, track.start(), track.numtracks(), track.space(), track.layerName());
+         }
 
 
 
