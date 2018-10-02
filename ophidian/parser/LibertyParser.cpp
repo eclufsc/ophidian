@@ -321,7 +321,7 @@ std::shared_ptr<Liberty> LibertyParser::readFile(const std::string &filename)
         gnames = si2drGroupGetNames(group, &this_->err);
         gname = si2drIterNextName(gnames, &this_->err);
         si2drIterQuit(gnames, &this_->err);
-        std::cout << "Liberty Library Name: " << (gname ? gname : "<NONAME>") << std::endl;
+//        std::cout << "Liberty Library Name: " << (gname ? gname : "<NONAME>") << std::endl;
         libraryGroups = si2drGroupGetGroups(group, &this_->err);
         si2drAttrsIdT lib_attrs = si2drGroupGetAttrs(group, &this_->err);
         si2drAttrIdT lib_attr;
