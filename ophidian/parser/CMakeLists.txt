@@ -74,6 +74,7 @@ target_link_libraries(ophidian_parser
     PRIVATE verilog-parser::verilogparser
     PRIVATE DEF::def
     PRIVATE LEF::lef
+    PRIVATE LibertyParser::LibertyParser
 )
 
 # Tell cmake the path to look for include files for this target
@@ -93,6 +94,7 @@ target_link_libraries(ophidian_parser_static
     PRIVATE verilog-parser::verilogparser_static
     PRIVATE DEF::def
     PRIVATE LEF::lef
+    PRIVATE LibertyParser::LibertyParser_static
 )
 
 # Tell cmake the path to look for include files for this target
