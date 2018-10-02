@@ -168,6 +168,7 @@ The Ophidian library depends on the following third party software:
 * [Verilog-Parser](https://gitlab.com/eclufsc/eda/verilog-parser)
 * [DEF](https://gitlab.com/eclufsc/eda/DEF)
 * [LEF](https://gitlab.com/eclufsc/eda/LEF)
+* [LibertyParser](https://gitlab.com/eclufsc/eda/libertyparser.git)
 
 Although some of this dependencies like Cmake and Boost are realy well supported
 on any operational system, the others can be a hassle to have on your system. 
