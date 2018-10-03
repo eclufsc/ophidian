@@ -57,8 +57,6 @@ gitlab_pages:
     artifacts:
         paths:
             - public
-    only:
-        - master
 
 build_on_debian-sid:
     image: debian:sid
