@@ -43,7 +43,7 @@ variables:
 stages:
     - build
 
-gitlab_pages:
+pages:
     image: alpine
     stage: build
     before_script:
