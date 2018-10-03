@@ -105,7 +105,7 @@ namespace ophidian::circuit::factory
             {
                 auto pin = netlist.add_pin_instance(instance.name() + ":" + portMap.first);
                 netlist.connect(cell, pin);
-                
+
                 netlist.connect(pin, std_cells.find_pin(instance.module() + ":" + portMap.first));
 
                 netlist.connect(netlist.find_net(portMap.second), pin);
@@ -119,7 +119,7 @@ namespace ophidian::circuit::factory
         {
             auto cell_instance = netlist.add_cell_instance(component.name());
 
-            netlist.connect(cell_instance, std_cells.find_cell(component.macro())); 
+            netlist.connect(cell_instance, std_cells.find_cell(component.macro()));
         }
 
         for(const auto& net : def.nets())
@@ -127,10 +127,14 @@ namespace ophidian::circuit::factory
             auto net_instance = netlist.add_net(net.name());
             for(const auto& pin : net.pins())
             {
+                if(pin.first == "PIN")
+                {
+                    continue;
+                }
+
                 auto pin_instance = netlist.add_pin_instance(pin.first + ":" + pin.second);
 
                 netlist.connect(net_instance, pin_instance);
-
                 auto cell_instance = netlist.find_cell_instance(pin.first);
 
                 netlist.connect(cell_instance, pin_instance);

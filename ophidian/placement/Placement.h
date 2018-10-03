@@ -80,12 +80,12 @@ namespace ophidian::placement
         void place(const output_pad_type& output, const point_type & location);
 
     private:
-        const circuit::Netlist & mNetlist;
-        const Library & mLibrary;
+        const circuit::Netlist & m_netlist;
+        const Library & m_library;
 
-        entity_system::Property<cell_type, point_type>   mCellLocations;
-        entity_system::Property<input_pad_type, point_type>  mInputLocations;
-        entity_system::Property<output_pad_type, point_type> mOutputLocations;
+        entity_system::Property<cell_type, point_type>   m_cell_locacations;
+        entity_system::Property<input_pad_type, point_type>  m_input_pad_locations;
+        entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
     };
 }
 

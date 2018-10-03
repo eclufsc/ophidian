@@ -19,3 +19,6 @@
 [submodule "3rdparty/OpenTimer"]
 	path = 3rdparty/OpenTimer
 	url = https://github.com/OpenTimer/OpenTimer.git
+[submodule "3rdparty/libertyparser"]
+	path = 3rdparty/libertyparser
+	url = https://gitlab.com/eclufsc/eda/libertyparser.git

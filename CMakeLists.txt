@@ -125,6 +125,9 @@ find_package(Flute REQUIRED)
 # Find Verilog-parser
 find_package(verilog-parser REQUIRED)
 
+# Find LibertyParser
+find_package(LibertyParser REQUIRED)
+
 # Find GUI Dependencies
 IF(OPHIDIAN_GUI)
     # Find SFML

@@ -136,6 +136,19 @@ install_OPENTIMER()
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build_shared
+    git clean -f -d
+}
+
+install_LIBERTY_PARSER()
+{
+    echo "installing liberty parser"
+    cd $SOURCE_ROOT/3rdparty/libertyparser
+    ./configure --prefix=""
+    make
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cp *.h $DEPENDENCIES_INCLUDE_PATH
+    git clean -f -d
+    cd ..
 }
 
 run_install()
@@ -153,6 +166,7 @@ run_install()
     install_LEMON
     install_UNITS
     install_OPENTIMER
+    install_LIBERTY_PARSER
 }
 
 run_install

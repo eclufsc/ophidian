@@ -21,27 +21,27 @@
 namespace ophidian::placement
 {
     Library::Library(const circuit::StandardCells & std_cells):
-            mGeometries{std_cells.make_property_cell<Library::std_cell_geometry_type>()},
-            mPinOffsets{std_cells.make_property_pin<Library::offset_type>()}
+            m_geometries{std_cells.make_property_cell<Library::std_cell_geometry_type>()},
+            m_pin_offsets{std_cells.make_property_pin<Library::offset_type>()}
     {}
 
     Library::std_cell_geometry_type& Library::geometry(const Library::std_cell_type& cell)
     {
-        return mGeometries[cell];
+        return m_geometries[cell];
     }
 
     const Library::std_cell_geometry_type& Library::geometry(const Library::std_cell_type& cell) const
     {
-        return mGeometries[cell];
+        return m_geometries[cell];
     }
 
     Library::offset_type& Library::offset(const Library::std_cell_pin_type& pin)
     {
-        return mPinOffsets[pin];
+        return m_pin_offsets[pin];
     }
 
     const Library::offset_type& Library::offset(const Library::std_cell_pin_type& pin) const
     {
-        return mPinOffsets[pin];
+        return m_pin_offsets[pin];
     }
 }

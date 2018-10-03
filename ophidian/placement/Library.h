@@ -65,8 +65,8 @@ namespace ophidian::placement
         // Modifiers
 
     private:
-        entity_system::Property<std_cell_type, std_cell_geometry_type> mGeometries;
-        entity_system::Property<std_cell_pin_type, offset_type>   mPinOffsets;
+        entity_system::Property<std_cell_type, std_cell_geometry_type> m_geometries;
+        entity_system::Property<std_cell_pin_type, offset_type>        m_pin_offsets;
     };
 }
 

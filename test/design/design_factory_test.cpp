@@ -2,7 +2,7 @@
 
 #include <ophidian/design/DesignFactory.h>
 
-TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[placement][Placement][factory]")
+TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][Design][factory]")
 {
     auto lef = ophidian::parser::Lef{"input_files/simple/simple.lef"};
     auto def = ophidian::parser::Def{"input_files/simple/simple.def"};
@@ -43,4 +43,22 @@ TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[placement
 
     CHECK(cell_u1_placed_geometry.front().max_corner().x() == std_cell_u1_geometry.front().max_corner().x() + cell_u1_xpos);
     CHECK(cell_u1_placed_geometry.front().max_corner().y() == std_cell_u1_geometry.front().max_corner().y() + cell_u1_ypos);
+}
+
+TEST_CASE("Design factory: test design_factory_iccad17 with contest files", "[design][Design][factory]")
+{
+    auto lef = ophidian::parser::Lef{};
+
+    lef.read_file("input_files/iccad17/pci_bridge32_a_md1/tech.lef");
+    lef.read_file("input_files/iccad17/pci_bridge32_a_md1/cells_modified.lef");
+
+    auto def = ophidian::parser::Def{};
+
+    def.read_file("input_files/iccad17/pci_bridge32_a_md1/placed.def");
+
+    auto design = ophidian::design::Design{};
+
+    ophidian::design::factory::make_design_iccad2017(design, def, lef);
+
+    CHECK(design.netlist().size_cell_instance() == 29521);
 }

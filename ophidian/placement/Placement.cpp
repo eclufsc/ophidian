@@ -21,26 +21,26 @@
 namespace ophidian::placement
 {
     Placement::Placement(const circuit::Netlist & netlist, const Library &library):
-            mNetlist(netlist),
-            mLibrary(library),
-            mCellLocations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
-            mInputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
-            mOutputLocations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
+            m_netlist(netlist),
+            m_library(library),
+            m_cell_locacations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
+            m_input_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
+            m_output_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
     {
     }
 
     // Element access
     const Placement::point_type& Placement::location(const Placement::cell_type& cell) const
     {
-        return mCellLocations[cell];
+        return m_cell_locacations[cell];
     }
 
     Placement::point_type Placement::location(const Placement::pin_type& pin) const
     {
-        auto stdCellPin = mNetlist.std_cell_pin(pin);
-        auto pinOwner = mNetlist.cell(pin);
+        auto stdCellPin = m_netlist.std_cell_pin(pin);
+        auto pinOwner = m_netlist.cell(pin);
         auto cell_location = location(pinOwner);
-        auto pinOffset = mLibrary.offset(stdCellPin);
+        auto pinOffset = m_library.offset(stdCellPin);
 
         auto pin_location = Placement::point_type{
             cell_location.x() + pinOffset.x(),
@@ -52,19 +52,19 @@ namespace ophidian::placement
 
     const Placement::point_type& Placement::location(const Placement::input_pad_type& input) const
     {
-        return mInputLocations[input];
+        return m_input_pad_locations[input];
     }
 
     const Placement::point_type& Placement::location(const Placement::output_pad_type& output) const
     {
-        return mOutputLocations[output];
+        return m_output_pad_locations[output];
     }
 
 
     Placement::cell_geometry_type Placement::geometry(const Placement::cell_type& cell) const
     {
-        auto stdCell = mNetlist.std_cell(cell);
-        auto stdCellGeometry = mLibrary.geometry(stdCell);
+        auto stdCell = m_netlist.std_cell(cell);
+        auto stdCellGeometry = m_library.geometry(stdCell);
         auto cell_location = location(cell);
 
         auto cellGeometry = geometry::translate(stdCellGeometry, cell_location);
@@ -75,16 +75,16 @@ namespace ophidian::placement
     // Modifiers
     void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
     {
-        mCellLocations[cell] = location;
+        m_cell_locacations[cell] = location;
     }
 
     void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
     {
-        mInputLocations[input] = location;
+        m_input_pad_locations[input] = location;
     }
 
     void Placement::place(const Placement::output_pad_type& output, const Placement::point_type & location)
     {
-        mOutputLocations[output] = location;
+        m_output_pad_locations[output] = location;
     }
 }
