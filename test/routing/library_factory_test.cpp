@@ -3,6 +3,7 @@
 
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/Guide.h>
 #include <ophidian/parser/ParserException.h>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/LibraryFactory.h>
@@ -19,9 +20,10 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
 
     Def sample_def = ophidian::parser::Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
     Lef sample_lef = ophidian::parser::Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};
+    Guide sample_guide = ophidian::parser::Guide{"input_files/ispd18/ispd18_sample/ispd18_sample.input.guide"};
 
     auto design = ophidian::design::Design{};
-    ophidian::design::factory::make_design_ispd2018(design, sample_def, sample_lef);
+    ophidian::design::factory::make_design_ispd2018(design, sample_def, sample_lef, sample_guide);
 
     auto& library = design.routing_library();
 

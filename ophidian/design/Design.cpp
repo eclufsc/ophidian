@@ -79,4 +79,14 @@ namespace ophidian::design
     {
         return m_routing_library;
     }
+
+    Design::global_routing_type &Design::global_routing() noexcept
+    {
+        return m_global_routing;
+    }
+
+    const Design::global_routing_type &Design::global_routing() const noexcept
+    {
+        return m_global_routing;
+    }
 }
