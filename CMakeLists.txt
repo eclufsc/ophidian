@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.7.2)
 
 # Set project version
-set(ophidian_VERSION 0.1.1)
+set(ophidian_VERSION 0.2.0)
 
 # Set project name
 project(ophidian VERSION ${ophidian_VERSION})
@@ -132,7 +132,7 @@ IF(OPHIDIAN_GUI)
 ENDIF(OPHIDIAN_GUI)
 
 ################################################################################
-# Project logic 
+# Project logic
 ################################################################################
 
 # Add subdirectories
