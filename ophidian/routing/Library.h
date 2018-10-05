@@ -196,7 +196,6 @@ namespace routing
         entity_system::Property<track_type, layer_type>         mLayerOfTrack{mTracks};
     };
 
-
 } // namespace routing
 } // namespace ophidian
 

@@ -77,8 +77,5 @@ entity_system::EntitySystem<GlobalRouting::region_type>::NotifierType *GlobalRou
     return mRegions.notifier();
 }
 
-
-
-
 } // namespace routing
 } // namespace ophidian

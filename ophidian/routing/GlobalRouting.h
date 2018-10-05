@@ -78,9 +78,6 @@ namespace routing
         entity_system::Aggregation<net_type, region_type>   mNet2Region;
     };
 
-
-
-
 } // namespace routing
 } // namespace ophidian
 
