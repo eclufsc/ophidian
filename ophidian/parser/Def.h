@@ -60,8 +60,8 @@ namespace ophidian::parser
         using track_type                        = Track;
         using track_container_type              = container_type<track_type>;
 
-        using nets_type                         = Net;
-        using nets_container_type               = container_type<nets_type>;
+        using net_type                         = Net;
+        using net_container_type               = container_type<net_type>;
 
         using database_unit_type                = util::database_unit_t;
         using database_unit_point_type          = point_type<database_unit_type>;
@@ -74,8 +74,8 @@ namespace ophidian::parser
         // Class constructors
         Def() = default;
 
-        Def(const Def&) = delete;
-        Def& operator=(const Def&) = delete;
+        Def(const Def&) = default;
+        Def& operator=(const Def&) = default;
 
         Def(Def&&) = default;
         Def& operator=(Def&&) = default;
@@ -92,57 +92,19 @@ namespace ophidian::parser
 
         const component_container_type& components() const noexcept;
 
+        const net_container_type& nets() const noexcept;
+
         const scalar_type& dbu_to_micrometer_ratio() const noexcept;
 
         const track_container_type& tracks() const noexcept;
-
-        const nets_container_type& nets() const noexcept;
 
     private:
         database_unit_box_type   m_die_area;
         row_container_type       m_rows;
         component_container_type m_components;
+        net_container_type       m_nets;
         scalar_type              m_dbu_to_micrometer_ratio;
         track_container_type     m_tracks;
-        nets_container_type      m_nets;
-    };
-
-    class Def::Net
-    {
-    public:
-        using string_type               = std::string;
-        using scalar_type               = Def::scalar_type;
-        using pin_pair_type             = std::pair<string_type, string_type>; //pair<cell, pin>
-        using pin_container_type        = Def::container_type<pin_pair_type>;
-
-        // Class constructors
-
-        Net() = delete;
-
-        Net(const Net&) = default;
-        Net& operator=(const Net&) = default;
-
-        Net(Net&&) = default;
-        Net& operator=(Net&&) = default;
-
-        template<class Arg1, class Arg2>
-        Net(Arg1&& name, Arg2&& num_pins):
-            m_name{std::forward<Arg1>(name)},
-            m_numPins{std::forward<Arg2>(num_pins)}
-        {
-            m_pins.reserve(m_numPins);
-        }
-
-        const string_type& name() const noexcept;
-
-        void add_connection(const string_type cell, const string_type pin);
-
-        const pin_container_type& pins() const noexcept;
-
-    private:
-        string_type m_name;
-        scalar_type m_numPins;
-        pin_container_type m_pins;
     };
 
     /**
@@ -218,10 +180,14 @@ namespace ophidian::parser
             N, S, W, E, FN, FS, FW, FE
         };
 
-        using string_type              = std::string;
+        using name_type                = std::string;
+
+        using macro_type               = std::string;
+
+        using orientation_type         = Orientation;
+
         using database_unit_type       = Def::database_unit_type;
         using database_unit_point_type = Def::database_unit_point_type;
-        using orientation_type         = Orientation;
 
         // Class constructors
 
@@ -243,9 +209,9 @@ namespace ophidian::parser
         {}
 
         // Class member functions
-        const string_type& name() const noexcept;
+        const name_type& name() const noexcept;
 
-        const string_type& macro() const noexcept;
+        const macro_type& macro() const noexcept;
 
         const orientation_type& orientation() const noexcept;
 
@@ -258,11 +224,47 @@ namespace ophidian::parser
         friend std::ostream& operator<<(std::ostream& os, const Component& component);
 
     private:
-        string_type              m_name; ///< Component's name for identification.
-        string_type              m_macro; ///< Component's type, like "NAND2_X1".
+        name_type                m_name; ///< Component's name for identification.
+        macro_type               m_macro; ///< Component's type, like "NAND2_X1".
         orientation_type         m_orientation; ///< Component's orientation.
         database_unit_point_type m_position; ///< Component's lower left corner.
         bool                     m_fixed; ///< This determines if the component's position is fixed in space, @c true for fixed.
+    };
+
+    class Def::Net
+    {
+    public:
+        // Class member types
+        using name_type = std::string;
+
+        using pin_name_type = std::string;
+
+        using pin_type = std::pair<Def::component_type::name_type, pin_name_type>;
+
+        using pin_container_type = std::vector<pin_type>;
+
+        // Class constructors
+        Net() = delete;
+
+        Net(const Net &) = default;
+        Net & operator=(const Net &) = default;
+
+        Net(Net &&) = default;
+        Net & operator=(Net &&) = default;
+
+        template<class Arg1, class Arg2>
+        Net(Arg1&& name, Arg2&& pins):
+            m_name{std::forward<Arg1>(name)},
+            m_pins{std::forward<Arg2>(pins)}
+        { }
+
+        const name_type& name() const noexcept;
+
+        const pin_container_type& pins() const noexcept;
+
+    private:
+        name_type m_name;
+        pin_container_type m_pins;
     };
 
     /**
@@ -275,7 +277,9 @@ namespace ophidian::parser
     {
     public:
         // Class member types
-        using string_type              = std::string;
+        using name_type              = std::string;
+
+        using site_type              = std::string;
 
         using database_unit_type       = Def::database_unit_type;
         using database_unit_point_type = Def::database_unit_point_type;
@@ -302,9 +306,9 @@ namespace ophidian::parser
         {}
 
         // Class member functions
-        const string_type& name() const noexcept;
+        const name_type& name() const noexcept;
 
-        const string_type& site() const noexcept;
+        const site_type& site() const noexcept;
 
         const database_unit_point_type& origin() const noexcept;
 
@@ -317,8 +321,8 @@ namespace ophidian::parser
         friend std::ostream& operator<<(std::ostream& os, const Row& row);
 
     private:
-        string_type              m_name; ///< Row's name for identification.
-        string_type              m_site; ///< This is the site to be used by the row defined by a LEF file.
+        name_type              m_name; ///< Row's name for identification.
+        site_type              m_site; ///< This is the site to be used by the row defined by a LEF file.
         database_unit_point_type m_origin; ///< Specifies the location of the first site in the row.
         database_unit_point_type m_step; ///< Specifies the spacing between sites in horizontal and vertical rows.
         scalar_point_type        m_num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.

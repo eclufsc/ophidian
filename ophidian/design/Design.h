@@ -45,7 +45,7 @@ namespace ophidian::design
            \brief Constructs a design system with no properties
          */
         Design() = default;
-        
+
         Design(const Design&) = delete;
         Design& operator=(const Design&) = delete;
 

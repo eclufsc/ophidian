@@ -122,3 +122,52 @@ TEST_CASE("Netlist factory: populate with simple verilog and simple standard cel
 
     CHECK(pin_iterator == cell_u1_pins.end());
 }
+
+TEST_CASE("Netlist factory: populate with ispd18 sample def and sample standard cells.", "[circuit][Netlist][factory]")
+{
+    auto netlist = Netlist{};
+
+    auto std_cells = StandardCells{};
+
+    auto lef = ophidian::parser::Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};
+    auto def = ophidian::parser::Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
+
+    factory::make_standard_cells(std_cells, lef);
+    factory::make_netlist(netlist, def, std_cells);
+
+    CHECK(netlist.size_cell_instance() == 22);
+
+    CHECK(netlist.size_pin_instance() == 22);
+
+    CHECK(netlist.size_net() == 11);
+
+    CHECK(netlist.size_input_pad() == 0);
+
+    CHECK(netlist.size_output_pad() == 0);
+
+    auto cell_u1 = netlist.find_cell_instance("inst2015");
+
+    CHECK(netlist.name(cell_u1) == "inst2015");
+
+    auto std_cell_u1 = netlist.std_cell(cell_u1);
+
+    CHECK(std_cells.name(std_cell_u1) == "NAND3X2");
+
+    auto cell_u1_pins = netlist.pins(cell_u1);
+
+    CHECK(cell_u1_pins.size() == 1);
+
+    auto pin_iterator = cell_u1_pins.begin();
+
+    auto pin_u1_o = *pin_iterator;
+
+    CHECK(netlist.name(pin_u1_o) == "inst2015:Y");
+
+    auto std_pin_u1_o = netlist.std_cell_pin(pin_u1_o);
+
+    CHECK(std_cells.name(std_pin_u1_o) == "NAND3X2:Y");
+
+    auto net_pin_u1_o = netlist.net(pin_u1_o);
+
+    CHECK(netlist.name(net_pin_u1_o) == "net1240");
+}

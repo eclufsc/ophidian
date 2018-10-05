@@ -19,9 +19,10 @@ Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](htt
     * [Arch Linux](#arch-linux)
     * [Others](#others)
 * [Hello World!](#hello-world)
+    * [Documentation](#documentation)
 * [Contributing](#contributing)
     * [Project Structure](#project-structure)
-    * [Build and Installation Guide](#build-and-installation-guide)
+* [Build and Installation Guide](#build-and-installation-guide)
     * [Build Dependencies](#build-dependencies)
     * [Compiling Ophidian](#compiling-ophidian)
 * [Credits](#credits)
@@ -60,10 +61,18 @@ $ pacaur -S ophidian-git
 **If we do not support your distro, consider [building it from source!](#build-and-installation-guide)**
 
 # Hello World!
-So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/ophidian_project_template) to make your life easier!
+So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/eda/ophidian_project_template) to make your life easier!
 
+## Documentation:
+Documentation at [eclufsc.gitlab.io/ophidian](eclufsc.gitlab.io/ophidian)
 
 # Contributing:
+Make shure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+
+For code style, try to keep very close to the [C++ Standard Library](https://en.cppreference.com/w/cpp).
+
+Feel free to fork Ophidian and create a merge request!
+
 So you want to push new code to Ophidian? First you should have an idea of the project structure:
 
 ## Project Structure:
@@ -149,7 +158,7 @@ Here you will find directories for each ophidian library unit tests.
 This file handles the compilation instructions for the unit tests binary.
 
 
-## Build and Installation Guide:
+# Build and Installation Guide:
 This section will guide you on the compilation process of the Ophidian library.
 The Ophidian library depends on the following third party software:
 
@@ -157,11 +166,11 @@ The Ophidian library depends on the following third party software:
 * [Cmake](https://cmake.org/) (>= 3.5.2)
 * [Boost](http://www.boost.org/) (>= 1.63)
 * [Lemmon](http://lemon.cs.elte.hu/trac/lemon)
-* [Units](https://gitlab.com/eclufsc/units) 
-* [Flute](https://gitlab.com/eclufsc/Flute)
-* [Verilog-Parser](https://gitlab.com/eclufsc/verilog-parser)
-* [DEF](https://gitlab.com/eclufsc/DEF)
-* [LEF](https://gitlab.com/eclufsc/LEF)
+* [Units](https://gitlab.com/eclufsc/eda/units) 
+* [Flute](https://gitlab.com/eclufsc/eda/Flute)
+* [Verilog-Parser](https://gitlab.com/eclufsc/eda/verilog-parser)
+* [DEF](https://gitlab.com/eclufsc/eda/DEF)
+* [LEF](https://gitlab.com/eclufsc/eda/LEF)
 
 Although some of this dependencies like Cmake and Boost are realy well supported
 on any operational system, the others can be a hassle to have on your system. 

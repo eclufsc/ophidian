@@ -21,14 +21,13 @@
 #include "Def.h"
 #include "ParserException.h"
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     Def::Def(const std::string& def_file):
         m_die_area{},
         m_rows{},
         m_components{},
+        m_nets{},
         m_dbu_to_micrometer_ratio{0}
     {
         read_file(def_file);
@@ -38,6 +37,7 @@ namespace parser
         m_die_area{},
         m_rows{},
         m_components{},
+        m_nets{},
         m_dbu_to_micrometer_ratio{}
     {
         for(const auto& file : def_files){
@@ -82,7 +82,7 @@ namespace parser
                     {
                         Def::database_unit_type{static_cast<double>(box->xl())},
                         Def::database_unit_type{static_cast<double>(box->yl())}
-                    }, 
+                    },
                     {
                         Def::database_unit_type{static_cast<double>(box->xh())},
                         Def::database_unit_type{static_cast<double>(box->yh())}
@@ -157,24 +157,13 @@ namespace parser
             [](defrCallbackType_e, defiNet *net, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
 
-
-                auto numCone = net->numConnections();
-                auto pin_0 = net->pin(0);
-
-                auto instance_0 = net->instance(0);
-
-
-
-                auto a = 0;
-                a++;
-
-                auto m_net = Def::Net(net->name(), net->numConnections());
+                auto pins = Def::net_type::pin_container_type{};
 
                 for (int i = 0; i < net->numConnections(); ++i) {
-                    m_net.add_connection(net->instance(i), net->pin(i));
+                    pins.emplace_back(net->instance(i), net->pin(i));
                 }
 
-                that->m_nets.push_back(m_net);
+                that->m_nets.emplace_back(net->name(), std::move(pins));
                 return 0;
             }
         );
@@ -201,6 +190,11 @@ namespace parser
         return m_components;
     }
 
+    const Def::net_container_type& Def::nets() const noexcept
+    {
+        return m_nets;
+    }
+
     const Def::row_container_type& Def::rows() const noexcept
     {
         return m_rows;
@@ -216,17 +210,12 @@ namespace parser
         return m_tracks;
     }
 
-    const Def::nets_container_type &Def::nets() const noexcept
-    {
-        return m_nets;
-    }
-
-    const Def::Component::string_type& Def::Component::name() const noexcept
+    const Def::Component::name_type& Def::Component::name() const noexcept
     {
         return m_name;
     }
 
-    const Def::Component::string_type& Def::Component::macro() const noexcept
+    const Def::Component::macro_type& Def::Component::macro() const noexcept
     {
         return m_macro;
     }
@@ -251,8 +240,8 @@ namespace parser
         return m_name == rhs.m_name &&
             m_macro == rhs.m_macro &&
             m_orientation == rhs.m_orientation &&
-            m_position.x() == rhs.m_position.x() && 
-            m_position.y() == rhs.m_position.y() && 
+            m_position.x() == rhs.m_position.x() &&
+            m_position.y() == rhs.m_position.y() &&
             m_fixed == rhs.m_fixed;
     }
 
@@ -285,23 +274,33 @@ namespace parser
             return component.m_fixed ? "true" : "false";
         };
 
-        os << "{name: " << component.m_name 
+        os << "{name: " << component.m_name
             << ", macro: " << component.m_macro
             << ", orientarion: " << orientation_string()
-            << ", position: (" << component.m_position.x() 
+            << ", position: (" << component.m_position.x()
             << ", " << component.m_position.y() << ")"
-            << ", fixed: " << fixed_string() 
+            << ", fixed: " << fixed_string()
             << "}";
 
         return os;
     }
 
-    const Def::Row::string_type& Def::Row::name() const noexcept
+    const Def::Net::name_type& Def::Net::name() const noexcept
     {
         return m_name;
     }
 
-    const Def::Row::string_type& Def::Row::site() const noexcept
+    const Def::Net::pin_container_type& Def::Net::pins() const noexcept
+    {
+        return m_pins;
+    }
+
+    const Def::Row::name_type& Def::Row::name() const noexcept
+    {
+        return m_name;
+    }
+
+    const Def::Row::site_type& Def::Row::site() const noexcept
     {
         return m_site;
     }
@@ -335,31 +334,17 @@ namespace parser
 
     std::ostream& operator<<(std::ostream& os,const Def::Row& row)
     {
-        os << "{name: " << row.m_name 
+        os << "{name: " << row.m_name
             << ", site: " << row.m_site
             << ", origin: )" << row.m_origin.x()
             << ", " << row.m_origin.y() << ")"
-            << ", step: (" << row.m_step.x() 
+            << ", step: (" << row.m_step.x()
             << ", " << row.m_step.y() << ")"
-            << ", num: (" << row.m_num.x() 
+            << ", num: (" << row.m_num.x()
             << ", " << row.m_num.y() << ")"
             << "}";
 
         return os;
-    }
-
-    const Def::Net::string_type& Def::Net::name() const noexcept
-    {
-        return m_name;
-    }
-
-    const Def::Net::pin_container_type& Def::Net::pins() const noexcept
-    {
-        return m_pins;
-    }
-
-    void Def::Net::add_connection(const Def::Net::string_type cell, const Def::Net::string_type pin){
-        m_pins.push_back(std::make_pair(cell, pin));
     }
 
     const Def::Track::Orientation& Def::Track::orientation() const noexcept
@@ -386,11 +371,4 @@ namespace parser
     {
         return m_numtracks;
     }
-
-
-
-
-
-}     // namespace parser
-}     // namespace ophidian
-
+}

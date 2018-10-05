@@ -24,104 +24,104 @@ namespace ophidian::floorplan
     // Element access
     Floorplan::point_type& Floorplan::chip_origin() noexcept
     {
-        return mChipOrigin;
+        return m_chip_origin;
     }
 
     const Floorplan::point_type& Floorplan::chip_origin() const noexcept
     {
-        return mChipOrigin;
+        return m_chip_origin;
     }
 
     Floorplan::point_type& Floorplan::chip_upper_right_corner() noexcept
     {
-        return mChipUpperRightCorner;
+        return m_chip_upper_right_corner;
     }
 
     const Floorplan::point_type& Floorplan::chip_upper_right_corner() const noexcept
     {
-        return mChipUpperRightCorner;
+        return m_chip_upper_right_corner;
     }
 
     Floorplan::point_type& Floorplan::origin(const Floorplan::row_type & row)
     {
-        return mOrigins[row];
+        return m_row_origins[row];
     }
 
     const Floorplan::point_type& Floorplan::origin(const Floorplan::row_type & row) const
     {
-        return mOrigins[row];
+        return m_row_origins[row];
     }
 
     Floorplan::point_type Floorplan::upper_right_corner(const Floorplan::row_type & row) const
     {
-        auto site = mSiteTypeOfRow[row];
+        auto site = m_row_site_types[row];
 
-        util::database_unit_scalar_t numSites = mNumberOfSites[row];
+        util::database_unit_scalar_t numSites = m_row_number_of_sites[row];
 
-        Floorplan::point_type uRCorner = mDimensions[site];
+        Floorplan::point_type uRCorner = m_site_dimensions[site];
 
         return Floorplan::point_type{uRCorner.x() * numSites + origin(row).x(), uRCorner.y() + origin(row).y()};
     }
 
     Floorplan::site_name_type& Floorplan::name(const Floorplan::site_type & site)
     {
-        return mNames[site];
+        return m_site_names[site];
     }
 
     const Floorplan::site_name_type& Floorplan::name(const Floorplan::site_type & site) const
     {
-        return mNames[site];
+        return m_site_names[site];
     }
 
     Floorplan::point_type& Floorplan::dimension(const Floorplan::site_type & site)
     {
-        return mDimensions[site];
+        return m_site_dimensions[site];
     }
 
     const Floorplan::point_type& Floorplan::dimension(const Floorplan::site_type & site) const
     {
-        return mDimensions[site];
+        return m_site_dimensions[site];
     }
 
     Floorplan::site_type Floorplan::find(const Floorplan::site_name_type& siteName) const
     {
-        return mName2Site.at(siteName);
+        return m_name_to_site.at(siteName);
     }
 
     Floorplan::row_size_type& Floorplan::number_of_sites(const Floorplan::row_type & row)
     {
-        return mNumberOfSites[row];
+        return m_row_number_of_sites[row];
     }
 
     const Floorplan::row_size_type& Floorplan::number_of_sites(const Floorplan::row_type & row) const
     {
-        return mNumberOfSites[row];
+        return m_row_number_of_sites[row];
     }
 
     Floorplan::site_type Floorplan::site(const Floorplan::row_type & row) const
     {
-        return mSiteTypeOfRow[row];
+        return m_row_site_types[row];
     }
 
     // Iterators
     ophidian::util::Range<Floorplan::SitesIterator> Floorplan::range_site() const
     {
-        return ophidian::util::Range<Floorplan::SitesIterator>(mSites.begin(), mSites.end());
+        return ophidian::util::Range<Floorplan::SitesIterator>(m_sites.begin(), m_sites.end());
     }
-    
+
     ophidian::util::Range<Floorplan::RowsIterator> Floorplan::range_row() const
     {
-        return util::Range<Floorplan::RowsIterator>(mRows.begin(), mRows.end());
+        return util::Range<Floorplan::RowsIterator>(m_rows.begin(), m_rows.end());
     }
 
     // Modifiers
     Floorplan::site_type Floorplan::add_site(const Floorplan::site_name_type & name, const Floorplan::point_type & loc)
     {
-        auto site = mSites.add();
+        auto site = m_sites.add();
 
-        mNames[site] = name;
-        mName2Site[name] = site;
-        mDimensions[site] = loc;
+        m_site_names[site] = name;
+        m_name_to_site[name] = site;
+        m_site_dimensions[site] = loc;
 
         return site;
     }
@@ -131,23 +131,23 @@ namespace ophidian::floorplan
         const Floorplan::row_size_type& num,
         const Floorplan::site_type & site)
     {
-        auto row = mRows.add();
+        auto row = m_rows.add();
 
-        mOrigins[row] = loc;
-        mNumberOfSites[row] = num;
-        mSiteTypeOfRow[row] = site;
+        m_row_origins[row] = loc;
+        m_row_number_of_sites[row] = num;
+        m_row_site_types[row] = site;
 
         return row;
     }
 
     void Floorplan::erase(const Floorplan::site_type& site)
     {
-        mName2Site.erase(name(site));
-        mSites.erase(site);
+        m_name_to_site.erase(name(site));
+        m_sites.erase(site);
     }
 
     void Floorplan::erase(const Floorplan::row_type & row)
     {
-        mRows.erase(row);
+        m_rows.erase(row);
     }
 }

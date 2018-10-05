@@ -51,6 +51,8 @@ namespace ophidian::design::factory
 
         circuit::factory::make_standard_cells(design.standard_cells(), lef);
 
+        circuit::factory::make_netlist(design.netlist(), def, design.standard_cells());
+
         placement::factory::make_library(design.placement_library(), lef, design.standard_cells());
 
         placement::factory::make_placement(design.placement(), def, design.netlist());

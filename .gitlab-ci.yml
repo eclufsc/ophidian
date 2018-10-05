@@ -1,18 +1,18 @@
-variables: 
+variables:
     BUILD_SCRIPT_DEPENDENCIES:
-        "build-essential 
+        "build-essential
         git
-        cmake 
+        cmake
         libboost1.63-dev
         libz-dev
-        flex 
+        flex
         bison
         libbison-dev"
 
-    DEPENDENCIES_UBUNTU_ARTFUL: 
-        "build-essential 
+    DEPENDENCIES_UBUNTU_ARTFUL:
+        "build-essential
         git
-        cmake 
+        cmake
         libboost1.63-dev
         liblemon-dev
         def
@@ -22,9 +22,9 @@ variables:
         libverilog-parser-dev"
 
     DEPENDENCIES_UBUNTU_BIONIC:
-        "build-essential 
+        "build-essential
         git
-        cmake 
+        cmake
         libboost-dev
         liblemon-dev
         def
@@ -43,14 +43,16 @@ variables:
 stages:
     - build
 
-gitlab_pages:
+pages:
     image: alpine
     stage: build
-    before_script: 
+    before_script:
         - apk update
         - apk add doxygen
     script:
-        - doxygen doc/Doxyfile
+        - cd doc
+        - doxygen Doxyfile
+        - cd ..
         - mv doc/documentation/html/ public/
     artifacts:
         paths:
@@ -68,9 +70,9 @@ build_on_debian-sid:
         - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-                -DCMAKE_BUILD_TYPE=Release 
-                -DOPHIDIAN_GUI=ON 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
+                -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
         - cd test
@@ -88,9 +90,9 @@ build_on_ubuntu-artful:
         - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
-                -DCMAKE_BUILD_TYPE=Release 
-                -DOPHIDIAN_GUI=ON 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
+                -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
         - cd test
@@ -108,9 +110,9 @@ build_on_ubuntu-bionic:
         - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON 
+                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
         - cd test
@@ -127,9 +129,9 @@ build_using_dependencies_script_on_source:
     script:
         - echo "y" | bash build_dependencies.sh
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON 
+                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
         - cd test
@@ -146,9 +148,9 @@ build_using_dependencies_script_on_sistem:
     script:
         - echo y | bash build_dependencies.sh --install_to /usr/local
         - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr 
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON 
+                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
         - cd test

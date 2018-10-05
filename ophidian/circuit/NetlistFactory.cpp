@@ -105,7 +105,7 @@ namespace ophidian::circuit::factory
             {
                 auto pin = netlist.add_pin_instance(instance.name() + ":" + portMap.first);
                 netlist.connect(cell, pin);
-                
+
                 netlist.connect(pin, std_cells.find_pin(instance.module() + ":" + portMap.first));
 
                 netlist.connect(netlist.find_net(portMap.second), pin);
@@ -113,8 +113,7 @@ namespace ophidian::circuit::factory
         }
     }
 
-
-    void make_netlist(Netlist &netlist, const parser::Def &def, const StandardCells &std_cells) noexcept
+    void make_netlist(Netlist& netlist, const parser::Def & def, const StandardCells& std_cells) noexcept
     {
         for(const auto& component : def.components())
         {
@@ -128,6 +127,11 @@ namespace ophidian::circuit::factory
             auto net_instance = netlist.add_net(net.name());
             for(const auto& pin : net.pins())
             {
+                if(pin.first == "PIN")
+                {
+                    continue;
+                }
+
                 auto pin_instance = netlist.add_pin_instance(pin.first + ":" + pin.second);
 
                 netlist.connect(net_instance, pin_instance);
@@ -141,7 +145,5 @@ namespace ophidian::circuit::factory
                 netlist.connect(pin_instance, std_cells.find_pin(std_cells.name(cell) + ":" + pin.second));
             }
         }
-
     }
-
 }

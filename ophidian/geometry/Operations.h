@@ -20,8 +20,7 @@
 #define OPHIDIAN_GEOMETRY_OPERATIONS_H
 
 #include <boost/geometry/algorithms/intersection.hpp>
-
-#include "Models.h"
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 
 namespace ophidian::geometry
 {
@@ -31,6 +30,19 @@ namespace ophidian::geometry
         namespace bg = boost::geometry;
 
         auto result = Geometry<Point_<T>>{};
+
+        auto translate = bg::strategy::transform::translate_transformer<T, 2, 2>{translationPoint.x(), translationPoint.y()};
+        bg::transform(geometry, result, translate);
+
+        return result;
+    }
+
+    template <template <typename> class Point_, class T>
+    Point_<T> translate(const Point_<T> & geometry, Point_<T> & translationPoint)
+    {
+        namespace bg = boost::geometry;
+
+        auto result = Point_<T>{};
 
         auto translate = bg::strategy::transform::translate_transformer<T, 2, 2>{translationPoint.x(), translationPoint.y()};
         bg::transform(geometry, result, translate);
@@ -59,6 +71,19 @@ namespace ophidian::geometry
         return result;
     }
 
+    template <template <typename> class Point_, class T>
+    Point_<T> scale(const Point_<T> & geometry, Point_<T> & scalingPoint)
+    {
+        Point_<T> result;
+
+        boost::geometry::strategy::transform::scale_transformer<T, 2, 2> scale(
+            scalingPoint.x(),
+            scalingPoint.y());
+        boost::geometry::transform(geometry, result, scale);
+
+        return result;
+    }
+
     //! Rotate operation
 
     /*!
@@ -71,6 +96,16 @@ namespace ophidian::geometry
     Geometry<Point_<T>> rotate(const Geometry<Point_<T>> & geometry, double degree)
     {
         Geometry<Point_<T>> result;
+        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2,
+            2> rotate(degree);
+        boost::geometry::transform(geometry, result, rotate);
+        return result;
+    }
+
+    template <template <typename> class Point_, class T>
+    Point_<T> rotate(const Point_<T> & geometry, double degree)
+    {
+        Point_<T> result;
         boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2,
             2> rotate(degree);
         boost::geometry::transform(geometry, result, rotate);

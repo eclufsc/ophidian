@@ -48,6 +48,8 @@ namespace ophidian::floorplan
         using RowsIterator = entity_system::EntitySystem<Row>::const_iterator;
         using SitesIterator = entity_system::EntitySystem<Site>::const_iterator;
 
+        using unit_type  = util::database_unit_t;
+
         using point_type = util::LocationDbu;
 
         using site_type = Site;
@@ -68,7 +70,7 @@ namespace ophidian::floorplan
         // Element access
         point_type& chip_origin() noexcept;
         const point_type& chip_origin() const noexcept;
-        
+
         point_type& chip_upper_right_corner() noexcept;
         const point_type& chip_upper_right_corner() const noexcept;
 
@@ -107,19 +109,18 @@ namespace ophidian::floorplan
         void erase(const row_type & row);
 
     private:
-        entity_system::EntitySystem<row_type>                           mRows{};
-        entity_system::Property<row_type, point_type>            mOrigins{mRows};
-        entity_system::Property<row_type, util::database_unit_scalar_t> mNumberOfSites{mRows};
-        entity_system::Property<row_type, site_type>                         mSiteTypeOfRow{mRows};
+        entity_system::EntitySystem<row_type>                           m_rows{};
+        entity_system::Property<row_type, point_type>                   m_row_origins{m_rows};
+        entity_system::Property<row_type, util::database_unit_scalar_t> m_row_number_of_sites{m_rows};
+        entity_system::Property<row_type, site_type>                    m_row_site_types{m_rows};
 
-        entity_system::EntitySystem<site_type>                mSites{};
-        entity_system::Property<site_type, site_name_type>       mNames{mSites};
-        entity_system::Property<site_type, point_type> mDimensions{mSites};
+        entity_system::EntitySystem<site_type>             m_sites{};
+        entity_system::Property<site_type, site_name_type> m_site_names{m_sites};
+        entity_system::Property<site_type, point_type>     m_site_dimensions{m_sites};
+        std::unordered_map<site_name_type, site_type>      m_name_to_site{};
 
-        point_type mChipOrigin{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
-        point_type mChipUpperRightCorner{util::database_unit_t{0.0}, util::database_unit_t{0.0}};
-
-        std::unordered_map<site_name_type, site_type> mName2Site{};
+        point_type m_chip_origin{unit_type{0.0}, unit_type{0.0}};
+        point_type m_chip_upper_right_corner{unit_type{0.0}, unit_type{0.0}};
     };
 }
 

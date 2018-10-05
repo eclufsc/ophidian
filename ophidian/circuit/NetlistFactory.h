@@ -30,7 +30,7 @@ namespace ophidian::circuit::factory
 
     void make_netlist(Netlist& netlist, const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
 
-    void make_netlist(Netlist& netlist, const parser::Def& def, const StandardCells& std_cells) noexcept;
+    void make_netlist(Netlist& netlist, const parser::Def & verilog, const StandardCells& std_cells) noexcept;
 }
 
 #endif

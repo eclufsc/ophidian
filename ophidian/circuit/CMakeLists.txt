@@ -20,7 +20,7 @@
 ################################################################################
 
 # Set the include path for installed target
-set(ophidian_circuit_install_include_dir 
+set(ophidian_circuit_install_include_dir
     ${ophidian_install_include_dir}/ophidian/circuit
 )
 
@@ -69,8 +69,8 @@ set_target_properties(ophidian_circuit PROPERTIES
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_circuit
-    PUBLIC ophidian_entity_system 
-    PUBLIC ophidian_parser 
+    PUBLIC ophidian_entity_system
+    PUBLIC ophidian_parser
 )
 
 # Tell cmake the path to look for include files for this target
@@ -86,7 +86,7 @@ add_library(ophidian_circuit_static STATIC ${ophidian_circuit_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_circuit_static
-    PUBLIC ophidian_entity_system_static 
+    PUBLIC ophidian_entity_system_static
     PUBLIC ophidian_parser_static
 )
 
@@ -110,6 +110,6 @@ install(
 
 # Install rule for headers
 install(
-    FILES ${ophidian_circuit_headers} 
+    FILES ${ophidian_circuit_headers}
     DESTINATION ${ophidian_circuit_install_include_dir}
 )
