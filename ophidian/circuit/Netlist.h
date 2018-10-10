@@ -232,7 +232,7 @@ namespace ophidian::circuit
         template <typename Value>
         entity_system::Aggregation<Net, Value> makeAggregation(Net, entity_system::EntitySystem<Value> & parts) const
         {
-            return entity_system::Aggregation<Net, Value>(mNets, parts);
+            return entity_system::Aggregation<Net, Value>(m_nets, parts);
         }
 
         entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
