@@ -24,6 +24,7 @@
 #include <ophidian/placement/PlacementFactory.h>
 #include <ophidian/floorplan/FloorplanFactory.h>
 #include <ophidian/routing/LibraryFactory.h>
+#include <ophidian/routing/GlobalRoutingFactory.h>
 
 namespace ophidian::design::factory
 {
@@ -58,7 +59,7 @@ namespace ophidian::design::factory
         placement::factory::make_placement(design.placement(), def, design.netlist());
     }
 
-    void make_design_ispd2018(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept
+    void make_design_ispd2018(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept
     {
         floorplan::factory::make_floorplan(design.floorplan(), def, lef);
 
@@ -71,5 +72,7 @@ namespace ophidian::design::factory
         placement::factory::make_placement(design.placement(), def, design.netlist());
 
         routing::factory::make_library(design.routing_library(), lef, def);
+
+        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), guide);
     }
 }

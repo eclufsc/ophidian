@@ -23,7 +23,7 @@ namespace ophidian
 namespace routing
 {
 
-Library::layer_type Library::find_layer_instance(const std::string &layerName)
+Library::layer_type Library::find_layer_instance(const std::string &layerName) const
 {
     return mName2Layer.at(layerName);
 }
@@ -38,7 +38,7 @@ const std::string& Library::name(const Library::layer_type &layer) const
     return mLayerName[layer];
 }
 
-Library::via_type Library::find_via_instance(const std::string &viaName)
+Library::via_type Library::find_via_instance(const std::string &viaName) const
 {
     return mName2Via.at(viaName);
 }

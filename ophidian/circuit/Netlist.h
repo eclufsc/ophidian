@@ -229,6 +229,12 @@ namespace ophidian::circuit
             return entity_system::Property<Output, Value>(m_output_pads);
         }
 
+        template <typename Value>
+        entity_system::Aggregation<Net, Value> makeAggregation(Net, entity_system::EntitySystem<Value> & parts) const
+        {
+            return entity_system::Aggregation<Net, Value>(mNets, parts);
+        }
+
         entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
         entity_system::EntitySystem<PinInstance>::NotifierType * notifier(PinInstance) const;
         entity_system::EntitySystem<Net>::NotifierType * notifier(Net) const;

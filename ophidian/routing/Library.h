@@ -3,6 +3,7 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
+#include <ophidian/entity_system/Aggregation.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/util/LookupTable.h>
 #include <unordered_map>
@@ -80,7 +81,7 @@ namespace routing
         Library& operator=(Library &&) = default;
 
         // Element access
-        layer_type find_layer_instance(const std::string& layerName);
+        layer_type find_layer_instance(const std::string& layerName) const;
 
         std::string& name(const layer_type& layer);
         const std::string& name(const layer_type& layer) const;
@@ -97,7 +98,7 @@ namespace routing
         unit_type EOLwithin(const layer_type& layer) const;
         const spacing_table_type& spacing_table(const layer_type& layer) const;
 
-        via_type find_via_instance(const std::string& viaName);
+        via_type find_via_instance(const std::string& viaName) const;
         std::string& name(const via_type& via);
         const std::string& name(const via_type& via) const;
         const box_type &geometry(const via_type& via, const std::string &layer);
@@ -155,6 +156,12 @@ namespace routing
             return entity_system::Property<track_type, Value>(mTracks);
         }
 
+        template <typename Value>
+        entity_system::Aggregation<layer_type, Value> makeAggregation(layer_type, entity_system::EntitySystem<Value> & parts) const
+        {
+            return entity_system::Aggregation<layer_type, Value>(mLayers, parts);
+        }
+
         entity_system::EntitySystem<layer_type>::NotifierType * notifier(layer_type) const;
         entity_system::EntitySystem<via_type>::NotifierType * notifier(via_type) const;
         entity_system::EntitySystem<track_type>::NotifierType * notifier(track_type) const;
@@ -188,7 +195,6 @@ namespace routing
         entity_system::Property<track_type, unit_type>          mTrackSpace{mTracks};
         entity_system::Property<track_type, layer_type>         mLayerOfTrack{mTracks};
     };
-
 
 } // namespace routing
 } // namespace ophidian
