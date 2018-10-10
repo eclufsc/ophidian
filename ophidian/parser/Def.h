@@ -99,12 +99,15 @@ namespace ophidian::parser
         const track_container_type& tracks() const noexcept;
 
     private:
-        database_unit_box_type   m_die_area;
-        row_container_type       m_rows;
-        component_container_type m_components;
-        net_container_type       m_nets;
-        scalar_type              m_dbu_to_micrometer_ratio;
-        track_container_type     m_tracks;
+        database_unit_box_type   m_die_area{
+            database_unit_point_type{database_unit_type{0.0d}, database_unit_type{0.0d}},
+            database_unit_point_type{database_unit_type{0.0d}, database_unit_type{0.0d}}
+        };
+        row_container_type       m_rows{};
+        component_container_type m_components{};
+        net_container_type       m_nets{};
+        scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
+        track_container_type     m_tracks{};
     };
 
     /**
@@ -123,10 +126,11 @@ namespace ophidian::parser
         enum class Orientation : int {
             X, Y
         };
-        using string_type               = std::string;
+
+        using layer_name_type           = std::string;
         using database_unit_type        = Def::database_unit_type;
         using scalar_type               = Def::scalar_type;
-        using orientation_type         = Orientation;
+        using orientation_type          = Orientation;
 
         // Class constructors
 
@@ -144,26 +148,30 @@ namespace ophidian::parser
             m_start{std::forward<Arg2>(start)},
             m_numtracks{std::forward<Arg3>(numTracks)},
             m_space{std::forward<Arg4>(space)},
-            m_layerName{std::forward<Arg5>(layer)}
+            m_layer_name{std::forward<Arg5>(layer)}
         {}
 
         // Class member functions
-        const Orientation& orientation() const noexcept;
+        const orientation_type& orientation() const noexcept;
 
         const database_unit_type& start() const noexcept;
 
-        const scalar_type& numtracks() const noexcept;
+        const scalar_type& number_of_tracks() const noexcept;
 
         const database_unit_type& space() const noexcept;
 
-        const string_type& layerName() const noexcept;
+        const layer_name_type& layer_name() const noexcept;
+
+        bool operator==(const Track& rhs) const noexcept;
+
+        friend std::ostream& operator<<(std::ostream& os, const Track& track);
 
     private:
-        Orientation m_orientation;///Specifies the location and direction of the first track defined. X indicates vertical lines; Y indicates horizontal lines.
+        orientation_type m_orientation;///Specifies the location and direction of the first track defined. X indicates vertical lines; Y indicates horizontal lines.
         database_unit_type m_start;/// is the X or Y coordinate of the first line.
         scalar_type m_numtracks;///Specifies the number of tracks to create for the grid.
         database_unit_type m_space;///Specifies the spacing between the tracks.
-        string_type m_layerName;///Specifies the routing layer used for the tracks.
+        layer_name_type m_layer_name;///Specifies the routing layer used for the tracks.
     };
 
     /**
@@ -261,6 +269,10 @@ namespace ophidian::parser
         const name_type& name() const noexcept;
 
         const pin_container_type& pins() const noexcept;
+
+        bool operator==(const Net& rhs) const noexcept;
+
+        friend std::ostream& operator<<(std::ostream& os, const Net& net);
 
     private:
         name_type m_name;

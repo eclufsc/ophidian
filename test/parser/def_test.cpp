@@ -150,7 +150,7 @@ TEST_CASE("Def: Loading ispd_18_sample.input.def", "[parser][Def][ispd18][sample
     auto& first_track = tracks.front();
     CHECK(first_track.orientation() == Def::track_type::orientation_type::X);
     CHECK(first_track.start() == dbu_t{83800.0});
-    CHECK(first_track.numtracks() == scalar_t{52.0});
+    CHECK(first_track.number_of_tracks() == scalar_t{52.0});
     CHECK(first_track.space() == dbu_t{400.0});
-    CHECK(first_track.layerName() == "Metal9");
+    CHECK(first_track.layer_name() == "Metal9");
 }

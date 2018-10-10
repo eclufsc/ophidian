@@ -295,6 +295,19 @@ namespace ophidian::parser
         return m_pins;
     }
 
+    bool Def::Net::operator==(const Def::Net& rhs) const noexcept
+    {
+        return m_name == rhs.m_name;
+    }
+
+    std::ostream& operator<<(std::ostream& os,const Def::Net& net)
+    {
+        os << "{name: " << net.m_name
+            << "}";
+
+        return os;
+    }
+
     const Def::Row::name_type& Def::Row::name() const noexcept
     {
         return m_name;
@@ -347,7 +360,7 @@ namespace ophidian::parser
         return os;
     }
 
-    const Def::Track::Orientation& Def::Track::orientation() const noexcept
+    const Def::Track::orientation_type& Def::Track::orientation() const noexcept
     {
         return m_orientation;
     }
@@ -362,13 +375,45 @@ namespace ophidian::parser
         return m_space;
     }
 
-    const Def::Track::string_type& Def::Track::layerName() const noexcept
+    const Def::Track::layer_name_type& Def::Track::layer_name() const noexcept
     {
-        return m_layerName;
+        return m_layer_name;
     }
 
-    const Def::Track::scalar_type& Def::Track::numtracks() const noexcept
+    const Def::Track::scalar_type& Def::Track::number_of_tracks() const noexcept
     {
         return m_numtracks;
+    }
+
+    bool Def::Track::operator==(const Def::Track& rhs) const noexcept
+    {
+        return m_orientation == rhs.m_orientation &&
+            m_start == rhs.m_start &&
+            m_numtracks == rhs.m_numtracks &&
+            m_space == rhs.m_space &&
+            m_layer_name == rhs.m_layer_name;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Def::Track& track)
+    {
+        auto orientation_string = [&]() -> std::string {
+            switch(track.m_orientation){
+                case Def::Track::orientation_type::X:
+                    return "X";
+                case Def::Track::orientation_type::Y:
+                    return "Y";
+                default:
+                    return "NA";
+            }
+        };
+
+        os << "{layer_name: " << track.m_layer_name
+            << ", orientarion: " << orientation_string()
+            << ", start: " << track.m_start
+            << ", number_of_tracks: " << track.m_numtracks
+            << ", space: " << track.m_space
+            << "}";
+
+        return os;
     }
 }

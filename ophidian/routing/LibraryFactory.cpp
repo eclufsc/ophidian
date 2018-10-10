@@ -117,7 +117,7 @@ namespace factory
             }else {
                 orientation = ophidian::routing::TrackOrientation::Y;
             }
-            library.add_track_instance(orientation, track.start(), track.numtracks(), track.space(), track.layerName());
+            library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
     }
 }
