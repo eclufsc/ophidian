@@ -170,7 +170,7 @@ TEST_CASE("Netlist: Make Cell Property (names)", "[circuit][Netlist]")
 	Netlist nl;
     auto u1 = nl.add_cell_instance("u1");
     auto u2  = nl.add_cell_instance("u2");
-    auto names = nl.makeProperty<std::string>(CellInstance());
+    auto names = nl.make_property_cell_instance<std::string>();
 	names[u1] = "u1";
 	names[u2] = "u2";
 	REQUIRE(names[u1] == "u1");
@@ -188,7 +188,7 @@ TEST_CASE("Netlist: Make Pin Property (position).", "[circuit][Netlist]")
 	Netlist nl;
     auto u1_a = nl.add_pin_instance("u1_a");
     auto u1_b  = nl.add_pin_instance("u1_b");
-    auto positions = nl.makeProperty<Point2D>(PinInstance());
+    auto positions = nl.make_property_pin_instance<Point2D>();
 	positions[u1_a] = {0, 1};
 	positions[u1_b] = {2, 3};
 	REQUIRE(positions[u1_a].x == 0);
@@ -204,7 +204,7 @@ TEST_CASE("Netlist: Make Net Property (Lumped Capacitance).", "[circuit][Netlist
 	Netlist nl;
 	auto n1 = nl.add_net("n1");
 	auto n2  = nl.add_net("n2");
-	auto CLoad = nl.makeProperty<Capacitance>(Net());
+	auto CLoad = nl.make_property_net<Capacitance>();
 	CLoad[n1] = 1e-15;
 	CLoad[n2] = 2e-15;
 	REQUIRE(Approx(CLoad[n1]) == 1e-15);
@@ -215,7 +215,7 @@ class DummyCellObserver : public Netlist::CellNotifier::ObserverBase
 {
 public:
 	DummyCellObserver(const Netlist & nl) :
-		Netlist::CellNotifier::ObserverBase(*nl.notifier(CellInstance())),
+		Netlist::CellNotifier::ObserverBase(*nl.notifier_cell_instance()),
 		added(0),
 		erased(0),
 		capacity(0)
@@ -317,8 +317,8 @@ TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")
 	nl.add_input_pad(inp2);
 	nl.add_output_pad(out);
 
-	auto inputSlews = nl.makeProperty<double>(Input());
-	auto outputLoads = nl.makeProperty<double>(Output());
+	auto inputSlews = nl.make_property_input_pad<double>();
+	auto outputLoads = nl.make_property_output_pad<double>();
 
 	inputSlews[nl.input(inp1)] = 1.1;
 	inputSlews[nl.input(inp2)] = 2.2;

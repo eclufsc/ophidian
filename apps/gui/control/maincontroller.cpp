@@ -72,7 +72,7 @@ void MainController::buildICCAD2015(std::string lef_file, std::string def_file, 
     }
 
     mDesign = new ophidian::design::Design{};
-    
+
     auto def = ophidian::parser::Def{def_file};
     auto lef = ophidian::parser::Lef{lef_file};
     auto verilog = ophidian::parser::Verilog{verilog_file};
@@ -83,7 +83,7 @@ void MainController::buildICCAD2015(std::string lef_file, std::string def_file, 
 
 void MainController::init()
 {
-    mCellToQuads = mDesign->netlist().makeProperty<std::vector<Quad>>(cell_type());
+    mCellToQuads = mDesign->netlist().make_property_cell_instance<std::vector<Quad>>();
 
     auto amountCells = mDesign->netlist().size_cell_instance();
     auto amountPins  = mDesign->netlist().size_pin_instance();

@@ -23,9 +23,9 @@ namespace ophidian::placement
     Placement::Placement(const circuit::Netlist & netlist, const Library &library):
             m_netlist(netlist),
             m_library(library),
-            m_cell_locacations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
-            m_input_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
-            m_output_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
+            m_cell_locacations(netlist.make_property_cell_instance<util::LocationDbu>()),
+            m_input_pad_locations(netlist.make_property_input_pad<util::LocationDbu>()),
+            m_output_pad_locations(netlist.make_property_output_pad<util::LocationDbu>())
     {
     }
 

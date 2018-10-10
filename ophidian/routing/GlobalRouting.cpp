@@ -24,7 +24,7 @@ namespace routing
 {
 
 GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist):
-    mNet2Region{netlist.makeAggregation<GlobalRouting::region_type>(ophidian::circuit::Net(), mRegions)}
+    mNet2Region{netlist.make_aggregation_net<GlobalRouting::region_type>(mRegions)}
 {
 }
 
