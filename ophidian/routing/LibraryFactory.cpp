@@ -35,13 +35,13 @@ namespace factory
             //layer type
             LayerType lType;
             switch (layer.type()) {
-            case ophidian::parser::Lef::Layer::Type::CUT:
+            case ophidian::parser::Lef::layer_type::Type::CUT:
                 lType = LayerType::CUT;
                 break;
-            case ophidian::parser::Lef::Layer::Type::MASTERSLICE:
+            case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
                 lType = LayerType::MASTERSLICE;
                 break;
-            case ophidian::parser::Lef::Layer::Type::ROUTING:
+            case ophidian::parser::Lef::layer_type::Type::ROUTING:
                 lType = LayerType::ROUTING;
                 break;
             default:
@@ -51,10 +51,10 @@ namespace factory
             //layer direction
             LayerDirection lDirection;
             switch (layer.direction()) {
-            case ophidian::parser::Lef::Layer::Direction::HORIZONTAL:
+                case ophidian::parser::Lef::layer_type::Direction::HORIZONTAL:
                 lDirection = LayerDirection::HORIZONTAL;
                 break;
-            case ophidian::parser::Lef::Layer::Direction::VERTICAL:
+            case ophidian::parser::Lef::layer_type::Direction::VERTICAL:
                 lDirection = LayerDirection::VERTICAL;
                 break;
             default:

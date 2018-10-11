@@ -20,7 +20,7 @@
 ################################################################################
 
 # Set the include path for installed target
-set(ophidian_parser_install_include_dir 
+set(ophidian_parser_install_include_dir
     ${ophidian_install_include_dir}/ophidian/parser
 )
 
@@ -109,13 +109,13 @@ target_include_directories(ophidian_parser_static PUBLIC
 
 # Install rule for target
 install(
-    TARGETS ophidian_parser ophidian_parser_static 
+    TARGETS ophidian_parser ophidian_parser_static
     DESTINATION ${ophidian_install_lib_dir}
     EXPORT ophidian-targets
 )
 
 # Install rule for headers
 install(
-    FILES ${ophidian_parser_headers} 
+    FILES ${ophidian_parser_headers}
     DESTINATION ${ophidian_parser_install_include_dir}
 )

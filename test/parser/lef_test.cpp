@@ -25,7 +25,7 @@ TEST_CASE("lef: missing file", "[parser][lef][missing_file]")
         Lef{"thisFileDoesNotExist.lef"},
         ophidian::parser::exceptions::InexistentFile
     );
-} 
+}
 
 TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
 {
@@ -64,11 +64,11 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
         auto& first_layer = simple.layers().front();
         CHECK(first_layer.name() == "metal1");
         CHECK(first_layer.type() == Lef::layer_type::type_type::ROUTING);
-        CHECK(first_layer.direction() == Lef::Layer::direction_type::HORIZONTAL);
+        CHECK(first_layer.direction() == Lef::layer_type::direction_type::HORIZONTAL);
         CHECK(first_layer.pitch() == micron_t{0.2});
         CHECK(first_layer.offset() == micron_t{0.0});
         CHECK(first_layer.width() == micron_t{0.1});
-        
+
         auto& last_layer = simple.layers().back();
         CHECK(last_layer.name() == "metal3");
         CHECK(last_layer.type() == Lef::layer_type::type_type::ROUTING);
@@ -100,7 +100,7 @@ TEST_CASE("lef: simple.lef parsing", "[parser][lef][simple]")
         CHECK(first_macro.site() == "core");
 
         CHECK(first_macro.pins().size() == 2);
-        
+
         auto& first_pin_fm = first_macro.pins().front();
 
         CHECK(first_pin_fm.name() == "o");
@@ -149,7 +149,7 @@ TEST_CASE("lef: ispd18_sample.input.lef parsing", "[parser][lef][sample][ispd18]
         auto& first_layer = sample.layers().front();
         CHECK(first_layer.name() == "Metal1");
         CHECK(first_layer.type() == Lef::layer_type::type_type::ROUTING);
-        CHECK(first_layer.direction() == Lef::Layer::direction_type::HORIZONTAL);
+        CHECK(first_layer.direction() == Lef::layer_type::direction_type::HORIZONTAL);
         CHECK(first_layer.pitch() == micron_t{0.19});
         CHECK(first_layer.offset() == micron_t{0.0});
         CHECK(first_layer.width() == micron_t{0.06});
