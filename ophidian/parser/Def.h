@@ -19,14 +19,15 @@
 #ifndef OPHIDIAN_PARSER_DEF_H
 #define OPHIDIAN_PARSER_DEF_H
 
-// std headers
 #include <utility>
 #include <string>
 #include <vector>
 
-// external headers
+#include "Row.h"
+#include "Component.h"
+#include "Net.h"
+#include "Track.h"
 
-// ophidian headers
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
@@ -42,11 +43,6 @@ namespace ophidian::parser
     {
     public:
         // Class member types
-        class Row;
-        class Component;
-        class Track;
-        class Net;
-
         template <class T> using container_type = std::vector<T>;
         template <class T> using point_type     = geometry::Point<T>;
         template <class T> using box_type       = geometry::Box<T>;
@@ -109,236 +105,6 @@ namespace ophidian::parser
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
     };
-
-    /**
-     * @brief Type to represent a circuit track.
-     *
-     * Defines the routing grid for a standard cell-based design.
-     * Typically, the routing grid is generated when the floorplan is initialized.
-     * The first track is located at an offset from the placement grid set by the
-     * OFFSET value for the layer in the LEF file. The track spacing is the PITCH
-     * value for the layer defined in LEF.
-     */
-    class Def::Track
-    {
-    public:
-        // Class member types
-        enum class Orientation : int {
-            X, Y
-        };
-
-        using layer_name_type           = std::string;
-        using database_unit_type        = Def::database_unit_type;
-        using scalar_type               = Def::scalar_type;
-        using orientation_type          = Orientation;
-
-        // Class constructors
-
-        Track() = delete;
-
-        Track(const Track&) = default;
-        Track& operator=(const Track&) = default;
-
-        Track(Track&&) = default;
-        Track& operator=(Track&&) = default;
-
-        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-        Track(Arg1&& orientation, Arg2&& start, Arg3&& numTracks, Arg4&& space, Arg5&& layer):
-            m_orientation{std::forward<Arg1>(orientation)},
-            m_start{std::forward<Arg2>(start)},
-            m_numtracks{std::forward<Arg3>(numTracks)},
-            m_space{std::forward<Arg4>(space)},
-            m_layer_name{std::forward<Arg5>(layer)}
-        {}
-
-        // Class member functions
-        const orientation_type& orientation() const noexcept;
-
-        const database_unit_type& start() const noexcept;
-
-        const scalar_type& number_of_tracks() const noexcept;
-
-        const database_unit_type& space() const noexcept;
-
-        const layer_name_type& layer_name() const noexcept;
-
-        bool operator==(const Track& rhs) const noexcept;
-
-        friend std::ostream& operator<<(std::ostream& os, const Track& track);
-
-    private:
-        orientation_type m_orientation;///Specifies the location and direction of the first track defined. X indicates vertical lines; Y indicates horizontal lines.
-        database_unit_type m_start;/// is the X or Y coordinate of the first line.
-        scalar_type m_numtracks;///Specifies the number of tracks to create for the grid.
-        database_unit_type m_space;///Specifies the spacing between the tracks.
-        layer_name_type m_layer_name;///Specifies the routing layer used for the tracks.
-    };
-
-    /**
-     * @brief Type to represent a circuit component.
-     *
-     * This is the data necessary to identify a given
-     * component and it's characteristics.
-     */
-    class Def::Component
-    {
-    public:
-        // Class member types
-        enum class Orientation : int {
-            N, S, W, E, FN, FS, FW, FE
-        };
-
-        using name_type                = std::string;
-
-        using macro_type               = std::string;
-
-        using orientation_type         = Orientation;
-
-        using database_unit_type       = Def::database_unit_type;
-        using database_unit_point_type = Def::database_unit_point_type;
-
-        // Class constructors
-
-        Component() = delete;
-
-        Component(const Component&) = default;
-        Component& operator=(const Component&) = default;
-
-        Component(Component&&) = default;
-        Component& operator=(Component&&) = default;
-
-        template<class Arg1, class Arg2, class Arg3, class Arg4>
-        Component(Arg1&& name, Arg2&& macro, Arg3&& orientation, Arg4&& position, bool fixed):
-            m_name{std::forward<Arg1>(name)},
-            m_macro{std::forward<Arg2>(macro)},
-            m_orientation{std::forward<Arg3>(orientation)},
-            m_position{std::forward<Arg4>(position)},
-            m_fixed{fixed}
-        {}
-
-        // Class member functions
-        const name_type& name() const noexcept;
-
-        const macro_type& macro() const noexcept;
-
-        const orientation_type& orientation() const noexcept;
-
-        const database_unit_point_type& position() const noexcept;
-
-        bool fixed() const noexcept;
-
-        bool operator==(const Component& rhs) const noexcept;
-
-        friend std::ostream& operator<<(std::ostream& os, const Component& component);
-
-    private:
-        name_type                m_name; ///< Component's name for identification.
-        macro_type               m_macro; ///< Component's type, like "NAND2_X1".
-        orientation_type         m_orientation; ///< Component's orientation.
-        database_unit_point_type m_position; ///< Component's lower left corner.
-        bool                     m_fixed; ///< This determines if the component's position is fixed in space, @c true for fixed.
-    };
-
-    class Def::Net
-    {
-    public:
-        // Class member types
-        using name_type = std::string;
-
-        using pin_name_type = std::string;
-
-        using pin_type = std::pair<Def::component_type::name_type, pin_name_type>;
-
-        using pin_container_type = std::vector<pin_type>;
-
-        // Class constructors
-        Net() = delete;
-
-        Net(const Net &) = default;
-        Net & operator=(const Net &) = default;
-
-        Net(Net &&) = default;
-        Net & operator=(Net &&) = default;
-
-        template<class Arg1, class Arg2>
-        Net(Arg1&& name, Arg2&& pins):
-            m_name{std::forward<Arg1>(name)},
-            m_pins{std::forward<Arg2>(pins)}
-        { }
-
-        const name_type& name() const noexcept;
-
-        const pin_container_type& pins() const noexcept;
-
-        bool operator==(const Net& rhs) const noexcept;
-
-        friend std::ostream& operator<<(std::ostream& os, const Net& net);
-
-    private:
-        name_type m_name;
-        pin_container_type m_pins;
-    };
-
-    /**
-     * @brief Type to represent a circuit row.
-     *
-     * This if the data necessary to identify a given
-     * row and it's characteristics.
-     */
-    class Def::Row
-    {
-    public:
-        // Class member types
-        using name_type              = std::string;
-
-        using site_type              = std::string;
-
-        using database_unit_type       = Def::database_unit_type;
-        using database_unit_point_type = Def::database_unit_point_type;
-
-        using scalar_type              = Def::scalar_type;
-        using scalar_point_type        = Def::scalar_point_type;
-
-        // Class constructors
-        Row() = delete;
-
-        Row(const Row&) = default;
-        Row& operator=(const Row&) = default;
-
-        Row(Row&&) = default;
-        Row& operator=(Row&&) = default;
-
-        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-        Row(Arg1&& name, Arg2&& site, Arg3&& origin, Arg4&& step, Arg5&& num):
-            m_name{std::forward<Arg1>(name)},
-            m_site{std::forward<Arg2>(site)},
-            m_origin{std::forward<Arg3>(origin)},
-            m_step{std::forward<Arg4>(step)},
-            m_num{std::forward<Arg5>(num)}
-        {}
-
-        // Class member functions
-        const name_type& name() const noexcept;
-
-        const site_type& site() const noexcept;
-
-        const database_unit_point_type& origin() const noexcept;
-
-        const database_unit_point_type& step() const noexcept;
-
-        const scalar_point_type& num() const noexcept;
-
-        bool operator==(const Row& rhs) const noexcept;
-
-        friend std::ostream& operator<<(std::ostream& os, const Row& row);
-
-    private:
-        name_type              m_name; ///< Row's name for identification.
-        site_type              m_site; ///< This is the site to be used by the row defined by a LEF file.
-        database_unit_point_type m_origin; ///< Specifies the location of the first site in the row.
-        database_unit_point_type m_step; ///< Specifies the spacing between sites in horizontal and vertical rows.
-        scalar_point_type        m_num; ///< Specifies the lenght and direction of the row. (x,1) horisontal line of x sites.
-    };
 }
 
-#endif /*OPHIDIAN_PARSER_DEF_H*/
+#endif

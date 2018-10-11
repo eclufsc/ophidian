@@ -112,7 +112,7 @@ namespace factory
         //creating tracks
          for(auto track : def.tracks()){
             ophidian::routing::TrackOrientation orientation;
-            if(track.orientation() == ophidian::parser::Def::Track::Orientation::X){
+            if(track.orientation() == ophidian::parser::Def::track_type::Orientation::X){
                 orientation = ophidian::routing::TrackOrientation::X;
             }else {
                 orientation = ophidian::routing::TrackOrientation::Y;
