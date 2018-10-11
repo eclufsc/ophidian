@@ -44,14 +44,14 @@ namespace ophidian::parser
 
     const Track::scalar_type& Track::number_of_tracks() const noexcept
     {
-        return m_numtracks;
+        return m_number_of_tracks;
     }
 
     bool Track::operator==(const Track& rhs) const noexcept
     {
         return m_orientation == rhs.m_orientation &&
             m_start == rhs.m_start &&
-            m_numtracks == rhs.m_numtracks &&
+            m_number_of_tracks == rhs.m_number_of_tracks &&
             m_space == rhs.m_space &&
             m_layer_name == rhs.m_layer_name;
     }
@@ -72,7 +72,7 @@ namespace ophidian::parser
         os << "{layer_name: " << track.m_layer_name
             << ", orientarion: " << orientation_string()
             << ", start: " << track.m_start
-            << ", number_of_tracks: " << track.m_numtracks
+            << ", number_of_tracks: " << track.m_number_of_tracks
             << ", space: " << track.m_space
             << "}";
 

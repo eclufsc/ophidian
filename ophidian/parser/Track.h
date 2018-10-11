@@ -58,10 +58,10 @@ namespace ophidian::parser
         Track& operator=(Track&&) = default;
 
         template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-        Track(Arg1&& orientation, Arg2&& start, Arg3&& numTracks, Arg4&& space, Arg5&& layer):
+        Track(Arg1&& orientation, Arg2&& start, Arg3&& number_of_tracks, Arg4&& space, Arg5&& layer):
             m_orientation{std::forward<Arg1>(orientation)},
             m_start{std::forward<Arg2>(start)},
-            m_numtracks{std::forward<Arg3>(numTracks)},
+            m_number_of_tracks{std::forward<Arg3>(number_of_tracks)},
             m_space{std::forward<Arg4>(space)},
             m_layer_name{std::forward<Arg5>(layer)}
         {}
@@ -84,7 +84,7 @@ namespace ophidian::parser
     private:
         orientation_type m_orientation;///Specifies the location and direction of the first track defined. X indicates vertical lines; Y indicates horizontal lines.
         database_unit_type m_start;/// is the X or Y coordinate of the first line.
-        scalar_type m_numtracks;///Specifies the number of tracks to create for the grid.
+        scalar_type m_number_of_tracks;///Specifies the number of tracks to create for the grid.
         database_unit_type m_space;///Specifies the spacing between the tracks.
         layer_name_type m_layer_name;///Specifies the routing layer used for the tracks.
     };
