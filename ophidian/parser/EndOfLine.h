@@ -33,8 +33,8 @@ namespace ophidian::parser
         // Class constructors
         EndOfLine() = delete;
 
-        EndOfLine(const EndOfLine&) = delete;
-        EndOfLine& operator=(const EndOfLine&) = delete;
+        EndOfLine(const EndOfLine&) = default;
+        EndOfLine& operator=(const EndOfLine&) = default;
 
         EndOfLine(EndOfLine&&) = default;
         EndOfLine& operator=(EndOfLine&&) = default;
