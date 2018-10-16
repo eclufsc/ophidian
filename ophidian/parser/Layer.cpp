@@ -74,12 +74,12 @@ namespace ophidian::parser
         return m_spacing;
     }
 
-    const Layer::endOfLine_type& Layer::EOL() const noexcept{
-        return m_eol;
+    const Layer::end_of_line_type& Layer::end_of_line() const noexcept{
+        return m_end_of_line;
     }
 
-    const Layer::parallelRunLength_type& Layer::parallelRunLength() const noexcept{
-        return m_parallelRunLength;
+    const Layer::parallel_run_length_type& Layer::parallel_run_length() const noexcept{
+        return m_parallel_run_length;
     }
 
     std::ostream& operator<<(std::ostream& os, const Layer& layer)

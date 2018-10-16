@@ -145,29 +145,29 @@ namespace ophidian::parser
                             }
                         }
                     if(i >= 0){
-                        return Lef::layer_type::endOfLine_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
+                        return Lef::layer_type::end_of_line_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
                     }else{
-                        return Lef::layer_type::endOfLine_type{0.0, 0.0, 0.0};
+                        return Lef::layer_type::end_of_line_type{0.0, 0.0, 0.0};
                     }
                     }(),
                     [&](){
                         if(l->numSpacingTable() == 0){
-                            return Lef::layer_type::parallelRunLength_type{0, 0};
+                            return Lef::layer_type::parallel_run_length_type{0, 0};
                         }
                         if(l->spacingTable(0)->isParallel())
                         {
                             auto parallel = l->spacingTable(0)->parallel();
-                            Lef::layer_type::parallelRunLength_type parallelRunLength = Lef::layer_type::parallelRunLength_type{parallel->numLength(), parallel->numWidth()};
+                            auto parallel_run_length = Lef::layer_type::parallel_run_length_type{parallel->numLength(), parallel->numWidth()};
                             for (int i = 0; i < parallel->numLength(); ++i) {
-                                parallelRunLength.add_length(micrometer_type{parallel->length(i)});
+                                parallel_run_length.add_length(micrometer_type{parallel->length(i)});
                                 for (int j = 0; j < parallel->numWidth(); ++j) {
-                                   parallelRunLength.add_width(micrometer_type{parallel->width(j)});
-                                   parallelRunLength.add_spacing(micrometer_type{parallel->width(j)}, micrometer_type{parallel->length(i)}, micrometer_type{parallel->widthSpacing(i, j)});
+                                   parallel_run_length.add_width(micrometer_type{parallel->width(j)});
+                                   parallel_run_length.add_spacing(micrometer_type{parallel->width(j)}, micrometer_type{parallel->length(i)}, micrometer_type{parallel->widthSpacing(i, j)});
                                 }
                             }
-                            return parallelRunLength;
+                            return parallel_run_length;
                         }else{
-                            return Lef::layer_type::parallelRunLength_type{0, 0};
+                            return Lef::layer_type::parallel_run_length_type{0, 0};
                         }
                     }()
                 );

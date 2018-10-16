@@ -50,8 +50,8 @@ namespace ophidian::parser
         using type_type                 = Type;
         using direction_type            = Direction;
 
-        using endOfLine_type            = EndOfLine;
-        using parallelRunLength_type    = ParallelRunLength;
+        using end_of_line_type            = EndOfLine;
+        using parallel_run_length_type    = ParallelRunLength;
 
         // Class constructors
         Layer() = delete;
@@ -63,19 +63,18 @@ namespace ophidian::parser
         Layer& operator=(Layer&&) = default;
 
         template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class Arg11>
-        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& pitch, Arg5&& offset, Arg6&& width, Arg7&& min_width, Arg8&& area, Arg9&& spacing, Arg10&& eol, Arg11&& parallelRunLength):
+        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& pitch, Arg5&& offset, Arg6&& width, Arg7&& min_width, Arg8&& area, Arg9&& spacing, Arg10&& eol, Arg11&& parallel_run_length):
             m_name{std::forward<Arg1>(name)},
             m_type{std::forward<Arg2>(type)},
             m_direction{std::forward<Arg3>(direction)},
             m_pitch{std::forward<Arg4>(pitch)},
             m_offset{std::forward<Arg5>(offset)},
             m_width{std::forward<Arg6>(width)},
-
             m_min_width{std::forward<Arg7>(min_width)},
             m_area{std::forward<Arg8>(area)},
             m_spacing{std::forward<Arg9>(spacing)},
-            m_eol{std::forward<Arg10>(eol)},
-            m_parallelRunLength{std::forward<Arg11>(parallelRunLength)}
+            m_end_of_line{std::forward<Arg10>(eol)},
+            m_parallel_run_length{std::forward<Arg11>(parallel_run_length)}
         {}
 
         // Class member functions
@@ -97,26 +96,26 @@ namespace ophidian::parser
 
         const micrometer_type& spacing() const noexcept;
 
-        const endOfLine_type& EOL() const noexcept;
+        const end_of_line_type& end_of_line() const noexcept;
 
-        const parallelRunLength_type& parallelRunLength() const noexcept;
+        const parallel_run_length_type& parallel_run_length() const noexcept;
 
         bool operator ==(const Layer& rhs) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Layer& layer);
 
     private:
-        string_type     m_name;
-        type_type       m_type;
-        direction_type  m_direction;
-        micrometer_type m_pitch;
-        micrometer_type m_offset;
-        micrometer_type m_width;
-        micrometer_type m_min_width;
-        micrometer_type m_area;
-        micrometer_type m_spacing;
-        endOfLine_type  m_eol;
-        parallelRunLength_type m_parallelRunLength;
+        string_type      m_name;
+        type_type        m_type;
+        direction_type   m_direction;
+        micrometer_type  m_pitch;
+        micrometer_type  m_offset;
+        micrometer_type  m_width;
+        micrometer_type  m_min_width;
+        micrometer_type  m_area;
+        micrometer_type  m_spacing;
+        end_of_line_type m_end_of_line;
+        parallel_run_length_type m_parallel_run_length;
     };
 }
 

@@ -63,20 +63,20 @@ namespace factory
             }
             //layer spacingTable
             Library::spacing_table_content_type lTableContents;
-            lTableContents.row_values.reserve(layer.parallelRunLength().numWidth());
-            for(auto& val : layer.parallelRunLength().widths()){
+            lTableContents.row_values.reserve(layer.parallel_run_length().numWidth());
+            for(auto& val : layer.parallel_run_length().widths()){
                 lTableContents.row_values.push_back(dbuConverter.convert(val));
             }
-            lTableContents.column_values.reserve(layer.parallelRunLength().numLength());
-            for(auto& val : layer.parallelRunLength().lengths()){
+            lTableContents.column_values.reserve(layer.parallel_run_length().numLength());
+            for(auto& val : layer.parallel_run_length().lengths()){
                 lTableContents.column_values.push_back(dbuConverter.convert(val));
             }
-            lTableContents.values.reserve(layer.parallelRunLength().numLength());
-            for(auto& width : layer.parallelRunLength().widths()){
+            lTableContents.values.reserve(layer.parallel_run_length().numLength());
+            for(auto& width : layer.parallel_run_length().widths()){
                 std::vector<Library::unit_type> v;
-                v.reserve(layer.parallelRunLength().numLength());
-                for(auto& length : layer.parallelRunLength().lengths()){
-                    auto spacing = layer.parallelRunLength().spacing(width, length);
+                v.reserve(layer.parallel_run_length().numLength());
+                for(auto& length : layer.parallel_run_length().lengths()){
+                    auto spacing = layer.parallel_run_length().spacing(width, length);
                     v.push_back(dbuConverter.convert(spacing));
                 }
                 lTableContents.values.push_back(v);
@@ -92,9 +92,9 @@ namespace factory
                         dbuConverter.convert(layer.min_width()),
                         dbuConverter.convert(layer.area()),
                         dbuConverter.convert(layer.spacing()),
-                        dbuConverter.convert(layer.EOL().space()),
-                        dbuConverter.convert(layer.EOL().width()),
-                        dbuConverter.convert(layer.EOL().within()),
+                        dbuConverter.convert(layer.end_of_line().space()),
+                        dbuConverter.convert(layer.end_of_line().width()),
+                        dbuConverter.convert(layer.end_of_line().within()),
                         lTable);
         }
 
