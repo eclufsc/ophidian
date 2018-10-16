@@ -18,7 +18,7 @@
    under the License.
  */
 
-#include "LibertyParser.h"
+#include "Liberty.h"
 
 #include <si2dr_liberty.h>
 
@@ -27,44 +27,9 @@
 #include <iostream>
 #include <sstream>
 
-
-namespace ophidian::parser
-{
-class LibertyParser::Pimpl
-{
-public:
-    std::vector<double> split_string_into_values(const std::string &the_string);
-    void read_LUT(si2drGroupIdT group, Liberty::LUT & lut);
-    void read_constraint(si2drGroupIdT group, Liberty::LUT &lut);
-    void read_LUTs(si2drGroupIdT timing, Liberty::Timing &newTimming);
-    Liberty::Timing readTiming(si2drGroupIdT timing, Liberty::Pin &pin);
-    Liberty::Pin readPin(si2drGroupIdT pin, Liberty::Cell &cell);
-    Liberty::Cell readCell(si2drGroupIdT cell);
-public:
-    Pimpl() {
-        si2drPIInit(&err);
-    }
-    ~Pimpl(){
-        si2drPIQuit(&err);
-    }
-
-public:
-    si2drErrorT err;
-};
-
-
-LibertyParser::LibertyParser() :
-     this_(std::make_unique<Pimpl>())
-{
-
-}
-
-LibertyParser::~LibertyParser()
-{
-
-}
-
-std::vector<double> LibertyParser::Pimpl::split_string_into_values(const std::string &the_string) {
+//helper functions for liberty parser
+namespace ophidian::parser{
+std::vector<double> split_string_into_values(const std::string &the_string) {
     std::vector<double> values;
     std::stringstream input(the_string);
     std::string segment;
@@ -75,7 +40,7 @@ std::vector<double> LibertyParser::Pimpl::split_string_into_values(const std::st
     return values;
 }
 
-void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
+void read_LUT(si2drGroupIdT group, Liberty::LUT & lut, si2drErrorT & err) {
     si2drAttrsIdT attrs = si2drGroupGetAttrs(group, &err);
     si2drAttrIdT attr;
     lut.index_1.reserve(8);
@@ -117,7 +82,7 @@ void LibertyParser::Pimpl::read_LUT(si2drGroupIdT group, Liberty::LUT & lut) {
     si2drIterQuit(attrs, &err);
 }
 
-void LibertyParser::Pimpl::read_constraint(si2drGroupIdT group, Liberty::LUT &lut)
+void read_constraint(si2drGroupIdT group, Liberty::LUT &lut, si2drErrorT & err)
 {
     si2drNamesIdT group_names{si2drGroupGetNames(group, &err)};
     std::string group_name{si2drIterNextName(group_names, &err)};
@@ -152,7 +117,7 @@ void LibertyParser::Pimpl::read_constraint(si2drGroupIdT group, Liberty::LUT &lu
     si2drIterQuit(attrs, &err);
 }
 
-void LibertyParser::Pimpl::read_LUTs(si2drGroupIdT timing, Liberty::Timing &newTimming) {
+void read_LUTs(si2drGroupIdT timing, Liberty::Timing &newTimming, si2drErrorT & err) {
     si2drGroupsIdT groups = si2drGroupGetGroups(timing, &err);
     si2drGroupIdT group;
     while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
@@ -161,12 +126,12 @@ void LibertyParser::Pimpl::read_LUTs(si2drGroupIdT timing, Liberty::Timing &newT
         if (group_type == "rise_constraint") {
             {
                 lut._lutInformation = Liberty::LUT::lutInformation::RISE_CONSTRAINT;
-                read_constraint(group, lut);
+                read_constraint(group, lut, err);
             }
         } else if (group_type == "fall_constraint") {
             {
                 lut._lutInformation = Liberty::LUT::lutInformation::FALL_CONSTRAINT;
-                read_constraint(group, lut);
+                read_constraint(group, lut, err);
             }
         } else {
             if (group_type == "cell_fall") {
@@ -179,14 +144,14 @@ void LibertyParser::Pimpl::read_LUTs(si2drGroupIdT timing, Liberty::Timing &newT
                 lut._lutInformation = Liberty::LUT::lutInformation::RISE_TRANSITION;
             } else
                 assert(false);
-            read_LUT(group, lut);
+            read_LUT(group, lut, err);
         }
         newTimming.luts.push_back(lut);
     }
     si2drIterQuit(groups, &err);
 }
 
-Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::Pin &pin) {
+Liberty::Timing readTiming(si2drGroupIdT timing, Liberty::Pin &pin, si2drErrorT & err) {
     Liberty::Timing newTiming;
     std::string timing_sense { "negative_unate" };
     std::string timing_type { "combinational" };
@@ -224,11 +189,11 @@ Liberty::Timing LibertyParser::Pimpl::readTiming(si2drGroupIdT timing, Liberty::
     else if (timing_sense == "non_unate")
         newTiming.timingSense = Liberty::Timing::unateness::NON_UNATE;
 
-    read_LUTs(timing, newTiming);
+    read_LUTs(timing, newTiming, err);
     return newTiming;
 }
 
-Liberty::Pin LibertyParser::Pimpl::readPin(si2drGroupIdT pin, Liberty::Cell &cell) {
+Liberty::Pin readPin(si2drGroupIdT pin, Liberty::Cell &cell, si2drErrorT & err) {
     si2drNamesIdT currentCellGroupNames = si2drGroupGetNames(pin, &err);
     std::string pinName { si2drIterNextName(currentCellGroupNames, &err) };
     si2drIterQuit(currentCellGroupNames, &err);
@@ -262,7 +227,7 @@ Liberty::Pin LibertyParser::Pimpl::readPin(si2drGroupIdT pin, Liberty::Cell &cel
     while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
         std::string groupType { si2drGroupGetGroupType(group, &err) };
         if (groupType == "timing") {
-            auto timing = readTiming(group, newPin);
+            auto timing = readTiming(group, newPin, err);
             newPin.timing.push_back(timing);
         }
     }
@@ -270,7 +235,7 @@ Liberty::Pin LibertyParser::Pimpl::readPin(si2drGroupIdT pin, Liberty::Cell &cel
     return newPin;
 }
 
-Liberty::Cell LibertyParser::Pimpl::readCell(si2drGroupIdT cell){
+Liberty::Cell readCell(si2drGroupIdT cell, si2drErrorT err){
     si2drNamesIdT cellNames = si2drGroupGetNames(cell, &err);
     std::string name { si2drIterNextName(cellNames, &err) };
     si2drIterQuit(cellNames, &err);
@@ -283,7 +248,7 @@ Liberty::Cell LibertyParser::Pimpl::readCell(si2drGroupIdT cell){
         if(currentCellGroupType == "ff")
             newCell.sequential = true;
         else if (currentCellGroupType == "pin") {
-            auto pin = readPin(currentCellGroup, newCell);
+            auto pin = readPin(currentCellGroup, newCell, err);
             newCell.pins.push_back(pin);
         }
     }
@@ -291,46 +256,170 @@ Liberty::Cell LibertyParser::Pimpl::readCell(si2drGroupIdT cell){
     return newCell;
 }
 
-std::shared_ptr<Liberty> LibertyParser::readFile(const std::string &filename)
+Liberty::Cell Liberty::find(std::string cellName)
 {
-    std::shared_ptr<Liberty> lib = std::make_shared<Liberty>();
-    Liberty * liberty = lib.get();
-    si2drReadLibertyFile(const_cast<char*>(filename.c_str()), &this_->err);
-    if (this_->err == SI2DR_INVALID_NAME) {
-        std::cout << "COULD NOT OPEN " << filename << " for parsing-- quitting...\n";
+    for (auto cell : cells)
+        if (cell.name == cellName)
+            return cell;
+
+    return Liberty::Cell();
+}
+
+Liberty::Pin Liberty::Cell::find(std::string pinName)
+{
+    for (auto pin : pins)
+        if (pin.name == pinName)
+            return pin;
+
+    return Liberty::Pin();
+}
+
+std::vector<Liberty::Pin> Liberty::Cell::inputs()
+{
+    std::vector<Pin> ins;
+    for (auto pin : pins)
+        if (pin.pinDirection == Liberty::Pin::INPUT)
+            ins.push_back(pin);
+
+    return ins;
+}
+
+std::vector<Liberty::Pin> Liberty::Cell::outputs()
+{
+    std::vector<Pin> outs;
+    for (auto pin : pins)
+        if (pin.pinDirection == Liberty::Pin::OUTPUT)
+            outs.push_back(pin);
+
+    return outs;
+}
+
+Liberty::Timing Liberty::Pin::find(Liberty::Timing::type timingT)
+{
+    for (auto tim : timing)
+        if (tim.timingType == timingT)
+            return tim;
+
+    return Liberty::Timing();
+}
+
+Liberty::LUT Liberty::Timing::find(Liberty::LUT::lutInformation info)
+{
+    for (auto lut : luts)
+        if (lut._lutInformation == info)
+            return lut;
+
+    return Liberty::LUT();
+}
+
+double Liberty::LUT::compute(const double rv, const double cv)
+{
+    if (values.size() == 1)
+        if (values.front().size() == 1)
+            return values.front().front();
+
+    double wTransition, wLoad;
+    double y1, y2;
+    double x1, x2;
+    double t[2][2];
+    std::size_t row1, row2, column1, column2;
+
+    wTransition = 0.0f;
+    wLoad = 0.0f;
+
+    row1 = index_1.size() - 2;
+    row2 = index_1.size() - 1;
+    y1 = index_1[row1];
+    y2 = index_1[row2];
+
+    // loads -- rows
+    for (size_t i = 0; i < index_1.size() - 1; i++) {
+        if (rv >= index_1[i] && rv <= index_1[i + 1]) {
+            row1 = i;
+            row2 = i + 1;
+            y1 = index_1[row1];
+            y2 = index_1[row2];
+        }
+    }
+
+    // transitions -- columns
+    if (cv < index_2[0]) {
+        column1 = 0;
+        column2 = 1;
+        x1 = index_2[column1];
+        x2 = index_2[column2];
+    } else if (cv > index_2[index_2.size() - 1]) {
+        column1 = index_2.size() - 2;
+        column2 = index_2.size() - 1;
+        x1 = index_2[column1];
+        x2 = index_2[column2];
+    } else {
+        for (size_t i = 0; i < index_2.size() - 1; i++) {
+            if (cv >= index_2[i] && cv <= index_2[i + 1]) {
+                column1 = i;
+                column2 = i + 1;
+                x1 = index_2[column1];
+                x2 = index_2[column2];
+            }
+        }
+    }
+
+    //equation for interpolation (Ref - ISPD Contest: http://www.ispd.cc/contests/12/ISPD_2012_Contest_Details.pdf), slide 17
+    wTransition = (cv - x1) / (x2 - x1);
+    wLoad = (rv - y1) / (y2 - y1);
+
+    t[0][0] = values[row1][column1];
+    t[0][1] = values[row1][column2];
+    t[1][0] = values[row2][column1];
+    t[1][1] = values[row2][column2];
+
+    return ((1 - wTransition) * (1 - wLoad) * t[0][0])
+            + (wTransition * (1 - wLoad) * t[0][1])
+            + ((1 - wTransition) * wLoad * t[1][0])
+            + (wTransition * wLoad * t[1][1]);
+
+}
+
+Liberty::Liberty(const std::string& liberty_file){
+    si2drErrorT err;
+    si2drPIInit(&err);
+
+    si2drReadLibertyFile(const_cast<char*>(liberty_file.c_str()), &err);
+    if (err == SI2DR_INVALID_NAME) {
+        std::cout << "COULD NOT OPEN " << liberty_file << " for parsing-- quitting...\n";
         assert(false);
-    } else if (this_->err == SI2DR_SYNTAX_ERROR) {
+    } else if (err == SI2DR_SYNTAX_ERROR) {
         std::cout << "\nSyntax Errors were detected in the input file!\n\n";
         assert(false);
     }
-    si2drGroupsIdT groups = si2drPIGetGroups(&this_->err);
+    si2drGroupsIdT groups = si2drPIGetGroups(&err);
     si2drGroupIdT group;
-    while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &this_->err)), &this_->err)) {
-        si2drCheckLibertyLibrary(group, &this_->err);
-        if (this_->err == SI2DR_NO_ERROR) {
+    while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
+        si2drCheckLibertyLibrary(group, &err);
+        if (err == SI2DR_NO_ERROR) {
         } else
             assert(false);
     }
-    si2drIterQuit(groups, &this_->err);
-    groups = si2drPIGetGroups(&this_->err);
-    while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &this_->err)), &this_->err)) {
+    si2drIterQuit(groups, &err);
+    groups = si2drPIGetGroups(&err);
+    while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {
         si2drNamesIdT gnames;
         si2drStringT gname;
         si2drGroupsIdT libraryGroups;
         si2drGroupIdT current_group;
-        gnames = si2drGroupGetNames(group, &this_->err);
-        gname = si2drIterNextName(gnames, &this_->err);
-        si2drIterQuit(gnames, &this_->err);
+        gnames = si2drGroupGetNames(group, &err);
+        gname = si2drIterNextName(gnames, &err);
+        si2drIterQuit(gnames, &err);
 //        std::cout << "Liberty Library Name: " << (gname ? gname : "<NONAME>") << std::endl;
-        libraryGroups = si2drGroupGetGroups(group, &this_->err);
-        si2drAttrsIdT lib_attrs = si2drGroupGetAttrs(group, &this_->err);
+        libraryGroups = si2drGroupGetGroups(group, &err);
+        si2drAttrsIdT lib_attrs = si2drGroupGetAttrs(group, &err);
         si2drAttrIdT lib_attr;
-        while (!si2drObjectIsNull((lib_attr = si2drIterNextAttr(lib_attrs, &this_->err)), &this_->err)) {
-            std::string attr_name { si2drAttrGetName(lib_attr, &this_->err) };
+        while (!si2drObjectIsNull((lib_attr = si2drIterNextAttr(lib_attrs, &err)), &err)) {
+            std::string attr_name { si2drAttrGetName(lib_attr, &err) };
             if (attr_name == "time_unit") {
-                liberty->timeUnit = si2drSimpleAttrGetStringValue(lib_attr, &this_->err);
+                timeUnit = si2drSimpleAttrGetStringValue(lib_attr, &err);
             } else if (attr_name == "capacitive_load_unit") {
-                si2drValuesIdT values = si2drComplexAttrGetValues(lib_attr, &this_->err);
+                si2drValuesIdT values = si2drComplexAttrGetValues(lib_attr, &err);
                 si2drValueTypeT type;
                 si2drInt32T int_val;
                 si2drFloat64T double_val;
@@ -338,26 +427,29 @@ std::shared_ptr<Liberty> LibertyParser::readFile(const std::string &filename)
                 si2drBooleanT bool_val;
                 si2drExprT *expr;
 
-                si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &this_->err);
-                liberty->capacitiveLoadUnitValue = int_val;
-                si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &this_->err);
+                si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
+                capacitiveLoadUnitValue = int_val;
+                si2drIterNextComplexValue(values, &type, &int_val, &double_val, &string_val, &bool_val, &expr, &err);
                 std::string str_value { string_val };
-                si2drIterQuit(values, &this_->err);
+                si2drIterQuit(values, &err);
 
-                liberty->capacitiveLoadUnit = str_value;
+                capacitiveLoadUnit = str_value;
             }
         }
-        si2drIterQuit(lib_attrs, &this_->err);
-        while (!si2drObjectIsNull((current_group = si2drIterNextGroup(libraryGroups, &this_->err)), &this_->err)) {
-            si2drStringT current_group_type = si2drGroupGetGroupType(current_group, &this_->err);
+        si2drIterQuit(lib_attrs, &err);
+        while (!si2drObjectIsNull((current_group = si2drIterNextGroup(libraryGroups, &err)), &err)) {
+            si2drStringT current_group_type = si2drGroupGetGroupType(current_group, &err);
             if (std::string { current_group_type } == "cell"){
-                auto cell = this_->readCell(current_group);
-                liberty->cells.push_back(cell);
+                auto cell = readCell(current_group, err);
+                cells.push_back(cell);
             }
         }
-        si2drIterQuit(libraryGroups, &this_->err);
+        si2drIterQuit(libraryGroups, &err);
     }
-    si2drIterQuit(groups, &this_->err);
-    return lib;
+    si2drIterQuit(groups, &err);
+
+    si2drPIQuit(&err);
 }
+
+
 }

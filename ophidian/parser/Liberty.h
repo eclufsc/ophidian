@@ -18,8 +18,8 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_PARSER_LIBERTYPARSER_H
-#define OPHIDIAN_PARSER_LIBERTYPARSER_H
+#ifndef OPHIDIAN_LIBERTYPARSER_H
+#define OPHIDIAN_LIBERTYPARSER_H
 
 // std headers
 #include <memory>
@@ -47,7 +47,7 @@ public:
             RISE_CONSTRAINT,
             FALL_CONSTRAINT
         };
-
+        double compute(const double rv, const double cv);
         lutInformation _lutInformation;
         std::vector<double> index_1;
         std::vector<double> index_2;
@@ -69,7 +69,7 @@ public:
             SETUP_RISING,
             HOLD_RISING
         };
-
+        LUT find(LUT::lutInformation info);
         type timingType;
         unateness timingSense;
         std::string relatedPin;
@@ -86,6 +86,8 @@ public:
             INPUT,
             OUTPUT
         };
+        Timing find(Timing::type timingT);
+        bool clock = false;
         directionPin pinDirection;
         std::vector<Timing> timing;
     };
@@ -96,26 +98,30 @@ public:
         std::string name;
         std::vector<Pin> pins;
         bool sequential = false;
+        Pin find(std::string pinName);
+        std::vector<Pin> inputs();
+        std::vector<Pin> outputs();
     };
+    Cell find(std::string cellName);
+
 
 public:
+    // Class constructors
+    Liberty() = delete;
+
+    Liberty(const Liberty&) = default;
+    Liberty& operator=(const Liberty&) = default;
+
+    Liberty(Liberty&&) = default;
+    Liberty& operator=(Liberty&&) = default;
+
+    Liberty(const std::string & filename);
+
     std::string timeUnit = "";
     std::string capacitiveLoadUnit = "";
     double capacitiveLoadUnitValue = 0;
     std::vector<Cell> cells;
 };
-
-class LibertyParser
-{
-public:
-    LibertyParser();
-    ~LibertyParser();
-
-    std::shared_ptr<Liberty> readFile(const std::string & filename);
-private:
-    class Pimpl;
-    const std::unique_ptr<Pimpl> this_;
-};
 }
 
-#endif /* OPHIDIAN_PARSER_LIBERTYPARSER_H */
+#endif /* OPHIDIAN_LIBERTYPARSER_H */
