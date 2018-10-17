@@ -169,26 +169,26 @@ TEST_CASE("lef: ispd18_sample.input.lef parsing", "[parser][lef][sample][ispd18]
         SECTION("ParallelRunLength Layers are parsed correctly", "[parser][lef][sample][ispd18][layers][ParallelRunLength]")
         {
             auto& parallel_run_length = first_layer.parallel_run_length();
-            CHECK(parallel_run_length.numLength() == 1);
-            CHECK(parallel_run_length.numWidth() == 4);
-            auto widths = Lef::layer_type::parallel_run_length_type::micrometer_container_type{
+            CHECK(parallel_run_length.lengths().size() == 1);
+            CHECK(parallel_run_length.widths().size() == 4);
+            auto widths = Lef::layer_type::parallel_run_length_type::width_container_type{
                     micron_t{0.0},
                     micron_t{0.1},
                     micron_t{0.75},
                     micron_t{1.5},
             };
             CHECK(std::is_permutation(widths.begin(), widths.end(), parallel_run_length.widths().begin()));
-            auto lengths = Lef::layer_type::parallel_run_length_type::micrometer_container_type{
+            auto lengths = Lef::layer_type::parallel_run_length_type::length_container_type{
                     micron_t{0.0},
             };
             CHECK(std::is_permutation(lengths.begin(), lengths.end(), parallel_run_length.lengths().begin()));
-            auto values = Lef::layer_type::parallel_run_length_type::parallelRunLength_container_type{
+            auto values = Lef::layer_type::parallel_run_length_type::spacing_container_type{
                     {{micron_t{0.0},  micron_t{0.0}}, micron_t{0.06}},
                     {{micron_t{0.1},  micron_t{0.0}}, micron_t{0.1}},
                     {{micron_t{0.75}, micron_t{0.0}}, micron_t{0.25}},
                     {{micron_t{1.5},  micron_t{0.0}}, micron_t{0.45}},
             };
-            CHECK(std::is_permutation(values.begin(), values.end(), parallel_run_length.values().begin()));
+            CHECK(std::is_permutation(values.begin(), values.end(), parallel_run_length.width_length_to_spacing().begin()));
         }
     }
 

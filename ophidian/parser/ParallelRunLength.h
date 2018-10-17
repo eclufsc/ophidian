@@ -28,52 +28,43 @@ namespace ophidian::parser
     class ParallelRunLength
     {
     public:
-        template <class T> using container_type = std::vector<T>;
+        //Member types
+        using width_type = util::micrometer_t;
+        using width_container_type = std::vector<width_type>;
 
-        using micrometer_type = util::micrometer_t;
-        using micrometer_container_type         = container_type<micrometer_type>;
+        using length_type = util::micrometer_t;
+        using length_container_type = std::vector<length_type>;
 
-        using parallelRunLength_container_type  = std::map<std::pair<micrometer_type, micrometer_type>, micrometer_type>;
+        using spacing_type = util::micrometer_t;
+        using spacing_container_type  = std::map<std::pair<width_type, length_type>, spacing_type>;
 
-        ParallelRunLength() = delete;
+        //Constructos
+        ParallelRunLength() = default;
 
-        ParallelRunLength(const ParallelRunLength&) = delete;
-        ParallelRunLength& operator=(const ParallelRunLength&) = delete;
+        ParallelRunLength(const ParallelRunLength&) = default;
+        ParallelRunLength& operator=(const ParallelRunLength&) = default;
 
         ParallelRunLength(ParallelRunLength&&) = default;
         ParallelRunLength& operator=(ParallelRunLength&&) = default;
 
-        template<class A1, class A2>
-        ParallelRunLength(A1&& length, A2&& width):
-            m_numLength{std::forward<A1>(length)},
-            m_numWidth{std::forward<A2>(width)}
-        {
-            m_lengths.reserve(m_numLength);
-            m_widths.reserve(m_numWidth);
-        }
+        template<class A1, class A2, class A3>
+        ParallelRunLength(A1&& widths, A2&& lengths, A3&& width_length_to_spacing):
+            m_widths{std::forward<A1>(widths)},
+            m_lengths{std::forward<A2>(lengths)},
+            m_width_legth_to_spacing{std::forward<A3>(width_length_to_spacing)}
+        { }
 
-        void add_length(micrometer_type length) noexcept;
-        void add_width(micrometer_type width) noexcept;
-        void add_spacing(micrometer_type width, micrometer_type length, micrometer_type spacing) noexcept;
+        //Member methods
+        const length_container_type& lengths() const noexcept;
 
-        int numLength() const noexcept;
+        const width_container_type& widths() const noexcept;
 
-        int numWidth() const noexcept;
-
-        const micrometer_container_type& lengths() const noexcept;
-
-        const micrometer_container_type& widths() const noexcept;
-
-        const parallelRunLength_container_type& values() const noexcept;
-
-        const micrometer_type& spacing(const micrometer_type width, const micrometer_type length) const noexcept;
+        const spacing_container_type& width_length_to_spacing() const noexcept;
 
     private:
-        int m_numLength;
-        int m_numWidth;
-        micrometer_container_type m_lengths;
-        micrometer_container_type m_widths;
-        parallelRunLength_container_type m_values; //map<pair<width, length>, spacing>
+        width_container_type   m_widths{};
+        length_container_type  m_lengths{};
+        spacing_container_type m_width_legth_to_spacing{};
     };
 }
 

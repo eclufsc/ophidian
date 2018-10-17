@@ -17,14 +17,10 @@
  */
 
 #include "LibraryFactory.h"
-#include "ophidian/util/Units.h"
+#include <ophidian/util/Units.h>
 #include <unordered_map>
 
-namespace ophidian
-{
-namespace routing
-{
-namespace factory
+namespace ophidian::routing::factory
 {
     void make_library(Library& library, const parser::Lef& lef, const parser::Def & def) noexcept
     {
@@ -34,20 +30,22 @@ namespace factory
         for(auto& layer : lef.layers()){
             //layer type
             LayerType lType;
+
             switch (layer.type()) {
-            case ophidian::parser::Lef::layer_type::Type::CUT:
-                lType = LayerType::CUT;
-                break;
-            case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
-                lType = LayerType::MASTERSLICE;
-                break;
-            case ophidian::parser::Lef::layer_type::Type::ROUTING:
-                lType = LayerType::ROUTING;
-                break;
-            default:
-                lType = LayerType::NA;
-                break;
+                case ophidian::parser::Lef::layer_type::Type::CUT:
+                    lType = LayerType::CUT;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
+                    lType = LayerType::MASTERSLICE;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::ROUTING:
+                    lType = LayerType::ROUTING;
+                    break;
+                default:
+                    lType = LayerType::NA;
+                    break;
             }
+
             //layer direction
             LayerDirection lDirection;
             switch (layer.direction()) {
@@ -63,20 +61,20 @@ namespace factory
             }
             //layer spacingTable
             Library::spacing_table_content_type lTableContents;
-            lTableContents.row_values.reserve(layer.parallel_run_length().numWidth());
+            lTableContents.row_values.reserve(layer.parallel_run_length().widths().size());
             for(auto& val : layer.parallel_run_length().widths()){
                 lTableContents.row_values.push_back(dbuConverter.convert(val));
             }
-            lTableContents.column_values.reserve(layer.parallel_run_length().numLength());
+            lTableContents.column_values.reserve(layer.parallel_run_length().lengths().size());
             for(auto& val : layer.parallel_run_length().lengths()){
                 lTableContents.column_values.push_back(dbuConverter.convert(val));
             }
-            lTableContents.values.reserve(layer.parallel_run_length().numLength());
+            lTableContents.values.reserve(layer.parallel_run_length().lengths().size());
             for(auto& width : layer.parallel_run_length().widths()){
                 std::vector<Library::unit_type> v;
-                v.reserve(layer.parallel_run_length().numLength());
+                v.reserve(layer.parallel_run_length().lengths().size());
                 for(auto& length : layer.parallel_run_length().lengths()){
-                    auto spacing = layer.parallel_run_length().spacing(width, length);
+                    auto spacing = layer.parallel_run_length().width_length_to_spacing().at({width, length});
                     v.push_back(dbuConverter.convert(spacing));
                 }
                 lTableContents.values.push_back(v);
@@ -120,6 +118,4 @@ namespace factory
             library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
     }
-}
-}
 }

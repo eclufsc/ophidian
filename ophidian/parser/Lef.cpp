@@ -130,11 +130,11 @@ namespace ophidian::parser
                                 break;
                             }
                         }
-                    if(i >= 0){
-                        return Lef::layer_type::micrometer_type{l->spacing(i)};
-                    }else{
-                        return Lef::layer_type::micrometer_type{0.0};
-                    }
+                        if(i >= 0){
+                            return Lef::layer_type::micrometer_type{l->spacing(i)};
+                        }else{
+                            return Lef::layer_type::micrometer_type{0.0};
+                        }
                     }(),
                     [&](){
                         int i = -1;
@@ -144,30 +144,40 @@ namespace ophidian::parser
                                 break;
                             }
                         }
-                    if(i >= 0){
-                        return Lef::layer_type::end_of_line_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
-                    }else{
-                        return Lef::layer_type::end_of_line_type{0.0, 0.0, 0.0};
-                    }
+                        if(i >= 0){
+                            return Lef::layer_type::end_of_line_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
+                        }else{
+                            return Lef::layer_type::end_of_line_type{0.0, 0.0, 0.0};
+                        }
                     }(),
                     [&](){
                         if(l->numSpacingTable() == 0){
-                            return Lef::layer_type::parallel_run_length_type{0, 0};
+                            return Lef::layer_type::parallel_run_length_type{};
                         }
                         if(l->spacingTable(0)->isParallel())
                         {
+                            auto lengths = Lef::layer_type::parallel_run_length_type::length_container_type{};
+                            auto widths = Lef::layer_type::parallel_run_length_type::width_container_type{};
+                            auto width_length_to_spacing = Lef::layer_type::parallel_run_length_type::spacing_container_type{};
+
                             auto parallel = l->spacingTable(0)->parallel();
-                            auto parallel_run_length = Lef::layer_type::parallel_run_length_type{parallel->numLength(), parallel->numWidth()};
-                            for (int i = 0; i < parallel->numLength(); ++i) {
-                                parallel_run_length.add_length(micrometer_type{parallel->length(i)});
+
+                            for (int i = 0; i < parallel->numLength(); ++i)
+                            {
+                                lengths.emplace_back(micrometer_type{parallel->length(i)});
+
                                 for (int j = 0; j < parallel->numWidth(); ++j) {
-                                   parallel_run_length.add_width(micrometer_type{parallel->width(j)});
-                                   parallel_run_length.add_spacing(micrometer_type{parallel->width(j)}, micrometer_type{parallel->length(i)}, micrometer_type{parallel->widthSpacing(i, j)});
+                                   widths.emplace_back(micrometer_type{parallel->width(j)});
+                                   width_length_to_spacing[{widths.back(), lengths.back()}] = Lef::layer_type::parallel_run_length_type::spacing_type{micrometer_type{parallel->widthSpacing(i, j)}};
                                 }
                             }
-                            return parallel_run_length;
+                            return Lef::layer_type::parallel_run_length_type{
+                                std::move(widths),
+                                std::move(lengths),
+                                std::move(width_length_to_spacing)
+                            };
                         }else{
-                            return Lef::layer_type::parallel_run_length_type{0, 0};
+                            return Lef::layer_type::parallel_run_length_type{};
                         }
                     }()
                 );

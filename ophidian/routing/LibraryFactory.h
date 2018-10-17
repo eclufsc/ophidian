@@ -24,15 +24,9 @@
 
 #include "Library.h"
 
-namespace ophidian
-{
-namespace routing
-{
-namespace factory
+namespace ophidian::routing::factory
 {
     void make_library(Library& library, const parser::Lef& lef, const parser::Def & def) noexcept;
-}
-}
 }
 
 #endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H
