@@ -77,8 +77,8 @@ namespace routing
         Library & operator =(const Library &) = delete;
 
         //! Move Constructor
-        Library(Library &&) = default;
-        Library& operator=(Library &&) = default;
+        Library(Library &&) = delete;
+        Library& operator=(Library &&) = delete;
 
         // Element access
         layer_type find_layer_instance(const std::string& layerName) const;
