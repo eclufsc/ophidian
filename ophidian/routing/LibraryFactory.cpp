@@ -80,7 +80,7 @@ namespace ophidian::routing::factory
                 lTableContents.values.push_back(v);
             }
             auto lTable = Library::spacing_table_type(lTableContents);
-            auto l = library.add_layer_instance(
+            auto l = library.add_layer(
                         layer.name(),
                         lType,
                         lDirection,
@@ -98,13 +98,13 @@ namespace ophidian::routing::factory
 
         //creating vias
          for(auto& via : lef.vias()){
-             auto map = Library::via_layer_map_type{};
+             auto map = Library::layer_name_to_via_geometry_type{};
              for(auto layer_map : via.layers()){
                  auto box_micron = layer_map.second.front();
-                 auto box_dbu = Library::box_type{dbuConverter.convert(box_micron.min_corner()), dbuConverter.convert(box_micron.max_corner())};
+                 auto box_dbu = Library::via_geometry_type{dbuConverter.convert(box_micron.min_corner()), dbuConverter.convert(box_micron.max_corner())};
                  map.emplace(layer_map.first, box_dbu);
              }
-             library.add_via_instance(via.name(), map);
+             library.add_via(via.name(), map);
          }
 
         //creating tracks
@@ -115,7 +115,7 @@ namespace ophidian::routing::factory
             }else {
                 orientation = ophidian::routing::TrackOrientation::Y;
             }
-            library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
+            library.add_track(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
     }
 }

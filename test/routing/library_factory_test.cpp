@@ -30,7 +30,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
     SECTION("Layers are created correctly", "[routing][library][factory]")
     {
         CHECK(library.size_layer() == 18);
-        auto layer = library.find_layer_instance("Metal1");
+        auto layer = library.find_layer("Metal1");
 
         CHECK(library.name(layer) == "Metal1");
         CHECK(library.type(layer) == ophidian::routing::LayerType::ROUTING);
@@ -38,7 +38,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
         CHECK(library.pitch(layer) == database_unit_t{380});
         CHECK(library.offset(layer) == database_unit_t{0.0});
         CHECK(library.width(layer) == database_unit_t{120});
-        CHECK(library.minWidth(layer) == database_unit_t{120});
+        CHECK(library.min_width(layer) == database_unit_t{120});
         CHECK(library.area(layer) == database_unit_t{40});
         CHECK(library.spacing(layer) == database_unit_t{120});
         CHECK(library.EOLspace(layer) == database_unit_t{180});
@@ -54,7 +54,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
     SECTION("Via are created correctly", "[routing][library][factory]")
     {
         CHECK(library.size_via() == 22);
-        auto via = library.find_via_instance("VIA12_1C_H");
+        auto via = library.find_via("VIA12_1C_H");
         auto box = library.geometry(via, "Metal2");
         CHECK(box.min_corner().x() == database_unit_t{-130});
         CHECK(box.min_corner().y() == database_unit_t{-70});
@@ -68,7 +68,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
         auto track = *library.begin_track();
         CHECK(library.orientation(track) == ophidian::routing::TrackOrientation::X);
         CHECK(library.start(track) == database_unit_t{83800});
-        CHECK(library.numTracs(track) == 52);
+        CHECK(library.number_of_tracks(track) == 52);
         CHECK(library.space(track) == database_unit_t{400});
         CHECK(library.name(library.layer(track)) == "Metal9");
     }

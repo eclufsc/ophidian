@@ -18,180 +18,267 @@
 
 #include "Library.h"
 
-namespace ophidian
+namespace ophidian::routing
 {
-namespace routing
-{
+    Library::layer_type Library::find_layer(const Library::layer_name_type &layerName) const
+    {
+        return m_name_to_layer.at(layerName);
+    }
 
-Library::layer_type Library::find_layer_instance(const std::string &layerName) const
-{
-    return mName2Layer.at(layerName);
-}
+    Library::via_type Library::find_via(const Library::via_name_type &viaName) const
+    {
+        return m_name_to_via.at(viaName);
+    }
 
-std::string& Library::name(const Library::layer_type &layer)
-{
-    return mLayerName[layer];
-}
+    Library::layer_name_type& Library::name(const Library::layer_type &layer)
+    {
+        return m_layer_names[layer];
+    }
 
-const std::string& Library::name(const Library::layer_type &layer) const
-{
-    return mLayerName[layer];
-}
+    const Library::layer_name_type& Library::name(const Library::layer_type &layer) const
+    {
+        return m_layer_names[layer];
+    }
 
-Library::via_type Library::find_via_instance(const std::string &viaName) const
-{
-    return mName2Via.at(viaName);
-}
+    Library::layer_type_type& Library::type(const Library::layer_type &layer)
+    {
+        return m_layer_types[layer];
+    }
 
-std::string& Library::name(const Library::via_type &via)
-{
-    return mViaName[via];
-}
+    const Library::layer_type_type& Library::type(const Library::layer_type &layer) const
+    {
+        return m_layer_types[layer];
+    }
 
-const std::string& Library::name(const Library::via_type &via) const
-{
-    return mViaName[via];
-}
+    Library::layer_direction_type& Library::direction(const Library::layer_type &layer)
+    {
+        return m_layer_directions[layer];
+    }
 
-const Library::box_type& Library::geometry(const Library::via_type &via, const std::string &layer)
-{
-    return  mViaLayers[via].find(layer)->second;
-}
+    const Library::layer_direction_type& Library::direction(const Library::layer_type &layer) const
+    {
+        return m_layer_directions[layer];
+    }
 
-const TrackOrientation Library::orientation(const Library::track_type &track) const
-{
-    return mTrackOrientation[track];
-}
+    Library::unit_type& Library::pitch(const Library::layer_type &layer)
+    {
+        return m_layer_pitches[layer];
+    }
 
-const Library::unit_type Library::start(const Library::track_type& track) const
-{
-    return mTrackStart[track];
-}
+    const Library::unit_type& Library::pitch(const Library::layer_type &layer) const
+    {
+        return m_layer_pitches[layer];
+    }
 
-const Library::scalar_type Library::numTracs(const Library::track_type& track) const
-{
-    return mNumberOfTracks[track];
-}
+    Library::unit_type& Library::offset(const Library::layer_type& layer)
+    {
+        return m_layer_offsets[layer];
+    }
 
-const Library::unit_type Library::space(const Library::track_type& track) const
-{
-    return mTrackSpace[track];
-}
+    const Library::unit_type& Library::offset(const Library::layer_type& layer) const
+    {
+        return m_layer_offsets[layer];
+    }
 
-const Library::layer_type Library::layer(const Library::track_type& track) const
-{
-    return mLayerOfTrack[track];
-}
+    Library::unit_type& Library::width(const Library::layer_type& layer)
+    {
+        return m_layer_widths[layer];
+    }
 
-LayerType Library::type(const Library::layer_type &layer) const
-{
-    return mLayerType[layer];
-}
+    const Library::unit_type& Library::width(const Library::layer_type& layer) const
+    {
+        return m_layer_widths[layer];
+    }
 
-LayerDirection Library::direction(const Library::layer_type &layer) const
-{
-    return mLayerDirection[layer];
-}
+    Library::unit_type& Library::min_width(const Library::layer_type& layer)
+    {
+        return m_layer_min_widths[layer];
+    }
 
-Library::unit_type Library::pitch(const Library::layer_type &layer) const
-{
-    return mLayerPitch[layer];
-}
+    const Library::unit_type& Library::min_width(const Library::layer_type& layer) const
+    {
+        return m_layer_min_widths[layer];
+    }
 
-Library::unit_type Library::offset(const Library::layer_type& layer) const
-{
-    return mLayerOffset[layer];
-}
+    Library::unit_type& Library::area(const Library::layer_type& layer)
+    {
+        return m_layer_areas[layer];
+    }
 
-Library::unit_type Library::width(const Library::layer_type& layer) const
-{
-    return mLayerWidth[layer];
-}
+    const Library::unit_type& Library::area(const Library::layer_type& layer) const
+    {
+        return m_layer_areas[layer];
+    }
 
-Library::unit_type Library::minWidth(const Library::layer_type& layer) const
-{
-    return mLayerMinWidth[layer];
-}
+    Library::unit_type& Library::spacing(const Library::layer_type& layer)
+    {
+        return m_layer_spacing[layer];
+    }
 
-Library::unit_type Library::area(const Library::layer_type& layer) const
-{
-    return mLayerArea[layer];
-}
+    const Library::unit_type& Library::spacing(const Library::layer_type& layer) const
+    {
+        return m_layer_spacing[layer];
+    }
 
-Library::unit_type Library::spacing(const Library::layer_type& layer) const
-{
-    return mLayerSpacing[layer];
-}
+    Library::unit_type& Library::EOLspace(const Library::layer_type& layer)
+    {
+        return m_layer_end_of_line_spaces[layer];
+    }
 
-Library::unit_type Library::EOLspace(const Library::layer_type& layer) const
-{
-    return mLayerEOLspace[layer];
-}
+    const Library::unit_type& Library::EOLspace(const Library::layer_type& layer) const
+    {
+        return m_layer_end_of_line_spaces[layer];
+    }
 
-Library::unit_type Library::EOLwidth(const Library::layer_type& layer) const
-{
-    return mLayerEOLwidth[layer];
-}
+    Library::unit_type& Library::EOLwidth(const Library::layer_type& layer)
+    {
+        return m_layer_end_of_line_widths[layer];
+    }
 
-Library::unit_type Library::EOLwithin(const Library::layer_type& layer) const
-{
-    return mLayerEOLwithin[layer];
-}
+    const Library::unit_type& Library::EOLwidth(const Library::layer_type& layer) const
+    {
+        return m_layer_end_of_line_widths[layer];
+    }
 
-const Library::spacing_table_type& Library::spacing_table(const Library::layer_type &layer) const
-{
-    return mLayerSpacingTable[layer];
-}
+    Library::unit_type& Library::EOLwithin(const Library::layer_type& layer)
+    {
+        return m_layer_end_of_line_withins[layer];
+    }
 
-Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
-{
-    return mLayers.begin();
-}
+    const Library::unit_type& Library::EOLwithin(const Library::layer_type& layer) const
+    {
+        return m_layer_end_of_line_withins[layer];
+    }
 
-Library::layer_container_type::const_iterator Library::end_layer() const noexcept
-{
-    return mLayers.end();
-}
+    Library::spacing_table_type& Library::spacing_table(const Library::layer_type &layer)
+    {
+        return m_layer_spacing_tables[layer];
+    }
 
-Library::via_container_type::const_iterator Library::begin_via() const noexcept
-{
-    return mVias.begin();
-}
+    const Library::spacing_table_type& Library::spacing_table(const Library::layer_type &layer) const
+    {
+        return m_layer_spacing_tables[layer];
+    }
 
-Library::via_container_type::const_iterator Library::end_via() const noexcept
-{
-    return mVias.end();
-}
+    Library::via_name_type& Library::name(const Library::via_type &via)
+    {
+        return m_via_names[via];
+    }
 
-Library::track_container_type::const_iterator Library::begin_track() const noexcept
-{
-    return mTracks.begin();
-}
+    const Library::via_name_type& Library::name(const Library::via_type &via) const
+    {
+        return m_via_names[via];
+    }
 
-Library::track_container_type::const_iterator Library::end_track() const noexcept
-{
-    return mTracks.end();
-}
+    Library::via_geometry_type& Library::geometry(const Library::via_type &via, const Library::layer_name_type& layer)
+    {
+        return  m_via_layers_names_to_via_geometries[via].find(layer)->second;
+    }
 
-Library::layer_container_type::size_type Library::size_layer() const noexcept
-{
-    return mLayers.size();
-}
+    const Library::via_geometry_type& Library::geometry(const Library::via_type &via, const Library::layer_name_type& layer) const
+    {
+        return  m_via_layers_names_to_via_geometries[via].find(layer)->second;
+    }
 
-Library::via_container_type::size_type Library::size_via() const noexcept
-{
-    return mVias.size();
-}
+    Library::track_orientation_type& Library::orientation(const Library::track_type &track)
+    {
+        return m_track_orientations[track];
+    }
 
-Library::track_container_type::size_type Library::size_track() const noexcept
-{
-    return mTracks.size();
-}
+    const Library::track_orientation_type& Library::orientation(const Library::track_type &track) const
+    {
+        return m_track_orientations[track];
+    }
 
-Library::layer_type Library::add_layer_instance(
-        const std::string &layerName,
-        const LayerType &type,
-        const LayerDirection &direction,
+    Library::unit_type& Library::start(const Library::track_type& track)
+    {
+        return m_track_starts[track];
+    }
+
+    const Library::unit_type& Library::start(const Library::track_type& track) const
+    {
+        return m_track_starts[track];
+    }
+
+    Library::scalar_type& Library::number_of_tracks(const Library::track_type& track)
+    {
+        return m_number_of_tracks[track];
+    }
+
+    const Library::scalar_type& Library::number_of_tracks(const Library::track_type& track) const
+    {
+        return m_number_of_tracks[track];
+    }
+
+    Library::unit_type& Library::space(const Library::track_type& track)
+    {
+        return m_track_spaces[track];
+    }
+
+    const Library::unit_type& Library::space(const Library::track_type& track) const
+    {
+        return m_track_spaces[track];
+    }
+
+    Library::layer_type& Library::layer(const Library::track_type& track)
+    {
+        return m_layer_tracks[track];
+    }
+
+    const Library::layer_type& Library::layer(const Library::track_type& track) const
+    {
+        return m_layer_tracks[track];
+    }
+
+    Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
+    {
+        return m_layers.begin();
+    }
+
+    Library::layer_container_type::const_iterator Library::end_layer() const noexcept
+    {
+        return m_layers.end();
+    }
+
+    Library::via_container_type::const_iterator Library::begin_via() const noexcept
+    {
+        return m_vias.begin();
+    }
+
+    Library::via_container_type::const_iterator Library::end_via() const noexcept
+    {
+        return m_vias.end();
+    }
+
+    Library::track_container_type::const_iterator Library::begin_track() const noexcept
+    {
+        return m_tracks.begin();
+    }
+
+    Library::track_container_type::const_iterator Library::end_track() const noexcept
+    {
+        return m_tracks.end();
+    }
+
+    Library::layer_container_type::size_type Library::size_layer() const noexcept
+    {
+        return m_layers.size();
+    }
+
+    Library::via_container_type::size_type Library::size_via() const noexcept
+    {
+        return m_vias.size();
+    }
+
+    Library::track_container_type::size_type Library::size_track() const noexcept
+    {
+        return m_tracks.size();
+    }
+
+    Library::layer_type Library::add_layer(
+        const Library::layer_name_type& layerName,
+        const Library::layer_type_type& type,
+        const Library::layer_direction_type& direction,
         const Library::unit_type& pitch,
         const Library::unit_type& offset,
         const Library::unit_type& width,
@@ -202,68 +289,75 @@ Library::layer_type Library::add_layer_instance(
         const Library::unit_type& EOLwidth,
         const Library::unit_type& EOLwithin,
         const Library::spacing_table_type spacingTable
-)
-{
-    if(mName2Layer.find(layerName) == mName2Layer.end()){
-        auto layer = mLayers.add();
+    )
+    {
+        if(m_name_to_layer.find(layerName) == m_name_to_layer.end()){
+            auto layer = m_layers.add();
 
-        mLayerName[layer] = layerName;
-        mName2Layer[layerName] = layer;
-        mLayerType[layer] = type;
-        mLayerDirection[layer] = direction;
-        mLayerPitch[layer] = pitch;
-        mLayerOffset[layer] = offset;
-        mLayerWidth[layer] = width;
-        mLayerMinWidth[layer] = minWidth;
-        mLayerArea[layer] = area;
-        mLayerSpacing[layer] = spacing;
-        mLayerEOLspace[layer] = EOLspace;
-        mLayerEOLwidth[layer] = EOLwidth;
-        mLayerEOLwithin[layer] = EOLwithin;
-        mLayerSpacingTable[layer] = spacingTable;
+            m_layer_names[layer] = layerName;
+            m_name_to_layer[layerName] = layer;
+            m_layer_types[layer] = type;
+            m_layer_directions[layer] = direction;
+            m_layer_pitches[layer] = pitch;
+            m_layer_offsets[layer] = offset;
+            m_layer_widths[layer] = width;
+            m_layer_min_widths[layer] = minWidth;
+            m_layer_areas[layer] = area;
+            m_layer_spacing[layer] = spacing;
+            m_layer_end_of_line_spaces[layer] = EOLspace;
+            m_layer_end_of_line_widths[layer] = EOLwidth;
+            m_layer_end_of_line_withins[layer] = EOLwithin;
+            m_layer_spacing_tables[layer] = spacingTable;
 
-        return layer;
-    }else{
-        return mName2Layer[layerName];
+            return layer;
+        }else{
+            return m_name_to_layer[layerName];
+        }
+    }
+
+    Library::via_type Library::add_via(const Library::via_name_type& viaName, const layer_name_to_via_geometry_type& layers)
+    {
+        if(m_name_to_via.find(viaName) == m_name_to_via.end()){
+            auto via = m_vias.add();
+
+            m_via_names[via] = viaName;
+            m_name_to_via[viaName] = via;
+            m_via_layers_names_to_via_geometries[via] = layers;
+            return via;
+        }else{
+            return m_name_to_via[viaName];
+        }
+    }
+
+    Library::track_type Library::add_track(
+        const Library::track_orientation_type& orientation,
+        const Library::unit_type& start,
+        const Library::scalar_type& num_tracks,
+        const Library::unit_type& space,
+        const Library::layer_name_type& layer
+    )
+    {
+        auto track = m_tracks.add();
+        m_track_orientations[track] = orientation;
+        m_track_starts[track] = start;
+        m_number_of_tracks[track] = num_tracks;
+        m_track_spaces[track] = space;
+        m_layer_tracks[track] = m_name_to_layer[layer];
+        return track;
+    }
+
+    entity_system::EntitySystem<Library::layer_type>::NotifierType * Library::notifier_layer() const noexcept
+    {
+        return m_layers.notifier();
+    }
+
+    entity_system::EntitySystem<Library::via_type>::NotifierType * Library::notifier_via() const noexcept
+    {
+        return m_vias.notifier();
+    }
+
+    entity_system::EntitySystem<Library::track_type>::NotifierType * Library::notifier_track() const noexcept
+    {
+        return m_tracks.notifier();
     }
 }
-
-Library::via_type Library::add_via_instance(const std::string &viaName, const via_layer_map_type &layers)
-{
-    if(mName2Via.find(viaName) == mName2Via.end()){
-        auto via = mVias.add();
-
-        mViaName[via] = viaName;
-        mName2Via[viaName] = via;
-        mViaLayers[via] = layers;
-        return via;
-    }else{
-        return mName2Via[viaName];
-    }
-}
-
-Library::track_type Library::add_track_instance(const TrackOrientation &orientation, const unit_type &start, const scalar_type &numTracks, const unit_type &space, const std::string &layer)
-{
-    auto track = mTracks.add();
-    mTrackOrientation[track] = orientation;
-    mTrackStart[track] = start;
-    mNumberOfTracks[track] = numTracks;
-    mTrackSpace[track] = space;
-    mLayerOfTrack[track] = mName2Layer[layer];
-    return track;
-}
-
-entity_system::EntitySystem<Library::layer_type>::NotifierType * Library::notifier(Library::layer_type) const {
-        return mLayers.notifier();
-    }
-
-    entity_system::EntitySystem<Library::via_type>::NotifierType * Library::notifier(Library::via_type) const {
-        return mVias.notifier();
-    }
-
-    entity_system::EntitySystem<Library::track_type>::NotifierType * Library::notifier(Library::track_type) const {
-        return mTracks.notifier();
-    }
-
-} // namespace routing
-} // namespace ophidian

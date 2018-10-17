@@ -31,8 +31,8 @@ namespace factory
         for(auto net : guide.nets()){
             auto net_instance = netlist.find_net(net.name());
             for(auto region : net.regions()){
-                auto layer_instance = library.find_layer_instance(region.metal());
-                globalRouting.add_region(region.region(), layer_instance, net_instance);
+                auto layer = library.find_layer(region.metal());
+                globalRouting.add_region(region.region(), layer, net_instance);
             }
         }
     }
