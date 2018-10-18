@@ -68,7 +68,7 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
         auto track = *library.begin_track();
         CHECK(library.orientation(track) == ophidian::routing::TrackOrientation::X);
         CHECK(library.start(track) == database_unit_t{83800});
-        CHECK(library.numTracs(track) == 52);
+        CHECK(library.numTracks(track) == 52);
         CHECK(library.space(track) == database_unit_t{400});
         CHECK(library.name(library.layer(track)) == "Metal9");
     }

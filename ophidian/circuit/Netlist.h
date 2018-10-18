@@ -24,6 +24,7 @@
 #include <ophidian/entity_system/Composition.h>
 #include <ophidian/circuit/StandardCells.h>
 #include <unordered_map>
+#include <ophidian/util/Range.h>
 
 namespace ophidian::circuit
 {
@@ -160,6 +161,8 @@ namespace ophidian::circuit
         output_pad_container_type::const_iterator begin_output_pad() const noexcept;
         output_pad_container_type::const_iterator end_output_pad() const noexcept;
 
+        ophidian::util::Range<cell_instance_container_type::const_iterator> range_cell() const noexcept;
+        ophidian::util::Range<net_container_type::const_iterator> range_net() const noexcept;
         // Capacity
         cell_instance_container_type::size_type size_cell_instance() const noexcept;
         pin_instance_container_type::size_type size_pin_instance() const noexcept;

@@ -68,7 +68,7 @@ const Library::unit_type Library::start(const Library::track_type& track) const
     return mTrackStart[track];
 }
 
-const Library::scalar_type Library::numTracs(const Library::track_type& track) const
+const Library::scalar_type Library::numTracks(const Library::track_type& track) const
 {
     return mNumberOfTracks[track];
 }
@@ -171,6 +171,11 @@ Library::track_container_type::const_iterator Library::begin_track() const noexc
 Library::track_container_type::const_iterator Library::end_track() const noexcept
 {
     return mTracks.end();
+}
+
+ophidian::util::Range<Library::track_container_type::const_iterator> Library::range_track() const noexcept
+{
+    return ophidian::util::Range<Library::track_container_type::const_iterator>(mTracks.begin(), mTracks.end());
 }
 
 Library::layer_container_type::size_type Library::size_layer() const noexcept

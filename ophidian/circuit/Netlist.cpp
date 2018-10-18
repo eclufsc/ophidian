@@ -165,6 +165,16 @@ namespace ophidian::circuit
         return mOutputs.end();
     }
 
+    ophidian::util::Range<Netlist::cell_instance_container_type::const_iterator> Netlist::range_cell() const noexcept
+    {
+        return ophidian::util::Range<Netlist::cell_instance_container_type::const_iterator>(mCells.begin(), mCells.end());
+    }
+
+    ophidian::util::Range<Netlist::net_container_type::const_iterator> Netlist::range_net() const noexcept
+    {
+        return ophidian::util::Range<Netlist::net_container_type::const_iterator>(mNets.begin(), mNets.end());
+    }
+
     Netlist::cell_instance_container_type::size_type Netlist::size_cell_instance() const noexcept
     {
         return mCells.size();

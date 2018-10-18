@@ -83,8 +83,14 @@ namespace ophidian::parser
         Def(const std::string& def_file);
         Def(const std::vector<std::string>& def_files);
 
+        Def(const database_unit_box_type& die_area, const row_container_type& rows,
+            const component_container_type& components, const scalar_type& micrometer_ratio,
+            const track_container_type& tracks, const nets_container_type& nets);
+
         // Class member functions
         void read_file(const std::string& def_file);
+
+        void write_file(const std::string& def_file);
 
         const database_unit_box_type& die_area() const noexcept;
 

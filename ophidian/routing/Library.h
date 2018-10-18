@@ -7,6 +7,7 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/util/LookupTable.h>
 #include <unordered_map>
+#include <ophidian/util/Range.h>
 
 namespace ophidian
 {
@@ -105,7 +106,7 @@ namespace routing
 
         const TrackOrientation orientation(const track_type& track) const;
         const unit_type start(const track_type& track) const;
-        const scalar_type numTracs(const track_type& track) const;
+        const scalar_type numTracks(const track_type& track) const;
         const unit_type space(const track_type& track) const;
         const layer_type layer(const track_type& track) const;
 
@@ -119,6 +120,7 @@ namespace routing
         track_container_type::const_iterator begin_track() const noexcept;
         track_container_type::const_iterator end_track() const noexcept;
 
+        ophidian::util::Range<track_container_type::const_iterator> range_track() const noexcept;
 
         // Capacity
         layer_container_type::size_type size_layer() const noexcept;

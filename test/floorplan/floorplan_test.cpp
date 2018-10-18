@@ -21,7 +21,7 @@ TEST_CASE("Floorplan: Brand-new floorplan must be empty.", "[floorplan]")
 	CHECK(floorplan.range_row().empty());
 }
 
-TEST_CASE("Floorplan: Set Origing and boundaries.", "[floorplan]")
+TEST_CASE("Floorplan: Set Origin and boundaries.", "[floorplan]")
 {
 	auto origin = Floorplan::point_type{dbu_t{2.0}, dbu_t{3.0}};
 	auto boundaries = Floorplan::point_type{dbu_t{4000.0}, dbu_t{3000.0}};
