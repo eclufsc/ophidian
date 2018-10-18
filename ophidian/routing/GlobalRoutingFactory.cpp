@@ -23,11 +23,11 @@ namespace ophidian::routing::factory
 {
     void make_global_routing(ophidian::routing::GlobalRouting &globalRouting, const Library &library, const ophidian::circuit::Netlist &netlist, const ophidian::parser::Guide &guide) noexcept
     {
-        for(auto& net : guide.nets()){
+        for(const auto& net : guide.nets()){
             auto net_instance = netlist.find_net(net.name());
-            for(auto& region : net.regions()){
-                auto layer = library.find_layer(region.metal());
-                globalRouting.add_region(region.region(), layer, net_instance);
+            for(const auto& region : net.regions()){
+                auto layer = library.find_layer(region.metal_layer_name());
+                globalRouting.add_region(region.geometry(), layer, net_instance);
             }
         }
     }
