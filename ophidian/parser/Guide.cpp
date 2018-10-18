@@ -9,7 +9,7 @@
 namespace ophidian::parser
 {
     Guide::Guide(const std::string &guide_file):
-        m_nets{};
+        m_nets{}
     {
         read_file(guide_file);
     }
