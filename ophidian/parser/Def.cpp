@@ -33,6 +33,17 @@ namespace parser
     {
         read_file(def_file);
     }
+    Def::Def(const database_unit_box_type& die_area, const row_container_type& rows,
+            const component_container_type& components, const scalar_type& micrometer_ratio,
+            const track_container_type& tracks, const nets_container_type& nets):
+        m_die_area{die_area},
+        m_rows{rows},
+        m_components{components},
+        m_dbu_to_micrometer_ratio{micrometer_ratio},
+        m_tracks{tracks},
+        m_nets{nets}
+        {}
+
 
     Def::Def(const std::vector<std::string>& def_files):
         m_die_area{},
