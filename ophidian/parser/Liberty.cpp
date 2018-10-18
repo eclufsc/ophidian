@@ -214,6 +214,7 @@ Liberty::Pin readPin(si2drGroupIdT pin, Liberty::Cell &cell, si2drErrorT & err) 
         }else if (attrName == "clock")
         {
             newPin.pinDirection = Liberty::Pin::directionPin::INPUT;
+            newPin.clock = true;
             cell.sequential = true;
         }
     }

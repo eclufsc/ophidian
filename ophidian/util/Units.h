@@ -69,6 +69,7 @@ namespace ophidian::util
     //!Capacitance Units
     using femtofarad_t = units::capacitance::femtofarad_t;
     using picofarad_t = units::capacitance::picofarad_t;
+    using nanofarad_t = units::capacitance::nanofarad_t;
     using farad_t = units::capacitance::farad_t;
 
     //!Resistance Units
