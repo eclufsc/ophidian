@@ -43,7 +43,7 @@ namespace ophidian::circuit
     };
 
     enum class PinDirection {
-        INPUT, OUTPUT, INOUT, NA
+        INPUT, OUTPUT, INOUT, INTERNAL, NA
     };
 
     class StandardCells

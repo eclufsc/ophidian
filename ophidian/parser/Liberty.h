@@ -84,7 +84,9 @@ public:
         double maxCapacitance = 0;
         enum directionPin{
             INPUT,
-            OUTPUT
+            OUTPUT,
+            INOUT,
+            INTERNAL
         };
         Timing find(Timing::type timingT);
         bool clock = false;

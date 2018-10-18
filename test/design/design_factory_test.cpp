@@ -2,6 +2,8 @@
 
 #include <ophidian/design/DesignFactory.h>
 
+
+
 TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][Design][factory]")
 {
     auto lef = ophidian::parser::Lef{"input_files/simple/simple.lef"};
@@ -61,4 +63,27 @@ TEST_CASE("Design factory: test design_factory_iccad17 with contest files", "[de
     ophidian::design::factory::make_design_iccad2017(design, def, lef);
 
     CHECK(design.netlist().size_cell_instance() == 29521);
+}
+
+TEST_CASE("Design factory: test design_factory_tau2017 with contest files", "[design][Design][factory]")
+{
+    auto liberty = ophidian::parser::Liberty{"input_files/tau2015/simple/simple_Late.lib"};
+
+    auto verilog = ophidian::parser::Verilog{"input_files/tau2015/simple/simple.v"};
+
+    auto design = ophidian::design::Design{};
+
+    ophidian::design::factory::make_design_tau2017(design, liberty, verilog);
+
+    auto cell_u1 = design.netlist().find_cell_instance("u1");
+    auto std_cell_u1 = design.netlist().std_cell(cell_u1);
+    auto pin_u1_a = design.netlist().find_pin_instance("u1:a");
+    auto std_cell_pin_a = design.netlist().std_cell_pin(pin_u1_a);
+    auto net_inp1 = design.netlist().net(pin_u1_a);
+
+    CHECK("u1" == design.netlist().name(cell_u1));
+    CHECK("NAND2_X1" == design.standard_cells().name(std_cell_u1));
+    CHECK("u1:a" == design.netlist().name(pin_u1_a));
+    CHECK("NAND2_X1:a" == design.standard_cells().name(std_cell_pin_a));
+    CHECK("inp1" == design.netlist().name(net_inp1));
 }

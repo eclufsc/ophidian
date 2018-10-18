@@ -24,6 +24,7 @@
 #include <ophidian/parser/Verilog.h>
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Liberty.h>
 
 namespace ophidian::design::factory
 {
@@ -32,6 +33,8 @@ namespace ophidian::design::factory
     void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
     void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
+
+    void make_design_tau2017(Design& design, const parser::Liberty& liberty, const parser::Verilog& verilog) noexcept;
 }
 
 #endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H

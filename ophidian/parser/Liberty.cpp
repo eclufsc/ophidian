@@ -223,6 +223,10 @@ Liberty::Pin readPin(si2drGroupIdT pin, Liberty::Cell &cell, si2drErrorT & err) 
         newPin.pinDirection = Liberty::Pin::directionPin::INPUT;
     else if (std::string(direction) == "output")
         newPin.pinDirection = Liberty::Pin::directionPin::OUTPUT;
+    else if (std::string(direction) == "inout")
+        newPin.pinDirection = Liberty::Pin::directionPin::INOUT;
+    else if (std::string(direction) == "internal")
+        newPin.pinDirection = Liberty::Pin::directionPin::INTERNAL;
     si2drGroupsIdT groups = si2drGroupGetGroups(pin, &err);
     si2drGroupIdT group;
     while (!si2drObjectIsNull((group = si2drIterNextGroup(groups, &err)), &err)) {

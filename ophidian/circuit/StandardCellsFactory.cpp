@@ -51,4 +51,29 @@ namespace ophidian::circuit::factory
             }
         }
     }
+
+    void make_standard_cells(StandardCells& cells, const parser::Liberty& liberty) noexcept{
+        for(const auto& macro : liberty.cells){
+            auto cell = cells.add_cell(macro.name);
+            for(const auto& pin : macro.pins){
+                auto cell_pin = Pin{};
+                auto pin_name = macro.name + ":" + pin.name;
+                switch(pin.pinDirection){
+                    case parser::Liberty::Pin::directionPin::INPUT:
+                        cell_pin = cells.add_pin(pin_name, PinDirection::INPUT);
+                        break;
+                    case parser::Liberty::Pin::directionPin::OUTPUT:
+                        cell_pin = cells.add_pin(pin_name, PinDirection::OUTPUT);
+                        break;
+                    case parser::Liberty::Pin::directionPin::INOUT:
+                        cell_pin = cells.add_pin(pin_name, PinDirection::INOUT);
+                        break;
+                    case parser::Liberty::Pin::directionPin::INTERNAL:
+                        cell_pin = cells.add_pin(pin_name, PinDirection::INTERNAL);
+                        break;
+                }
+                cells.connect(cell, cell_pin);
+            }
+        }
+    }
 }

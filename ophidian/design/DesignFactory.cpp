@@ -16,7 +16,7 @@
    under the License.
  */
 
-#include "Design.h"
+#include "DesignFactory.h"
 
 #include <ophidian/circuit/StandardCellsFactory.h>
 #include <ophidian/circuit/NetlistFactory.h>
@@ -55,5 +55,11 @@ namespace ophidian::design::factory
         placement::factory::make_library(design.library(), lef, design.standard_cells());
 
         placement::factory::make_placement(design.placement(), def, design.netlist());
+    }
+
+    void make_design_tau2017(Design& design, const parser::Liberty& liberty, const parser::Verilog& verilog) noexcept{
+        circuit::factory::make_standard_cells(design.standard_cells(), liberty);
+
+        circuit::factory::make_netlist(design.netlist(), verilog, design.standard_cells());
     }
 }
