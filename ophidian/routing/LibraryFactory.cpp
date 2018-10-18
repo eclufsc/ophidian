@@ -24,98 +24,121 @@ namespace ophidian::routing::factory
 {
     void make_library(Library& library, const parser::Lef& lef, const parser::Def & def) noexcept
     {
-        util::DbuConverter dbuConverter{lef.micrometer_to_dbu_ratio()};
+        auto dbuConverter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
 
         //creating layers
         for(auto& layer : lef.layers()){
             //layer type
-            LayerType lType;
+            auto lType = Library::layer_type_type{};
 
             switch (layer.type()) {
-                case ophidian::parser::Lef::layer_type::Type::CUT:
-                    lType = LayerType::CUT;
+                case ophidian::parser::Lef::layer_type::type_type::CUT:
+                    lType = Library::layer_type_type::CUT;
                     break;
-                case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
-                    lType = LayerType::MASTERSLICE;
+                case ophidian::parser::Lef::layer_type::type_type::MASTERSLICE:
+                    lType = Library::layer_type_type::MASTERSLICE;
                     break;
-                case ophidian::parser::Lef::layer_type::Type::ROUTING:
-                    lType = LayerType::ROUTING;
+                case ophidian::parser::Lef::layer_type::type_type::ROUTING:
+                    lType = Library::layer_type_type::ROUTING;
                     break;
                 default:
-                    lType = LayerType::NA;
+                    lType = Library::layer_type_type::NA;
                     break;
             }
 
             //layer direction
-            LayerDirection lDirection;
+            auto lDirection = Library::layer_direction_type{};
+
             switch (layer.direction()) {
-                case ophidian::parser::Lef::layer_type::Direction::HORIZONTAL:
-                lDirection = LayerDirection::HORIZONTAL;
-                break;
-            case ophidian::parser::Lef::layer_type::Direction::VERTICAL:
-                lDirection = LayerDirection::VERTICAL;
-                break;
-            default:
-                lDirection = LayerDirection::NA;
-                break;
+                case ophidian::parser::Lef::layer_type::direction_type::HORIZONTAL:
+                    lDirection = Library::layer_direction_type::HORIZONTAL;
+                    break;
+                case ophidian::parser::Lef::layer_type::direction_type::VERTICAL:
+                    lDirection = Library::layer_direction_type::VERTICAL;
+                    break;
+                default:
+                    lDirection = Library::layer_direction_type::NA;
+                    break;
             }
+
             //layer spacingTable
-            Library::spacing_table_content_type lTableContents;
+            auto lTableContents = Library::spacing_table_content_type{};
+
             lTableContents.row_values.reserve(layer.parallel_run_length().widths().size());
+
             for(auto& val : layer.parallel_run_length().widths()){
-                lTableContents.row_values.push_back(dbuConverter.convert(val));
+                lTableContents.row_values.emplace_back(dbuConverter.convert(val));
             }
+
             lTableContents.column_values.reserve(layer.parallel_run_length().lengths().size());
+
             for(auto& val : layer.parallel_run_length().lengths()){
-                lTableContents.column_values.push_back(dbuConverter.convert(val));
+                lTableContents.column_values.emplace_back(dbuConverter.convert(val));
             }
+
             lTableContents.values.reserve(layer.parallel_run_length().lengths().size());
+
             for(auto& width : layer.parallel_run_length().widths()){
-                std::vector<Library::unit_type> v;
-                v.reserve(layer.parallel_run_length().lengths().size());
+                auto lenghts = std::vector<Library::unit_type>{};
+
+                lenghts.reserve(layer.parallel_run_length().lengths().size());
+
                 for(auto& length : layer.parallel_run_length().lengths()){
                     auto spacing = layer.parallel_run_length().width_length_to_spacing().at({width, length});
-                    v.push_back(dbuConverter.convert(spacing));
+                    lenghts.push_back(dbuConverter.convert(spacing));
                 }
-                lTableContents.values.push_back(v);
+
+                lTableContents.values.emplace_back(std::move(lenghts));
             }
-            auto lTable = Library::spacing_table_type(lTableContents);
+
+            auto lTable = Library::spacing_table_type{lTableContents};
+
             auto l = library.add_layer(
-                        layer.name(),
-                        lType,
-                        lDirection,
-                        dbuConverter.convert(layer.pitch()),
-                        dbuConverter.convert(layer.offset()),
-                        dbuConverter.convert(layer.width()),
-                        dbuConverter.convert(layer.min_width()),
-                        dbuConverter.convert(layer.area()),
-                        dbuConverter.convert(layer.spacing()),
-                        dbuConverter.convert(layer.end_of_line().space()),
-                        dbuConverter.convert(layer.end_of_line().width()),
-                        dbuConverter.convert(layer.end_of_line().within()),
-                        lTable);
+                layer.name(),
+                lType,
+                lDirection,
+                dbuConverter.convert(layer.pitch()),
+                dbuConverter.convert(layer.offset()),
+                dbuConverter.convert(layer.width()),
+                dbuConverter.convert(layer.min_width()),
+                dbuConverter.convert(layer.area()),
+                dbuConverter.convert(layer.spacing()),
+                dbuConverter.convert(layer.end_of_line().space()),
+                dbuConverter.convert(layer.end_of_line().width()),
+                dbuConverter.convert(layer.end_of_line().within()),
+                lTable
+            );
         }
 
         //creating vias
-         for(auto& via : lef.vias()){
-             auto map = Library::layer_name_to_via_geometry_type{};
-             for(auto layer_map : via.layers()){
-                 auto box_micron = layer_map.second.front();
-                 auto box_dbu = Library::via_geometry_type{dbuConverter.convert(box_micron.min_corner()), dbuConverter.convert(box_micron.max_corner())};
-                 map.emplace(layer_map.first, box_dbu);
-             }
-             library.add_via(via.name(), map);
-         }
+        for(auto& via : lef.vias()){
+            auto map = Library::layer_name_to_via_geometry_type{};
+
+            for(auto layer_map : via.layers()){
+                auto box_micron = layer_map.second.front();
+
+                auto box_dbu = Library::via_geometry_type{
+                    dbuConverter.convert(box_micron.min_corner()),
+                    dbuConverter.convert(box_micron.max_corner())
+                };
+
+                map.emplace(layer_map.first, box_dbu);
+            }
+
+            library.add_via(via.name(), map);
+        }
 
         //creating tracks
-         for(auto track : def.tracks()){
-            ophidian::routing::TrackOrientation orientation;
-            if(track.orientation() == ophidian::parser::Def::track_type::Orientation::X){
-                orientation = ophidian::routing::TrackOrientation::X;
-            }else {
-                orientation = ophidian::routing::TrackOrientation::Y;
+        for(auto& track : def.tracks()){
+            auto orientation = routing::Library::track_orientation_type{};
+
+            if(track.orientation() == parser::Def::track_type::orientation_type::X){
+                orientation = Library::track_orientation_type::X;
+            }else{
+                orientation = Library::track_orientation_type::Y;
             }
+
             library.add_track(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
-         }
+        }
     }
 }

@@ -24,15 +24,9 @@
 #include <ophidian/routing/Library.h>
 #include "GlobalRouting.h"
 
-namespace ophidian
-{
-namespace routing
-{
-namespace factory
+namespace ophidian::routing::factory
 {
     void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::circuit::Netlist & netlist, const ophidian::parser::Guide& guide) noexcept;
-}
-}
 }
 
 #endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H

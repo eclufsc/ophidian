@@ -48,7 +48,7 @@ TEST_CASE("Global Routing Factory Test", "[routing][globalRouting][factory]")
 
     std::vector<std::pair<box_type, std::string>> global_routing_regions;
     for(auto part : regions){
-        auto box = globalRouting.box(part);
+        auto box = globalRouting.geometry(part);
         auto layer_instance = globalRouting.layer(part);
         auto layer_name = design.routing_library().name(layer_instance);
         global_routing_regions.push_back(std::make_pair(box, layer_name));
