@@ -13,5 +13,6 @@ TEST_CASE("Timer: test of integration with OpenTimer.", "[timing][opentimer]"){
 
     design::factory::make_design_tau2017(design, liberty, verilog);
     auto openTimer = timing::OpenTimer(design, "./input_files/tau2015/simple/simple_Early.lib", "./input_files/tau2015/simple/simple_Late.lib", "./input_files/tau2015/simple/simple.sdc", "./input_files/tau2015/simple/simple.spef");
-    CHECK(openTimer.wns() == Approx(-204.347f));
+    CHECK(openTimer.wns() == openTimer.slack(std::string("u1:o"), timing::OpenTimer::split_type_type::MAX, timing::OpenTimer::transition_type::FALL));
+    CHECK(openTimer.tns() == Approx(-590.861));
 }

@@ -55,11 +55,71 @@ namespace ophidian::timing{
         m_timer.read_sdc(sdc_path);
     }
 
+    float OpenTimer::at(const std::string& pin_name, split_type_type split_type, transition_type transition_type){
+        return *m_timer.at(pin_name, split_type, transition_type);
+    }
+
+    float OpenTimer::rat(const std::string& pin_name, split_type_type split_type, transition_type transition_type){
+        return *m_timer.rat(pin_name, split_type, transition_type);
+    }
+
+    float OpenTimer::slew(const std::string& pin_name, split_type_type split_type, transition_type transition_type){
+        return *m_timer.slew(pin_name, split_type, transition_type);
+    }
+
+    float OpenTimer::slack(const std::string& pin_name, split_type_type split_type, transition_type transition_type){
+        return *m_timer.slack(pin_name, split_type, transition_type);
+    }
+
+    float OpenTimer::load(const std::string& pin_name, split_type_type split_type, transition_type transition_type){
+        return *m_timer.load(pin_name, split_type, transition_type);
+    }
+
+    float OpenTimer::leakage_power(){
+        return *m_timer.leakage_power();
+    }
+
+    float OpenTimer::tns(){
+        return *m_timer.tns();
+    }
+
     float OpenTimer::wns(){
         return *m_timer.wns();
     }
 
     void OpenTimer::update_timing(){
         m_timer.update_timing();
+    }
+
+    void OpenTimer::cppr(bool mode){
+        m_timer.cppr(mode);
+    }
+
+    void OpenTimer::insert_net(std::string net_name){
+        m_timer.insert_net(net_name);
+    }
+
+    void OpenTimer::insert_cell_instance(std::string cell_instance, std::string standard_cell){
+        m_timer.insert_gate(cell_instance, standard_cell);
+    }
+
+    void OpenTimer::repower_cell_instance(std::string cell_instance, std::string standard_cell){
+        m_timer.repower_gate(cell_instance, standard_cell);
+    }
+
+    void OpenTimer::remove_net(std::string net_name){
+        m_timer.remove_net(net_name);
+    }
+
+    void OpenTimer::remove_cell_instance(std::string cell_instance_name){
+        m_timer.remove_gate(cell_instance_name);
+    }
+
+    void OpenTimer::disconnect_pin(std::string pin_instance_name){
+        m_timer.disconnect_pin(pin_instance_name);
+    }
+
+    void OpenTimer::connect_pin(std::string pin_instance_name, std::string net_name){
+        m_timer.connect_pin(pin_instance_name, net_name);
     }
 }
