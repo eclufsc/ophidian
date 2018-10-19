@@ -68,7 +68,7 @@ const Library::unit_type Library::start(const Library::track_type& track) const
     return mTrackStart[track];
 }
 
-const Library::scalar_type Library::numTracs(const Library::track_type& track) const
+const Library::scalar_type Library::numTracks(const Library::track_type& track) const
 {
     return mNumberOfTracks[track];
 }
