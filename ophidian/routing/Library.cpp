@@ -68,7 +68,7 @@ const Library::unit_type Library::start(const Library::track_type& track) const
     return mTrackStart[track];
 }
 
-const Library::scalar_type Library::numTracks(const Library::track_type& track) const
+const Library::scalar_type Library::numTracs(const Library::track_type& track) const
 {
     return mNumberOfTracks[track];
 }
@@ -241,6 +241,7 @@ Library::via_type Library::add_via_instance(const std::string &viaName, const vi
         mViaName[via] = viaName;
         mName2Via[viaName] = via;
         mViaLayers[via] = layers;
+        return via;
     }else{
         return mName2Via[viaName];
     }
@@ -254,6 +255,7 @@ Library::track_type Library::add_track_instance(const TrackOrientation &orientat
     mNumberOfTracks[track] = numTracks;
     mTrackSpace[track] = space;
     mLayerOfTrack[track] = mName2Layer[layer];
+    return track;
 }
 
 entity_system::EntitySystem<Library::layer_type>::NotifierType * Library::notifier(Library::layer_type) const {
