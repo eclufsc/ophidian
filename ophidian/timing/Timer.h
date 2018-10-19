@@ -19,9 +19,35 @@
 #ifndef OPHIDIAN_TIMING_OPENTIMER_H
 #define OPHIDIAN_TIMING_OPENTIMER_H
 
+#include <ophidian/design/Design.h>
+#include <ot/timer/timer.hpp>
+
 namespace ophidian::timing
 {
-    float run_open_timer();
+    class OpenTimer{
+    public:
+        //Constructors
+        OpenTimer() = delete;
+
+        OpenTimer(const OpenTimer&) = default;
+        OpenTimer& operator=(const OpenTimer&) = default;
+
+        OpenTimer(OpenTimer&&) = default;
+        OpenTimer& operator=(OpenTimer&&) = default;
+
+        OpenTimer(ophidian::design::Design & design, std::string early_lib_path, std::string late_lib_path, std::string sdc_path, std::string spef_path);
+
+        //Timing info queries
+        float wns();
+
+        //Design modifiers
+        void update_timing();
+
+
+    private:
+        ot::Timer m_timer;
+        ophidian::design::Design & m_design;
+    };
 }
 
 #endif // OPHIDIAN_TIMING_OPENTIMER_H
