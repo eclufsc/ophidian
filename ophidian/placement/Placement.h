@@ -68,6 +68,8 @@ namespace ophidian::placement
 
         cell_geometry_type geometry(const cell_type& cell) const;
 
+        bool fixed(const cell_type& cell) const;
+
         // Iterators
 
         // Capacity
@@ -79,11 +81,14 @@ namespace ophidian::placement
 
         void place(const output_pad_type& output, const point_type & location);
 
+        void fix(const cell_type& cell, bool fixed);
+
     private:
         const circuit::Netlist & m_netlist;
         const Library & m_library;
 
-        entity_system::Property<cell_type, point_type>   m_cell_locacations;
+        entity_system::Property<cell_type, point_type>   m_cell_locations;
+        entity_system::Property<cell_type, bool> m_cell_fixed;
         entity_system::Property<input_pad_type, point_type>  m_input_pad_locations;
         entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
     };

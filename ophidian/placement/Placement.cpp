@@ -23,7 +23,8 @@ namespace ophidian::placement
     Placement::Placement(const circuit::Netlist & netlist, const Library &library):
             m_netlist(netlist),
             m_library(library),
-            m_cell_locacations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
+            m_cell_locations(netlist.makeProperty<util::LocationDbu>(circuit::CellInstance())),
+            m_cell_fixed(netlist.makeProperty<bool>(circuit::CellInstance())),
             m_input_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Input())),
             m_output_pad_locations(netlist.makeProperty<util::LocationDbu>(circuit::Output()))
     {
@@ -32,7 +33,7 @@ namespace ophidian::placement
     // Element access
     const Placement::point_type& Placement::location(const Placement::cell_type& cell) const
     {
-        return m_cell_locacations[cell];
+        return m_cell_locations[cell];
     }
 
     Placement::point_type Placement::location(const Placement::pin_type& pin) const
@@ -72,10 +73,15 @@ namespace ophidian::placement
         return cellGeometry;
     }
 
+    bool Placement::fixed(const Placement::cell_type& cell) const 
+    {
+        return m_cell_fixed[cell];
+    }
+
     // Modifiers
     void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
     {
-        m_cell_locacations[cell] = location;
+        m_cell_locations[cell] = location;
     }
 
     void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
@@ -86,5 +92,10 @@ namespace ophidian::placement
     void Placement::place(const Placement::output_pad_type& output, const Placement::point_type & location)
     {
         m_output_pad_locations[output] = location;
+    }
+
+    void Placement::fix(const Placement::cell_type& cell, bool fixed) 
+    {
+        m_cell_fixed[cell] = fixed;
     }
 }
