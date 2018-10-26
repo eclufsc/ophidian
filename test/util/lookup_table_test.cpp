@@ -9,9 +9,9 @@ TEST_CASE("lookupTable Floor Test", "[util][lookupTable]")
 {
     using namespace ophidian::util;
     using unit_type = double;
-    using strategy = floor_strategy<unit_type, unit_type, unit_type>;
+    using strategy = FloorStrategy<unit_type, unit_type, unit_type>;
     using table = LookupTable<unit_type, unit_type, unit_type, strategy>;
-    using contents = tableContents<unit_type, unit_type, unit_type>;
+    using contents = TableContents<unit_type, unit_type, unit_type>;
 
     contents c;
     c.row_values = {0.0, 0.1, 0.75, 1.5};
@@ -31,9 +31,9 @@ TEST_CASE("lookupTable Ceiling Test", "[util][lookupTable]")
 {
     using namespace ophidian::util;
     using unit_type = double;
-    using strategy = ceiling_strategy<unit_type, unit_type, unit_type>;
+    using strategy = CeilingStrategy<unit_type, unit_type, unit_type>;
     using table = LookupTable<unit_type, unit_type, unit_type, strategy>;
-    using contents = tableContents<unit_type, unit_type, unit_type>;
+    using contents = TableContents<unit_type, unit_type, unit_type>;
 
     contents c;
     c.row_values = {0.0, 0.1, 0.75, 1.5};

@@ -14,9 +14,9 @@ TEST_CASE("Library Factory Test", "[routing][library][factory]")
 {
     using namespace ophidian::util;
     using unit_type = double;
-    using strategy = floor_strategy<unit_type, unit_type, unit_type>;
+    using strategy = FloorStrategy<unit_type, unit_type, unit_type>;
     using table = LookupTable<unit_type, unit_type, unit_type, strategy>;
-    using contents = tableContents<unit_type, unit_type, unit_type>;
+    using contents = TableContents<unit_type, unit_type, unit_type>;
 
     Def sample_def = ophidian::parser::Def{"input_files/ispd18/ispd18_sample/ispd18_sample.input.def"};
     Lef sample_lef = ophidian::parser::Lef{"input_files/ispd18/ispd18_sample/ispd18_sample.input.lef"};

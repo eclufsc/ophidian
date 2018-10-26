@@ -48,9 +48,9 @@ namespace ophidian::routing
     public:
         using scalar_type           = int;
         using unit_type             = util::database_unit_t;
-        using table_strategy_type   = util::floor_strategy<unit_type, unit_type, unit_type>;
+        using table_strategy_type   = util::FloorStrategy<unit_type, unit_type, unit_type>;
         using spacing_table_type    = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
-        using spacing_table_content_type = util::tableContents<unit_type, unit_type, unit_type>;
+        using spacing_table_content_type = util::TableContents<unit_type, unit_type, unit_type>;
 
         using layer_type            = Layer;
         using layer_container_type  = entity_system::EntitySystem<layer_type>;
