@@ -64,7 +64,7 @@ $ pacaur -S ophidian-git
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/eda/ophidian_project_template) to make your life easier!
 
 ## Documentation:
-Documentation at [eclufsc.gitlab.io/ophidian](eclufsc.gitlab.io/ophidian)
+Documentation at [eclufsc.gitlab.io/ophidian](https://eclufsc.gitlab.io/ophidian)
 
 # Contributing:
 Make shure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
