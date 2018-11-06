@@ -96,30 +96,57 @@ namespace ophidian::timing{
     }
 
     void OpenTimer::insert_net(std::string net_name){
+        m_design.netlist().add_net(net_name);
         m_timer.insert_net(net_name);
     }
 
     void OpenTimer::insert_cell_instance(std::string cell_instance, std::string standard_cell){
+        auto std_cell = m_design.standard_cells().add_cell(standard_cell);
+        auto instance = m_design.netlist().add_cell_instance(cell_instance);
+        m_design.netlist().connect(instance, std_cell);
         m_timer.insert_gate(cell_instance, standard_cell);
     }
 
     void OpenTimer::repower_cell_instance(std::string cell_instance, std::string standard_cell){
+        auto std_cell = m_design.standard_cells().find_cell(standard_cell);
+        auto instance = m_design.netlist().find_cell_instance(cell_instance);
+        m_design.netlist().connect(instance, std_cell);
         m_timer.repower_gate(cell_instance, standard_cell);
     }
 
     void OpenTimer::remove_net(std::string net_name){
+        auto net = m_design.netlist().find_net(net_name);
+        auto net_pins = m_design.netlist().pins(net);
+        for(auto pin : net_pins){
+            m_design.netlist().disconnect(pin);
+            m_timer.disconnect_pin(m_design.netlist().name(pin));
+        }
+        m_design.netlist().erase(net);
         m_timer.remove_net(net_name);
     }
 
     void OpenTimer::remove_cell_instance(std::string cell_instance_name){
+        auto cell_instance = m_design.netlist().find_cell_instance(cell_instance_name);
+        auto cell_pins = m_design.netlist().pins(cell_instance);
+        for(auto pin : cell_pins){
+            m_design.netlist().disconnect(pin);
+            m_timer.disconnect_pin(m_design.netlist().name(pin));
+            m_design.netlist().erase(pin);
+        }
+        m_design.netlist().erase(cell_instance);
         m_timer.remove_gate(cell_instance_name);
     }
 
     void OpenTimer::disconnect_pin(std::string pin_instance_name){
+        auto pin = m_design.netlist().find_pin_instance(pin_instance_name);
+        m_design.netlist().disconnect(pin);
         m_timer.disconnect_pin(pin_instance_name);
     }
 
     void OpenTimer::connect_pin(std::string pin_instance_name, std::string net_name){
+        auto pin = m_design.netlist().find_pin_instance(pin_instance_name);
+        auto net = m_design.netlist().find_net(net_name);
+        m_design.netlist().connect(net, pin);
         m_timer.connect_pin(pin_instance_name, net_name);
     }
 }
