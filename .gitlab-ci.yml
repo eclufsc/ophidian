@@ -3,11 +3,23 @@ variables:
         "build-essential
         git
         cmake
-        libboost1.63-dev
+        libboost-dev
         libz-dev
         flex
         bison
         libbison-dev"
+
+    DEPENDENCIES_DEBIAN:
+        "build-essential
+        git
+        cmake
+        libboost1.63-dev
+        liblemon-dev
+        def
+        lef
+        ophidian-units
+        libflute-dev
+        libverilog-parser-dev"
 
     DEPENDENCIES_UBUNTU_BIONIC:
         "build-essential
@@ -54,8 +66,8 @@ build_on_debian-sid:
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
         - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
-        - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
+        - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu bionic main"
+        - apt-get install -qq -y $DEPENDENCIES_DEBIAN $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr
