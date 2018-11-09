@@ -9,18 +9,6 @@ variables:
         bison
         libbison-dev"
 
-    DEPENDENCIES_UBUNTU_ARTFUL:
-        "build-essential
-        git
-        cmake
-        libboost1.63-dev
-        liblemon-dev
-        def
-        lef
-        ophidian-units
-        libflute-dev
-        libverilog-parser-dev"
-
     DEPENDENCIES_UBUNTU_BIONIC:
         "build-essential
         git
@@ -81,26 +69,6 @@ build_on_debian-sid:
         paths:
             - build/
 
-build_on_ubuntu-artful:
-    image: ubuntu:artful
-    stage: build
-    before_script:
-        - apt-get update -qq && apt-get install -qq -y software-properties-common
-        - add-apt-repository -y -u ppa:eclufsc/ophidian
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_ARTFUL $DEPENDENCIES_GUI
-    script:
-        - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr
-                -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
-                ..
-        - make -j2
-        - cd test
-        - ./ophidian_tests
-    artifacts:
-        paths:
-            - build/
-
 build_on_ubuntu-bionic:
     image: ubuntu:bionic
     stage: build
@@ -121,8 +89,8 @@ build_on_ubuntu-bionic:
         paths:
             - build/
 
-build_using_dependencies_script_on_source:
-    image: ubuntu:artful
+build_using_local_packages_on_source:
+    image: ubuntu:bionic
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
@@ -140,8 +108,8 @@ build_using_dependencies_script_on_source:
         paths:
             - build/
 
-build_using_dependencies_script_on_sistem:
-    image: ubuntu:artful
+build_using_local_packages_on_system:
+    image: ubuntu:bionic
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
