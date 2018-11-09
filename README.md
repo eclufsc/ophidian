@@ -258,6 +258,6 @@ Currently, Ophidian has many collaborators in the same university that support i
 * [Renan Netto](https://renannetto.github.io/)
 * Thiago Barbato
 * [Tiago Augusto Fontana](https://tiagoafontana.github.io)
-* Sheiny Almeida
+* [Sheiny Fabre Almeida](https://sheiny.github.io)
 * [Vinicius Livramento](http://vinilivramento.com)
 * João Vicente Souto
