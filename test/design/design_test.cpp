@@ -6,10 +6,10 @@
 using namespace ophidian::design;
 using dbu_t = ophidian::util::database_unit_t;
 
-Design design;
 
 TEST_CASE("Design: testing netlist.", "[design]")
 {
+	Design design;
 	auto cell = design.netlist().add_cell_instance("cell");
 	auto pin = design.netlist().add_pin_instance("pin");
 	auto net = design.netlist().add_net("net");
@@ -23,6 +23,7 @@ TEST_CASE("Design: testing netlist.", "[design]")
 
 TEST_CASE("Design: testing floorplan.", "[design]")
 {
+	Design design;
 	REQUIRE(design.floorplan().chip_origin().x() == dbu_t{0.0});
 	REQUIRE(design.floorplan().chip_origin().y() == dbu_t{0.0});
 	REQUIRE(design.floorplan().chip_upper_right_corner().x() == dbu_t{0.0});
@@ -45,6 +46,7 @@ TEST_CASE("Design: testing floorplan.", "[design]")
 
 TEST_CASE("Design: testing placement.", "[design]")
 {
+	Design design;
 	auto cell1 = design.netlist().add_cell_instance("cell1");
 	auto cell2 = design.netlist().add_cell_instance("cell2");
 
@@ -62,6 +64,7 @@ TEST_CASE("Design: testing placement.", "[design]")
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 {
+	Design design;
     auto cell1 = design.standard_cells().add_cell("cell1");
     auto cell2 = design.standard_cells().add_cell("cell2");
 
