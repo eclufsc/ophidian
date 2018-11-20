@@ -11,7 +11,7 @@ class NetlistFixture {
 public:
     CellInstance cell1, cell2;
 
-    PinInstance pin1, pin2, pin3, pin4;
+    PinInstance pin1, pin2, pin3, pin4, pin5, pin6;
 
     Input input1, input2;
 
@@ -28,12 +28,17 @@ public:
         pin2 = netlist.add_pin_instance("pin2");
         pin3 = netlist.add_pin_instance("pin3");
         pin4 = netlist.add_pin_instance("pin4");
+        pin5 = netlist.add_pin_instance("pin5");
+        pin6 = netlist.add_pin_instance("pin6");
 
         input1 = netlist.add_input_pad(pin1);
         input2 = netlist.add_input_pad(pin2);
 
         output1 = netlist.add_output_pad(pin3);
         output2 = netlist.add_output_pad(pin4);
+
+        netlist.connect(cell1, pin5);
+        netlist.connect(cell1, pin6);
     }
 };
 
@@ -79,6 +84,8 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing an input pad", "[placement]
 
     REQUIRE(placement.location(input1).x() == input1Location.x());
     REQUIRE(placement.location(input1).y() == input1Location.y());
+    REQUIRE(placement.location(pin1).x() == input1Location.x());
+    REQUIRE(placement.location(pin1).y() == input1Location.y());
 
     auto input2Location = Placement::point_type{
         Placement::unit_type{5},
@@ -89,6 +96,8 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing an input pad", "[placement]
 
     REQUIRE(placement.location(input2).x() == input2Location.x());
     REQUIRE(placement.location(input2).y() == input2Location.y());
+    REQUIRE(placement.location(pin2).x() == input2Location.x());
+    REQUIRE(placement.location(pin2).y() == input2Location.y());
 
     REQUIRE(placement.location(input1).x() != placement.location(input2).x());
     REQUIRE(placement.location(input1).y() != placement.location(input2).y());
@@ -106,6 +115,8 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing an output pad", "[placement
 
     REQUIRE(placement.location(output1).x() == output1Location.x());
     REQUIRE(placement.location(output1).y() == output1Location.y());
+    REQUIRE(placement.location(pin3).x() == output1Location.x());
+    REQUIRE(placement.location(pin3).y() == output1Location.y());
 
     auto output2Location = Placement::point_type{
         Placement::unit_type{5},
@@ -116,6 +127,8 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: placing an output pad", "[placement
 
     REQUIRE(placement.location(output2).x() == output2Location.x());
     REQUIRE(placement.location(output2).y() == output2Location.y());
+    REQUIRE(placement.location(pin4).x() == output2Location.x());
+    REQUIRE(placement.location(pin4).y() == output2Location.y());
 
     REQUIRE(placement.location(output1).x() != placement.location(output2).x());
     REQUIRE(placement.location(output1).y() != placement.location(output2).y());
