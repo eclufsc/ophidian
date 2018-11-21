@@ -24,6 +24,8 @@
 #include <ophidian/placement/Placement.h>
 #include <ophidian/placement/Library.h>
 #include <ophidian/circuit/StandardCells.h>
+#include <ophidian/routing/Library.h>
+#include <ophidian/routing/GlobalRouting.h>
 
 namespace ophidian::design
 {
@@ -31,11 +33,13 @@ namespace ophidian::design
     {
     public:
         //! Class member types
-        using floorplan_type       = floorplan::Floorplan;
-        using standard_cell_type   = circuit::StandardCells;
-        using netlist_type         = circuit::Netlist;
-        using library_type         = placement::Library;
-        using placement_type       = placement::Placement;
+        using floorplan_type            = floorplan::Floorplan;
+        using standard_cell_type        = circuit::StandardCells;
+        using netlist_type              = circuit::Netlist;
+        using placement_library_type    = placement::Library;
+        using placement_type            = placement::Placement;
+        using routing_library_type      = routing::Library;
+        using global_routing_type       = routing::GlobalRouting;
 
         //! Design Constructor
 
@@ -90,22 +94,46 @@ namespace ophidian::design
 
         const standard_cell_type& standard_cells() const noexcept;
 
-        //! library getter
+        //! placement library getter
 
         /*!
-           \brief Get the library.
-           \return Library.
+           \brief Get the placement library.
+           \return Placement Library.
          */
-        library_type& library() noexcept;
+        placement_library_type& placement_library() noexcept;
 
-        const library_type& library() const noexcept;
+        const placement_library_type& placement_library() const noexcept;
+
+        //! Routing library getter
+
+        /*!
+           \brief Get the routing library.
+           \return Routing Library.
+         */
+        routing_library_type& routing_library() noexcept;
+
+        const routing_library_type& routing_library() const noexcept;
+
+
+        //! Global Routing getter
+
+        /*!
+           \brief Get the global routing.
+           \return Global Routing.
+         */
+        global_routing_type& global_routing() noexcept;
+
+        const global_routing_type& global_routing() const noexcept;
+
 
     private:
-        floorplan_type       m_floorplan{};
-        standard_cell_type   m_standard_cells{};
-        netlist_type         m_netlist{};
-        library_type         m_library{m_standard_cells};
-        placement_type       m_placement{m_netlist, m_library};
+        floorplan_type          m_floorplan{};
+        standard_cell_type      m_standard_cells{};
+        netlist_type            m_netlist{};
+        placement_library_type  m_placement_library{m_standard_cells};
+        placement_type          m_placement{m_netlist, m_placement_library};
+        routing_library_type    m_routing_library{};
+        global_routing_type     m_global_routing{m_netlist};
     };
 }
 

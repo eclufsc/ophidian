@@ -56,6 +56,25 @@ namespace ophidian::parser
             }
         );
 
+        defrSetTrackCbk(
+            [](defrCallbackType_e, defiTrack *track, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+                that->m_tracks.emplace_back(
+                    [&]() -> Def::track_type::orientation_type {
+                        auto orientation_str = std::string(track->macro());
+                        if(orientation_str == "X") { return Def::track_type::orientation_type::X; }
+                        else { return Def::track_type::orientation_type::Y; }
+                     }(),
+                     Def::track_type::database_unit_type{static_cast<double>(track->x())},
+                     Def::track_type::scalar_type{static_cast<double>(track->xNum())},
+                     Def::track_type::database_unit_type{static_cast<double>(track->xStep())},
+                     track->layer(0)
+                     );
+                return 0;
+            }
+        );
+
         defrSetDieAreaCbk(
             [](defrCallbackType_e, defiBox * box, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -63,7 +82,7 @@ namespace ophidian::parser
                     {
                         Def::database_unit_type{static_cast<double>(box->xl())},
                         Def::database_unit_type{static_cast<double>(box->yl())}
-                    }, 
+                    },
                     {
                         Def::database_unit_type{static_cast<double>(box->xh())},
                         Def::database_unit_type{static_cast<double>(box->yh())}
@@ -186,140 +205,8 @@ namespace ophidian::parser
         return m_dbu_to_micrometer_ratio;
     }
 
-    const Def::Component::name_type& Def::Component::name() const noexcept
+    const Def::track_container_type& Def::tracks() const noexcept
     {
-        return m_name;
-    }
-
-    const Def::Component::macro_type& Def::Component::macro() const noexcept
-    {
-        return m_macro;
-    }
-
-    const Def::Component::orientation_type& Def::Component::orientation() const noexcept
-    {
-        return m_orientation;
-    }
-
-    const Def::Component::database_unit_point_type& Def::Component::position() const noexcept
-    {
-        return m_position;
-    }
-
-    bool Def::Component::fixed() const noexcept
-    {
-        return m_fixed;
-    }
-
-    bool Def::Component::operator==(const Def::Component& rhs) const noexcept
-    {
-        return m_name == rhs.m_name &&
-            m_macro == rhs.m_macro &&
-            m_orientation == rhs.m_orientation &&
-            m_position.x() == rhs.m_position.x() && 
-            m_position.y() == rhs.m_position.y() && 
-            m_fixed == rhs.m_fixed;
-    }
-
-    std::ostream& operator<<(std::ostream& os, const Def::Component& component)
-    {
-        auto orientation_string = [&]() -> std::string {
-            switch(component.m_orientation){
-                case Def::Component::orientation_type::N:
-                    return "N";
-                case Def::Component::orientation_type::S:
-                    return "S";
-                case Def::Component::orientation_type::W:
-                    return "W";
-                case Def::Component::orientation_type::E:
-                    return "E";
-                case Def::Component::orientation_type::FN:
-                    return "FN";
-                case Def::Component::orientation_type::FS:
-                    return "FS";
-                case Def::Component::orientation_type::FW:
-                    return "FW";
-                case Def::Component::orientation_type::FE:
-                    return "FE";
-                default:
-                    return "NA";
-            }
-        };
-
-        auto fixed_string = [&]() -> std::string {
-            return component.m_fixed ? "true" : "false";
-        };
-
-        os << "{name: " << component.m_name 
-            << ", macro: " << component.m_macro
-            << ", orientarion: " << orientation_string()
-            << ", position: (" << component.m_position.x() 
-            << ", " << component.m_position.y() << ")"
-            << ", fixed: " << fixed_string() 
-            << "}";
-
-        return os;
-    }
-
-    const Def::Net::name_type& Def::Net::name() const noexcept
-    {
-        return m_name;
-    }
-
-    const Def::Net::pin_container_type& Def::Net::pins() const noexcept
-    {
-        return m_pins;
-    }
-
-    const Def::Row::name_type& Def::Row::name() const noexcept
-    {
-        return m_name;
-    }
-
-    const Def::Row::site_type& Def::Row::site() const noexcept
-    {
-        return m_site;
-    }
-
-    const Def::Row::database_unit_point_type& Def::Row::origin() const noexcept
-    {
-        return m_origin;
-    }
-
-    const Def::Row::database_unit_point_type& Def::Row::step() const noexcept
-    {
-        return m_step;
-    }
-
-    const Def::Row::scalar_point_type& Def::Row::num() const noexcept
-    {
-        return m_num;
-    }
-
-    bool Def::Row::operator==(const Def::Row& rhs) const noexcept
-    {
-        return m_name == rhs.m_name &&
-            m_site == rhs.m_site &&
-            m_origin.x() == rhs.m_origin.x() &&
-            m_origin.y() == rhs.m_origin.y() &&
-            m_step.x() == rhs.m_step.x() &&
-            m_step.y() == rhs.m_step.y() &&
-            m_num.x() == rhs.m_num.x() &&
-            m_num.y() == rhs.m_num.y();
-    }
-
-    std::ostream& operator<<(std::ostream& os,const Def::Row& row)
-    {
-        os << "{name: " << row.m_name 
-            << ", site: " << row.m_site
-            << ", origin: )" << row.m_origin.x()
-            << ", " << row.m_origin.y() << ")"
-            << ", step: (" << row.m_step.x() 
-            << ", " << row.m_step.y() << ")"
-            << ", num: (" << row.m_num.x() 
-            << ", " << row.m_num.y() << ")"
-            << "}";
-
-        return os;
+        return m_tracks;
     }
 }

@@ -64,7 +64,7 @@ $ pacaur -S ophidian-git
 So you want to code? We make avaliable a [project template](https://gitlab.com/eclufsc/eda/ophidian_project_template) to make your life easier!
 
 ## Documentation:
-Documentation at [eclufsc.gitlab.io/ophidian](eclufsc.gitlab.io/ophidian)
+Documentation at [eclufsc.gitlab.io/ophidian](https://eclufsc.gitlab.io/ophidian)
 
 # Contributing:
 Make shure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
@@ -258,6 +258,6 @@ Currently, Ophidian has many collaborators in the same university that support i
 * [Renan Netto](https://renannetto.github.io/)
 * Thiago Barbato
 * [Tiago Augusto Fontana](https://tiagoafontana.github.io)
-* Sheiny Almeida
+* [Sheiny Fabre Almeida](https://sheiny.github.io)
 * [Vinicius Livramento](http://vinilivramento.com)
 * João Vicente Souto

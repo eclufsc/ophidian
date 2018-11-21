@@ -178,3 +178,30 @@ TEST_CASE_METHOD(NetlistFixture, "Placement: get cell geometry", "[placement]") 
 
     REQUIRE(placement.geometry(cell1) == newCellGeometry);
 }
+
+TEST_CASE_METHOD(NetlistFixture, "Placement: fixing two cells", "[placement]") {
+    auto placement = Placement{netlist, library};
+
+    REQUIRE(!placement.fixed(cell1));
+    REQUIRE(!placement.fixed(cell2));
+
+    placement.fix(cell1, true);
+
+    REQUIRE(placement.fixed(cell1));
+    REQUIRE(!placement.fixed(cell2));
+
+    placement.fix(cell2, true);
+
+    REQUIRE(placement.fixed(cell1));
+    REQUIRE(placement.fixed(cell2));
+
+    placement.fix(cell1, false);
+
+    REQUIRE(!placement.fixed(cell1));
+    REQUIRE(placement.fixed(cell2));
+
+    placement.fix(cell2, false);
+
+    REQUIRE(!placement.fixed(cell1));
+    REQUIRE(!placement.fixed(cell2));
+}

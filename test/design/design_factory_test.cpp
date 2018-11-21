@@ -24,7 +24,7 @@ TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][D
 
     auto std_cell_u1 = design.netlist().std_cell(cell_u1);
 
-    auto std_cell_u1_geometry = design.library().geometry(std_cell_u1);
+    auto std_cell_u1_geometry = design.placement_library().geometry(std_cell_u1);
 
     auto first_box = std_cell_u1_geometry.front();
 

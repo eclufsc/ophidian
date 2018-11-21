@@ -200,40 +200,46 @@ namespace ophidian::circuit
         void disconnect(const pin_instance_type& pin);
 
         template <typename Value>
-        entity_system::Property<CellInstance, Value> makeProperty(CellInstance) const
+        entity_system::Property<CellInstance, Value> make_property_cell_instance() const noexcept
         {
             return entity_system::Property<CellInstance, Value>(m_cells);
         }
 
         template <typename Value>
-        entity_system::Property<PinInstance, Value> makeProperty(PinInstance) const
+        entity_system::Property<PinInstance, Value> make_property_pin_instance() const noexcept
         {
             return entity_system::Property<PinInstance, Value>(m_pins);
         }
 
         template <typename Value>
-        entity_system::Property<Net, Value> makeProperty(Net) const
+        entity_system::Property<Net, Value> make_property_net() const noexcept
         {
             return entity_system::Property<Net, Value>(m_nets);
         }
 
         template <typename Value>
-        entity_system::Property<Input, Value> makeProperty(Input) const
+        entity_system::Aggregation<Net, Value> make_aggregation_net(entity_system::EntitySystem<Value> & parts) const noexcept
+        {
+            return entity_system::Aggregation<Net, Value>(m_nets, parts);
+        }
+
+        template <typename Value>
+        entity_system::Property<Input, Value> make_property_input_pad() const noexcept
         {
             return entity_system::Property<Input, Value>(m_input_pads);
         }
 
         template <typename Value>
-        entity_system::Property<Output, Value> makeProperty(Output) const
+        entity_system::Property<Output, Value> make_property_output_pad() const noexcept
         {
             return entity_system::Property<Output, Value>(m_output_pads);
         }
 
-        entity_system::EntitySystem<CellInstance>::NotifierType * notifier(CellInstance) const;
-        entity_system::EntitySystem<PinInstance>::NotifierType * notifier(PinInstance) const;
-        entity_system::EntitySystem<Net>::NotifierType * notifier(Net) const;
-        entity_system::EntitySystem<Input>::NotifierType * notifier(Input) const;
-        entity_system::EntitySystem<Output>::NotifierType * notifier(Output) const;
+        entity_system::EntitySystem<CellInstance>::NotifierType * notifier_cell_instance() const noexcept;
+        entity_system::EntitySystem<PinInstance>::NotifierType * notifier_pin_instance() const noexcept;
+        entity_system::EntitySystem<Net>::NotifierType * notifier_net() const noexcept;
+        entity_system::EntitySystem<Input>::NotifierType * notifier_input_pad() const noexcept;
+        entity_system::EntitySystem<Output>::NotifierType * notifier_output_pad() const noexcept;
 
     private:
         entity_system::EntitySystem<CellInstance>             m_cells{};

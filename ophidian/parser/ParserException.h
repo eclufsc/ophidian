@@ -34,6 +34,15 @@ namespace ophidian::parser::exceptions
     public:
         const char * what() const noexcept override;
     };
+
+    class GuideFileSyntaxError :
+            public std::exception
+    {
+        const char * what() const noexcept override
+        {
+            return "Invalid Syntax of .guide file";
+        }
+    };
 }
 
 #endif

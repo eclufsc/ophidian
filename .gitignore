@@ -10,5 +10,6 @@
 /build*
 /doc/documentation
 .DS_Store
-.vscode
 *.user
+/test/input_files/ispd18/*
+.vscode

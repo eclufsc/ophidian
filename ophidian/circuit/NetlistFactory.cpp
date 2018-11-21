@@ -135,6 +135,7 @@ namespace ophidian::circuit::factory
                 auto pin_instance = netlist.add_pin_instance(pin.first + ":" + pin.second);
 
                 netlist.connect(net_instance, pin_instance);
+
                 auto cell_instance = netlist.find_cell_instance(pin.first);
 
                 netlist.connect(cell_instance, pin_instance);

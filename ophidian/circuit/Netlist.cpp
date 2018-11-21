@@ -342,23 +342,23 @@ namespace ophidian::circuit
         m_net_to_pins.eraseAssociation(net(p), p);
     }
 
-    entity_system::EntitySystem<PinInstance>::NotifierType * Netlist::notifier(PinInstance) const {
+    entity_system::EntitySystem<PinInstance>::NotifierType * Netlist::notifier_pin_instance() const noexcept {
         return m_pins.notifier();
     }
 
-    entity_system::EntitySystem<CellInstance>::NotifierType * Netlist::notifier(CellInstance) const {
+    entity_system::EntitySystem<CellInstance>::NotifierType * Netlist::notifier_cell_instance() const noexcept {
         return m_cells.notifier();
     }
 
-    entity_system::EntitySystem<Net>::NotifierType * Netlist::notifier(Net) const {
+    entity_system::EntitySystem<Net>::NotifierType * Netlist::notifier_net() const noexcept {
         return m_nets.notifier();
     }
 
-    entity_system::EntitySystem<Input>::NotifierType * Netlist::notifier(Input) const {
+    entity_system::EntitySystem<Input>::NotifierType * Netlist::notifier_input_pad() const noexcept {
         return m_input_pads.notifier();
     }
 
-    entity_system::EntitySystem<Output>::NotifierType * Netlist::notifier(Output) const {
+    entity_system::EntitySystem<Output>::NotifierType * Netlist::notifier_output_pad() const noexcept {
         return m_output_pads.notifier();
     }
 }

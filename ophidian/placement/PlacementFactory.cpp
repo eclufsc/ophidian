@@ -26,6 +26,7 @@ namespace ophidian::placement::factory
         {
             auto cell = netlist.find_cell_instance(component.name());
             placement.place(cell, component.position());
+            placement.fix(cell, component.fixed());
         }
     }
 }
