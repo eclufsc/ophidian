@@ -33,7 +33,7 @@ Get Ophidian! We support a few of the most used linux environments.
 ## Debian Family:
 Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu/ophidian).
 
-### Ubuntu artful (17.10) or newer:
+### Ubuntu Bionic 18.04 LTS or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ sudo apt install libophidian-dev
@@ -47,7 +47,7 @@ $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A
 
 Then add the launchpad repository and install ophidian.
 ```
-$ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
+$ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu bionic main"
 $ sudo apt install libophidian-dev
 ```
 
