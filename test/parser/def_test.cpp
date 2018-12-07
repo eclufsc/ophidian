@@ -180,7 +180,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
         {{dbu_t{379200}, dbu_t{0}}, {dbu_t{400400}, dbu_t{399870}}}
     };
     auto region2Boxes = Region::rectangles_container_type {
-        {{dbu_t{140691}, dbu_t{12600}}, {dbu_t{177600}, dbu_t{148000}}},
+        {{dbu_t{140691}, dbu_t{126000}}, {dbu_t{177600}, dbu_t{148000}}},
         {{dbu_t{211000}, dbu_t{126000}}, {dbu_t{249691}, dbu_t{148000}}},
         {{dbu_t{114400}, dbu_t{126000}}, {dbu_t{140691}, dbu_t{260000}}},
         {{dbu_t{140691}, dbu_t{234073}}, {dbu_t{249691}, dbu_t{260000}}},
@@ -189,7 +189,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
     auto region3Boxes = Region::rectangles_container_type {
         {{dbu_t{85673}, dbu_t{58000}}, {dbu_t{144200}, dbu_t{80000}}},
         {{dbu_t{250200}, dbu_t{56000}}, {dbu_t{308873}, dbu_t{80000}}},
-        {{dbu_t{64600}, dbu_t{58000}}, {dbu_t{85673}, dbu_t{32200}}},
+        {{dbu_t{64600}, dbu_t{58000}}, {dbu_t{85673}, dbu_t{322000}}},
         {{dbu_t{85673}, dbu_t{298000}}, {dbu_t{308873}, dbu_t{322000}}},
         {{dbu_t{308873}, dbu_t{56000}}, {dbu_t{330600}, dbu_t{322000}}}
     };
@@ -205,7 +205,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
     };
 
     auto & regions = circuitDef.regions();
-    
+
     CHECK(regions.size() == expectedRegions.size());
     CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin(), regionsComparator));
 

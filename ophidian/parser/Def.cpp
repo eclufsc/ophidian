@@ -168,6 +168,33 @@ namespace ophidian::parser
             }
         );
 
+        defrSetRegionStartCbk(
+            [](defrCallbackType_e, int number, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+                that->m_regions.reserve(number);
+                return 0;
+            }
+        );
+
+        defrSetRegionCbk(
+            [](defrCallbackType_e, defiRegion * parserRegion, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+                auto regionRectangles = region_type::rectangles_container_type{};
+                regionRectangles.reserve(parserRegion->numRectangles());
+                for (auto regionIndex = 0; regionIndex < parserRegion->numRectangles(); regionIndex++) {
+                    auto lowerCorner = database_unit_point_type{database_unit_type{parserRegion->xl(regionIndex)}, database_unit_type{parserRegion->yl(regionIndex)}};
+                    auto upperCorner = database_unit_point_type{database_unit_type{parserRegion->xh(regionIndex)}, database_unit_type{parserRegion->yh(regionIndex)}};
+                    regionRectangles.push_back({lowerCorner, upperCorner});
+                }
+                
+                auto region = region_type(parserRegion->name(), regionRectangles);
+                that->m_regions.push_back(region);
+
+                return 0;
+            }
+        );
+
         auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
             std::fopen(def_file.c_str(), "r"),
             &std::fclose);
