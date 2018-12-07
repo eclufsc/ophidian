@@ -214,4 +214,9 @@ namespace ophidian::parser
     {
         return m_regions;
     }
+
+    const Def::group_container_type& Def::groups() const noexcept
+    {
+        return m_groups;
+    }
 }

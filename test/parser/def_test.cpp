@@ -4,20 +4,21 @@
 #include <ophidian/parser/ParserException.h>
 
 using ophidian::parser::Def;
+using ophidian::parser::Region;
 using dbu_t = Def::database_unit_type;
 using scalar_t = Def::scalar_type;
 using orient_t = Def::component_type::orientation_type;
 
 namespace {
     bool boxComparator (const Def::database_unit_box_type & box1, const Def::database_unit_box_type & box2) {
-        return box1.min_corner().x() == box2.min_corner().x() && box1.max_corner().x() == box2.max_corner.x()
-                && box1.min_corner().y() == box2.min_corner().y() && box1.max_corner().y() == box2.max_corner.y();
+        return box1.min_corner().x() == box2.min_corner().x() && box1.max_corner().x() == box2.max_corner().x()
+                && box1.min_corner().y() == box2.min_corner().y() && box1.max_corner().y() == box2.max_corner().y();
     }
 
     bool regionsComparator (const Def::region_type & region1, const Def::region_type & region2) {
-        bool equalName = region1.name == region2.name;
-        bool equalRectangles = region1.rectangles.size() && region2.rectangles.size() && 
-                        std::is_permutation(region1.rectangles.begin(), region1.rectangles.end(), region2.rectangles.begin(), boxComparator);
+        bool equalName = region1.name() == region2.name();
+        bool equalRectangles = region1.rectangles().size() && region2.rectangles().size() && 
+                        std::is_permutation(region1.rectangles().begin(), region1.rectangles().end(), region2.rectangles().begin(), boxComparator);
         return equalName && equalRectangles;
     }
 }
@@ -172,27 +173,27 @@ TEST_CASE("Def: Loading ispd_18_sample.input.def", "[parser][Def][ispd18][sample
 TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser][Def][iccad17]") {
     auto circuitDef = Def{"input_files/iccad17/pci_bridge32_a_md1/placed.def"};
 
-    auto region1Boxes = std::vector<Def::database_unit_box_type> {
+    auto region1Boxes = Region::rectangles_container_type {
         {{dbu_t{23200}, dbu_t{0}}, {dbu_t{379200}, dbu_t{20000}}},
         {{dbu_t{87}, dbu_t{0}}, {dbu_t{23200}, dbu_t{399870}}},
         {{dbu_t{23200}, dbu_t{380000}}, {dbu_t{379200}, dbu_t{399870}}},
         {{dbu_t{379200}, dbu_t{0}}, {dbu_t{400400}, dbu_t{399870}}}
     };
-    auto region2Boxes = std::vector<Def::database_unit_box_type> {
+    auto region2Boxes = Region::rectangles_container_type {
         {{dbu_t{140691}, dbu_t{12600}}, {dbu_t{177600}, dbu_t{148000}}},
         {{dbu_t{211000}, dbu_t{126000}}, {dbu_t{249691}, dbu_t{148000}}},
         {{dbu_t{114400}, dbu_t{126000}}, {dbu_t{140691}, dbu_t{260000}}},
         {{dbu_t{140691}, dbu_t{234073}}, {dbu_t{249691}, dbu_t{260000}}},
         {{dbu_t{249691}, dbu_t{126000}}, {dbu_t{276800}, dbu_t{260000}}}
     };
-    auto region3Boxes = std::vector<Def::database_unit_box_type> {
+    auto region3Boxes = Region::rectangles_container_type {
         {{dbu_t{85673}, dbu_t{58000}}, {dbu_t{144200}, dbu_t{80000}}},
         {{dbu_t{250200}, dbu_t{56000}}, {dbu_t{308873}, dbu_t{80000}}},
         {{dbu_t{64600}, dbu_t{58000}}, {dbu_t{85673}, dbu_t{32200}}},
         {{dbu_t{85673}, dbu_t{298000}}, {dbu_t{308873}, dbu_t{322000}}},
         {{dbu_t{308873}, dbu_t{56000}}, {dbu_t{330600}, dbu_t{322000}}}
     };
-    auto region4Boxes = std::vector<Def::database_unit_box_type> {
+    auto region4Boxes = Region::rectangles_container_type {
         {{dbu_t{163000}, dbu_t{172000}}, {dbu_t{223400}, dbu_t{210000}}}
     };
 
@@ -200,7 +201,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
         {"er0", region1Boxes},
         {"er1", region2Boxes},
         {"er3", region3Boxes},
-        {"er4", region4Boxes},
+        {"er4", region4Boxes}
     };
 
     auto & regions = circuitDef.regions();
@@ -210,8 +211,8 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
 
     auto & groups = circuitDef.groups();
     REQUIRE(groups.size() == 4);
-    CHECK(groups.at(0).elements.size() = 0);
-    CHECK(groups.at(1).elements.size() = 0);
-    CHECK(groups.at(2).elements.size() = 0);
-    CHECK(groups.at(3).elements.size() = 0);
+    CHECK(groups.at(0).members().size() == 0);
+    CHECK(groups.at(1).members().size() == 0);
+    CHECK(groups.at(2).members().size() == 0);
+    CHECK(groups.at(3).members().size() == 0);
 }

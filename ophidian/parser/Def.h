@@ -28,6 +28,7 @@
 #include "Net.h"
 #include "Track.h"
 #include "Region.h"
+#include "Group.h"
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
@@ -71,6 +72,9 @@ namespace ophidian::parser
         using region_type                       = Region;
         using region_container_type             = container_type<region_type>;
 
+        using group_type                        = Group;
+        using group_container_type              = container_type<group_type>;
+
         // Class constructors
         Def() = default;
 
@@ -100,6 +104,8 @@ namespace ophidian::parser
 
         const region_container_type& regions() const noexcept;
 
+        const group_container_type& groups() const noexcept;
+
     private:
         database_unit_box_type   m_die_area{
             database_unit_point_type{database_unit_type{0.0d}, database_unit_type{0.0d}},
@@ -111,6 +117,7 @@ namespace ophidian::parser
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
         region_container_type    m_regions{};
+        group_container_type     m_groups{};
     };
 }
 

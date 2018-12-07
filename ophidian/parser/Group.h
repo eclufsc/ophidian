@@ -18,8 +18,8 @@
    under the License.
  */
 
-#ifndef OPHIDIAN_PARSER_REGION_H
-#define OPHIDIAN_PARSER_REGION_H
+#ifndef OPHIDIAN_PARSER_GROUP_H
+#define OPHIDIAN_PARSER_GROUP_H
 
 #include <ophidian/util/Units.h>
 
@@ -31,7 +31,7 @@ namespace ophidian::parser
      * This is the data necessary to identify a given
      * component and it's characteristics.
      */
-    class Region
+    class Group
     {
     public:
         template <class T> using container_type = std::vector<T>;
@@ -39,38 +39,36 @@ namespace ophidian::parser
 
         using name_type                = std::string;
 
-        using database_unit_type                = util::database_unit_t;
-        using database_unit_box_type          = box_type<database_unit_type>;
-        using rectangles_container_type = container_type<database_unit_box_type>;
+        using members_container_type  = container_type<name_type>;
 
         // Class constructors
 
-        Region() = delete;
+        Group() = delete;
 
-        Region(const Region&) = default;
-        Region& operator=(Region&) = default;
+        Group(const Group&) = default;
+        Group& operator=(Group&) = default;
 
-        Region(Region&&) = default;
-        Region& operator=(Region&&) = default;
+        Group(Group&&) = default;
+        Group& operator=(Group&&) = default;
 
         template<class Arg1, class Arg2>
-        Region(Arg1&& name, Arg2&& rectangles):
+        Group(Arg1&& name, Arg2&& members):
             m_name{std::forward<Arg1>(name)},
-            m_rectangles{std::forward<Arg2>(rectangles)}
+            m_members{std::forward<Arg2>(members)}
         {}
 
         // Class member functions
         const name_type& name() const noexcept;
 
-        const rectangles_container_type & rectangles() const noexcept;
+        const members_container_type & members() const noexcept;
 
-        bool operator==(const Region& rhs) const noexcept;
+        bool operator==(const Group& rhs) const noexcept;
 
-        friend std::ostream& operator<<(std::ostream& os, const Region& region);
+        friend std::ostream& operator<<(std::ostream& os, const Group& group);
 
     private:
         name_type                m_name; 
-        rectangles_container_type m_rectangles;
+        members_container_type m_members;
     };
 }
 
