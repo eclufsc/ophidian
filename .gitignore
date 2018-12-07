@@ -12,5 +12,5 @@
 .DS_Store
 *.user
 /test/input_files/ispd18/*
-launch.json
 *.orig
+*.json

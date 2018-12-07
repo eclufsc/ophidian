@@ -196,7 +196,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
         {{dbu_t{163000}, dbu_t{172000}}, {dbu_t{223400}, dbu_t{210000}}}
     };
 
-    auto expectedRegions = std::vector<Def::region_type> = {
+    auto expectedRegions = Def::region_container_type {
         {"er0", region1Boxes},
         {"er1", region2Boxes},
         {"er3", region3Boxes},
@@ -206,7 +206,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
     auto & regions = circuitDef.regions();
     
     CHECK(regions.size() == expectedRegions.size());
-    CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin()), regionsComparator);
+    CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin(), regionsComparator));
 
     auto & groups = circuitDef.groups();
     REQUIRE(groups.size() == 4);

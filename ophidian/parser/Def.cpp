@@ -209,4 +209,9 @@ namespace ophidian::parser
     {
         return m_tracks;
     }
+
+    const Def::region_container_type& Def::regions() const noexcept
+    {
+        return m_regions;
+    }
 }
