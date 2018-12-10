@@ -22,6 +22,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Row.h"
 #include "Component.h"
@@ -46,6 +47,7 @@ namespace ophidian::parser
     public:
         // Class member types
         template <class T> using container_type = std::vector<T>;
+        template <class Key, class Value> using map_type       = std::unordered_map<Key, Value>;
         template <class T> using point_type     = geometry::Point<T>;
         template <class T> using box_type       = geometry::Box<T>;
 
@@ -73,7 +75,7 @@ namespace ophidian::parser
         using region_container_type             = container_type<region_type>;
 
         using group_type                        = Group;
-        using group_container_type              = container_type<group_type>;
+        using group_container_type              = map_type<group_type::name_type, group_type>;
 
         // Class constructors
         Def() = default;
@@ -117,7 +119,9 @@ namespace ophidian::parser
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
         region_container_type    m_regions{};
-        group_container_type     m_groups{};
+        group_container_type     m_groups;
+
+        group_type::name_type    m_current_group_name;
     };
 }
 

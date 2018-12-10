@@ -195,6 +195,35 @@ namespace ophidian::parser
             }
         );
 
+        defrSetGroupsStartCbk(
+            [](defrCallbackType_e, int number, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+                that->m_groups.reserve(number);
+                return 0;
+            }
+        );
+
+        defrSetGroupNameCbk(
+            [](defrCallbackType_e, const char* group_name, defiUserData ud)->int{
+                auto that = static_cast<Def*>(ud);
+
+                that->m_current_group_name = group_name;
+                that->m_groups[that->m_current_group_name] = group_type{group_name};
+
+                return 0;
+            }
+        );
+
+        defrSetGroupMemberCbk(
+            [](defrCallbackType_e, const char* group_members, defiUserData ud)->int{
+                auto that = static_cast<Def *>(ud);
+
+                that->m_groups[that->m_current_group_name].add_member(group_members);
+
+                return 0;
+            }
+        );
+
         auto fp = std::unique_ptr<FILE, decltype( & std::fclose)>(
             std::fopen(def_file.c_str(), "r"),
             &std::fclose);

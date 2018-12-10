@@ -43,7 +43,7 @@ namespace ophidian::parser
 
         // Class constructors
 
-        Group() = delete;
+        Group() = default;
 
         Group(const Group&) = default;
         Group& operator=(Group&) = default;
@@ -56,6 +56,12 @@ namespace ophidian::parser
             m_name{std::forward<Arg1>(name)},
             m_members{std::forward<Arg2>(members)}
         {}
+
+        Group(name_type name):
+            m_name{name}
+        {}
+
+        void add_member(name_type member) noexcept;
 
         // Class member functions
         const name_type& name() const noexcept;

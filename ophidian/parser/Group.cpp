@@ -20,6 +20,11 @@
 
 namespace ophidian::parser
 {
+    void Group::add_member(std::string member) noexcept
+    {
+        m_members.push_back(member);
+    }
+
     const Group::name_type& Group::name() const noexcept
     {
         return m_name;
@@ -32,7 +37,9 @@ namespace ophidian::parser
 
     bool Group::operator==(const Group& rhs) const noexcept
     {
-        return m_name == rhs.m_name;
+        return m_name == rhs.m_name 
+                && this->m_members.size() == rhs.m_members.size() 
+                && std::is_permutation(this->m_members.begin(), this->m_members.end(), rhs.m_members.begin());
     }
 
     std::ostream& operator<<(std::ostream& os, const Group& group)

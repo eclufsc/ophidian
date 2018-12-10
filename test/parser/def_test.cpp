@@ -209,10 +209,15 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
     CHECK(regions.size() == expectedRegions.size());
     CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin(), regionsComparator));
 
+    auto expectedGroups = Def::group_container_type {
+        {"er0", {"er0", Def::group_type::members_container_type{"h0c/*", "h0a/*", "h0b/*", "h0/*"}}},
+        {"er1", {"er1", Def::group_type::members_container_type{"h2e/*", "h2c/*", "h2a/*", "h2d/*", "h2b/*"}}},
+        {"er3", {"er3", Def::group_type::members_container_type{"h1a/*", "h1d/*", "h1b/*", "h1e/*", "h1c/*"}}},
+        {"er4", {"er4", Def::group_type::members_container_type{"hh4a/*", "hh4b/*"}}}
+    };
+
     auto & groups = circuitDef.groups();
-    REQUIRE(groups.size() == 4);
-    CHECK(groups.at(0).members().size() == 0);
-    CHECK(groups.at(1).members().size() == 0);
-    CHECK(groups.at(2).members().size() == 0);
-    CHECK(groups.at(3).members().size() == 0);
+
+    CHECK(groups.size() == expectedGroups.size());
+    CHECK(std::is_permutation(expectedGroups.begin(), expectedGroups.end(), groups.begin()));
 }
