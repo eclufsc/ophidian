@@ -119,9 +119,9 @@ namespace ophidian::parser
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
         region_container_type    m_regions{};
-        group_container_type     m_groups;
+        group_container_type     m_groups{};
 
-        group_type::name_type    m_current_group_name;
+        group_type::name_type    m_current_group_name{};
     };
 }
 

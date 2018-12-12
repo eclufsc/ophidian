@@ -72,8 +72,8 @@ namespace ophidian::parser
         friend std::ostream& operator<<(std::ostream& os, const Group& group);
 
     private:
-        name_type                m_name; 
-        members_container_type m_members;
+        name_type                m_name{}; 
+        members_container_type   m_members{};
     };
 }
 
