@@ -20,7 +20,19 @@
 
 namespace ophidian::parser
 {
-    void Group::add_member(std::string member) noexcept
+    Group::Group(const name_type & name) :
+    m_name{name}
+    {
+
+    }
+
+    Group::Group(name_type && name) :
+    m_name{std::move(name)}
+    {
+
+    }
+
+    void Group::add_member(name_type member) noexcept
     {
         m_members.push_back(member);
     }

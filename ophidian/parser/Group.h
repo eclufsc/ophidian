@@ -35,7 +35,6 @@ namespace ophidian::parser
     {
     public:
         template <class T> using container_type = std::vector<T>;
-        template <class T> using box_type     = geometry::Box<T>;
 
         using name_type                = std::string;
 
@@ -57,9 +56,9 @@ namespace ophidian::parser
             m_members{std::forward<Arg2>(members)}
         {}
 
-        Group(name_type name):
-            m_name{name}
-        {}
+        Group(const name_type & name);
+
+        Group(name_type&& name);
 
         void add_member(name_type member) noexcept;
 
