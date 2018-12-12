@@ -9,20 +9,6 @@ using dbu_t = Def::database_unit_type;
 using scalar_t = Def::scalar_type;
 using orient_t = Def::component_type::orientation_type;
 
-namespace {
-    bool boxComparator (const Def::database_unit_box_type & box1, const Def::database_unit_box_type & box2) {
-        return box1.min_corner().x() == box2.min_corner().x() && box1.max_corner().x() == box2.max_corner().x()
-                && box1.min_corner().y() == box2.min_corner().y() && box1.max_corner().y() == box2.max_corner().y();
-    }
-
-    bool regionsComparator (const Def::region_type & region1, const Def::region_type & region2) {
-        bool equalName = region1.name() == region2.name();
-        bool equalRectangles = region1.rectangles().size() && region2.rectangles().size() && 
-                        std::is_permutation(region1.rectangles().begin(), region1.rectangles().end(), region2.rectangles().begin(), boxComparator);
-        return equalName && equalRectangles;
-    }
-}
-
 TEST_CASE("Def: Try to load inexistent file", "[parser][Def]")
 {
     CHECK_THROWS_AS(
@@ -207,7 +193,7 @@ TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser]
     auto & regions = circuitDef.regions();
 
     CHECK(regions.size() == expectedRegions.size());
-    CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin(), regionsComparator));
+    CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin()));
 
     auto expectedGroups = Def::group_container_type {
         {"er0", {"er0", Def::group_type::members_container_type{"h0c/*", "h0a/*", "h0b/*", "h0/*"}}},

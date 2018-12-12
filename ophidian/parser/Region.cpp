@@ -32,7 +32,14 @@ namespace ophidian::parser
 
     bool Region::operator==(const Region& rhs) const noexcept
     {
-        return m_name == rhs.m_name;
+        auto boxComparator = [](const database_unit_box_type & box1, const database_unit_box_type & box2) -> bool {
+                return box1.min_corner().x() == box2.min_corner().x() && box1.max_corner().x() == box2.max_corner().x()
+                && box1.min_corner().y() == box2.min_corner().y() && box1.max_corner().y() == box2.max_corner().y();
+        };
+
+        return m_name == rhs.m_name 
+                && m_rectangles.size() == rhs.m_rectangles.size()
+                && std::is_permutation(m_rectangles.begin(), m_rectangles.end(), rhs.m_rectangles.begin(), boxComparator);
     }
 
     std::ostream& operator<<(std::ostream& os, const Region& region)
