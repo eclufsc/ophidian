@@ -157,53 +157,53 @@ TEST_CASE("Def: Loading ispd_18_sample.input.def", "[parser][Def][ispd18][sample
 }
 
 TEST_CASE("Def: reading iccad2017 contest circuit with fence regions", "[parser][Def][iccad17]") {
-    auto circuitDef = Def{"input_files/iccad17/pci_bridge32_a_md1/placed.def"};
+    auto circuit_def = Def{"input_files/iccad17/pci_bridge32_a_md1/placed.def"};
 
-    auto region1Boxes = Region::rectangles_container_type {
+    auto region1_boxes = Region::rectangles_container_type {
         {{dbu_t{23200}, dbu_t{0}}, {dbu_t{379200}, dbu_t{20000}}},
         {{dbu_t{87}, dbu_t{0}}, {dbu_t{23200}, dbu_t{399870}}},
         {{dbu_t{23200}, dbu_t{380000}}, {dbu_t{379200}, dbu_t{399870}}},
         {{dbu_t{379200}, dbu_t{0}}, {dbu_t{400400}, dbu_t{399870}}}
     };
-    auto region2Boxes = Region::rectangles_container_type {
+    auto region2_boxes = Region::rectangles_container_type {
         {{dbu_t{140691}, dbu_t{126000}}, {dbu_t{177600}, dbu_t{148000}}},
         {{dbu_t{211000}, dbu_t{126000}}, {dbu_t{249691}, dbu_t{148000}}},
         {{dbu_t{114400}, dbu_t{126000}}, {dbu_t{140691}, dbu_t{260000}}},
         {{dbu_t{140691}, dbu_t{234073}}, {dbu_t{249691}, dbu_t{260000}}},
         {{dbu_t{249691}, dbu_t{126000}}, {dbu_t{276800}, dbu_t{260000}}}
     };
-    auto region3Boxes = Region::rectangles_container_type {
+    auto region3_boxes = Region::rectangles_container_type {
         {{dbu_t{85673}, dbu_t{58000}}, {dbu_t{144200}, dbu_t{80000}}},
         {{dbu_t{250200}, dbu_t{56000}}, {dbu_t{308873}, dbu_t{80000}}},
         {{dbu_t{64600}, dbu_t{58000}}, {dbu_t{85673}, dbu_t{322000}}},
         {{dbu_t{85673}, dbu_t{298000}}, {dbu_t{308873}, dbu_t{322000}}},
         {{dbu_t{308873}, dbu_t{56000}}, {dbu_t{330600}, dbu_t{322000}}}
     };
-    auto region4Boxes = Region::rectangles_container_type {
+    auto region4_boxes = Region::rectangles_container_type {
         {{dbu_t{163000}, dbu_t{172000}}, {dbu_t{223400}, dbu_t{210000}}}
     };
 
-    auto expectedRegions = Def::region_container_type {
-        {"er0", region1Boxes},
-        {"er1", region2Boxes},
-        {"er3", region3Boxes},
-        {"er4", region4Boxes}
+    auto expected_regions = Def::region_container_type {
+        {"er0", region1_boxes},
+        {"er1", region2_boxes},
+        {"er3", region3_boxes},
+        {"er4", region4_boxes}
     };
 
-    auto & regions = circuitDef.regions();
+    auto & regions = circuit_def.regions();
 
-    CHECK(regions.size() == expectedRegions.size());
-    CHECK(std::is_permutation(expectedRegions.begin(), expectedRegions.end(), regions.begin()));
+    CHECK(regions.size() == expected_regions.size());
+    CHECK(std::is_permutation(expected_regions.begin(), expected_regions.end(), regions.begin()));
 
-    auto expectedGroups = Def::group_container_type {
+    auto expected_groups = Def::group_container_type {
         {"er0", {"er0", Def::group_type::members_container_type{"h0c/*", "h0a/*", "h0b/*", "h0/*"}}},
         {"er1", {"er1", Def::group_type::members_container_type{"h2e/*", "h2c/*", "h2a/*", "h2d/*", "h2b/*"}}},
         {"er3", {"er3", Def::group_type::members_container_type{"h1a/*", "h1d/*", "h1b/*", "h1e/*", "h1c/*"}}},
         {"er4", {"er4", Def::group_type::members_container_type{"hh4a/*", "hh4b/*"}}}
     };
 
-    auto & groups = circuitDef.groups();
+    auto & groups = circuit_def.groups();
 
-    CHECK(groups.size() == expectedGroups.size());
-    CHECK(std::is_permutation(expectedGroups.begin(), expectedGroups.end(), groups.begin()));
+    CHECK(groups.size() == expected_groups.size());
+    CHECK(std::is_permutation(expected_groups.begin(), expected_groups.end(), groups.begin()));
 }
