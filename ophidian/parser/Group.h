@@ -60,7 +60,7 @@ namespace ophidian::parser
 
         Group(name_type&& name);
 
-        void add_member(name_type member) noexcept;
+        void add_member(const name_type & member) noexcept;
 
         // Class member functions
         const name_type& name() const noexcept;

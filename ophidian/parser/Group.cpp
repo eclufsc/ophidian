@@ -32,7 +32,7 @@ namespace ophidian::parser
 
     }
 
-    void Group::add_member(name_type member) noexcept
+    void Group::add_member(const name_type & member) noexcept
     {
         m_members.push_back(member);
     }
