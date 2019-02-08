@@ -29,8 +29,13 @@ namespace ophidian::placement {
 
     FenceRegions::fence_region_type FenceRegions::add_fence_region(const fence_region_name_type & name) noexcept
     {
-        auto fence_region = m_fence_regions.add();
+        auto fence_region = find_fence_region(name);
+        if (fence_region != FenceRegion()) {
+            return fence_region;
+        }
+        fence_region = m_fence_regions.add();
         m_fence_names[fence_region] = name;
+        m_name_to_fence_region[name] = fence_region;
         return fence_region;
     }
 
@@ -68,6 +73,20 @@ namespace ophidian::placement {
     {
         auto fence = fence_region(cell);
         return fence != FenceRegion();
+    }
+
+    FenceRegions::fence_region_container_type::size_type FenceRegions::size_fence_region() const noexcept
+    {
+        return m_fence_regions.size();
+    }
+
+    FenceRegions::fence_region_type FenceRegions::find_fence_region(const fence_region_name_type & name) const noexcept
+    {
+        auto fence_region_it = m_name_to_fence_region.find(name);
+        if (fence_region_it == m_name_to_fence_region.end()) {
+            return FenceRegion();
+        }
+        return fence_region_it->second;
     }
 
 }

@@ -23,6 +23,27 @@ class FenceRegionsFixture {
         }
 };
 
+TEST_CASE_METHOD(FenceRegionsFixture, "Add new fence region", "[placement][fence_regions]") {
+    auto fence_region2 = fence_regions.add_fence_region("fence2");
+
+    auto fence = fence_regions.find_fence_region("fence1");
+
+    REQUIRE(fence_regions.name(fence_region2) == "fence2");
+    REQUIRE(fence_regions.size_fence_region() == 2);
+    REQUIRE(fence_regions.find_fence_region("fence1") == fence_region1);
+    REQUIRE(fence_regions.find_fence_region("fence2") == fence_region2);
+    REQUIRE(fence_region1 != fence_region2);
+}
+
+TEST_CASE_METHOD(FenceRegionsFixture, "Add two fence regions with same name", "[placement][fence_regions]") {
+    auto fence_region2 = fence_regions.add_fence_region("fence1");
+
+    REQUIRE(fence_regions.size_fence_region() == 1);
+    REQUIRE(fence_regions.find_fence_region("fence1") == fence_region1);
+    REQUIRE(fence_regions.find_fence_region("fence2") == FenceRegions::fence_region_type());
+    REQUIRE(fence_region1 == fence_region2);
+}
+
 TEST_CASE_METHOD(FenceRegionsFixture, "Add geometry to fence region", "[placement][fence_regions]") {
     auto fence_region_box = FenceRegions::fence_region_geometry_type::box_type{{dbu_type{0}, dbu_type{0}}, 
         {dbu_type{10}, dbu_type{10}}};

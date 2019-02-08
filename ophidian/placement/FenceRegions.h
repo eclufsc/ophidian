@@ -37,6 +37,7 @@ namespace ophidian::placement {
         using cell_instance_type = circuit::CellInstance;
         using fence_region_geometry_type = geometry::CellGeometry;
         using members_view_type = entity_system::Aggregation<fence_region_type, cell_instance_type>::Parts;
+        using fence_region_container_type = entity_system::EntitySystem<fence_region_type>;
 
         FenceRegions() = delete;
 
@@ -64,6 +65,10 @@ namespace ophidian::placement {
 
         bool has_fence(const cell_instance_type & cell) const noexcept;
 
+        fence_region_container_type::size_type size_fence_region() const noexcept;
+
+        fence_region_type find_fence_region(const fence_region_name_type & name) const noexcept;
+
     private:
         entity_system::EntitySystem<fence_region_type> m_fence_regions;
 
@@ -71,6 +76,8 @@ namespace ophidian::placement {
         entity_system::Property<fence_region_type, fence_region_geometry_type> m_fence_areas;
 
         entity_system::Aggregation<fence_region_type, cell_instance_type> m_fence_members;
+
+        std::unordered_map<fence_region_name_type, fence_region_type> m_name_to_fence_region;
     };
 
 }
