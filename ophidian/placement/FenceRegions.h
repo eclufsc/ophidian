@@ -33,8 +33,10 @@ namespace ophidian::placement {
     {
     public:
         using fence_region_type = FenceRegion;
+        using fence_region_name_type = std::string;
         using cell_instance_type = circuit::CellInstance;
-        using cell_geometry_type = geometry::CellGeometry;
+        using fence_region_geometry_type = geometry::CellGeometry;
+        using members_view_type = entity_system::Aggregation<fence_region_type, cell_instance_type>::Parts;
 
         FenceRegions() = delete;
 
@@ -46,13 +48,29 @@ namespace ophidian::placement {
 
         FenceRegions(circuit::Netlist & netlist);
 
+        fence_region_type add_fence_region(const fence_region_name_type & name) noexcept;
+
+        void add_member(const fence_region_type& fence_region, const cell_instance_type & cell) noexcept;
+
+        void add_box(const fence_region_type& fence_region, const fence_region_geometry_type::box_type & box) noexcept;
+
+        const fence_region_name_type & name(const fence_region_type & fence_region) const noexcept;
+
+        const fence_region_geometry_type & area(const fence_region_type & fence_region) const noexcept;
+
+        members_view_type members(const fence_region_type & fence_region) const noexcept;
+
+        fence_region_type fence_region(const cell_instance_type & cell) const noexcept;
+
+        bool has_fence(const cell_instance_type & cell) const noexcept;
+
     private:
         entity_system::EntitySystem<fence_region_type> m_fence_regions;
 
-        entity_system::Property<fence_region_type, std::string> m_fence_names;
-        entity_system::Property<fence_region_type, cell_geometry_type> m_fence_areas;
+        entity_system::Property<fence_region_type, fence_region_name_type> m_fence_names;
+        entity_system::Property<fence_region_type, fence_region_geometry_type> m_fence_areas;
 
-        entity_system::Aggregation<fence_region_type, cell_instance_type> m_fence_cells;
+        entity_system::Aggregation<fence_region_type, cell_instance_type> m_fence_members;
     };
 
 }
