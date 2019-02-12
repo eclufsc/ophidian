@@ -37,6 +37,18 @@ namespace ophidian::geometry
         using box_type  = Box<unit_type>;
         using box_container_type = std::vector<box_type>;
 
+        class BoxComparator {
+        public:
+            bool operator()(const box_type & box1, const box_type & box2) 
+            {
+                bool comparison = (box1.min_corner().x() - box2.min_corner().x() < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (box1.min_corner().y() - box2.min_corner().y() < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (box1.max_corner().x() - box2.max_corner().x() < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (box1.max_corner().y() - box2.max_corner().y() < unit_type(std::numeric_limits<double>::epsilon()));
+                return comparison;
+            }   
+        };
+
         // Constructors
         CellGeometry() = default;
 
@@ -73,26 +85,39 @@ namespace ophidian::geometry
 
         bool operator==(const CellGeometry & other) const noexcept
         {
-            for(auto box1 : m_boxes)
-            {
-                for(auto box2 : other.m_boxes)
-                {
-                    bool comparison = (box1.min_corner().x() == box2.min_corner().x()) &&
-                                      (box1.min_corner().y() == box2.min_corner().y()) &&
-                                      (box1.max_corner().x() == box2.max_corner().x()) &&
-                                      (box1.max_corner().y() == box2.max_corner().y());
-                    if(!comparison) {
-                        return false;
-                    }
-                }
-            }
+            auto size1 = m_boxes.size();
+            auto size2 = other.m_boxes.size();
+            return size1 == size2 && std::is_permutation(m_boxes.begin(), m_boxes.end(), other.m_boxes.begin(), BoxComparator());
 
-            return true;
+            // for(auto box1 : m_boxes)
+            // {
+            //     for(auto box2 : other.m_boxes)
+            //     {
+            //         bool comparison = (box1.min_corner().x() == box2.min_corner().x()) &&
+            //                           (box1.min_corner().y() == box2.min_corner().y()) &&
+            //                           (box1.max_corner().x() == box2.max_corner().x()) &&
+            //                           (box1.max_corner().y() == box2.max_corner().y());
+            //         if(!comparison) {
+            //             return false;
+            //         }
+            //     }
+            // }
+
+            // return true;
         }
 
         bool operator!=(const CellGeometry & other) const noexcept
         {
             return !(*this == other);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const CellGeometry& geometry)
+        {
+            for (auto box : geometry.m_boxes) {
+                os << box.min_corner().x() << ", " << box.min_corner().y() << " -> " 
+                   << box.max_corner().x() << ", " << box.max_corner().y() << std::endl;
+            }
+            return os;
         }
 
     private:
