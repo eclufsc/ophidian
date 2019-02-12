@@ -41,12 +41,12 @@ namespace ophidian::geometry
         public:
             bool operator()(const box_type & box1, const box_type & box2) 
             {
-                bool comparison = (box1.min_corner().x() - box2.min_corner().x() < unit_type(std::numeric_limits<double>::epsilon())) &&
-                                      (box1.min_corner().y() - box2.min_corner().y() < unit_type(std::numeric_limits<double>::epsilon())) &&
-                                      (box1.max_corner().x() - box2.max_corner().x() < unit_type(std::numeric_limits<double>::epsilon())) &&
-                                      (box1.max_corner().y() - box2.max_corner().y() < unit_type(std::numeric_limits<double>::epsilon()));
+                bool comparison = (units::math::abs(box1.min_corner().x() - box2.min_corner().x()) < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (units::math::abs(box1.min_corner().y() - box2.min_corner().y()) < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (units::math::abs(box1.max_corner().x() - box2.max_corner().x()) < unit_type(std::numeric_limits<double>::epsilon())) &&
+                                      (units::math::abs(box1.max_corner().y() - box2.max_corner().y()) < unit_type(std::numeric_limits<double>::epsilon()));
                 return comparison;
-            }   
+            }
         };
 
         // Constructors

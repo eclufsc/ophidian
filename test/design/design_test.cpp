@@ -80,6 +80,8 @@ TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 	ophidian::geometry::CellGeometry cell2Geometry(cell2Boxes);
     design.placement_library().geometry(cell2) =  cell2Geometry;
 
+	std::cout << dbu_t(std::numeric_limits<double>::epsilon()) << std::endl;
+
 	REQUIRE(cell1Geometry == design.placement_library().geometry(cell1));
 	REQUIRE(cell2Geometry == design.placement_library().geometry(cell2));
 	REQUIRE(design.placement_library().geometry(cell1) != design.placement_library().geometry(cell2));

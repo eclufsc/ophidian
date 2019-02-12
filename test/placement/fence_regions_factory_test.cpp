@@ -46,7 +46,7 @@ TEST_CASE_METHOD(DesignFixture, "Create fence regions for pci_bridge32_a_md1", "
         {{dbu_type{23200}, dbu_type{0}}, {dbu_type{379200}, dbu_type{20000}}},
         {{dbu_type{87}, dbu_type{0}}, {dbu_type{23200}, dbu_type{399870}}},
         {{dbu_type{23200}, dbu_type{380000}}, {dbu_type{379200}, dbu_type{399870}}},
-        {{dbu_type{379200}, dbu_type{0}}, {dbu_type{400400}, dbu_type{399870}}}
+        {{dbu_type{379200}, dbu_type{0}}, {dbu_type{400000}, dbu_type{399870}}}
     }};
 
     auto area = fence_regions.area(er0);
