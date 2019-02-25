@@ -9,9 +9,9 @@ Master: [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/master/pi
 Development: [![pipeline status](https://gitlab.com/eclufsc/ophidian/badges/development/pipeline.svg)](https://gitlab.com/eclufsc/ophidian/commits/development)
 
 ## About:
-Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](http://eclab.paginas.ufsc.br/), [Federal University of Santa Catarina (UFSC)](http://ufsc.br/), [Brazil](https://www.google.com.br/maps/place/Departamento+de+Inform%C3%A1tica+e+Estat%C3%ADstica/@-27.600561,-48.520762,17z/data=!3m1!4b1!4m5!3m4!1s0x95273900f56d3f99:0xc2fd35f96d3fb9b3!8m2!3d-27.6005658!4d-48.5185733?hl=en). The main objective of Ophidian project is to provide a multi-platform library to facilitate the research and teaching of topics associated to the physical design of integrated circuits.
+Ophidian is an open-source library developed at [Embedded Computing Lab (ECL)](http://eclab.paginas.ufsc.br/), [Federal University of Santa Catarina (UFSC)](http://ufsc.br/), [Brazil](https://www.google.com.br/maps/place/Departamento+de+Inform%C3%A1tica+e+Estat%C3%ADstica/@-27.600561,-48.520762,17z/data=!3m1!4b1!4m5!3m4!1s0x95273900f56d3f99:0xc2fd35f96d3fb9b3!8m2!3d-27.6005658!4d-48.5185733?hl=en). The main objective of the Ophidian project is to provide a multi-platform library to facilitate the research and teaching of topics associated to the physical design of integrated circuits.
 
-Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](https://renannetto.github.io/), and [Vinicius Livramento](http://vinilivramento.com), under the advise of [Prof. José Güntzel](https://www.inf.ufsc.br/~j.guntzel/), during their research activities at Federal University of Santa Catarina.
+Ophidian was conceived by [Chrystian Guth](http://csguth.com), [Renan Netto](https://renannetto.github.io/), and [Vinicius Livramento](http://vinilivramento.com), under the advice of [Prof. José Güntzel](https://www.inf.ufsc.br/~j.guntzel/), during their research activities at Federal University of Santa Catarina.
 
 ## Index:
 * [Getting Started](#getting-started)
@@ -33,13 +33,13 @@ Get Ophidian! We support a few of the most used linux environments.
 ## Debian Family:
 Add the [Ophidian repository ppa](https://launchpad.net/~eclufsc/+archive/ubuntu/ophidian).
 
-### Ubuntu artful (17.10) or newer:
+### Ubuntu Bionic 18.04 LTS or newer:
 ```
 $ sudo add-apt-repository -y -u ppa:eclufsc/ophidian
 $ sudo apt install libophidian-dev
 ```
 
-### Debian Sid:
+### Debian Buster:
 First you will need to add the **Launchpad PPA for eclufsc** gpg key:
 ```
 $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
@@ -47,7 +47,7 @@ $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A
 
 Then add the launchpad repository and install ophidian.
 ```
-$ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu artful main"
+$ sudo add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu bionic main"
 $ sudo apt install libophidian-dev
 ```
 
@@ -67,7 +67,7 @@ So you want to code? We make avaliable a [project template](https://gitlab.com/e
 Documentation at [eclufsc.gitlab.io/ophidian](https://eclufsc.gitlab.io/ophidian)
 
 # Contributing:
-Make shure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+Make sure to follow [CppCoreGuidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
 
 For code style, try to keep very close to the [C++ Standard Library](https://en.cppreference.com/w/cpp).
 
@@ -117,7 +117,7 @@ ophidian
 ```
 
 ### The main [`ophidian/CMakeLists.txt`](CMakeLists.txt) file:
-This is the main Cmake file for the ophidian project, it's goals are set up project variables,
+This is the main Cmake file for the ophidian project, it's goals are to set up project variables,
 handle dependencies and include the project subdirectories.
 
 ### The [`ophidian/build_dependencies.sh`](build_dependencies.sh) script:
@@ -172,19 +172,19 @@ The Ophidian library depends on the following third party software:
 * [DEF](https://gitlab.com/eclufsc/eda/DEF)
 * [LEF](https://gitlab.com/eclufsc/eda/LEF)
 
-Although some of this dependencies like Cmake and Boost are realy well supported
-on any operational system, the others can be a hassle to have on your system. 
+Although some of these dependencies like Cmake and Boost are realy well supported
+on any operational system, others can be a hassle to have on your system. 
 So you can try [building them yourself!](#build-dependencies) 
 
 ## Build Dependencies:
-First, make shure you have all dependencies dependencies:
+First, make sure you have all dependencies dependencies:
 
 ### Dependencies Dependencies:
 * [zlib](https://www.zlib.net/)
 * [Bison](https://www.gnu.org/software/bison/)
 * [Flex](https://www.gnu.org/software/flex/)
 
-Second, if you are going to use the graphical user interface, make shure you have all gui's dependencies:
+Second, if you are going to use the graphical user interface, make sure you have all gui's dependencies:
 
 ### GUI Dependencies:
 * [SFML](https://www.sfml-dev.org/) (>= 2.0)
@@ -241,8 +241,8 @@ $ sudo bash build_dependencies.sh --install_to /usr/local
 This will install all dependencies to the `/usr/local` directory.
 
 ## [optional] Install Ophidian on System:
-If you wish to install Ophidian on your system please make shure your have
-installed all [dependencies on your system](#optional-install-dependencies-on-system) first then run:
+If you wish to install Ophidian on your system please make sure you have
+installed all [dependencies on your system](#optional-install-dependencies-on-system) first, then run:
 
 ```
  $ sudo make install
@@ -252,12 +252,13 @@ This will install the Ophidian Library to the `/usr/local` directory.
 
 # Credits
 Currently, Ophidian has many collaborators in the same university that support its development.
+* [Arthur Philippi Bianco](https://www.linkedin.com/in/arthur-philippi-bianco-85a679153/)
 * [Bernardo Mendonça](http://tarberd.me)
 * [Chrystian Guth](http://csguth.com)
+* João Vicente Souto
 * [José Güntzel](https://www.inf.ufsc.br/~j.guntzel/)
 * [Renan Netto](https://renannetto.github.io/)
+* [Sheiny Fabre Almeida](https://sheiny.github.io)
 * Thiago Barbato
 * [Tiago Augusto Fontana](https://tiagoafontana.github.io)
-* [Sheiny Fabre Almeida](https://sheiny.github.io)
 * [Vinicius Livramento](http://vinilivramento.com)
-* João Vicente Souto
