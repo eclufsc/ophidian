@@ -32,6 +32,18 @@ variables:
         ophidian-units
         libflute-dev
         libverilog-parser-dev"
+    
+    DEPENDENCIES_MINT_TESSA:
+        "build-essential
+        git
+        cmake
+        libboost-dev
+        liblemon-dev
+        def
+        lef
+        ophidian-units
+        libflute-dev
+        libverilog-parser-dev"
 
     DEPENDENCIES_GUI:
         "libsfml-dev
@@ -88,6 +100,26 @@ build_on_ubuntu-bionic:
         - apt-get update -qq && apt-get install -qq -y software-properties-common
         - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
         - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC $DEPENDENCIES_GUI
+    script:
+        - mkdir build && cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=/usr
+                -DCMAKE_BUILD_TYPE=Release
+                -DOPHIDIAN_GUI=ON
+                ..
+        - make -j2
+        - cd test
+        - ./ophidian_tests
+    artifacts:
+        paths:
+            - build/
+
+build_on_mint-tessa:
+    image: mint:tessa
+    stage: build
+    before_script:
+        - apt-get update -qq && apt-get install -qq -y software-properties-common
+        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
+        - apt-get install -qq -y $DEPENDENCIES_MINT_TESSA $DEPENDENCIES_GUI
     script:
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr
