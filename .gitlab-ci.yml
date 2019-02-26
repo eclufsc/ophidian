@@ -13,7 +13,7 @@ variables:
         "build-essential
         git
         cmake
-        libboost1.63-dev
+        libboost-dev
         liblemon-dev
         def
         lef
@@ -60,8 +60,8 @@ pages:
     only:
         - master
 
-build_on_debian-sid:
-    image: debian:sid
+build_on_debian-buster:
+    image: debian:buster
     stage: build
     before_script:
         - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
