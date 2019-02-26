@@ -22,11 +22,14 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Row.h"
 #include "Component.h"
 #include "Net.h"
 #include "Track.h"
+#include "Region.h"
+#include "Group.h"
 
 #include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
@@ -44,6 +47,7 @@ namespace ophidian::parser
     public:
         // Class member types
         template <class T> using container_type = std::vector<T>;
+        template <class Key, class Value> using map_type       = std::unordered_map<Key, Value>;
         template <class T> using point_type     = geometry::Point<T>;
         template <class T> using box_type       = geometry::Box<T>;
 
@@ -66,6 +70,12 @@ namespace ophidian::parser
         using scalar_type                       = util::database_unit_scalar_t;
         using scalar_point_type                 = point_type<scalar_type>;
         using scalar_box_type                   = box_type<scalar_type>;
+
+        using region_type                       = Region;
+        using region_container_type             = container_type<region_type>;
+
+        using group_type                        = Group;
+        using group_container_type              = map_type<group_type::name_type, group_type>;
 
         // Class constructors
         Def() = default;
@@ -94,6 +104,10 @@ namespace ophidian::parser
 
         const track_container_type& tracks() const noexcept;
 
+        const region_container_type& regions() const noexcept;
+
+        const group_container_type& groups() const noexcept;
+
     private:
         database_unit_box_type   m_die_area{
             database_unit_point_type{database_unit_type{0.0d}, database_unit_type{0.0d}},
@@ -104,6 +118,10 @@ namespace ophidian::parser
         net_container_type       m_nets{};
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
+        region_container_type    m_regions{};
+        group_container_type     m_groups{};
+
+        group_type::name_type    m_current_group_name{};
     };
 }
 

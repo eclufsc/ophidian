@@ -7,8 +7,12 @@
 /benchmarks/
 .project
 .cproject
-/build
+/build*
 /doc/documentation
 .DS_Store
 *.user
 /test/input_files/ispd18/*
+*.orig
+*.json
+3rdparty/*
+.vscode
