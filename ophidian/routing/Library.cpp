@@ -344,7 +344,15 @@ bool Library::isFirstRightBelowSecond(const Library::layer_type& first, const Li
         return false;
 }
 
+Library::layer_type Library::highest_layer() const
+{
+    return this->mHighest_layer;
+}
 
+void Library::set_highest_layer(const layer_type& layer)
+{
+    this->mHighest_layer = layer;
+}
 
 Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
 {

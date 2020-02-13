@@ -290,5 +290,15 @@ namespace ophidian::routing::factory
             }
             library.add_pad_instance(pad.name(), position, orientation, layers);
         }
+        int highest = 0;
+        for (auto layerIt = library.begin_layer(); layerIt != library.end_layer(); ++layerIt)
+        {
+            auto name = library.name(*layerIt);
+            if (name.find("Metal") != std::string::npos)
+            {
+                highest = std::max(highest, std::stoi(name.substr(5)));
+            }
+        }
+        library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest)));
     }
 }

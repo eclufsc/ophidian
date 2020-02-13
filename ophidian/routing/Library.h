@@ -172,6 +172,9 @@ namespace ophidian::routing
         orientation_type orientation (const pad_type& pad) const;
         std::map<std::string, box_container_type> box_in_layer(const pad_type& pad) const;
 
+        layer_type highest_layer() const;
+        void set_highest_layer(const layer_type& layer);
+
         // Iterators
         layer_container_type::const_iterator begin_layer() const noexcept;
         layer_container_type::const_iterator end_layer() const noexcept;
@@ -262,6 +265,7 @@ namespace ophidian::routing
         entity_system::EntitySystem<pad_type>::NotifierType * notifier(pad_type) const;
 
     private:
+        layer_type mHighest_layer;
         unit_container_type mGCell_x_axis, mGCell_y_axis;
         entity_system::EntitySystem<layer_type>  mLayers{};
         entity_system::Property<layer_type, std::string>        mLayerName{mLayers};
