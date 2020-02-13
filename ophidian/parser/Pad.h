@@ -37,9 +37,6 @@ namespace ophidian::parser
         enum class Orientation : int { N, W, S, E, FN, FW, FS, FE };
 
         using string_type                           = std::string;
-        // using micrometer_type                       = util::micrometer_t;
-        // using micrometer_point_type                 = point_type<micrometer_type>;
-        // using micrometer_box_type                   = box_type<micrometer_type>;
 
         using database_unit_type                    = util::database_unit_t;
         using dbu_point_type                        = point_type<database_unit_type>;

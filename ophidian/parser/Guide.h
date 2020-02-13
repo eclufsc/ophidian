@@ -30,9 +30,7 @@
 //#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
     /**
      * This is an encapsulation of rectangles, called global routing guide,
@@ -130,7 +128,6 @@ namespace parser
         box_type    m_region; /// rectangle of guide region
     };
 
-}
 }
 
 #endif // OPHIDIAN_PARSER_GUIDE_H
