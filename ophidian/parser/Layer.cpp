@@ -62,24 +62,45 @@ namespace ophidian::parser
             m_width == rhs.m_width;
     }
 
-    const Layer::micrometer_type& Layer::min_width() const noexcept{
+    const Layer::micrometer_type& Layer::min_width() const noexcept
+    {
         return m_min_width;
     }
 
-    const Layer::micrometer_type& Layer::area() const noexcept{
+    const Layer::micrometer_type& Layer::area() const noexcept
+    {
         return m_area;
     }
 
-    const Layer::micrometer_type& Layer::spacing() const noexcept{
+    const Layer::micrometer_type& Layer::spacing() const noexcept
+    {
         return m_spacing;
     }
 
-    const Layer::end_of_line_type& Layer::end_of_line() const noexcept{
+    const Layer::end_of_line_type& Layer::end_of_line() const noexcept
+    {
         return m_end_of_line;
     }
 
-    const Layer::parallel_run_length_type& Layer::parallel_run_length() const noexcept{
+    const Layer::parallel_edge_type& Layer::parallel_edge() const noexcept
+    {
+        return m_parallel_edge;
+    }
+
+    const Layer::parallel_run_length_type& Layer::parallel_run_length() const noexcept
+    {
+
         return m_parallel_run_length;
+    }
+
+    const Layer::adjacent_cut_spacing_type& Layer::adjacent_cut_spacing() const noexcept
+    {
+        return m_adjacent_cut_spacing;
+    }
+
+    const Layer::corner_spacing_type& Layer::corner_spacing() const noexcept
+    {
+        return m_corner_spacing;
     }
 
     std::ostream& operator<<(std::ostream& os, const Layer& layer)

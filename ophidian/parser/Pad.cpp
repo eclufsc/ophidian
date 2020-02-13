@@ -18,34 +18,43 @@
    under the License.
  */
 
-#include "EndOfLine.h"
+#include "Pad.h"
 
 namespace ophidian::parser
 {
-    const EndOfLine::micrometer_type & EndOfLine::space() const noexcept
+    const Pad::string_type& Pad::name() const noexcept
     {
-        return m_space;
+        return m_name;
     }
 
-    const EndOfLine::micrometer_type & EndOfLine::width() const noexcept
+    void Pad::addLayer(Pad::string_type layer, layer_container_type boxes) noexcept
     {
-        return m_width;
+        m_layers.insert(std::make_pair(layer, boxes));
     }
 
-    const EndOfLine::micrometer_type & EndOfLine::within() const noexcept
+    void Pad::set_orientation(Pad::orientation_type ori) noexcept
     {
-        return m_within;
-    }
-    
-    const ParallelEdge::micrometer_type & ParallelEdge::par_space() const noexcept
-    {
-        return m_par_space;
-    }
-    
-    const ParallelEdge::micrometer_type & ParallelEdge::par_within() const noexcept
-    {
-        return m_par_within;
+        m_orientation = ori;
     }
 
+    void Pad::set_position(Pad::dbu_point_type pos) noexcept
+    {
+        m_position = pos;
+    }
+
+    const Pad::layer_map_type &Pad::layers() const noexcept
+    {
+        return m_layers;
+    }
+
+    const Pad::orientation_type Pad::orientation() const noexcept
+    {
+        return m_orientation;
+    }
+
+    const Pad::dbu_point_type Pad::position() const noexcept
+    {
+        return m_position;
+    }
 
 }

@@ -69,6 +69,7 @@ set_target_properties(ophidian_routing PROPERTIES
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_routing
+    PUBLIC ophidian_interconnection
     PUBLIC ophidian_parser
     PUBLIC ophidian_circuit
     PUBLIC ophidian_entity_system
@@ -88,6 +89,7 @@ add_library(ophidian_routing_static STATIC ${ophidian_routing_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_routing_static
+    PUBLIC ophidian_interconnection_static
     PUBLIC ophidian_parser_static
     PUBLIC ophidian_circuit_static
     PUBLIC ophidian_entity_system_static

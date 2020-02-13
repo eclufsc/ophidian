@@ -24,11 +24,15 @@
 #include <string>
 #include <vector>
 
+// external headers
+
 // ophidian headers
-#include <ophidian/geometry/Models.h>
+//#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
-namespace ophidian::parser
+namespace ophidian
+{
+namespace parser
 {
     /**
      * This is an encapsulation of rectangles, called global routing guide,
@@ -54,23 +58,18 @@ namespace ophidian::parser
         using net_type                          = Net;
         using net_container_type                = container_type<net_type>;
 
+        using string_type                       = std::string;
+
         // Class constructors
-        Guide() = delete;
-
-        Guide(const Guide&) = default;
-
-        Guide(Guide&&) = default;
-
-        Guide& operator=(const Guide&) = default;
-
-        Guide& operator=(Guide&&) = default;
+        Guide() = default;
 
         Guide(const std::string& guide_file);
 
         // Class member functions
         void read_file(const std::string& guide_file);
 
-        net_container_type& nets() noexcept;
+        const size_t size() const noexcept;
+
         const net_container_type& nets() const noexcept;
 
     private:
@@ -81,34 +80,27 @@ namespace ophidian::parser
     {
     public:
         template <class T> using container_type = std::vector<T>;
-        using name_type                       = std::string;
+        using string_type                       = std::string;
 
         using region_type                       = Guide::Region;
         using region_container_type             = container_type<region_type>;
 
-        Net() = delete;
+        Net() = default;
 
-        Net(const Net&) = default;
-
-        Net(Net&&) = default;
-
-        Net& operator=(const Net&) = default;
-
-        Net& operator=(Net&&) = default;
-
-        template<class A1, class A2>
-        Net(A1&& name, A2&& regions):
-            m_name{std::forward<A1>(name)},
-            m_regions{std::forward<A2>(regions)}
+        Net(string_type name):
+            m_name(name)
         {}
 
-        const name_type& name() const noexcept;
+        void add_region(region_type& region);
 
-        region_container_type& regions() noexcept;
+        const string_type& name() const noexcept;
+
         const region_container_type& regions() const noexcept;
 
+        const size_t regions_size() const noexcept;
+
     private:
-        name_type m_name;
+        string_type m_name;
         region_container_type m_regions;
     };
 
@@ -116,35 +108,29 @@ namespace ophidian::parser
     {
     public:
         // Class member types
-        using geometry_type                     = Guide::database_unit_box_type;
-        using layer_name_type                   = std::string;
+        using point_type                        = Guide::database_unit_point_type;
+        using box_type                          = Guide::database_unit_box_type;
+        using string_type                       = std::string;
 
         // Class constructors
-        Region() = delete;
+        Region() = default;
 
-        Region(const Region&) = default;
-
-        Region(Region&&) = default;
-
-        Region& operator=(const Region&) = default;
-
-        Region& operator=(Region&&) = default;
-
-        template<class A1, class A2>
-        Region(A1&& metal_layer_name, A2&& geometry):
-            m_metal{std::forward<A1>(metal_layer_name)},
-            m_region{std::forward<A2>(geometry)}
+        Region(point_type origin, point_type upper_right_corner, string_type metal):
+            m_metal(metal),
+            m_region(origin, upper_right_corner)
         {}
 
         // Class member functions
-        const layer_name_type& metal_layer_name() const noexcept;
+        const string_type& metal() const noexcept;
 
-        const geometry_type& geometry() const noexcept;
+        const box_type& region() const noexcept;
 
     private:
-        layer_name_type  m_metal; ///metal layer of guide region
-        geometry_type    m_region; /// rectangle of guide region
+        string_type m_metal; ///metal layer of guide region
+        box_type    m_region; /// rectangle of guide region
     };
+
+}
 }
 
 #endif // OPHIDIAN_PARSER_GUIDE_H

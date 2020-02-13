@@ -19,41 +19,41 @@ TEST_CASE("Guide: Loading ispd18_sample.input.guide", "[parser][Guide][sample]")
 {
     Guide sample = Guide{"input_files/ispd18/ispd18_sample/ispd18_sample.input.guide"};
 
-    CHECK(sample.nets().size() == 11);
+    CHECK(sample.size() == 11);
     auto& nets = sample.nets();
 
     auto& net = nets[0];
     CHECK(net.name() == "net1230");
-    CHECK(net.regions().size() == 5);
+    CHECK(net.regions_size() == 5);
 
     auto& regions = net.regions();
-    CHECK(regions[0].geometry().min_corner().x() == dbu_t{89600});
-    CHECK(regions[0].geometry().min_corner().y() == dbu_t{71820});
-    CHECK(regions[0].geometry().max_corner().x() == dbu_t{95600});
-    CHECK(regions[0].geometry().max_corner().y() == dbu_t{77520});
-    CHECK(regions[0].metal_layer_name() == "Metal1");
+    CHECK(regions[0].region().min_corner().x() == dbu_t{89600});
+    CHECK(regions[0].region().min_corner().y() == dbu_t{71820});
+    CHECK(regions[0].region().max_corner().x() == dbu_t{95600});
+    CHECK(regions[0].region().max_corner().y() == dbu_t{77520});
+    CHECK(regions[0].metal() == "Metal1");
 
-    CHECK(regions[1].geometry().min_corner().x() == dbu_t{95600});
-    CHECK(regions[1].geometry().min_corner().y() == dbu_t{83220});
-    CHECK(regions[1].geometry().max_corner().x() == dbu_t{104400});
-    CHECK(regions[1].geometry().max_corner().y() == dbu_t{91200});
-    CHECK(regions[1].metal_layer_name() == "Metal1");
+    CHECK(regions[1].region().min_corner().x() == dbu_t{95600});
+    CHECK(regions[1].region().min_corner().y() == dbu_t{83220});
+    CHECK(regions[1].region().max_corner().x() == dbu_t{104400});
+    CHECK(regions[1].region().max_corner().y() == dbu_t{91200});
+    CHECK(regions[1].metal() == "Metal1");
 
-    CHECK(regions[2].geometry().min_corner().x() == dbu_t{89600});
-    CHECK(regions[2].geometry().min_corner().y() == dbu_t{71820});
-    CHECK(regions[2].geometry().max_corner().x() == dbu_t{95600});
-    CHECK(regions[2].geometry().max_corner().y() == dbu_t{83220});
-    CHECK(regions[2].metal_layer_name() == "Metal2");
+    CHECK(regions[2].region().min_corner().x() == dbu_t{89600});
+    CHECK(regions[2].region().min_corner().y() == dbu_t{71820});
+    CHECK(regions[2].region().max_corner().x() == dbu_t{95600});
+    CHECK(regions[2].region().max_corner().y() == dbu_t{83220});
+    CHECK(regions[2].metal() == "Metal2");
 
-    CHECK(regions[3].geometry().min_corner().x() == dbu_t{95600});
-    CHECK(regions[3].geometry().min_corner().y() == dbu_t{77520});
-    CHECK(regions[3].geometry().max_corner().x() == dbu_t{104400});
-    CHECK(regions[3].geometry().max_corner().y() == dbu_t{91200});
-    CHECK(regions[3].metal_layer_name() == "Metal2");
+    CHECK(regions[3].region().min_corner().x() == dbu_t{95600});
+    CHECK(regions[3].region().min_corner().y() == dbu_t{77520});
+    CHECK(regions[3].region().max_corner().x() == dbu_t{104400});
+    CHECK(regions[3].region().max_corner().y() == dbu_t{91200});
+    CHECK(regions[3].metal() == "Metal2");
 
-    CHECK(regions[4].geometry().min_corner().x() == dbu_t{89600});
-    CHECK(regions[4].geometry().min_corner().y() == dbu_t{77520});
-    CHECK(regions[4].geometry().max_corner().x() == dbu_t{104400});
-    CHECK(regions[4].geometry().max_corner().y() == dbu_t{83220});
-    CHECK(regions[4].metal_layer_name() == "Metal3");
+    CHECK(regions[4].region().min_corner().x() == dbu_t{89600});
+    CHECK(regions[4].region().min_corner().y() == dbu_t{77520});
+    CHECK(regions[4].region().max_corner().x() == dbu_t{104400});
+    CHECK(regions[4].region().max_corner().y() == dbu_t{83220});
+    CHECK(regions[4].metal() == "Metal3");
 }

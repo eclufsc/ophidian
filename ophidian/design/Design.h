@@ -26,6 +26,7 @@
 #include <ophidian/circuit/StandardCells.h>
 #include <ophidian/routing/Library.h>
 #include <ophidian/routing/GlobalRouting.h>
+//#include <ophidian/routing/DetailedRouting.h>
 
 namespace ophidian::design
 {
@@ -40,6 +41,7 @@ namespace ophidian::design
         using placement_type            = placement::Placement;
         using routing_library_type      = routing::Library;
         using global_routing_type       = routing::GlobalRouting;
+        // using detailed_routing_type     = routing::DetailedRouting;
 
         //! Design Constructor
 
@@ -125,6 +127,14 @@ namespace ophidian::design
 
         const global_routing_type& global_routing() const noexcept;
 
+        //! Detailed Routing getter
+        /*!
+           \brief Get the detailed routing
+           \return Detailed Routing
+        */
+        // detailed_routing_type& detailed_routing() noexcept;
+
+        // const detailed_routing_type& detailed_routing() const noexcept;
 
     private:
         floorplan_type          m_floorplan{};
@@ -134,6 +144,7 @@ namespace ophidian::design
         placement_type          m_placement{m_netlist, m_placement_library};
         routing_library_type    m_routing_library{};
         global_routing_type     m_global_routing{m_netlist};
+        // detailed_routing_type   m_detailed_routing{m_netlist};
     };
 }
 

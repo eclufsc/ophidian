@@ -39,7 +39,7 @@ namespace ophidian::parser
     public:
         // Class member types
         enum class Orientation : int {
-            X, Y
+            HORIZONTAL, VERTICAL
         };
 
         using layer_name_type           = std::string;

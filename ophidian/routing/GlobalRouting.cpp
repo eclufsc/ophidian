@@ -20,9 +20,9 @@
 
 namespace ophidian::routing
 {
-    GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist) noexcept:
+    GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist):
         m_regions{},
-        m_region_geometries{m_regions},
+        m_region_box{m_regions},
         m_region_layers{m_regions},
         m_net_to_regions{netlist.make_aggregation_net<GlobalRouting::region_type>(m_regions)}
     {
@@ -38,22 +38,12 @@ namespace ophidian::routing
         return m_net_to_regions.whole(region);
     }
 
-    GlobalRouting::region_geometry_type& GlobalRouting::geometry(const GlobalRouting::region_type &region)
+    const GlobalRouting::region_geometry_type& GlobalRouting::box(const GlobalRouting::region_type &region) const
     {
-        return m_region_geometries[region];
+        return m_region_box[region];
     }
 
-    const GlobalRouting::region_geometry_type& GlobalRouting::geometry(const GlobalRouting::region_type &region) const
-    {
-        return m_region_geometries[region];
-    }
-
-    GlobalRouting::layer_type& GlobalRouting::layer(const GlobalRouting::region_type &region)
-    {
-        return m_region_layers[region];
-    }
-
-    const GlobalRouting::layer_type& GlobalRouting::layer(const GlobalRouting::region_type &region) const
+    const GlobalRouting::layer_type GlobalRouting::layer(const GlobalRouting::region_type &region) const
     {
         return m_region_layers[region];
     }
@@ -76,13 +66,13 @@ namespace ophidian::routing
     GlobalRouting::region_type GlobalRouting::add_region(const GlobalRouting::region_geometry_type &geometry, const GlobalRouting::layer_type &layer, const GlobalRouting::net_type &net)
     {
         auto region = m_regions.add();
-        m_region_geometries[region] = geometry;
+        m_region_box[region] = geometry;
         m_region_layers[region] = layer;
         m_net_to_regions.addAssociation(net, region);
         return region;
     }
 
-    entity_system::EntitySystem<GlobalRouting::region_type>::NotifierType *GlobalRouting::notifier_region() const noexcept
+    entity_system::EntitySystem<GlobalRouting::region_type>::NotifierType *GlobalRouting::notifier(GlobalRouting::region_type) const
     {
         return m_regions.notifier();
     }

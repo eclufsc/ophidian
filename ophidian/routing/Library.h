@@ -21,10 +21,14 @@ namespace ophidian::routing
         ROUTING, MASTERSLICE, CUT, NA
     };
 
-    enum class LayerDirection {
+    enum class Direction {
         HORIZONTAL, VERTICAL, NA
     };
 
+    enum class Orientation : int {
+        N, S, W, E, FN, FS, FW, FE
+    };
+    
     class Via :
         public entity_system::EntityBase
     {
@@ -39,38 +43,56 @@ namespace ophidian::routing
         using entity_system::EntityBase::EntityBase;
     };
 
-    enum class TrackOrientation {
-        X, Y
+    class Pad :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
+    struct geometry_in_layer_type
+    {
+    public:
+        using unit_type             = util::database_unit_t;
+        using box_type              = geometry::Box<unit_type>;
+        using box_container_type    = std::vector<box_type>;
+
+        Layer layer;
+        box_container_type boxes;
     };
 
     class Library
     {
     public:
+        template <class K, class V> using map_type  = std::unordered_map<K,V>;
+
         using scalar_type           = int;
         using unit_type             = util::database_unit_t;
+        using unit_container_type   = std::vector<unit_type>;
         using table_strategy_type   = util::FloorStrategy<unit_type, unit_type, unit_type>;
         using spacing_table_type    = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
         using spacing_table_content_type = util::TableContents<unit_type, unit_type, unit_type>;
 
         using layer_type            = Layer;
-        using layer_container_type  = entity_system::EntitySystem<layer_type>;
-
-        using layer_type_type       = LayerType;
-        using layer_name_type       = std::string;
-        using layer_direction_type  = LayerDirection;
+        using layer_container_type  = std::vector<layer_type>;
 
         using via_type              = Via;
-        using via_container_type    = entity_system::EntitySystem<via_type>;
-
-        using via_name_type         = std::string;
-        using via_geometry_type     = geometry::Box<unit_type>;
-
-        using layer_name_to_via_geometry_type = std::unordered_map<layer_name_type, via_geometry_type>;
+        using via_container_type    = std::vector<via_type>;
+        using box_type              = geometry::Box<unit_type>;
+        using box_container_type    = std::vector<box_type>;
+        using via_geometries_container_type    = std::vector<geometry_in_layer_type>;
+        using point_type            = ophidian::util::LocationDbu;
+        
 
         using track_type            = Track;
-        using track_container_type  = entity_system::EntitySystem<track_type>;
+        using track_container_type  = std::vector<track_type>;
 
-        using track_orientation_type = TrackOrientation;
+        using pad_type              = Pad;
+        using pad_container_type    = std::vector<pad_type>;
+        using pad_geometries_container_type    = std::vector<geometry_in_layer_type>;
+        using orientation_type      = Orientation;
+
+        using layer_tracks_view_type = entity_system::Association<layer_type, track_type>::Parts;
 
         // Constructors
         //! Construct Netlist
@@ -81,73 +103,74 @@ namespace ophidian::routing
         Library & operator =(const Library &) = delete;
 
         //! Move Constructor
-        Library(Library &&) = delete;
-        Library& operator=(Library &&) = delete;
+        Library(Library &&) = default;
+        Library& operator=(Library &&) = default;
 
         // Element access
-        layer_type find_layer(const layer_name_type& layerName) const;
+        const layer_type find_layer_instance(const std::string& layerName) const;
 
-        via_type find_via(const via_name_type& viaName) const;
-
-        layer_name_type& name(const layer_type& layer);
-        const layer_name_type& name(const layer_type& layer) const;
-
-        layer_type_type& type(const layer_type& layer);
-        const layer_type_type& type(const layer_type& layer) const;
-
-        layer_direction_type& direction(const layer_type& layer);
-        const layer_direction_type& direction(const layer_type& layer) const;
-
-        unit_type& pitch(const layer_type& layer);
-        const unit_type& pitch(const layer_type& layer) const;
-
-        unit_type& offset(const layer_type& layer);
-        const unit_type& offset(const layer_type& layer) const;
-
-        unit_type& width(const layer_type& layer);
-        const unit_type& width(const layer_type& layer) const;
-
-        unit_type& min_width(const layer_type& layer);
-        const unit_type& min_width(const layer_type& layer) const;
-
-        unit_type& area(const layer_type& layer);
-        const unit_type& area(const layer_type& layer) const;
-
-        unit_type& spacing(const layer_type& layer);
-        const unit_type& spacing(const layer_type& layer) const;
-
-        unit_type& EOLspace(const layer_type& layer);
-        const unit_type& EOLspace(const layer_type& layer) const;
-
-        unit_type& EOLwidth(const layer_type& layer);
-        const unit_type& EOLwidth(const layer_type& layer) const;
-
-        unit_type& EOLwithin(const layer_type& layer);
-        const unit_type& EOLwithin(const layer_type& layer) const;
-
-        spacing_table_type& spacing_table(const layer_type& layer);
+        //given a dbu box return a box with gcell coordinates
+        box_type gcell_box(const point_type &, const point_type &) const;
+        void set_gcell_coordinates(unit_container_type GCell_x_axis, unit_container_type GCell_y_axis);
+        std::string name(const layer_type& layer);
+        const std::string& name(const layer_type& layer) const;
+        int index(const layer_type& layer) const;
+        const layer_type layer_from_index(int index) const;
+        LayerType type(const layer_type& layer) const;
+        Direction direction(const layer_type& layer) const;
+        unit_type pitch(const layer_type& layer) const;
+        unit_type offset(const layer_type& layer) const;
+        unit_type width(const layer_type& layer) const;
+        unit_type minWidth(const layer_type& layer) const;
+        unit_type area(const layer_type& layer) const;
+        unit_type spacing(const layer_type& layer) const;
+        unit_type EOLspace(const layer_type& layer) const;
+        unit_type EOLwidth(const layer_type& layer) const;
+        unit_type EOLwithin(const layer_type& layer) const;
+        unit_type EOLPspace(const layer_type& layer) const;
+        unit_type EOLPwidth(const layer_type& layer) const;
+        unit_type EOLPwithin(const layer_type& layer) const;
+        unit_type EOLpar_space(const layer_type& layer) const;
+        unit_type EOLpar_within(const layer_type& layer) const;
+        unit_type ExceptEOLwidth(const layer_type& layer) const;
         const spacing_table_type& spacing_table(const layer_type& layer) const;
+        layer_tracks_view_type tracks(const layer_type& layer) const;
+        const unit_type adjacentSpacing(const layer_type& layer) const;
+        const scalar_type adjacentCuts(const layer_type& layer) const;
+        const unit_type cutWithinLength(const layer_type& layer) const;
 
-        via_name_type& name(const via_type& via);
-        const via_name_type& name(const via_type& via) const;
+        const track_type prefTrack(const layer_type& layer) const;
+        const track_type nonPrefTrack(const layer_type& layer) const;
+        const layer_type upperLayer(const layer_type& layer) const;
+        const layer_type lowerLayer(const layer_type& layer) const;
+        const scalar_type layerIndex(const layer_type& layer) const;
+        const void viaCandidates(via_container_type& vias, const layer_type& layer, const layer_type& upperLayer) const;
+        //! returns the via layer (cut) below the above layer
+        const layer_type viaLayerBelow(const layer_type& above) const;
+        //! returns true if the second layer is above the first
+        bool isFirstRightBelowSecond(const layer_type& first, const layer_type& second) const;
 
-        via_geometry_type& geometry(const via_type& via, const layer_name_type& layer_name);
-        const via_geometry_type& geometry(const via_type& via, const layer_name_type& layer_name) const;
+        via_type find_via_instance(const std::string& viaName) const;
+        std::string& name(const via_type& via);
+        const std::string& name(const via_type& via) const;
+        const box_container_type geometry(const via_type& via, const layer_type &layer);
+        const box_container_type geometry(const via_type& via, const std::string &layer_name);
 
-        track_orientation_type& orientation(const track_type& track);
-        const track_orientation_type& orientation(const track_type& track) const;
+        const Direction direction(const track_type& track) const;
+        const unit_type start(const track_type& track) const;
+        const scalar_type numTracs(const track_type& track) const;
+        const unit_type space(const track_type& track) const;
+        const layer_type layer(const track_type& track) const;
 
-        unit_type& start(const track_type& track);
-        const unit_type& start(const track_type& track) const;
-
-        scalar_type& number_of_tracks(const track_type& track);
-        const scalar_type& number_of_tracks(const track_type& track) const;
-
-        unit_type& space(const track_type& track);
-        const unit_type& space(const track_type& track) const;
-
-        layer_type& layer(const track_type& track);
-        const layer_type& layer(const track_type& track) const;
+        std::string& name(const pad_type& pad);
+        pad_type pad(const std::string padName);
+        const box_container_type geometry(const pad_type& pad, const layer_type &layer) const;
+        const box_container_type geometry(const pad_type& pad, const std::string &layer_name) const;
+        pad_geometries_container_type geometries(const pad_type& pad) const;
+        pad_geometries_container_type geometries(const std::string padName);
+        point_type position(const pad_type& pad) const;
+        orientation_type orientation (const pad_type& pad) const;
+        std::map<std::string, box_container_type> box_in_layer(const pad_type& pad) const;
 
         // Iterators
         layer_container_type::const_iterator begin_layer() const noexcept;
@@ -159,83 +182,134 @@ namespace ophidian::routing
         track_container_type::const_iterator begin_track() const noexcept;
         track_container_type::const_iterator end_track() const noexcept;
 
+        pad_container_type::const_iterator begin_pad() const noexcept;
+        pad_container_type::const_iterator end_pad() const noexcept;
+
+
         // Capacity
         layer_container_type::size_type size_layer() const noexcept;
         via_container_type::size_type size_via() const noexcept;
         track_container_type::size_type size_track() const noexcept;
+        pad_container_type::size_type size_pad() const noexcept;
+
+
 
         // Modifiers
-        layer_type add_layer(const layer_name_type& layerName, const layer_type_type& type, const layer_direction_type& direction,
-                                      const Library::unit_type& pitch, const Library::unit_type& offset, const Library::unit_type& width,
-                                      const Library::unit_type& minWidth, const Library::unit_type& area, const Library::unit_type& spacing,
-                                      const Library::unit_type& EOLspace, const Library::unit_type& EOLwidth, const Library::unit_type& EOLwithin,
-                                      const Library::spacing_table_type spacingTable);
+        layer_type add_layer_instance(
+        const std::string &layerName,
+        const LayerType &type,
+        const Direction &direction,
+        const Library::unit_type& pitch,
+        const Library::unit_type& offset,
+        const Library::unit_type& width,
+        const Library::unit_type& minWidth,
+        const Library::unit_type& area,
+        const Library::unit_type& spacing,
+        const Library::unit_type& EOLspace,
+        const Library::unit_type& EOLwidth,
+        const Library::unit_type& EOLwithin,
+        const Library::unit_type& EOLPspace,
+        const Library::unit_type& EOLPwidth,
+        const Library::unit_type& EOLPwithin,
+        const Library::unit_type& EOLParSpace,
+        const Library::unit_type& EOLParWithin,
+        const Library::spacing_table_type spacingTable,
+        const Library::unit_type& adjSpacing,
+        const Library::scalar_type adjCuts,
+        const Library::unit_type cutWithinLength,
+        const Library::unit_type& ExceptEOLwidth
+);
 
-        via_type add_via(const via_name_type& viaName, const layer_name_to_via_geometry_type& layers);
+        via_type add_via_instance(const std::string &viaName, const via_geometries_container_type & layers);
 
-        track_type add_track(const track_orientation_type& orientation, const Library::unit_type& start, const Library::scalar_type& num_tracks, const Library::unit_type& space, const layer_name_type& layer);
+        track_type add_track_instance(const Direction &direction, const Library::unit_type &start, const Library::scalar_type &numTracks, const Library::unit_type &space, const std::string &layer);
+
+        pad_type add_pad_instance(const std::string padName, const point_type position, const orientation_type orientation, const pad_geometries_container_type & geometries );
 
         template <typename Value>
-        entity_system::Property<layer_type, Value> make_property_layer() const noexcept
+        entity_system::Property<layer_type, Value> makeProperty(layer_type) const
         {
-            return entity_system::Property<layer_type, Value>(m_layers);
+            return entity_system::Property<layer_type, Value>(mLayers);
         }
 
         template <typename Value>
-        entity_system::Property<via_type, Value> make_property_via() const noexcept
+        entity_system::Property<via_type, Value> makeProperty(via_type) const
         {
-            return entity_system::Property<via_type, Value>(m_vias);
+            return entity_system::Property<via_type, Value>(mVias);
         }
 
         template <typename Value>
-        entity_system::Property<track_type, Value> make_property_track() const noexcept
+        entity_system::Property<track_type, Value> makeProperty(track_type) const
         {
-            return entity_system::Property<track_type, Value>(m_tracks);
+            return entity_system::Property<track_type, Value>(mTracks);
+        }
+        
+        template <typename Value>
+        entity_system::Property<pad_type, Value> makeProperty(pad_type) const
+        {
+            return entity_system::Property<pad_type, Value>(mPads);
         }
 
         template <typename Value>
-        entity_system::Aggregation<layer_type, Value> make_aggregation_layer(entity_system::EntitySystem<Value> & parts) const noexcept
+        entity_system::Aggregation<layer_type, Value> makeAggregation(layer_type, entity_system::EntitySystem<Value> & parts) const
         {
-            return entity_system::Aggregation<layer_type, Value>(m_layers, parts);
+            return entity_system::Aggregation<layer_type, Value>(mLayers, parts);
         }
 
-        entity_system::EntitySystem<layer_type>::NotifierType * notifier_layer() const noexcept;
-        entity_system::EntitySystem<via_type>::NotifierType * notifier_via() const noexcept;
-        entity_system::EntitySystem<track_type>::NotifierType * notifier_track() const noexcept;
+        entity_system::EntitySystem<layer_type>::NotifierType * notifier(layer_type) const;
+        entity_system::EntitySystem<via_type>::NotifierType * notifier(via_type) const;
+        entity_system::EntitySystem<track_type>::NotifierType * notifier(track_type) const;
+        entity_system::EntitySystem<pad_type>::NotifierType * notifier(pad_type) const;
 
     private:
-        //Entities
-        entity_system::EntitySystem<layer_type> m_layers{};
-        entity_system::EntitySystem<via_type>   m_vias{};
-        entity_system::EntitySystem<track_type> m_tracks{};
+        unit_container_type mGCell_x_axis, mGCell_y_axis;
+        entity_system::EntitySystem<layer_type>  mLayers{};
+        entity_system::Property<layer_type, std::string>        mLayerName{mLayers};
+        std::unordered_map<std::string, layer_type>             mName2Layer{};
+        entity_system::Property<layer_type, LayerType>          mLayerType{mLayers, LayerType::NA};
+        entity_system::Property<layer_type, Direction>          mLayerDirection{mLayers, Direction::NA};
+        entity_system::Property<layer_type, unit_type>          mLayerPitch{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerOffset{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerWidth{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerMinWidth{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerArea{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerSpacing{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLspace{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLwidth{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLwithin{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLPspace{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLPwidth{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLPwithin{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLParSpace{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerEOLParWithin{mLayers};
+        entity_system::Property<layer_type, spacing_table_type> mLayerSpacingTable{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerAdjSpacing{mLayers};
+        entity_system::Property<layer_type, scalar_type>        mLayerAdjCuts{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerCutWithinLength{mLayers};
+        entity_system::Property<layer_type, unit_type>          mLayerExceptEOLwidth{mLayers};
+        
 
-        //Properties
-        entity_system::Property<layer_type, layer_name_type>      m_layer_names{m_layers};
-        entity_system::Property<layer_type, layer_type_type>      m_layer_types{m_layers, layer_type_type::NA};
-        entity_system::Property<layer_type, layer_direction_type> m_layer_directions{m_layers, layer_direction_type::NA};
-        entity_system::Property<layer_type, unit_type>            m_layer_pitches{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_offsets{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_widths{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_min_widths{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_areas{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_spacing{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_end_of_line_spaces{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_end_of_line_widths{m_layers};
-        entity_system::Property<layer_type, unit_type>            m_layer_end_of_line_withins{m_layers};
-        entity_system::Property<layer_type, spacing_table_type>   m_layer_spacing_tables{m_layers};
+        entity_system::EntitySystem<via_type>    mVias{};
+        entity_system::Property<via_type, std::string>          mViaName{mVias};
+        std::unordered_map<std::string, via_type>               mName2Via{};
+        entity_system::Property<via_type, via_geometries_container_type>   mViaGeometries{mVias};
 
-        entity_system::Property<via_type, via_name_type>          m_via_names{m_vias};
-        entity_system::Property<via_type, layer_name_to_via_geometry_type> m_via_layers_names_to_via_geometries{m_vias};
+        entity_system::EntitySystem<track_type>    mTracks{};
+        entity_system::Property<track_type, Direction>          mTrackDirection{mTracks};
+        entity_system::Property<track_type, unit_type>          mTrackStart{mTracks};
+        entity_system::Property<track_type, scalar_type>        mNumberOfTracks{mTracks};
+        entity_system::Property<track_type, unit_type>          mTrackSpace{mTracks};
 
-        entity_system::Property<track_type, track_orientation_type> m_track_orientations{m_tracks};
-        entity_system::Property<track_type, unit_type>              m_track_starts{m_tracks};
-        entity_system::Property<track_type, scalar_type>            m_number_of_tracks{m_tracks};
-        entity_system::Property<track_type, unit_type>              m_track_spaces{m_tracks};
-        entity_system::Property<track_type, layer_type>             m_layer_tracks{m_tracks};
+        entity_system::EntitySystem<pad_type>    mPads{};
+        entity_system::Property<pad_type, std::string>          mPadName{mPads};
+        entity_system::Property<pad_type, orientation_type>     mPadOrientation{mPads};
+        entity_system::Property<pad_type, point_type>           mPadPosition{mPads};
+        entity_system::Property<pad_type, pad_geometries_container_type>   mPadGeometries{mPads};
+        std::unordered_map<std::string, pad_type> map_name_to_pad;
 
-        //Entity maps
-        std::unordered_map<via_name_type, via_type>                 m_name_to_via{};
-        std::unordered_map<layer_name_type, layer_type>             m_name_to_layer{};
+        entity_system::Aggregation<layer_type, track_type>      mLayer2Tracks{mLayers, mTracks};
+        entity_system::Aggregation<layer_type, via_type>        mLayer2Vias{mLayers, mVias};
+              
     };
 }
 

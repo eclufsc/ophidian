@@ -1,5 +1,6 @@
+
 /*
- * Copyright 2017 Ophidian
+ * Copyright 2018 Ophidian
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
    distributed with this work for additional information
@@ -7,7 +8,9 @@
    to you under the Apache License, Version 2.0 (the
    "License"); you may not use this file except in compliance
    with the License.  You may obtain a copy of the License at
+
    http://www.apache.org/licenses/LICENSE-2.0
+
    Unless required by applicable law or agreed to in writing,
    software distributed under the License is distributed on an
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +19,19 @@
    under the License.
  */
 
-#include "GlobalRoutingFactory.h"
-#include <unordered_map>
+#include "CornerSpacing.h"
 
-namespace ophidian::routing::factory
+namespace ophidian::parser
 {
-    void make_global_routing(ophidian::routing::GlobalRouting &globalRouting, const Library &library, const ophidian::circuit::Netlist &netlist, const ophidian::parser::Guide &guide) noexcept
+
+    const CornerSpacing::width_type& CornerSpacing::eol_width() const noexcept
     {
-        for(auto net : guide.nets()){
-            auto net_instance = netlist.find_net(net.name());
-            for(auto region : net.regions()){
-                auto layer_instance = library.find_layer_instance(region.metal());
-                globalRouting.add_region(region.region(), layer_instance, net_instance);
-            }
-        }
+        return m_eol_width;
     }
+
+    const CornerSpacing::width_to_spacing_container_type& CornerSpacing::width_to_spacing() const noexcept
+    {
+        return m_width_legth_to_spacing;
+    }
+
 }

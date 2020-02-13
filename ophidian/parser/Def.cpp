@@ -28,6 +28,7 @@ namespace ophidian::parser
         m_rows{},
         m_components{},
         m_nets{},
+        m_pads{},
         m_dbu_to_micrometer_ratio{0}
     {
         read_file(def_file);
@@ -38,6 +39,7 @@ namespace ophidian::parser
         m_rows{},
         m_components{},
         m_nets{},
+        m_pads{},
         m_dbu_to_micrometer_ratio{}
     {
         for(const auto& file : def_files){
@@ -56,6 +58,19 @@ namespace ophidian::parser
             }
         );
 
+        defrSetGcellGridCbk(
+            [](defrCallbackType_e, defiGcellGrid *grid, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+
+                that->m_gcells.emplace_back(
+                        bool(*grid->macro()=='Y'),
+                        grid->x(),
+                        grid->xNum(),
+                        grid->xStep());
+                return 0;
+            }
+        );
+
         defrSetTrackCbk(
             [](defrCallbackType_e, defiTrack *track, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -63,8 +78,8 @@ namespace ophidian::parser
                 that->m_tracks.emplace_back(
                     [&]() -> Def::track_type::orientation_type {
                         auto orientation_str = std::string(track->macro());
-                        if(orientation_str == "X") { return Def::track_type::orientation_type::X; }
-                        else { return Def::track_type::orientation_type::Y; }
+                        if(orientation_str == "X") { return Def::track_type::orientation_type::VERTICAL; }
+                        else { return Def::track_type::orientation_type::HORIZONTAL; }
                      }(),
                      Def::track_type::database_unit_type{static_cast<double>(track->x())},
                      Def::track_type::scalar_type{static_cast<double>(track->xNum())},
@@ -132,7 +147,7 @@ namespace ophidian::parser
                     comp->id(),
                     comp->name(),
                     [&]() -> Def::component_type::orientation_type {
-                        auto orientation_str = comp->placementOrientStr();
+                        std::string orientation_str = comp->placementOrientStr();
                         if(orientation_str == "N")      { return Def::component_type::orientation_type::N; }
                         else if(orientation_str == "S") { return Def::component_type::orientation_type::S; }
                         else if(orientation_str == "W") { return Def::component_type::orientation_type::W; }
@@ -153,6 +168,45 @@ namespace ophidian::parser
             }
         );
 
+        defrSetPinCbk(
+            [](defrCallbackType_e, defiPin *pin, defiUserData ud) -> int {
+                auto that = static_cast<Def *>(ud);
+                auto pad = Def::pad_type{pin->pinName()};
+                using dbu = Def::pad_type::database_unit_type;
+                using dbuPoint = Def::pad_type::dbu_point_type;
+
+                auto position = dbuPoint{dbu{static_cast<double>(pin->placementX())}, dbu{static_cast<double>(pin->placementY())}};
+                pad.set_position(position);
+
+                Def::pad_type::Orientation orientation;
+                std::string orientation_str = pin->orientStr();
+                if(orientation_str == "N")      { orientation = Def::pad_type::orientation_type::N; }
+                else if(orientation_str == "S") { orientation = Def::pad_type::orientation_type::S; }
+                else if(orientation_str == "W") { orientation = Def::pad_type::orientation_type::W; }
+                else if(orientation_str == "E") { orientation = Def::pad_type::orientation_type::E; }
+                else if(orientation_str == "FN"){ orientation = Def::pad_type::orientation_type::FN; }
+                else if(orientation_str == "FS"){ orientation = Def::pad_type::orientation_type::FS; }
+                else if(orientation_str == "FW"){ orientation = Def::pad_type::orientation_type::FW; }
+                else if(orientation_str == "FE"){ orientation = Def::pad_type::orientation_type::FE; }
+                else { orientation = Def::pad_type::orientation_type::N; }
+                pad.set_orientation(orientation);
+
+                int xl, yl, xh, yh = 0;
+                for (int i = 0; i < pin->numLayer(); ++i) {
+                    Def::pad_type::layer_container_type boxes;
+
+                    pin->bounds(i, &xl, &yl, &xh, &yh);
+                    auto pl = dbuPoint{dbu{static_cast<double>(xl)}, dbu{static_cast<double>(yl)}};
+                    auto ph = dbuPoint{dbu{static_cast<double>(xh)}, dbu{static_cast<double>(yh)}};
+                    auto box = Def::pad_type::dbu_box_type{pl, ph};
+                    boxes.push_back(box);
+                    pad.addLayer(pin->layer(i), boxes);
+                }
+                that->m_pads.emplace_back(pad);
+                return 0;
+            }
+        );
+
         defrSetNetCbk(
             [](defrCallbackType_e, defiNet *net, defiUserData ud) -> int {
                 auto that = static_cast<Def *>(ud);
@@ -164,62 +218,6 @@ namespace ophidian::parser
                 }
 
                 that->m_nets.emplace_back(net->name(), std::move(pins));
-                return 0;
-            }
-        );
-
-        defrSetRegionStartCbk(
-            [](defrCallbackType_e, int number, defiUserData ud) -> int {
-                auto that = static_cast<Def *>(ud);
-                that->m_regions.reserve(number);
-                return 0;
-            }
-        );
-
-        defrSetRegionCbk(
-            [](defrCallbackType_e, defiRegion * parserRegion, defiUserData ud) -> int {
-                auto that = static_cast<Def *>(ud);
-
-                auto regionRectangles = region_type::rectangles_container_type{};
-                regionRectangles.reserve(parserRegion->numRectangles());
-                for (auto regionIndex = 0; regionIndex < parserRegion->numRectangles(); regionIndex++) {
-                    auto lowerCorner = database_unit_point_type{database_unit_type{parserRegion->xl(regionIndex)}, database_unit_type{parserRegion->yl(regionIndex)}};
-                    auto upperCorner = database_unit_point_type{database_unit_type{parserRegion->xh(regionIndex)}, database_unit_type{parserRegion->yh(regionIndex)}};
-                    regionRectangles.push_back({lowerCorner, upperCorner});
-                }
-                
-                auto region = region_type(parserRegion->name(), regionRectangles);
-                that->m_regions.push_back(region);
-
-                return 0;
-            }
-        );
-
-        defrSetGroupsStartCbk(
-            [](defrCallbackType_e, int number, defiUserData ud) -> int {
-                auto that = static_cast<Def *>(ud);
-                that->m_groups.reserve(number);
-                return 0;
-            }
-        );
-
-        defrSetGroupNameCbk(
-            [](defrCallbackType_e, const char* group_name, defiUserData ud)->int{
-                auto that = static_cast<Def*>(ud);
-
-                that->m_current_group_name = group_name;
-                that->m_groups[that->m_current_group_name] = group_type{group_name};
-
-                return 0;
-            }
-        );
-
-        defrSetGroupMemberCbk(
-            [](defrCallbackType_e, const char* group_members, defiUserData ud)->int{
-                auto that = static_cast<Def *>(ud);
-
-                that->m_groups[that->m_current_group_name].add_member(group_members);
-
                 return 0;
             }
         );
@@ -266,13 +264,13 @@ namespace ophidian::parser
         return m_tracks;
     }
 
-    const Def::region_container_type& Def::regions() const noexcept
+    const Def::gcell_container_type& Def::gcells() const noexcept
     {
-        return m_regions;
+        return m_gcells;
     }
 
-    const Def::group_container_type& Def::groups() const noexcept
+    const Def::pad_container_type& Def::pads() const noexcept
     {
-        return m_groups;
+        return m_pads;
     }
 }

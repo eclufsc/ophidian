@@ -60,10 +60,10 @@ namespace ophidian::parser
     {
         auto orientation_string = [&]() -> std::string {
             switch(track.m_orientation){
-                case Track::orientation_type::X:
-                    return "X";
-                case Track::orientation_type::Y:
-                    return "Y";
+                case Track::orientation_type::HORIZONTAL:
+                    return "HORIZONTAL";
+                case Track::orientation_type::VERTICAL:
+                    return "VERTICAL";
                 default:
                     return "NA";
             }

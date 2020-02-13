@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Ophidian
+ * Copyright 2018 Ophidian
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements.  See the NOTICE file
    distributed with this work for additional information
@@ -7,7 +7,9 @@
    to you under the Apache License, Version 2.0 (the
    "License"); you may not use this file except in compliance
    with the License.  You may obtain a copy of the License at
+
    http://www.apache.org/licenses/LICENSE-2.0
+
    Unless required by applicable law or agreed to in writing,
    software distributed under the License is distributed on an
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -15,20 +17,23 @@
    specific language governing permissions and limitations
    under the License.
  */
+#include "AdjacentCutSpacing.h" 
 
-#include "GlobalRoutingFactory.h"
-#include <unordered_map>
-
-namespace ophidian::routing::factory
+namespace ophidian::parser
 {
-    void make_global_routing(ophidian::routing::GlobalRouting &globalRouting, const Library &library, const ophidian::circuit::Netlist &netlist, const ophidian::parser::Guide &guide) noexcept
+    const AdjacentCutSpacing::spacing_type& AdjacentCutSpacing::adj_spacing() const noexcept
     {
-        for(auto net : guide.nets()){
-            auto net_instance = netlist.find_net(net.name());
-            for(auto region : net.regions()){
-                auto layer_instance = library.find_layer_instance(region.metal());
-                globalRouting.add_region(region.region(), layer_instance, net_instance);
-            }
-        }
+        return m_adj_spacing;
     }
+
+    const AdjacentCutSpacing::scalar_type& AdjacentCutSpacing::cuts() const noexcept
+    {
+        return m_adjacent_cuts;
+    }
+
+    const AdjacentCutSpacing::cut_length_type& AdjacentCutSpacing::cut_within_length() const noexcept
+    {
+        return m_cut_within_length;
+    }
+
 }

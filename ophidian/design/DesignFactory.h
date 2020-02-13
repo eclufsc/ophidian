@@ -35,6 +35,10 @@ namespace ophidian::design::factory
     void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
 
     void make_design_ispd2018(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept;
+
+    void make_design_ispd2019(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept;
+
+    void make_design_iccad2019(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
 }
 
 #endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H

@@ -107,7 +107,8 @@ namespace ophidian::util
     {
         static ValueType compute(const RowType & rv, const ColumnType & cv, const TableContents<RowType, ColumnType, ValueType> & c){
 
-            int row, col = 0;
+            int row = 0;
+            int col = 0;
             for (int i = 0; i < c.row_values.size(); ++i) {
                 if(rv > c.row_values[i]){
                     row = i;

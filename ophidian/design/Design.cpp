@@ -89,4 +89,15 @@ namespace ophidian::design
     {
         return m_global_routing;
     }
+
+    // Design::detailed_routing_type& Design::detailed_routing() noexcept
+    // {
+    //     return m_detailed_routing;
+    // }
+
+    // const Design::detailed_routing_type& Design::detailed_routing() const noexcept
+    // {
+    //     return m_detailed_routing;
+    // }
+    
 }

@@ -56,6 +56,38 @@ namespace ophidian::parser
         micrometer_type m_width;
         micrometer_type m_within;
     };
+
+    class ParallelEdge : public EndOfLine
+    {
+    public:
+        using micrometer_type = util::micrometer_t;
+        
+        // Class constructors
+        ParallelEdge() = delete;
+
+        ParallelEdge(const ParallelEdge&) = default;
+        ParallelEdge& operator=(const ParallelEdge&) = default;
+
+        ParallelEdge(ParallelEdge&&) = default;
+        ParallelEdge& operator=(ParallelEdge&&) = default;
+
+        template<class A1, class A2, class A3, class A4, class A5>
+        ParallelEdge(A1&& space, A2&& width, A3&& within, A4&& par_space, A5&& par_within)
+        : EndOfLine(space, width, within),
+            m_par_space{std::forward<A4>(par_space)},
+            m_par_within{std::forward<A5>(par_within)}
+        {}
+
+        // Class member functions
+        const micrometer_type & par_space() const noexcept;
+        const micrometer_type & par_within() const noexcept;
+
+
+    private:
+        micrometer_type m_par_space;
+        micrometer_type m_par_within;
+    };
+
 }
 
 #endif

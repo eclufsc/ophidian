@@ -20,7 +20,7 @@
 
 #include <memory>
 #include <string>
-
+#include <boost/algorithm/string.hpp>
 #include <lefrReader.hpp>
 
 #include "Lef.h"
@@ -137,18 +137,20 @@ namespace ophidian::parser
                         }
                     }(),
                     [&](){
-                        int i = -1;
                         for (int index = 0; index < l->numSpacing(); ++index) {
-                            if(l->hasSpacingEndOfLine(index)){
-                                i = index;
-                                break;
+                            if(l->hasSpacingEndOfLine(index) && !l->hasSpacingParellelEdge(index)){
+                                return Lef::layer_type::end_of_line_type{Lef::layer_type::micrometer_type{l->spacing(index)}, Lef::layer_type::micrometer_type{l->spacingEolWidth(index)}, Lef::layer_type::micrometer_type{l->spacingEolWithin(index)}};
                             }
                         }
-                        if(i >= 0){
-                            return Lef::layer_type::end_of_line_type{l->spacing(i), l->spacingEolWidth(i), l->spacingEolWithin(i)};
-                        }else{
-                            return Lef::layer_type::end_of_line_type{0.0, 0.0, 0.0};
+                            return Lef::layer_type::end_of_line_type{Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}};
+                    }(),
+                    [&](){
+                        for (int index = 0; index < l->numSpacing(); ++index) {
+                            if(l->hasSpacingParellelEdge(index)){
+                               return Lef::layer_type::parallel_edge_type{Lef::layer_type::micrometer_type{l->spacing(index)}, Lef::layer_type::micrometer_type{l->spacingEolWidth(index)}, Lef::layer_type::micrometer_type{l->spacingEolWithin(index)}, Lef::layer_type::micrometer_type{l->spacingParSpace(index)}, Lef::layer_type::micrometer_type{l->spacingParWithin(index)}};
+                            }
                         }
+                        return Lef::layer_type::parallel_edge_type{Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}, Lef::layer_type::micrometer_type{0.0}};
                     }(),
                     [&](){
                         if(l->numSpacingTable() == 0){
@@ -167,10 +169,10 @@ namespace ophidian::parser
                                 lengths.emplace_back(micrometer_type{parallel->length(i)});
 
                                 for (int j = 0; j < parallel->numWidth(); ++j) {
-                                   widths.emplace_back(micrometer_type{parallel->width(j)});
-                                   width_length_to_spacing[{widths.back(), lengths.back()}] = Lef::layer_type::parallel_run_length_type::spacing_type{micrometer_type{parallel->widthSpacing(i, j)}};
+                                    widths.emplace_back(micrometer_type{parallel->width(j)});
+                                    width_length_to_spacing[{widths.back(), lengths.back()}] = Lef::layer_type::parallel_run_length_type::spacing_type{micrometer_type{parallel->widthSpacing(j, i)}};
                                 }
-                            }
+                            }           
                             return Lef::layer_type::parallel_run_length_type{
                                 std::move(widths),
                                 std::move(lengths),
@@ -178,6 +180,65 @@ namespace ophidian::parser
                             };
                         }else{
                             return Lef::layer_type::parallel_run_length_type{};
+                        }
+                    }(),
+                    [&](){
+                        {
+                            for (int i = 0; i != l->numSpacing(); i++)
+                            {
+                                if (l->hasSpacingAdjacent(i)) {
+                                    Lef::layer_type::adjacent_cut_spacing_type::spacing_type spacing =  Lef::layer_type::micrometer_type{l->spacing(i)};
+                                    Lef::layer_type::adjacent_cut_spacing_type::scalar_type spacing_adj_cuts = l->spacingAdjacentCuts(i);
+                                    Lef::layer_type::adjacent_cut_spacing_type::cut_length_type spacing_adj_within = Lef::layer_type::micrometer_type{l->spacingAdjacentWithin(i)};
+
+                                    return Lef::layer_type::adjacent_cut_spacing_type{
+                                    std::move(spacing),
+                                    std::move(spacing_adj_cuts),
+                                    std::move(spacing_adj_within)};
+                                }
+                            }
+                            return Lef::layer_type::adjacent_cut_spacing_type{};
+                        }
+                    }(),
+                    [&](){
+                        if (l->numProps() != 0) {
+
+                            for (int i = 0; i != l->numProps(); i++)
+                            {
+                                auto propName = std::string(l->propName(i));
+                                if (propName == "LEF58_CORNERSPACING")
+                                {
+                                    Lef::layer_type::corner_spacing_type::width_type exceptEol{};
+                                    Lef::layer_type::corner_spacing_type::width_to_spacing_container_type width_to_spacing_container{};
+                                    
+                                    auto values = l->propValue(i);
+                                    std::vector<std::string> strs;
+                                    boost::split(strs, values, boost::is_any_of(" \n"));
+                                    for (auto it = strs.begin(); it != strs.end(); ++it)
+                                    {                                        
+                                        if (*it == "EXCEPTEOL")
+                                        {
+                                            it = std::next(it);
+                                            exceptEol = Lef::layer_type::micrometer_type{std::stod(*it)};
+                                            continue;
+                                        }
+                                        if (*it == "WIDTH")
+                                        {
+                                            it = std::next(it);
+                                            Lef::layer_type::corner_spacing_type::width_type width = Lef::layer_type::micrometer_type{std::stod(*it)};
+                                            it = std::next(it);
+                                            it = std::next(it);
+                                            Lef::layer_type::corner_spacing_type::spacing_type spacing = Lef::layer_type::micrometer_type{std::stod(*it)};
+                                            Lef::layer_type::corner_spacing_type::width_to_spacing_type width_to_spacing = std::make_pair(width, spacing);
+                                            width_to_spacing_container.push_back(width_to_spacing);
+                                        }
+                                    }
+                                    return Lef::layer_type::corner_spacing_type{std::move(exceptEol), std::move(width_to_spacing_container)};
+                                }
+                            }
+                            return Lef::layer_type::corner_spacing_type{};
+                        } else {
+                            return Lef::layer_type::corner_spacing_type{};
                         }
                     }()
                 );
