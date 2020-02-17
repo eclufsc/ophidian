@@ -10,7 +10,7 @@
 
 namespace ophidian::routing
 {
-    class Region :
+    class GRSegment :
         public entity_system::EntityBase
     {
     public:
@@ -22,13 +22,13 @@ namespace ophidian::routing
     public:
         using scalar_type           = int;
         using unit_type             = util::database_unit_t;
-        using region_type           = Region;
-        using region_container_type = std::vector<region_type>;
-        using region_geometry_type  = geometry::Box<unit_type>;
+        using gr_segment_type           = GRSegment;
+        using segment_container_type = std::vector<gr_segment_type>;
+        using segment_geometry_type  = geometry::Box<unit_type>;
         using layer_type            = Library::layer_type;
         using net_type              = ophidian::circuit::Net;
 
-        using net_region_view_type  = entity_system::Association<net_type, region_type>::Parts;
+        using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
 
         // Constructors
         //! Construct Netlist
@@ -45,35 +45,35 @@ namespace ophidian::routing
         GlobalRouting(const ophidian::circuit::Netlist & netlist);
 
         // Element access
-        net_region_view_type regions(const net_type& net) const;
-        net_type net(const region_type& region) const;
-        const region_geometry_type& box(const region_type& region) const;
-        const layer_type layer(const region_type& region) const;
+        net_segment_view_type segments(const net_type& net) const;
+        net_type net(const gr_segment_type& segment) const;
+        const segment_geometry_type& box(const gr_segment_type& segment) const;
+        const layer_type layer(const gr_segment_type& segment) const;
 
         // Iterators
-        region_container_type::const_iterator begin_region() const noexcept;
-        region_container_type::const_iterator end_region() const noexcept;
+        segment_container_type::const_iterator begin_segment() const noexcept;
+        segment_container_type::const_iterator end_segment() const noexcept;
 
         // Capacity
-        region_container_type::size_type size_region() const noexcept;
+        segment_container_type::size_type size_segment() const noexcept;
 
         // Modifiers
-        region_type add_region(const region_geometry_type & box, const layer_type & layer, const net_type & net);
+        gr_segment_type add_segment(const segment_geometry_type & box, const layer_type & layer, const net_type & net);
 
         template <typename Value>
-        entity_system::Property<region_type, Value> makeProperty(region_type) const
+        entity_system::Property<gr_segment_type, Value> makeProperty(gr_segment_type) const
         {
-            return entity_system::Property<region_type, Value>(m_regions);
+            return entity_system::Property<gr_segment_type, Value>(m_gr_segments);
         }
 
-        entity_system::EntitySystem<region_type>::NotifierType * notifier(region_type) const;
+        entity_system::EntitySystem<gr_segment_type>::NotifierType * notifier(gr_segment_type) const;
 
     private:
-        entity_system::EntitySystem<region_type>            m_regions;
-        entity_system::Property<region_type, region_geometry_type>      m_region_box;
-        entity_system::Property<region_type, layer_type>    m_region_layers;
+        entity_system::EntitySystem<gr_segment_type>            m_gr_segments;
+        entity_system::Property<gr_segment_type, segment_geometry_type>      m_gr_segment_box;
+        entity_system::Property<gr_segment_type, layer_type>    m_gr_segment_layers;
 
-        entity_system::Aggregation<net_type, region_type>   m_net_to_regions;
+        entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
     };
 }
 
