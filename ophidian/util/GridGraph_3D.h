@@ -115,6 +115,5 @@ namespace ophidian::util
 
 } // namespace
 
-#include "GridGraph_3D.ipp"
 
 #endif // OPHIDIAN_UTIL_GRID_GRAPH_3D

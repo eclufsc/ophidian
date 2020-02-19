@@ -16,7 +16,7 @@
    under the License.
  */
 
-// #include "GridGraph_3D.h"
+#include "GridGraph_3D.h"
 #include <cmath>
 #include <iostream>
 
