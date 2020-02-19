@@ -110,8 +110,11 @@ namespace ophidian::routing
         const layer_type find_layer_instance(const std::string& layerName) const;
 
         //given a dbu box return a box with gcell coordinates
-        box_type gcell_box(const point_type &, const point_type &) const;
+        // box_type gcell_box(const point_type &, const point_type &) const;
         void set_gcell_coordinates(unit_container_type GCell_x_axis, unit_container_type GCell_y_axis);
+        unit_container_type get_GCell_x_axis();
+        unit_container_type get_GCell_y_axis();        
+        
         std::string name(const layer_type& layer);
         const std::string& name(const layer_type& layer) const;
         int index(const layer_type& layer) const;
@@ -221,7 +224,7 @@ namespace ophidian::routing
         const Library::scalar_type adjCuts,
         const Library::unit_type cutWithinLength,
         const Library::unit_type& ExceptEOLwidth
-);
+        );
 
         via_type add_via_instance(const std::string &viaName, const via_geometries_container_type & layers);
 

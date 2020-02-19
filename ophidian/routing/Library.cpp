@@ -28,25 +28,33 @@ void Library::set_gcell_coordinates(Library::unit_container_type GCell_x_axis, L
     mGCell_y_axis = GCell_y_axis;
 }
 
-Library::box_type Library::gcell_box(const point_type & min_corner, const point_type & max_corner) const
-{
-    auto min_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), min_corner.x(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-    auto min_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), min_corner.y(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-    if(min_x_it != mGCell_x_axis.begin())
-        min_x_it--;
-    if(min_y_it != mGCell_y_axis.begin())
-        min_y_it--;
+// Library::box_type Library::gcell_box(const point_type & min_corner, const point_type & max_corner) const
+// {
+//     auto min_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), min_corner.x(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
+//     auto min_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), min_corner.y(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
+//     if(min_x_it != mGCell_x_axis.begin())
+//         min_x_it--;
+//     if(min_y_it != mGCell_y_axis.begin())
+//         min_y_it--;
 
-    auto max_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), max_corner.x());
-    auto max_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), max_corner.y());
-    if(max_x_it == mGCell_x_axis.end())
-        max_x_it--;
-    if(max_y_it == mGCell_y_axis.end())
-        max_y_it--;
+//     auto max_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), max_corner.x());
+//     auto max_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), max_corner.y());
+//     if(max_x_it == mGCell_x_axis.end())
+//         max_x_it--;
+//     if(max_y_it == mGCell_y_axis.end())
+//         max_y_it--;
 
-    return box_type(point_type(unit_type(*min_x_it), unit_type(*min_y_it)),
-                    point_type(unit_type(*max_x_it), unit_type(*max_y_it)));
+//     return box_type(point_type(unit_type(*min_x_it), unit_type(*min_y_it)),
+//                     point_type(unit_type(*max_x_it), unit_type(*max_y_it)));
 
+// }
+
+Library::unit_container_type Library::get_GCell_x_axis(){
+    return mGCell_x_axis;
+}
+
+Library::unit_container_type Library::get_GCell_y_axis(){
+    return mGCell_y_axis;
 }
 
 const Library::layer_type Library::find_layer_instance(const std::string &layerName) const
