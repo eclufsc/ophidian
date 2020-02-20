@@ -20,6 +20,7 @@
 #define OPHIDIAN_GLOBAL_ROUTING_FACTORY_H
 
 #include <ophidian/parser/Guide.h>
+#include <ophidian/parser/Def.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
 #include "GlobalRouting.h"
@@ -27,6 +28,7 @@
 namespace ophidian::routing::factory
 {
     void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::circuit::Netlist & netlist, const ophidian::parser::Guide& guide) noexcept;
+    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::parser::Def& def) noexcept;
 }
 
 #endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H

@@ -25,6 +25,7 @@ namespace ophidian::routing
         m_gr_segment_box{m_gr_segments},
         m_gr_segment_layers{m_gr_segments},
         m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)}
+        // m_gcell_graph{}
     {
     }
 

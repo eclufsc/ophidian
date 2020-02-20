@@ -21,6 +21,7 @@
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/segment.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -31,7 +32,9 @@ namespace ophidian::geometry
 {
     template <typename T>
     using Point = boost::geometry::model::d2::point_xy<T>;
-
+    
+    template <typename T>
+    using Point3D = boost::geometry::model::point<T,3,boost::geometry::cs::cartesian>;
     template <typename T>
     using Box = boost::geometry::model::box<Point<T>>;
 

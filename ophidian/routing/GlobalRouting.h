@@ -7,6 +7,7 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
+// #include <ophidian/routing/GCellGraph.h>
 
 namespace ophidian::routing
 {
@@ -20,13 +21,15 @@ namespace ophidian::routing
     class GlobalRouting
     {
     public:
-        using scalar_type           = int;
-        using unit_type             = util::database_unit_t;
+        using scalar_type               = int;
+        using unit_type                 = util::database_unit_t;
         using gr_segment_type           = GRSegment;
-        using segment_container_type = std::vector<gr_segment_type>;
-        using segment_geometry_type  = geometry::Box<unit_type>;
-        using layer_type            = Library::layer_type;
-        using net_type              = ophidian::circuit::Net;
+        using segment_container_type    = std::vector<gr_segment_type>;
+        using segment_geometry_type     = geometry::Box<unit_type>;
+        using layer_type                = Library::layer_type;
+        using net_type                  = ophidian::circuit::Net;
+        // using gcell_graph_type          = GCellGraph;
+        using point_3d_type             = geometry::Point3D<int>;
 
         using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
 
@@ -74,6 +77,8 @@ namespace ophidian::routing
         entity_system::Property<gr_segment_type, layer_type>    m_gr_segment_layers;
 
         entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
+
+        // gcell_graph_type m_gcell_graph;
     };
 }
 

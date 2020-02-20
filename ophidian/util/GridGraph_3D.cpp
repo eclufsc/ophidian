@@ -23,9 +23,21 @@
 namespace ophidian::util
 {
 
-GridGraph_3D::GridGraph_3D(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z, GridGraph_3D::capacity_type capacity_edge, GridGraph_3D::cost_type edge_cost):
-    m_width(x), m_height(y), m_depth(z), m_nodes(boost::extents[x][y][z]), m_nodes_indexes(m_graph), m_edge_capacity(m_graph, capacity_edge), m_edge_cost(m_graph ,edge_cost)
+GridGraph_3D::GridGraph_3D():
+    m_nodes_indexes(m_graph),
+    m_edge_capacity(m_graph),
+    m_edge_cost(m_graph),
+    m_nodes(boost::extents[1][1][1])
 {
+}
+
+void GridGraph_3D::initialize(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z, GridGraph_3D::capacity_type capacity_edge, GridGraph_3D::cost_type edge_cost)
+{
+    m_width = x;
+    m_height = y;
+    m_depth = z;
+    m_nodes.resize(boost::extents[2][2][2]);
+
     //creating graph
     m_graph.reserveNode(x*y*z);
     if(z == 0)
