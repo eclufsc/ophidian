@@ -159,8 +159,35 @@ TEST_CASE("Def: Loading ispd_18_sample.input.def", "[parser][Def][ispd18][sample
 TEST_CASE("Def: Test for GCELLGRID keyword", "[parser][Def][ispd19][sample]")
 {
     Def sample = Def{"input_files/ispd19/ispd19_sample4/ispd19_sample4.input.def"};
+
     auto & gcells = sample.gcells();
     std::vector<ophidian::parser::GCell> expected_gcells = {{false, 390100, 2, 500}, {false, 100, 196, 2000}, {false, 0, 2, 100},
                                                             {true, 388200, 2, 1800}, {true, 200, 195, 2000}, {true, 0, 2, 200}};
     REQUIRE(std::is_permutation(gcells.begin(), gcells.end(), expected_gcells.begin()));
+}
+
+TEST_CASE("Def: Test for GCELL", "[parser][Def][gcell]")
+{
+    Def sample = Def{"input_files/ophidianSample/ophidian_sample.def"};
+
+    SECTION("GCell Unroll values", "[parser][Def][gcell]")
+    {
+        // GCELLGRID X 1100 DO 2 STEP 50 ;
+        // GCELLGRID X 200 DO 4 STEP 300 ;
+        // GCELLGRID X 0 DO 2 STEP 200 ;
+        // GCELLGRID Y 700 DO 2 STEP 150 ;
+        // GCELLGRID Y 100 DO 4 STEP 200 ;
+        // GCELLGRID Y 0 DO 2 STEP 100 ;
+        using dbu = ophidian::parser::Def::database_unit_type;
+        std::vector<dbu> expected_gcells_x_axis{dbu{0}, dbu{200}, dbu{500}, dbu{800}, dbu{1100}, dbu{1150}};
+        std::vector<dbu> expected_gcells_y_axis{dbu{0}, dbu{100}, dbu{300}, dbu{500}, dbu{700}, dbu{850}};
+
+        auto obtained_gcells_x_axis = sample.gcell_x_axis();
+        auto obtained_gcells_y_axis = sample.gcell_y_axis();
+
+        REQUIRE(obtained_gcells_x_axis.size() == 6);
+        REQUIRE(obtained_gcells_y_axis.size() == 6);
+        REQUIRE(std::equal(obtained_gcells_x_axis.begin(), obtained_gcells_x_axis.end(), expected_gcells_x_axis.begin()));
+        REQUIRE(std::equal(obtained_gcells_y_axis.begin(), obtained_gcells_y_axis.end(), expected_gcells_y_axis.begin()));
+    }
 }

@@ -68,6 +68,7 @@ namespace ophidian::parser
         using pad_container_type                = container_type<pad_type>;
 
         using database_unit_type                = util::database_unit_t;
+        using database_unit_container_type      = container_type<database_unit_type>;
         using database_unit_point_type          = point_type<database_unit_type>;
         using database_unit_box_type            = box_type<database_unit_type>;
 
@@ -106,6 +107,13 @@ namespace ophidian::parser
 
         const pad_container_type& pads() const noexcept;
 
+        int gcell_x_size() const noexcept;
+        int gcell_y_size() const noexcept;
+        database_unit_container_type gcell_x_axis() const noexcept;
+        database_unit_container_type gcell_y_axis() const noexcept;
+    private:
+        void unroll_GCell_cordinates();
+
     private:
         database_unit_box_type   m_die_area{
             database_unit_point_type{database_unit_type{0.0d}, database_unit_type{0.0d}},
@@ -116,8 +124,10 @@ namespace ophidian::parser
         net_container_type       m_nets{};
         scalar_type              m_dbu_to_micrometer_ratio{scalar_type{0.0d}};
         track_container_type     m_tracks{};
-        gcell_container_type     m_gcells{};
         pad_container_type       m_pads{};
+        gcell_container_type     m_gcells{};
+        database_unit_container_type m_gcell_x_axis;
+        database_unit_container_type m_gcell_y_axis;
     };
 }
 

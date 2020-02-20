@@ -40,7 +40,7 @@ namespace ophidian::util
         GridGraph_3D() = delete;
         GridGraph_3D( GridGraph_3D& g) = delete;
 
-        GridGraph_3D(index_type x, index_type y, index_type z, capacity_type capacity_edge, cost_type edge_cost);
+        GridGraph_3D(index_type x, index_type y, index_type z, capacity_type capacity_edge = 1, cost_type edge_cost = 1 );
 
         node_type node(index_type x, index_type y, index_type z) const;
         node_position_type position(node_type node);

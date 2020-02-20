@@ -232,6 +232,7 @@ namespace ophidian::parser
 
         defrRead(fp.get(), def_file.c_str(), this, true);
         defrClear();
+        unroll_GCell_cordinates();
     }
 
     const Def::database_unit_box_type& Def::die_area() const noexcept
@@ -272,5 +273,44 @@ namespace ophidian::parser
     const Def::pad_container_type& Def::pads() const noexcept
     {
         return m_pads;
+    }
+
+    void Def::unroll_GCell_cordinates()
+    {
+        for(auto gcell : m_gcells)
+        {
+            if(gcell.horizontal()){
+                for(auto i = 0; i < gcell.num(); ++i)
+                    m_gcell_y_axis.push_back(gcell.origin() + i * gcell.step());
+            }else{
+                for(auto i = 0; i < gcell.num(); ++i)
+                    m_gcell_x_axis.push_back(gcell.origin() + i * gcell.step());
+            }
+        }
+
+        std::sort(m_gcell_x_axis.begin(), m_gcell_x_axis.end());
+        m_gcell_x_axis.erase( std::unique( m_gcell_x_axis.begin(), m_gcell_x_axis.end() ), m_gcell_x_axis.end());
+        std::sort(m_gcell_y_axis.begin(), m_gcell_y_axis.end());
+        m_gcell_y_axis.erase( std::unique( m_gcell_y_axis.begin(), m_gcell_y_axis.end() ), m_gcell_y_axis.end());
+    }
+
+    int Def::gcell_x_size() const noexcept
+    {
+        return m_gcell_x_axis.size();
+    }
+
+    int Def::gcell_y_size() const noexcept
+    {
+        return m_gcell_y_axis.size();
+    }
+
+    Def::database_unit_container_type Def::gcell_x_axis() const noexcept
+    {
+        return m_gcell_x_axis;
+    }
+
+    Def::database_unit_container_type Def::gcell_y_axis() const noexcept
+    {
+        return m_gcell_y_axis;
     }
 }
