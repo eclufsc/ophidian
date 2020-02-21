@@ -35,12 +35,12 @@ namespace ophidian::util
         using node_container_type = std::vector<node_type>;
         template <class T> using node_map_type = graph_type::NodeMap<T>;
         template <class T> using edge_map_type = graph_type::EdgeMap<T>;
-        using matrix_type = boost::multi_array<node_type, 3>;
+        using matrix_type = boost::multi_array<node_type, 3, std::allocator<node_type> >;
 
-        GridGraph_3D();
+        GridGraph_3D() = delete;
         GridGraph_3D( GridGraph_3D& g) = delete;
 
-        void initialize(index_type x, index_type y, index_type z, capacity_type capacity_edge = 1, cost_type edge_cost = 1 );
+        GridGraph_3D(index_type x, index_type y, index_type z, capacity_type capacity_edge = 1, cost_type edge_cost = 1 );
 
         node_type node(index_type x, index_type y, index_type z) const;
         node_position_type position(node_type node);
@@ -101,7 +101,6 @@ namespace ophidian::util
         index_type height();
         index_type depth();
 
-        // graph_type & get_graph(){return m_graph;}
     private:
         index_type m_width;
         index_type m_height;

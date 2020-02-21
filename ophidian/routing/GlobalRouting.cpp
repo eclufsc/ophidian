@@ -25,7 +25,6 @@ namespace ophidian::routing
         m_gr_segment_box{m_gr_segments},
         m_gr_segment_layers{m_gr_segments},
         m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)}
-        // m_gcell_graph{}
     {
     }
 
@@ -47,6 +46,11 @@ namespace ophidian::routing
     const GlobalRouting::layer_type GlobalRouting::layer(const GlobalRouting::gr_segment_type &segment) const
     {
         return m_gr_segment_layers[segment];
+    }
+
+    void GlobalRouting::create_gcell_graph(GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z)
+    {
+        m_gcell_graph.reset(new gcell_graph_type(x, y,z));
     }
 
     GlobalRouting::segment_container_type::const_iterator GlobalRouting::begin_segment() const noexcept

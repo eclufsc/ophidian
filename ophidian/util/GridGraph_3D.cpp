@@ -23,21 +23,10 @@
 namespace ophidian::util
 {
 
-GridGraph_3D::GridGraph_3D():
-    m_nodes_indexes(m_graph),
-    m_edge_capacity(m_graph),
-    m_edge_cost(m_graph),
-    m_nodes(boost::extents[1][1][1])
-{
-}
 
-void GridGraph_3D::initialize(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z, GridGraph_3D::capacity_type capacity_edge, GridGraph_3D::cost_type edge_cost)
+GridGraph_3D::GridGraph_3D(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z, GridGraph_3D::capacity_type capacity_edge, GridGraph_3D::cost_type edge_cost):
+    m_width(x), m_height(y), m_depth(z), m_nodes(boost::extents[x][y][z]), m_nodes_indexes(m_graph), m_edge_capacity(m_graph, capacity_edge), m_edge_cost(m_graph ,edge_cost)
 {
-    m_width = x;
-    m_height = y;
-    m_depth = z;
-    m_nodes.resize(boost::extents[2][2][2]);
-
     //creating graph
     m_graph.reserveNode(x*y*z);
     if(z == 0)
@@ -123,7 +112,6 @@ void GridGraph_3D::initialize(GridGraph_3D::index_type x, GridGraph_3D::index_ty
 
 GridGraph_3D::node_type GridGraph_3D::node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z) const {
     if(!(x < m_width && x >=0 && y < m_height && y >=0 && z < m_depth && z >=0 )){
-        // throw ophidian::util::exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x][y][z];
@@ -162,8 +150,7 @@ GridGraph_3D::node_type GridGraph_3D::north_node(GridGraph_3D::node_type node){
 
 GridGraph_3D::node_type GridGraph_3D::north_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
-    if(!(x < m_width && y < m_height-1 && z < m_depth)){
-        // throw exceptions::BoundariNode();
+    if(!(x < m_width && y < m_height-1 && z < m_depth))
         return lemon::INVALID;
     }
     return m_nodes[x][y+1][z];
@@ -177,7 +164,6 @@ GridGraph_3D::node_type GridGraph_3D::south_node(GridGraph_3D::node_type node){
 GridGraph_3D::node_type GridGraph_3D::south_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
     if(!(x < m_width && y < m_height && y > 0 && z < m_depth)){
-        // throw exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x][y-1][z];
@@ -191,7 +177,6 @@ GridGraph_3D::node_type GridGraph_3D::east_node(GridGraph_3D::node_type node){
 GridGraph_3D::node_type GridGraph_3D::east_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
     if(!(x < m_width-1 && y < m_height && z < m_depth)){
-        // throw exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x+1][y][z];
@@ -205,7 +190,6 @@ GridGraph_3D::node_type GridGraph_3D::west_node(GridGraph_3D::node_type node){
 GridGraph_3D::node_type GridGraph_3D::west_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
     if(!(x < m_width && x > 0 && y < m_height && z < m_depth)){
-        // throw exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x-1][y][z];
@@ -219,7 +203,6 @@ GridGraph_3D::node_type GridGraph_3D::up_node(GridGraph_3D::node_type node){
 GridGraph_3D::node_type GridGraph_3D::up_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
     if(!(x < m_width && y < m_height && z < m_depth-1)){
-        // throw exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x][y][z+1];
@@ -233,7 +216,6 @@ GridGraph_3D::node_type GridGraph_3D::down_node(GridGraph_3D::node_type node){
 GridGraph_3D::node_type GridGraph_3D::down_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
     if(!(x < m_width && y < m_height && z < m_depth && z > 0)){
-        // throw exceptions::BoundariNode();
         return lemon::INVALID;
     }
     return m_nodes[x][y][z-1];

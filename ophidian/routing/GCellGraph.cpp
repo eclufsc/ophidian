@@ -1,47 +1,33 @@
-// #include <ophidian/routing/GCellGraph.h>
+#include <ophidian/routing/GCellGraph.h>
 
-// namespace ophidian::routing{
+namespace ophidian::routing{
 
-// GCellGraph::GCellGraph():
-//     ophidian::util::GridGraph_3D()
-// {
-// }
+GCellGraph::GCellGraph(GCellGraph::unit_container_type x, GCellGraph::unit_container_type y, GCellGraph::index_type z):
+    ophidian::util::GridGraph_3D(x.size()-1,y.size()-1,z)
+{
+    for (index_type x_it = 0; x_it < x.size() -1; ++x_it) {
+        for (index_type y_it = 0; y_it < y.size() -1; ++y_it) {
+            for (index_type z_it = 0; z_it < z; ++z_it) {
+                auto gcell = m_gcells.add();
+                m_gcell_node[gcell] = node(x_it, y_it, z_it);
+            }
 
-// // void GCellGraph::initialize(GCellGraph::index_type x, GCellGraph::index_type y, GCellGraph::index_type z)
-// // {
-// //     ophidian::util::GridGraph_3D::initialize(x,y,z);
-// // }
+            auto min_corner = point_type{x.at(x_it), y.at(y_it)}; 
+            auto max_corner = point_type{x.at(x_it + 1), y.at(y_it + 1)};
+            m_gcell_box.emplace(std::make_pair( std::make_pair(x_it,y_it) , box_type(min_corner, max_corner) ));
+        }
+    }
+}
 
-// void GCellGraph::add_gcell(GCellGraph::index_type x, GCellGraph::index_type y, GCellGraph::index_type z, GCellGraph::point_type min_corner, GCellGraph::point_type max_corner)
-// {
-//     auto gcell = m_gcells.add();
-//     m_gcell_min_corners[gcell] = min_corner;
-//     m_gcell_max_corners[gcell] = max_corner;
-//     m_gcell_node[gcell] = node(x, y, z);
-// }
+GCellGraph::gcell_container_type::const_iterator GCellGraph::begin_gcell() const noexcept
+{
+    return m_gcells.begin();
+}
 
-
-// GCellGraph::point_type GCellGraph::min_corner(const GCellGraph::gcell_type & gcell) const 
-// {
-//     return m_gcell_min_corners[gcell];
-// }
-
-// GCellGraph::point_type GCellGraph::max_corner(const GCellGraph::gcell_type & gcell) const 
-// {
-//     return m_gcell_max_corners[gcell];
-// }
+GCellGraph::gcell_container_type::const_iterator GCellGraph::end_gcell() const noexcept
+{
+    return m_gcells.end();
+}
 
 
-
-// GCellGraph::gcell_container_type::const_iterator GCellGraph::begin_gcell() const noexcept
-// {
-//     return m_gcells.begin();
-// }
-
-// GCellGraph::gcell_container_type::const_iterator GCellGraph::end_gcell() const noexcept
-// {
-//     return m_gcells.end();
-// }
-
-
-// }
+}

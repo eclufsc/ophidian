@@ -27,8 +27,12 @@
 
 namespace ophidian::routing::factory
 {
-    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::circuit::Netlist & netlist, const ophidian::parser::Guide& guide) noexcept;
-    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::parser::Def& def) noexcept;
+    void make_global_routing(GlobalRouting& globalRouting,
+                             const Library & library,
+                             const ophidian::circuit::Netlist & netlist,
+                             const ophidian::parser::Guide& guide,
+                             const ophidian::parser::Def& def
+                            ) noexcept;
 }
 
 #endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H

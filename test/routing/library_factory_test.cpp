@@ -10,7 +10,7 @@
 
 using namespace ophidian::parser;
 
-TEST_CASE("Library Factory Test ispd2018", "[routing][library][factory][ispd18]")
+TEST_CASE("Routing Library Factory Test ispd2018", "[routing][library][factory][ispd18]")
 {
     using namespace ophidian::util;
     using unit_type = double;
@@ -73,7 +73,7 @@ TEST_CASE("Library Factory Test ispd2018", "[routing][library][factory][ispd18]"
         CHECK(library.name(library.layer(track)) == "Metal9");
     }
 }
-TEST_CASE("Library Factory Test ispd2019", "[routing][library][factory][ispd19]")
+TEST_CASE("Routing Library Factory Test ispd2019", "[routing][library][factory][ispd19]")
 {
     using namespace ophidian::util;
     using unit_type = double;

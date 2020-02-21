@@ -7,7 +7,7 @@
 #include <ophidian/util/Units.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
-// #include <ophidian/routing/GCellGraph.h>
+#include <ophidian/routing/GCellGraph.h>
 
 namespace ophidian::routing
 {
@@ -21,15 +21,18 @@ namespace ophidian::routing
     class GlobalRouting
     {
     public:
+        template <class T> using container_type = std::vector<T>;
         using scalar_type               = int;
         using unit_type                 = util::database_unit_t;
+        using unit_container_type       = container_type<unit_type>;
         using gr_segment_type           = GRSegment;
-        using segment_container_type    = std::vector<gr_segment_type>;
+        using segment_container_type    = container_type<gr_segment_type>;
         using segment_geometry_type     = geometry::Box<unit_type>;
         using layer_type                = Library::layer_type;
         using net_type                  = ophidian::circuit::Net;
-        // using gcell_graph_type          = GCellGraph;
-        using point_3d_type             = geometry::Point3D<int>;
+        using gcell_graph_type          = GCellGraph;
+        using gcell_graph_ptr_type      = std::unique_ptr<gcell_graph_type>;
+        using index_type                = GCellGraph::index_type;
 
         using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
 
@@ -52,6 +55,8 @@ namespace ophidian::routing
         net_type net(const gr_segment_type& segment) const;
         const segment_geometry_type& box(const gr_segment_type& segment) const;
         const layer_type layer(const gr_segment_type& segment) const;
+
+        void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z);
 
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;
@@ -78,7 +83,7 @@ namespace ophidian::routing
 
         entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
 
-        // gcell_graph_type m_gcell_graph;
+        gcell_graph_ptr_type m_gcell_graph;
     };
 }
 
