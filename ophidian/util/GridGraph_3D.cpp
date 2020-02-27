@@ -150,7 +150,7 @@ GridGraph_3D::node_type GridGraph_3D::north_node(GridGraph_3D::node_type node){
 
 GridGraph_3D::node_type GridGraph_3D::north_node(GridGraph_3D::index_type x, GridGraph_3D::index_type y, GridGraph_3D::index_type z)
 {
-    if(!(x < m_width && y < m_height-1 && z < m_depth))
+    if(!(x < m_width && y < m_height-1 && z < m_depth)){
         return lemon::INVALID;
     }
     return m_nodes[x][y+1][z];
