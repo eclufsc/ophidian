@@ -23,7 +23,7 @@
 
 namespace ophidian::util::exceptions
 {
-    class BoundariNode : public std::exception
+    class BoundaryNode : public std::exception
     {
     public:
         const char * what() const noexcept
@@ -32,7 +32,7 @@ namespace ophidian::util::exceptions
         }
     };
 
-    class BoundariEdge : public std::exception
+    class BoundaryEdge : public std::exception
     {
     public:
         const char * what() const noexcept
