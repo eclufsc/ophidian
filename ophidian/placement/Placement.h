@@ -46,6 +46,17 @@ namespace ophidian::placement
 
         using cell_geometry_type = geometry::CellGeometry;
 
+        using pin_geometry_type = geometry::CellGeometry;
+
+        using fixed_type = bool;
+
+        // Class member types
+        enum class Orientation : int {
+            N, S, W, E, FN, FS, FW, FE
+        };
+
+        using orientation_type = Orientation;
+
         // Constructors
         Placement() = delete;
 
@@ -68,29 +79,36 @@ namespace ophidian::placement
 
         cell_geometry_type geometry(const cell_type& cell) const;
 
-        bool fixed(const cell_type& cell) const;
+        pin_geometry_type geometry(const pin_type& pin) const;
 
+        orientation_type orientation(const cell_type& cell) const;
+
+        const fixed_type isFixed(const cell_type& cell) const;
         // Iterators
 
         // Capacity
 
         // Modifiers
-        void place(const cell_type& cell, const point_type& location);
+        void place(const cell_type& cell, const point_type& location, const orientation_type& orientation);
 
         void place(const input_pad_type& input, const point_type & location);
 
         void place(const output_pad_type& output, const point_type & location);
 
-        void fix(const cell_type& cell, bool fixed);
+        void fixLocation(const cell_type& cell);
+
+        void unfixLocation(const cell_type& cell);
 
     private:
         const circuit::Netlist & m_netlist;
         const Library & m_library;
 
-        entity_system::Property<cell_type, point_type>   m_cell_locations;
-        entity_system::Property<cell_type, bool> m_cell_fixed;
-        entity_system::Property<input_pad_type, point_type>  m_input_pad_locations;
+        entity_system::Property<cell_type, point_type> m_cell_locations;
+        entity_system::Property<cell_type, fixed_type> m_fixed_cells;
+        entity_system::Property<cell_type, orientation_type> m_cell_orientation;
+        entity_system::Property<input_pad_type, point_type> m_input_pad_locations;
         entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
+
     };
 }
 

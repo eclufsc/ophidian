@@ -25,8 +25,41 @@ namespace ophidian::placement::factory
         for(const auto & component : def.components())
         {
             auto cell = netlist.find_cell_instance(component.name());
-            placement.place(cell, component.position());
-            placement.fix(cell, component.fixed());
+            Placement::Orientation orientation;
+            switch (component.orientation())
+            {
+                case ophidian::parser::Component::Orientation::N :
+                    orientation = Placement::Orientation::N;
+                    break;
+                case ophidian::parser::Component::Orientation::S :
+                    orientation = Placement::Orientation::S;
+                    break;
+                case ophidian::parser::Component::Orientation::W :
+                    orientation = Placement::Orientation::W;
+                    break;
+                case ophidian::parser::Component::Orientation::E :
+                    orientation = Placement::Orientation::E;
+                    break;
+                case ophidian::parser::Component::Orientation::FN :
+                    orientation = Placement::Orientation::FN;
+                    break;
+                case ophidian::parser::Component::Orientation::FS :
+                    orientation = Placement::Orientation::FS;
+                    break;
+                case ophidian::parser::Component::Orientation::FW :
+                    orientation = Placement::Orientation::FW;
+                    break;
+                case ophidian::parser::Component::Orientation::FE :
+                    orientation = Placement::Orientation::FE;
+                    break;
+                default:
+                    orientation = Placement::Orientation::N;
+            }
+            placement.place(cell, component.position(), orientation);
+            if(component.fixed())
+                placement.fixLocation(cell);
+            else
+                placement.unfixLocation(cell);
         }
     }
 }

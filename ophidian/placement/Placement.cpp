@@ -17,6 +17,8 @@
  */
 
 #include "Placement.h"
+#include <ophidian/geometry/Operations.h>
+#include <ophidian/geometry/Models.h>
 
 namespace ophidian::placement
 {
@@ -24,9 +26,10 @@ namespace ophidian::placement
             m_netlist(netlist),
             m_library(library),
             m_cell_locations(netlist.make_property_cell_instance<util::LocationDbu>()),
-            m_cell_fixed(netlist.make_property_cell_instance<bool>()),
+            m_cell_orientation(netlist.make_property_cell_instance<Placement::orientation_type>()),
             m_input_pad_locations(netlist.make_property_input_pad<util::LocationDbu>()),
-            m_output_pad_locations(netlist.make_property_output_pad<util::LocationDbu>())
+            m_output_pad_locations(netlist.make_property_output_pad<util::LocationDbu>()),
+            m_fixed_cells(netlist.make_property_cell_instance<fixed_type>())
     {
     }
 
@@ -38,15 +41,15 @@ namespace ophidian::placement
 
     Placement::point_type Placement::location(const Placement::pin_type& pin) const
     {
-        auto pinInput = m_netlist.input(pin);
-        if (pinInput != input_pad_type()) {
-            return location(pinInput);
-        }
+         auto pinInput = m_netlist.input(pin);
+         if (pinInput != input_pad_type()) {
+             return location(pinInput);
+         }
 
-        auto pinOutput = m_netlist.output(pin);
-        if (pinOutput != output_pad_type()) {
-            return location(pinOutput);
-        }
+         auto pinOutput = m_netlist.output(pin);
+         if (pinOutput != output_pad_type()) {
+             return location(pinOutput);
+         }
 
         auto stdCellPin = m_netlist.std_cell_pin(pin);
         auto pinOwner = m_netlist.cell(pin);
@@ -83,15 +86,99 @@ namespace ophidian::placement
         return cellGeometry;
     }
 
-    bool Placement::fixed(const Placement::cell_type& cell) const
+    Placement::pin_geometry_type Placement::geometry(const Placement::pin_type& pin) const
     {
-        return m_cell_fixed[cell];
+        using Point = ophidian::geometry::Point<double>;
+        using Box = ophidian::geometry::Box<double>;
+
+
+        auto stdPin = m_netlist.std_cell_pin(pin);
+        auto stdPinGeometry = m_library.geometry(stdPin);
+        auto cell = m_netlist.cell(pin);
+        auto std_cell = m_netlist.std_cell(cell);
+
+        auto cell_location = location(cell);
+        auto cell_width = m_library.geometry(std_cell).width();
+        auto cell_height = m_library.geometry(std_cell).height();
+
+        auto translated_boxes = geometry::CellGeometry{};
+        translated_boxes.reserve(stdPinGeometry.size());
+
+        for(auto layer : stdPinGeometry.layers())
+        {
+            translated_boxes.push_back(layer);
+        }
+
+        for(auto & box : stdPinGeometry)
+        {
+            point_type min_corner;
+            point_type max_corner;
+
+            switch (orientation(cell)){
+                case orientation_type::N:
+                    min_corner = point_type{
+                        box.min_corner().x() + cell_location.x(),
+                        box.min_corner().y() + cell_location.y()
+                    };
+                    max_corner = point_type{
+                        box.max_corner().x() + cell_location.x(),
+                        box.max_corner().y() + cell_location.y()
+                    };
+                    break;
+                case orientation_type::FN:
+                    min_corner = point_type{
+                        cell_location.x() + cell_width - box.max_corner().x(),
+                        box.min_corner().y() + cell_location.y()
+                    };
+                    max_corner = point_type{
+                        cell_location.x() + cell_width - box.min_corner().x(),
+                        box.max_corner().y() + cell_location.y()
+                    };
+                    break;
+                case orientation_type::S:
+                    min_corner = point_type{
+                        cell_location.x() + cell_width - box.max_corner().x(),
+                        cell_location.y() + cell_height - box.max_corner().y()
+                    };
+                    max_corner = point_type{
+                        cell_location.x() + cell_width - box.min_corner().x(),
+                        cell_location.y() + cell_height - box.min_corner().y()
+                    };
+                    break;
+                case orientation_type::FS:
+                    min_corner = point_type{
+                        box.min_corner().x() + cell_location.x(),
+                        cell_location.y() + cell_height - box.max_corner().y()
+                    };
+                    max_corner = point_type{
+                        box.max_corner().x() + cell_location.x(),
+                        cell_location.y() + cell_height - box.min_corner().y()
+                    };
+                    break;
+            }
+            geometry::CellGeometry::box_type new_box (
+                min_corner, max_corner
+            );
+            translated_boxes.push_back(new_box);
+        }
+        return translated_boxes;
+    }
+
+    Placement::orientation_type Placement::orientation(const Placement::cell_type& cell) const
+    {
+        return m_cell_orientation[cell];
+    }
+
+
+    const Placement::fixed_type Placement::isFixed(const Placement::cell_type& cell) const{
+        return m_fixed_cells[cell];
     }
 
     // Modifiers
-    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
+    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location, const Placement::orientation_type& orientation)
     {
         m_cell_locations[cell] = location;
+        m_cell_orientation[cell] = orientation;
     }
 
     void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
@@ -104,8 +191,13 @@ namespace ophidian::placement
         m_output_pad_locations[output] = location;
     }
 
-    void Placement::fix(const Placement::cell_type& cell, bool fixed)
+    void Placement::fixLocation(const Placement::cell_type& cell)
     {
-        m_cell_fixed[cell] = fixed;
+        m_fixed_cells[cell] = true;
+    }
+
+    void Placement::unfixLocation(const Placement::cell_type& cell)
+    {
+        m_fixed_cells[cell] = false;
     }
 }

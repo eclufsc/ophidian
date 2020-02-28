@@ -53,8 +53,8 @@ TEST_CASE("Design: testing placement.", "[design]")
     auto cell1Location = ophidian::util::LocationDbu{ dbu_t{10}, dbu_t{20}};
     auto cell2Location = ophidian::util::LocationDbu{ dbu_t{20}, dbu_t{10}};
 
-    design.placement().place(cell1, cell1Location);
-    design.placement().place(cell2, cell2Location);
+    design.placement().place(cell1, cell1Location, ophidian::placement::Placement::Orientation::N);
+    design.placement().place(cell2, cell2Location, ophidian::placement::Placement::Orientation::S);
 
     REQUIRE(cell1Location.x() == design.placement().location((cell1)).x());
     REQUIRE(cell1Location.y() == design.placement().location((cell1)).y());
