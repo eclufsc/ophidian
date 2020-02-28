@@ -40,7 +40,6 @@ namespace ophidian::design
         using placement_type            = placement::Placement;
         using routing_library_type      = routing::Library;
         using global_routing_type       = routing::GlobalRouting;
-        // using detailed_routing_type     = routing::DetailedRouting;
 
         //! Design Constructor
 
