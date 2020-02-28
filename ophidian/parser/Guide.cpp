@@ -6,9 +6,7 @@
 #include "Guide.h"
 #include "ParserException.h"
 
-namespace ophidian
-{
-namespace parser
+namespace ophidian::parser
 {
 
 Guide::Guide(const std::string &guide_file)
@@ -115,5 +113,4 @@ const Guide::Region::box_type &Guide::Region::region() const noexcept
     return m_region;
 }
 
-}
 }
