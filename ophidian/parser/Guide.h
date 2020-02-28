@@ -27,7 +27,6 @@
 // external headers
 
 // ophidian headers
-//#include <ophidian/geometry/Models.h>
 #include <ophidian/util/Units.h>
 
 namespace ophidian::parser
