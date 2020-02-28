@@ -35,15 +35,19 @@ class GCellGraph : public ophidian::util::GridGraph_3D
 {
 public:
     template <class T> using container_type = std::vector<T>;
+    using scalar_type           = int;
+    using scalar_container_type = container_type<scalar_type>;
     using index_type            = ophidian::util::GridGraph_3D::index_type;
     using node_type             = ophidian::util::GridGraph_3D::node_type;
+    template <class T> 
+    using node_map_type         = ophidian::util::GridGraph_3D::node_map_type<T>;
     using unit_type             = util::database_unit_t;
     using unit_container_type   = container_type<unit_type>;
     using point_type            = ophidian::util::LocationDbu;
     using box_type              = geometry::Box<unit_type>;
     using gcell_type            = GCell;
     using gcell_container_type  = std::vector<gcell_type>;
-
+    using layer_type            = ophidian::routing::Library::layer_type;
 
     using map_type              = std::unordered_map<std::pair<index_type, index_type>, box_type, hash_pair >;
 
@@ -59,9 +63,14 @@ public:
     GCellGraph(GCellGraph &&) = default;
     GCellGraph& operator=(GCellGraph &&) = default;
 
-    GCellGraph(unit_container_type x, unit_container_type y, index_type z);
+    GCellGraph(unit_container_type x, unit_container_type y, index_type z, scalar_container_type capacity = {1});
 
     // Element access
+    box_type box(const gcell_type& gcell);
+    scalar_type capacity(const gcell_type& gcell);
+    scalar_type demand(const gcell_type& gcell);
+    void increase_demand(const gcell_type& gcell);
+    // gcell_type& gcell intersect(const box_type box, const layer_type & layer);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;
@@ -72,8 +81,11 @@ public:
 private:
     entity_system::EntitySystem<gcell_type> m_gcells{};
     entity_system::Property<gcell_type, node_type> m_gcell_node{m_gcells};
+    entity_system::Property<gcell_type, scalar_type> m_gcell_capacity{m_gcells};
+    entity_system::Property<gcell_type, scalar_type> m_gcell_demand{m_gcells, 0};
 
     map_type m_gcell_box;
+    node_map_type<gcell_type> m_nodes_to_gcell;
 };
 
 
