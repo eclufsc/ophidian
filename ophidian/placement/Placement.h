@@ -89,11 +89,13 @@ namespace ophidian::placement
         // Capacity
 
         // Modifiers
-        void place(const cell_type& cell, const point_type& location, const orientation_type& orientation);
+        void place(const cell_type& cell, const point_type& location);
 
         void place(const input_pad_type& input, const point_type & location);
 
         void place(const output_pad_type& output, const point_type & location);
+
+        void setOrientation(const Placement::cell_type& cell, const orientation_type& orientation);
 
         void fixLocation(const cell_type& cell);
 

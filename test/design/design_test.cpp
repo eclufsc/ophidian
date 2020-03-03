@@ -53,13 +53,17 @@ TEST_CASE("Design: testing placement.", "[design]")
     auto cell1Location = ophidian::util::LocationDbu{ dbu_t{10}, dbu_t{20}};
     auto cell2Location = ophidian::util::LocationDbu{ dbu_t{20}, dbu_t{10}};
 
-    design.placement().place(cell1, cell1Location, ophidian::placement::Placement::Orientation::N);
-    design.placement().place(cell2, cell2Location, ophidian::placement::Placement::Orientation::S);
+    design.placement().place(cell1, cell1Location);
+    design.placement().place(cell2, cell2Location);
+    design.placement().setOrientation(cell1, ophidian::placement::Placement::Orientation::N);
+    design.placement().setOrientation(cell2, ophidian::placement::Placement::Orientation::S);
 
     REQUIRE(cell1Location.x() == design.placement().location((cell1)).x());
     REQUIRE(cell1Location.y() == design.placement().location((cell1)).y());
     REQUIRE(cell2Location.x() == design.placement().location((cell2)).x());
     REQUIRE(cell2Location.y() == design.placement().location((cell2)).y());
+    REQUIRE(ophidian::placement::Placement::Orientation::N == design.placement().orientation(cell1));
+    REQUIRE(ophidian::placement::Placement::Orientation::S == design.placement().orientation(cell2));
 }
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")

@@ -175,10 +175,9 @@ namespace ophidian::placement
     }
 
     // Modifiers
-    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location, const Placement::orientation_type& orientation)
+    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
     {
         m_cell_locations[cell] = location;
-        m_cell_orientation[cell] = orientation;
     }
 
     void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
@@ -189,6 +188,11 @@ namespace ophidian::placement
     void Placement::place(const Placement::output_pad_type& output, const Placement::point_type & location)
     {
         m_output_pad_locations[output] = location;
+    }
+
+    void Placement::setOrientation(const Placement::cell_type& cell, const orientation_type& orientation)
+    {
+        m_cell_orientation[cell] = orientation;
     }
 
     void Placement::fixLocation(const Placement::cell_type& cell)

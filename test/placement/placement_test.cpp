@@ -49,7 +49,8 @@ public:
 
 TEST_CASE_METHOD(PlacementFixture, "Placement: placing a cell1 with north orientation", "[placement]") {
     auto cell1_orientation = Placement::orientation_type::N;
-    placement.place(cell1, location_1, cell1_orientation);
+    placement.place(cell1, location_1);
+    placement.setOrientation(cell1, cell1_orientation);
 
     REQUIRE(boost::geometry::equals(placement.location(cell1), location_1));
     REQUIRE(placement.orientation(cell1) == cell1_orientation);
@@ -57,7 +58,8 @@ TEST_CASE_METHOD(PlacementFixture, "Placement: placing a cell1 with north orient
 
 TEST_CASE_METHOD(PlacementFixture, "Placement: placing a cell2 with fliped south orientation", "[placement]") {
     auto cell2_orientation = Placement::orientation_type::FS;
-    placement.place(cell2, location_2, cell2_orientation);
+    placement.place(cell2, location_2);
+    placement.setOrientation(cell2, cell2_orientation);
 
     REQUIRE(boost::geometry::equals(placement.location(cell2), location_2));
     REQUIRE(placement.orientation(cell2) == cell2_orientation);

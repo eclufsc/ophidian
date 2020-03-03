@@ -55,7 +55,8 @@ namespace ophidian::placement::factory
                 default:
                     orientation = Placement::Orientation::N;
             }
-            placement.place(cell, component.position(), orientation);
+            placement.place(cell, component.position());
+            placement.setOrientation(cell, orientation);
             if(component.fixed())
                 placement.fixLocation(cell);
             else
