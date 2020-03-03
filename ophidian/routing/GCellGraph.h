@@ -66,6 +66,7 @@ public:
     GCellGraph(unit_container_type x, unit_container_type y, index_type z, scalar_container_type capacity = {1});
 
     // Element access
+    gcell_type gcell(index_type x, index_type y, index_type z) const ;
     box_type box(const gcell_type& gcell);
     scalar_type capacity(const gcell_type& gcell);
     scalar_type demand(const gcell_type& gcell);

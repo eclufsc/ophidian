@@ -40,6 +40,12 @@ GCellGraph::gcell_container_type::const_iterator GCellGraph::end_gcell() const n
 }
 
 
+GCellGraph::gcell_type GCellGraph::gcell(GCellGraph::index_type x, GCellGraph::index_type y, GCellGraph::index_type z) const
+{
+    auto n = node(x,y,z);
+    return m_nodes_to_gcell[n];
+}
+
 GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
 {
     auto node = m_gcell_node[gcell];
