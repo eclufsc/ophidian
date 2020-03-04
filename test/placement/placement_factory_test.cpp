@@ -40,8 +40,8 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
     CHECK(cell_u1_xpos == dbu_t{3420});
     CHECK(cell_u1_ypos == dbu_t{6840});
 
-    CHECK(!placement.fixed(cell_u1));
-    CHECK(placement.fixed(cell_f1));
+    CHECK(!placement.isFixed(cell_u1));
+    CHECK(placement.isFixed(cell_f1));
 
     auto std_cell_u1 = netlist.std_cell(cell_u1);
 

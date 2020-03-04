@@ -38,6 +38,78 @@ namespace ophidian::geometry
         return m_boxes.front();
     }
 
+    const CellGeometry::box_type CellGeometry::bounding_box() const
+    {
+        unit_type min_x{std::numeric_limits<double>::max()};
+        unit_type max_x{std::numeric_limits<double>::min()};
+        unit_type min_y{std::numeric_limits<double>::max()};
+        unit_type max_y{std::numeric_limits<double>::min()};
+        for(auto box : m_boxes)
+        {
+            min_x = (box.min_corner().x() < min_x) ? box.min_corner().x() : min_x;
+            max_x = (box.max_corner().x() > max_x) ? box.max_corner().x() : max_x;
+            min_y = (box.min_corner().y() < min_y) ? box.min_corner().y() : min_y;
+            max_y = (box.max_corner().y() > max_y) ? box.max_corner().y() : max_y;
+        }
+        return box_type{point_type{min_x, min_y}, point_type{max_x, max_y}};
+    }
+
+    CellGeometry::point_type CellGeometry::center() const
+    {
+        unit_type min_x{std::numeric_limits<double>::max()};
+        unit_type min_y{std::numeric_limits<double>::max()};
+        unit_type max_x{std::numeric_limits<double>::min()};
+        unit_type max_y{std::numeric_limits<double>::min()};
+        for(auto box : m_boxes)
+        {
+            min_x = (box.min_corner().x() < min_x) ? box.min_corner().x() : min_x;
+            min_y = (box.min_corner().y() < min_y) ? box.min_corner().y() : min_y;
+            max_x = (box.max_corner().x() > max_x) ? box.max_corner().x() : max_x;
+            max_y = (box.max_corner().y() > max_y) ? box.max_corner().y() : max_y;
+        }
+        return point_type{ ((max_x - min_x)/2) , ((max_y - min_y)/2) };
+    }
+
+    CellGeometry::unit_type CellGeometry::width() const
+    {
+        unit_type min_x{std::numeric_limits<double>::max()};
+        unit_type max_x{std::numeric_limits<double>::min()};
+        for(auto box : m_boxes)
+        {
+            min_x = (box.min_corner().x() < min_x) ? box.min_corner().x() : min_x;
+            max_x = (box.max_corner().x() > max_x) ? box.max_corner().x() : max_x;
+        }
+        return max_x - min_x;
+    }
+
+    CellGeometry::unit_type CellGeometry::height() const
+    {
+        unit_type min_y{std::numeric_limits<double>::max()};
+        unit_type max_y{std::numeric_limits<double>::min()};
+        for(auto box : m_boxes)
+        {
+            min_y = (box.min_corner().y() < min_y) ? box.min_corner().y() : min_y;
+            max_y = (box.max_corner().y() > max_y) ? box.max_corner().y() : max_y;
+        }
+        return max_y - min_y;
+    }
+
+    const CellGeometry::layer_container_type& CellGeometry::layers() const
+    {
+        return m_layers;
+    }
+
+    std::map<std::string, CellGeometry::box_container_type> CellGeometry::box_in_layer() const
+    {
+        std::map<std::string, CellGeometry::box_container_type> map;
+        // m_boxes and m_layers have same size
+        for(auto i = 0; i < m_boxes.size() && i < m_layers.size() ; i++)
+        {
+            map[m_layers.at(i)].push_back(m_boxes.at(i));
+        }
+        return map;
+    }
+
     // Iterators
     CellGeometry::box_container_type::iterator CellGeometry::begin()
     {
@@ -60,10 +132,16 @@ namespace ophidian::geometry
     }
 
     // Capacity
+    void CellGeometry::reserve(size_t size) noexcept
+    {
+        m_boxes.reserve(size);
+    }
+
     CellGeometry::box_container_type::size_type CellGeometry::size() const noexcept
     {
         return m_boxes.size();
     }
+
     
     // Modifiers
     void CellGeometry::push_back(const CellGeometry::box_type & box)
@@ -74,6 +152,11 @@ namespace ophidian::geometry
     void CellGeometry::push_back(CellGeometry::box_type && box)
     {
         m_boxes.push_back(std::move(box));
+    }
+
+    void CellGeometry::push_back(std::string layer)
+    {
+        m_layers.push_back(std::move(layer));
     }
 
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept

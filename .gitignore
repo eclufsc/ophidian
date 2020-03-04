@@ -16,3 +16,4 @@
 *.json
 3rdparty/*
 .vscode
+tags

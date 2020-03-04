@@ -23,6 +23,7 @@
 
 #include <ophidian/util/Units.h>
 #include "Models.h"
+#include <map>
 
 namespace ophidian::geometry
 {
@@ -36,6 +37,8 @@ namespace ophidian::geometry
 
         using box_type  = Box<unit_type>;
         using box_container_type = std::vector<box_type>;
+
+        using layer_container_type = std::vector<std::string>;
 
         // Constructors
         CellGeometry() = default;
@@ -54,6 +57,17 @@ namespace ophidian::geometry
         box_type& front();
         const box_type& front() const;
 
+        const box_type bounding_box() const;
+
+        point_type center() const;
+        unit_type width() const;
+        unit_type height() const;
+
+        const layer_container_type& layers() const;
+
+        std::map<std::string, box_container_type> box_in_layer() const;
+
+
         // Iterators
         box_container_type::iterator begin();
 
@@ -64,12 +78,16 @@ namespace ophidian::geometry
         box_container_type::const_iterator end() const;
 
         // Capacity
+        void reserve(size_t size) noexcept;
+
         box_container_type::size_type size() const noexcept;
 
         // Modifiers
         void push_back(const box_type & box);
 
         void push_back(box_type && box);
+
+        void push_back(std::string layer);
 
         bool operator==(const CellGeometry & other) const noexcept
         {
@@ -97,6 +115,7 @@ namespace ophidian::geometry
 
     private:
         box_container_type m_boxes;
+        layer_container_type m_layers;
     };
 
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept;
