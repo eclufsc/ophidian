@@ -25,6 +25,15 @@ GCellGraph::GCellGraph(GCellGraph::unit_container_type x, GCellGraph::unit_conta
             auto min_corner = point_type{x.at(x_it), y.at(y_it)}; 
             auto max_corner = point_type{x.at(x_it + 1), y.at(y_it + 1)};
             m_gcell_box.emplace(std::make_pair( std::make_pair(x_it,y_it) , box_type(min_corner, max_corner) ));
+
+            //generate RTree;
+            // using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
+            // using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+            auto min_corner_d = point_scalar_type{units::unit_cast<double>(x.at(x_it)), units::unit_cast<double>(y.at(y_it))}; 
+            auto max_corner_d = point_scalar_type{units::unit_cast<double>(x.at(x_it + 1)), units::unit_cast<double>(y.at(y_it + 1))};
+
+            auto box = box_scalar_type{min_corner_d, max_corner_d};
+            m_grid.insert(std::make_pair(box, std::make_pair(x_it,y_it)));
         }
     }
 }
@@ -70,10 +79,23 @@ void GCellGraph::increase_demand(const GCellGraph::gcell_type& gcell)
     m_gcell_demand[gcell] += 1;
 }
 
-// GCellGraph::gcell_type& gcell GCellGraph::intersect(const GCellGraph::box_type box, const GCellGraph::layer_type & layer)
-// {
-//     return 0;
-// }
+void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer)
+{
+    namespace bgi = boost::geometry::index;
+    auto min_corner_d = point_scalar_type{units::unit_cast<double>(box.min_corner().x()), units::unit_cast<double>(box.min_corner().y())}; 
+    auto max_corner_d = point_scalar_type{units::unit_cast<double>(box.max_corner().x()), units::unit_cast<double>(box.max_corner().y())};
+    auto box_d = box_scalar_type{min_corner_d, max_corner_d};
+
+    // using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
+    std::vector<rtree_node_type> results;
+    m_grid.query(bgi::intersects(box_d), std::back_inserter(results));
+
+    for(auto r : results)
+    {
+        auto node = r.second;
+        gcells.push_back(gcell(node.first, node.second, layer));
+    }
+}
 
 
 }

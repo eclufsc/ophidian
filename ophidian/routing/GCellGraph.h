@@ -8,6 +8,7 @@
 #include <ophidian/routing/Library.h>
 #include <ophidian/util/GridGraph_3D.h>
 
+#include <boost/geometry/index/rtree.hpp>
 namespace ophidian::routing{
 
 
@@ -51,6 +52,11 @@ public:
 
     using map_type              = std::unordered_map<std::pair<index_type, index_type>, box_type, hash_pair >;
 
+    using point_scalar_type     = geometry::Point<double>;
+    using box_scalar_type       = geometry::Box<double>;
+    using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
+    using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+
     // Constructors
     //! Construct GCellGraph
     GCellGraph() = delete;
@@ -71,7 +77,7 @@ public:
     scalar_type capacity(const gcell_type& gcell);
     scalar_type demand(const gcell_type& gcell);
     void increase_demand(const gcell_type& gcell);
-    // gcell_type& gcell intersect(const box_type box, const layer_type & layer);
+    void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;
@@ -87,6 +93,7 @@ private:
 
     map_type m_gcell_box;
     node_map_type<gcell_type> m_nodes_to_gcell;
+    rtree_type m_grid;
 };
 
 
