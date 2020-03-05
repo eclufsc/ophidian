@@ -74,9 +74,9 @@ GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
     return m_gcell_demand[gcell];
 }
 
-void GCellGraph::increase_demand(const GCellGraph::gcell_type& gcell)
+void GCellGraph::increase_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
 {
-    m_gcell_demand[gcell] += 1;
+    m_gcell_demand[gcell] += delta;
 }
 
 void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer)

@@ -56,6 +56,8 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
     SECTION("increase defaut demand"){
         graph.increase_demand(gcell);
         CHECK(graph.demand(gcell) == 1);
+        graph.increase_demand(gcell, 3);
+        CHECK(graph.demand(gcell) == 4);
     }
     SECTION("intersect with box"){
         auto box = box_type{point_type{dbu{600}, dbu{575}}, point_type{dbu{700}, dbu{675}}};

@@ -76,7 +76,7 @@ public:
     box_type box(const gcell_type& gcell);
     scalar_type capacity(const gcell_type& gcell);
     scalar_type demand(const gcell_type& gcell);
-    void increase_demand(const gcell_type& gcell);
+    void increase_demand(const gcell_type& gcell, const scalar_type delta = 1);
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
 
     // Iterators
