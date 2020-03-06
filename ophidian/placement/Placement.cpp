@@ -41,15 +41,15 @@ namespace ophidian::placement
 
     Placement::point_type Placement::location(const Placement::pin_type& pin) const
     {
-         auto pinInput = m_netlist.input(pin);
-         if (pinInput != input_pad_type()) {
-             return location(pinInput);
-         }
+        auto pinInput = m_netlist.input(pin);
+        if (pinInput != input_pad_type()) {
+            return location(pinInput);
+        }
 
-         auto pinOutput = m_netlist.output(pin);
-         if (pinOutput != output_pad_type()) {
-             return location(pinOutput);
-         }
+        auto pinOutput = m_netlist.output(pin);
+        if (pinOutput != output_pad_type()) {
+            return location(pinOutput);
+        }
 
         auto stdCellPin = m_netlist.std_cell_pin(pin);
         auto pinOwner = m_netlist.cell(pin);
