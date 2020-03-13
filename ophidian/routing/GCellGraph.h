@@ -70,6 +70,7 @@ public:
     GCellGraph& operator=(GCellGraph &&) = default;
 
     GCellGraph(unit_container_type x, unit_container_type y, index_type z, scalar_container_type capacity = {1});
+    GCellGraph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
 
     // Element access
     gcell_type gcell(index_type x, index_type y, index_type z) const ;

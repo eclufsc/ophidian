@@ -34,7 +34,7 @@ namespace ophidian::routing::factory
         if( def.gcell_x_axis().size() != 0 && def.gcell_y_axis().size() != 0)
         {
             int z = library.index(library.highest_layer());
-            globalRouting.create_gcell_graph(def.gcell_x_axis(), def.gcell_y_axis(), z);
+            globalRouting.create_gcell_graph(library, def.gcell_x_axis(), def.gcell_y_axis(), z);
         }else{
             // Design does not have GCELL definitions !!
             std::cout << "WARNING : This Design does not have GCELL definitions in .def file!" << std::endl;

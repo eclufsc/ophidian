@@ -38,6 +38,60 @@ GCellGraph::GCellGraph(GCellGraph::unit_container_type x, GCellGraph::unit_conta
     }
 }
 
+GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::unit_container_type x, GCellGraph::unit_container_type y, GCellGraph::index_type z):
+    ophidian::util::GridGraph_3D(x.size()-1,y.size()-1,z), m_nodes_to_gcell(m_graph)
+{
+    std::cout<<"size x : " << x.size()<< std::endl;
+    std::cout<<"size y : " << y.size()<< std::endl;
+    for (index_type z_it = 0; z_it < z; ++z_it) {
+
+        auto layer = library.layer_from_index(z_it+1);
+        auto track = library.prefTrack(layer);
+        auto tracDir = library.direction(track);
+        auto start = units::unit_cast<double>(library.start(track));
+        auto space = units::unit_cast<double>(library.space(track));
+
+        for (index_type x_it = 0; x_it < x.size() -1; ++x_it) {
+            for (index_type y_it = 0; y_it < y.size() -1; ++y_it) {
+                
+                auto min_corner = point_type{x.at(x_it), y.at(y_it)}; 
+                auto max_corner = point_type{x.at(x_it + 1), y.at(y_it + 1)};
+                m_gcell_box.emplace(std::make_pair( std::make_pair(x_it,y_it) , box_type(min_corner, max_corner) ));
+                
+                auto gcell = m_gcells.add();
+                auto node_inst = node(x_it, y_it, z_it);
+                m_gcell_node[gcell] = node_inst;
+                m_nodes_to_gcell[node_inst] = gcell;
+                
+                //cap = (max - start)/space  --  (min-start)/space
+                int capacity = 0;
+                double min_cord = 0;
+                double max_cord = 0;
+                if(tracDir == ophidian::routing::Direction::HORIZONTAL){
+                    min_cord = units::unit_cast<double>(min_corner.y());
+                    max_cord = units::unit_cast<double>(max_corner.y());
+                }else if (tracDir == ophidian::routing::Direction::VERTICAL){
+                    min_cord = units::unit_cast<double>(min_corner.x());
+                    max_cord = units::unit_cast<double>(max_corner.x());
+                }
+                capacity = (int) std::ceil((max_cord - start)/space) - std::ceil((min_cord - start)/space);
+
+                if(capacity == 0 && max_cord == start)
+                    capacity = 1;
+                m_gcell_capacity[gcell] = capacity;
+                
+                if(z_it == 0){ // generate Rtree once
+                    //generate RTree;
+                    auto min_corner_d = point_scalar_type{units::unit_cast<double>(x.at(x_it)), units::unit_cast<double>(y.at(y_it))}; 
+                    auto max_corner_d = point_scalar_type{units::unit_cast<double>(x.at(x_it + 1)), units::unit_cast<double>(y.at(y_it + 1))};
+                    auto box = box_scalar_type{min_corner_d, max_corner_d};
+                    m_grid.insert(std::make_pair(box, std::make_pair(x_it,y_it)));
+                }
+            }
+        }
+    }
+}
+
 GCellGraph::gcell_container_type::const_iterator GCellGraph::begin_gcell() const noexcept
 {
     return m_gcells.begin();

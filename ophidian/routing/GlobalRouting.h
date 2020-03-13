@@ -31,7 +31,7 @@ namespace ophidian::routing
         using layer_type                = Library::layer_type;
         using net_type                  = ophidian::circuit::Net;
         using gcell_graph_type          = GCellGraph;
-        using gcell_graph_ptr_type      = std::unique_ptr<gcell_graph_type>;
+        using gcell_graph_ptr_type      = std::shared_ptr<gcell_graph_type>;
         using index_type                = GCellGraph::index_type;
 
         using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
@@ -56,7 +56,8 @@ namespace ophidian::routing
         const segment_geometry_type& box(const gr_segment_type& segment) const;
         const layer_type layer(const gr_segment_type& segment) const;
 
-        void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z);
+        void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
+        gcell_graph_ptr_type gcell_graph();
 
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;

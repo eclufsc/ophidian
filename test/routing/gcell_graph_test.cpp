@@ -1,11 +1,22 @@
 #include <catch.hpp>
+#include <ophidian/parser/Lef.h>
+#include <ophidian/parser/Def.h>
+#include <ophidian/parser/Guide.h>
+#include <ophidian/design/DesignFactory.h>
+#include <ophidian/routing/GlobalRoutingFactory.h>
+#include <ophidian/parser/ParserException.h>
 #include <ophidian/routing/GCellGraph.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/geometry/Models.h>
+#include <algorithm>
+
+using namespace ophidian::parser;
 
 using dbu = ophidian::util::database_unit_t;
 using point_type = ophidian::geometry::Point<dbu>;
 using box_type = ophidian::geometry::Box<dbu>;
+
+
 
 bool boxCompare(const box_type& a, const box_type& b)
 {
@@ -94,4 +105,49 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
         expected_gcells.push_back(graph.gcell(2, 2, 1));
         CHECK(std::is_permutation(gcells.begin(), gcells.end(), expected_gcells.begin()));
     }
+}
+
+TEST_CASE("Test GCell Capacity", "[routing][gcell][capacity]")
+{
+    Def sample_def = ophidian::parser::Def{"input_files/ispd19/ispd19_sample4/ispd19_sample4.input.def"};
+    Lef sample_lef = ophidian::parser::Lef{"input_files/ispd19/ispd19_sample4/ispd19_sample4.input.lef"};
+    Guide sample_guide = ophidian::parser::Guide{"input_files/ispd19/ispd19_sample4/ispd19_sample4.input.guide"};
+
+    auto design = ophidian::design::Design{};
+    ophidian::design::factory::make_design_ispd2019(design, sample_def, sample_lef, sample_guide);
+
+    auto gcell_graph = design.global_routing().gcell_graph();
+
+    // "Metal 1 Horizontal"
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,0)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,0)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,0)) == 10);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,0)) == 10);
+    
+    // "Metal 2 Vertical"
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,1)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,1)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,1)) == 10);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,1)) == 10);
+
+    // "Metal 8 Horizontal"
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,7)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,7)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,7)) == 5);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(3,2,7)) == 5);
+
+    // "Metal 9 Vertical"
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,8)) == 0);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,8)) == 0);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,8)) == 5);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(2,1,8)) == 5);
+
+    // upper corner gcell
+    // "Metal 2 Vertical"
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(198,197,1)) == 8);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(198,0,1)) == 1);
+    // CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,1)) == 1);
+    // CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,1)) == 10);
+    // CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,1)) == 10);
+
 }
