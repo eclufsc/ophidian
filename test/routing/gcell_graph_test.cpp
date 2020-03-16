@@ -115,7 +115,6 @@ TEST_CASE("Test GCell Capacity", "[routing][gcell][capacity]")
 
     auto design = ophidian::design::Design{};
     ophidian::design::factory::make_design_ispd2019(design, sample_def, sample_lef, sample_guide);
-
     auto gcell_graph = design.global_routing().gcell_graph();
 
     // "Metal 1 Horizontal"
@@ -123,12 +122,20 @@ TEST_CASE("Test GCell Capacity", "[routing][gcell][capacity]")
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,0)) == 1);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,0)) == 10);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,0)) == 10);
-    
+    // upper corner gcell
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(196,195,0)) == 2);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,195,0)) == 1);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(196,0,0)) == 2);
+
     // "Metal 2 Vertical"
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,1)) == 1);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,1)) == 1);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,1)) == 10);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,1)) == 10);
+    // upper corner gcell
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(196,195,1)) == 8);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(0,195,1)) == 8);
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(196,0,1)) == 1);
 
     // "Metal 8 Horizontal"
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,7)) == 1);
@@ -140,14 +147,5 @@ TEST_CASE("Test GCell Capacity", "[routing][gcell][capacity]")
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,0,8)) == 0);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,8)) == 0);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,8)) == 5);
-    CHECK(gcell_graph->capacity(gcell_graph->gcell(2,1,8)) == 5);
-
-    // upper corner gcell
-    // "Metal 2 Vertical"
-    CHECK(gcell_graph->capacity(gcell_graph->gcell(198,197,1)) == 8);
-    CHECK(gcell_graph->capacity(gcell_graph->gcell(198,0,1)) == 1);
-    // CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,1)) == 1);
-    // CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,1)) == 10);
-    // CHECK(gcell_graph->capacity(gcell_graph->gcell(2,2,1)) == 10);
-
+    CHECK(gcell_graph->capacity(gcell_graph->gcell(2,1,8)) == 5);    
 }

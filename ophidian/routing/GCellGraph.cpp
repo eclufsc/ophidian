@@ -41,19 +41,18 @@ GCellGraph::GCellGraph(GCellGraph::unit_container_type x, GCellGraph::unit_conta
 GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::unit_container_type x, GCellGraph::unit_container_type y, GCellGraph::index_type z):
     ophidian::util::GridGraph_3D(x.size()-1,y.size()-1,z), m_nodes_to_gcell(m_graph)
 {
-    std::cout<<"size x : " << x.size()<< std::endl;
-    std::cout<<"size y : " << y.size()<< std::endl;
     for (index_type z_it = 0; z_it < z; ++z_it) {
 
         auto layer = library.layer_from_index(z_it+1);
         auto track = library.prefTrack(layer);
         auto tracDir = library.direction(track);
+        auto numTracks = library.numTracs(track);
         auto start = units::unit_cast<double>(library.start(track));
         auto space = units::unit_cast<double>(library.space(track));
+        double last_track_max_cord = start + (numTracks -1)*space;
 
         for (index_type x_it = 0; x_it < x.size() -1; ++x_it) {
             for (index_type y_it = 0; y_it < y.size() -1; ++y_it) {
-                
                 auto min_corner = point_type{x.at(x_it), y.at(y_it)}; 
                 auto max_corner = point_type{x.at(x_it + 1), y.at(y_it + 1)};
                 m_gcell_box.emplace(std::make_pair( std::make_pair(x_it,y_it) , box_type(min_corner, max_corner) ));
@@ -74,6 +73,8 @@ GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::u
                     min_cord = units::unit_cast<double>(min_corner.x());
                     max_cord = units::unit_cast<double>(max_corner.x());
                 }
+                if(max_cord > last_track_max_cord)
+                    max_cord = last_track_max_cord;
                 capacity = (int) std::ceil((max_cord - start)/space) - std::ceil((min_cord - start)/space);
 
                 if(capacity == 0 && max_cord == start)
@@ -106,7 +107,9 @@ GCellGraph::gcell_container_type::const_iterator GCellGraph::end_gcell() const n
 GCellGraph::gcell_type GCellGraph::gcell(GCellGraph::index_type x, GCellGraph::index_type y, GCellGraph::index_type z) const
 {
     auto n = node(x,y,z);
-    return m_nodes_to_gcell[n];
+    if(n != lemon::INVALID)
+        return m_nodes_to_gcell[n];
+    return gcell_type();
 }
 
 GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
