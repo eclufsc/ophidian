@@ -174,6 +174,14 @@ namespace ophidian::parser
             m_ports{std::forward<A3>(ports)}
         {}
 
+        template<class A1, class A2, class A3, class A4>
+        Pin(A1&& name, A2&& direction, A3&& ports, A4&& layer):
+            m_name{std::forward<A1>(name)},
+            m_direction{std::forward<A2>(direction)},
+            m_ports{std::forward<A3>(ports)},
+            m_layer{std::forward<A4>(layer)}
+        {}
+
         // Class member functions
         const string_type& name() const noexcept;
 
@@ -181,10 +189,13 @@ namespace ophidian::parser
 
         const port_map_type& ports() const noexcept;
 
+        const string_type & layer() const noexcept;
+
     private:
         string_type    m_name;
         direction_type m_direction;
         port_map_type  m_ports;
+        string_type    m_layer;
     };
 }
 

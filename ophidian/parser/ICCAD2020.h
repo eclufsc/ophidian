@@ -26,6 +26,33 @@
 
 namespace ophidian::parser
 {
+
+    //Aditional informations about macros
+    struct ICCADBlockage{
+        std::string blockage_name;
+        std::string macro_name;
+        std::string layer_name;
+        int demand;
+
+        ICCADBlockage(std::string blk_name, std::string macro_name, std::string layer_name, int d){
+            blockage_name = blk_name;
+            macro_name = macro_name;
+            layer_name = layer_name;
+            demand = d;
+        };
+    };
+
+    //Global routing provided information
+    struct ICCADSegment{
+        std::string net_name;
+        std::tuple<int, int, int> start, end;
+        ICCADSegment(int sx, int sy, int sz, int ex, int ey, int ez, std::string n_name){
+            start = std::make_tuple(sx, sy, sz);
+            end = std::make_tuple(ex, ey, ez);
+            net_name = n_name;
+        }
+    };
+
     /**
      * This is an encapsulation of an ICCAD2020 input 
      * described on a txt file to present max cell move, grid 
@@ -38,16 +65,30 @@ namespace ophidian::parser
     public:
         // class member types
         template <class T> using container_type     = std::vector<T>;
-        template <class K, class V> using map_type  = std::map<K,V>;
+        template <class K, class V> using map_type  = std::unordered_map<K,V>;
         template <class K, class V> using pair_type = std::pair<K, V>;
 
         using gcell_index                           = std::tuple<int, int, int>;
+        using demand_type                           = int;
         using layer_container_type                  = container_type<Layer>;
         using macro_container_type                  = container_type<Macro>;
-        using net_container_type                    = container_type<Net>;
-        using component_container_type              = container_type<Component>;
+        using net_type                              = Net;
+        using net_container_type                    = container_type<net_type>;
+        using component_type                        = Component;
+        using macro_type                            = Macro;
+        using pin_type                              = Macro::Pin;
+        using component_container_type              = container_type<component_type>;
+        using blockage_type                         = ICCADBlockage;
+        using blockage_container_type               = container_type<blockage_type>;
+        using segment_type                          = ICCADSegment;
+        using segment_container_type                = container_type<segment_type>;
         using layer_name_type                       = std::string;
-        using layer_capacity_map                    = map_type<layer_name_type, int>;
+        using macro_name_type                       = std::string;
+        using same_grid_key_type                    = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
+        using adj_grid_key_type                     = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
+        using blockage_map                          = map_type<macro_name_type, blockage_container_type>;
+        using same_grid_map                         = map_type<same_grid_key_type, demand_type>;
+        using adj_grid_map                          = map_type<adj_grid_key_type, demand_type>;
         using gcell_ndf_supply                      = container_type< pair_type<gcell_index, int> >;
 
         ICCAD2020() = default;
@@ -60,20 +101,46 @@ namespace ophidian::parser
 
         ICCAD2020(const std::string& iccad2020_file);
 
+        const unsigned int max_cell_move() const noexcept;
+
+        const gcell_index & grid_dimensions() const noexcept;
+
+        const std::pair<int, int> & grid_origin() const noexcept;
+
+        const std::pair<int, int> & grid_boundary() const noexcept;
+
+        const layer_container_type & layers() const noexcept;
+
+        const component_container_type & components() const noexcept;
+
+        const net_container_type & nets() const noexcept;
+
+        const macro_container_type & macros() const noexcept;
+
+        const gcell_ndf_supply & gcell_non_default_supply() const noexcept;
+
+        const segment_container_type & segments() const noexcept;
+
+        demand_type extra_demand_same_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);
+
+        demand_type extra_demand_adj_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);
     private:
         void read_file(const std::string& iccad2020_file);
 
         unsigned int m_max_cell_move;
         gcell_index m_grid_dimensions;
-        layer_capacity_map m_layer_capacity;
+        std::pair<int, int> m_grid_origin;
+        std::pair<int, int> m_grid_boundary;
         gcell_ndf_supply m_gcell_ndf_supply;
+        blockage_map m_iccad_blockage_map;
+        same_grid_map m_extra_demand_same_grid_map;
+        adj_grid_map m_extra_demand_adj_grid_map;
 
         layer_container_type m_layers{};
         component_container_type m_components{};
         macro_container_type m_macros{};
-        net_container_type       m_nets{};
-        //vector of positions
-        //routes
+        net_container_type m_nets{};
+        segment_container_type m_segments{};
     };
 }
 

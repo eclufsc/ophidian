@@ -54,9 +54,18 @@ namespace ophidian::parser
             m_pins{std::forward<Arg2>(pins)}
         { }
 
+        template<class Arg1, class Arg2, class Arg3>
+        Net(Arg1&& name, Arg2&& pins, Arg3&& min_layer):
+            m_name{std::forward<Arg1>(name)},
+            m_pins{std::forward<Arg2>(pins)},
+            m_min_layer{std::forward<Arg3>(min_layer)}
+        { }
+
         const name_type& name() const noexcept;
 
         const pin_container_type& pins() const noexcept;
+
+        const name_type & min_layer() const noexcept;
 
         bool operator==(const Net& rhs) const noexcept;
 
@@ -65,6 +74,7 @@ namespace ophidian::parser
     private:
         name_type m_name;
         pin_container_type m_pins;
+        name_type m_min_layer;
     };
 }
 

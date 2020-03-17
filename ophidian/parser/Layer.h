@@ -51,6 +51,8 @@ namespace ophidian::parser
         using micrometer_type           = util::micrometer_t;
         using type_type                 = Type;
         using direction_type            = Direction;
+        using index_type                = int;
+        using capacity_type             = int;
 
         using end_of_line_type            = EndOfLine;
         using parallel_run_length_type    = ParallelRunLength;
@@ -94,6 +96,15 @@ namespace ophidian::parser
             m_corner_spacing{std::forward<Arg14>(corner_spacing)}
         {}
 
+        template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
+        Layer(Arg1&& name, Arg2&& type, Arg3&& direction, Arg4&& index, Arg5&& capacity):
+            m_name{std::forward<Arg1>(name)},
+            m_type{std::forward<Arg2>(type)},
+            m_direction{std::forward<Arg3>(direction)},
+            m_index{std::forward<Arg4>(index)},
+            m_capacity{std::forward<Arg5>(capacity)}
+        {}
+
         // Class member functions
         const string_type& name() const noexcept;
 
@@ -123,6 +134,10 @@ namespace ophidian::parser
 
         const corner_spacing_type& corner_spacing() const noexcept;
 
+        const index_type index() const noexcept;
+
+        const capacity_type capacity() const noexcept;
+
         bool operator ==(const Layer& rhs) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Layer& layer);
@@ -142,6 +157,8 @@ namespace ophidian::parser
         parallel_run_length_type m_parallel_run_length;
         adjacent_cut_spacing_type m_adjacent_cut_spacing;
         corner_spacing_type m_corner_spacing;
+        index_type m_index;
+        capacity_type m_capacity;
     };
 }
 

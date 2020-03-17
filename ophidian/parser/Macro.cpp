@@ -116,4 +116,9 @@ namespace ophidian::parser
     {
         return m_ports;
     }
+
+    const Macro::Pin::string_type & Macro::Pin::layer() const noexcept
+    {
+        return m_layer;
+    }
 }
