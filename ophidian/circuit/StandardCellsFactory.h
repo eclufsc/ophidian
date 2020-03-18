@@ -20,12 +20,15 @@
 #define OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_FACTORY_H
 
 #include <ophidian/parser/Lef.h>
+#include <ophidian/parser/ICCAD2020.h>
 
 #include "StandardCells.h"
 
 namespace ophidian::circuit::factory
 {
     void make_standard_cells(StandardCells& cells, const parser::Lef& lef) noexcept;
+
+    void make_standard_cells(StandardCells& cells, const parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
 #endif

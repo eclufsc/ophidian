@@ -20,12 +20,15 @@
 #define OPHIDIAN_PLACEMENT_LEF2LIBRARY_H
 
 #include <ophidian/parser/Lef.h>
+#include <ophidian/parser/ICCAD2020.h>
 
 #include "Library.h"
 
 namespace ophidian::placement::factory
 {
     void make_library(Library& library, const parser::Lef& lef, circuit::StandardCells& stdCells) noexcept;
+
+    void make_library(Library& library, const parser::ICCAD2020 & iccad_2020, circuit::StandardCells& stdCells) noexcept;
 }
 
 #endif // OPHIDIAN_PLACEMENT_LEF2LIBRARY_H

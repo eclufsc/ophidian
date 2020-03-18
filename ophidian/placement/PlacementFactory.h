@@ -20,6 +20,7 @@
 #define OPHIDIAN_PLACEMENT_PLACEMENTFACTORY_H
 
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ICCAD2020.h>
 #include <ophidian/circuit/Netlist.h>
 
 #include "Placement.h"
@@ -28,6 +29,8 @@
 namespace ophidian::placement::factory
 {
     void make_placement(Placement& placement, const parser::Def& def, const circuit::Netlist& netlist) noexcept;
+
+    void make_placement(Placement& placement, const parser::ICCAD2020 & iccad_2020, const circuit::Netlist& netlist) noexcept;
 }
 
 #endif // OPHIDIAN_PLACEMENT_DEF2PLACEMENT_H

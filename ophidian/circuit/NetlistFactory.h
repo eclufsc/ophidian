@@ -21,6 +21,7 @@
 
 #include <ophidian/parser/Verilog.h>
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ICCAD2020.h>
 
 #include "Netlist.h"
 
@@ -31,6 +32,8 @@ namespace ophidian::circuit::factory
     void make_netlist(Netlist& netlist, const parser::Verilog & verilog, const StandardCells& std_cells) noexcept;
 
     void make_netlist(Netlist& netlist, const parser::Def & verilog, const StandardCells& std_cells) noexcept;
+
+    void make_netlist(Netlist& netlist, const parser::ICCAD2020 & iccad_2020, const StandardCells & std_cells) noexcept;
 }
 
 #endif

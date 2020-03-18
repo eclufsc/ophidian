@@ -56,4 +56,34 @@ namespace ophidian::placement::factory
             }
         }
     }
+
+    void make_library(Library& library, const parser::ICCAD2020 & iccad_2020, circuit::StandardCells& stdCells) noexcept {
+        for(const auto& macro : iccad_2020.macros())
+        {
+            auto stdCell = stdCells.find_cell(macro.name());
+
+            auto pmin = geometry::CellGeometry::point_type{
+                macro.origin().x(),
+                macro.origin().y()
+            };
+            auto pmax = geometry::CellGeometry::point_type{
+                macro.size().x(),
+                macro.size().y()
+            };
+
+            library.geometry(stdCell) = geometry::CellGeometry{ {{pmin, pmax}} };
+
+            for(const auto& pin : macro.pins())
+            {
+                auto stdPin = stdCells.find_pin(macro.name() + ":" + pin.name());
+
+                library.offset(stdPin) = Library::offset_type{Library::unit_type{0}, Library::unit_type{0}};
+
+                auto min_corner = geometry::CellGeometry::point_type{Library::unit_type{0}, Library::unit_type{0}};
+                auto max_corner = geometry::CellGeometry::point_type{Library::unit_type{0}, Library::unit_type{0}};
+                library.geometry(stdPin) = Library::std_pin_geometry_type();
+                library.geometry(stdPin).push_back(geometry::CellGeometry::box_type{min_corner, max_corner});
+            }
+        }
+    }
 }

@@ -50,6 +50,15 @@ namespace ophidian::routing
         using entity_system::EntityBase::EntityBase;
     };
 
+    /*
+    class GCell :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+    */
+
     struct geometry_in_layer_type
     {
     public:
@@ -82,7 +91,6 @@ namespace ophidian::routing
         using box_container_type    = std::vector<box_type>;
         using via_geometries_container_type    = std::vector<geometry_in_layer_type>;
         using point_type            = ophidian::util::LocationDbu;
-        
 
         using track_type            = Track;
         using track_container_type  = std::vector<track_type>;
@@ -91,6 +99,12 @@ namespace ophidian::routing
         using pad_container_type    = std::vector<pad_type>;
         using pad_geometries_container_type    = std::vector<geometry_in_layer_type>;
         using orientation_type      = Orientation;
+
+        /*
+        using gcell_type            = GCell;
+        using gcell_container_type  = std::vector<gcell_type>;
+        using layer_map_type        = std::unordered_map<std::string, unsigned>;
+        */
 
         using layer_tracks_view_type = entity_system::Association<layer_type, track_type>::Parts;
 
@@ -109,12 +123,12 @@ namespace ophidian::routing
         // Element access
         const layer_type find_layer_instance(const std::string& layerName) const;
 
+        /*
         //given a dbu box return a box with gcell coordinates
-        // box_type gcell_box(const point_type &, const point_type &) const;
+        box_type gcell_box(const point_type &, const point_type &) const;
         void set_gcell_coordinates(unit_container_type GCell_x_axis, unit_container_type GCell_y_axis);
-        unit_container_type get_GCell_x_axis();
-        unit_container_type get_GCell_y_axis();        
-        
+        gcell_type add_gcell(const point_type & min_corner, const point_type & max_corner);
+        */
         std::string name(const layer_type& layer);
         const std::string& name(const layer_type& layer) const;
         int index(const layer_type& layer) const;
@@ -175,6 +189,13 @@ namespace ophidian::routing
         orientation_type orientation (const pad_type& pad) const;
         std::map<std::string, box_container_type> box_in_layer(const pad_type& pad) const;
 
+        /*
+        point_type min_corner(const gcell_type & gcell) const;
+        point_type max_corner(const gcell_type & gcell) const;
+        unsigned capacity(const gcell_type & gcell, std::string layer_name) const;
+        void capacity(const gcell_type & gcell, std::string layer_name, unsigned capacity);
+        */
+
         layer_type highest_layer() const;
         void set_highest_layer(const layer_type& layer);
 
@@ -191,6 +212,11 @@ namespace ophidian::routing
         pad_container_type::const_iterator begin_pad() const noexcept;
         pad_container_type::const_iterator end_pad() const noexcept;
 
+        /*
+        gcell_container_type::const_iterator begin_gcell() const noexcept;
+        gcell_container_type::const_iterator end_gcell() const noexcept;
+        */
+
 
         // Capacity
         layer_container_type::size_type size_layer() const noexcept;
@@ -203,6 +229,7 @@ namespace ophidian::routing
         // Modifiers
         layer_type add_layer_instance(
         const std::string &layerName,
+        const Library::scalar_type index,
         const LayerType &type,
         const Direction &direction,
         const Library::unit_type& pitch,
@@ -273,6 +300,7 @@ namespace ophidian::routing
         entity_system::EntitySystem<layer_type>  mLayers{};
         entity_system::Property<layer_type, std::string>        mLayerName{mLayers};
         std::unordered_map<std::string, layer_type>             mName2Layer{};
+        entity_system::Property<layer_type, scalar_type>        mLayerIndexes{mLayers};
         entity_system::Property<layer_type, LayerType>          mLayerType{mLayers, LayerType::NA};
         entity_system::Property<layer_type, Direction>          mLayerDirection{mLayers, Direction::NA};
         entity_system::Property<layer_type, unit_type>          mLayerPitch{mLayers};
@@ -316,7 +344,13 @@ namespace ophidian::routing
 
         entity_system::Aggregation<layer_type, track_type>      mLayer2Tracks{mLayers, mTracks};
         entity_system::Aggregation<layer_type, via_type>        mLayer2Vias{mLayers, mVias};
-              
+
+        /*
+        entity_system::EntitySystem<gcell_type> m_gcells{};
+        entity_system::Property<gcell_type, point_type> m_gcell_min_corners{m_gcells};
+        entity_system::Property<gcell_type, point_type> m_gcell_max_corners{m_gcells};
+        entity_system::Property<gcell_type, layer_map_type> m_gcell_capacities{m_gcells};
+        */
     };
 }
 

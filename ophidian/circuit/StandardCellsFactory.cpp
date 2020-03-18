@@ -51,4 +51,18 @@ namespace ophidian::circuit::factory
             }
         }
     }
+
+    void make_standard_cells(StandardCells& cells, const parser::ICCAD2020 & iccad_2020) noexcept {
+        for(const auto& macro : iccad_2020.macros())
+        {
+            auto cell = cells.add_cell(macro.name());
+            for(const auto& pin : macro.pins())
+            {
+                auto cell_pin = Pin{};
+                auto pin_name = macro.name() + ":" + pin.name();
+                cell_pin = cells.add_pin(pin_name, PinDirection::NA);
+                cells.connect(cell, cell_pin);
+            }
+        }
+    }
 }

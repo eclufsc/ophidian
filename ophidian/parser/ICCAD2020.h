@@ -121,6 +121,9 @@ namespace ophidian::parser
 
         const segment_container_type & segments() const noexcept;
 
+        //TODO: move blockages and segments to routing factories, and also constraint maps.
+        //const ICCADBlockage & blockage(std::string macro_name) const noexcept;
+
         demand_type extra_demand_same_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);
 
         demand_type extra_demand_adj_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);

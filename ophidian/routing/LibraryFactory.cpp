@@ -17,6 +17,7 @@
  */
 
 #include "LibraryFactory.h"
+#include <boost/lexical_cast.hpp>
 #include <ophidian/util/Units.h>
 #include <unordered_map>
 
@@ -91,8 +92,17 @@ namespace ophidian::routing::factory
                 lTableContents.values.emplace_back(std::move(lenghts));
             }
             auto lTable = Library::spacing_table_type(lTableContents);
+
+            auto l_name = layer.name();
+            int l_index = -1;
+            if(l_name.find("Metal") == 0)
+                l_index = std::stoi(l_name.substr(5, l_name.size()));
+            else if(l_name.find("Via") == 0)
+                l_index = std::stoi(l_name.substr(3, l_name.size()));
+
             auto l = library.add_layer_instance(
                         layer.name(),
+                        l_index,
                         lType,
                         lDirection,
                         dbuConverter.convert(layer.pitch()),
@@ -146,6 +156,8 @@ namespace ophidian::routing::factory
             library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
 
+         /*
+        TODO: move  all GCell informations to global routing factory.
         std::vector<ophidian::util::database_unit_t> gcell_x_axis, gcell_y_axis;
         for(auto gcell : def.gcells())
         {
@@ -168,6 +180,7 @@ namespace ophidian::routing::factory
         std::sort(gcell_y_axis.begin(), gcell_y_axis.end());
         gcell_y_axis.erase( std::unique( gcell_y_axis.begin(), gcell_y_axis.end() ), gcell_y_axis.end());
         library.set_gcell_coordinates(gcell_x_axis, gcell_y_axis);
+        */
 
 
         //pads
@@ -300,5 +313,95 @@ namespace ophidian::routing::factory
             }
         }
         library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest)));
+    }
+
+    void make_library(Library& library, const parser::ICCAD2020 & iccad_2020) noexcept {
+        util::DbuConverter dbuConverter{1};
+
+        for(auto& layer : iccad_2020.layers()){
+            //layer type
+            LayerType lType;
+
+            switch (layer.type()) {
+                case ophidian::parser::Lef::layer_type::Type::CUT:
+                    lType = LayerType::CUT;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
+                    lType = LayerType::MASTERSLICE;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::ROUTING:
+                    lType = LayerType::ROUTING;
+                    break;
+                default:
+                    lType = LayerType::NA;
+                    break;
+            }
+
+            //layer direction
+            Direction lDirection;
+            switch (layer.direction()) {
+                case ophidian::parser::Lef::layer_type::Direction::HORIZONTAL:
+                lDirection = Direction::HORIZONTAL;
+                break;
+            case ophidian::parser::Lef::layer_type::Direction::VERTICAL:
+                lDirection = Direction::VERTICAL;
+                break;
+            default:
+                lDirection = Direction::NA;
+                break;
+            }
+            //layer spacingTable
+            Library::spacing_table_content_type lTableContents;
+            auto lTable = Library::spacing_table_type(lTableContents);
+            auto l = library.add_layer_instance(
+                        layer.name(),
+                        layer.index(),
+                        lType,
+                        lDirection,
+                        dbuConverter.convert(layer.pitch()),
+                        dbuConverter.convert(layer.offset()),
+                        dbuConverter.convert(layer.width()),
+                        dbuConverter.convert(layer.min_width()),
+                        dbuConverter.convert(layer.area()),
+                        dbuConverter.convert(layer.spacing()),
+                        dbuConverter.convert(layer.end_of_line().space()),
+                        dbuConverter.convert(layer.end_of_line().width()),
+                        dbuConverter.convert(layer.end_of_line().within()),
+                        dbuConverter.convert(layer.parallel_edge().space()),
+                        dbuConverter.convert(layer.parallel_edge().width()),
+                        dbuConverter.convert(layer.parallel_edge().within()),
+                        dbuConverter.convert(layer.parallel_edge().par_space()),
+                        dbuConverter.convert(layer.parallel_edge().par_within()),
+                        lTable,
+                        dbuConverter.convert(layer.adjacent_cut_spacing().adj_spacing()),
+                        layer.adjacent_cut_spacing().cuts(),
+                        dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
+                        dbuConverter.convert(layer.corner_spacing().eol_width()));
+        }
+
+        /*
+        auto gcells_ndf_supply = iccad_2020.gcell_non_default_supply();
+
+        auto gcell_size = 10;
+        auto grid_origin = iccad_2020.grid_origin();
+        auto grid_boundary = iccad_2020.grid_boundary();
+        for (auto x = grid_origin.first; x <= grid_boundary.first; x++) {
+            for (auto y = grid_origin.second; y <= grid_boundary.second; y++) {
+                auto min_corner = Library::point_type{util::micrometer_t(x*gcell_size), util::micrometer_t(y*gcell_size)};
+                auto max_corner = Library::point_type{util::micrometer_t(x*gcell_size + gcell_size), util::micrometer_t(y*gcell_size + gcell_size)};
+                //auto min_corner = Library::point_type{util::micrometer_t(x), util::micrometer_t(y)};
+                //auto max_corner = Library::point_type{util::micrometer_t(x+0.1), util::micrometer_t(y+0.1)};
+                auto gcell = library.add_gcell(min_corner, max_corner);
+                for (auto layer : iccad_2020.layers()) {
+                    auto layer_name = layer.name();
+                    auto layer_capacity = layer.capacity();
+                    auto layer_index = layer.index();
+                    auto gcell_index = std::make_tuple((int)x, (int)y, (int)layer_index);
+                    auto gcell_ndf_supply = (gcells_ndf_supply.find(gcell_index) == gcells_ndf_supply.end()) ? 0 : gcells_ndf_supply.at(gcell_index);
+                    library.capacity(gcell, layer_name, layer_capacity + gcell_ndf_supply);
+                }
+            }
+        }
+        */
     }
 }

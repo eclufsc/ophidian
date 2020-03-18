@@ -16,11 +16,7 @@
    under the License.
  */
 
-#include "AdjacentCutSpacing.h"
-#include "CornerSpacing.h"
-#include "EndOfLine.h"
 #include "ICCAD2020.h"
-#include "ParallelRunLength.h"
 #include "Macro.h"
 #include <ophidian/util/Units.h>
 #include <fstream>
