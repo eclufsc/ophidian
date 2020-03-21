@@ -23,49 +23,6 @@ namespace ophidian
 namespace routing
 {
 
-/*
-void Library::set_gcell_coordinates(Library::unit_container_type GCell_x_axis, Library::unit_container_type GCell_y_axis){
-    mGCell_x_axis = GCell_x_axis;
-    mGCell_y_axis = GCell_y_axis;
-}
-
-Library::box_type Library::gcell_box(const point_type & min_corner, const point_type & max_corner) const
-{
-    auto min_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), min_corner.x(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-    auto min_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), min_corner.y(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-    if(min_x_it != mGCell_x_axis.begin())
-        min_x_it--;
-    if(min_y_it != mGCell_y_axis.begin())
-        min_y_it--;
-
-    auto max_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), max_corner.x());
-    auto max_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), max_corner.y());
-    if(max_x_it == mGCell_x_axis.end())
-        max_x_it--;
-    if(max_y_it == mGCell_y_axis.end())
-        max_y_it--;
-
-    return box_type(point_type(unit_type(*min_x_it), unit_type(*min_y_it)),
-                    point_type(unit_type(*max_x_it), unit_type(*max_y_it)));
-
-// }
-
-Library::unit_container_type Library::get_GCell_x_axis(){
-    return mGCell_x_axis;
-}
-
-Library::gcell_type Library::add_gcell(const point_type & min_corner, const point_type & max_corner) {
-    auto gcell = m_gcells.add();
-    m_gcell_min_corners[gcell] = min_corner;
-    m_gcell_max_corners[gcell] = max_corner;
-    return gcell;
-}
-
-Library::unit_container_type Library::get_GCell_y_axis(){
-    return mGCell_y_axis;
-}
-*/
-
 const Library::layer_type Library::find_layer_instance(const std::string &layerName) const
 {
     if (mName2Layer.find(layerName) != mName2Layer.end())
@@ -417,18 +374,6 @@ Library::pad_container_type::const_iterator Library::end_pad() const noexcept
     return mPads.end();
 }
 
-/*
-Library::gcell_container_type::const_iterator Library::begin_gcell() const noexcept
-{
-    return m_gcells.begin();
-}
-
-Library::gcell_container_type::const_iterator Library::end_gcell() const noexcept
-{
-    return m_gcells.end();
-}
-*/
-
 Library::layer_container_type::size_type Library::size_layer() const noexcept
 {
     return mLayers.size();
@@ -503,28 +448,6 @@ Library::orientation_type Library::orientation(const Library::pad_type& pad) con
 {
     return mPadOrientation[pad];
 }
-
-/*
-Library::point_type Library::min_corner(const Library::gcell_type & gcell) const
-{
-    return m_gcell_min_corners[gcell];
-}
-
-Library::point_type Library::max_corner(const Library::gcell_type & gcell) const
-{
-    return m_gcell_max_corners[gcell];
-}
-
-unsigned Library::capacity(const Library::gcell_type & gcell, std::string layer_name) const
-{
-    return m_gcell_capacities[gcell].at(layer_name);
-}
-
-void Library::capacity(const Library::gcell_type & gcell, std::string layer_name, unsigned capacity)
-{
-    m_gcell_capacities[gcell][layer_name] = capacity;
-}
-*/
 
 std::map<std::string, Library::box_container_type> Library::box_in_layer(const Library::pad_type& pad) const
 {

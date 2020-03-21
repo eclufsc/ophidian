@@ -156,33 +156,6 @@ namespace ophidian::routing::factory
             library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
 
-         /*
-        TODO: move  all GCell informations to global routing factory.
-        std::vector<ophidian::util::database_unit_t> gcell_x_axis, gcell_y_axis;
-        for(auto gcell : def.gcells())
-        {
-            if(gcell.horizontal())
-                continue;
-            for(auto i = 0; i < gcell.num(); ++i)
-                gcell_x_axis.push_back(gcell.origin() + i * gcell.step());
-        }
-
-        for(auto gcell : def.gcells())
-        {
-            if(!gcell.horizontal())
-                continue;
-            for(auto i = 0; i < gcell.num(); ++i)
-                gcell_y_axis.push_back(gcell.origin() + i * gcell.step());
-        }
-
-        std::sort(gcell_x_axis.begin(), gcell_x_axis.end());
-        gcell_x_axis.erase( std::unique( gcell_x_axis.begin(), gcell_x_axis.end() ), gcell_x_axis.end());
-        std::sort(gcell_y_axis.begin(), gcell_y_axis.end());
-        gcell_y_axis.erase( std::unique( gcell_y_axis.begin(), gcell_y_axis.end() ), gcell_y_axis.end());
-        library.set_gcell_coordinates(gcell_x_axis, gcell_y_axis);
-        */
-
-
         //pads
         for(auto pad : def.pads())
         {
@@ -378,30 +351,5 @@ namespace ophidian::routing::factory
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
         }
-
-        /*
-        auto gcells_ndf_supply = iccad_2020.gcell_non_default_supply();
-
-        auto gcell_size = 10;
-        auto grid_origin = iccad_2020.grid_origin();
-        auto grid_boundary = iccad_2020.grid_boundary();
-        for (auto x = grid_origin.first; x <= grid_boundary.first; x++) {
-            for (auto y = grid_origin.second; y <= grid_boundary.second; y++) {
-                auto min_corner = Library::point_type{util::micrometer_t(x*gcell_size), util::micrometer_t(y*gcell_size)};
-                auto max_corner = Library::point_type{util::micrometer_t(x*gcell_size + gcell_size), util::micrometer_t(y*gcell_size + gcell_size)};
-                //auto min_corner = Library::point_type{util::micrometer_t(x), util::micrometer_t(y)};
-                //auto max_corner = Library::point_type{util::micrometer_t(x+0.1), util::micrometer_t(y+0.1)};
-                auto gcell = library.add_gcell(min_corner, max_corner);
-                for (auto layer : iccad_2020.layers()) {
-                    auto layer_name = layer.name();
-                    auto layer_capacity = layer.capacity();
-                    auto layer_index = layer.index();
-                    auto gcell_index = std::make_tuple((int)x, (int)y, (int)layer_index);
-                    auto gcell_ndf_supply = (gcells_ndf_supply.find(gcell_index) == gcells_ndf_supply.end()) ? 0 : gcells_ndf_supply.at(gcell_index);
-                    library.capacity(gcell, layer_name, layer_capacity + gcell_ndf_supply);
-                }
-            }
-        }
-        */
     }
 }

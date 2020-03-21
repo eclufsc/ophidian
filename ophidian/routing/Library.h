@@ -50,15 +50,6 @@ namespace ophidian::routing
         using entity_system::EntityBase::EntityBase;
     };
 
-    /*
-    class GCell :
-        public entity_system::EntityBase
-    {
-    public:
-        using entity_system::EntityBase::EntityBase;
-    };
-    */
-
     struct geometry_in_layer_type
     {
     public:
@@ -75,38 +66,32 @@ namespace ophidian::routing
     public:
         template <class K, class V> using map_type  = std::unordered_map<K,V>;
 
-        using scalar_type           = int;
-        using unit_type             = util::database_unit_t;
-        using unit_container_type   = std::vector<unit_type>;
-        using table_strategy_type   = util::FloorStrategy<unit_type, unit_type, unit_type>;
-        using spacing_table_type    = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
-        using spacing_table_content_type = util::TableContents<unit_type, unit_type, unit_type>;
+        using scalar_type                      = int;
+        using unit_type                        = util::database_unit_t;
+        using unit_container_type              = std::vector<unit_type>;
+        using table_strategy_type              = util::FloorStrategy<unit_type, unit_type, unit_type>;
+        using spacing_table_type               = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
+        using spacing_table_content_type       = util::TableContents<unit_type, unit_type, unit_type>;
 
-        using layer_type            = Layer;
-        using layer_container_type  = std::vector<layer_type>;
+        using layer_type                       = Layer;
+        using layer_container_type             = std::vector<layer_type>;
 
-        using via_type              = Via;
-        using via_container_type    = std::vector<via_type>;
-        using box_type              = geometry::Box<unit_type>;
-        using box_container_type    = std::vector<box_type>;
+        using via_type                         = Via;
+        using via_container_type               = std::vector<via_type>;
+        using box_type                         = geometry::Box<unit_type>;
+        using box_container_type               = std::vector<box_type>;
         using via_geometries_container_type    = std::vector<geometry_in_layer_type>;
-        using point_type            = ophidian::util::LocationDbu;
+        using point_type                       = ophidian::util::LocationDbu;
 
-        using track_type            = Track;
-        using track_container_type  = std::vector<track_type>;
+        using track_type                       = Track;
+        using track_container_type             = std::vector<track_type>;
 
-        using pad_type              = Pad;
-        using pad_container_type    = std::vector<pad_type>;
+        using pad_type                         = Pad;
+        using pad_container_type               = std::vector<pad_type>;
         using pad_geometries_container_type    = std::vector<geometry_in_layer_type>;
-        using orientation_type      = Orientation;
+        using orientation_type                 = Orientation;
 
-        /*
-        using gcell_type            = GCell;
-        using gcell_container_type  = std::vector<gcell_type>;
-        using layer_map_type        = std::unordered_map<std::string, unsigned>;
-        */
-
-        using layer_tracks_view_type = entity_system::Association<layer_type, track_type>::Parts;
+        using layer_tracks_view_type           = entity_system::Association<layer_type, track_type>::Parts;
 
         // Constructors
         //! Construct Netlist
@@ -123,12 +108,6 @@ namespace ophidian::routing
         // Element access
         const layer_type find_layer_instance(const std::string& layerName) const;
 
-        /*
-        //given a dbu box return a box with gcell coordinates
-        box_type gcell_box(const point_type &, const point_type &) const;
-        void set_gcell_coordinates(unit_container_type GCell_x_axis, unit_container_type GCell_y_axis);
-        gcell_type add_gcell(const point_type & min_corner, const point_type & max_corner);
-        */
         std::string name(const layer_type& layer);
         const std::string& name(const layer_type& layer) const;
         int index(const layer_type& layer) const;
@@ -189,13 +168,6 @@ namespace ophidian::routing
         orientation_type orientation (const pad_type& pad) const;
         std::map<std::string, box_container_type> box_in_layer(const pad_type& pad) const;
 
-        /*
-        point_type min_corner(const gcell_type & gcell) const;
-        point_type max_corner(const gcell_type & gcell) const;
-        unsigned capacity(const gcell_type & gcell, std::string layer_name) const;
-        void capacity(const gcell_type & gcell, std::string layer_name, unsigned capacity);
-        */
-
         layer_type highest_layer() const;
         void set_highest_layer(const layer_type& layer);
 
@@ -211,12 +183,6 @@ namespace ophidian::routing
 
         pad_container_type::const_iterator begin_pad() const noexcept;
         pad_container_type::const_iterator end_pad() const noexcept;
-
-        /*
-        gcell_container_type::const_iterator begin_gcell() const noexcept;
-        gcell_container_type::const_iterator end_gcell() const noexcept;
-        */
-
 
         // Capacity
         layer_container_type::size_type size_layer() const noexcept;
@@ -344,13 +310,6 @@ namespace ophidian::routing
 
         entity_system::Aggregation<layer_type, track_type>      mLayer2Tracks{mLayers, mTracks};
         entity_system::Aggregation<layer_type, via_type>        mLayer2Vias{mLayers, mVias};
-
-        /*
-        entity_system::EntitySystem<gcell_type> m_gcells{};
-        entity_system::Property<gcell_type, point_type> m_gcell_min_corners{m_gcells};
-        entity_system::Property<gcell_type, point_type> m_gcell_max_corners{m_gcells};
-        entity_system::Property<gcell_type, layer_map_type> m_gcell_capacities{m_gcells};
-        */
     };
 }
 
