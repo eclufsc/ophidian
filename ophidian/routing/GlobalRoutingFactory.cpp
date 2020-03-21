@@ -41,4 +41,34 @@ namespace ophidian::routing::factory
             std::cout << "        : Global Routing does not have GCELL Graph" << std::endl;
         }
     }
+
+    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
+    {
+        auto dimensions = iccad_2020.grid_dimensions();
+        auto gcell_size = 10.0;
+        ophidian::routing::GCellGraph::unit_container_type x_gcell_axis, y_gcell_axis;
+        x_gcell_axis.reserve(std::get<0>(dimensions)+1);
+        y_gcell_axis.reserve(std::get<1>(dimensions)+1);
+        for(int x = 0; x <= std::get<0>(dimensions); x++)
+            x_gcell_axis.push_back(util::micrometer_t{x*gcell_size});
+        for(int y = 0; y <= std::get<1>(dimensions); y++)
+            y_gcell_axis.push_back(util::micrometer_t{y*gcell_size});
+        auto iccad_layers = iccad_2020.layers();
+        std::vector<int> capacities;
+        capacities.resize(iccad_layers.size());
+        for(auto layer : iccad_layers)
+            capacities.at(layer.index()-1) = layer.capacity();
+        globalRouting.create_gcell_graph(x_gcell_axis, y_gcell_axis, std::get<2>(dimensions), capacities);
+
+        /*
+        //TODO: Pass global routing segments
+        for(auto net : guide.nets()){
+            auto net_instance = netlist.find_net(net.name());
+            for(auto region : net.regions()){
+                auto layer_instance = library.find_layer_instance(region.metal());
+                globalRouting.add_segment(region.region(), layer_instance, net_instance);
+            }
+        }
+        */
+    }
 }

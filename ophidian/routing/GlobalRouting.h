@@ -56,6 +56,7 @@ namespace ophidian::routing
         const segment_geometry_type& box(const gr_segment_type& segment) const;
         const layer_type layer(const gr_segment_type& segment) const;
 
+        void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
         gcell_graph_ptr_type gcell_graph();
 

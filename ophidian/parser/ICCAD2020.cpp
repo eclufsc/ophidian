@@ -75,34 +75,14 @@ namespace ophidian::parser
         return m_segments;
     }
 
-    ICCAD2020::demand_type ICCAD2020::extra_demand_same_grid(macro_name_type m1, macro_name_type m2, layer_name_type l){
-        auto key1 = m1+":"+m2+":"+l;
-        auto search = m_extra_demand_same_grid_map.find(key1);
-        if(search != m_extra_demand_same_grid_map.end())
-            return search->second;
-        else{
-            auto key2 = m2+":"+m1+":"+l;
-            search = m_extra_demand_same_grid_map.find(key2);
-            if(search != m_extra_demand_same_grid_map.end())
-                return search->second;
-            else
-                return 0;
-        }
+    const ICCAD2020::extra_demands_type & ICCAD2020::same_grid_extra_demands() const noexcept
+    {
+        return m_same_grid;
     }
 
-    ICCAD2020::demand_type ICCAD2020::extra_demand_adj_grid(macro_name_type m1, macro_name_type m2, layer_name_type l){
-        auto key1 = m1+":"+m2+":"+l;
-        auto search = m_extra_demand_adj_grid_map.find(key1);
-        if(search != m_extra_demand_adj_grid_map.end())
-            return search->second;
-        else{
-            auto key2 = m2+":"+m1+":"+l;
-            search = m_extra_demand_adj_grid_map.find(key2);
-            if(search != m_extra_demand_adj_grid_map.end())
-                return search->second;
-            else
-                return 0;
-        }
+    const ICCAD2020::extra_demands_type & ICCAD2020::adj_grid_extra_demands() const noexcept
+    {
+        return m_adj_grid;
     }
 
     void ICCAD2020::read_file(const std::string& iccad2020_file)
@@ -207,9 +187,9 @@ namespace ophidian::parser
                     tokens = {std::istream_iterator<std::string>{iss},
                               std::istream_iterator<std::string>{}};
                     if(tokens.at(0) == "sameGGrid")
-                        m_extra_demand_same_grid_map.insert({tokens.at(1)+":"+tokens.at(2)+":"+tokens.at(3), std::stoi(tokens.at(4))});
+                        m_same_grid.push_back({tokens.at(1), tokens.at(2), tokens.at(3), std::stoi(tokens.at(4))});
                     else if(tokens.at(0) == "adjHGGrid")
-                        m_extra_demand_adj_grid_map.insert({tokens.at(1)+":"+tokens.at(2)+":"+tokens.at(3), std::stoi(tokens.at(4))});
+                        m_adj_grid.push_back({tokens.at(1), tokens.at(2), tokens.at(3), std::stoi(tokens.at(4))});
                 }
             }
             else if(tokens.at(0) == "NumCellInst")

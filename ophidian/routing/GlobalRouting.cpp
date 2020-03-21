@@ -48,9 +48,14 @@ namespace ophidian::routing
         return m_gr_segment_layers[segment];
     }
 
+    void GlobalRouting::create_gcell_graph(GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z, GCellGraph::scalar_container_type capacities)
+    {
+        m_gcell_graph.reset(new gcell_graph_type(x, y, z, capacities));
+    }
+
     void GlobalRouting::create_gcell_graph(const ophidian::routing::Library & library, GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z)
     {
-        m_gcell_graph.reset(new gcell_graph_type(library, x, y,z));
+        m_gcell_graph.reset(new gcell_graph_type(library, x, y, z));
     }
 
     GlobalRouting::gcell_graph_ptr_type GlobalRouting::gcell_graph()

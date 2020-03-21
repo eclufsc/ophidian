@@ -42,6 +42,20 @@ namespace ophidian::parser
         };
     };
 
+    struct ExtraDemandConstraint{
+        std::string macro1_name;
+        std::string macro2_name;
+        std::string layer_name;
+        int extra_demand;
+
+        ExtraDemandConstraint(std::string m1_name, std::string m2_name, std::string l_name, int demand){
+            macro1_name = m1_name;
+            macro2_name = m2_name;
+            layer_name = l_name;
+            extra_demand = demand;
+        };
+    };
+
     //Global routing provided information
     struct ICCADSegment{
         std::string net_name;
@@ -86,6 +100,7 @@ namespace ophidian::parser
         using macro_name_type                       = std::string;
         using same_grid_key_type                    = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
         using adj_grid_key_type                     = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
+        using extra_demands_type                    = container_type<ExtraDemandConstraint>;
         using blockage_map                          = map_type<macro_name_type, blockage_container_type>;
         using same_grid_map                         = map_type<same_grid_key_type, demand_type>;
         using adj_grid_map                          = map_type<adj_grid_key_type, demand_type>;
@@ -121,12 +136,12 @@ namespace ophidian::parser
 
         const segment_container_type & segments() const noexcept;
 
-        //TODO: move blockages and segments to routing factories, and also constraint maps.
-        //const ICCADBlockage & blockage(std::string macro_name) const noexcept;
+        const extra_demands_type & same_grid_extra_demands() const noexcept;
 
-        demand_type extra_demand_same_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);
+        const extra_demands_type & adj_grid_extra_demands() const noexcept;
 
-        demand_type extra_demand_adj_grid(macro_name_type m1, macro_name_type m2, layer_name_type l);
+        //TODO: move blockages to somewere in cell geometry
+        ////const ICCADBlockage & blockage(std::string macro_name) const noexcept;
     private:
         void read_file(const std::string& iccad2020_file);
 
@@ -136,9 +151,9 @@ namespace ophidian::parser
         std::pair<int, int> m_grid_boundary;
         gcell_ndf_supply m_gcell_ndf_supply;
         blockage_map m_iccad_blockage_map;
-        same_grid_map m_extra_demand_same_grid_map;
-        adj_grid_map m_extra_demand_adj_grid_map;
 
+        extra_demands_type m_same_grid{};
+        extra_demands_type m_adj_grid{};
         layer_container_type m_layers{};
         component_container_type m_components{};
         macro_container_type m_macros{};

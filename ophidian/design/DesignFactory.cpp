@@ -25,6 +25,7 @@
 #include <ophidian/floorplan/FloorplanFactory.h>
 #include <ophidian/routing/LibraryFactory.h>
 #include <ophidian/routing/GlobalRoutingFactory.h>
+#include <ophidian/routing/RoutingConstraintsFactory.h>
 
 namespace ophidian::design::factory
 {
@@ -108,7 +109,8 @@ namespace ophidian::design::factory
 
         routing::factory::make_library(design.routing_library(), iccad_2020);
 
-        //WIP:
-        //routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), design.standard_cells(), iccad_2020);
+        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), design.standard_cells(), iccad_2020);
+
+        routing::factory::make_routing_constraints(design.routing_constraints(), design.routing_library(), design.netlist(), iccad_2020);
     }
 }

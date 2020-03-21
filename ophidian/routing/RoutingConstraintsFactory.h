@@ -14,33 +14,23 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License.
- */
+ */ 
 
-#ifndef OPHIDIAN_GLOBAL_ROUTING_FACTORY_H
-#define OPHIDIAN_GLOBAL_ROUTING_FACTORY_H
 
-#include <ophidian/parser/Guide.h>
-#include <ophidian/parser/Def.h>
-#include <ophidian/parser/ICCAD2020.h>
+#ifndef OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H
+#define OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H
+
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
+#include <ophidian/parser/ICCAD2020.h>
 #include <ophidian/routing/RoutingConstraints.h>
-#include "GlobalRouting.h"
 
 namespace ophidian::routing::factory
 {
-    void make_global_routing(GlobalRouting& globalRouting,
-                             const Library & library,
-                             const ophidian::circuit::Netlist & netlist,
-                             const ophidian::parser::Guide& guide,
-                             const ophidian::parser::Def& def
-                            ) noexcept;
-
-    void make_global_routing(GlobalRouting& globalRouting,
-                             const Library & library,
-                             const ophidian::circuit::Netlist & netlist,
-                             const ophidian::circuit::StandardCells & std_cells,
-                             const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
+    void make_routing_constraints(ophidian::routing::RoutingConstraints & routingConstraints,
+                                  const ophidian::routing::Library & library,
+                                  const ophidian::circuit::Netlist & netlist,
+                                  const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
-#endif // OPHIDIAN_GLOBAL_ROUTING_FACTORY_H
+#endif // OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H
