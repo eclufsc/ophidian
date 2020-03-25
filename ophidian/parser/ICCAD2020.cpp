@@ -85,6 +85,15 @@ namespace ophidian::parser
         return m_adj_grid;
     }
 
+    const ICCAD2020::blockage_container_type ICCAD2020::blockages(std::string macro_name) const noexcept
+    {
+        auto blockage_it = m_iccad_blockage_map.find(macro_name);
+        if(blockage_it != m_iccad_blockage_map.end())
+            return blockage_it->second;
+        else
+            return {};
+    }
+
     void ICCAD2020::read_file(const std::string& iccad2020_file)
     {
         std::ifstream infile(iccad2020_file);

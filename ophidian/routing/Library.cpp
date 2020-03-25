@@ -279,8 +279,13 @@ const Library::layer_type Library::lowerLayer(const Library::layer_type& layer) 
 const Library::scalar_type Library::layerIndex(const Library::layer_type& layer) const
 {
     /*
-    //Sheiny: this layer mapping needs to be improved, I sugest a mapping by layer type plus index
     //Renan: changed to work with ICCAD2020 circuits, it will not work with ISPD circuits anymore
+    //
+    //Sheiny: this layer mapping needs to be improved.
+    //I sugest split layer mapping by layer type (Layer, Via ...).
+    //We can not subtract 1 from layer name, because if we have Metal0 as layer name it would be negative.
+    //I sugest use layer index just for sorting.
+    //
     auto layerName = mLayerName[layer];
     //std::string indexLayerSegment = layerName.substr(5);
     std::string indexLayerSegment = layerName.substr(1);

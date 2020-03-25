@@ -134,6 +134,7 @@ namespace ophidian::parser
 
         const corner_spacing_type& corner_spacing() const noexcept;
 
+        //Use only for sorting, not for container accessing.
         const index_type index() const noexcept;
 
         const capacity_type capacity() const noexcept;

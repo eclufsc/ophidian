@@ -116,7 +116,7 @@ TEST_CASE("Routing Library Factory Test ispd2019", "[routing][library][factory][
         CHECK(library.direction(library.prefTrack(layer)) == ophidian::routing::Direction::HORIZONTAL);
         CHECK(library.direction(library.nonPrefTrack(layer)) == ophidian::routing::Direction::VERTICAL);
         CHECK(library.name((library.upperLayer(layer))) == "Metal3");
-        CHECK(library.layerIndex(layer) == 2);
+//        CHECK(library.layerIndex(layer) == 2);// See Renan's comment in Library.cpp
         CHECK(library.isFirstRightBelowSecond(library.find_layer_instance("Metal1"), library.find_layer_instance("Metal2")));
 
         auto& spacing_table = library.spacing_table(layer);

@@ -34,10 +34,10 @@ namespace ophidian::parser
         std::string layer_name;
         int demand;
 
-        ICCADBlockage(std::string blk_name, std::string macro_name, std::string layer_name, int d){
+        ICCADBlockage(std::string blk_name, std::string m_name, std::string l_name, int d){
             blockage_name = blk_name;
-            macro_name = macro_name;
-            layer_name = layer_name;
+            macro_name = m_name;
+            layer_name = l_name;
             demand = d;
         };
     };
@@ -140,8 +140,7 @@ namespace ophidian::parser
 
         const extra_demands_type & adj_grid_extra_demands() const noexcept;
 
-        //TODO: move blockages to somewere in cell geometry
-        ////const ICCADBlockage & blockage(std::string macro_name) const noexcept;
+        const blockage_container_type blockages(std::string macro_name) const noexcept;
     private:
         void read_file(const std::string& iccad2020_file);
 

@@ -139,7 +139,7 @@ namespace ophidian::routing
         const track_type nonPrefTrack(const layer_type& layer) const;
         const layer_type upperLayer(const layer_type& layer) const;
         const layer_type lowerLayer(const layer_type& layer) const;
-        const scalar_type layerIndex(const layer_type& layer) const;
+        const scalar_type layerIndex(const layer_type& layer) const;//Be careful, use only for sorting layers.
         const void viaCandidates(via_container_type& vias, const layer_type& layer, const layer_type& upperLayer) const;
         //! returns the via layer (cut) below the above layer
         const layer_type viaLayerBelow(const layer_type& above) const;
