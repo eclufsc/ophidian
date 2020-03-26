@@ -148,6 +148,8 @@ namespace ophidian::circuit::factory
     }
 
     void make_netlist(Netlist& netlist, const parser::ICCAD2020 & iccad_2020, const StandardCells & std_cells) noexcept {
+        netlist.reserve_net(iccad_2020.nets().size());
+        netlist.reserve_cell_instance(iccad_2020.components().size());
         for(const auto & component : iccad_2020.components())
         {
             auto cell_instance = netlist.add_cell_instance(component.name());
@@ -159,13 +161,6 @@ namespace ophidian::circuit::factory
             auto net_instance = netlist.add_net(net.name());
             for(const auto& pin : net.pins())
             {
-                if(pin.first == "PIN")
-                {
-                   auto pin_instance = netlist.add_pin_instance(pin.second);
-                   netlist.connect(net_instance, pin_instance);
-                    continue;
-                }
-
                 auto pin_instance = netlist.add_pin_instance(pin.first + ":" + pin.second);
 
                 netlist.connect(net_instance, pin_instance);
