@@ -2,10 +2,15 @@
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/Guide.h>
-#include <ophidian/design/DesignFactory.h>
-#include <ophidian/routing/GlobalRoutingFactory.h>
 #include <ophidian/parser/ParserException.h>
+#include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/GCellGraph.h>
+#include <ophidian/routing/GlobalRoutingFactory.h>
+#include <ophidian/routing/LibraryFactory.h>
+#include <ophidian/circuit/StandardCellsFactory.h>
+#include <ophidian/circuit/NetlistFactory.h>
+#include <ophidian/placement/LibraryFactory.h>
+#include <ophidian/placement/PlacementFactory.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/geometry/Models.h>
 #include <algorithm>
@@ -77,7 +82,7 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
         CHECK(gcells.size() == 1);
         CHECK(gcells[0] == gcell);
     }
-    SECTION("intersect box which is bigguer tha gcell"){
+    SECTION("intersect box which is bigger than gcell"){
         auto box = box_type{point_type{dbu{300}, dbu{400}}, point_type{dbu{900}, dbu{800}}};
         std::vector<ophidian::routing::GCell> gcells;
         graph.intersect(gcells, box, 1);
@@ -99,10 +104,10 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
         auto box = box_type{point_type{dbu{600}, dbu{500}}, point_type{dbu{700}, dbu{600}}};
         std::vector<ophidian::routing::GCell> gcells;
         graph.intersect(gcells, box, 1);
-        CHECK(gcells.size() == 2);
+        CHECK(gcells.size() == 1);
         std::vector<ophidian::routing::GCell> expected_gcells;
-        expected_gcells.push_back(gcell); //graph.gcell(2, 3, 1)
-        expected_gcells.push_back(graph.gcell(2, 2, 1));
+        expected_gcells.push_back(gcell);
+        expected_gcells.push_back(graph.gcell(2, 3, 1));
         CHECK(std::is_permutation(gcells.begin(), gcells.end(), expected_gcells.begin()));
     }
 }
@@ -148,4 +153,96 @@ TEST_CASE("Test GCell Capacity", "[routing][gcell][capacity]")
     CHECK(gcell_graph->capacity(gcell_graph->gcell(0,1,8)) == 0);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(1,0,8)) == 5);
     CHECK(gcell_graph->capacity(gcell_graph->gcell(2,1,8)) == 5);    
+}
+
+
+TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
+{
+    /* Case1.txt
+     * Z = 3 layers
+       Y
+    50|-------|-------|-------|-------|-------|
+      |       |       |       |       |       |
+      |       |   C2  |       |       |       |
+    40|-------|-------|-------|-------|-------|
+      |       |       |       |       |       |
+      |   C1  |       |       |   C5  |       |
+    30|-------|-------|-------|-------|-------|
+      |       |       |       |       |       |
+      |       |       |       |       |  C8   |
+    20|-------|-------|-------|-------|-------|
+      |       |  C3   |       |   C6  |       |
+      |       |  C4   |       |   C7  |       |
+    10|-------|-------|-------|-------|-------|
+      |       |       |       |       |       |
+      |       |       |       |       |       |
+     0----------------------------------------- X
+      0       10      20      30      40      50
+    */
+    ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    auto design = ophidian::design::Design{};
+    auto std_cells = ophidian::circuit::StandardCells{};
+    auto netlist = ophidian::circuit::Netlist{};
+    ophidian::circuit::factory::make_standard_cells(std_cells, sample);
+    ophidian::circuit::factory::make_netlist(netlist, sample, std_cells);
+    auto placement_library = ophidian::placement::Library{std_cells};
+    auto placement = ophidian::placement::Placement{netlist, placement_library};
+    ophidian::placement::factory::make_placement(placement, sample, netlist);
+    auto & routing_library = design.routing_library();
+    ophidian::routing::factory::make_library(routing_library, sample);
+    auto & global_routing = design.global_routing();
+    ophidian::routing::factory::make_global_routing(global_routing, routing_library, netlist, std_cells, sample);
+
+    auto gcell_graph = global_routing.gcell_graph();
+
+    SECTION("Graph dimensions")
+    {
+        REQUIRE(gcell_graph->width() == 5);
+        REQUIRE(gcell_graph->height() == 5);
+        REQUIRE(gcell_graph->depth() == 3);
+    }
+
+    SECTION("GCell box")
+    {
+        auto gcell_C1 = gcell_graph->gcell(0,3,0);
+        auto box_gcell_C1 = box_type{point_type{dbu{0}, dbu{30}},
+                                     point_type{dbu{10}, dbu{40}}};
+        REQUIRE(boxCompare(box_gcell_C1, gcell_graph->box(gcell_C1)));
+    }
+
+    SECTION("GCell default capacity and demand")
+    {
+        auto gcell_C1 = gcell_graph->gcell(0,3,0);
+        REQUIRE(gcell_graph->capacity(gcell_C1) == 10);
+        REQUIRE(gcell_graph->demand(gcell_C1) == 0);
+        auto gcell_C1_layer3 = gcell_graph->gcell(0,3,2);
+        REQUIRE(gcell_graph->capacity(gcell_C1_layer3) == 8);
+    }
+
+    SECTION("GCell gcell edge insersection")
+    {
+        auto gcell_C1 = gcell_graph->gcell(0,3,0);
+        auto box_gcell_C1 = gcell_graph->box(gcell_C1);
+        std::vector<ophidian::routing::GCell> gcells;
+        gcell_graph->intersect(gcells, box_gcell_C1, 0);
+        REQUIRE(gcells.size() == 1);
+    }
+
+    SECTION("GCell within insersection")
+    {
+        auto query_box = box_type{point_type{dbu{11}, dbu{11}},
+                                  point_type{dbu{19}, dbu{19}}};
+        std::vector<ophidian::routing::GCell> gcells;
+        gcell_graph->intersect(gcells, query_box, 0);
+        REQUIRE(gcells.size() == 1);
+    }
+
+    SECTION("Box bigger than a gcell insersection")
+    {
+        auto query_box = box_type{point_type{dbu{20}, dbu{20}},
+                                  point_type{dbu{30}, dbu{50}}};
+        std::vector<ophidian::routing::GCell> gcells;
+        gcell_graph->intersect(gcells, query_box, 0);
+        REQUIRE(gcells.size() == 3);
+    }
 }

@@ -71,8 +71,8 @@ namespace ophidian::placement::factory
             auto cell = netlist.find_cell_instance(component.name());
             Placement::Orientation orientation = Placement::Orientation::N;
             auto cell_location = component.position();
-            auto adjusted_location = Placement::point_type{Placement::unit_type{cell_location.x().value()*gcell_size + gcell_size / 2},
-                                                           Placement::unit_type{cell_location.y().value()*gcell_size + gcell_size / 2}};
+            auto adjusted_location = Placement::point_type{Placement::unit_type{(cell_location.x().value()-1)*gcell_size + gcell_size / 2},
+                                                           Placement::unit_type{(cell_location.y().value()-1)*gcell_size + gcell_size / 2}};
             placement.place(cell, adjusted_location);
             placement.setOrientation(cell, orientation);
             if(component.fixed())

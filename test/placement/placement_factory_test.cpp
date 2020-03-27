@@ -66,7 +66,6 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
     CHECK(cell_u1_placed_geometry.front().max_corner().y() == std_cell_u1_geometry.front().max_corner().y() + cell_u1_ypos);
 }
 
-
 TEST_CASE("Make a placement from an iccad2020 file.", "[placement][Placement][factory]")
 {
 
@@ -82,9 +81,17 @@ TEST_CASE("Make a placement from an iccad2020 file.", "[placement][Placement][fa
 
     auto inst_C2 = netlist.find_cell_instance("C2");
     auto inst_position = placement.location(inst_C2);
-    auto position = ophidian::parser::Component::database_unit_point_type{ophidian::parser::Component::database_unit_type{25},
-                                                                          ophidian::parser::Component::database_unit_type{55}};
+    auto position = ophidian::parser::Component::database_unit_point_type{ophidian::parser::Component::database_unit_type{15},
+                                                                          ophidian::parser::Component::database_unit_type{45}};
     REQUIRE(position.x() == inst_position.x());
     REQUIRE(position.y() == inst_position.y());
     REQUIRE(placement.isFixed(inst_C2) == false);
+
+    auto inst_C8 = netlist.find_cell_instance("C8");
+    auto inst_position2 = placement.location(inst_C8);
+    auto position2 = ophidian::parser::Component::database_unit_point_type{ophidian::parser::Component::database_unit_type{45},
+                                                                          ophidian::parser::Component::database_unit_type{25}};
+    REQUIRE(position2.x() == inst_position2.x());
+    REQUIRE(position2.y() == inst_position2.y());
+    REQUIRE(placement.isFixed(inst_C8) == false);
 }

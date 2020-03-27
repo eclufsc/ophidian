@@ -19,6 +19,7 @@
 #include "LibraryFactory.h"
 #include <boost/lexical_cast.hpp>
 #include <ophidian/util/Units.h>
+#include <limits>
 #include <unordered_map>
 
 namespace ophidian::routing::factory
@@ -291,6 +292,8 @@ namespace ophidian::routing::factory
     void make_library(Library& library, const parser::ICCAD2020 & iccad_2020) noexcept {
         util::DbuConverter dbuConverter{1};
 
+        int highest_index = std::numeric_limits<int>::min();
+        ophidian::routing::Layer highest_layer;
         for(auto& layer : iccad_2020.layers()){
             //layer type
             LayerType lType;
@@ -350,6 +353,12 @@ namespace ophidian::routing::factory
                         layer.adjacent_cut_spacing().cuts(),
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
+            if(layer.index() >= highest_index)
+            {
+                highest_index = layer.index();
+                highest_layer = l;
+            }
         }
+        library.set_highest_layer(highest_layer);
     }
 }

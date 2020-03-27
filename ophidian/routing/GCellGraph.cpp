@@ -144,15 +144,17 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
     auto box_d = box_scalar_type{min_corner_d, max_corner_d};
 
     // using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
-    std::vector<rtree_node_type> results;
-    m_grid.query(bgi::intersects(box_d), std::back_inserter(results));
-
-    for(auto r : results)
+    std::vector<rtree_node_type> result;
+    m_grid.query(bgi::intersects(box_d), std::back_inserter(result));
+    for(auto r : result)
     {
-        auto node = r.second;
-        gcells.push_back(gcell(node.first, node.second, layer));
+        auto node_index_pair = r.second;
+        auto node_box = r.first;
+
+        box_scalar_type intersection;
+        boost::geometry::intersection(node_box, box_d, intersection);
+        if(boost::geometry::area(intersection) != 0)
+            gcells.push_back(gcell(node_index_pair.first, node_index_pair.second, layer));
     }
 }
-
-
 }
