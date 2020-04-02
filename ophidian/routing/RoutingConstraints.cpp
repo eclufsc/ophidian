@@ -72,7 +72,7 @@ namespace ophidian::routing
 
     void RoutingConstraints::set_ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z, RoutingConstraints::demand_type val)
     {
-        m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y);
+        m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y) = val;
     }
 
     RoutingConstraints::demand_type RoutingConstraints::ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z)

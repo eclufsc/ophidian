@@ -49,10 +49,11 @@ namespace ophidian::routing::factory
         {
             auto net_name = iccad_net.name();
             auto net = netlist.find_net(net_name);
-            if (iccad_net.min_layer()== "NoCstr")
+            auto min_layer_name = iccad_net.min_layer();
+            if (min_layer_name == "NoCstr")
                 routingConstraints.set_min_net_layer(net, first_layer);
             else
-                routingConstraints.set_min_net_layer(net, library.find_layer_instance(net_name));
+                routingConstraints.set_min_net_layer(net, library.find_layer_instance(min_layer_name));
         }
 
         for(auto ndf : iccad_2020.gcell_non_default_supply())
