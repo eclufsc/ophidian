@@ -1,12 +1,16 @@
 #include <catch.hpp>
 #include <vector>
 
+#include <ophidian/circuit/StandardCellsFactory.h>
+#include <ophidian/circuit/NetlistFactory.h>
+#include <ophidian/placement/PlacementFactory.h>
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/Guide.h>
 #include <ophidian/parser/ParserException.h>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/GlobalRoutingFactory.h>
+#include <ophidian/routing/LibraryFactory.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/geometry/Models.h>
 
@@ -49,7 +53,7 @@ TEST_CASE("Global Routing Factory Test", "[routing][globalRouting][factory]")
     std::vector<std::pair<box_type, std::string>> global_routing_segments;
     for(auto part : segments){
         auto box = globalRouting.box(part);
-        auto layer_instance = globalRouting.layer(part);
+        auto layer_instance = globalRouting.layer_start(part);
         auto layer_name = design.routing_library().name(layer_instance);
         global_routing_segments.push_back(std::make_pair(box, layer_name));
     }
@@ -63,3 +67,31 @@ TEST_CASE("Global Routing Factory Test", "[routing][globalRouting][factory]")
     CHECK(std::is_permutation(expected_segments.begin(), expected_segments.end(), global_routing_segments.begin(), pairComparator));
 }
 
+TEST_CASE("Make a global routing from an iccad2020 file.", "[routing][globalRouting][factory]")
+{
+    ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    auto design = ophidian::design::Design{};
+    ophidian::design::factory::make_design_iccad2020(design, sample);
+
+    auto & netlist = design.netlist();
+    auto & global_routing = design.global_routing();
+    auto & library = design.routing_library();
+
+    CHECK(global_routing.size_segment() == 42);
+    SECTION("Net N3 segments")
+    {
+        auto net_N3 = netlist.find_net("N3");
+        auto segments = global_routing.segments(net_N3);
+        std::vector<box_type> box_segments;
+        std::vector<box_type> expected_box_segments{{point_type{unit_type{10}, unit_type{10}}, point_type{unit_type{20}, unit_type{20}}},
+                                                    {point_type{unit_type{10}, unit_type{10}}, point_type{unit_type{40}, unit_type{20}}},
+                                                    {point_type{unit_type{30}, unit_type{10}}, point_type{unit_type{40}, unit_type{20}}},
+                                                    {point_type{unit_type{10}, unit_type{10}}, point_type{unit_type{20}, unit_type{50}}}};
+        box_segments.reserve(segments.size());
+        for(auto segment : segments)
+            box_segments.push_back(global_routing.box(segment));
+        REQUIRE(segments.size() == 4);
+        REQUIRE(std::is_permutation(box_segments.begin(), box_segments.end(), expected_box_segments.begin(), boxComparator));
+    }
+
+}

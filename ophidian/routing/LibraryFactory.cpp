@@ -21,6 +21,7 @@
 #include <ophidian/util/Units.h>
 #include <limits>
 #include <unordered_map>
+#include <regex>
 
 namespace ophidian::routing::factory
 {
@@ -29,6 +30,7 @@ namespace ophidian::routing::factory
         auto dbuConverter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
 
         //creating layers
+        int highest_layer_index = -1;
         for(auto& layer : lef.layers()){
             //layer type
             auto lType = LayerType{};
@@ -96,10 +98,14 @@ namespace ophidian::routing::factory
 
             auto l_name = layer.name();
             int l_index = -1;
-            if(l_name.find("Metal") == 0)
-                l_index = std::stoi(l_name.substr(5, l_name.size()));
-            else if(l_name.find("Via") == 0)
-                l_index = std::stoi(l_name.substr(3, l_name.size()));
+            std::regex word_regex("(\\d+)");
+            auto words_begin = std::sregex_iterator(l_name.begin(), l_name.end(), word_regex);
+            auto words_end = std::sregex_iterator();
+            if(words_begin != words_end)
+            {
+                std::string indexLayerSegment = words_begin->str();
+                l_index = boost::lexical_cast<int>(indexLayerSegment);
+            }
 
             auto l = library.add_layer_instance(
                         layer.name(),
@@ -125,7 +131,11 @@ namespace ophidian::routing::factory
                         layer.adjacent_cut_spacing().cuts(),
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
+
+            if (l_name.find("Metal") != std::string::npos)
+                highest_layer_index = std::max(highest_layer_index, l_index);
         }
+        library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest_layer_index)));
 
         //creating vias
         for(auto& via : lef.vias())
@@ -277,16 +287,6 @@ namespace ophidian::routing::factory
             }
             library.add_pad_instance(pad.name(), position, orientation, layers);
         }
-        int highest = 0;
-        for (auto layerIt = library.begin_layer(); layerIt != library.end_layer(); ++layerIt)
-        {
-            auto name = library.name(*layerIt);
-            if (name.find("Metal") != std::string::npos)
-            {
-                highest = std::max(highest, std::stoi(name.substr(5)));
-            }
-        }
-        library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest)));
     }
 
     void make_library(Library& library, const parser::ICCAD2020 & iccad_2020) noexcept {

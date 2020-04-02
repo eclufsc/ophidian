@@ -145,4 +145,12 @@ TEST_CASE("ICCAD2020: read case1.txt file", "[parser][iccad2020]")
             net_elements.push_back(pin_pair);
         REQUIRE(std::is_permutation(net_elements.begin(), net_elements.end(), expected_net_elements.begin()));
     }
+
+    SECTION("Routing segments"){
+        auto segments_N1 = sample.segments("N1");
+        REQUIRE(segments_N1.size() == 10);
+
+        auto segments_invalid = sample.segments("invalid");
+        REQUIRE(segments_invalid.size() == 0);
+    }
 }

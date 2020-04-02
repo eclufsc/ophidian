@@ -54,7 +54,8 @@ namespace ophidian::routing
         net_segment_view_type segments(const net_type& net) const;
         net_type net(const gr_segment_type& segment) const;
         const segment_geometry_type& box(const gr_segment_type& segment) const;
-        const layer_type layer(const gr_segment_type& segment) const;
+        const layer_type layer_start(const gr_segment_type& segment) const;
+        const layer_type layer_end(const gr_segment_type& segment) const;
 
         void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
@@ -68,7 +69,7 @@ namespace ophidian::routing
         segment_container_type::size_type size_segment() const noexcept;
 
         // Modifiers
-        gr_segment_type add_segment(const segment_geometry_type & box, const layer_type & layer, const net_type & net);
+        gr_segment_type add_segment(const segment_geometry_type & box, const layer_type & layer_start, const layer_type & layer_end, const net_type & net);
 
         template <typename Value>
         entity_system::Property<gr_segment_type, Value> makeProperty(gr_segment_type) const
@@ -81,7 +82,7 @@ namespace ophidian::routing
     private:
         entity_system::EntitySystem<gr_segment_type>            m_gr_segments;
         entity_system::Property<gr_segment_type, segment_geometry_type>      m_gr_segment_box;
-        entity_system::Property<gr_segment_type, layer_type>    m_gr_segment_layers;
+        entity_system::Property<gr_segment_type, layer_type>    m_gr_segment_layers_start, m_gr_segment_layers_end;
 
         entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
 

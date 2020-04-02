@@ -3,7 +3,9 @@
 *.swo
 /dependencies/
 /Debug/
+/debug
 /Release/
+/release
 /benchmarks/
 .project
 .cproject

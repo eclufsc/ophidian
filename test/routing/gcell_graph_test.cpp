@@ -181,18 +181,8 @@ TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
     */
     ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
     auto design = ophidian::design::Design{};
-    auto std_cells = ophidian::circuit::StandardCells{};
-    auto netlist = ophidian::circuit::Netlist{};
-    ophidian::circuit::factory::make_standard_cells(std_cells, sample);
-    ophidian::circuit::factory::make_netlist(netlist, sample, std_cells);
-    auto placement_library = ophidian::placement::Library{std_cells};
-    auto placement = ophidian::placement::Placement{netlist, placement_library};
-    ophidian::placement::factory::make_placement(placement, sample, netlist);
-    auto & routing_library = design.routing_library();
-    ophidian::routing::factory::make_library(routing_library, sample);
+    ophidian::design::factory::make_design_iccad2020(design, sample);
     auto & global_routing = design.global_routing();
-    ophidian::routing::factory::make_global_routing(global_routing, routing_library, netlist, std_cells, sample);
-
     auto gcell_graph = global_routing.gcell_graph();
 
     SECTION("Graph dimensions")

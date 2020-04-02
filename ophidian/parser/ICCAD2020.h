@@ -56,17 +56,6 @@ namespace ophidian::parser
         };
     };
 
-    //Global routing provided information
-    struct ICCADSegment{
-        std::string net_name;
-        std::tuple<int, int, int> start, end;
-        ICCADSegment(int sx, int sy, int sz, int ex, int ey, int ez, std::string n_name){
-            start = std::make_tuple(sx, sy, sz);
-            end = std::make_tuple(ex, ey, ez);
-            net_name = n_name;
-        }
-    };
-
     /**
      * This is an encapsulation of an ICCAD2020 input 
      * described on a txt file to present max cell move, grid 
@@ -94,14 +83,16 @@ namespace ophidian::parser
         using component_container_type              = container_type<component_type>;
         using blockage_type                         = ICCADBlockage;
         using blockage_container_type               = container_type<blockage_type>;
-        using segment_type                          = ICCADSegment;
+        using segment_type                          = pair_type<gcell_index, gcell_index>;
         using segment_container_type                = container_type<segment_type>;
         using layer_name_type                       = std::string;
         using macro_name_type                       = std::string;
+        using net_name_type                         = std::string;
         using same_grid_key_type                    = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
         using adj_grid_key_type                     = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
         using extra_demands_type                    = container_type<ExtraDemandConstraint>;
         using blockage_map                          = map_type<macro_name_type, blockage_container_type>;
+        using net_segments_map                      = map_type<net_name_type, segment_container_type>;
         using same_grid_map                         = map_type<same_grid_key_type, demand_type>;
         using adj_grid_map                          = map_type<adj_grid_key_type, demand_type>;
         using gcell_ndf_supply                      = container_type< pair_type<gcell_index, int> >;
@@ -134,13 +125,13 @@ namespace ophidian::parser
 
         const gcell_ndf_supply & gcell_non_default_supply() const noexcept;
 
-        const segment_container_type & segments() const noexcept;
+        const segment_container_type segments(net_name_type net_name) const noexcept;
 
         const extra_demands_type & same_grid_extra_demands() const noexcept;
 
         const extra_demands_type & adj_grid_extra_demands() const noexcept;
 
-        const blockage_container_type blockages(std::string macro_name) const noexcept;
+        const blockage_container_type blockages(macro_name_type macro_name) const noexcept;
     private:
         void read_file(const std::string& iccad2020_file);
 
@@ -150,6 +141,7 @@ namespace ophidian::parser
         std::pair<int, int> m_grid_boundary;
         gcell_ndf_supply m_gcell_ndf_supply;
         blockage_map m_iccad_blockage_map;
+        net_segments_map m_net_segments_map;
 
         extra_demands_type m_same_grid{};
         extra_demands_type m_adj_grid{};
@@ -157,7 +149,6 @@ namespace ophidian::parser
         component_container_type m_components{};
         macro_container_type m_macros{};
         net_container_type m_nets{};
-        segment_container_type m_segments{};
     };
 }
 

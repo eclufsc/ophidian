@@ -23,7 +23,8 @@ namespace ophidian::routing
     GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist):
         m_gr_segments{},
         m_gr_segment_box{m_gr_segments},
-        m_gr_segment_layers{m_gr_segments},
+        m_gr_segment_layers_start{m_gr_segments},
+        m_gr_segment_layers_end{m_gr_segments},
         m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)}
     {
     }
@@ -43,9 +44,14 @@ namespace ophidian::routing
         return m_gr_segment_box[segment];
     }
 
-    const GlobalRouting::layer_type GlobalRouting::layer(const GlobalRouting::gr_segment_type &segment) const
+    const GlobalRouting::layer_type GlobalRouting::layer_start(const GlobalRouting::gr_segment_type &segment) const
     {
-        return m_gr_segment_layers[segment];
+        return m_gr_segment_layers_start[segment];
+    }
+
+    const GlobalRouting::layer_type GlobalRouting::layer_end(const GlobalRouting::gr_segment_type &segment) const
+    {
+        return m_gr_segment_layers_end[segment];
     }
 
     void GlobalRouting::create_gcell_graph(GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z, GCellGraph::scalar_container_type capacities)
@@ -78,11 +84,12 @@ namespace ophidian::routing
         return m_gr_segments.size();
     }
 
-    GlobalRouting::gr_segment_type GlobalRouting::add_segment(const GlobalRouting::segment_geometry_type &geometry, const GlobalRouting::layer_type &layer, const GlobalRouting::net_type &net)
+    GlobalRouting::gr_segment_type GlobalRouting::add_segment(const GlobalRouting::segment_geometry_type &geometry, const GlobalRouting::layer_type &layer_start, const GlobalRouting::layer_type &layer_end, const GlobalRouting::net_type &net)
     {
         auto segment = m_gr_segments.add();
         m_gr_segment_box[segment] = geometry;
-        m_gr_segment_layers[segment] = layer;
+        m_gr_segment_layers_start[segment] = layer_start;
+        m_gr_segment_layers_end[segment] = layer_end;
         m_net_to_gr_segment.addAssociation(net, segment);
         return segment;
     }

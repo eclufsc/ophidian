@@ -71,8 +71,12 @@ namespace ophidian::parser
         return m_gcell_ndf_supply;
     }
 
-    const ICCAD2020::segment_container_type & ICCAD2020::segments() const noexcept {
-        return m_segments;
+    const ICCAD2020::segment_container_type ICCAD2020::segments(ICCAD2020::net_name_type net_name) const noexcept {
+        auto segment_it = m_net_segments_map.find(net_name);
+        if(segment_it != m_net_segments_map.end())
+            return segment_it->second;
+        else
+            return {};
     }
 
     const ICCAD2020::extra_demands_type & ICCAD2020::same_grid_extra_demands() const noexcept
@@ -85,7 +89,7 @@ namespace ophidian::parser
         return m_adj_grid;
     }
 
-    const ICCAD2020::blockage_container_type ICCAD2020::blockages(std::string macro_name) const noexcept
+    const ICCAD2020::blockage_container_type ICCAD2020::blockages(ICCAD2020::macro_name_type macro_name) const noexcept
     {
         auto blockage_it = m_iccad_blockage_map.find(macro_name);
         if(blockage_it != m_iccad_blockage_map.end())
@@ -215,7 +219,8 @@ namespace ophidian::parser
                         auto macro_name = tokens.at(2);
                         auto x = std::stod(tokens.at(4));
                         auto y = std::stod(tokens.at(3));
-                        auto position = component_type::database_unit_point_type{component_type::database_unit_type{x}, component_type::database_unit_type{y}};
+                        auto position = component_type::database_unit_point_type{component_type::database_unit_type{x},
+                                                                                 component_type::database_unit_type{y}};
                         auto fixed = tokens.at(5) != "Movable";
                         m_components.push_back(component_type{cell_name, macro_name, Component::Orientation::N, position, fixed});
                     }
@@ -257,8 +262,14 @@ namespace ophidian::parser
                     iss = std::istringstream(line);
                     tokens = {std::istream_iterator<std::string>{iss},
                               std::istream_iterator<std::string>{}};
-                    m_segments.push_back({std::stoi(tokens.at(1)), std::stoi(tokens.at(0)), std::stoi(tokens.at(2)),
-                                          std::stoi(tokens.at(4)), std::stoi(tokens.at(3)), std::stoi(tokens.at(5)), tokens.at(6)});
+                    gcell_index start{std::stoi(tokens.at(1)),
+                                      std::stoi(tokens.at(0)),
+                                      std::stoi(tokens.at(2))};
+                    gcell_index end{std::stoi(tokens.at(4)),
+                                    std::stoi(tokens.at(3)),
+                                    std::stoi(tokens.at(5))};
+                    segment_type segment{start, end};
+                    m_net_segments_map[tokens.at(6)].push_back(segment);
                 }
             }
         }
