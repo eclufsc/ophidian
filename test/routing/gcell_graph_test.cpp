@@ -70,9 +70,9 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
         CHECK(graph.demand(gcell) == 0);
     }
     SECTION("increase defaut demand"){
-        graph.increase_demand(gcell);
+        graph.change_demand(gcell, 1);
         CHECK(graph.demand(gcell) == 1);
-        graph.increase_demand(gcell, 3);
+        graph.change_demand(gcell, 3);
         CHECK(graph.demand(gcell) == 4);
     }
     SECTION("intersect with box"){

@@ -20,12 +20,13 @@
 
 namespace ophidian::routing
 {
-    GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist):
+    GlobalRouting::GlobalRouting(const ophidian::circuit::Netlist &netlist, const ophidian::routing::Library &library):
         m_gr_segments{},
         m_gr_segment_box{m_gr_segments},
         m_gr_segment_layers_start{m_gr_segments},
         m_gr_segment_layers_end{m_gr_segments},
-        m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)}
+        m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)},
+        m_library{library}
     {
     }
 
@@ -69,6 +70,27 @@ namespace ophidian::routing
         return m_gcell_graph;
     }
 
+    GlobalRouting::gcell_container_type GlobalRouting::gcells(const GlobalRouting::net_type& net){
+        auto segments = m_net_to_gr_segment.parts(net);
+        std::vector<ophidian::routing::GCell> gcells;
+        for(auto segment : segments)
+        {
+            auto layer_start = m_gr_segment_layers_start[segment];
+            auto layer_end = m_gr_segment_layers_end[segment];
+            auto min_index = std::min(m_library.layerIndex(layer_start), m_library.layerIndex(layer_end));
+            auto max_index = std::max(m_library.layerIndex(layer_start), m_library.layerIndex(layer_end));
+            for(auto i = min_index; i <= max_index; i++)
+            {
+                auto box = m_gr_segment_box[segment];
+                m_gcell_graph->intersect(gcells, box, i-1);
+            }
+        }
+        //remove duplicated gcells
+        std::sort(gcells.begin(), gcells.end(), [&](auto &lhs, auto &rhs){return m_gcell_graph->id(lhs) < m_gcell_graph->id(rhs);});
+        gcells.erase(std::unique(gcells.begin(), gcells.end()), gcells.end());
+        return gcells;
+    }
+
     GlobalRouting::segment_container_type::const_iterator GlobalRouting::begin_segment() const noexcept
     {
         return m_gr_segments.begin();
@@ -92,6 +114,20 @@ namespace ophidian::routing
         m_gr_segment_layers_end[segment] = layer_end;
         m_net_to_gr_segment.addAssociation(net, segment);
         return segment;
+    }
+
+    void GlobalRouting::increase_demand(const GlobalRouting::net_type& net)
+    {
+        auto gcell_container = gcells(net);
+        for(auto gcell : gcell_container)
+            m_gcell_graph->change_demand(gcell, 1);
+    }
+
+    void GlobalRouting::decrease_demand(const GlobalRouting::net_type& net)
+    {
+        auto gcell_container = gcells(net);
+        for(auto gcell : gcell_container)
+            m_gcell_graph->change_demand(gcell, -1);
     }
 
     entity_system::EntitySystem<GlobalRouting::gr_segment_type>::NotifierType *GlobalRouting::notifier(GlobalRouting::gr_segment_type) const

@@ -94,4 +94,27 @@ TEST_CASE("Make a global routing from an iccad2020 file.", "[routing][globalRout
         REQUIRE(std::is_permutation(box_segments.begin(), box_segments.end(), expected_box_segments.begin(), boxComparator));
     }
 
+    SECTION("GCell Graph demand"){
+        int all_demand = 0;
+        auto gcell_graph = global_routing.gcell_graph();
+        for(int z = 0; z < gcell_graph->depth(); z++)
+            for(int x = 0; x < gcell_graph->width(); x++)
+                for(int y = 0; y < gcell_graph->width(); y++)
+                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        REQUIRE(all_demand == 0);
+        auto net_N3 = netlist.find_net("N3");
+        global_routing.increase_demand(net_N3);
+        for(int z = 0; z < gcell_graph->depth(); z++)
+            for(int x = 0; x < gcell_graph->width(); x++)
+                for(int y = 0; y < gcell_graph->width(); y++)
+                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        REQUIRE(all_demand == 10);
+        all_demand = 0;
+        global_routing.decrease_demand(net_N3);
+        for(int z = 0; z < gcell_graph->depth(); z++)
+            for(int x = 0; x < gcell_graph->width(); x++)
+                for(int y = 0; y < gcell_graph->width(); y++)
+                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        REQUIRE(all_demand == 0);
+    }
 }

@@ -28,6 +28,8 @@ namespace ophidian::routing
         using gr_segment_type           = GRSegment;
         using segment_container_type    = container_type<gr_segment_type>;
         using segment_geometry_type     = geometry::Box<unit_type>;
+        using gcell_type                = GCell;
+        using gcell_container_type      = container_type<gcell_type>;
         using layer_type                = Library::layer_type;
         using net_type                  = ophidian::circuit::Net;
         using gcell_graph_type          = GCellGraph;
@@ -48,7 +50,7 @@ namespace ophidian::routing
         GlobalRouting(GlobalRouting &&) = delete;
         GlobalRouting& operator=(GlobalRouting &&) = delete;
 
-        GlobalRouting(const ophidian::circuit::Netlist & netlist);
+        GlobalRouting(const ophidian::circuit::Netlist & netlist, const ophidian::routing::Library & library);
 
         // Element access
         net_segment_view_type segments(const net_type& net) const;
@@ -60,6 +62,7 @@ namespace ophidian::routing
         void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
         gcell_graph_ptr_type gcell_graph();
+        gcell_container_type gcells(const net_type& net);
 
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;
@@ -70,6 +73,8 @@ namespace ophidian::routing
 
         // Modifiers
         gr_segment_type add_segment(const segment_geometry_type & box, const layer_type & layer_start, const layer_type & layer_end, const net_type & net);
+        void increase_demand(const net_type& net);
+        void decrease_demand(const net_type& net);
 
         template <typename Value>
         entity_system::Property<gr_segment_type, Value> makeProperty(gr_segment_type) const
@@ -87,6 +92,8 @@ namespace ophidian::routing
         entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
 
         gcell_graph_ptr_type m_gcell_graph;
+
+        const Library & m_library;
     };
 }
 

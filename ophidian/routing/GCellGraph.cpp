@@ -131,7 +131,7 @@ GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
     return m_gcell_demand[gcell];
 }
 
-void GCellGraph::increase_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
+void GCellGraph::change_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
 {
     m_gcell_demand[gcell] += delta;
 }
@@ -157,4 +157,10 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
             gcells.push_back(gcell(node_index_pair.first, node_index_pair.second, layer));
     }
 }
+
+uint32_t GCellGraph::id(const GCellGraph::gcell_type& gcell)
+{
+    return m_gcells.id(gcell);
+}
+
 }
