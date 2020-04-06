@@ -289,7 +289,7 @@ namespace ophidian::routing::factory
         }
     }
 
-    void make_library(Library& library, const parser::ICCAD2020 & iccad_2020) noexcept {
+    void make_library(Library& library, const ophidian::circuit::StandardCells& std_cells, const parser::ICCAD2020 & iccad_2020) noexcept {
         util::DbuConverter dbuConverter{1};
 
         int highest_index = std::numeric_limits<int>::min();
@@ -360,5 +360,15 @@ namespace ophidian::routing::factory
             }
         }
         library.set_highest_layer(highest_layer);
+        for(auto std_cell : std_cells.range_cell())
+        {
+            auto std_cell_name = std_cells.name(std_cell);
+            auto blockages = iccad_2020.blockages(std_cell_name);
+            for(auto blockage : blockages)
+            {
+                auto layer = library.find_layer_instance(blockage.layer_name);
+                library.add_blockage(blockage.blockage_name, std_cell, layer, blockage.demand);
+            }
+        }
     }
 }

@@ -23,6 +23,10 @@ namespace ophidian
 namespace routing
 {
 
+Library::Library(ophidian::circuit::StandardCells& std_cells):
+    mCell2Blockages(std_cells.make_composition_cell<blockage_type>(mBlockages))
+    {}
+
 const Library::layer_type Library::find_layer_instance(const std::string &layerName) const
 {
     if (mName2Layer.find(layerName) != mName2Layer.end())
@@ -339,6 +343,43 @@ void Library::set_highest_layer(const layer_type& layer)
     this->mHighest_layer = layer;
 }
 
+std::string Library::name(const Library::blockage_type& blkg)
+{
+    return mBlockageNames[blkg];
+}
+
+Library::std_cell_type Library::std_cell(const Library::blockage_type& blkg)
+{
+    return mCell2Blockages.whole(blkg);
+}
+
+Library::layer_type Library::layer(const Library::blockage_type& blkg)
+{
+    return mBlockageLayer[blkg];
+}
+
+Library::scalar_type Library::demand(const Library::blockage_type& blkg)
+{
+    return mBlockageDemand[blkg];
+}
+
+Library::blockage_type Library::find_blockage(const std::string &blockage_name) const
+{
+    if (mName2Blockage.find(blockage_name) != mName2Blockage.end())
+    {
+        return mName2Blockage.at(blockage_name);
+    }
+    else
+    {
+        return Library::blockage_type{};
+    }
+}
+
+Library::blockages_view_type Library::blockages(const Library::std_cell_type& std_cell) const
+{
+    return mCell2Blockages.parts(std_cell);
+}
+
 Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
 {
     return mLayers.begin();
@@ -379,6 +420,16 @@ Library::pad_container_type::const_iterator Library::end_pad() const noexcept
     return mPads.end();
 }
 
+Library::blockage_container_type::const_iterator Library::begin_blockages() const noexcept
+{
+    return mBlockages.begin();
+}
+
+Library::blockage_container_type::const_iterator Library::end_blockages() const noexcept
+{
+    return mBlockages.end();
+}
+
 Library::layer_container_type::size_type Library::size_layer() const noexcept
 {
     return mLayers.size();
@@ -397,6 +448,11 @@ Library::track_container_type::size_type Library::size_track() const noexcept
 Library::pad_container_type::size_type Library::size_pad() const noexcept
 {
     return mPads.size();
+}
+
+Library::blockage_container_type::size_type Library::size_blockage() const noexcept
+{
+    return mBlockages.size();
 }
 
 std::string& Library::name(const Library::pad_type& pad)
@@ -527,6 +583,22 @@ Library::layer_type Library::add_layer_instance(
     }
 }
 
+Library::blockage_type Library::add_blockage(const std::string blockage_name, const Library::std_cell_type &std_cell, const Library::layer_type layer, Library::scalar_type demand)
+{
+    if(mName2Blockage.find(blockage_name) == mName2Blockage.end()){
+        auto blockage = mBlockages.add();
+
+        mBlockageNames[blockage] = blockage_name;
+        mName2Blockage[blockage_name] = blockage;
+        mBlockageLayer[blockage] = layer;
+        mBlockageDemand[blockage] = demand;
+        mCell2Blockages.addAssociation(std_cell, blockage);
+        return blockage;
+    }else{
+        return mName2Blockage[blockage_name];
+    }
+}
+
 Library::via_type Library::add_via_instance(const std::string &viaName, const Library::via_geometries_container_type &layers)
 {
     if(mName2Via.find(viaName) == mName2Via.end()){
@@ -590,6 +662,10 @@ entity_system::EntitySystem<Library::track_type>::NotifierType * Library::notifi
 
 entity_system::EntitySystem<Library::pad_type>::NotifierType * Library::notifier(Library::pad_type) const {
     return mPads.notifier();
+}
+
+entity_system::EntitySystem<Library::blockage_type>::NotifierType * Library::notifier(Library::blockage_type) const {
+    return mBlockages.notifier();
 }
 
 } // namespace routing

@@ -62,12 +62,22 @@ namespace ophidian::routing
         }
     }
 
+    unsigned int RoutingConstraints::max_cell_movement()
+    {
+        return m_max_cell_move;
+    }
+
     void RoutingConstraints::resize_ndf_constraints(std::size_t size_x, std::size_t size_y, std::size_t size_z)
     {
         m_size_x = size_x;
         m_size_y = size_y;
         m_size_z = size_z;
         m_ndf_constraint.resize(m_size_x * m_size_y * m_size_z);
+    }
+
+    void RoutingConstraints::set_max_cell_movement(unsigned int max_move)
+    {
+        m_max_cell_move = max_move;
     }
 
     void RoutingConstraints::set_ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z, RoutingConstraints::demand_type val)

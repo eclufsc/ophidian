@@ -16,6 +16,11 @@ TEST_CASE("Make a routing constraints from an iccad2020 file.", "[routing][facto
 
     SECTION("ndf_constraints")
     {
+        REQUIRE(routing_constr.max_cell_movement() == 2);
+    }
+
+    SECTION("ndf_constraints")
+    {
         REQUIRE(routing_constr.ndf_constraint(1, 1, 0) == 3);
         REQUIRE(routing_constr.ndf_constraint(1, 0, 2) == -2);
         REQUIRE(routing_constr.ndf_constraint(1, 1, 2) == -2);

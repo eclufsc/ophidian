@@ -25,6 +25,7 @@ namespace ophidian::routing::factory
                                   const ophidian::circuit::Netlist & netlist,
                                   const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
     {
+        routingConstraints.set_max_cell_movement(iccad_2020.max_cell_move());
         auto dimensions = iccad_2020.grid_dimensions();
         routingConstraints.resize_ndf_constraints(std::get<0>(dimensions), std::get<1>(dimensions), std::get<2>(dimensions));
 

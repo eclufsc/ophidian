@@ -141,7 +141,7 @@ namespace ophidian::design
         netlist_type              m_netlist{};
         placement_library_type    m_placement_library{m_standard_cells};
         placement_type            m_placement{m_netlist, m_placement_library};
-        routing_library_type      m_routing_library{};
+        routing_library_type      m_routing_library{m_standard_cells};
         global_routing_type       m_global_routing{m_netlist, m_routing_library};
         routing_constraints_type  m_routing_constraints{m_netlist};
     };
