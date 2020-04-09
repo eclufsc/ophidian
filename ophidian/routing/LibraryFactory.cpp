@@ -132,10 +132,11 @@ namespace ophidian::routing::factory
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
 
-            if (l_name.find("Metal") != std::string::npos)
-                highest_layer_index = std::max(highest_layer_index, l_index);
+            if(l_index >= highest_layer_index){
+                highest_layer_index = l_index;
+                library.set_highest_layer(l);
+            }
         }
-        library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest_layer_index)));
 
         //creating vias
         for(auto& via : lef.vias())
