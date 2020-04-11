@@ -42,7 +42,7 @@ TEST_CASE("StandardCells factory: make Simple standard cells.", "[circuit][Stand
 
 TEST_CASE("Make standard cells from an iccad2020 file.", "[circuit][StandardCells][factory]")
 {
-    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto std_cells = ophidian::circuit::StandardCells{};
     ophidian::circuit::factory::make_standard_cells(std_cells, sample);
 

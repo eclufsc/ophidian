@@ -159,7 +159,7 @@ TEST_CASE("Routing Library Factory Test ispd2019", "[routing][library][factory][
 
 TEST_CASE("Make a routing library from an iccad2020 file.", "[routing][library][factory][iccad2020]")
 {
-    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto design = ophidian::design::Design{};
     ophidian::design::factory::make_design_iccad2020(design, sample);
 

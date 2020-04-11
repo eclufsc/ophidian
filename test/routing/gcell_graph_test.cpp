@@ -179,7 +179,7 @@ TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
      0----------------------------------------- X
       0       10      20      30      40      50
     */
-    ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto design = ophidian::design::Design{};
     ophidian::design::factory::make_design_iccad2020(design, sample);
     auto & global_routing = design.global_routing();

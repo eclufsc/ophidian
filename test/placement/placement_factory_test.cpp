@@ -69,7 +69,7 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
 TEST_CASE("Make a placement from an iccad2020 file.", "[placement][Placement][factory]")
 {
 
-    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto std_cells = ophidian::circuit::StandardCells{};
     auto netlist = ophidian::circuit::Netlist{};
     ophidian::circuit::factory::make_standard_cells(std_cells, sample);

@@ -69,7 +69,7 @@ TEST_CASE("Global Routing Factory Test", "[routing][globalRouting][factory]")
 
 TEST_CASE("Make a global routing from an iccad2020 file.", "[routing][globalRouting][factory]")
 {
-    ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto design = ophidian::design::Design{};
     ophidian::design::factory::make_design_iccad2020(design, sample);
 

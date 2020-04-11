@@ -175,7 +175,7 @@ TEST_CASE("Netlist factory: populate with ispd18 sample def and sample standard 
 
 TEST_CASE("Make a netlist from an iccad2020 file.", "[circuit][Netlist][factory]")
 {
-    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/case1.txt"};
+    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto std_cells = ophidian::circuit::StandardCells{};
     auto netlist = Netlist{};
     ophidian::circuit::factory::make_standard_cells(std_cells, sample);

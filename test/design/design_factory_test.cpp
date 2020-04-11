@@ -62,10 +62,3 @@ TEST_CASE("Design factory: test design_factory_iccad17 with contest files", "[de
 
     CHECK(design.netlist().size_cell_instance() == 29521);
 }
-
-TEST_CASE("Design: iccad2020 make design.", "[design][iccad2020]")
-{
-    ophidian::parser::ICCAD2020 iccad2020{"input_files/iccad2020/case1.txt"};
-    ophidian::design::Design design;
-    ophidian::design::factory::make_design_iccad2020(design, iccad2020);
-}
