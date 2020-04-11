@@ -103,13 +103,22 @@ GCellGraph::gcell_container_type::const_iterator GCellGraph::end_gcell() const n
     return m_gcells.end();
 }
 
-
 GCellGraph::gcell_type GCellGraph::gcell(GCellGraph::index_type x, GCellGraph::index_type y, GCellGraph::index_type z) const
 {
     auto n = node(x,y,z);
     if(n != lemon::INVALID)
         return m_nodes_to_gcell[n];
     return gcell_type();
+}
+
+GCellGraph::gcell_type GCellGraph::nearest_gcell(const GCellGraph::point_type location, const GCellGraph::index_type layer) const
+{
+    namespace bgi = boost::geometry::index;
+    point_scalar_type point{location.x().value(), location.y().value()};
+    std::vector<rtree_node_type> result;
+    m_grid.query(bgi::nearest(point, 1), std::back_inserter(result));
+    auto node_index_pair = result.front().second;
+    return gcell(node_index_pair.first, node_index_pair.second, layer);
 }
 
 GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
@@ -119,6 +128,11 @@ GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
     auto x = index.get<0>();
     auto y = index.get<1>();
     return m_gcell_box[std::make_pair(x,y)];
+}
+
+GCellGraph::node_type GCellGraph::graph_node(const GCellGraph::gcell_type gcell) const
+{
+    return m_gcell_node[gcell];
 }
 
 GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell)

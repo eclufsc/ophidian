@@ -3,7 +3,6 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-// #include <ophidian/entity_system/Aggregation.h>
 
 #include <ophidian/routing/Library.h>
 #include <ophidian/util/GridGraph_3D.h>
@@ -48,7 +47,6 @@ public:
     using box_type              = geometry::Box<unit_type>;
     using gcell_type            = GCell;
     using gcell_container_type  = std::vector<gcell_type>;
-    using layer_type            = ophidian::routing::Library::layer_type;
 
     using map_type              = std::unordered_map<std::pair<index_type, index_type>, box_type, hash_pair >;
 
@@ -74,6 +72,8 @@ public:
 
     // Element access
     gcell_type gcell(index_type x, index_type y, index_type z) const ;
+    gcell_type nearest_gcell(const point_type location, const index_type layer) const ;
+    node_type graph_node(const gcell_type gcell) const;
     box_type box(const gcell_type& gcell);
     scalar_type capacity(const gcell_type& gcell);
     scalar_type demand(const gcell_type& gcell);
@@ -88,17 +88,15 @@ public:
     // Modifiers
 
 private:
-    entity_system::EntitySystem<gcell_type> m_gcells{};
-    entity_system::Property<gcell_type, node_type> m_gcell_node{m_gcells};
-    entity_system::Property<gcell_type, scalar_type> m_gcell_capacity{m_gcells};
-    entity_system::Property<gcell_type, scalar_type> m_gcell_demand{m_gcells, 0};
+    entity_system::EntitySystem<gcell_type>             m_gcells{};
+    entity_system::Property<gcell_type, node_type>      m_gcell_node{m_gcells};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_capacity{m_gcells};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_demand{m_gcells, 0};
 
-    map_type m_gcell_box;
-    node_map_type<gcell_type> m_nodes_to_gcell;
-    rtree_type m_grid;
+    map_type                                            m_gcell_box;
+    node_map_type<gcell_type>                           m_nodes_to_gcell;
+    rtree_type                                          m_grid;
 };
-
-
 
 }// end namespace
 

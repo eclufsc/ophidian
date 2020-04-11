@@ -183,6 +183,8 @@ TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
     auto design = ophidian::design::Design{};
     ophidian::design::factory::make_design_iccad2020(design, sample);
     auto & global_routing = design.global_routing();
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
     auto gcell_graph = global_routing.gcell_graph();
 
     SECTION("Graph dimensions")
@@ -234,5 +236,20 @@ TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
         std::vector<ophidian::routing::GCell> gcells;
         gcell_graph->intersect(gcells, query_box, 0);
         REQUIRE(gcells.size() == 3);
+    }
+
+    SECTION("Get a gcell by cell location")
+    {
+        auto cell_C3 = netlist.find_cell_instance("C3");
+        auto location = placement.location(cell_C3);
+        auto gcell_1_1 = gcell_graph->nearest_gcell(location, 0);
+        auto box_gcell_1_1 = box_type{point_type{dbu{10}, dbu{10}},
+                                      point_type{dbu{20}, dbu{20}}};
+        REQUIRE(boxCompare(box_gcell_1_1, gcell_graph->box(gcell_1_1)));
+        auto graph_node = gcell_graph->graph_node(gcell_1_1);
+        auto node_position = gcell_graph->position(graph_node);
+        REQUIRE(node_position.get<0>() == 1);
+        REQUIRE(node_position.get<1>() == 1);
+        REQUIRE(node_position.get<2>() == 0);
     }
 }
