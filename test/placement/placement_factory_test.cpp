@@ -40,8 +40,8 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
     CHECK(cell_u1_xpos == dbu_t{3420});
     CHECK(cell_u1_ypos == dbu_t{6840});
 
-    CHECK(!placement.fixed(cell_u1));
-    CHECK(placement.fixed(cell_f1));
+    CHECK(!placement.isFixed(cell_u1));
+    CHECK(placement.isFixed(cell_f1));
 
     auto std_cell_u1 = netlist.std_cell(cell_u1);
 
@@ -64,4 +64,34 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
 
     CHECK(cell_u1_placed_geometry.front().max_corner().x() == std_cell_u1_geometry.front().max_corner().x() + cell_u1_xpos);
     CHECK(cell_u1_placed_geometry.front().max_corner().y() == std_cell_u1_geometry.front().max_corner().y() + cell_u1_ypos);
+}
+
+TEST_CASE("Make a placement from an iccad2020 file.", "[placement][Placement][factory]")
+{
+
+    ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
+    auto std_cells = ophidian::circuit::StandardCells{};
+    auto netlist = ophidian::circuit::Netlist{};
+    ophidian::circuit::factory::make_standard_cells(std_cells, sample);
+    ophidian::circuit::factory::make_netlist(netlist, sample, std_cells);
+
+    auto library = ophidian::placement::Library{std_cells};
+    auto placement = ophidian::placement::Placement{netlist, library};
+    ophidian::placement::factory::make_placement(placement, sample, netlist);
+
+    auto inst_C2 = netlist.find_cell_instance("C2");
+    auto inst_position = placement.location(inst_C2);
+    auto position = ophidian::parser::Component::database_unit_point_type{ophidian::parser::Component::database_unit_type{15},
+                                                                          ophidian::parser::Component::database_unit_type{45}};
+    REQUIRE(position.x() == inst_position.x());
+    REQUIRE(position.y() == inst_position.y());
+    REQUIRE(placement.isFixed(inst_C2) == false);
+
+    auto inst_C8 = netlist.find_cell_instance("C8");
+    auto inst_position2 = placement.location(inst_C8);
+    auto position2 = ophidian::parser::Component::database_unit_point_type{ophidian::parser::Component::database_unit_type{45},
+                                                                          ophidian::parser::Component::database_unit_type{25}};
+    REQUIRE(position2.x() == inst_position2.x());
+    REQUIRE(position2.y() == inst_position2.y());
+    REQUIRE(placement.isFixed(inst_C8) == false);
 }

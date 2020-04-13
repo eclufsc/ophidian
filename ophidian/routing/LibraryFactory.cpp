@@ -17,8 +17,11 @@
  */
 
 #include "LibraryFactory.h"
+#include <boost/lexical_cast.hpp>
 #include <ophidian/util/Units.h>
+#include <limits>
 #include <unordered_map>
+#include <regex>
 
 namespace ophidian::routing::factory
 {
@@ -27,6 +30,7 @@ namespace ophidian::routing::factory
         auto dbuConverter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
 
         //creating layers
+        int highest_layer_index = -1;
         for(auto& layer : lef.layers()){
             //layer type
             auto lType = LayerType{};
@@ -91,8 +95,21 @@ namespace ophidian::routing::factory
                 lTableContents.values.emplace_back(std::move(lenghts));
             }
             auto lTable = Library::spacing_table_type(lTableContents);
+
+            auto l_name = layer.name();
+            int l_index = -1;
+            std::regex word_regex("(\\d+)");
+            auto words_begin = std::sregex_iterator(l_name.begin(), l_name.end(), word_regex);
+            auto words_end = std::sregex_iterator();
+            if(words_begin != words_end)
+            {
+                std::string indexLayerSegment = words_begin->str();
+                l_index = boost::lexical_cast<int>(indexLayerSegment);
+            }
+
             auto l = library.add_layer_instance(
                         layer.name(),
+                        l_index,
                         lType,
                         lDirection,
                         dbuConverter.convert(layer.pitch()),
@@ -114,6 +131,11 @@ namespace ophidian::routing::factory
                         layer.adjacent_cut_spacing().cuts(),
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
+
+            if(l_index >= highest_layer_index){
+                highest_layer_index = l_index;
+                library.set_highest_layer(l);
+            }
         }
 
         //creating vias
@@ -145,30 +167,6 @@ namespace ophidian::routing::factory
             }
             library.add_track_instance(orientation, track.start(), track.number_of_tracks(), track.space(), track.layer_name());
          }
-
-        std::vector<ophidian::util::database_unit_t> gcell_x_axis, gcell_y_axis;
-        for(auto gcell : def.gcells())
-        {
-            if(gcell.horizontal())
-                continue;
-            for(auto i = 0; i < gcell.num(); ++i)
-                gcell_x_axis.push_back(gcell.origin() + i * gcell.step());
-        }
-
-        for(auto gcell : def.gcells())
-        {
-            if(!gcell.horizontal())
-                continue;
-            for(auto i = 0; i < gcell.num(); ++i)
-                gcell_y_axis.push_back(gcell.origin() + i * gcell.step());
-        }
-
-        std::sort(gcell_x_axis.begin(), gcell_x_axis.end());
-        gcell_x_axis.erase( std::unique( gcell_x_axis.begin(), gcell_x_axis.end() ), gcell_x_axis.end());
-        std::sort(gcell_y_axis.begin(), gcell_y_axis.end());
-        gcell_y_axis.erase( std::unique( gcell_y_axis.begin(), gcell_y_axis.end() ), gcell_y_axis.end());
-        library.set_gcell_coordinates(gcell_x_axis, gcell_y_axis);
-
 
         //pads
         for(auto pad : def.pads())
@@ -290,15 +288,88 @@ namespace ophidian::routing::factory
             }
             library.add_pad_instance(pad.name(), position, orientation, layers);
         }
-        int highest = 0;
-        for (auto layerIt = library.begin_layer(); layerIt != library.end_layer(); ++layerIt)
-        {
-            auto name = library.name(*layerIt);
-            if (name.find("Metal") != std::string::npos)
+    }
+
+    void make_library(Library& library, const ophidian::circuit::StandardCells& std_cells, const parser::ICCAD2020 & iccad_2020) noexcept {
+        util::DbuConverter dbuConverter{1};
+
+        int highest_index = std::numeric_limits<int>::min();
+        ophidian::routing::Layer highest_layer;
+        for(auto& layer : iccad_2020.layers()){
+            //layer type
+            LayerType lType;
+
+            switch (layer.type()) {
+                case ophidian::parser::Lef::layer_type::Type::CUT:
+                    lType = LayerType::CUT;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::MASTERSLICE:
+                    lType = LayerType::MASTERSLICE;
+                    break;
+                case ophidian::parser::Lef::layer_type::Type::ROUTING:
+                    lType = LayerType::ROUTING;
+                    break;
+                default:
+                    lType = LayerType::NA;
+                    break;
+            }
+
+            //layer direction
+            Direction lDirection;
+            switch (layer.direction()) {
+                case ophidian::parser::Lef::layer_type::Direction::HORIZONTAL:
+                lDirection = Direction::HORIZONTAL;
+                break;
+            case ophidian::parser::Lef::layer_type::Direction::VERTICAL:
+                lDirection = Direction::VERTICAL;
+                break;
+            default:
+                lDirection = Direction::NA;
+                break;
+            }
+            //layer spacingTable
+            Library::spacing_table_content_type lTableContents;
+            auto lTable = Library::spacing_table_type(lTableContents);
+            auto l = library.add_layer_instance(
+                        layer.name(),
+                        layer.index(),
+                        lType,
+                        lDirection,
+                        dbuConverter.convert(layer.pitch()),
+                        dbuConverter.convert(layer.offset()),
+                        dbuConverter.convert(layer.width()),
+                        dbuConverter.convert(layer.min_width()),
+                        dbuConverter.convert(layer.area()),
+                        dbuConverter.convert(layer.spacing()),
+                        dbuConverter.convert(layer.end_of_line().space()),
+                        dbuConverter.convert(layer.end_of_line().width()),
+                        dbuConverter.convert(layer.end_of_line().within()),
+                        dbuConverter.convert(layer.parallel_edge().space()),
+                        dbuConverter.convert(layer.parallel_edge().width()),
+                        dbuConverter.convert(layer.parallel_edge().within()),
+                        dbuConverter.convert(layer.parallel_edge().par_space()),
+                        dbuConverter.convert(layer.parallel_edge().par_within()),
+                        lTable,
+                        dbuConverter.convert(layer.adjacent_cut_spacing().adj_spacing()),
+                        layer.adjacent_cut_spacing().cuts(),
+                        dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
+                        dbuConverter.convert(layer.corner_spacing().eol_width()));
+            if(layer.index() >= highest_index)
             {
-                highest = std::max(highest, std::stoi(name.substr(5)));
+                highest_index = layer.index();
+                highest_layer = l;
             }
         }
-        library.set_highest_layer(library.find_layer_instance("Metal" + std::to_string(highest)));
+        library.set_highest_layer(highest_layer);
+        for(auto std_cell : std_cells.range_cell())
+        {
+            auto std_cell_name = std_cells.name(std_cell);
+            auto blockages = iccad_2020.blockages(std_cell_name);
+            for(auto blockage : blockages)
+            {
+                auto layer = library.find_layer_instance(blockage.layer_name);
+                library.add_blockage(blockage.blockage_name, std_cell, layer, blockage.demand);
+            }
+        }
     }
 }

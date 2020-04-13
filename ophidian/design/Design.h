@@ -26,6 +26,7 @@
 #include <ophidian/circuit/StandardCells.h>
 #include <ophidian/routing/Library.h>
 #include <ophidian/routing/GlobalRouting.h>
+#include <ophidian/routing/RoutingConstraints.h>
 
 namespace ophidian::design
 {
@@ -40,7 +41,7 @@ namespace ophidian::design
         using placement_type            = placement::Placement;
         using routing_library_type      = routing::Library;
         using global_routing_type       = routing::GlobalRouting;
-
+        using routing_constraints_type  = routing::RoutingConstraints;
         //! Design Constructor
 
         /*!
@@ -125,14 +126,24 @@ namespace ophidian::design
 
         const global_routing_type& global_routing() const noexcept;
 
+        //! Routing Constraints getter
+
+        /*!
+           \brief Get the routing constraints.
+           \return Routing Constraints.
+         */
+        routing_constraints_type& routing_constraints() noexcept;
+
+        const routing_constraints_type& routing_constraints() const noexcept;
     private:
-        floorplan_type          m_floorplan{};
-        standard_cell_type      m_standard_cells{};
-        netlist_type            m_netlist{};
-        placement_library_type  m_placement_library{m_standard_cells};
-        placement_type          m_placement{m_netlist, m_placement_library};
-        routing_library_type    m_routing_library{};
-        global_routing_type     m_global_routing{m_netlist};
+        floorplan_type            m_floorplan{};
+        standard_cell_type        m_standard_cells{};
+        netlist_type              m_netlist{};
+        placement_library_type    m_placement_library{m_standard_cells};
+        placement_type            m_placement{m_netlist, m_placement_library};
+        routing_library_type      m_routing_library{m_standard_cells};
+        global_routing_type       m_global_routing{m_netlist, m_routing_library};
+        routing_constraints_type  m_routing_constraints{m_netlist};
     };
 }
 

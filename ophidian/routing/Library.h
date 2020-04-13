@@ -1,9 +1,11 @@
 #ifndef OPHIDIAN_ROUTING_LIBRARY_H
 #define OPHIDIAN_ROUTING_LIBRARY_H
 
+#include <ophidian/circuit/StandardCells.h>
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/entity_system/Aggregation.h>
+#include <ophidian/entity_system/Composition.h>
 #include <ophidian/util/Units.h>
 #include <ophidian/util/LookupTable.h>
 #include <unordered_map>
@@ -50,6 +52,13 @@ namespace ophidian::routing
         using entity_system::EntityBase::EntityBase;
     };
 
+    class RoutingBlockage :
+        public entity_system::EntityBase
+    {
+    public:
+        using entity_system::EntityBase::EntityBase;
+    };
+
     struct geometry_in_layer_type
     {
     public:
@@ -66,37 +75,40 @@ namespace ophidian::routing
     public:
         template <class K, class V> using map_type  = std::unordered_map<K,V>;
 
-        using scalar_type           = int;
-        using unit_type             = util::database_unit_t;
-        using unit_container_type   = std::vector<unit_type>;
-        using table_strategy_type   = util::FloorStrategy<unit_type, unit_type, unit_type>;
-        using spacing_table_type    = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
-        using spacing_table_content_type = util::TableContents<unit_type, unit_type, unit_type>;
+        using scalar_type                      = int;
+        using unit_type                        = util::database_unit_t;
+        using table_strategy_type              = util::FloorStrategy<unit_type, unit_type, unit_type>;
+        using spacing_table_type               = util::LookupTable<unit_type, unit_type, unit_type, table_strategy_type>;
+        using spacing_table_content_type       = util::TableContents<unit_type, unit_type, unit_type>;
 
-        using layer_type            = Layer;
-        using layer_container_type  = std::vector<layer_type>;
+        using layer_type                       = Layer;
+        using layer_container_type             = std::vector<layer_type>;
 
-        using via_type              = Via;
-        using via_container_type    = std::vector<via_type>;
-        using box_type              = geometry::Box<unit_type>;
-        using box_container_type    = std::vector<box_type>;
+        using via_type                         = Via;
+        using via_container_type               = std::vector<via_type>;
+        using box_type                         = geometry::Box<unit_type>;
+        using box_container_type               = std::vector<box_type>;
         using via_geometries_container_type    = std::vector<geometry_in_layer_type>;
-        using point_type            = ophidian::util::LocationDbu;
-        
+        using point_type                       = ophidian::util::LocationDbu;
 
-        using track_type            = Track;
-        using track_container_type  = std::vector<track_type>;
+        using track_type                       = Track;
+        using track_container_type             = std::vector<track_type>;
 
-        using pad_type              = Pad;
-        using pad_container_type    = std::vector<pad_type>;
+        using blockage_type                    = RoutingBlockage;
+        using blockage_container_type          = std::vector<blockage_type>;
+        using std_cell_type                    = ophidian::circuit::Cell;
+
+        using pad_type                         = Pad;
+        using pad_container_type               = std::vector<pad_type>;
         using pad_geometries_container_type    = std::vector<geometry_in_layer_type>;
-        using orientation_type      = Orientation;
+        using orientation_type                 = Orientation;
 
-        using layer_tracks_view_type = entity_system::Association<layer_type, track_type>::Parts;
+        using layer_tracks_view_type           = entity_system::Association<layer_type, track_type>::Parts;
+        using blockages_view_type              = entity_system::Association<std_cell_type, blockage_type>::Parts;
 
         // Constructors
         //! Construct Netlist
-        Library() = default;
+        Library() = delete;
 
         //! coppy constructor
         Library(const Library &) = delete;
@@ -106,15 +118,11 @@ namespace ophidian::routing
         Library(Library &&) = default;
         Library& operator=(Library &&) = default;
 
+        Library(ophidian::circuit::StandardCells& std_cells);
+
         // Element access
         const layer_type find_layer_instance(const std::string& layerName) const;
 
-        //given a dbu box return a box with gcell coordinates
-        // box_type gcell_box(const point_type &, const point_type &) const;
-        void set_gcell_coordinates(unit_container_type GCell_x_axis, unit_container_type GCell_y_axis);
-        unit_container_type get_GCell_x_axis();
-        unit_container_type get_GCell_y_axis();        
-        
         std::string name(const layer_type& layer);
         const std::string& name(const layer_type& layer) const;
         int index(const layer_type& layer) const;
@@ -146,7 +154,7 @@ namespace ophidian::routing
         const track_type nonPrefTrack(const layer_type& layer) const;
         const layer_type upperLayer(const layer_type& layer) const;
         const layer_type lowerLayer(const layer_type& layer) const;
-        const scalar_type layerIndex(const layer_type& layer) const;
+        const scalar_type layerIndex(const layer_type& layer) const;//Be careful, use only for sorting layers.
         const void viaCandidates(via_container_type& vias, const layer_type& layer, const layer_type& upperLayer) const;
         //! returns the via layer (cut) below the above layer
         const layer_type viaLayerBelow(const layer_type& above) const;
@@ -178,6 +186,13 @@ namespace ophidian::routing
         layer_type highest_layer() const;
         void set_highest_layer(const layer_type& layer);
 
+        std::string name(const blockage_type& blkg);
+        std_cell_type std_cell(const blockage_type& blkg);
+        layer_type layer(const blockage_type& blkg);
+        scalar_type demand(const blockage_type& blkg);
+        blockage_type find_blockage(const std::string& blockage_name) const;
+        blockages_view_type blockages(const std_cell_type& std_cell) const;
+
         // Iterators
         layer_container_type::const_iterator begin_layer() const noexcept;
         layer_container_type::const_iterator end_layer() const noexcept;
@@ -191,18 +206,22 @@ namespace ophidian::routing
         pad_container_type::const_iterator begin_pad() const noexcept;
         pad_container_type::const_iterator end_pad() const noexcept;
 
+        blockage_container_type::const_iterator begin_blockages() const noexcept;
+        blockage_container_type::const_iterator end_blockages() const noexcept;
 
         // Capacity
         layer_container_type::size_type size_layer() const noexcept;
         via_container_type::size_type size_via() const noexcept;
         track_container_type::size_type size_track() const noexcept;
         pad_container_type::size_type size_pad() const noexcept;
+        blockage_container_type::size_type size_blockage() const noexcept;
 
 
 
         // Modifiers
         layer_type add_layer_instance(
         const std::string &layerName,
+        const Library::scalar_type index,
         const LayerType &type,
         const Direction &direction,
         const Library::unit_type& pitch,
@@ -225,6 +244,8 @@ namespace ophidian::routing
         const Library::unit_type cutWithinLength,
         const Library::unit_type& ExceptEOLwidth
         );
+
+        blockage_type add_blockage(const std::string blockage_name, const std_cell_type &std_cell, const layer_type layer, scalar_type demand);
 
         via_type add_via_instance(const std::string &viaName, const via_geometries_container_type & layers);
 
@@ -266,13 +287,22 @@ namespace ophidian::routing
         entity_system::EntitySystem<via_type>::NotifierType * notifier(via_type) const;
         entity_system::EntitySystem<track_type>::NotifierType * notifier(track_type) const;
         entity_system::EntitySystem<pad_type>::NotifierType * notifier(pad_type) const;
+        entity_system::EntitySystem<blockage_type>::NotifierType * notifier(blockage_type) const;
 
     private:
-        layer_type mHighest_layer;
-        unit_container_type mGCell_x_axis, mGCell_y_axis;
-        entity_system::EntitySystem<layer_type>  mLayers{};
+        layer_type                                              mHighest_layer;
+        entity_system::EntitySystem<layer_type>                 mLayers{};
+
+        entity_system::EntitySystem<blockage_type>              mBlockages{};
+        entity_system::Property<blockage_type, std::string>     mBlockageNames{mBlockages};
+        entity_system::Property<blockage_type, layer_type>      mBlockageLayer{mBlockages};
+        entity_system::Property<blockage_type, scalar_type>     mBlockageDemand{mBlockages};
+        std::unordered_map<std::string, blockage_type>          mName2Blockage{};
+        entity_system::Composition<std_cell_type, blockage_type>mCell2Blockages;
+
         entity_system::Property<layer_type, std::string>        mLayerName{mLayers};
         std::unordered_map<std::string, layer_type>             mName2Layer{};
+        entity_system::Property<layer_type, scalar_type>        mLayerIndexes{mLayers};
         entity_system::Property<layer_type, LayerType>          mLayerType{mLayers, LayerType::NA};
         entity_system::Property<layer_type, Direction>          mLayerDirection{mLayers, Direction::NA};
         entity_system::Property<layer_type, unit_type>          mLayerPitch{mLayers};
@@ -316,7 +346,6 @@ namespace ophidian::routing
 
         entity_system::Aggregation<layer_type, track_type>      mLayer2Tracks{mLayers, mTracks};
         entity_system::Aggregation<layer_type, via_type>        mLayer2Vias{mLayers, mVias};
-              
     };
 }
 

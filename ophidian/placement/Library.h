@@ -40,6 +40,8 @@ namespace ophidian::placement
 
         using std_cell_geometry_type = geometry::CellGeometry;
 
+        using std_pin_geometry_type = geometry::CellGeometry;
+
         // Constructors
         Library() = delete;
 
@@ -58,6 +60,9 @@ namespace ophidian::placement
         offset_type& offset(const std_cell_pin_type& pin);
         const offset_type& offset(const std_cell_pin_type& pin) const;
 
+        std_pin_geometry_type& geometry(const std_cell_pin_type& pin);
+        const std_pin_geometry_type& geometry(const std_cell_pin_type& pin) const;
+
         // Iterators
 
         // Capacity
@@ -67,6 +72,7 @@ namespace ophidian::placement
     private:
         entity_system::Property<std_cell_type, std_cell_geometry_type> m_geometries;
         entity_system::Property<std_cell_pin_type, offset_type>        m_pin_offsets;
+        entity_system::Property<std_cell_pin_type, std_pin_geometry_type> m_pin_geometries;
     };
 }
 

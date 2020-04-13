@@ -116,7 +116,7 @@ TEST_CASE("Routing Library Factory Test ispd2019", "[routing][library][factory][
         CHECK(library.direction(library.prefTrack(layer)) == ophidian::routing::Direction::HORIZONTAL);
         CHECK(library.direction(library.nonPrefTrack(layer)) == ophidian::routing::Direction::VERTICAL);
         CHECK(library.name((library.upperLayer(layer))) == "Metal3");
-        CHECK(library.layerIndex(layer) == 1);
+//        CHECK(library.layerIndex(layer) == 2);// See Renan's comment in Library.cpp
         CHECK(library.isFirstRightBelowSecond(library.find_layer_instance("Metal1"), library.find_layer_instance("Metal2")));
 
         auto& spacing_table = library.spacing_table(layer);
@@ -154,5 +154,85 @@ TEST_CASE("Routing Library Factory Test ispd2019", "[routing][library][factory][
         CHECK(library.numTracs(track) == 975);
         CHECK(library.space(track) == database_unit_t{400});
         CHECK(library.name(library.layer(track)) == "Metal9");
+    }
+}
+
+TEST_CASE("Make a routing library from an iccad2020 file.", "[routing][library][factory][iccad2020]")
+{
+    ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
+    auto design = ophidian::design::Design{};
+    ophidian::design::factory::make_design_iccad2020(design, sample);
+
+    auto & library = design.routing_library();
+    auto & std_cells = design.standard_cells();
+
+    SECTION("Test for highest layer.")
+    {
+        REQUIRE(library.size_layer() == 3);
+        auto highest_layer = library.highest_layer();
+        REQUIRE(library.name(highest_layer) == "M3");
+    }
+
+    SECTION("Test for lower layer.")
+    {
+        // Not working!
+        // auto layer_2 = library.lowerLayer(highest_layer);
+        // REQUIRE(library.name(layer_2) == "M2");
+    }
+
+
+    SECTION("Test for upper layer.")
+    {
+        // Not working!
+        // auto layer_1 = library.find_layer_instance("M1");
+        // REQUIRE(library.type(layer_1) == ophidian::routing::LayerType::ROUTING);
+        // auto upperLayer = library.upperLayer(layer_1);
+        // REQUIRE(library.name(upperLayer) == "M2");
+    }
+
+    SECTION("Test for layer directions.")
+    {
+        auto layer_1 = library.find_layer_instance("M1");
+        REQUIRE(library.type(layer_1) == ophidian::routing::LayerType::ROUTING);
+        REQUIRE(library.layerIndex(layer_1) == 1);
+
+        //metal 1 is always horizontal
+        REQUIRE(library.direction(layer_1) == ophidian::routing::Direction::HORIZONTAL);
+        auto layer_2 = library.find_layer_instance("M2");
+        REQUIRE(library.direction(layer_2) == ophidian::routing::Direction::VERTICAL);
+        auto highest_layer = library.highest_layer();
+        REQUIRE(library.direction(highest_layer) == ophidian::routing::Direction::HORIZONTAL);
+    }
+
+    SECTION("Blockages size.")
+    {
+        REQUIRE(library.size_blockage() == 2);
+        unsigned int i = 0;
+        for(auto blk_it = library.begin_blockages(); blk_it != library.end_blockages(); blk_it++)
+            i++;
+        REQUIRE(i == 2);
+    }
+
+    SECTION("Blockage getters.")
+    {
+        auto blk_B1 = library.find_blockage("B1");
+        REQUIRE(library.name(blk_B1) == "B1");
+    }
+
+    SECTION("Blockage properties.")
+    {
+        auto blk_B1 = library.find_blockage("B1");
+        REQUIRE(library.demand(blk_B1) == 2);
+        auto layer_B1 = library.layer(blk_B1);
+        REQUIRE(library.name(layer_B1) == "M1");
+    }
+
+    SECTION("Blockage composition.")
+    {
+        auto blk_B1 = library.find_blockage("B1");
+        auto std_cell_MC1 = library.std_cell(blk_B1);
+        REQUIRE(std_cells.name(std_cell_MC1) == "MC1");
+        auto blockages = library.blockages(std_cell_MC1);
+        REQUIRE(blockages.size() == 2);
     }
 }

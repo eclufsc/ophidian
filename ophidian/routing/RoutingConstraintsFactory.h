@@ -14,21 +14,23 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License.
- */
+ */ 
 
-#ifndef OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_FACTORY_H
-#define OPHIDIAN_STANDARD_CELL_STANDARD_CELLS_FACTORY_H
 
-#include <ophidian/parser/Lef.h>
+#ifndef OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H
+#define OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H
+
+#include <ophidian/circuit/Netlist.h>
+#include <ophidian/routing/Library.h>
 #include <ophidian/parser/ICCAD2020.h>
+#include <ophidian/routing/RoutingConstraints.h>
 
-#include "StandardCells.h"
-
-namespace ophidian::circuit::factory
+namespace ophidian::routing::factory
 {
-    void make_standard_cells(StandardCells& cells, const parser::Lef& lef) noexcept;
-
-    void make_standard_cells(StandardCells& cells, const parser::ICCAD2020 & iccad_2020) noexcept;
+    void make_routing_constraints(ophidian::routing::RoutingConstraints & routingConstraints,
+                                  const ophidian::routing::Library & library,
+                                  const ophidian::circuit::Netlist & netlist,
+                                  const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
-#endif
+#endif // OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H

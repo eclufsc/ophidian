@@ -31,7 +31,7 @@ namespace ophidian::parser
         using micrometer_type = util::micrometer_t;
 
         // Class constructors
-        EndOfLine() = delete;
+        EndOfLine() = default;
 
         EndOfLine(const EndOfLine&) = default;
         EndOfLine& operator=(const EndOfLine&) = default;
@@ -63,7 +63,7 @@ namespace ophidian::parser
         using micrometer_type = util::micrometer_t;
         
         // Class constructors
-        ParallelEdge() = delete;
+        ParallelEdge() = default;
 
         ParallelEdge(const ParallelEdge&) = default;
         ParallelEdge& operator=(const ParallelEdge&) = default;

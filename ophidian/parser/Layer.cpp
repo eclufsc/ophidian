@@ -103,6 +103,16 @@ namespace ophidian::parser
         return m_corner_spacing;
     }
 
+    const Layer::index_type Layer::index() const noexcept
+    {
+        return m_index;
+    }
+
+    const Layer::capacity_type Layer::capacity() const noexcept
+    {
+        return m_capacity;
+    }
+
     std::ostream& operator<<(std::ostream& os, const Layer& layer)
     {
         auto type_string = [&](){

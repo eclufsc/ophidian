@@ -21,12 +21,16 @@
 
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ICCAD2020.h>
+#include <ophidian/circuit/StandardCells.h>
 
 #include "Library.h"
 
 namespace ophidian::routing::factory
 {
     void make_library(Library& library, const parser::Lef& lef, const parser::Def & def) noexcept;
+
+    void make_library(Library& library,const ophidian::circuit::StandardCells& std_cells, const parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
 #endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H

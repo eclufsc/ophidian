@@ -100,13 +100,14 @@ namespace ophidian::util
         index_type width();
         index_type height();
         index_type depth();
-
+        
+    protected:
+        graph_type m_graph;
     private:
         index_type m_width;
         index_type m_height;
         index_type m_depth;
         matrix_type m_nodes;
-        graph_type m_graph;
 
         node_map_type<node_position_type> m_nodes_indexes;
 

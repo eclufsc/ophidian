@@ -16,7 +16,7 @@
    under the License.
  */
 
-#include "Design.h"
+#include "DesignFactory.h"
 
 #include <ophidian/circuit/StandardCellsFactory.h>
 #include <ophidian/circuit/NetlistFactory.h>
@@ -25,6 +25,7 @@
 #include <ophidian/floorplan/FloorplanFactory.h>
 #include <ophidian/routing/LibraryFactory.h>
 #include <ophidian/routing/GlobalRoutingFactory.h>
+#include <ophidian/routing/RoutingConstraintsFactory.h>
 
 namespace ophidian::design::factory
 {
@@ -94,5 +95,22 @@ namespace ophidian::design::factory
         placement::factory::make_placement(design.placement(), def, design.netlist());
 
         routing::factory::make_library(design.routing_library(), lef, def);
+    }
+
+    void make_design_iccad2020(Design& design, const parser::ICCAD2020 & iccad_2020) noexcept
+    {
+        circuit::factory::make_standard_cells(design.standard_cells(), iccad_2020);
+
+        circuit::factory::make_netlist(design.netlist(), iccad_2020, design.standard_cells());
+
+        placement::factory::make_library(design.placement_library(), iccad_2020, design.standard_cells());
+
+        placement::factory::make_placement(design.placement(), iccad_2020, design.netlist());
+
+        routing::factory::make_library(design.routing_library(), design.standard_cells(), iccad_2020);
+
+        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), design.standard_cells(), iccad_2020);
+
+        routing::factory::make_routing_constraints(design.routing_constraints(), design.routing_library(), design.netlist(), iccad_2020);
     }
 }

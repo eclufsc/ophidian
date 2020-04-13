@@ -21,8 +21,10 @@
 
 #include <ophidian/parser/Guide.h>
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ICCAD2020.h>
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
+#include <ophidian/routing/RoutingConstraints.h>
 #include "GlobalRouting.h"
 
 namespace ophidian::routing::factory
@@ -33,6 +35,12 @@ namespace ophidian::routing::factory
                              const ophidian::parser::Guide& guide,
                              const ophidian::parser::Def& def
                             ) noexcept;
+
+    void make_global_routing(GlobalRouting& globalRouting,
+                             const Library & library,
+                             const ophidian::circuit::Netlist & netlist,
+                             const ophidian::circuit::StandardCells & std_cells,
+                             const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
-#endif // OPHIDIAN_ROUTING_LIBRARY_FACTORY_H
+#endif // OPHIDIAN_GLOBAL_ROUTING_FACTORY_H

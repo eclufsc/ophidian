@@ -23,39 +23,9 @@ namespace ophidian
 namespace routing
 {
 
-void Library::set_gcell_coordinates(Library::unit_container_type GCell_x_axis, Library::unit_container_type GCell_y_axis){
-    mGCell_x_axis = GCell_x_axis;
-    mGCell_y_axis = GCell_y_axis;
-}
-
-// Library::box_type Library::gcell_box(const point_type & min_corner, const point_type & max_corner) const
-// {
-//     auto min_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), min_corner.x(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-//     auto min_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), min_corner.y(), [](const auto & lhs, const auto & rhs){return lhs <= rhs;});
-//     if(min_x_it != mGCell_x_axis.begin())
-//         min_x_it--;
-//     if(min_y_it != mGCell_y_axis.begin())
-//         min_y_it--;
-
-//     auto max_x_it = std::lower_bound(mGCell_x_axis.begin(), mGCell_x_axis.end(), max_corner.x());
-//     auto max_y_it = std::lower_bound(mGCell_y_axis.begin(), mGCell_y_axis.end(), max_corner.y());
-//     if(max_x_it == mGCell_x_axis.end())
-//         max_x_it--;
-//     if(max_y_it == mGCell_y_axis.end())
-//         max_y_it--;
-
-//     return box_type(point_type(unit_type(*min_x_it), unit_type(*min_y_it)),
-//                     point_type(unit_type(*max_x_it), unit_type(*max_y_it)));
-
-// }
-
-Library::unit_container_type Library::get_GCell_x_axis(){
-    return mGCell_x_axis;
-}
-
-Library::unit_container_type Library::get_GCell_y_axis(){
-    return mGCell_y_axis;
-}
+Library::Library(ophidian::circuit::StandardCells& std_cells):
+    mCell2Blockages(std_cells.make_composition_cell<blockage_type>(mBlockages))
+    {}
 
 const Library::layer_type Library::find_layer_instance(const std::string &layerName) const
 {
@@ -312,12 +282,23 @@ const Library::layer_type Library::lowerLayer(const Library::layer_type& layer) 
 
 const Library::scalar_type Library::layerIndex(const Library::layer_type& layer) const
 {
+    /*
+    //Renan: changed to work with ICCAD2020 circuits, it will not work with ISPD circuits anymore
+    //
+    //Sheiny: this layer mapping needs to be improved.
+    //I sugest split layer mapping by layer type (Layer, Via ...).
+    //We can not subtract 1 from layer name, because if we have Metal0 as layer name it would be negative.
+    //I sugest use layer index just for sorting.
+    //
     auto layerName = mLayerName[layer];
-    std::string indexLayerSegment = layerName.substr(5);
-    int layerIndex = boost::lexical_cast<int>(indexLayerSegment) -1;
+    //std::string indexLayerSegment = layerName.substr(5);
+    std::string indexLayerSegment = layerName.substr(1);
+    //int layerIndex = boost::lexical_cast<int>(indexLayerSegment) -1;
+    int layerIndex = boost::lexical_cast<int>(indexLayerSegment);
     std::string metalName = "Metal" + boost::lexical_cast<std::string>(layerIndex);
     return layerIndex;
-
+    */
+    return mLayerIndexes[layer];
 }
 
 const void Library::viaCandidates(Library::via_container_type& vias, const Library::layer_type& layer, const Library::layer_type& upperLayer) const
@@ -362,6 +343,43 @@ void Library::set_highest_layer(const layer_type& layer)
     this->mHighest_layer = layer;
 }
 
+std::string Library::name(const Library::blockage_type& blkg)
+{
+    return mBlockageNames[blkg];
+}
+
+Library::std_cell_type Library::std_cell(const Library::blockage_type& blkg)
+{
+    return mCell2Blockages.whole(blkg);
+}
+
+Library::layer_type Library::layer(const Library::blockage_type& blkg)
+{
+    return mBlockageLayer[blkg];
+}
+
+Library::scalar_type Library::demand(const Library::blockage_type& blkg)
+{
+    return mBlockageDemand[blkg];
+}
+
+Library::blockage_type Library::find_blockage(const std::string &blockage_name) const
+{
+    if (mName2Blockage.find(blockage_name) != mName2Blockage.end())
+    {
+        return mName2Blockage.at(blockage_name);
+    }
+    else
+    {
+        return Library::blockage_type{};
+    }
+}
+
+Library::blockages_view_type Library::blockages(const Library::std_cell_type& std_cell) const
+{
+    return mCell2Blockages.parts(std_cell);
+}
+
 Library::layer_container_type::const_iterator Library::begin_layer() const noexcept
 {
     return mLayers.begin();
@@ -402,6 +420,16 @@ Library::pad_container_type::const_iterator Library::end_pad() const noexcept
     return mPads.end();
 }
 
+Library::blockage_container_type::const_iterator Library::begin_blockages() const noexcept
+{
+    return mBlockages.begin();
+}
+
+Library::blockage_container_type::const_iterator Library::end_blockages() const noexcept
+{
+    return mBlockages.end();
+}
+
 Library::layer_container_type::size_type Library::size_layer() const noexcept
 {
     return mLayers.size();
@@ -420,6 +448,11 @@ Library::track_container_type::size_type Library::size_track() const noexcept
 Library::pad_container_type::size_type Library::size_pad() const noexcept
 {
     return mPads.size();
+}
+
+Library::blockage_container_type::size_type Library::size_blockage() const noexcept
+{
+    return mBlockages.size();
 }
 
 std::string& Library::name(const Library::pad_type& pad)
@@ -493,6 +526,7 @@ std::map<std::string, Library::box_container_type> Library::box_in_layer(const L
 
 Library::layer_type Library::add_layer_instance(
         const std::string &layerName,
+        const Library::scalar_type index,
         const LayerType &type,
         const Direction &direction,
         const Library::unit_type& pitch,
@@ -521,6 +555,7 @@ Library::layer_type Library::add_layer_instance(
 
         mLayerName[layer] = layerName;
         mName2Layer[layerName] = layer;
+        mLayerIndexes[layer] = index;
         mLayerType[layer] = type;
         mLayerDirection[layer] = direction;
         mLayerPitch[layer] = pitch;
@@ -545,6 +580,22 @@ Library::layer_type Library::add_layer_instance(
         return layer;
     }else{
         return mName2Layer[layerName];
+    }
+}
+
+Library::blockage_type Library::add_blockage(const std::string blockage_name, const Library::std_cell_type &std_cell, const Library::layer_type layer, Library::scalar_type demand)
+{
+    if(mName2Blockage.find(blockage_name) == mName2Blockage.end()){
+        auto blockage = mBlockages.add();
+
+        mBlockageNames[blockage] = blockage_name;
+        mName2Blockage[blockage_name] = blockage;
+        mBlockageLayer[blockage] = layer;
+        mBlockageDemand[blockage] = demand;
+        mCell2Blockages.addAssociation(std_cell, blockage);
+        return blockage;
+    }else{
+        return mName2Blockage[blockage_name];
     }
 }
 
@@ -611,6 +662,10 @@ entity_system::EntitySystem<Library::track_type>::NotifierType * Library::notifi
 
 entity_system::EntitySystem<Library::pad_type>::NotifierType * Library::notifier(Library::pad_type) const {
     return mPads.notifier();
+}
+
+entity_system::EntitySystem<Library::blockage_type>::NotifierType * Library::notifier(Library::blockage_type) const {
+    return mBlockages.notifier();
 }
 
 } // namespace routing

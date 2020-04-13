@@ -3,11 +3,11 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-// #include <ophidian/entity_system/Aggregation.h>
 
 #include <ophidian/routing/Library.h>
 #include <ophidian/util/GridGraph_3D.h>
 
+#include <boost/geometry/index/rtree.hpp>
 namespace ophidian::routing{
 
 
@@ -35,8 +35,12 @@ class GCellGraph : public ophidian::util::GridGraph_3D
 {
 public:
     template <class T> using container_type = std::vector<T>;
+    using scalar_type           = int;
+    using scalar_container_type = container_type<scalar_type>;
     using index_type            = ophidian::util::GridGraph_3D::index_type;
     using node_type             = ophidian::util::GridGraph_3D::node_type;
+    template <class T> 
+    using node_map_type         = ophidian::util::GridGraph_3D::node_map_type<T>;
     using unit_type             = util::database_unit_t;
     using unit_container_type   = container_type<unit_type>;
     using point_type            = ophidian::util::LocationDbu;
@@ -44,8 +48,12 @@ public:
     using gcell_type            = GCell;
     using gcell_container_type  = std::vector<gcell_type>;
 
-
     using map_type              = std::unordered_map<std::pair<index_type, index_type>, box_type, hash_pair >;
+
+    using point_scalar_type     = geometry::Point<double>;
+    using box_scalar_type       = geometry::Box<double>;
+    using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
+    using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
 
     // Constructors
     //! Construct GCellGraph
@@ -59,9 +67,19 @@ public:
     GCellGraph(GCellGraph &&) = default;
     GCellGraph& operator=(GCellGraph &&) = default;
 
-    GCellGraph(unit_container_type x, unit_container_type y, index_type z);
+    GCellGraph(unit_container_type x, unit_container_type y, index_type z, scalar_container_type capacity = {1});
+    GCellGraph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
 
     // Element access
+    gcell_type gcell(index_type x, index_type y, index_type z) const ;
+    gcell_type nearest_gcell(const point_type location, const index_type layer) const ;
+    node_type graph_node(const gcell_type gcell) const;
+    box_type box(const gcell_type& gcell);
+    scalar_type capacity(const gcell_type& gcell);
+    scalar_type demand(const gcell_type& gcell);
+    void change_demand(const gcell_type& gcell, const scalar_type delta);
+    void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
+    uint32_t id(const gcell_type& gcell);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;
@@ -70,13 +88,15 @@ public:
     // Modifiers
 
 private:
-    entity_system::EntitySystem<gcell_type> m_gcells{};
-    entity_system::Property<gcell_type, node_type> m_gcell_node{m_gcells};
+    entity_system::EntitySystem<gcell_type>             m_gcells{};
+    entity_system::Property<gcell_type, node_type>      m_gcell_node{m_gcells};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_capacity{m_gcells};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_demand{m_gcells, 0};
 
-    map_type m_gcell_box;
+    map_type                                            m_gcell_box;
+    node_map_type<gcell_type>                           m_nodes_to_gcell;
+    rtree_type                                          m_grid;
 };
-
-
 
 }// end namespace
 

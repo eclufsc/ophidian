@@ -3,7 +3,9 @@
 *.swo
 /dependencies/
 /Debug/
+/debug
 /Release/
+/release
 /benchmarks/
 .project
 .cproject
@@ -16,3 +18,4 @@
 *.json
 3rdparty/*
 .vscode
+tags

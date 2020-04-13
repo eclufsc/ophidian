@@ -32,6 +32,11 @@ namespace ophidian::parser
         return m_pins;
     }
 
+    const Net::name_type & Net::min_layer() const noexcept
+    {
+        return m_min_layer;
+    }
+
     bool Net::operator==(const Net& rhs) const noexcept
     {
         return m_name == rhs.m_name;

@@ -25,6 +25,7 @@
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Guide.h>
+#include <ophidian/parser/ICCAD2020.h>
 
 namespace ophidian::design::factory
 {
@@ -39,6 +40,8 @@ namespace ophidian::design::factory
     void make_design_ispd2019(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept;
 
     void make_design_iccad2019(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
+
+    void make_design_iccad2020(Design& design, const parser::ICCAD2020 & iccad_2020) noexcept;
 }
 
 #endif // OPHIDIAN_DESIGN_DESIGNBUILDER_H

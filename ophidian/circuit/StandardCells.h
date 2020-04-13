@@ -125,6 +125,11 @@ namespace ophidian::circuit
             return entity_system::Property<pin_type, Value>(m_std_pins);
         }
 
+        template <typename Value>
+        entity_system::Composition<Cell, Value> make_composition_cell(entity_system::EntitySystem<Value> & parts) const noexcept
+        {
+            return entity_system::Composition<Cell, Value>(m_std_cells, parts);
+        }
     private:
         //cells entity system and properties
         cell_container_type                                m_std_cells{};
