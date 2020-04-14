@@ -75,6 +75,7 @@ TEST_CASE("Make a global routing from an iccad2020 file.", "[routing][globalRout
 
     auto & netlist = design.netlist();
     auto & global_routing = design.global_routing();
+    auto graph_ptr = global_routing.gcell_graph();
     auto & library = design.routing_library();
 
     CHECK(global_routing.size_segment() == 42);
@@ -94,27 +95,90 @@ TEST_CASE("Make a global routing from an iccad2020 file.", "[routing][globalRout
         REQUIRE(std::is_permutation(box_segments.begin(), box_segments.end(), expected_box_segments.begin(), boxComparator));
     }
 
+    SECTION("Horizontal segment properties")
+    {
+        auto net_N3 = netlist.find_net("N3");
+        auto segments = global_routing.segments(net_N3);
+        auto box = box_type{point_type{unit_type{10}, unit_type{10}}, point_type{unit_type{40}, unit_type{20}}};
+        auto segment_it = std::find_if(segments.begin(),
+                                       segments.end(),
+                                       [&](auto & seg){return boxComparator(global_routing.box(seg), box);});
+
+        auto start_layer = global_routing.layer_start(*segment_it);
+        auto end_layer = global_routing.layer_end(*segment_it);
+        REQUIRE(start_layer == end_layer);
+        REQUIRE(library.layerIndex(start_layer) == 3);
+        auto start_gcell = global_routing.gcell_start(*segment_it);
+        auto end_gcell = global_routing.gcell_end(*segment_it);
+
+        auto s_graph_node = graph_ptr->graph_node(start_gcell);
+        auto s_node_position = graph_ptr->position(s_graph_node);
+
+        auto e_graph_node = graph_ptr->graph_node(end_gcell);
+        auto e_node_position = graph_ptr->position(e_graph_node);
+
+        std::vector<std::tuple<int,int,int>> expected_nodes={{1,1,2}, {3,1,2}};
+        std::vector<std::tuple<int,int,int>> nodes;
+        nodes.push_back({s_node_position.get<0>(), s_node_position.get<1>(), s_node_position.get<2>()});
+        nodes.push_back({e_node_position.get<0>(), e_node_position.get<1>(), e_node_position.get<2>()});
+
+        REQUIRE(std::is_permutation(nodes.begin(), nodes.end(), expected_nodes.begin()));
+    }
+
+    SECTION("Via segment properties")
+    {
+        auto net_N3 = netlist.find_net("N3");
+        auto segments = global_routing.segments(net_N3);
+        auto box = box_type{point_type{unit_type{10}, unit_type{10}}, point_type{unit_type{20}, unit_type{20}}};
+        auto segment_it = std::find_if(segments.begin(),
+                                       segments.end(),
+                                       [&](auto & seg){return boxComparator(global_routing.box(seg), box);});
+
+        auto start_layer = global_routing.layer_start(*segment_it);
+        auto end_layer = global_routing.layer_end(*segment_it);
+        REQUIRE(start_layer != end_layer);
+        auto start_gcell = global_routing.gcell_start(*segment_it);
+        auto end_gcell = global_routing.gcell_end(*segment_it);
+
+        auto s_graph_node = graph_ptr->graph_node(start_gcell);
+        auto s_node_position = graph_ptr->position(s_graph_node);
+
+        auto e_graph_node = graph_ptr->graph_node(end_gcell);
+        auto e_node_position = graph_ptr->position(e_graph_node);
+
+        std::vector<std::tuple<int,int,int>> expected_nodes={{1,1,0}, {1,1,2}};
+        std::vector<std::tuple<int,int,int>> nodes;
+        nodes.push_back({s_node_position.get<0>(), s_node_position.get<1>(), s_node_position.get<2>()});
+        nodes.push_back({e_node_position.get<0>(), e_node_position.get<1>(), e_node_position.get<2>()});
+
+        REQUIRE(std::is_permutation(nodes.begin(), nodes.end(), expected_nodes.begin()));
+    }
+
     SECTION("GCell Graph demand"){
+        //initial demand = 0
         int all_demand = 0;
-        auto gcell_graph = global_routing.gcell_graph();
-        for(int z = 0; z < gcell_graph->depth(); z++)
-            for(int x = 0; x < gcell_graph->width(); x++)
-                for(int y = 0; y < gcell_graph->width(); y++)
-                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        for(int z = 0; z < graph_ptr->depth(); z++)
+            for(int x = 0; x < graph_ptr->width(); x++)
+                for(int y = 0; y < graph_ptr->width(); y++)
+                    all_demand += graph_ptr->demand(graph_ptr->gcell(x,y,z));
         REQUIRE(all_demand == 0);
+
+        //add net N3 demand
         auto net_N3 = netlist.find_net("N3");
         global_routing.increase_demand(net_N3);
-        for(int z = 0; z < gcell_graph->depth(); z++)
-            for(int x = 0; x < gcell_graph->width(); x++)
-                for(int y = 0; y < gcell_graph->width(); y++)
-                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        for(int z = 0; z < graph_ptr->depth(); z++)
+            for(int x = 0; x < graph_ptr->width(); x++)
+                for(int y = 0; y < graph_ptr->width(); y++)
+                    all_demand += graph_ptr->demand(graph_ptr->gcell(x,y,z));
         REQUIRE(all_demand == 10);
+
+        //remove net N3 demand
         all_demand = 0;
         global_routing.decrease_demand(net_N3);
-        for(int z = 0; z < gcell_graph->depth(); z++)
-            for(int x = 0; x < gcell_graph->width(); x++)
-                for(int y = 0; y < gcell_graph->width(); y++)
-                    all_demand += gcell_graph->demand(gcell_graph->gcell(x,y,z));
+        for(int z = 0; z < graph_ptr->depth(); z++)
+            for(int x = 0; x < graph_ptr->width(); x++)
+                for(int y = 0; y < graph_ptr->width(); y++)
+                    all_demand += graph_ptr->demand(graph_ptr->gcell(x,y,z));
         REQUIRE(all_demand == 0);
     }
 }

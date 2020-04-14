@@ -3,7 +3,7 @@
 
 #include <ophidian/design/DesignFactory.h>
 
-TEST_CASE("Make a routing constraints from an iccad2020 file.", "[routing][factory][test]")
+TEST_CASE("Make a routing constraints from an iccad2020 file.", "[routing][factory]")
 {
     ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
     auto design = ophidian::design::Design{};

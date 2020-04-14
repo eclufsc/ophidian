@@ -23,22 +23,26 @@ namespace ophidian::routing::factory
 {
     void make_global_routing(ophidian::routing::GlobalRouting &globalRouting, const Library &library, const ophidian::circuit::Netlist &netlist, const ophidian::parser::Guide &guide, const ophidian::parser::Def& def) noexcept
     {
-        for(auto net : guide.nets()){
-            auto net_instance = netlist.find_net(net.name());
-            for(auto region : net.regions()){
-                auto layer_instance = library.find_layer_instance(region.metal());
-                globalRouting.add_segment(region.region(), layer_instance, layer_instance, net_instance);
-            }
-        }
-
         if( def.gcell_x_axis().size() != 0 && def.gcell_y_axis().size() != 0)
         {
             int z = library.index(library.highest_layer());
             globalRouting.create_gcell_graph(library, def.gcell_x_axis(), def.gcell_y_axis(), z);
-        }else{
-            // Design does not have GCELL definitions !!
-            std::cout << "WARNING : This Design does not have GCELL definitions in .def file!" << std::endl;
-            std::cout << "        : Global Routing does not have GCELL Graph" << std::endl;
+        }
+        else
+        {
+            //TODO: from a .guide, construct a GCellGraph following .guide coordinates.
+            std::cout << "WARNING : This Design DOES NOT have gcell definitions in .def file!" << std::endl;
+            std::cout << "        : GCellGraph WILL NOT be initialized." << std::endl;
+        }
+
+        for(auto net : guide.nets())
+        {
+            auto net_instance = netlist.find_net(net.name());
+            for(auto region : net.regions())
+            {
+                auto layer_instance = library.find_layer_instance(region.metal());
+                globalRouting.add_segment(region.region(), layer_instance, layer_instance, net_instance);
+            }
         }
     }
 

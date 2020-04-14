@@ -25,6 +25,8 @@ namespace ophidian::routing
         m_gr_segment_box{m_gr_segments},
         m_gr_segment_layers_start{m_gr_segments},
         m_gr_segment_layers_end{m_gr_segments},
+        m_gr_segment_gcell_start{m_gr_segments},
+        m_gr_segment_gcell_end{m_gr_segments},
         m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)},
         m_library{library}
     {
@@ -55,6 +57,16 @@ namespace ophidian::routing
         return m_gr_segment_layers_end[segment];
     }
 
+    const GlobalRouting::gcell_type GlobalRouting::gcell_start(const GlobalRouting::gr_segment_type &segment) const
+    {
+        return m_gr_segment_gcell_start[segment];
+    }
+
+    const GlobalRouting::gcell_type GlobalRouting::gcell_end(const GlobalRouting::gr_segment_type &segment) const
+    {
+        return m_gr_segment_gcell_end[segment];
+    }
+
     void GlobalRouting::create_gcell_graph(GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z, GCellGraph::scalar_container_type capacities)
     {
         m_gcell_graph.reset(new gcell_graph_type(x, y, z, capacities));
@@ -77,8 +89,8 @@ namespace ophidian::routing
         {
             auto layer_start = m_gr_segment_layers_start[segment];
             auto layer_end = m_gr_segment_layers_end[segment];
-            auto min_index = std::min(m_library.layerIndex(layer_start), m_library.layerIndex(layer_end));
-            auto max_index = std::max(m_library.layerIndex(layer_start), m_library.layerIndex(layer_end));
+            auto min_index = m_library.layerIndex(layer_start);
+            auto max_index = m_library.layerIndex(layer_end);
             for(auto i = min_index; i <= max_index; i++)
             {
                 auto box = m_gr_segment_box[segment];
@@ -110,9 +122,16 @@ namespace ophidian::routing
     {
         auto segment = m_gr_segments.add();
         m_gr_segment_box[segment] = geometry;
-        m_gr_segment_layers_start[segment] = layer_start;
-        m_gr_segment_layers_end[segment] = layer_end;
         m_net_to_gr_segment.addAssociation(net, segment);
+
+        auto s_index = m_library.layerIndex(layer_start);
+        auto e_index = m_library.layerIndex(layer_end);
+        //make sure layer_start is always below layer_end, it helps to set their gcells.
+        m_gr_segment_layers_start[segment] = (s_index <= e_index) ? layer_start : layer_end;
+        m_gr_segment_layers_end[segment] = (s_index <= e_index) ? layer_end : layer_start;
+
+        if(m_gcell_graph)
+            set_gcells(segment);
         return segment;
     }
 
@@ -133,5 +152,45 @@ namespace ophidian::routing
     entity_system::EntitySystem<GlobalRouting::gr_segment_type>::NotifierType *GlobalRouting::notifier(GlobalRouting::gr_segment_type) const
     {
         return m_gr_segments.notifier();
+    }
+
+    void GlobalRouting::set_gcells(const GlobalRouting::gr_segment_type& segment)
+    {
+        gcell_container_type gcells;
+        gcell_type start_gcell, end_gcell;
+        auto box_segment = m_gr_segment_box[segment];
+        auto start_index = m_library.layerIndex(m_gr_segment_layers_start[segment]);
+        auto end_index = m_library.layerIndex(m_gr_segment_layers_end[segment]);
+
+        //same layer
+        if(start_index == end_index)
+        {
+            m_gcell_graph->intersect(gcells, box_segment, start_index-1);
+            std::pair<int, int> min{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+            std::pair<int, int> max{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
+            for(auto gcell : gcells)
+            {
+                auto graph_node = m_gcell_graph->graph_node(gcell);
+                auto node_position = m_gcell_graph->position(graph_node);
+                min.first = std::min(node_position.get<0>(), min.first);
+                min.second = std::min(node_position.get<1>(), min.second);
+                max.first = std::max(node_position.get<0>(), max.first);
+                max.second = std::max(node_position.get<1>(), max.second);
+            }
+            start_gcell = m_gcell_graph->gcell(min.first, min.second, start_index-1);
+            end_gcell = m_gcell_graph->gcell(max.first, max.second, end_index-1);
+        }
+        //via
+        else
+        {
+            m_gcell_graph->intersect(gcells, box_segment, start_index-1);
+            start_gcell = gcells.back();
+
+            gcells.clear();
+            m_gcell_graph->intersect(gcells, box_segment, end_index-1);
+            end_gcell = gcells.back();
+        }
+        m_gr_segment_gcell_start[segment] = start_gcell;
+        m_gr_segment_gcell_end[segment] = end_gcell;
     }
 }

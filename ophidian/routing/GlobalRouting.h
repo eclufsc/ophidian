@@ -58,6 +58,8 @@ namespace ophidian::routing
         const segment_geometry_type& box(const gr_segment_type& segment) const;
         const layer_type layer_start(const gr_segment_type& segment) const;
         const layer_type layer_end(const gr_segment_type& segment) const;
+        const gcell_type gcell_start(const gr_segment_type& segment) const;
+        const gcell_type gcell_end(const gr_segment_type& segment) const;
 
         void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
@@ -85,15 +87,21 @@ namespace ophidian::routing
         entity_system::EntitySystem<gr_segment_type>::NotifierType * notifier(gr_segment_type) const;
 
     private:
-        entity_system::EntitySystem<gr_segment_type>            m_gr_segments;
-        entity_system::Property<gr_segment_type, segment_geometry_type>      m_gr_segment_box;
-        entity_system::Property<gr_segment_type, layer_type>    m_gr_segment_layers_start, m_gr_segment_layers_end;
+        void set_all_segment_gcells();
+        void set_gcells(const gr_segment_type& segment);
 
-        entity_system::Aggregation<net_type, gr_segment_type>   m_net_to_gr_segment;
+        entity_system::EntitySystem<gr_segment_type>                    m_gr_segments;
+        entity_system::Property<gr_segment_type, segment_geometry_type> m_gr_segment_box;
+        entity_system::Property<gr_segment_type, layer_type>            m_gr_segment_layers_start;
+        entity_system::Property<gr_segment_type, layer_type>            m_gr_segment_layers_end;
+        entity_system::Property<gr_segment_type, gcell_type>            m_gr_segment_gcell_start;
+        entity_system::Property<gr_segment_type, gcell_type>            m_gr_segment_gcell_end;
 
-        gcell_graph_ptr_type m_gcell_graph;
+        entity_system::Aggregation<net_type, gr_segment_type>           m_net_to_gr_segment;
 
-        const Library & m_library;
+        gcell_graph_ptr_type                                            m_gcell_graph;
+
+        const Library&                                                  m_library;
     };
 }
 
