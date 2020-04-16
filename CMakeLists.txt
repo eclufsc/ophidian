@@ -139,6 +139,7 @@ ENDIF(OPHIDIAN_GUI)
 add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(test)
+add_subdirectory(experiments)
 
 IF(OPHIDIAN_APPS)
     add_subdirectory(apps)

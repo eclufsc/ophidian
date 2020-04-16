@@ -42,10 +42,20 @@ namespace entity_system
         return !((*this) == entity);
     }
 
+    uint32_t EntityBase::id() const
+    {
+        return mId;
+    }
+
     EntityBase::EntityBase(uint32_t id, EntitySystemBase * system):
             mId(id),
             mSystem(system)
     {
+    }
+
+    std::size_t EntityBaseHash::operator()(const EntityBase & entity) const
+    {
+        return std::hash<uint32_t>()(entity.id());
     }
 
     uint32_t EntitySystemBase::id(const EntityBase & en) const

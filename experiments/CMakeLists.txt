@@ -10,26 +10,22 @@
 ################################################################################
 
 # Fetch test files recursevely
-file(GLOB_RECURSE ophidian_tests_source
+file(GLOB_RECURSE ophidian_experiments_source
     "*.cpp"
     "main.cpp"
 )
 
-if(UNCRUSTIFY_IT)
-    include(uncrustify_helper)
-    uncrustify_it(${ophidian_uncrustify_config} ${ophidian_tests_source})
-endif()
-
-if(RUN_UNCRUSTIFY_CHECK)
-    include(uncrustify_helper)
-    uncrustify_check(${ophidian_uncrustify_config} ${ophidian_tests_source})
-endif()
-
 # Add test target
-add_executable(ophidian_tests ${ophidian_tests_source})
+add_executable(iccad19gr ${ophidian_experiments_source})
+
+# Fetch test files recursevely
+file(GLOB_RECURSE ophidian_experiments_source
+    "*.cpp"
+    "main.cpp"
+)
 
 # Link target dependencies
-target_link_libraries(ophidian_tests
+target_link_libraries(iccad19gr
     PRIVATE Catch
     PRIVATE ophidian_circuit_static
     PRIVATE ophidian_design_static
@@ -44,9 +40,9 @@ target_link_libraries(ophidian_tests
     PRIVATE gurobi90
 )
 
-if(OPHIDIAN_TESTS_FULLY_STATIC)
+if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
     # Link EVERYTHING staticly!
-    set_target_properties(ophidian_tests PROPERTIES
+    set_target_properties(iccad19gr PROPERTIES
         LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
     )
 endif()
@@ -57,7 +53,7 @@ endif()
 
 message("Creating symlink for test files")
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/experiments/.
     RESULT_VARIABLE result
 )
 
@@ -74,11 +70,11 @@ find_file(PORT9 "PORT9.dat" PATHS
 
 message("Creating symlink FLUTE LUTs")
 execute_process(
-    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/experiments/.
     RESULT_VARIABLE result
 )
 execute_process(
-    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/test/.
+    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/experiments/.
     RESULT_VARIABLE result
 )
 
@@ -87,4 +83,5 @@ execute_process(
 ################################################################################
 
 enable_testing()
-add_test(NAME unit_test COMMAND ophidian_tests)
+add_test(NAME unit_test COMMAND iccad19gr)
+

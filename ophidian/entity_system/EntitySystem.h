@@ -48,9 +48,17 @@ namespace entity_system
 
         bool operator!=(const EntityBase & entity) const;
 
+        uint32_t id() const;
+
     private:
         uint32_t           mId;
         EntitySystemBase * mSystem;
+    };
+
+    class EntityBaseHash
+    {
+    public:
+        std::size_t operator()(const EntityBase & entity) const;
     };
 
     class EntitySystemBase
