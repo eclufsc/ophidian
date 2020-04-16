@@ -26,25 +26,21 @@ public:
 
 TEST_CASE_METHOD(StandardCellsFixture, "Library: setting geometry of cells", "[placement][library]")
 {
+    using unit_t = CellGeometry::unit_type;
+    using box_type = CellGeometry::box_type;
+    using geometry_container = CellGeometry::geometry_container_type;
+
     auto library = Library{std_cells};
 
-    auto cell1Boxes = CellGeometry::box_container_type{
-        {
-            {CellGeometry::unit_type{0}, CellGeometry::unit_type{0}},
-            {CellGeometry::unit_type{10}, CellGeometry::unit_type{10}}
-        }
-    };
+    box_type cell1Box{{unit_t{0},  unit_t{0}}, {unit_t{10}, unit_t{10}}};
+    auto cell1Boxes = geometry_container{{std::make_pair(cell1Box, "Metal1")}};
 
     auto cell1Geometry = CellGeometry{std::move(cell1Boxes)};
 
     library.geometry(cell1) = cell1Geometry;
 
-    auto cell2Boxes = CellGeometry::box_container_type{
-        {
-            {CellGeometry::unit_type{0}, CellGeometry::unit_type{0}},
-            {CellGeometry::unit_type{20}, CellGeometry::unit_type{10}}
-        }
-    };
+    box_type cell2Box{{unit_t{0},  unit_t{0}}, {unit_t{20}, unit_t{10}}};
+    auto cell2Boxes = geometry_container{{std::make_pair(cell2Box, "Metal1")}};
 
     auto cell2Geometry = CellGeometry{std::move(cell2Boxes)};
 

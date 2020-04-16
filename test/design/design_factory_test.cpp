@@ -4,6 +4,9 @@
 
 TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][Design][factory]")
 {
+    using geometry_container = ophidian::geometry::CellGeometry::geometry_container_type;
+    using box_type = ophidian::geometry::CellGeometry::box_type;
+
     auto lef = ophidian::parser::Lef{"input_files/simple/simple.lef"};
     auto def = ophidian::parser::Def{"input_files/simple/simple.def"};
     auto verilog = ophidian::parser::Verilog{"input_files/simple/simple.v"};
@@ -26,7 +29,7 @@ TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][D
 
     auto std_cell_u1_geometry = design.placement_library().geometry(std_cell_u1);
 
-    auto first_box = std_cell_u1_geometry.front();
+    auto first_box = std_cell_u1_geometry.front().first;
 
     CHECK(first_box.min_corner().x() == dbu_t{0});
     CHECK(first_box.min_corner().y() == dbu_t{0});
@@ -38,11 +41,11 @@ TEST_CASE("Design factory: populate with simple lef, def, verilog.", "[design][D
 
     auto cell_u1_placed_geometry = design.placement().geometry(cell_u1);
 
-    CHECK(cell_u1_placed_geometry.front().min_corner().x() == cell_u1_xpos);
-    CHECK(cell_u1_placed_geometry.front().min_corner().y() == cell_u1_ypos);
+    CHECK(cell_u1_placed_geometry.front().first.min_corner().x() == cell_u1_xpos);
+    CHECK(cell_u1_placed_geometry.front().first.min_corner().y() == cell_u1_ypos);
 
-    CHECK(cell_u1_placed_geometry.front().max_corner().x() == std_cell_u1_geometry.front().max_corner().x() + cell_u1_xpos);
-    CHECK(cell_u1_placed_geometry.front().max_corner().y() == std_cell_u1_geometry.front().max_corner().y() + cell_u1_ypos);
+    CHECK(cell_u1_placed_geometry.front().first.max_corner().x() == std_cell_u1_geometry.front().first.max_corner().x() + cell_u1_xpos);
+    CHECK(cell_u1_placed_geometry.front().first.max_corner().y() == std_cell_u1_geometry.front().first.max_corner().y() + cell_u1_ypos);
 }
 
 TEST_CASE("Design factory: test design_factory_iccad17 with contest files", "[design][Design][factory]")

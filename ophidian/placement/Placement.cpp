@@ -74,7 +74,6 @@ namespace ophidian::placement
         return m_output_pad_locations[output];
     }
 
-
     Placement::cell_geometry_type Placement::geometry(const Placement::cell_type& cell) const
     {
         auto stdCell = m_netlist.std_cell(cell);
@@ -104,15 +103,11 @@ namespace ophidian::placement
         auto translated_boxes = geometry::CellGeometry{};
         translated_boxes.reserve(stdPinGeometry.size());
 
-        for(auto layer : stdPinGeometry.layers())
-        {
-            translated_boxes.push_back(layer);
-        }
-
-        for(auto & box : stdPinGeometry)
+        for(auto & geometry : stdPinGeometry)
         {
             point_type min_corner;
             point_type max_corner;
+            auto& box = geometry.first;
 
             switch (orientation(cell)){
                 case orientation_type::N:
@@ -159,7 +154,7 @@ namespace ophidian::placement
             geometry::CellGeometry::box_type new_box (
                 min_corner, max_corner
             );
-            translated_boxes.push_back(new_box);
+            translated_boxes.push_back(std::make_pair(new_box, geometry.second));
         }
         return translated_boxes;
     }

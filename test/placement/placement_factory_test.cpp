@@ -47,7 +47,7 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
 
     auto std_cell_u1_geometry = library.geometry(std_cell_u1);
 
-    auto first_box = std_cell_u1_geometry.front();
+    auto first_box = std_cell_u1_geometry.front().first;
 
     CHECK(first_box.min_corner().x() == dbu_t{0});
     CHECK(first_box.min_corner().y() == dbu_t{0});
@@ -59,11 +59,11 @@ TEST_CASE("Placement factory: populate with simple project.", "[placement][Place
 
     auto cell_u1_placed_geometry = placement.geometry(cell_u1);
 
-    CHECK(cell_u1_placed_geometry.front().min_corner().x() == std_cell_u1_geometry.front().min_corner().x() + cell_u1_xpos);
-    CHECK(cell_u1_placed_geometry.front().min_corner().y() == std_cell_u1_geometry.front().min_corner().y() + cell_u1_ypos);
+    CHECK(cell_u1_placed_geometry.front().first.min_corner().x() == std_cell_u1_geometry.front().first.min_corner().x() + cell_u1_xpos);
+    CHECK(cell_u1_placed_geometry.front().first.min_corner().y() == std_cell_u1_geometry.front().first.min_corner().y() + cell_u1_ypos);
 
-    CHECK(cell_u1_placed_geometry.front().max_corner().x() == std_cell_u1_geometry.front().max_corner().x() + cell_u1_xpos);
-    CHECK(cell_u1_placed_geometry.front().max_corner().y() == std_cell_u1_geometry.front().max_corner().y() + cell_u1_ypos);
+    CHECK(cell_u1_placed_geometry.front().first.max_corner().x() == std_cell_u1_geometry.front().first.max_corner().x() + cell_u1_xpos);
+    CHECK(cell_u1_placed_geometry.front().first.max_corner().y() == std_cell_u1_geometry.front().first.max_corner().y() + cell_u1_ypos);
 }
 
 TEST_CASE("Make a placement from an iccad2020 file.", "[placement][Placement][factory]")

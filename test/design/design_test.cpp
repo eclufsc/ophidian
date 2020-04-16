@@ -68,22 +68,22 @@ TEST_CASE("Design: testing placement.", "[design]")
 
 TEST_CASE("Design: testing library (setting geometry of cells).", "[design]")
 {
+    using geometry_container = ophidian::geometry::CellGeometry::geometry_container_type;
+    using box_type = ophidian::geometry::CellGeometry::box_type;
+
     Design design;
     auto cell1 = design.standard_cells().add_cell("cell1");
     auto cell2 = design.standard_cells().add_cell("cell2");
 
-    std::vector<ophidian::geometry::Box<dbu_t>> cell1Boxes = {
-        ophidian::geometry::Box<dbu_t>{ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}}, ophidian::geometry::Point<dbu_t>{dbu_t{10}, dbu_t{10}}}
-    };
+    box_type box1{{dbu_t{0}, dbu_t{0}}, {dbu_t{1}, dbu_t{1}}};
+    geometry_container cell1Boxes{{std::make_pair(box1, "Metal1")}};
+
     ophidian::geometry::CellGeometry cell1Geometry(cell1Boxes);
     design.placement_library().geometry(cell1) = cell1Geometry;
 
-    std::vector<ophidian::geometry::Box<dbu_t>> cell2Boxes = {
-        ophidian::geometry::Box<dbu_t>{
-            ophidian::geometry::Point<dbu_t>{dbu_t{0}, dbu_t{0}},
-            ophidian::geometry::Point<dbu_t>{dbu_t{20}, dbu_t{10}}
-        }
-    };
+    box_type box2{{dbu_t{0}, dbu_t{0}}, {dbu_t{20}, dbu_t{10}}};
+    geometry_container cell2Boxes{{std::make_pair(box2, "Metal1")}};
+
     ophidian::geometry::CellGeometry cell2Geometry(cell2Boxes);
     design.placement_library().geometry(cell2) =  cell2Geometry;
 

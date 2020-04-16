@@ -31,14 +31,12 @@ namespace ophidian::geometry
     {
     public:
         // Member types
-        using unit_type = util::database_unit_t;
-
-        using point_type = Point<unit_type>;
-
-        using box_type  = Box<unit_type>;
-        using box_container_type = std::vector<box_type>;
-
-        using layer_container_type = std::vector<std::string>;
+        using unit_type               = util::database_unit_t;
+        using point_type              = Point<unit_type>;
+        using layer_name_type         = std::string;
+        using box_type                = Box<unit_type>;
+        using geometry_type           = std::pair<box_type, layer_name_type>;
+        using geometry_container_type = std::vector<geometry_type>;
 
         // Constructors
         CellGeometry() = default;
@@ -49,13 +47,13 @@ namespace ophidian::geometry
         CellGeometry(CellGeometry &&) = default;
         CellGeometry& operator= ( CellGeometry && ) = default;
 
-        CellGeometry(const box_container_type& boxes);
+        CellGeometry(const geometry_container_type& geometries);
 
-        CellGeometry(box_container_type&& boxes);
+        CellGeometry(geometry_container_type && geometries);
 
         // Element access
-        box_type& front();
-        const box_type& front() const;
+        geometry_type& front();
+        const geometry_type& front() const;
 
         const box_type bounding_box() const;
 
@@ -63,42 +61,38 @@ namespace ophidian::geometry
         unit_type width() const;
         unit_type height() const;
 
-        const layer_container_type& layers() const;
-
-        std::map<std::string, box_container_type> box_in_layer() const;
-
-
         // Iterators
-        box_container_type::iterator begin();
+        geometry_container_type::iterator begin();
 
-        box_container_type::iterator end();
+        geometry_container_type::iterator end();
 
-        box_container_type::const_iterator begin() const;
+        geometry_container_type::const_iterator begin() const;
 
-        box_container_type::const_iterator end() const;
+        geometry_container_type::const_iterator end() const;
 
         // Capacity
         void reserve(size_t size) noexcept;
 
-        box_container_type::size_type size() const noexcept;
+        geometry_container_type::size_type size() const noexcept;
 
         // Modifiers
-        void push_back(const box_type & box);
+        void push_back(const geometry_type & geometry);
 
-        void push_back(box_type && box);
-
-        void push_back(std::string layer);
+        void push_back(geometry_type && geometry);
 
         bool operator==(const CellGeometry & other) const noexcept
         {
-            for(auto box1 : m_boxes)
+            for(auto geometry1 : m_geometries)
             {
-                for(auto box2 : other.m_boxes)
+                auto box1 = geometry1.first;
+                for(auto geometry2 : other.m_geometries)
                 {
+                    auto box2 = geometry2.first;
                     bool comparison = (box1.min_corner().x() == box2.min_corner().x()) &&
                                       (box1.min_corner().y() == box2.min_corner().y()) &&
                                       (box1.max_corner().x() == box2.max_corner().x()) &&
-                                      (box1.max_corner().y() == box2.max_corner().y());
+                                      (box1.max_corner().y() == box2.max_corner().y()) &&
+                                      (geometry1.second == geometry2.second);
                     if(!comparison) {
                         return false;
                     }
@@ -114,8 +108,7 @@ namespace ophidian::geometry
         }
 
     private:
-        box_container_type m_boxes;
-        layer_container_type m_layers;
+        geometry_container_type m_geometries;
     };
 
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept;

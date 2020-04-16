@@ -35,7 +35,8 @@ namespace ophidian::placement::factory
                 macro.size().y() * lef.micrometer_to_dbu_ratio()
             };
 
-            library.geometry(stdCell) = geometry::CellGeometry{ {{pmin, pmax}} };
+            geometry::CellGeometry::box_type box{pmin, pmax};
+            library.geometry(stdCell) = geometry::CellGeometry{ {std::make_pair(box, "")} };
 
             auto dbu_converter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
 
@@ -71,7 +72,8 @@ namespace ophidian::placement::factory
                 macro.size().y()
             };
 
-            library.geometry(stdCell) = geometry::CellGeometry{ {{pmin, pmax}} };
+            geometry::CellGeometry::box_type box{pmin, pmax};
+            library.geometry(stdCell) = geometry::CellGeometry{ {std::make_pair(box, "")} };
 
             for(const auto& pin : macro.pins())
             {
@@ -82,7 +84,9 @@ namespace ophidian::placement::factory
                 auto min_corner = geometry::CellGeometry::point_type{Library::unit_type{0}, Library::unit_type{0}};
                 auto max_corner = geometry::CellGeometry::point_type{Library::unit_type{0}, Library::unit_type{0}};
                 library.geometry(stdPin) = Library::std_pin_geometry_type();
-                library.geometry(stdPin).push_back(geometry::CellGeometry::box_type{min_corner, max_corner});
+
+                geometry::CellGeometry::box_type box{min_corner, max_corner};
+                library.geometry(stdPin).push_back(std::make_pair(box, pin.layer()));
             }
         }
     }
