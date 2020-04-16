@@ -47,17 +47,16 @@ namespace ophidian::routing {
             using wire_type                 = NetWire;
             using wire_container_type       = std::vector<wire_type>;
             using gcell_type                = GCell;
+            using gcell_container_type      = std::vector<GCell>;
 
             using point_type                = util::LocationDbu;
+            using box_type                  = geometry::Box<unit_type>;
             using ilp_var_type              = GRBVar;
             using ilp_var_container_type    = std::vector<ilp_var_type>;
 
             using unitless_point_type       = geometry::Point<double>;
             using unitless_box_type         = geometry::Box<double>;
             using unitless_segment_type     = geometry::Segment<unitless_point_type>;
-
-            using rtree_node_type           = std::pair<unitless_box_type, gcell_type>;
-            using rtree_type                = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16>>;
 
             using layer_type                = Library::layer_type;
             using layer_direction_type      = Direction;
@@ -68,8 +67,6 @@ namespace ophidian::routing {
 
         private:
             void update_gcell_capacities();
-
-            void create_gcell_rtrees();
 
             void create_all_candidates(const std::vector<net_type> & nets, GRBModel & model);
 
@@ -96,10 +93,6 @@ namespace ophidian::routing {
 	        void write_gcell_capacities();
 
 	        void write_segments(const std::vector<net_type> & nets);
-
-            void draw_gcell_capacities(boost::geometry::svg_mapper<unitless_point_type> & mapper);
-
-            void write_svg(const std::vector<net_type> & nets);
 
     	    void save_result();
 
@@ -131,8 +124,6 @@ namespace ophidian::routing {
 
             entity_system::Aggregation<net_type, candidate_type>            m_net_candidates{m_design.netlist().make_aggregation_net<candidate_type>(m_candidates)};
             entity_system::Aggregation<net_type, segment_type>              m_net_segments{m_design.netlist().make_aggregation_net<segment_type>(m_segments)};
-
-            std::vector<rtree_type>                                         m_gcells_rtrees;
 
 	        std::string                                                     m_circuit_name;
     };
