@@ -668,7 +668,7 @@ namespace ophidian::routing {
 		            auto end_layer_index = m_design.routing_library().layerIndex(wire_end_layer);
         		    routed_segments << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
 
-                    auto route_string = std::to_string(((int)wire_start.y().value() - 5) / 10) + " " + std::to_string(((int)wire_start.x().value() - 5) / 10) + " " + std::to_string(start_layer_index) + " " + std::to_string(((int)wire_end.y().value() - 5) / 10) + " " + std::to_string(((int)wire_end.x().value() - 5) / 10) + " " + std::to_string(end_layer_index) + " " + net_name;
+                    auto route_string = std::to_string(((int)wire_start.y().value() - 5) / 10 + 1) + " " + std::to_string(((int)wire_start.x().value() - 5) / 10 +1) + " " + std::to_string(start_layer_index) + " " + std::to_string(((int)wire_end.y().value() - 5) / 10+1) + " " + std::to_string(((int)wire_end.x().value() - 5) / 10 +1) + " " + std::to_string(end_layer_index) + " " + net_name;
                     route_strings.push_back(route_string);
 		        }
     	    }
