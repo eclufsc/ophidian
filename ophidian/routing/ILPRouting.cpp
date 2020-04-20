@@ -181,7 +181,7 @@ namespace ophidian::routing {
                 auto end_layer = global_routing.layer_end(segment);
                 auto start_layer_name = routing_library.name(start_layer);
                 auto end_layer_name = routing_library.name(end_layer);
-                //std::cout << "creating wire from " << start.x().value() << ", " << start.y().value() << " " << start_layer_name << " to " << end.x().value() << ", " << end.y().value() << " " << end_layer_name << std::endl;
+                std::cout << "creating initial wire from " << start.x().value() << ", " << start.y().value() << " " << start_layer_name << " to " << end.x().value() << ", " << end.y().value() << " " << end_layer_name << std::endl;
                 auto wire = create_wire(start, end, start_layer, end_layer);
                 wires.push_back(wire);
             }
@@ -305,7 +305,7 @@ namespace ophidian::routing {
         auto horizontal_layer_name = m_design.routing_library().name(horizontal_layer);
         auto vertical_layer_name = m_design.routing_library().name(vertical_layer);
 
-        //std::cout << "creating candidates for net " << net_name << " in layers " << horizontal_layer_name << " and " << vertical_layer_name << std::endl;
+        std::cout << "creating candidates for net " << net_name << " in layers " << horizontal_layer_name << " and " << vertical_layer_name << std::endl;
 
         unsigned number_of_candidates = 1;
     	if(large_net)
@@ -333,7 +333,7 @@ namespace ophidian::routing {
         {
             auto candidate = m_candidates.add();
             auto variable_name = net_name + "_" + horizontal_layer_name + "_" + vertical_layer_name + "_" + std::to_string(candidate_index);
-            //std::cout << "variable " << variable_name << std::endl;
+            std::cout << "variable " << variable_name << std::endl;
             auto variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
             m_candidate_names[candidate] = variable_name;
             m_name_to_candidate[variable_name] = candidate;
@@ -347,10 +347,11 @@ namespace ophidian::routing {
         {
             auto segment_start = m_segment_starts[segment];
             auto segment_end = m_segment_ends[segment];
-            //std::cout << "segment " << segment_start.x().value() << ", " << segment_start.y().value() << "->"
-                //<< segment_end.x().value() << ", " << segment_end.y().value() << std::endl;
+            std::cout << "segment " << segment_start.x().value() << ", " << segment_start.y().value() << "->"
+                << segment_end.x().value() << ", " << segment_end.y().value() << std::endl;
             if(segment_start.x() != segment_end.x() && segment_start.y() != segment_end.y())
             {
+                std::cout << "split segment" << std::endl;
                 add_wires_of_splitted_segment(segment, segment_start, segment_end, horizontal_layer, vertical_layer,  true, branch_count, candidates, large_net);
                 if(!large_net)
                 {
@@ -361,7 +362,7 @@ namespace ophidian::routing {
             else
             {
                 auto layer = (segment_start.x() == segment_end.x()) ? vertical_layer : horizontal_layer;
-                //std::cout << "create segment wire" << std::endl;
+                std::cout << "create segment wire" << std::endl;
                 auto wire = create_wire(segment_start, segment_end, layer, layer);
                 auto wires = wire_container_type{wire};
                 auto segment_start_pins = m_segment_start_pin[segment];
@@ -519,9 +520,9 @@ namespace ophidian::routing {
 
         auto wire_box = geometry::Box<double>{{min_x, min_y}, {max_x, max_y}};
 
-        //auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
-        //auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
-        //std::cout << "adding to rtree wire " << wire_box.min_corner().x() << " " << wire_box.min_corner().y() << " " << start_layer_index << " -> " << wire_box.max_corner().x() << " " << wire_box.max_corner().y() << " " << end_layer_index << std::endl;
+        auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
+        auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
+        std::cout << "creating wire " << wire_box.min_corner().x() << " " << wire_box.min_corner().y() << " " << start_layer_index << " -> " << wire_box.max_corner().x() << " " << wire_box.max_corner().y() << " " << end_layer_index << std::endl;
 
         m_wire_start_layers[wire] = start_layer;
         m_wire_end_layers[wire] = end_layer;
@@ -590,6 +591,7 @@ namespace ophidian::routing {
                         auto layer_name = "M" + std::to_string(layer_index);
                         gcell_container_type gcells;
                         gcell_graph->intersect(gcells, wire_box, layer_index-1);
+                        //std::cout << "gcells " << gcells.size() << std::endl;
                         for(auto gcell : gcells)
                         {
                             gcell_nets[layer_name][gcell].insert(candidate);
@@ -609,7 +611,6 @@ namespace ophidian::routing {
                 auto gcell_set = gcell_pair.second;
                 auto box = gcell_graph->box(gcell);
                 auto gcell_min_corner = box.min_corner();
-                auto gcell_max_corner = box.max_corner();
                 if(gcell_set.size() > 0)
                 {
                     GRBLinExpr gcell_constraint = 0.0;
@@ -619,8 +620,9 @@ namespace ophidian::routing {
                         gcell_constraint += variable;
                     }
                     auto capacity = gcell_graph->capacity(gcell);
+                    auto demand = gcell_graph->demand(gcell);
                     auto constraint_name = std::to_string((int)gcell_min_corner.y().value()) + "_" + std::to_string((int)gcell_min_corner.x().value()) + "_" + std::to_string(layer_index);
-                    model.addConstr(gcell_constraint <= capacity, constraint_name);
+                    model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
                 }
             }
         }
@@ -639,7 +641,7 @@ namespace ophidian::routing {
         for(auto net : nets)
         {
     	    auto net_name = m_design.netlist().name(net);
-            //std::cout << net_name << " count " << net_count++ << std::endl;
+            std::cout << net_name << " count " << net_count++ << std::endl;
             auto candidates = m_net_candidates.parts(net);
             bool routed = 0;
     	    candidate_type routed_candidate;
@@ -658,6 +660,8 @@ namespace ophidian::routing {
             if(routed)
             {
 	    	    unsigned count_candidate = 0;
+                auto candidate_name = m_candidate_names[routed_candidate];
+                std::cout << "routed candidate " << candidate_name << std::endl;
         		for(auto wire : m_candidate_wires[routed_candidate])
                 {
         		    auto wire_start = m_wire_starts[wire];
@@ -667,6 +671,7 @@ namespace ophidian::routing {
         		    auto start_layer_index = m_design.routing_library().layerIndex(wire_start_layer);
 		            auto end_layer_index = m_design.routing_library().layerIndex(wire_end_layer);
         		    routed_segments << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
+                    std::cout << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
 
                     auto route_string = std::to_string(((int)wire_start.y().value() - 5) / 10 + 1) + " " + std::to_string(((int)wire_start.x().value() - 5) / 10 +1) + " " + std::to_string(start_layer_index) + " " + std::to_string(((int)wire_end.y().value() - 5) / 10+1) + " " + std::to_string(((int)wire_end.x().value() - 5) / 10 +1) + " " + std::to_string(end_layer_index) + " " + net_name;
                     route_strings.push_back(route_string);

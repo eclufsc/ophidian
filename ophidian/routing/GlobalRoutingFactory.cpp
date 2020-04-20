@@ -46,7 +46,7 @@ namespace ophidian::routing::factory
         }
     }
 
-    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
+    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const RoutingConstraints & routing_constraints, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
     {
         //Create GCell Graph
         auto dimensions = iccad_2020.grid_dimensions();
@@ -64,9 +64,21 @@ namespace ophidian::routing::factory
         for(auto layer : iccad_layers)
             layers_capacity.at(layer.index()-1) = layer.capacity();
         globalRouting.create_gcell_graph(x_gcell_axis, y_gcell_axis, std::get<2>(dimensions), layers_capacity);
-
-        //Global Routing Segments
+        
         auto gcell_graph = globalRouting.gcell_graph();
+        
+        for (auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++) {
+            auto gcell = *gcell_it;
+            auto gcell_node = gcell_graph->graph_node(gcell);
+            auto gcell_position = gcell_graph->position(gcell_node);
+
+            auto gcell_capacity = gcell_graph->capacity(gcell);
+            auto non_default_supply = routing_constraints.ndf_constraint(gcell_position.get<0>(), gcell_position.get<1>(), gcell_position.get<2>());
+            std::cout << "gcell " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << " non default supply " << non_default_supply << " new capacity " << (gcell_capacity + non_default_supply) << std::endl;
+            gcell_graph->capacity(gcell, gcell_capacity + non_default_supply);
+        }
+        
+        //Global Routing Segments
         for(auto iccad_net : iccad_2020.nets())
         {
             auto net_name = iccad_net.name();
@@ -80,10 +92,14 @@ namespace ophidian::routing::factory
                 auto gcell2 = gcell_graph->gcell(std::get<0>(end)-1, std::get<1>(end)-1, std::get<2>(end)-1);
                 auto box1 = gcell_graph->box(gcell1);
                 auto box2 = gcell_graph->box(gcell2);
-                auto min_x = std::min(box1.min_corner().x(), box2.min_corner().x());
-                auto min_y = std::min(box1.min_corner().y(), box2.min_corner().y());
-                auto max_x = std::max(box1.max_corner().x(), box2.max_corner().x());
-                auto max_y = std::max(box1.max_corner().y(), box2.max_corner().y());
+                auto box1_center_x = (box1.min_corner().x() + box1.max_corner().x()) / 2.0;
+                auto box1_center_y = (box1.min_corner().y() + box1.max_corner().y()) / 2.0;
+                auto box2_center_x = (box2.min_corner().x() + box2.max_corner().x()) / 2.0;
+                auto box2_center_y = (box2.min_corner().y() + box2.max_corner().y()) / 2.0;
+                auto min_x = std::min(box1_center_x, box2_center_x);
+                auto min_y = std::min(box1_center_y, box2_center_y);
+                auto max_x = std::max(box1_center_x, box2_center_x);
+                auto max_y = std::max(box1_center_y, box2_center_y);
                 ophidian::routing::GlobalRouting::segment_geometry_type box_segment{{min_x, min_y}, {max_x, max_y}};
                 //get layer by index
                 auto layer_start_it = std::find_if(library.begin_layer(),
@@ -93,6 +109,7 @@ namespace ophidian::routing::factory
                 auto layer_end_it = std::find_if(library.begin_layer(),
                                                  library.end_layer(),
                                                  [&](auto & layer){return library.layerIndex(layer) == std::get<2>(end);});
+
                 globalRouting.add_segment(box_segment, *layer_start_it, *layer_end_it, net);
             }
         }

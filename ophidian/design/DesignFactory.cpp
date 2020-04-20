@@ -108,9 +108,9 @@ namespace ophidian::design::factory
         placement::factory::make_placement(design.placement(), iccad_2020, design.netlist());
 
         routing::factory::make_library(design.routing_library(), design.standard_cells(), iccad_2020);
-
-        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), design.standard_cells(), iccad_2020);
-
+        
         routing::factory::make_routing_constraints(design.routing_constraints(), design.routing_library(), design.netlist(), iccad_2020);
+
+        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.routing_constraints(), design.netlist(), design.standard_cells(), iccad_2020);
     }
 }
