@@ -1,6 +1,7 @@
 #include <catch.hpp>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
+#include <ophidian/parser/ICCAD2020Writer.h>
 
 /*
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
@@ -67,22 +68,27 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
 
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets);
     std::cout << "result " << result << std::endl;
+
+    if(result){
+        iccad_output_writer.write_ICCAD_2020_output();
+    }
    
     //write_statistics_for_circuit(design, circuit_name);
 }
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-        "case1"
+        "case1",
         //"case2",
         //"case3_no_blockages",
-        //"case3_no_extra_demand"//,
+        "case3_no_extra_demand"//,
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";

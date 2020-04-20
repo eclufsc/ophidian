@@ -193,4 +193,15 @@ namespace ophidian::routing
         m_gr_segment_gcell_start[segment] = start_gcell;
         m_gr_segment_gcell_end[segment] = end_gcell;
     }
+
+    void GlobalRouting::unroute(const net_type& net){
+        std::vector<gr_segment_type> segments_to_remove;
+        for(auto segment : segments(net))
+        {
+            segments_to_remove.push_back(segment);
+        }
+        for(auto segment : segments_to_remove){
+            m_gr_segments.erase(segment);
+        }
+    }
 }

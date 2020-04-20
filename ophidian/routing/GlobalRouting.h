@@ -78,6 +78,8 @@ namespace ophidian::routing
         void increase_demand(const net_type& net);
         void decrease_demand(const net_type& net);
 
+        void unroute(const net_type& net);
+
         template <typename Value>
         entity_system::Property<gr_segment_type, Value> makeProperty(gr_segment_type) const
         {

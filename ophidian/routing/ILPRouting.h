@@ -94,6 +94,8 @@ namespace ophidian::routing {
 
 	        void write_segments(const std::vector<net_type> & nets);
 
+	        void write_segments_dbg(const std::vector<net_type> & nets);
+
     	    void save_result();
 
             design_type&                                                    m_design;

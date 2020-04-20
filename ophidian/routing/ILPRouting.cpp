@@ -99,6 +99,8 @@ namespace ophidian::routing {
 
     	    write_segments(nets);
 
+            write_segments_dbg(nets);
+
 	        save_result();
         }
 
@@ -628,12 +630,52 @@ namespace ophidian::routing {
 
     void ILPRouting::write_segments(const std::vector<net_type> & nets)
     {
+        auto & global_routing = m_design.global_routing();
+        for(auto net : nets)
+        {
+    	    auto net_name = m_design.netlist().name(net);
+            auto candidates = m_net_candidates.parts(net);
+            bool routed = 0;
+    	    candidate_type routed_candidate;
+            for(auto candidate : candidates)
+            {
+                auto candidate_name = m_candidate_names[candidate];
+                auto variable = m_candidate_variables[candidate];
+                auto value = variable.get(GRB_DoubleAttr_X);
+    	    	if(value)
+                {
+                    routed = 1;
+		            routed_candidate = candidate;
+                    break;
+        		}
+            }
+            if(routed)
+            {
+                //clear possible old routings
+                global_routing.unroute(net);
+
+        		for(auto wire : m_candidate_wires[routed_candidate])
+                {
+        		    auto wire_start = m_wire_starts[wire];
+		            auto wire_end = m_wire_ends[wire];
+        		    auto wire_start_layer = m_wire_start_layers[wire];
+		            auto wire_end_layer = m_wire_end_layers[wire];
+                    global_routing.add_segment(box_type{wire_start, wire_end}, wire_start_layer, wire_end_layer, net);
+		        }
+    	    }
+            else
+            {
+                std::cout << "WARNING: net " << net_name << " unrouted" << std::endl;
+            }
+         }
+    }
+
+    void ILPRouting::write_segments_dbg(const std::vector<net_type> & nets)
+    {
 	    std::ofstream routed_segments("routed_segments_" + m_circuit_name + ".txt");
 	    routed_segments << "net_name,xs,ys,zs,xt,yt,zt" << std::endl;
-	    std::ofstream unrouted_segments("unrouted_segments_" + m_circuit_name + ".txt");
-	    unrouted_segments << "net_name,xs,ys,pin_start,xt,yt,pin_end" << std::endl;
-
-        std::vector<std::string> route_strings;
+	    // std::ofstream unrouted_segments("unrouted_segments_" + m_circuit_name + ".txt");
+	    // unrouted_segments << "net_name,xs,ys,pin_start,xt,yt,pin_end" << std::endl;
 
 	    unsigned net_count = 0;
         for(auto net : nets)
@@ -667,31 +709,20 @@ namespace ophidian::routing {
         		    auto start_layer_index = m_design.routing_library().layerIndex(wire_start_layer);
 		            auto end_layer_index = m_design.routing_library().layerIndex(wire_end_layer);
         		    routed_segments << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
-
-                    auto route_string = std::to_string(((int)wire_start.y().value() - 5) / 10 + 1) + " " + std::to_string(((int)wire_start.x().value() - 5) / 10 +1) + " " + std::to_string(start_layer_index) + " " + std::to_string(((int)wire_end.y().value() - 5) / 10+1) + " " + std::to_string(((int)wire_end.x().value() - 5) / 10 +1) + " " + std::to_string(end_layer_index) + " " + net_name;
-                    route_strings.push_back(route_string);
 		        }
     	    }
             else
             {
                 std::cout << "net " << net_name << " unrouted" << std::endl;
-        		for(auto segment : m_net_segments.parts(net))
-                {
-		    	    auto segment_start = m_segment_starts[segment];
-        			auto segment_end = m_segment_ends[segment];
-	        		auto pin_start = m_segment_start_pin[segment];
-		        	auto pin_end = m_segment_end_pin[segment];
-	        	}
+        		// for(auto segment : m_net_segments.parts(net))
+                // {
+		    	//     auto segment_start = m_segment_starts[segment];
+        		// 	auto segment_end = m_segment_ends[segment];
+	        	// 	auto pin_start = m_segment_start_pin[segment];
+		        // 	auto pin_end = m_segment_end_pin[segment];
+	        	// }
             }
          }
-
-        std::ofstream out_file(m_circuit_name + "_out.txt");
-        out_file << "NumMovedCellInst 0" << std::endl;
-        out_file << "NumRoutes " << route_strings.size() << std::endl;
-        for(auto route_string : route_strings)
-        {
-            out_file << route_string << std::endl;
-        }
     }
 
     void ILPRouting::save_result()
