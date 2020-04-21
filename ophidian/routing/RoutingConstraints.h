@@ -38,7 +38,7 @@ namespace ophidian::routing
         RoutingConstraints(const ophidian::circuit::Netlist & netlist);
 
         //Element access
-        demand_type ndf_constraint(index_type x, index_type y, index_type z);
+        demand_type ndf_constraint(index_type x, index_type y, index_type z) const;
 
         //if there is no constraints, it returns the first metal layer
         layer_type min_net_layer(net_type net);

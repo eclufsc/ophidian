@@ -140,6 +140,11 @@ GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell
     return m_gcell_capacity[gcell];
 }
 
+GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell, scalar_type capacity)
+{
+    m_gcell_capacity[gcell] = capacity;
+}
+
 GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
 {
     return m_gcell_demand[gcell];
@@ -165,9 +170,9 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
         auto node_index_pair = r.second;
         auto node_box = r.first;
 
-        box_scalar_type intersection;
-        boost::geometry::intersection(node_box, box_d, intersection);
-        if(boost::geometry::area(intersection) != 0)
+        //box_scalar_type intersection;
+        //boost::geometry::intersection(node_box, box_d, intersection);
+        //if(boost::geometry::area(intersection) != 0)
             gcells.push_back(gcell(node_index_pair.first, node_index_pair.second, layer));
     }
 }

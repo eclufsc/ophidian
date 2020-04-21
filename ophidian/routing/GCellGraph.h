@@ -76,6 +76,7 @@ public:
     node_type graph_node(const gcell_type gcell) const;
     box_type box(const gcell_type& gcell);
     scalar_type capacity(const gcell_type& gcell);
+    scalar_type capacity(const gcell_type& gcell, scalar_type capacity);
     scalar_type demand(const gcell_type& gcell);
     void change_demand(const gcell_type& gcell, const scalar_type delta);
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);

@@ -38,6 +38,7 @@ namespace ophidian::routing::factory
 
     void make_global_routing(GlobalRouting& globalRouting,
                              const Library & library,
+                             const RoutingConstraints & routing_constraints,
                              const ophidian::circuit::Netlist & netlist,
                              const ophidian::circuit::StandardCells & std_cells,
                              const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
