@@ -72,6 +72,7 @@ public:
 
     // Element access
     gcell_type gcell(index_type x, index_type y, index_type z) const ;
+    gcell_type gcell(node_type & node) const;
     gcell_type nearest_gcell(const point_type location, const index_type layer) const ;
     node_type graph_node(const gcell_type gcell) const;
     box_type box(const gcell_type& gcell);

@@ -179,19 +179,18 @@ namespace ophidian::routing
             }
             start_gcell = m_gcell_graph->gcell(min.first, min.second, start_index-1);
             end_gcell = m_gcell_graph->gcell(max.first, max.second, end_index-1);
-        }
-        //via
-        else
-        {
+        } else {
+            //via
             m_gcell_graph->intersect(gcells, box_segment, start_index-1);
             start_gcell = gcells.back();
-
+            
             gcells.clear();
             m_gcell_graph->intersect(gcells, box_segment, end_index-1);
             end_gcell = gcells.back();
         }
         m_gr_segment_gcell_start[segment] = start_gcell;
         m_gr_segment_gcell_end[segment] = end_gcell;
+        update_gcells_demand(segment, 1);
     }
 
     void GlobalRouting::unroute(const net_type& net){
@@ -199,9 +198,44 @@ namespace ophidian::routing
         for(auto segment : segments(net))
         {
             segments_to_remove.push_back(segment);
+            update_gcells_demand(segment, -1);
         }
+
         for(auto segment : segments_to_remove){
             m_gr_segments.erase(segment);
         }
     }
+
+    void GlobalRouting::update_gcells_demand(const gr_segment_type & segment, const int delta){
+        auto layer_start = m_gr_segment_layers_start[segment];
+        auto layer_end = m_gr_segment_layers_end[segment];
+        auto gcell_start = m_gr_segment_gcell_start[segment];
+        auto gcell_end = m_gr_segment_gcell_end[segment];
+        auto box_segment = m_gr_segment_box[segment];
+        auto start_index = m_library.layerIndex(m_gr_segment_layers_start[segment]);
+        auto end_index = m_library.layerIndex(m_gr_segment_layers_end[segment]);
+        
+        gcell_container_type gcells;
+        if(layer_start == layer_end){
+            m_gcell_graph->intersect(gcells, box_segment, start_index-1);
+            std::pair<int, int> min{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+            std::pair<int, int> max{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
+            for(auto gcell : gcells)
+            {
+                m_gcell_graph->change_demand(gcell, delta);
+            }
+        }else{
+            // via
+            auto start_node = m_gcell_graph->graph_node(gcell_start);
+            auto end_node = m_gcell_graph->graph_node(gcell_end);
+            auto current_node = m_gcell_graph->up_node(start_node);
+            while (current_node != end_node)
+            {
+                auto gcell = m_gcell_graph->gcell(current_node);
+                m_gcell_graph->change_demand(gcell, delta);
+                current_node = m_gcell_graph->up_node(current_node);
+            }
+        }
+    }
+
 }

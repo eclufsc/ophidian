@@ -91,6 +91,7 @@ namespace ophidian::routing
     private:
         void set_all_segment_gcells();
         void set_gcells(const gr_segment_type& segment);
+        void update_gcells_demand(const gr_segment_type & segment, const int delta);
 
         entity_system::EntitySystem<gr_segment_type>                    m_gr_segments;
         entity_system::Property<gr_segment_type, segment_geometry_type> m_gr_segment_box;

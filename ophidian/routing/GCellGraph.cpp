@@ -111,6 +111,13 @@ GCellGraph::gcell_type GCellGraph::gcell(GCellGraph::index_type x, GCellGraph::i
     return gcell_type();
 }
 
+GCellGraph::gcell_type GCellGraph::gcell(GCellGraph::node_type & node) const
+{
+    if(node != lemon::INVALID)
+        return m_nodes_to_gcell[node];
+    return gcell_type();
+}
+
 GCellGraph::gcell_type GCellGraph::nearest_gcell(const GCellGraph::point_type location, const GCellGraph::index_type layer) const
 {
     namespace bgi = boost::geometry::index;

@@ -624,7 +624,8 @@ namespace ophidian::routing {
                     auto capacity = gcell_graph->capacity(gcell);
                     auto demand = gcell_graph->demand(gcell);
                     auto constraint_name = std::to_string((int)gcell_min_corner.y().value()) + "_" + std::to_string((int)gcell_min_corner.x().value()) + "_" + std::to_string(layer_index);
-                    model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
+                    // model.addConstr(gcell_constraint <= capacity - demand, constraint_name); // tiago
+                    model.addConstr(gcell_constraint <= capacity, constraint_name);
                 }
             }
         }
