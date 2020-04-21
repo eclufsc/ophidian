@@ -6,11 +6,23 @@
 #include <ophidian/routing/Library.h>
 #include <ophidian/parser/ICCAD2020.h>
 
+#include "boost/tuple/tuple.hpp"
+
 namespace ophidian::routing
 {
     class RoutingConstraints
     {
     public:
+        struct tuple_hash
+        {
+            template <class T1, class T2, class T3>
+            std::size_t operator() (const std::tuple<T1, T2, T3> &tuple) const
+            {
+                return std::hash<T1>()(std::get<0>(tuple)) ^ std::hash<T2>()(std::get<1>(tuple)) ^ std::hash<T2>()(std::get<2>(tuple));
+            }
+        };
+
+
         template <class K, class V> using map_type  = std::unordered_map<K,V>;
         using index_type                            = int;
         using demand_type                           = int;
@@ -22,6 +34,10 @@ namespace ophidian::routing
         using adj_grid_key_type                     = std::string;// cell1_name + ":" + cell2_name + ":" + layer_name;
         using same_grid_map                         = map_type<same_grid_key_type, demand_type>;
         using adj_grid_map                          = map_type<adj_grid_key_type, demand_type>;
+
+        using ndf_index_type                        = std::tuple<index_type, index_type, index_type>;
+        // using tuple_hash_type                       = tuple_hash<index_type, index_type, index_type>;
+        using ndf_map_type                          = std::unordered_map<ndf_index_type, demand_type, tuple_hash>;
 
         // Constructors
         //! Construct Netlist
@@ -61,10 +77,12 @@ namespace ophidian::routing
     private:
         entity_system::Property<net_type, layer_type> m_min_net_layer;
         std::size_t m_size_x, m_size_y, m_size_z;//It needs to be lazy initialized because of lazy initialization of GCellGraph
-        std::vector<demand_type> m_ndf_constraint;//maps a gcell_index to a ndf routing constraint
+        // std::vector<demand_type> m_ndf_constraint;//maps a gcell_index to a ndf routing constraint
+        ndf_map_type m_ndf_constraint; //maps a gcell_index to a ndf routing constraint
         same_grid_map m_extra_demand_same_grid_map;
         adj_grid_map m_extra_demand_adj_grid_map;
         unsigned int m_max_cell_move;
+
     };
 }
 #endif // ROUTING_CONSTRAINTS_H

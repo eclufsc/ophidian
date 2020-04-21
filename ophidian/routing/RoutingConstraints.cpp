@@ -72,7 +72,7 @@ namespace ophidian::routing
         m_size_x = size_x;
         m_size_y = size_y;
         m_size_z = size_z;
-        m_ndf_constraint.resize(m_size_x * m_size_y * m_size_z);
+        // m_ndf_constraint.resize(m_size_x * m_size_y * m_size_z);
     }
 
     void RoutingConstraints::set_max_cell_movement(unsigned int max_move)
@@ -82,12 +82,18 @@ namespace ophidian::routing
 
     void RoutingConstraints::set_ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z, RoutingConstraints::demand_type val)
     {
-        m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y) = val;
+        // m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y) = val;
+        m_ndf_constraint[std::make_tuple(x,y,z)] = val;
     }
 
     RoutingConstraints::demand_type RoutingConstraints::ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z) const
     {
-        return m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y);
+        // return m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y);
+        auto key = std::make_tuple(x,y,z);
+        if(m_ndf_constraint.count(key)){
+            return m_ndf_constraint.at({x,y,z});
+        }
+        return 0;
     }
 
     void RoutingConstraints::set_min_net_layer(RoutingConstraints::net_type net, RoutingConstraints::layer_type layer)
