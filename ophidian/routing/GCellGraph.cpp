@@ -147,19 +147,38 @@ GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell
     return m_gcell_capacity[gcell];
 }
 
-GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell, scalar_type capacity)
+void GCellGraph::capacity(const GCellGraph::gcell_type& gcell, scalar_type capacity)
 {
     m_gcell_capacity[gcell] = capacity;
 }
 
 GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
 {
-    return m_gcell_demand[gcell];
+    return m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell];
 }
 
-void GCellGraph::change_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
+bool GCellGraph::overfloed(const gcell_type& gcell){
+    return (m_gcell_capacity[gcell] < (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
+}
+
+GCellGraph::scalar_type GCellGraph::net_demand(const GCellGraph::gcell_type& gcell)
 {
-    m_gcell_demand[gcell] += delta;
+    return m_gcell_net_demand[gcell];
+}
+
+GCellGraph::scalar_type GCellGraph::blockage_demand(const GCellGraph::gcell_type& gcell)
+{
+    return m_gcell_blockage_demand[gcell];
+}
+
+void GCellGraph::change_net_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
+{
+    m_gcell_net_demand[gcell] += delta;
+}
+
+void GCellGraph::change_blockage_demand(const GCellGraph::gcell_type& gcell, const scalar_type delta)
+{
+    m_gcell_blockage_demand[gcell] += delta;
 }
 
 void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer)
@@ -187,6 +206,10 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
 uint32_t GCellGraph::id(const GCellGraph::gcell_type& gcell)
 {
     return m_gcells.id(gcell);
+}
+
+entity_system::EntitySystem<GCellGraph::gcell_type>::NotifierType * GCellGraph::notifier_gcells() const noexcept {
+    return m_gcells.notifier();
 }
 
 }

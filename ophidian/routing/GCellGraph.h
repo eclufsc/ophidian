@@ -77,23 +77,34 @@ public:
     node_type graph_node(const gcell_type gcell) const;
     box_type box(const gcell_type& gcell);
     scalar_type capacity(const gcell_type& gcell);
-    scalar_type capacity(const gcell_type& gcell, scalar_type capacity);
+    void capacity(const gcell_type& gcell, scalar_type capacity);
     scalar_type demand(const gcell_type& gcell);
-    void change_demand(const gcell_type& gcell, const scalar_type delta);
+    scalar_type net_demand(const gcell_type& gcell);
+    scalar_type blockage_demand(const gcell_type& gcell);
+    void change_net_demand(const gcell_type& gcell, const scalar_type delta);
+    void change_blockage_demand(const gcell_type& gcell, const scalar_type delta);
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
     uint32_t id(const gcell_type& gcell);
+    bool overfloed(const gcell_type& gcell);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;
     gcell_container_type::const_iterator end_gcell() const noexcept;
 
     // Modifiers
+    template <typename Value>
+    entity_system::Property<gcell_type, Value> make_property_gcells() const noexcept
+    {
+        return entity_system::Property<gcell_type, Value>(m_gcells);
+    }
 
+    entity_system::EntitySystem<gcell_type>::NotifierType * notifier_gcells() const noexcept;
 private:
     entity_system::EntitySystem<gcell_type>             m_gcells{};
     entity_system::Property<gcell_type, node_type>      m_gcell_node{m_gcells};
     entity_system::Property<gcell_type, scalar_type>    m_gcell_capacity{m_gcells};
-    entity_system::Property<gcell_type, scalar_type>    m_gcell_demand{m_gcells, 0};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_net_demand{m_gcells, 0};
+    entity_system::Property<gcell_type, scalar_type>    m_gcell_blockage_demand{m_gcells, 0};
 
     map_type                                            m_gcell_box;
     node_map_type<gcell_type>                           m_nodes_to_gcell;

@@ -109,27 +109,21 @@ namespace ophidian::routing {
 
     void ILPRouting::update_gcell_capacities()
     {
-        auto& routing_library = m_design.routing_library();
+        // auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
-        auto& netlist = m_design.netlist();
-        auto& placement = m_design.placement();
+        // auto& netlist = m_design.netlist();
+        // auto& placement = m_design.placement();
         auto gcell_graph = global_routing.gcell_graph();
 
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
-        {
-            auto cell = *cell_it;
-            auto location = placement.location(cell);
-            auto std_cell = netlist.std_cell(cell);
-            auto blockages = routing_library.blockages(std_cell);
-            for(auto blockage : blockages)
-            {
-                auto layer = routing_library.layer(blockage);
-                auto layer_index = routing_library.layerIndex(layer);
-                auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
-                auto demand = routing_library.demand(blockage);
-                gcell_graph->change_demand(gcell, demand);
-            }
+        //copy the blockageDenamd to ILP propoerty!
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+            auto blockage_demand = gcell_graph->blockage_demand(gcell);
+            m_gcells_demand[gcell] = blockage_demand;
         }
+
+        // here we have to update the demand od nets with won't be routed in this execution!
+
     }
 
     void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, GRBModel & model)
@@ -586,7 +580,16 @@ namespace ophidian::routing {
                     auto min_layer_index = std::min(start_layer_index, end_layer_index);
                     auto max_layer_index = std::max(start_layer_index, end_layer_index);
 
-                    auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+                    auto wire_start = m_wire_starts[wire];
+                    auto wire_end = m_wire_ends[wire];
+                    auto min_x = std::min(wire_start.x(), wire_end.x());
+                    auto max_x = std::max(wire_start.x(), wire_end.x());
+                    auto min_y = std::min(wire_start.y(), wire_end.y());
+                    auto max_y = std::max(wire_start.y(), wire_end.y());
+
+                    auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+
+                    // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
 
                     for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
                     {
@@ -622,10 +625,9 @@ namespace ophidian::routing {
                         gcell_constraint += variable;
                     }
                     auto capacity = gcell_graph->capacity(gcell);
-                    auto demand = gcell_graph->demand(gcell);
+                    auto demand = m_gcells_demand[gcell];
                     auto constraint_name = std::to_string((int)gcell_min_corner.y().value()) + "_" + std::to_string((int)gcell_min_corner.x().value()) + "_" + std::to_string(layer_index);
-                    // model.addConstr(gcell_constraint <= capacity - demand, constraint_name); // tiago
-                    model.addConstr(gcell_constraint <= capacity, constraint_name);
+                    model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
                 }
             }
         }

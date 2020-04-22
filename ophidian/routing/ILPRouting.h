@@ -36,6 +36,7 @@ namespace ophidian::routing {
 
     class ILPRouting {
         public:
+            using scalar_type               = int;
             using unit_type                 = util::database_unit_t;
             using design_type               = design::Design;
             using net_type                  = circuit::Net;
@@ -126,6 +127,8 @@ namespace ophidian::routing {
 
             entity_system::Aggregation<net_type, candidate_type>            m_net_candidates{m_design.netlist().make_aggregation_net<candidate_type>(m_candidates)};
             entity_system::Aggregation<net_type, segment_type>              m_net_segments{m_design.netlist().make_aggregation_net<segment_type>(m_segments)};
+
+            entity_system::Property<gcell_type, scalar_type>                m_gcells_demand{m_design.global_routing().gcell_graph()->make_property_gcells<scalar_type>()};
 
 	        std::string                                                     m_circuit_name;
     };

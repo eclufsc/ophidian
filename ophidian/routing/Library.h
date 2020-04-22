@@ -186,10 +186,10 @@ namespace ophidian::routing
         layer_type highest_layer() const;
         void set_highest_layer(const layer_type& layer);
 
-        std::string name(const blockage_type& blkg);
-        std_cell_type std_cell(const blockage_type& blkg);
-        layer_type layer(const blockage_type& blkg);
-        scalar_type demand(const blockage_type& blkg);
+        std::string name(const blockage_type& blkg) const;
+        std_cell_type std_cell(const blockage_type& blkg) const;
+        layer_type layer(const blockage_type& blkg) const;
+        scalar_type demand(const blockage_type& blkg) const;
         blockage_type find_blockage(const std::string& blockage_name) const;
         blockages_view_type blockages(const std_cell_type& std_cell) const;
 

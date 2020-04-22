@@ -69,11 +69,22 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
     SECTION("verify defaut demand"){
         CHECK(graph.demand(gcell) == 0);
     }
-    SECTION("increase defaut demand"){
-        graph.change_demand(gcell, 1);
-        CHECK(graph.demand(gcell) == 1);
-        graph.change_demand(gcell, 3);
-        CHECK(graph.demand(gcell) == 4);
+    SECTION("increase defaut net demand"){
+        graph.change_net_demand(gcell, 1);
+        CHECK(graph.net_demand(gcell) == 1);
+        graph.change_net_demand(gcell, 3);
+        CHECK(graph.net_demand(gcell) == 4);
+    }
+    SECTION("increase defaut blockage demand"){
+        graph.change_blockage_demand(gcell, 1);
+        CHECK(graph.blockage_demand(gcell) == 1);
+        graph.change_blockage_demand(gcell, 3);
+        CHECK(graph.blockage_demand(gcell) == 4);
+    }
+    SECTION("increase defaut blockage demand"){
+        graph.change_blockage_demand(gcell, 1);
+        graph.change_blockage_demand(gcell, 2);
+        CHECK(graph.demand(gcell) == 3);
     }
     SECTION("intersect with box"){
         auto box = box_type{point_type{dbu{600}, dbu{575}}, point_type{dbu{700}, dbu{675}}};
@@ -206,7 +217,7 @@ TEST_CASE("GCell Graph from iccad2020", "[routing][gcell]")
     {
         auto gcell_C1 = gcell_graph->gcell(0,3,0);
         REQUIRE(gcell_graph->capacity(gcell_C1) == 10);
-        REQUIRE(gcell_graph->demand(gcell_C1) == 0);
+        REQUIRE(gcell_graph->demand(gcell_C1) == 2);
         auto gcell_C1_layer3 = gcell_graph->gcell(0,3,2);
         REQUIRE(gcell_graph->capacity(gcell_C1_layer3) == 8);
     }
