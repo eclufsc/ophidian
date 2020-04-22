@@ -46,7 +46,7 @@ namespace ophidian::routing::factory
         }
     }
 
-    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const RoutingConstraints & routing_constraints, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
+    void make_global_routing(GlobalRouting& globalRouting, const Library & library, const RoutingConstraints & routing_constraints, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::placement::Placement & placement, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept
     {
         //Create GCell Graph
         auto dimensions = iccad_2020.grid_dimensions();
@@ -74,10 +74,27 @@ namespace ophidian::routing::factory
 
             auto gcell_capacity = gcell_graph->capacity(gcell);
             auto non_default_supply = routing_constraints.ndf_constraint(gcell_position.get<0>(), gcell_position.get<1>(), gcell_position.get<2>());
-            //std::cout << "gcell " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << " non default supply " << non_default_supply << " new capacity " << (gcell_capacity + non_default_supply) << std::endl;
+            // std::cout << "gcell " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << " non default supply " << non_default_supply << " new capacity " << (gcell_capacity + non_default_supply) << std::endl;
             gcell_graph->capacity(gcell, gcell_capacity + non_default_supply);
         }
         
+        //set cells demands in gcell_grapg
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
+        {
+            auto cell = *cell_it;
+            auto location = placement.location(cell);
+            auto std_cell = netlist.std_cell(cell);
+            auto blockages = library.blockages(std_cell);
+            for(auto blockage : blockages)
+            {
+                auto layer = library.layer(blockage);
+                auto layer_index = library.layerIndex(layer);
+                auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
+                auto demand = library.demand(blockage);
+                gcell_graph->change_blockage_demand(gcell, demand);
+            }
+        }
+
         //Global Routing Segments
         for(auto iccad_net : iccad_2020.nets())
         {

@@ -25,6 +25,7 @@
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
 #include <ophidian/routing/RoutingConstraints.h>
+#include <ophidian/placement/Placement.h>
 #include "GlobalRouting.h"
 
 namespace ophidian::routing::factory
@@ -41,6 +42,7 @@ namespace ophidian::routing::factory
                              const RoutingConstraints & routing_constraints,
                              const ophidian::circuit::Netlist & netlist,
                              const ophidian::circuit::StandardCells & std_cells,
+                             const ophidian::placement::Placement & placement,
                              const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
 }
 

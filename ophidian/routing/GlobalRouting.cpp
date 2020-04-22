@@ -139,14 +139,14 @@ namespace ophidian::routing
     {
         auto gcell_container = gcells(net);
         for(auto gcell : gcell_container)
-            m_gcell_graph->change_demand(gcell, 1);
+            m_gcell_graph->change_net_demand(gcell, 1);
     }
 
     void GlobalRouting::decrease_demand(const GlobalRouting::net_type& net)
     {
         auto gcell_container = gcells(net);
         for(auto gcell : gcell_container)
-            m_gcell_graph->change_demand(gcell, -1);
+            m_gcell_graph->change_net_demand(gcell, -1);
     }
 
     entity_system::EntitySystem<GlobalRouting::gr_segment_type>::NotifierType *GlobalRouting::notifier(GlobalRouting::gr_segment_type) const
@@ -222,7 +222,7 @@ namespace ophidian::routing
             std::pair<int, int> max{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
             for(auto gcell : gcells)
             {
-                m_gcell_graph->change_demand(gcell, delta);
+                m_gcell_graph->change_net_demand(gcell, delta);
             }
         }else{
             // via
@@ -232,7 +232,7 @@ namespace ophidian::routing
             while (current_node != end_node)
             {
                 auto gcell = m_gcell_graph->gcell(current_node);
-                m_gcell_graph->change_demand(gcell, delta);
+                m_gcell_graph->change_net_demand(gcell, delta);
                 current_node = m_gcell_graph->up_node(current_node);
             }
         }

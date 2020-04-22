@@ -343,22 +343,22 @@ void Library::set_highest_layer(const layer_type& layer)
     this->mHighest_layer = layer;
 }
 
-std::string Library::name(const Library::blockage_type& blkg)
+std::string Library::name(const Library::blockage_type& blkg) const
 {
     return mBlockageNames[blkg];
 }
 
-Library::std_cell_type Library::std_cell(const Library::blockage_type& blkg)
+Library::std_cell_type Library::std_cell(const Library::blockage_type& blkg) const
 {
     return mCell2Blockages.whole(blkg);
 }
 
-Library::layer_type Library::layer(const Library::blockage_type& blkg)
+Library::layer_type Library::layer(const Library::blockage_type& blkg) const
 {
     return mBlockageLayer[blkg];
 }
 
-Library::scalar_type Library::demand(const Library::blockage_type& blkg)
+Library::scalar_type Library::demand(const Library::blockage_type& blkg) const
 {
     return mBlockageDemand[blkg];
 }
