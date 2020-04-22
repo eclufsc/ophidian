@@ -70,34 +70,13 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
-
-    auto & contraints = design.routing_constraints();
-                                                   // r c l
-                                                   // y x z
-    auto c1 = contraints.ndf_constraint(11, 0, 0); // 1 12 1 -14
-    auto c2 = contraints.ndf_constraint(19, 3, 0); // 4 20 1 +0
-    auto c3 = contraints.ndf_constraint(4, 7, 1);  // 8 5  2 +1
-    auto c4 = contraints.ndf_constraint(10, 1, 0);  // 2 11 1 -6
-
-    auto gcell_graph = design.global_routing().gcell_graph();
-    
-    // auto gcell = gcell_graph->gcell(10, 1, 0);
-    auto gcell = gcell_graph->gcell(0, 1, 0);
-    
-    auto suply = gcell_graph->capacity(gcell);
-    auto demand = gcell_graph->demand(gcell);
-
-
-
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N160")};
+
+    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
     
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets);
     std::cout << "result " << result << std::endl;
-
-    suply = gcell_graph->capacity(gcell);
-    demand = gcell_graph->demand(gcell);
 
     if(result){
         iccad_output_writer.write_ICCAD_2020_output();
@@ -115,11 +94,13 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         "case3_no_extra_demand"
     };
 
-    std::string benchmarks_path = "./input_files/iccad20/";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
         std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+
+        std::cout << "file " << iccad_2020_file << std::endl;
 
         auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
 

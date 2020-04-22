@@ -190,7 +190,7 @@ namespace ophidian::routing
         }
         m_gr_segment_gcell_start[segment] = start_gcell;
         m_gr_segment_gcell_end[segment] = end_gcell;
-        update_gcells_demand(segment, 1);
+        //update_gcells_demand(segment, 1);
     }
 
     void GlobalRouting::unroute(const net_type& net){

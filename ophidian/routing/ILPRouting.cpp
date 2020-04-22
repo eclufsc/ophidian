@@ -46,25 +46,6 @@ namespace ophidian::routing {
             std::cout << "write solution" << std::endl;
             model.write("ilp_routing_model.sol");
 
-            std::vector<std::string> layers = {"Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "Metal6", "Metal7", "Metal8", "Metal9"};
-            std::unordered_map<std::string, unsigned> count;
-            for(auto candidate : m_candidates)
-            {
-                auto variable = m_candidate_variables[candidate];
-                auto value = variable.get(GRB_DoubleAttr_X);
-                auto name = variable.get(GRB_StringAttr_VarName);
-                if(value == 1)
-                {
-                    for(auto layer_name : layers)
-                    {
-                        if(name.find(layer_name) != std::string::npos)
-                        {
-                            count[layer_name] += 1;
-                        }
-                    }
-                }
-            }
-
             /*
             for(auto layer_name : layers)
             {
@@ -198,7 +179,7 @@ namespace ophidian::routing {
         {
             auto pin_name = netlist.name(pin);
             auto pin_location = placement.location(pin);
-            //std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
+            std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
             net_points.push_back(pin_location);
             auto point = std::make_pair(pin_location.x().value(), pin_location.y().value());
             auto std_pin = netlist.std_cell_pin(pin);
@@ -349,8 +330,8 @@ namespace ophidian::routing {
         {
             auto segment_start = m_segment_starts[segment];
             auto segment_end = m_segment_ends[segment];
-            //std::cout << "segment " << segment_start.x().value() << ", " << segment_start.y().value() << "->"
-                //<< segment_end.x().value() << ", " << segment_end.y().value() << std::endl;
+            std::cout << "segment " << segment_start.x().value() << ", " << segment_start.y().value() << "->"
+                << segment_end.x().value() << ", " << segment_end.y().value() << std::endl;
             if(segment_start.x() != segment_end.x() && segment_start.y() != segment_end.y())
             {
                 std::cout << "split segment" << std::endl;
@@ -559,7 +540,9 @@ namespace ophidian::routing {
                 auto candidate_variable = m_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            model.addConstr(candidates_constraints == 1);
+            if (candidates.size()) {
+                model.addConstr(candidates_constraints == 1);
+            }
         }
     }
 
@@ -572,11 +555,15 @@ namespace ophidian::routing {
         for(auto net : nets)
         {
             auto net_name = m_design.netlist().name(net);
-            //std::cout << "capacity constraints for net " << net_name << std::endl;
+            std::cout << "capacity constraints for net " << net_name << std::endl;
             auto candidates = m_net_candidates.parts(net);
             for(auto candidate : candidates)
             {
                 auto wires = m_candidate_wires[candidate];
+
+                auto candidate_name = m_candidate_names[candidate];
+                std::cout << "candidate " << candidate_name << std::endl;
+
                 for(auto wire : wires)
                 {
                     auto start_layer = m_wire_start_layers[wire];
@@ -586,14 +573,25 @@ namespace ophidian::routing {
                     auto min_layer_index = std::min(start_layer_index, end_layer_index);
                     auto max_layer_index = std::max(start_layer_index, end_layer_index);
 
-                    auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+                    auto wire_start = m_wire_starts[wire];
+                    auto wire_end = m_wire_ends[wire];
+                    auto min_x = std::min(wire_start.x().value(), wire_end.x().value());
+                    auto max_x = std::max(wire_start.x().value(), wire_end.x().value());
+                    auto min_y = std::min(wire_start.y().value(), wire_end.y().value());
+                    auto max_y = std::max(wire_start.y().value(), wire_end.y().value());
+
+                    auto wire_box = box_type{{unit_type{min_x}, unit_type{min_y}}, {unit_type{max_x}, unit_type{max_y}}};
+
+                    std::cout << "wire " << wire_box.min_corner().x().value() << ", " << wire_box.min_corner().y().value() << " -> " << wire_box.max_corner().x().value() << ", " << wire_box.max_corner().y().value() << std::endl;
 
                     for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
                     {
                         auto layer_name = "M" + std::to_string(layer_index);
+                        std::cout << "layer " << layer_name << std::endl;
+
                         gcell_container_type gcells;
                         gcell_graph->intersect(gcells, wire_box, layer_index-1);
-                        //std::cout << "gcells " << gcells.size() << std::endl;
+                        std::cout << "gcells " << gcells.size() << std::endl;
                         for(auto gcell : gcells)
                         {
                             gcell_nets[layer_name][gcell].insert(candidate);
@@ -623,9 +621,9 @@ namespace ophidian::routing {
                     }
                     auto capacity = gcell_graph->capacity(gcell);
                     auto demand = gcell_graph->demand(gcell);
-                    auto constraint_name = std::to_string((int)gcell_min_corner.y().value()) + "_" + std::to_string((int)gcell_min_corner.x().value()) + "_" + std::to_string(layer_index);
-                    // model.addConstr(gcell_constraint <= capacity - demand, constraint_name); // tiago
-                    model.addConstr(gcell_constraint <= capacity, constraint_name);
+                    auto constraint_name = std::to_string((int)gcell_min_corner.y().value() + 10) + "_" + std::to_string((int)gcell_min_corner.x().value() + 10) + "_" + std::to_string(layer_index);
+                    model.addConstr(gcell_constraint <= capacity - demand, constraint_name); // tiago
+                    //model.addConstr(gcell_constraint <= capacity, constraint_name);
                 }
             }
         }

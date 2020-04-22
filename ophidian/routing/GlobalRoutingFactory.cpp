@@ -74,7 +74,7 @@ namespace ophidian::routing::factory
 
             auto gcell_capacity = gcell_graph->capacity(gcell);
             auto non_default_supply = routing_constraints.ndf_constraint(gcell_position.get<0>(), gcell_position.get<1>(), gcell_position.get<2>());
-            std::cout << "gcell " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << " non default supply " << non_default_supply << " new capacity " << (gcell_capacity + non_default_supply) << std::endl;
+            //std::cout << "gcell " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << " non default supply " << non_default_supply << " new capacity " << (gcell_capacity + non_default_supply) << std::endl;
             gcell_graph->capacity(gcell, gcell_capacity + non_default_supply);
         }
         

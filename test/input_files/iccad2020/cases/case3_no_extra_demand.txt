@@ -1792,6 +1792,7 @@ MasterCell MC250 1 2
 Pin P1 M3
 Blkg B1 M1 0
 Blkg B2 M2 0
+NumNeighborCellExtraDemand 0
 NumCellInst 2735
 CellInst C1 MC1 23 30 Movable
 CellInst C2 MC2 24 29 Movable

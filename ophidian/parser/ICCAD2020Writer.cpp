@@ -10,7 +10,7 @@ namespace ophidian::parser
     void ICCAD2020Writer::write_ICCAD_2020_output(const std::string path, const std::vector<std::pair<cell_type, point_type>> & movements){
         auto & netlist = m_design.netlist();
         auto & global_routing = m_design.global_routing();
-        std::ofstream out_file(path + m_circuit_name + "_out.txt", std::ofstream::out | std::ofstream::app);
+        std::ofstream out_file(path + m_circuit_name + "_out.txt", std::ofstream::out);
         out_file << "NumMovedCellInst " << movements.size() << std::endl;
         for (auto move : movements) {
             int x = move.second.x().value() / 10 +1;
@@ -18,10 +18,11 @@ namespace ophidian::parser
             out_file << "CellInst " << netlist.name(move.first) << " " << y << " " << x << std::endl;
         }
 
+        std::cout << "writing output" << std::endl;
         std::vector<std::string> segment_strings; 
         for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++){
             auto net = *net_it;
-            auto net_name = netlist.name(net);
+            auto net_name = netlist.name(net);     
 
             for(auto segment : global_routing.segments(net)){
                 auto box = global_routing.box(segment);

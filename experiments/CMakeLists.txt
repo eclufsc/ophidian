@@ -33,9 +33,9 @@ target_link_libraries(iccad19gr
     PRIVATE ophidian_floorplan_static
     PRIVATE ophidian_geometry_static
     PRIVATE ophidian_interconnection_static
-    PRIVATE ophidian_parser_static
-    PRIVATE ophidian_placement_static
     PRIVATE ophidian_routing_static
+    PRIVATE ophidian_placement_static
+    PRIVATE ophidian_parser_static
     PRIVATE gurobi_g++5.2
     PRIVATE gurobi90
 )

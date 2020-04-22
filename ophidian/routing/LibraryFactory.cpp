@@ -368,7 +368,7 @@ namespace ophidian::routing::factory
             for(auto blockage : blockages)
             {
                 auto layer = library.find_layer_instance(blockage.layer_name);
-                library.add_blockage(blockage.blockage_name, std_cell, layer, blockage.demand);
+                library.add_blockage(std_cell_name + ":" + blockage.blockage_name, std_cell, layer, blockage.demand);
             }
         }
     }
