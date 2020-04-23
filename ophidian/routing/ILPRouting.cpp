@@ -4,6 +4,8 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
+bool DEBUG = false;
+
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
         m_design(design), m_circuit_name(circuit_name)
@@ -13,26 +15,29 @@ namespace ophidian::routing {
     bool ILPRouting::route_nets(const std::vector<net_type> & nets)
     {
         m_segments.clear();
-        m_candidates.clear();
+        m_route_candidate.clear();
 
         GRBModel model = GRBModel(m_GRBENv);
 
-        std::cout << "update capacities from blockages" << std::endl;
+        if(DEBUG) std::cout << "update capacities from blockages" << std::endl;
         update_gcell_capacities();
 
-        std::cout << "create all candidates" << std::endl;
+        if(DEBUG) std::cout << "create all cells initial candidates" << std::endl;
+        create_all_cell_initial_candidates(model);
+
+        if(DEBUG) std::cout << "create all candidates" << std::endl;
         create_all_candidates(nets, model);
 
-        std::cout << "add objective function" << std::endl;
+        if(DEBUG) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
 
-        std::cout << "add candidate constraints" << std::endl;
+        if(DEBUG) std::cout << "add candidate constraints" << std::endl;
         add_candidate_constraints(nets, model);
 
-        std::cout << "add capacity constraints" << std::endl;
+        if(DEBUG) std::cout << "add capacity constraints" << std::endl;
         add_capacity_constraints(nets, model);
 
-        std::cout << "write model" << std::endl;
+        if(DEBUG) std::cout << "write model" << std::endl;
         model.write("ilp_routing_model.lp");
 
         model.optimize();
@@ -43,14 +48,14 @@ namespace ophidian::routing {
 
         if(result)
         {
-            std::cout << "write solution" << std::endl;
+            if(DEBUG) std::cout << "write solution" << std::endl;
             model.write("ilp_routing_model.sol");
 
             std::vector<std::string> layers = {"Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "Metal6", "Metal7", "Metal8", "Metal9"};
             std::unordered_map<std::string, unsigned> count;
-            for(auto candidate : m_candidates)
+            for(auto candidate : m_route_candidate)
             {
-                auto variable = m_candidate_variables[candidate];
+                auto variable = m_route_candidate_variables[candidate];
                 auto value = variable.get(GRB_DoubleAttr_X);
                 auto name = variable.get(GRB_StringAttr_VarName);
                 if(value == 1)
@@ -80,7 +85,7 @@ namespace ophidian::routing {
 		        bool routed = 0;
         		for(auto candidate : candidates)
                 {
-		        	auto variable = m_candidate_variables[candidate];
+		        	auto variable = m_route_candidate_variables[candidate];
         			auto value = variable.get(GRB_DoubleAttr_X);
 		        	routed |= (value == 1);
         		}
@@ -93,17 +98,14 @@ namespace ophidian::routing {
         		}
 	        }
     	    double percentage = (double)routed_segments / (double)(routed_segments + unrouted_segments);
-	        std::cout << "routed segments " << routed_segments << std::endl;
-	        std::cout << "unrouted segments " << unrouted_segments << std::endl;
-    	    std::cout << "percentage of routed segments " << percentage << std::endl;
+	        if(DEBUG) std::cout << "routed segments " << routed_segments << std::endl;
+	        if(DEBUG) std::cout << "unrouted segments " << unrouted_segments << std::endl;
+    	    if(DEBUG) std::cout << "percentage of routed segments " << percentage << std::endl;
 
     	    write_segments(nets);
 
-            //write_segments_dbg(nets);
-
 	        save_result();
         }
-
         return true;
     }
 
@@ -153,12 +155,12 @@ namespace ophidian::routing {
 
         if(segments.size() > 0)
         {
-            auto initial_candidate = m_candidates.add();
+            auto initial_candidate = m_route_candidate.add();
             auto initial_variable_name = net_name + "_initial";
             auto initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
-            m_candidate_names[initial_candidate] = initial_variable_name;
-            m_name_to_candidate[initial_variable_name] = initial_candidate;
-            m_candidate_variables[initial_candidate] = initial_variable;
+            m_route_candidate_names[initial_candidate] = initial_variable_name;
+            m_name_to_route_candidate[initial_variable_name] = initial_candidate;
+            m_route_candidate_variables[initial_candidate] = initial_variable;
             m_net_candidates.addAssociation(net, initial_candidate);
 
             auto wires = wire_container_type{};
@@ -322,17 +324,17 @@ namespace ophidian::routing {
 
         //std::cout << "number of candidates " << number_of_candidates << std::endl;
 
-        std::vector<candidate_type> candidates;
+        std::vector<route_candidate_type> candidates;
         candidates.reserve(number_of_candidates);
         for(auto candidate_index = 0; candidate_index < number_of_candidates; candidate_index++)
         {
-            auto candidate = m_candidates.add();
+            auto candidate = m_route_candidate.add();
             auto variable_name = net_name + "_" + horizontal_layer_name + "_" + vertical_layer_name + "_" + std::to_string(candidate_index);
             //std::cout << "variable " << variable_name << std::endl;
             auto variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
-            m_candidate_names[candidate] = variable_name;
-            m_name_to_candidate[variable_name] = candidate;
-            m_candidate_variables[candidate] = variable;
+            m_route_candidate_names[candidate] = variable_name;
+            m_name_to_route_candidate[variable_name] = candidate;
+            m_route_candidate_variables[candidate] = variable;
             m_net_candidates.addAssociation(net, candidate);
             candidates.push_back(candidate);
         }
@@ -403,7 +405,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<candidate_type> & candidates, bool large_net)
+    void ILPRouting::add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<route_candidate_type> & candidates, bool large_net)
     {
         auto& placement_library = m_design.placement_library();
         auto& routing_library = m_design.routing_library();
@@ -456,19 +458,19 @@ namespace ophidian::routing {
                 {
                     auto candidate = candidates.at(i);
                     add_wires_to_candidate(candidate, wires);
-                    //std::cout << "candidate " << i << " number of wires " << m_candidate_wires[candidate].size() << std::endl;
+                    //std::cout << "candidate " << i << " number of wires " << m_route_candidate_wires[candidate].size() << std::endl;
                 }
                 candidate_index += step;
             }
     	}
     }
 
-    void ILPRouting::add_wires_to_candidate(const candidate_type & candidate, const wire_container_type & wires)
+    void ILPRouting::add_wires_to_candidate(const route_candidate_type & candidate, const wire_container_type & wires)
     {
         auto wirelength = unit_type{0};
         for(auto wire : wires)
         {
-            m_candidate_wires[candidate].push_back(wire);
+            m_route_candidate_wires[candidate].push_back(wire);
             auto wire_start = m_wire_starts[wire];
             auto wire_end = m_wire_ends[wire];
             wirelength += unit_type{std::abs(wire_end.x().value() - wire_start.x().value()) / 10.0 + std::abs(wire_end.y().value() - wire_start.y().value()) / 10.0};
@@ -483,8 +485,8 @@ namespace ophidian::routing {
 
             //std::cout << "adding wire " << wire_start.x().value() << " " << wire_start.y().value() << " " << start_layer_index << " " << wire_end.x().value() << " " << wire_end.y().value() << " " << end_layer_index << std::endl;
         }
-    	m_candidate_wires[candidate].shrink_to_fit();
-        m_candidate_wirelengths[candidate] += wirelength;
+    	m_route_candidate_wires[candidate].shrink_to_fit();
+        m_route_candidate_wirelengths[candidate] += wirelength;
     }
 
     void ILPRouting::split_segment(const point_type & segment_start, const point_type & segment_end, const layer_type & wire1_layer, const layer_type & wire2_layer, bool connect_on_y, wire_container_type & wires) {
@@ -528,12 +530,12 @@ namespace ophidian::routing {
     {
         GRBLinExpr objective = 0.0;
         unsigned candidate_count = 0;
-        for(auto candidate : m_candidates)
+        for(auto candidate : m_route_candidate)
         {
-            auto candidate_variable = m_candidate_variables[candidate];
-            auto candidate_wirelength = m_candidate_wirelengths[candidate].value();
+            auto candidate_variable = m_route_candidate_variables[candidate];
+            auto candidate_wirelength = m_route_candidate_wirelengths[candidate].value();
 
-            //std::cout << "candidate " << m_candidate_names[candidate] << " wirelength " << candidate_wirelength << std::endl;
+            //std::cout << "candidate " << m_route_candidate_names[candidate] << " wirelength " << candidate_wirelength << std::endl;
 
             objective += candidate_variable * candidate_wirelength;
         }
@@ -542,17 +544,79 @@ namespace ophidian::routing {
 
     void ILPRouting::add_candidate_constraints(const std::vector<net_type> & nets, GRBModel & model)
     {
-        unsigned net_count = 0;
-        for(auto net : nets)
-        {
+        // unsigned net_count = 0;
+        // for(auto net : nets)
+        // {
+        //     GRBLinExpr candidates_constraints = 0.0;
+        //     auto candidates = m_net_candidates.parts(net);
+        //     for(auto candidate : candidates)
+        //     {
+        //         auto candidate_variable = m_route_candidate_variables[candidate];
+        //         candidates_constraints += candidate_variable;
+        //     }
+        //     model.addConstr(candidates_constraints == 1);
+        // }
+
+        auto & netlist = m_design.netlist();
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
+            auto cell = *cell_it;
+            std::vector<net_type> cell_nets;
+            for(auto pin : m_design.netlist().pins(cell)){
+                cell_nets.push_back(m_design.netlist().net(pin));
+            }
+
+            auto cell_initial_position_candidate = m_cell_initial_candidate[cell];
+            auto cell_initial_var = m_position_candidate_variables[cell_initial_position_candidate];
+
+            for(auto net : cell_nets){
+                GRBLinExpr candidates_constraints = 0.0;
+                auto candidates = m_net_candidates.parts(net);
+                for(auto candidate : candidates)
+                {
+                    auto candidate_variable = m_route_candidate_variables[candidate];
+                    candidates_constraints += candidate_variable;
+                }
+                model.addConstr(candidates_constraints == cell_initial_var);
+            }
+        }
+
+        // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
+            auto cell = *cell_it;
             GRBLinExpr candidates_constraints = 0.0;
-            auto candidates = m_net_candidates.parts(net);
-            for(auto candidate : candidates)
-            {
-                auto candidate_variable = m_candidate_variables[candidate];
+            
+            auto initial_candidate = m_cell_initial_candidate[cell];
+            auto initial_candidate_variable = m_position_candidate_variables[initial_candidate];
+            candidates_constraints += initial_candidate_variable;
+
+            auto candidates = m_cell_position_candidates.parts(cell);
+            for (auto candidate : candidates) {
+                auto candidate_variable = m_position_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
             model.addConstr(candidates_constraints == 1);
+
+            // for(auto pin : netlist.pins(cell)){
+            //     auto net = netlist.net(pin);
+            //     nets.insert(net);
+            // }
+        }
+
+        //freeze neighbors
+        for(auto net : nets){
+            GRBLinExpr neighbors_constraints = 0.0;
+            auto cont_candidates = 0;
+            for(auto pin : netlist.pins(net)){
+                auto cell = netlist.cell(pin);
+                auto candidates = m_cell_position_candidates.parts(cell);
+                for (auto candidate : candidates) {
+                    auto candidate_variable = m_position_candidate_variables[candidate];
+                    neighbors_constraints += candidate_variable;
+                    cont_candidates ++;
+                }
+            }
+            if(cont_candidates != 0)
+                model.addConstr(neighbors_constraints <= 1);
         }
     }
 
@@ -561,7 +625,7 @@ namespace ophidian::routing {
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
 
-        std::unordered_map<std::string, std::unordered_map<gcell_type, std::unordered_set<candidate_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash>> gcell_nets;
+        std::unordered_map<std::string, std::unordered_map<gcell_type, std::unordered_set<route_candidate_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash>> gcell_nets;
         for(auto net : nets)
         {
             auto net_name = m_design.netlist().name(net);
@@ -569,7 +633,7 @@ namespace ophidian::routing {
             auto candidates = m_net_candidates.parts(net);
             for(auto candidate : candidates)
             {
-                auto wires = m_candidate_wires[candidate];
+                auto wires = m_route_candidate_wires[candidate];
                 for(auto wire : wires)
                 {
                     auto start_layer = m_wire_start_layers[wire];
@@ -620,7 +684,7 @@ namespace ophidian::routing {
                     GRBLinExpr gcell_constraint = 0.0;
                     for(auto candidate : gcell_set)
                     {
-                        auto variable = m_candidate_variables[candidate];
+                        auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
                     }
                     auto capacity = gcell_graph->capacity(gcell);
@@ -640,11 +704,11 @@ namespace ophidian::routing {
     	    auto net_name = m_design.netlist().name(net);
             auto candidates = m_net_candidates.parts(net);
             bool routed = 0;
-    	    candidate_type routed_candidate;
+    	    route_candidate_type routed_candidate;
             for(auto candidate : candidates)
             {
-                auto candidate_name = m_candidate_names[candidate];
-                auto variable = m_candidate_variables[candidate];
+                auto candidate_name = m_route_candidate_names[candidate];
+                auto variable = m_route_candidate_variables[candidate];
                 auto value = variable.get(GRB_DoubleAttr_X);
     	    	if(value)
                 {
@@ -658,7 +722,7 @@ namespace ophidian::routing {
                 //clear possible old routings
                 global_routing.unroute(net);
 
-        		for(auto wire : m_candidate_wires[routed_candidate])
+        		for(auto wire : m_route_candidate_wires[routed_candidate])
                 {
         		    auto wire_start = m_wire_starts[wire];
 		            auto wire_end = m_wire_ends[wire];
@@ -681,83 +745,48 @@ namespace ophidian::routing {
          }
     }
 
-    void ILPRouting::write_segments_dbg(const std::vector<net_type> & nets)
-    {
-	    std::ofstream routed_segments("routed_segments_" + m_circuit_name + ".txt");
-	    routed_segments << "net_name,xs,ys,zs,xt,yt,zt" << std::endl;
-	    std::ofstream unrouted_segments("unrouted_segments_" + m_circuit_name + ".txt");
-	    unrouted_segments << "net_name,xs,ys,pin_start,xt,yt,pin_end" << std::endl;
-
-        std::vector<std::string> route_strings;
-
-	    unsigned net_count = 0;
-        for(auto net : nets)
-        {
-    	    auto net_name = m_design.netlist().name(net);
-            //std::cout << net_name << " count " << net_count++ << std::endl;
-            auto candidates = m_net_candidates.parts(net);
-            bool routed = 0;
-    	    candidate_type routed_candidate;
-            for(auto candidate : candidates)
-            {
-                auto candidate_name = m_candidate_names[candidate];
-                auto variable = m_candidate_variables[candidate];
-                auto value = variable.get(GRB_DoubleAttr_X);
-    	    	if(value)
-                {
-                    routed = 1;
-		            routed_candidate = candidate;
-                    auto name = variable.get(GRB_StringAttr_VarName);
-        		}
-            }
-            if(routed)
-            {
-	    	    unsigned count_candidate = 0;
-                auto candidate_name = m_candidate_names[routed_candidate];
-                //std::cout << "routed candidate " << candidate_name << std::endl;
-        		for(auto wire : m_candidate_wires[routed_candidate])
-                {
-        		    auto wire_start = m_wire_starts[wire];
-		            auto wire_end = m_wire_ends[wire];
-        		    auto wire_start_layer = m_wire_start_layers[wire];
-		            auto wire_end_layer = m_wire_end_layers[wire];
-        		    auto start_layer_index = m_design.routing_library().layerIndex(wire_start_layer);
-		            auto end_layer_index = m_design.routing_library().layerIndex(wire_end_layer);
-        		    routed_segments << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
-                    std::cout << net_name << "," << wire_start.x().value() << "," << wire_start.y().value() << "," << start_layer_index << "," << wire_end.x().value() << "," << wire_end.y().value() << "," << end_layer_index << std::endl;
-
-                    auto route_string = std::to_string(((int)wire_start.y().value() - 5) / 10 + 1) + " " + std::to_string(((int)wire_start.x().value() - 5) / 10 +1) + " " + std::to_string(start_layer_index) + " " + std::to_string(((int)wire_end.y().value() - 5) / 10+1) + " " + std::to_string(((int)wire_end.x().value() - 5) / 10 +1) + " " + std::to_string(end_layer_index) + " " + net_name;
-                    route_strings.push_back(route_string);
-		        }
-    	    }
-            else
-            {
-                std::cout << "net " << net_name << " unrouted" << std::endl;
-        		for(auto segment : m_net_segments.parts(net))
-                {
-		    	    auto segment_start = m_segment_starts[segment];
-        			auto segment_end = m_segment_ends[segment];
-	        		auto pin_start = m_segment_start_pin[segment];
-		        	auto pin_end = m_segment_end_pin[segment];
-	        	}
-            }
-         }
-    }
-
     void ILPRouting::save_result()
     {
     	std::ofstream results_file("ilp_results.csv", std::ofstream::out | std::ofstream::app);
         auto total_wirelength = unit_type{0};
-        for(auto candidate : m_candidates)
+        for(auto candidate : m_route_candidate)
         {
-                auto variable = m_candidate_variables[candidate];
+                auto variable = m_route_candidate_variables[candidate];
                 auto value = variable.get(GRB_DoubleAttr_X);
                 if (value == 1)
                 {
-                auto wirelength = m_candidate_wirelengths[candidate];
+                auto wirelength = m_route_candidate_wirelengths[candidate];
                 total_wirelength += wirelength;
                 }
         }
         results_file << m_circuit_name << "," << total_wirelength.value() << std::endl;
+    }
+
+    void ILPRouting::create_all_cell_initial_candidates(GRBModel & model){
+        auto & netlist = m_design.netlist();
+
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
+            auto cell = *cell_it;
+            auto cell_name = m_design.netlist().name(cell);
+            if (DEBUG) std::cout << "create candidates for cell " << cell_name << std::endl;
+            
+            // std::vector<net_type> cell_nets;
+            // for(auto pin : m_design.netlist().pins(cell)){
+            //     cell_nets.push_back(m_design.netlist().net(pin));
+            // }
+            
+            //initial position
+            auto initial_candidate = m_position_candidates.add();
+            auto initial_variable_name = cell_name + "_initial";
+            auto initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            m_position_candidate_names[initial_candidate] = initial_variable_name;
+            m_position_candidate_cell[initial_candidate] = cell;
+            m_name_to_position_candidate[initial_variable_name] = initial_candidate;
+            m_position_candidate_variables[initial_candidate] = initial_variable;
+            m_position_candidate_position[initial_candidate] = m_design.placement().location(cell);
+            // m_candidate_wirelengths[initial_candidate] = evaluate_candidate_wirelengths(cell, m_candidate_position[initial_candidate], cell_nets);
+            m_cell_initial_candidate[cell] = initial_candidate;
+        }
+
     }
 }

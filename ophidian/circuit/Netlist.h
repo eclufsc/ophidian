@@ -206,6 +206,12 @@ namespace ophidian::circuit
         }
 
         template <typename Value>
+        entity_system::Aggregation<CellInstance, Value> make_aggregation_cell(entity_system::EntitySystem<Value> & parts) const noexcept
+        {
+            return entity_system::Aggregation<CellInstance, Value>(m_cells, parts);
+        }
+
+        template <typename Value>
         entity_system::Property<PinInstance, Value> make_property_pin_instance() const noexcept
         {
             return entity_system::Property<PinInstance, Value>(m_pins);
