@@ -763,7 +763,14 @@ namespace ophidian::routing {
 		            auto wire_end = m_wire_ends[wire];
         		    auto wire_start_layer = m_wire_start_layers[wire];
 		            auto wire_end_layer = m_wire_end_layers[wire];
-                    global_routing.add_segment(box_type{wire_start, wire_end}, wire_start_layer, wire_end_layer, net);
+
+                    auto min_x = std::min(wire_start.x(), wire_end.x());
+                    auto max_x = std::max(wire_start.x(), wire_end.x());
+                    auto min_y = std::min(wire_start.y(), wire_end.y());
+                    auto max_y = std::max(wire_start.y(), wire_end.y());
+
+                    auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+                    global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);
 		        }
     	    }
             else
