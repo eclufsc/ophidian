@@ -169,10 +169,31 @@ namespace ophidian::placement
         return m_fixed_cells[cell];
     }
 
+    void Placement::cells_within(const box_type & region, cell_container_type & cells) const {
+        auto min_corner = unitless_point_type{region.min_corner().x().value(), region.min_corner().y().value()};
+        auto max_corner = unitless_point_type{region.max_corner().x().value(), region.max_corner().y().value()};
+        auto box = unitless_box_type{min_corner, max_corner};
+
+        cells.clear();
+        std::vector<rtree_node_type> nodes;
+        m_cells_rtree.query(boost::geometry::index::within(box), std::back_inserter(nodes));
+        cells.reserve(nodes.size());
+        for (auto node : nodes) {
+            cells.push_back(node.second);
+        }
+    }
+
     // Modifiers
-    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location)
+    void Placement::place(const Placement::cell_type& cell, const Placement::point_type& location, bool update_rtree)
     {
+        auto previous_location = m_cell_locations[cell];
         m_cell_locations[cell] = location;
+        if (update_rtree) {
+            auto previous_node = rtree_node_type{unitless_point_type{previous_location.x().value(), previous_location.y().value()}, cell};
+            m_cells_rtree.remove(previous_node);
+            auto new_node = rtree_node_type{unitless_point_type{location.x().value(), location.y().value()}, cell};
+            m_cells_rtree.insert(new_node);
+        }
     }
 
     void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
@@ -198,5 +219,16 @@ namespace ophidian::placement
     void Placement::unfixLocation(const Placement::cell_type& cell)
     {
         m_fixed_cells[cell] = false;
+    }
+
+    void Placement::reset_rtree()
+    {
+        m_cells_rtree.clear();
+        for (auto cell_it = m_netlist.begin_cell_instance(); cell_it != m_netlist.end_cell_instance(); cell_it++) {
+            auto cell = *cell_it;
+            auto cell_location = m_cell_locations[cell];          
+            auto node = rtree_node_type{unitless_point_type{cell_location.x().value(), cell_location.y().value()}, cell};
+            m_cells_rtree.insert(node);
+        }
     }
 }

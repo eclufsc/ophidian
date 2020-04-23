@@ -3,8 +3,6 @@
 
 #include <unordered_set>
 
-#include <boost/geometry/index/rtree.hpp>
-
 #include <ophidian/geometry/Models.h>
 
 #include <ophidian/design/Design.h>
@@ -68,6 +66,8 @@ namespace ophidian::routing {
 
         private:
             void update_gcell_capacities();
+
+            void add_extra_demand();
 
             void create_all_candidates(const std::vector<net_type> & nets, GRBModel & model);
 

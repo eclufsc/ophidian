@@ -75,6 +75,22 @@ namespace ophidian::routing
         // m_ndf_constraint.resize(m_size_x * m_size_y * m_size_z);
     }
 
+    RoutingConstraints::same_grid_map::const_iterator RoutingConstraints::begin_same_grid() const {
+        return m_extra_demand_same_grid_map.begin();
+    }
+
+    RoutingConstraints::same_grid_map::const_iterator RoutingConstraints::end_same_grid() const {
+        return m_extra_demand_same_grid_map.end();
+    }
+
+    RoutingConstraints::adj_grid_map::const_iterator RoutingConstraints::begin_adj_grid() const {
+        return m_extra_demand_adj_grid_map.begin();
+    }
+
+    RoutingConstraints::adj_grid_map::const_iterator RoutingConstraints::end_adj_grid() const {
+        return m_extra_demand_adj_grid_map.end();
+    }
+
     void RoutingConstraints::set_max_cell_movement(unsigned int max_move)
     {
         m_max_cell_move = max_move;

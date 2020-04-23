@@ -89,9 +89,10 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
         // "case1"
         //"case2",
-        // "case3",
+         "case3",
         //"case3_no_blockages",
-        "case3_no_extra_demand"
+        //"case3_no_extra_demand"
+        //"case3_only_same_grid"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
