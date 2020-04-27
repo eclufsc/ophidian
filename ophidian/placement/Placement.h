@@ -19,6 +19,8 @@
 #ifndef OPHIDIAN_PLACEMENT_PLACEMENT_H
 #define OPHIDIAN_PLACEMENT_PLACEMENT_H
 
+#include <boost/geometry/index/rtree.hpp>
+
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/util/Range.h>
@@ -36,6 +38,8 @@ namespace ophidian::placement
 
         using point_type = util::LocationDbu;
 
+        using box_type = geometry::Box<unit_type>;
+
         using cell_type = circuit::Netlist::cell_instance_type;
 
         using pin_type = circuit::Netlist::pin_instance_type;
@@ -49,6 +53,13 @@ namespace ophidian::placement
         using pin_geometry_type = geometry::CellGeometry;
 
         using fixed_type = bool;
+
+        using cell_container_type = std::vector<cell_type>;
+
+        using unitless_point_type       = geometry::Point<double>;
+        using unitless_box_type       = geometry::Box<double>;
+        using rtree_node_type       = std::pair<unitless_point_type, cell_type>;
+        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
 
         // Class member types
         enum class Orientation : int {
@@ -84,12 +95,14 @@ namespace ophidian::placement
         orientation_type orientation(const cell_type& cell) const;
 
         const fixed_type isFixed(const cell_type& cell) const;
+
+        void cells_within(const box_type & region, cell_container_type & cells) const;
         // Iterators
 
         // Capacity
 
         // Modifiers
-        void place(const cell_type& cell, const point_type& location);
+        void place(const cell_type& cell, const point_type& location, bool update_rtree = false);
 
         void place(const input_pad_type& input, const point_type & location);
 
@@ -101,6 +114,8 @@ namespace ophidian::placement
 
         void unfixLocation(const cell_type& cell);
 
+        void reset_rtree();
+
     private:
         const circuit::Netlist & m_netlist;
         const Library & m_library;
@@ -111,6 +126,7 @@ namespace ophidian::placement
         entity_system::Property<input_pad_type, point_type> m_input_pad_locations;
         entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
 
+        rtree_type m_cells_rtree;
     };
 }
 

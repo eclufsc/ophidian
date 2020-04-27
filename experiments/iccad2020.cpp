@@ -3,11 +3,12 @@
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
 
-/*
-void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
+
+void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool out) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
 
-    std::ofstream stats_file("stats/" + circuit_name + "_nets.csv");
+    std::string file_name = (out) ? circuit_name + "_out_nets.csv" : circuit_name + "_nets.csv";
+    std::ofstream stats_file("stats/" + file_name);
     stats_file << "net,pins,stwl,routed_length,routed_length_no_vias,box_width,box_height" << std::endl;
     for (auto net : nets) {
         auto net_name = design.netlist().name(net);
@@ -37,16 +38,17 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
             stwl = 1;
         } 
 
-        auto routes = design.global_routing().routes(net);
+        auto routes = design.global_routing().segments(net);
         auto routed_length_no_vias = 0;
         auto via_length = 0;
         for (auto route : routes) {
-            auto start = design.global_routing().start(route);
-            auto end = design.global_routing().end(route);
+            auto box = design.global_routing().box(route);
+            auto start = box.min_corner();
+            auto end = box.max_corner();
             routed_length_no_vias += (std::abs(start.x().value() - end.x().value()) + std::abs(start.y().value() - end.y().value()));
 
-            auto start_layer = design.global_routing().start_layer(route);
-            auto end_layer = design.global_routing().end_layer(route);
+            auto start_layer = design.global_routing().layer_start(route);
+            auto end_layer = design.global_routing().layer_end(route);
             auto start_layer_index = design.routing_library().layerIndex(start_layer);
             auto end_layer_index = design.routing_library().layerIndex(end_layer);
             via_length += std::abs(start_layer_index - end_layer_index);
@@ -64,7 +66,7 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
     }
     stats_file.close();
 }
-*/
+
 
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
@@ -82,16 +84,17 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
         iccad_output_writer.write_ICCAD_2020_output();
     }
    
-    //write_statistics_for_circuit(design, circuit_name);
+    write_statistics_for_circuit(design, circuit_name, true);
 }
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
         // "case1"
         //"case2",
-        // "case3",
+         "case3",
         //"case3_no_blockages",
-        "case3_no_extra_demand"
+        //"case3_no_extra_demand"
+        //"case3_only_same_grid"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
@@ -110,11 +113,11 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     }
 }
 
-/*
+
 TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-        "case1",
-        "case2",
+        //"case1",
+        //"case2",
         "case3",
     };
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
@@ -129,7 +132,7 @@ TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
 
-        write_statistics_for_circuit(design, circuit_name);
+        write_statistics_for_circuit(design, circuit_name, false);
     }
 }
-*/
+

@@ -56,6 +56,12 @@ namespace ophidian::routing
         //Element access
         demand_type ndf_constraint(index_type x, index_type y, index_type z) const;
 
+        same_grid_map::const_iterator begin_same_grid() const;
+        same_grid_map::const_iterator end_same_grid() const;
+
+        adj_grid_map::const_iterator begin_adj_grid() const;
+        adj_grid_map::const_iterator end_adj_grid() const;
+
         //if there is no constraints, it returns the first metal layer
         layer_type min_net_layer(net_type net);
 

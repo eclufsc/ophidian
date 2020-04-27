@@ -3,8 +3,6 @@
 
 #include <unordered_set>
 
-#include <boost/geometry/index/rtree.hpp>
-
 #include <ophidian/geometry/Models.h>
 
 #include <ophidian/design/Design.h>
@@ -78,6 +76,8 @@ namespace ophidian::routing {
         private:
             void update_gcell_capacities();
 
+            void add_extra_demand();
+
             void create_all_candidates(const std::vector<net_type> & nets, IloModel & model);
 
             void create_net_candidates(const net_type & net, IloModel & model);
@@ -100,11 +100,11 @@ namespace ophidian::routing {
 
             void add_capacity_constraints(const std::vector<net_type> & nets, IloModel & model);
 
-	        void write_gcell_capacities();
+            void write_gcell_capacities();
 
-	        void write_segments(const IloCplex& model, const std::vector<net_type> & nets);
+            void write_segments(const IloCplex& model, const std::vector<net_type> & nets);
 
-	        void write_segments_dbg(const IloCplex& cplex, const std::vector<net_type> & nets);
+            void write_segments_dbg(const IloCplex& cplex, const std::vector<net_type> & nets);
 
             void save_result(const IloCplex& cplex);
 

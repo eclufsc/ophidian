@@ -45,7 +45,7 @@ GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::u
 
         auto layer = library.layer_from_index(z_it+1);
         auto track = library.prefTrack(layer);
-        auto tracDir = library.direction(track);
+        auto trackDir = library.direction(track);
         auto numTracks = library.numTracs(track);
         auto start = units::unit_cast<double>(library.start(track));
         auto space = units::unit_cast<double>(library.space(track));
@@ -66,10 +66,10 @@ GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::u
                 int capacity = 0;
                 double min_cord = 0;
                 double max_cord = 0;
-                if(tracDir == ophidian::routing::Direction::HORIZONTAL){
+                if(trackDir == ophidian::routing::Direction::HORIZONTAL){
                     min_cord = units::unit_cast<double>(min_corner.y());
                     max_cord = units::unit_cast<double>(max_corner.y());
-                }else if (tracDir == ophidian::routing::Direction::VERTICAL){
+                }else if (trackDir == ophidian::routing::Direction::VERTICAL){
                     min_cord = units::unit_cast<double>(min_corner.x());
                     max_cord = units::unit_cast<double>(max_corner.x());
                 }
@@ -157,8 +157,14 @@ GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
     return m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell];
 }
 
-bool GCellGraph::overfloed(const gcell_type& gcell){
+bool GCellGraph::overflowed(const gcell_type& gcell){
     return (m_gcell_capacity[gcell] < (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
+}
+
+GCellGraph::index_type GCellGraph::layer_index(const gcell_type & gcell) {
+    auto node = graph_node(gcell);
+    auto gcell_position = position(node);
+    return gcell_position.get<2>() + 1;
 }
 
 GCellGraph::scalar_type GCellGraph::net_demand(const GCellGraph::gcell_type& gcell)

@@ -4,7 +4,8 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-namespace ophidian::routing {
+namespace ophidian::routing
+{
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
         m_design(design), m_circuit_name(circuit_name)
     {
@@ -20,6 +21,9 @@ namespace ophidian::routing {
 
         std::cout << "update capacities from blockages" << std::endl;
         update_gcell_capacities();
+
+        std::cout << "add extra demand rules" << std::endl;
+        add_extra_demand();
 
         std::cout << "create all candidates" << std::endl;
         create_all_candidates(nets, model);
@@ -48,34 +52,34 @@ namespace ophidian::routing {
             cplex.writeSolution("ilp_routing_model.sol");
 	        unsigned routed_segments = 0;
     	    unsigned unrouted_segments = 0;
-            for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) {
+            for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++)
+            {
                 auto net = *net_it;
-        		auto candidates = m_net_candidates.parts(net);
-		        bool routed = 0;
-        		for(auto candidate : candidates)
-                {
-		        	auto variable = m_candidate_variables[candidate];
-                    auto value = cplex.getValue(variable);
-		        	routed |= (value == 1);
-        		}
-        		if(routed)
-                {
-		        	routed_segments++;
-        		}else
-                {
-		        	unrouted_segments++;
-        		}
-	        }
-            double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
-            std::cout << "routed segments " << routed_segments << std::endl;
-            std::cout << "unrouted segments " << unrouted_segments << std::endl;
-            std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
+                auto candidates = m_net_candidates.parts(net);
+                bool routed = 0;
+            for(auto candidate : candidates)
+            {
+                auto variable = m_candidate_variables[candidate];
+                auto value = cplex.getValue(variable);
+                routed |= (value == 1);
+            }
+            if(routed)
+            {
+                routed_segments++;
+        	}else{
+                unrouted_segments++;
+            }
+        }
+        double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
+        std::cout << "routed segments " << routed_segments << std::endl;
+        std::cout << "unrouted segments " << unrouted_segments << std::endl;
+        std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
 
-            write_segments(cplex, nets);
+        write_segments(cplex, nets);
 
-            //write_segments_dbg(cplex, nets);
+        //write_segments_dbg(cplex, nets);
 
-            save_result(cplex);
+        save_result(cplex);
         }
         return true;
     }
@@ -86,7 +90,8 @@ namespace ophidian::routing {
         auto gcell_graph = global_routing.gcell_graph();
 
         //copy the blockageDenamd to ILP propoerty!
-        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++)
+        {
             auto gcell = *gcell_it;
             auto blockage_demand = gcell_graph->blockage_demand(gcell);
             m_gcells_demand[gcell] = blockage_demand;
@@ -94,6 +99,110 @@ namespace ophidian::routing {
 
         // here we have to update the demand of nets which won't be routed in this execution!
     }
+
+    void ILPRouting::add_extra_demand()
+    {
+        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, double, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        auto& global_routing = m_design.global_routing();
+        auto gcell_graph = global_routing.gcell_graph();
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++)
+        {
+            auto gcell = *gcell_it;
+            auto gcell_box = gcell_graph->box(gcell);
+            auto cells_within_gcell = placement::Placement::cell_container_type{};
+            m_design.placement().cells_within(gcell_box, cells_within_gcell);
+
+            std::unordered_map<circuit::StandardCells::cell_type, double, entity_system::EntityBaseHash> std_cell_count;
+            for(auto cell : cells_within_gcell)
+            {
+                auto std_cell = m_design.netlist().std_cell(cell);
+                std_cell_count[std_cell] += 1;
+            }
+            std_cells_per_gcell[gcell] = std_cell_count;
+        }
+
+        auto & routing_constraints = m_design.routing_constraints();
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+            auto gcell_layer_index = gcell_graph->layer_index(gcell);
+            auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
+            auto gcell_layer = m_design.routing_library().find_layer_instance(gcell_layer_name);
+
+            auto gcell_box = gcell_graph->box(gcell);
+
+            for(auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++)
+            {
+                auto key = same_grid_it->first;
+                auto demand = same_grid_it->second;
+
+                std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));
+
+                auto macro1_name = strs.at(0);
+                auto macro2_name = strs.at(1);
+                auto layer_name = strs.at(2);
+
+                auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+                auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+                auto layer = m_design.routing_library().find_layer_instance(layer_name);
+
+                if (layer == gcell_layer)
+                {
+                    auto pair_count = std::min(std_cells_per_gcell.at(gcell)[macro1], std_cells_per_gcell.at(gcell)[macro2]);
+                    m_gcells_demand[gcell] += pair_count * demand;
+                }
+            }
+
+            auto gcell_node = gcell_graph->graph_node(gcell);
+            auto east_node = gcell_graph->east_node(gcell_node);
+            auto east_gcell = gcell_graph->gcell(east_node);
+            auto west_node = gcell_graph->west_node(gcell_node);
+            auto west_gcell = gcell_graph->gcell(west_node);
+
+            for(auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++)
+            {
+                auto key = adj_grid_it->first;
+                auto demand = adj_grid_it->second;
+
+                std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));
+
+                auto macro1_name = strs.at(0);
+                auto macro2_name = strs.at(1);
+                auto layer_name = strs.at(2);
+
+                auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+                auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+                auto layer = m_design.routing_library().find_layer_instance(layer_name);
+
+                if(layer == gcell_layer)
+                {
+                    auto east_pair_count = 0;
+                    auto west_pair_count = 0;
+                    if(macro1 == macro2)
+                    {
+                        if(east_node != lemon::INVALID)
+                            east_pair_count = std::min(std_cells_per_gcell.at(gcell)[macro1], std_cells_per_gcell.at(east_gcell)[macro1]);
+                        if(west_node != lemon::INVALID)
+                            west_pair_count = std::min(std_cells_per_gcell.at(gcell)[macro1], std_cells_per_gcell.at(west_gcell)[macro1]);
+                    }else{
+                        if(east_node != lemon::INVALID)
+                        {
+                            east_pair_count = std::min(std_cells_per_gcell.at(gcell)[macro1], std_cells_per_gcell.at(east_gcell)[macro2])
+                            + std::min(std_cells_per_gcell.at(gcell)[macro2], std_cells_per_gcell.at(east_gcell)[macro1]);
+                        }
+                        if(west_node != lemon::INVALID)
+                        {
+                            west_pair_count = std::min(std_cells_per_gcell.at(gcell)[macro1], std_cells_per_gcell.at(west_gcell)[macro2])
+                            + std::min(std_cells_per_gcell.at(gcell)[macro2], std_cells_per_gcell.at(west_gcell)[macro1]);
+                        }
+                    }
+                    m_gcells_demand[gcell] += (east_pair_count + west_pair_count) * demand;
+                }
+            }
+        }
+    }
+
 
     void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, IloModel & model)
     {
@@ -201,16 +310,14 @@ namespace ophidian::routing {
                 if(net_points_map.count(point))
                 {
                     m_segment_start_pin[segment] = net_points_map.at(point);
-                }else
-                {
+                }else{
                     net_steiner_points.insert(std::make_pair(segment_start.x(), segment_start.y()));
                 }
                 point = std::make_pair(segment_end.x().value(), segment_end.y().value());
                 if(net_points_map.count(point))
                 {
                     m_segment_end_pin[segment] = net_points_map.at(point);
-                }else
-                {
+                }else{
                     net_steiner_points.insert(std::make_pair(segment_end.x(), segment_end.y()));
                 }
                 m_net_segments.addAssociation(net, segment);
@@ -279,7 +386,7 @@ namespace ophidian::routing {
     	}
         else
         {
-	    for(auto segment : m_net_segments.parts(net))
+            for(auto segment : m_net_segments.parts(net))
             {
                 auto segment_start = m_segment_starts[segment];
                 auto segment_end = m_segment_ends[segment];
@@ -725,13 +832,13 @@ namespace ophidian::routing {
         auto total_wirelength = unit_type{0};
         for(auto candidate : m_candidates)
         {
-                auto variable = m_candidate_variables[candidate];
-                auto value = cplex.getValue(variable);
-                if (value == 1)
-                {
+            auto variable = m_candidate_variables[candidate];
+            auto value = cplex.getValue(variable);
+            if (value == 1)
+            {
                 auto wirelength = m_candidate_wirelengths[candidate];
                 total_wirelength += wirelength;
-                }
+            }
         }
         results_file << m_circuit_name << "," << total_wirelength.value() << std::endl;
     }

@@ -62,6 +62,7 @@ namespace ophidian::placement::factory
             else
                 placement.unfixLocation(cell);
         }
+        placement.reset_rtree();
     }
 
     void make_placement(Placement& placement, const parser::ICCAD2020 & iccad_2020, const circuit::Netlist& netlist) noexcept {
@@ -80,5 +81,6 @@ namespace ophidian::placement::factory
             else
                 placement.unfixLocation(cell);
         }
+        placement.reset_rtree();
     }
 }

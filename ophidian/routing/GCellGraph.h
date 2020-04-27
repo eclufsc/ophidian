@@ -3,8 +3,8 @@
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
-
 #include <ophidian/routing/Library.h>
+
 #include <ophidian/util/GridGraph_3D.h>
 
 #include <boost/geometry/index/rtree.hpp>
@@ -85,7 +85,8 @@ public:
     void change_blockage_demand(const gcell_type& gcell, const scalar_type delta);
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
     uint32_t id(const gcell_type& gcell);
-    bool overfloed(const gcell_type& gcell);
+    bool overflowed(const gcell_type& gcell);
+    index_type layer_index(const gcell_type& gcell);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;
