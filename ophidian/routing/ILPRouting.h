@@ -13,7 +13,15 @@
 #include <ophidian/interconnection/SteinerTree.h>
 #include <ophidian/routing/Library.h>
 
-#include "gurobi_c++.h"
+// Magic tricks to have CPLEX behave well:
+// source https://github.com/alberto-santini/cplex-example
+#ifndef IL_STD
+#define IL_STD
+#endif
+#include <cstring>
+#include <ilcplex/ilocplex.h>
+ILOSTLBEGIN
+// End magic tricks
 
 namespace ophidian::routing {
     class RouteCandidate : public entity_system::EntityBase
@@ -52,7 +60,8 @@ namespace ophidian::routing {
 
             using point_type                = util::LocationDbu;
             using box_type                  = geometry::Box<unit_type>;
-            using ilp_var_type              = GRBVar;
+
+            using ilp_var_type              = IloBoolVar;
             using ilp_var_container_type    = std::vector<ilp_var_type>;
 
             using unitless_point_type       = geometry::Point<double>;
@@ -69,15 +78,15 @@ namespace ophidian::routing {
         private:
             void update_gcell_capacities();
 
-            void create_all_candidates(const std::vector<net_type> & nets, GRBModel & model);
+            void create_all_candidates(const std::vector<net_type> & nets, IloModel & model);
 
-            void create_net_candidates(const net_type & net, GRBModel & model);
+            void create_net_candidates(const net_type & net, IloModel & model);
 
-            void create_net_candidates_in_layers(const net_type & net, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, GRBModel & model);
+            void create_net_candidates_in_layers(const net_type & net, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, IloModel & model);
 
             void add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<candidate_type> & candidates, bool large_net);
 
-            void create_candidate(const net_type & net, const wire_container_type & wires, std::string variable_name, GRBModel & model);
+            void create_candidate(const net_type & net, const wire_container_type & wires, std::string variable_name, IloModel & model);
 
             void add_wires_to_candidate(const candidate_type & candidate, const wire_container_type & wires);
 
@@ -85,23 +94,23 @@ namespace ophidian::routing {
 
             wire_type create_wire(const point_type & wire_start, const point_type & wire_end, const layer_type & start_layer, const layer_type & end_layer);
 
-            void add_objective_function(GRBModel & model);
+            void add_objective_function(IloModel & model);
 
-            void add_candidate_constraints(const std::vector<net_type> & nets, GRBModel & model);
+            void add_candidate_constraints(const std::vector<net_type> & nets, IloModel & model);
 
-            void add_capacity_constraints(const std::vector<net_type> & nets, GRBModel & model);
+            void add_capacity_constraints(const std::vector<net_type> & nets, IloModel & model);
 
 	        void write_gcell_capacities();
 
-	        void write_segments(const std::vector<net_type> & nets);
+	        void write_segments(const IloCplex& model, const std::vector<net_type> & nets);
 
-	        void write_segments_dbg(const std::vector<net_type> & nets);
+	        void write_segments_dbg(const IloCplex& cplex, const std::vector<net_type> & nets);
 
-    	    void save_result();
+            void save_result(const IloCplex& cplex);
 
             design_type&                                                    m_design;
 
-            GRBEnv                                                          m_GRBENv;
+            IloEnv                                                          m_env;
 
             entity_system::EntitySystem<wire_type>                          m_wires;
             entity_system::Property<wire_type, point_type>                  m_wire_starts{m_wires};
