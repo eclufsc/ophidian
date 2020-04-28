@@ -80,7 +80,13 @@ namespace ophidian::routing {
 
             void create_net_candidates(const net_type & net, GRBModel & model);
 
-            void create_net_candidates_in_layers(const net_type & net, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, GRBModel & model);
+            void create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model);
+
+            void create_movement_candidate(const cell_type & cell, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model );
+
+            void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, GRBModel & model);
+            
+            void create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, GRBModel & model);
 
             void add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<route_candidate_type> & candidates, bool large_net);
 
@@ -147,10 +153,11 @@ namespace ophidian::routing {
             entity_system::Property<position_candidate_type, point_type>    m_position_candidate_position{m_position_candidates};
             // entity_system::Property<position_candidate_type, unit_type>     m_position_candidate_wirelengths{m_position_candidates};
 
+            entity_system::Aggregation<position_candidate_type, route_candidate_type>  m_position_candidate_to_routes{m_position_candidates, m_route_candidate};
+
             std::unordered_map<std::string, position_candidate_type>        m_name_to_position_candidate;
             entity_system::Property<cell_type, position_candidate_type>     m_cell_initial_candidate{m_design.netlist().make_property_cell_instance<position_candidate_type>()};
             entity_system::Aggregation<cell_type, position_candidate_type>  m_cell_position_candidates{m_design.netlist().make_aggregation_cell<position_candidate_type>(m_position_candidates)};
-
     };
 }
 
