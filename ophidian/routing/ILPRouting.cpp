@@ -1006,22 +1006,19 @@ namespace ophidian::routing {
     }
 
     void ILPRouting::save_movements(std::vector<std::pair<cell_type, point_type>> & movements) {
-        auto & netlist = m_design.netlist();
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
-            auto cell = *cell_it;
+        for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {
+            auto candidate = *candidate_it;
+            auto variable = m_position_candidate_variables[candidate];
+            auto value = variable.get(GRB_DoubleAttr_X);
+            auto name = variable.get(GRB_StringAttr_VarName);
+            if (value == 1) {
+                if (name.find("initial") == std::string::npos) {
+                    auto candidate = m_name_to_position_candidate[name];
+                    auto cell = m_position_candidate_cell[candidate];
+                    auto position = m_position_candidate_position[candidate];
+                    movements.push_back(std::make_pair(cell, position));
 
-            auto cell_name = netlist.name(cell);
-            std::cout << "cell " << cell_name << std::endl;
-
-            auto candidates = m_cell_position_candidates.parts(cell);
-            for (auto candidate : candidates) {
-                auto candidate_variable = m_position_candidate_variables[candidate];
-                auto value = candidate_variable.get(GRB_DoubleAttr_X);
-                if (value) {
-                    auto location = m_position_candidate_position[candidate];
-                    movements.push_back({cell, location});                    
-
-                    std::cout << "location " << location.x().value() << ", " << location.y().value() << std::endl;
+                    std::cout << "location " << position.x().value() << ", " << position.y().value() << std::endl;
                 }
             }
         }

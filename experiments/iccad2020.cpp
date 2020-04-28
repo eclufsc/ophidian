@@ -109,7 +109,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         // "case3_no_extra_demand"
     };
 
-    std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string benchmarks_path = "./input_files/iccad20/";
+    // std::string benchmarks_path = "./input_files/iccad2020/cases/";
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
