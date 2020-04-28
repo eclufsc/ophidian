@@ -101,11 +101,11 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-         "case1",
+        // "case1",
         //"case1N4",
         //"case2",
         // "case3",
-        //"case3_no_blockages",
+        "case3_no_blockages",
         // "case3_no_extra_demand"
     };
 

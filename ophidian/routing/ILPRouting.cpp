@@ -38,7 +38,7 @@ namespace ophidian::routing {
         add_candidate_constraints(nets, model);
 
         if(DEBUG) std::cout << "add capacity constraints" << std::endl;
-        // add_capacity_constraints(nets, model);
+         add_capacity_constraints(nets, model);
 
         std::cout << "Print variables values" << std::endl;
         for(auto route_it = m_route_candidate.begin(); route_it != m_route_candidate.end(); route_it++)
@@ -825,8 +825,26 @@ namespace ophidian::routing {
                 model.addConstr(candidates_constraints == cell_initial_var);
             }*/
 
+            std::unordered_map<std::string, GRBLinExpr> cell_candidate_expressions;
             auto position_candidates = m_cell_position_candidates.parts(cell);
-            for(auto pos_candidate : position_candidates)
+            for(auto pos_candidate : position_candidates) {
+                auto routes = m_position_candidate_to_routes.parts(pos_candidate);
+                for(auto route : routes)
+                {
+                    auto candidate_variable = m_route_candidate_variables[route];
+                    auto variable_name = m_route_candidate_names[route];
+                    std::vector<std::string> strs;
+                    boost::split(strs, variable_name, boost::is_any_of("_"));
+                    auto net_name = strs.at(0);
+                    cell_candidate_expressions[net_name] += candidate_variable;
+                }
+                auto cell_position_variable = m_position_candidate_variables[pos_candidate];
+                for (auto expression_pair_it = cell_candidate_expressions.begin(); expression_pair_it != cell_candidate_expressions.end(); expression_pair_it++) {
+                    auto expression = expression_pair_it->second;
+                    model.addConstr(expression == cell_position_variable);
+                }
+            }
+            /*for(auto pos_candidate : position_candidates)
             {
                 GRBLinExpr candidates_constraints = 0.0;
                 auto cell_position_variable = m_position_candidate_variables[pos_candidate];
@@ -837,7 +855,7 @@ namespace ophidian::routing {
                     candidates_constraints += candidate_variable;
                 }
                 model.addConstr(candidates_constraints == cell_position_variable);
-            }
+            }*/
         }
 
         // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
@@ -1010,9 +1028,6 @@ namespace ophidian::routing {
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
 
-            auto cell_name = netlist.name(cell);
-            std::cout << "cell " << cell_name << std::endl;
-
             auto candidates = m_cell_position_candidates.parts(cell);
             for (auto candidate : candidates) {
                 auto candidate_variable = m_position_candidate_variables[candidate];
@@ -1020,8 +1035,6 @@ namespace ophidian::routing {
                 if (value) {
                     auto location = m_position_candidate_position[candidate];
                     movements.push_back({cell, location});                    
-
-                    std::cout << "location " << location.x().value() << ", " << location.y().value() << std::endl;
                 }
             }
         }
