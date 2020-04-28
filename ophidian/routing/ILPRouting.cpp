@@ -1009,6 +1009,21 @@ namespace ophidian::routing {
         auto & netlist = m_design.netlist();
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
+
+            auto cell_name = netlist.name(cell);
+            std::cout << "cell " << cell_name << std::endl;
+
+            auto candidates = m_cell_position_candidates.parts(cell);
+            for (auto candidate : candidates) {
+                auto candidate_variable = m_position_candidate_variables[candidate];
+                auto value = candidate_variable.get(GRB_DoubleAttr_X);
+                if (value) {
+                    auto location = m_position_candidate_position[candidate];
+                    movements.push_back({cell, location});                    
+
+                    std::cout << "location " << location.x().value() << ", " << location.y().value() << std::endl;
+                }
+            }
         }
     }
 

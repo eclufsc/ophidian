@@ -83,7 +83,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::cout << "result " << result << std::endl;
 
     if(result){
-        iccad_output_writer.write_ICCAD_2020_output();
+        iccad_output_writer.write_ICCAD_2020_output("", movements);
     }
 
     auto & global_routing = design.global_routing();
@@ -101,8 +101,8 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-        // "case1",
-        "case1N4",
+         "case1",
+        //"case1N4",
         //"case2",
         // "case3",
         //"case3_no_blockages",
