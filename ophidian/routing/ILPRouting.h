@@ -71,7 +71,7 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            bool route_nets(const std::vector<net_type> & nets);
+            bool route_nets(const std::vector<net_type> & nets, std::vector<std::pair<cell_type, point_type>> & movements);
 
         private:
             void update_gcell_capacities();
@@ -107,6 +107,8 @@ namespace ophidian::routing {
 	        void write_gcell_capacities();
 
 	        void write_segments(const std::vector<net_type> & nets);
+
+            void save_movements(std::vector<std::pair<cell_type, point_type>> & movements);
 
     	    void save_result();
 

@@ -77,9 +77,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
 
-    
+    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets);
+    auto result = ilpRouting.route_nets(nets, movements);
     std::cout << "result " << result << std::endl;
 
     if(result){
@@ -109,7 +109,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         // "case3_no_extra_demand"
     };
 
-    std::string benchmarks_path = "./input_files/iccad20/";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
@@ -171,9 +171,10 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
 
 
     std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
+    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets);
+    auto result = ilpRouting.route_nets(nets, movements);
     std::cout << "result " << result << std::endl;
 
     if(result){
