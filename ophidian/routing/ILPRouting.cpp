@@ -38,18 +38,7 @@ namespace ophidian::routing {
         add_candidate_constraints(nets, model);
 
         if(DEBUG) std::cout << "add capacity constraints" << std::endl;
-        // add_capacity_constraints(nets, model);
-
-        std::cout << "Print variables values" << std::endl;
-        for(auto route_it = m_route_candidate.begin(); route_it != m_route_candidate.end(); route_it++)
-        {
-            auto route = *route_it;
-            auto name = m_route_candidate_names[route];
-            auto var = m_route_candidate_variables[route];
-            auto wirelength = m_route_candidate_wirelengths[route].value();
-            // auto var_str = var.get(GRB_StringAttr_VarName);
-            std::cout << name << " " << wirelength << std::endl;
-        }
+        add_capacity_constraints(nets, model);
 
         if(DEBUG) std::cout << "write model" << std::endl;
         model.write("ilp_routing_model.lp");
@@ -569,8 +558,16 @@ namespace ophidian::routing {
             pos_candidate_str = "_" + m_position_candidate_names[pos_candidate];
         for(auto candidate_index = 0; candidate_index < number_of_candidates; candidate_index++)
         {
-            auto candidate = m_route_candidate.add();
             auto variable_name = net_name + "_" + horizontal_layer_name + "_" + vertical_layer_name + "_" + std::to_string(candidate_index) + pos_candidate_str;
+
+            while(m_name_to_route_candidate.count(variable_name)>0)
+            {
+                number_of_candidates ++;
+                candidate_index ++;
+                variable_name = net_name + "_" + horizontal_layer_name + "_" + vertical_layer_name + "_" + std::to_string(candidate_index) + pos_candidate_str;
+            }
+
+            auto candidate = m_route_candidate.add();
             //std::cout << "variable " << variable_name << std::endl;
             auto variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
             m_route_candidate_names[candidate] = variable_name;
@@ -825,8 +822,26 @@ namespace ophidian::routing {
                 model.addConstr(candidates_constraints == cell_initial_var);
             }*/
 
+            std::unordered_map<std::string, GRBLinExpr> cell_candidate_expressions;
             auto position_candidates = m_cell_position_candidates.parts(cell);
-            for(auto pos_candidate : position_candidates)
+            for(auto pos_candidate : position_candidates) {
+                auto routes = m_position_candidate_to_routes.parts(pos_candidate);
+                for(auto route : routes)
+                {
+                    auto candidate_variable = m_route_candidate_variables[route];
+                    auto variable_name = m_route_candidate_names[route];
+                    std::vector<std::string> strs;
+                    boost::split(strs, variable_name, boost::is_any_of("_"));
+                    auto net_name = strs.at(0);
+                    cell_candidate_expressions[net_name] += candidate_variable;
+                }
+                auto cell_position_variable = m_position_candidate_variables[pos_candidate];
+                for (auto expression_pair_it = cell_candidate_expressions.begin(); expression_pair_it != cell_candidate_expressions.end(); expression_pair_it++) {
+                    auto expression = expression_pair_it->second;
+                    model.addConstr(expression == cell_position_variable);
+                }
+            }
+            /*for(auto pos_candidate : position_candidates)
             {
                 GRBLinExpr candidates_constraints = 0.0;
                 auto cell_position_variable = m_position_candidate_variables[pos_candidate];
@@ -837,7 +852,7 @@ namespace ophidian::routing {
                     candidates_constraints += candidate_variable;
                 }
                 model.addConstr(candidates_constraints == cell_position_variable);
-            }
+            }*/
         }
 
         // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
@@ -1017,8 +1032,6 @@ namespace ophidian::routing {
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
                     movements.push_back(std::make_pair(cell, position));
-
-                    std::cout << "location " << position.x().value() << ", " << position.y().value() << std::endl;
                 }
             }
         }
