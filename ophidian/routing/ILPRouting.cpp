@@ -123,13 +123,16 @@ namespace ophidian::routing {
         auto gcell_graph = global_routing.gcell_graph();
 
         //copy the blockageDenamd to ILP propoerty!
-        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
-            auto gcell = *gcell_it;
-            auto blockage_demand = gcell_graph->blockage_demand(gcell);
-            m_gcells_demand[gcell] = blockage_demand;
-        }
 
-        // here we have to update the demand od nets with won't be routed in this execution!
+        // TODO: here we have to update the demand od cells with won't be replaced in this execution!
+
+        // for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+        //     auto gcell = *gcell_it;
+        //     auto blockage_demand = gcell_graph->blockage_demand(gcell);
+        //     m_gcells_demand[gcell] = blockage_demand;
+        // }
+
+        // TODO: here we have to update the demand od nets with won't be routed in this execution!
 
     }
 
@@ -194,112 +197,6 @@ namespace ophidian::routing {
         }
 
         generate_routes_of_net(net, position_candidate_type(), model);
-        // auto net_pins = netlist.pins(net);
-        // std::vector<interconnection::Flute::Point> net_points;
-        // net_points.reserve(net_pins.size());
-        // std::map<std::pair<double, double>, pin_container_type> net_points_map;
-        // for(auto pin : net_pins)
-        // {
-        //     auto pin_name = netlist.name(pin);
-        //     auto pin_location = placement.location(pin);
-        //     //std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
-        //     net_points.push_back(pin_location);
-        //     auto point = std::make_pair(pin_location.x().value(), pin_location.y().value());
-        //     auto std_pin = netlist.std_cell_pin(pin);
-        //     net_points_map[point].push_back(std_pin);
-        // }
-
-        // auto & flute = interconnection::Flute::instance();
-        // auto tree = flute.create(net_points);
-
-        // auto number_of_segments = tree->size(interconnection::SteinerTree::Segment());
-        // std::set<std::pair<unit_type, unit_type>> net_steiner_points;
-        // if(number_of_segments == 0)
-        // {
-        //     // this happens when all pins are in the same gcell
-        //     auto segment = m_segments.add();
-        //     auto point = net_points.at(0);
-        //     m_segment_starts[segment] = point;
-        //     m_segment_ends[segment] = point;
-        //     auto point_pair = std::make_pair(point.x().value(), point.y().value());
-        //     m_segment_start_pin[segment] = net_points_map.at(point_pair);
-        //     m_segment_end_pin[segment] = net_points_map.at(point_pair);
-        //     m_net_segments.addAssociation(net, segment);
-        // }
-        // else
-        // {
-      	//     for(auto tree_segment_it = tree->segments().first; tree_segment_it != tree->segments().second; ++tree_segment_it)
-        //     {
-        //         auto tree_segment = *tree_segment_it;
-        //         auto segment = m_segments.add();
-        //         auto segment_start = tree->position(tree->u(tree_segment));
-        //         auto segment_end = tree->position(tree->v(tree_segment));
-
-        //         m_segment_starts[segment] = segment_start;
-        //         m_segment_ends[segment] = segment_end;
-
-        //         auto point = std::make_pair(segment_start.x().value(), segment_start.y().value());
-        //         if(net_points_map.count(point))
-        //         {
-        //             m_segment_start_pin[segment] = net_points_map.at(point);
-        //         }
-        //         else
-        //         {
-        //             net_steiner_points.insert(std::make_pair(segment_start.x(), segment_start.y()));
-        //         }
-        //         point = std::make_pair(segment_end.x().value(), segment_end.y().value());
-        //         if(net_points_map.count(point))
-        //         {
-        //             m_segment_end_pin[segment] = net_points_map.at(point);
-        //         }else
-        //         {
-        //             net_steiner_points.insert(std::make_pair(segment_end.x(), segment_end.y()));
-        //         }
-        //         m_net_segments.addAssociation(net, segment);
-	    //     }
-        // }
-
-    	// std::vector<layer_type> horizontal_layers;
-	    // std::vector<layer_type> vertical_layers;
-    	// for(auto layer_it = m_design.routing_library().begin_layer(); layer_it != m_design.routing_library().end_layer(); layer_it++)
-        // {
-	    //     auto layer = *layer_it;
-        //     auto layer_name = m_design.routing_library().name(layer);
-    	//     auto layer_direction = m_design.routing_library().direction(layer);
-	    //     if(layer_direction == layer_direction_type::HORIZONTAL)
-        //     {
-        // 		horizontal_layers.push_back(layer);
-    	//     }
-	    //     if(layer_direction == layer_direction_type::VERTICAL)
-        //     {
-        // 		vertical_layers.push_back(layer);
-    	//     }
-    	// }
-
-    	// auto large_net = net_points.size() > 5;
-        // auto min_layer = routing_constraints.min_net_layer(net);
-        // auto min_layer_index = m_design.routing_library().layerIndex(min_layer);
-    	// for(auto horizontal_layer : horizontal_layers)
-        // {
-        //     auto horizontal_layer_index = m_design.routing_library().layerIndex(horizontal_layer);
-        //     if(horizontal_layer_index < min_layer_index)
-        //     {
-        //         continue;
-        //     }
-	    // for(auto vertical_layer : vertical_layers)
-        //     {
-        //         auto vertical_layer_index = m_design.routing_library().layerIndex(vertical_layer);
-        //         if(vertical_layer_index < min_layer_index)
-        //         {
-        //             continue;
-        //         }
-        //         if(std::abs(horizontal_layer_index - vertical_layer_index) > 1)
-        //         {
-        //             continue;
-        //         }
-        //     	create_net_candidates_in_layers(net, horizontal_layer, vertical_layer, large_net, net_steiner_points, model);
-    	//     }
-	    // }
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model)
@@ -529,8 +426,6 @@ namespace ophidian::routing {
         auto horizontal_layer_name = m_design.routing_library().name(horizontal_layer);
         auto vertical_layer_name = m_design.routing_library().name(vertical_layer);
 
-        //std::cout << "creating candidates for net " << net_name << " in layers " << horizontal_layer_name << " and " << vertical_layer_name << std::endl;
-
         unsigned number_of_candidates = 1;
     	if(large_net)
         {
@@ -548,8 +443,6 @@ namespace ophidian::routing {
                 }
             }
     	}
-
-        //std::cout << "number of candidates " << number_of_candidates << std::endl;
 
         std::vector<route_candidate_type> candidates;
         candidates.reserve(number_of_candidates);
@@ -899,6 +792,31 @@ namespace ophidian::routing {
     {
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
+        auto & netlist = m_design.netlist();
+        auto & routing_library = m_design.routing_library();
+        
+        entity_system::Property<gcell_type, GRBLinExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<GRBLinExpr>()};
+        
+        for(auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++)
+        {
+            auto candidate = *candidate_it;
+            auto variable = m_position_candidate_variables[candidate];
+            auto position = m_position_candidate_position[candidate];
+
+            auto cell = m_position_candidate_cell[candidate];
+            auto std_cell = netlist.std_cell(cell);
+            auto blockages = routing_library.blockages(std_cell);
+            for(auto blockage : blockages)
+            {
+                auto layer = routing_library.layer(blockage);
+                auto layer_index = routing_library.layerIndex(layer);
+                auto gcell = gcell_graph->nearest_gcell(position, layer_index-1);
+                auto demand = routing_library.demand(blockage);
+
+                gcells_constraints[gcell] += demand * variable;
+            }
+        }
+
 
         std::unordered_map<std::string, std::unordered_map<gcell_type, std::unordered_set<route_candidate_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash>> gcell_nets;
         for(auto net : nets)
@@ -908,13 +826,14 @@ namespace ophidian::routing {
             auto candidates = m_net_candidates.parts(net);
             for(auto candidate : candidates)
             {
+
                 auto wires = m_route_candidate_wires[candidate];
                 for(auto wire : wires)
                 {
                     auto start_layer = m_wire_start_layers[wire];
                     auto end_layer = m_wire_end_layers[wire];
-                    auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
-                    auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
+                    auto start_layer_index = routing_library.layerIndex(start_layer);
+                    auto end_layer_index = routing_library.layerIndex(end_layer);
                     auto min_layer_index = std::min(start_layer_index, end_layer_index);
                     auto max_layer_index = std::max(start_layer_index, end_layer_index);
 
@@ -943,6 +862,7 @@ namespace ophidian::routing {
                 }
             }
         }
+
         for(auto layer_pair : gcell_nets)
         {
             auto layer_name = layer_pair.first;
@@ -962,11 +882,24 @@ namespace ophidian::routing {
                         auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
                     }
-                    auto capacity = gcell_graph->capacity(gcell);
-                    auto demand = m_gcells_demand[gcell];
-                    auto constraint_name = std::to_string((int)gcell_min_corner.y().value()) + "_" + std::to_string((int)gcell_min_corner.x().value()) + "_" + std::to_string(layer_index);
-                    model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
+                    gcells_constraints[gcell] += gcell_constraint;
                 }
+            }
+        }
+
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+
+            auto node = gcell_graph->graph_node(gcell);
+            auto location = gcell_graph->position(node);
+
+            auto gcell_constraint = gcells_constraints[gcell];
+            if(gcell_constraint.size() > 0 )
+            {
+                auto capacity = gcell_graph->capacity(gcell);
+                auto demand = m_gcells_demand[gcell];
+                auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
+                model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
             }
         }
     }
