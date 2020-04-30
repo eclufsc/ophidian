@@ -104,6 +104,8 @@ namespace ophidian::routing {
 
             void add_capacity_constraints(const std::vector<net_type> & nets, GRBModel & model);
 
+            void add_movements_constraints(GRBModel & model);
+
 	        void write_gcell_capacities();
 
 	        void write_segments(const std::vector<net_type> & nets);

@@ -40,6 +40,9 @@ namespace ophidian::routing {
         if(DEBUG) std::cout << "add capacity constraints" << std::endl;
         add_capacity_constraints(nets, model);
 
+        if(DEBUG) std::cout << "add movements constraints" << std::endl;
+        add_movements_constraints(model);
+
         if(DEBUG) std::cout << "write model" << std::endl;
         model.write("ilp_routing_model.lp");
 
@@ -1013,5 +1016,18 @@ namespace ophidian::routing {
             m_cell_initial_candidate[cell] = initial_candidate;
         }
 
+    }
+
+    void ILPRouting::add_movements_constraints(GRBModel & model){
+        auto max_movemnts = m_design.routing_constraints().max_cell_movement();
+        GRBLinExpr candicates = 0.0;
+        for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {
+            auto candidate = *candidate_it;        
+            auto name = m_position_candidate_names[candidate];
+            if (name.find("initial") == std::string::npos) {
+                candicates += m_position_candidate_variables[candidate];
+            }
+        }
+        model.addConstr(candicates <= max_movemnts, "max_movements");
     }
 }
