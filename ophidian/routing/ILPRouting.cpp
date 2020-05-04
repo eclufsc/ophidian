@@ -206,6 +206,8 @@ namespace ophidian::routing {
     {
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
+
+        auto candidate_type =  candidate_origin_type::TWO_PIN_NET;
         for(auto net : nets)
         {
             auto size = m_design.netlist().pins(net).size();
@@ -236,7 +238,6 @@ namespace ophidian::routing {
                 auto net = netlist.net(pin);
                 nets_of_cell_b.push_back(net);
             }
-
             // WARNING!!
             // using possition insteag GCEll
             // Will NOT WORK with ICCAD2019 circuits!!
@@ -244,10 +245,10 @@ namespace ophidian::routing {
             if(cell_a_pos.x() == cell_b_pos.x() || cell_a_pos.y() == cell_b_pos.y()){
                 //same collum or same row
                 if(!cell_b_fixed)
-                    create_movement_candidate(cell_b, cell_a_pos, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
+                    create_movement_candidate(cell_b, candidate_type, cell_a_pos, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
                 
                 if(!cell_a_fixed)        
-                    create_movement_candidate(cell_a, cell_b_pos, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
+                    create_movement_candidate(cell_a, candidate_type, cell_b_pos, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
 
             }else if (cell_a_pos.x() != cell_b_pos.x() && cell_a_pos.y() != cell_b_pos.y()){
                 // different row and column
@@ -256,27 +257,27 @@ namespace ophidian::routing {
                 if(!cell_b_fixed){
                     //change B to A's row
                     new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
-                    create_movement_candidate(cell_b, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
+                    create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
 
                     //change B to A's column
                     new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
-                    create_movement_candidate(cell_b, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_column_" + net_name, model);
+                    create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_column_" + net_name, model);
                 }
 
                 if(!cell_a_fixed){
                     //change A to B's row
                     new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
-                    create_movement_candidate(cell_a, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
+                    create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
 
                     //change A to B's column
                     new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
-                    create_movement_candidate(cell_a, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_column_" + net_name, model);
+                    create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_column_" + net_name, model);
                 }
             }
         }
     }
 
-    void ILPRouting::create_movement_candidate(const cell_type & cell, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model )
+    void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model )
     {
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
@@ -287,7 +288,7 @@ namespace ophidian::routing {
         m_position_candidate_variables[candidate] = candidate_variable;
         m_position_candidate_position[candidate] = new_position;
         m_cell_position_candidates.addAssociation(cell, candidate);
-        // m_candidate_wirelengths[candidate] = evaluate_candidate_wirelengths(cell, new_position, nets);
+        m_position_candidate_origin[candidate] = type;
 
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
@@ -1012,7 +1013,7 @@ namespace ophidian::routing {
             m_name_to_position_candidate[initial_variable_name] = initial_candidate;
             m_position_candidate_variables[initial_candidate] = initial_variable;
             m_position_candidate_position[initial_candidate] = m_design.placement().location(cell);
-            // m_candidate_wirelengths[initial_candidate] = evaluate_candidate_wirelengths(cell, m_candidate_position[initial_candidate], cell_nets);
+            m_position_candidate_origin[initial_candidate] = candidate_origin_type::INITIAL;
             m_cell_initial_candidate[cell] = initial_candidate;
         }
 
