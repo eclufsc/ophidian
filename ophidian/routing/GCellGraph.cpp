@@ -137,6 +137,27 @@ GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
     return m_gcell_box[std::make_pair(x,y)];
 }
 
+GCellGraph::point_type GCellGraph::center_of_box(const GCellGraph::gcell_type& gcell)
+{
+    box_type gbox = box(gcell);
+    // std::pair<unit_type, unit_type> min{std::numeric_limits<unit_type>::max(), std::numeric_limits<unit_type>::max()};
+    // std::pair<unit_type, unit_type> max{std::numeric_limits<unit_type>::min(), std::numeric_limits<unit_type>::min()};
+
+    // min.first = std::min(gbox.min_corner().x(), gbox.max_corner().x());
+    // min.second = std::min(gbox.min_corner().y(), gbox.max_corner().y());
+    // max.first = std::max(gbox.min_corner().x(), gbox.max_corner().x());
+    // max.second = std::max(gbox.min_corner().y(), gbox.max_corner().y());
+
+    auto min_x = gbox.min_corner().x();
+    auto min_y = gbox.min_corner().y();
+    auto max_x = gbox.max_corner().x();
+    auto max_y = gbox.max_corner().y();
+
+    // return point_type{ min.first + ((max.first - min.first)/2), min.second + ((max.second - min.second) / 2) };
+    return point_type{ min_x + ((min_x+max_x)/2) , min_y + ((min_y+max_y)/2) };
+    // return point_type();
+}
+
 GCellGraph::node_type GCellGraph::graph_node(const GCellGraph::gcell_type gcell) const
 {
     return m_gcell_node[gcell];

@@ -57,31 +57,6 @@ namespace ophidian::routing {
             if(DEBUG) std::cout << "write solution" << std::endl;
             model.write("ilp_routing_model.sol");
 
-            std::vector<std::string> layers = {"Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "Metal6", "Metal7", "Metal8", "Metal9"};
-            std::unordered_map<std::string, unsigned> count;
-            for(auto candidate : m_route_candidate)
-            {
-                auto variable = m_route_candidate_variables[candidate];
-                auto value = variable.get(GRB_DoubleAttr_X);
-                auto name = variable.get(GRB_StringAttr_VarName);
-                if(value == 1)
-                {
-                    for(auto layer_name : layers)
-                    {
-                        if(name.find(layer_name) != std::string::npos)
-                        {
-                            count[layer_name] += 1;
-                        }
-                    }
-                }
-            }
-
-            /*
-            for(auto layer_name : layers)
-            {
-                std::cout << "layer " << layer_name << " count " << count[layer_name] << std::endl;
-            }
-            */
 
 	        unsigned routed_segments = 0;
     	    unsigned unrouted_segments = 0;
@@ -204,75 +179,166 @@ namespace ophidian::routing {
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model)
     {
-        auto& netlist = m_design.netlist();
-        auto& placement = m_design.placement();
-
-        auto candidate_type =  candidate_origin_type::TWO_PIN_NET;
+        auto & netlist = m_design.netlist();
+        auto & placement = m_design.placement();
         for(auto net : nets)
         {
-            auto size = m_design.netlist().pins(net).size();
-            if(size != 2)
-                continue;
+            auto size = netlist.pins(net).size();
+            if(size == 2)
+                create_2_pin_nets_candidates_with_movements(net, model);
+        }
+        // for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
+        //     auto cell = *cell_it;
+        //     if( !placement.isFixed(cell))
+        //     {
+        //         create_center_of_mass_candidate(cell, model);
+        //         create_median_candidate(cell, model);
+        //     }
+        // }
+    }
 
-            auto net_name = netlist.name(net);
-            std::vector<ophidian::circuit::PinInstance> pins (netlist.pins(net).begin(), netlist.pins(net).end());
-
-            auto pin_a = pins[0];
-            auto cell_a = netlist.cell(pin_a);
-            auto cell_a_name = netlist.name(cell_a);
-            auto cell_a_pos = placement.location(cell_a);
-            auto cell_a_fixed = placement.isFixed(cell_a);
-            std::vector<net_type> nets_of_cell_a;
-            for(auto pin : netlist.pins(cell_a)){
-                auto net = netlist.net(pin);
-                nets_of_cell_a.push_back(net);
+    void ILPRouting::create_center_of_mass_candidate(const cell_type cell, GRBModel & model){
+        auto & netlist = m_design.netlist();
+        auto & placement = m_design.placement();
+        std::vector<net_type> cell_nets;
+        std::vector<point_type> positions;
+        for(auto pin : netlist.pins(cell)){
+            auto net = netlist.net(pin);
+            cell_nets.push_back(net);
+            for(auto net_pin : netlist.pins(net)){
+                if(net_pin == pin)
+                    continue;
+                auto location = placement.location(net_pin);
+                positions.push_back(location);
             }
+        }
+        double sum_x = 0.0;
+        double sum_y = 0.0;
+        for(auto position : positions){
+            sum_x += position.x().value();
+            sum_y += position.y().value();
+        }
+        double new_x = sum_x / positions.size();
+        double new_y = sum_x / positions.size();
+
+        point_type center_mass {unit_type(new_x), unit_type(new_y)};
+        
+        auto nearst_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(center_mass, 0);
+
+        auto cell_location = placement.location(cell);
+        auto actual_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+
+        if(actual_gcell != nearst_gcell){
+            auto center_gcell = m_design.global_routing().gcell_graph()->center_of_box(nearst_gcell);
+            // creating candidate
+            auto cell_name = netlist.name(cell);
+            create_movement_candidate(cell, candidate_origin_type::CENTER_OF_MASS, center_gcell, cell_nets, cell_name + "_center_mass", model);
+        }
+    }
+
+    void ILPRouting::create_median_candidate(const cell_type cell, GRBModel & model){
+        auto & netlist = m_design.netlist();
+        auto & placement = m_design.placement();
+        std::vector<net_type> cell_nets;
+        
+        std::vector<double> x_positions;
+        std::vector<double> y_positions;
+
+        for(auto pin : netlist.pins(cell)){
+            auto net = netlist.net(pin);
+            cell_nets.push_back(net);
+            for(auto net_pin : netlist.pins(net)){
+                if(net_pin == pin)
+                    continue;
+                auto location = placement.location(net_pin);
+                x_positions.push_back(location.x().value());
+                y_positions.push_back(location.y().value());
+            }
+        }
+
+        std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
+        auto median_x = x_positions[x_positions.size()/2];
+        std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
+        auto median_y = y_positions[y_positions.size()/2];
+
+        point_type median_point {unit_type(median_x), unit_type(median_y)};
+        
+        auto nearst_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
+
+        auto cell_location = placement.location(cell);
+        auto actual_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+
+        if(actual_gcell != nearst_gcell){
+            auto center_gcell = m_design.global_routing().gcell_graph()->center_of_box(nearst_gcell);
+            // creating candidate
+            auto cell_name = netlist.name(cell);
+            create_movement_candidate(cell, candidate_origin_type::MEDIAN, center_gcell, cell_nets, cell_name + "_median", model);
+        }
+    }
+
+    void ILPRouting::create_2_pin_nets_candidates_with_movements(const net_type net, GRBModel & model){
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+        auto candidate_type =  candidate_origin_type::TWO_PIN_NET;
+
+        auto net_name = netlist.name(net);
+        std::vector<ophidian::circuit::PinInstance> pins (netlist.pins(net).begin(), netlist.pins(net).end());
+
+        auto pin_a = pins[0];
+        auto cell_a = netlist.cell(pin_a);
+        auto cell_a_name = netlist.name(cell_a);
+        auto cell_a_pos = placement.location(cell_a);
+        auto cell_a_fixed = placement.isFixed(cell_a);
+        std::vector<net_type> nets_of_cell_a;
+        for(auto pin : netlist.pins(cell_a)){
+            auto net = netlist.net(pin);
+            nets_of_cell_a.push_back(net);
+        }
+        
+        auto pin_b = pins[1];
+        auto cell_b = netlist.cell(pin_b);
+        auto cell_b_name = netlist.name(cell_b);
+        auto cell_b_pos = placement.location(cell_b);
+        auto cell_b_fixed = placement.isFixed(cell_b);
+        std::vector<net_type> nets_of_cell_b;
+        for(auto pin : netlist.pins(cell_b)){
+            auto net = netlist.net(pin);
+            nets_of_cell_b.push_back(net);
+        }
+        // WARNING!!
+        // using possition insteag GCEll
+        // Will NOT WORK with ICCAD2019 circuits!!
+        unit_type candidate_wirelength;
+        if(cell_a_pos.x() == cell_b_pos.x() || cell_a_pos.y() == cell_b_pos.y()){
+            //same collum or same row
+            if(!cell_b_fixed)
+                create_movement_candidate(cell_b, candidate_type, cell_a_pos, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
             
-            auto pin_b = pins[1];
-            auto cell_b = netlist.cell(pin_b);
-            auto cell_b_name = netlist.name(cell_b);
-            auto cell_b_pos = placement.location(cell_b);
-            auto cell_b_fixed = placement.isFixed(cell_b);
-            std::vector<net_type> nets_of_cell_b;
-            for(auto pin : netlist.pins(cell_b)){
-                auto net = netlist.net(pin);
-                nets_of_cell_b.push_back(net);
+            if(!cell_a_fixed)        
+                create_movement_candidate(cell_a, candidate_type, cell_b_pos, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
+
+        }else if (cell_a_pos.x() != cell_b_pos.x() && cell_a_pos.y() != cell_b_pos.y()){
+            // different row and column
+            point_type new_position;
+
+            if(!cell_b_fixed){
+                //change B to A's row
+                new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
+                create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
+
+                //change B to A's column
+                new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
+                create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_column_" + net_name, model);
             }
-            // WARNING!!
-            // using possition insteag GCEll
-            // Will NOT WORK with ICCAD2019 circuits!!
-            unit_type candidate_wirelength;
-            if(cell_a_pos.x() == cell_b_pos.x() || cell_a_pos.y() == cell_b_pos.y()){
-                //same collum or same row
-                if(!cell_b_fixed)
-                    create_movement_candidate(cell_b, candidate_type, cell_a_pos, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
-                
-                if(!cell_a_fixed)        
-                    create_movement_candidate(cell_a, candidate_type, cell_b_pos, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
 
-            }else if (cell_a_pos.x() != cell_b_pos.x() && cell_a_pos.y() != cell_b_pos.y()){
-                // different row and column
-                point_type new_position;
+            if(!cell_a_fixed){
+                //change A to B's row
+                new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
+                create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
 
-                if(!cell_b_fixed){
-                    //change B to A's row
-                    new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
-                    create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_row_" + net_name, model);
-
-                    //change B to A's column
-                    new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
-                    create_movement_candidate(cell_b, candidate_type, new_position, nets_of_cell_b, cell_b_name + "_to_" + cell_a_name + "_column_" + net_name, model);
-                }
-
-                if(!cell_a_fixed){
-                    //change A to B's row
-                    new_position = point_type(cell_a_pos.x(), cell_b_pos.y());
-                    create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_row_" + net_name, model);
-
-                    //change A to B's column
-                    new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
-                    create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_column_" + net_name, model);
-                }
+                //change A to B's column
+                new_position = point_type(cell_b_pos.x(), cell_a_pos.y());
+                create_movement_candidate(cell_a, candidate_type, new_position, nets_of_cell_a, cell_a_name + "_to_" + cell_b_name + "_column_" + net_name, model);
             }
         }
     }
@@ -293,15 +359,13 @@ namespace ophidian::routing {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
         auto initial_position = m_design.placement().location(cell);
-        placement.place(cell, new_position);
 
-        //genarate route for every net with new location
+        // place cell in the new position
+        placement.place(cell, new_position);
+        // genarate route for every net with new location
         for(auto net : nets)
             generate_routes_of_net(net, candidate, model);
-
-        //generate contraints?
-
-        //restore position
+        // restore original position
         placement.place(cell, initial_position);
     }
 
@@ -958,6 +1022,11 @@ namespace ophidian::routing {
     }
 
     void ILPRouting::save_movements(std::vector<std::pair<cell_type, point_type>> & movements) {
+        int initial_candidate = 0;
+        int two_pin = 0;
+        int center_of_mass = 0;
+        int median = 0;
+        int na = 0;
         for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {
             auto candidate = *candidate_it;
             auto variable = m_position_candidate_variables[candidate];
@@ -969,9 +1038,37 @@ namespace ophidian::routing {
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
                     movements.push_back(std::make_pair(cell, position));
+                    auto type = m_position_candidate_origin[candidate];
+                    switch (type)
+                    {
+                    case candidate_origin_type::TWO_PIN_NET :
+                        two_pin++;
+                        break;
+                    case candidate_origin_type::CENTER_OF_MASS :
+                        center_of_mass++;
+                        break;
+                    case candidate_origin_type::MEDIAN :
+                        median++;
+                        break;
+                    default:
+                        na++;
+                        break;
+                    }
+
+                }else{
+                    initial_candidate ++;
                 }
             }
         }
+
+        auto sum = initial_candidate + two_pin + center_of_mass + na + median;
+        auto move_sum = two_pin + center_of_mass + median;
+        std::cout<< "Movements Report:" << sum << "\n" <<
+                    "Initial position = " << initial_candidate << "\t" << std::to_string(initial_candidate / sum) << "% \n" <<
+                    "2 pin net = " << two_pin << "\t" << std::to_string(two_pin / sum) << "% \t" << std::to_string(two_pin / move_sum) << "% \n" <<
+                    "Center of mass = " << center_of_mass << "\t" << std::to_string(center_of_mass / sum) << "% \t" << std::to_string(center_of_mass / move_sum) << "% \n" <<
+                    "Median = " << median << "\t" << std::to_string(median / sum) << "% \t" << std::to_string(median / move_sum) << "% \n" <<
+                    "NA" << na << " \t" << std::to_string(na / sum) << "%" << std::endl;
     }
 
     void ILPRouting::save_result()

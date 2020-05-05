@@ -43,7 +43,7 @@ namespace ophidian::routing {
     class ILPRouting {
         public:
             enum PositionCandidateOrigin{
-                NA, INITIAL, TWO_PIN_NET, CENTER_OF_MASS
+                NA, INITIAL, TWO_PIN_NET, CENTER_OF_MASS, MEDIAN
             };
         public:
             using scalar_type               = int;
@@ -86,6 +86,12 @@ namespace ophidian::routing {
             void create_net_candidates(const net_type & net, GRBModel & model);
 
             void create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model);
+
+            void create_center_of_mass_candidate(const cell_type cell, GRBModel & model);
+
+            void create_median_candidate(const cell_type cell, GRBModel & model);
+
+            void create_2_pin_nets_candidates_with_movements(const net_type net, GRBModel & model);
 
             void create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model );
 
