@@ -77,16 +77,20 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
 
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements, true);
+    //fixed_nets.insert(fixed_nets.end(), routed_nets.begin(), routed_nets.end());
+    //result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements, true);
     std::cout << "result " << result << std::endl;
 
     if(result){
         iccad_output_writer.write_ICCAD_2020_output("", movements);
     }
 
-    auto & global_routing = design.global_routing();
+    /*auto & global_routing = design.global_routing();
     int wirelength = 0;
     for(auto net : nets){
         auto gcells = global_routing.gcells(net);
@@ -94,7 +98,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
         wirelength += gcells.size();
         std::cout << "Net: " << net_name << " = " << gcells.size() << std::endl;
     }
-    std::cout << "wirelength : " << wirelength << std::endl;
+    std::cout << "wirelength : " << wirelength << std::endl;*/
    
     //write_statistics_for_circuit(design, circuit_name);
 }
@@ -173,8 +177,11 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
+    
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     std::cout << "result " << result << std::endl;
 
     if(result){

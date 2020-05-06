@@ -12,15 +12,19 @@ namespace ophidian::routing {
     {
     }
 
-    bool ILPRouting::route_nets(const std::vector<net_type> & nets, std::vector<std::pair<cell_type, point_type>> & movements)
+    bool ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
     {
+        m_integer = integer;
+
         m_segments.clear();
+        m_wires.clear();
         m_route_candidate.clear();
+        m_position_candidates.clear();
 
         GRBModel model = GRBModel(m_GRBENv);
 
         if(DEBUG) std::cout << "update capacities from blockages" << std::endl;
-        update_gcell_capacities();
+        update_gcell_capacities(fixed_nets);
 
         if(DEBUG) std::cout << "create all cells initial candidates" << std::endl;
         create_all_cell_initial_candidates(model);
@@ -29,7 +33,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(DEBUG) std::cout << "create all candidates with movements" << std::endl;
-        create_all_candidates_with_movements(nets, model);
+        //create_all_candidates_with_movements(nets, model);
 
         if(DEBUG) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -48,7 +52,7 @@ namespace ophidian::routing {
             auto var = m_route_candidate_variables[route];
             auto wirelength = m_route_candidate_wirelengths[route].value();
             // auto var_str = var.get(GRB_StringAttr_VarName);
-            std::cout << name << " " << wirelength << std::endl;
+            //std::cout << name << " " << wirelength << std::endl;
         }
 
         if(DEBUG) std::cout << "write model" << std::endl;
@@ -116,16 +120,44 @@ namespace ophidian::routing {
 	        if(DEBUG) std::cout << "unrouted segments " << unrouted_segments << std::endl;
     	    if(DEBUG) std::cout << "percentage of routed segments " << percentage << std::endl;
 
-    	    write_segments(nets);
+    	    write_segments(nets, routed_nets);
 
             save_movements(movements);
 
 	        save_result();
-        }
-        return true;
-    }
 
-    void ILPRouting::update_gcell_capacities()
+            // print model slacks
+    	    std::ofstream slacks("slacks.csv", std::ofstream::out);
+            slacks << "constraint,slack" << std::endl;
+            auto constraints = model.getConstrs();
+            for (auto constraint_index = 0; constraint_index < model.get(GRB_IntAttr_NumConstrs); ++constraint_index) {
+                auto constraint = constraints[constraint_index];
+                auto name = constraint.get(GRB_StringAttr_ConstrName);
+                auto slack = constraint.get(GRB_DoubleAttr_Slack);
+
+                slacks << name << "," << slack << std::endl;
+            }
+
+            std::ofstream values("variables.csv", std::ofstream::out);
+            values << "variable,value,object_name" << std::endl;
+            auto variables = model.getVars();
+            for (auto variable_index = 0; variable_index < model.get(GRB_IntAttr_NumVars); ++variable_index) {
+                auto variable = variables[variable_index];
+                auto name = variable.get(GRB_StringAttr_VarName);
+                auto value = variable.get(GRB_DoubleAttr_X);
+                    
+                std::vector<std::string> strs;
+                boost::split(strs, name, boost::is_any_of("_"));
+                auto object_name = strs.at(0);
+
+                values << name << "," << value << "," << object_name << std::endl;
+            }
+
+        }
+        return result;
+        }
+
+    void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
     {
         // auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
@@ -141,7 +173,18 @@ namespace ophidian::routing {
         }
 
         // here we have to update the demand od nets with won't be routed in this execution!
-
+        for (auto net : fixed_nets) {
+            std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
+            for (auto segment : global_routing.segments(net)) {
+                auto gcell_start = global_routing.gcell_start(segment);
+                auto gcell_end = global_routing.gcell_end(segment);
+                gcells.insert(gcell_start);
+                gcells.insert(gcell_end);
+            }
+            for (auto gcell : gcells) {
+                m_gcells_demand[gcell] += 1;
+            }
+        }
     }
 
     void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, GRBModel & model)
@@ -176,7 +219,12 @@ namespace ophidian::routing {
         {
             auto initial_candidate = m_route_candidate.add();
             auto initial_variable_name = net_name + "_initial";
-            auto initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            GRBVar initial_variable;
+            if (m_integer) {
+                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            } else {
+                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
+            }
             m_route_candidate_names[initial_candidate] = initial_variable_name;
             m_name_to_route_candidate[initial_variable_name] = initial_candidate;
             m_route_candidate_variables[initial_candidate] = initial_variable;
@@ -391,7 +439,12 @@ namespace ophidian::routing {
     {
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
-        auto candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
+        GRBVar candidate_variable;
+        if (m_integer) {
+            candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
+        } else {
+            candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, candidate_variable_name);
+        }
         m_position_candidate_names[candidate] = candidate_variable_name;
         m_position_candidate_cell[candidate] = cell;
         m_name_to_position_candidate[candidate_variable_name] = candidate;
@@ -572,7 +625,12 @@ namespace ophidian::routing {
             auto candidate = m_route_candidate.add();
             auto variable_name = net_name + "_" + horizontal_layer_name + "_" + vertical_layer_name + "_" + std::to_string(candidate_index) + pos_candidate_str;
             //std::cout << "variable " << variable_name << std::endl;
-            auto variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
+            GRBVar variable;
+            if (m_integer) {
+                variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
+            } else {                
+                variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, variable_name);
+            }
             m_route_candidate_names[candidate] = variable_name;
             m_name_to_route_candidate[variable_name] = candidate;
             m_route_candidate_variables[candidate] = variable;
@@ -974,7 +1032,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::write_segments(const std::vector<net_type> & nets)
+    void ILPRouting::write_segments(const std::vector<net_type> & nets, std::vector<net_type> & routed_nets)
     {
         auto & global_routing = m_design.global_routing();
         for(auto net : nets)
@@ -988,7 +1046,7 @@ namespace ophidian::routing {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = variable.get(GRB_DoubleAttr_X);
-    	    	if(value)
+    	    	if(value == 1)
                 {
                     routed = 1;
 		            routed_candidate = candidate;
@@ -997,6 +1055,7 @@ namespace ophidian::routing {
             }
             if(routed)
             {
+                routed_nets.push_back(net);
                 //clear possible old routings
                 global_routing.unroute(net);
 
@@ -1013,12 +1072,12 @@ namespace ophidian::routing {
                     auto max_y = std::max(wire_start.y(), wire_end.y());
 
                     auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
-                    global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);
+                    global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);                    
 		        }
     	    }
             else
             {
-                std::cout << "WARNING: net " << net_name << " unrouted" << std::endl;
+                //std::cout << "WARNING: net " << net_name << " unrouted" << std::endl;
             }
          }
     }
@@ -1032,7 +1091,7 @@ namespace ophidian::routing {
             for (auto candidate : candidates) {
                 auto candidate_variable = m_position_candidate_variables[candidate];
                 auto value = candidate_variable.get(GRB_DoubleAttr_X);
-                if (value) {
+                if (value == 1) {
                     auto location = m_position_candidate_position[candidate];
                     movements.push_back({cell, location});                    
                 }
@@ -1073,7 +1132,12 @@ namespace ophidian::routing {
             //initial position
             auto initial_candidate = m_position_candidates.add();
             auto initial_variable_name = cell_name + "_initial";
-            auto initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            GRBVar initial_variable;
+            if (m_integer) {
+                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            } else {
+                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
+            }
             m_position_candidate_names[initial_candidate] = initial_variable_name;
             m_position_candidate_cell[initial_candidate] = cell;
             m_name_to_position_candidate[initial_variable_name] = initial_candidate;
