@@ -154,7 +154,7 @@ GCellGraph::point_type GCellGraph::center_of_box(const GCellGraph::gcell_type& g
     auto max_y = gbox.max_corner().y();
 
     // return point_type{ min.first + ((max.first - min.first)/2), min.second + ((max.second - min.second) / 2) };
-    return point_type{ min_x + ((min_x+max_x)/2) , min_y + ((min_y+max_y)/2) };
+    return point_type{ (min_x+max_x)/2 , (min_y+max_y)/2 };
     // return point_type();
 }
 

@@ -76,10 +76,10 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            bool route_nets(const std::vector<net_type> & nets, std::vector<std::pair<cell_type, point_type>> & movements);
+            bool route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer = true);
 
         private:
-            void update_gcell_capacities();
+            void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
 
             void create_all_candidates(const std::vector<net_type> & nets, GRBModel & model);
 
@@ -119,7 +119,7 @@ namespace ophidian::routing {
 
 	        void write_gcell_capacities();
 
-	        void write_segments(const std::vector<net_type> & nets);
+	        void write_segments(const std::vector<net_type> & nets, std::vector<net_type> & routed_nets);
 
             void save_movements(std::vector<std::pair<cell_type, point_type>> & movements);
 
@@ -173,6 +173,8 @@ namespace ophidian::routing {
             std::unordered_map<std::string, position_candidate_type>        m_name_to_position_candidate;
             entity_system::Property<cell_type, position_candidate_type>     m_cell_initial_candidate{m_design.netlist().make_property_cell_instance<position_candidate_type>()};
             entity_system::Aggregation<cell_type, position_candidate_type>  m_cell_position_candidates{m_design.netlist().make_aggregation_cell<position_candidate_type>(m_position_candidates)};
+
+            bool m_integer;
     };
 }
 
