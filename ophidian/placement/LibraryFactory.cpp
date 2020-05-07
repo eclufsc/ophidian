@@ -44,15 +44,45 @@ namespace ophidian::placement::factory
             {
                 auto stdPin = stdCells.find_pin(macro.name() + ":" + pin.name());
 
+                library.geometry(stdPin) = Library::std_pin_geometry_type();
+
                 for(const auto& port : pin.ports())
                 {
+                    auto layer_name = port.first;
+                    
+                    geometry::CellGeometry::unit_type sum_x{0};
+                    geometry::CellGeometry::unit_type sum_y{0};
+                    double cont = 0.0;
+
                     for(const auto& rect : port.second)
                     {
-                        library.offset(stdPin) = Library::offset_type{
-                            0.5 * (dbu_converter.convert(rect.min_corner().x()) + dbu_converter.convert(rect.max_corner().x())),
-                            0.5 * (dbu_converter.convert(rect.min_corner().y()) + dbu_converter.convert(rect.max_corner().y())),
-                        };
+                        // library.offset(stdPin) = Library::offset_type{
+                        //     0.5 * (dbu_converter.convert(rect.min_corner().x()) + dbu_converter.convert(rect.max_corner().x())),
+                        //     0.5 * (dbu_converter.convert(rect.min_corner().y()) + dbu_converter.convert(rect.max_corner().y())),
+                        // };
+
+                        auto min_x = dbu_converter.convert(std::min( rect.min_corner().x(), rect.max_corner().x() ));
+                        auto min_y = dbu_converter.convert(std::min( rect.min_corner().y(), rect.max_corner().y() ));
+                        auto max_x = dbu_converter.convert(std::max( rect.min_corner().x(), rect.max_corner().x() ));
+                        auto max_y = dbu_converter.convert(std::max( rect.min_corner().y(), rect.max_corner().y() ));
+
+                        sum_x += min_x + max_x;
+                        sum_y += min_y + max_y;
+                        cont ++;
+
+                        auto min_corner = geometry::CellGeometry::point_type{ min_x, min_y };
+                        auto max_corner = geometry::CellGeometry::point_type{ max_x, max_y };
+                        geometry::CellGeometry::box_type box{min_corner, max_corner};
+
+                        library.geometry(stdPin).push_back(std::make_pair(box, layer_name));
                     }
+
+                    double center_of_mass_x = sum_x.value() / cont;
+                    double center_of_mass_y = sum_y.value() / cont;
+                    library.offset(stdPin) = Library::offset_type{ 
+                        geometry::CellGeometry::unit_type(center_of_mass_x), 
+                        geometry::CellGeometry::unit_type(center_of_mass_y) 
+                    };
                 }
             }
         }

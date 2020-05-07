@@ -672,6 +672,7 @@ namespace ophidian::routing {
         auto segment_end_pins = m_segment_end_pin[segment];
         for(auto segment_end_pin : segment_end_pins)
         {
+            auto pin_name = m_design.standard_cells().name(segment_end_pin);
             auto pin_geometry = placement_library.geometry(segment_end_pin);
             auto layer_name = pin_geometry.front().second;
             auto pin_layer = routing_library.find_layer_instance(layer_name);
