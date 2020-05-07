@@ -183,8 +183,13 @@ namespace ophidian::routing
         orientation_type orientation (const pad_type& pad) const;
         std::map<std::string, box_container_type> box_in_layer(const pad_type& pad) const;
 
+        layer_type lowest_layer() const;
+        scalar_type lowest_layer_index() const;
+        // void set_lowest_layer(const layer_type& layer);
+        
         layer_type highest_layer() const;
-        void set_highest_layer(const layer_type& layer);
+        scalar_type highest_layer_index() const;
+        // void set_highest_layer(const layer_type& layer);
 
         std::string name(const blockage_type& blkg) const;
         std_cell_type std_cell(const blockage_type& blkg) const;
@@ -290,7 +295,11 @@ namespace ophidian::routing
         entity_system::EntitySystem<blockage_type>::NotifierType * notifier(blockage_type) const;
 
     private:
+        layer_type                                              mLowest_layer;
+        scalar_type                                             mLowest_layer_index;
         layer_type                                              mHighest_layer;
+        scalar_type                                             mHighest_layer_index;
+
         entity_system::EntitySystem<layer_type>                 mLayers{};
 
         entity_system::EntitySystem<blockage_type>              mBlockages{};

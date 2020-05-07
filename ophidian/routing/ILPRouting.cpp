@@ -4,7 +4,7 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = false;
+bool DEBUG = true;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -16,6 +16,7 @@ namespace ophidian::routing {
     {
         m_segments.clear();
         m_route_candidate.clear();
+        m_position_candidates.clear();
 
         GRBModel model = GRBModel(m_GRBENv);
 

@@ -51,7 +51,7 @@ namespace ophidian::routing
         RoutingConstraints(RoutingConstraints &&) = delete;
         RoutingConstraints& operator=(RoutingConstraints &&) = delete;
 
-        RoutingConstraints(const ophidian::circuit::Netlist & netlist);
+        RoutingConstraints(const ophidian::circuit::Netlist & netlist, const ophidian::routing::Library & library);
 
         //Element access
         demand_type ndf_constraint(index_type x, index_type y, index_type z) const;

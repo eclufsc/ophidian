@@ -42,9 +42,26 @@ namespace ophidian::design::factory
         placement::factory::make_placement(design.placement(), def, design.netlist());
     }
 
+    void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept
+    {
+        floorplan::factory::make_floorplan(design.floorplan(), def, lef);
+
+        circuit::factory::make_standard_cells(design.standard_cells(), lef);
+
+        circuit::factory::make_netlist(design.netlist(), def, design.standard_cells());
+
+        placement::factory::make_library(design.placement_library(), lef, design.standard_cells());
+
+        placement::factory::make_placement(design.placement(), def, design.netlist());
+
+        routing::factory::make_library(design.routing_library(), lef, def);
+
+        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), guide, def);
+    }
+
     void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept
     {
-        return make_design(design, def, lef, verilog);
+        make_design(design, def, lef, verilog);
     }
 
     void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept
@@ -62,24 +79,12 @@ namespace ophidian::design::factory
 
     void make_design_ispd2018(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept
     {
-        floorplan::factory::make_floorplan(design.floorplan(), def, lef);
-
-        circuit::factory::make_standard_cells(design.standard_cells(), lef);
-
-        circuit::factory::make_netlist(design.netlist(), def, design.standard_cells());
-
-        placement::factory::make_library(design.placement_library(), lef, design.standard_cells());
-
-        placement::factory::make_placement(design.placement(), def, design.netlist());
-
-        routing::factory::make_library(design.routing_library(), lef, def);
-
-        routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), guide, def);
+        make_design(design, def, lef, guide);
     }
 
     void make_design_ispd2019(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept
     {
-        make_design_ispd2018(design, def, lef, guide);
+        make_design(design, def, lef, guide);
     }
 
     void make_design_iccad2019(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept

@@ -30,7 +30,6 @@ namespace ophidian::routing::factory
         auto dbuConverter = util::DbuConverter{lef.micrometer_to_dbu_ratio()};
 
         //creating layers
-        int highest_layer_index = -1;
         for(auto& layer : lef.layers()){
             //layer type
             auto lType = LayerType{};
@@ -131,11 +130,6 @@ namespace ophidian::routing::factory
                         layer.adjacent_cut_spacing().cuts(),
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
-
-            if(l_index >= highest_layer_index){
-                highest_layer_index = l_index;
-                library.set_highest_layer(l);
-            }
         }
 
         //creating vias
@@ -294,7 +288,7 @@ namespace ophidian::routing::factory
         util::DbuConverter dbuConverter{1};
 
         int highest_index = std::numeric_limits<int>::min();
-        ophidian::routing::Layer highest_layer;
+        // ophidian::routing::Layer highest_layer;
         for(auto& layer : iccad_2020.layers()){
             //layer type
             LayerType lType;
@@ -354,13 +348,7 @@ namespace ophidian::routing::factory
                         layer.adjacent_cut_spacing().cuts(),
                         dbuConverter.convert(layer.adjacent_cut_spacing().cut_within_length()),
                         dbuConverter.convert(layer.corner_spacing().eol_width()));
-            if(layer.index() >= highest_index)
-            {
-                highest_index = layer.index();
-                highest_layer = l;
-            }
         }
-        library.set_highest_layer(highest_layer);
         for(auto std_cell : std_cells.range_cell())
         {
             auto std_cell_name = std_cells.name(std_cell);

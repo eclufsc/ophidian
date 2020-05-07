@@ -25,7 +25,10 @@ namespace routing
 
 Library::Library(ophidian::circuit::StandardCells& std_cells):
     mCell2Blockages(std_cells.make_composition_cell<blockage_type>(mBlockages))
-    {}
+{
+    mLowest_layer_index = std::numeric_limits<scalar_type>::max();
+    mHighest_layer_index = std::numeric_limits<scalar_type>::min();
+}
 
 const Library::layer_type Library::find_layer_instance(const std::string &layerName) const
 {
@@ -338,10 +341,34 @@ Library::layer_type Library::highest_layer() const
     return this->mHighest_layer;
 }
 
-void Library::set_highest_layer(const layer_type& layer)
+Library::scalar_type Library::highest_layer_index() const
 {
-    this->mHighest_layer = layer;
+    return this->mHighest_layer_index;
 }
+
+// void Library::set_highest_layer(const layer_type& layer)
+// {
+//     this->mHighest_layer = layer;
+//     this->mHighest_layer_index = mLayerIndexes[layer];
+// }
+
+
+Library::layer_type Library::lowest_layer() const
+{
+    return this->mLowest_layer;
+}
+
+Library::scalar_type Library::lowest_layer_index() const
+{
+    return this->mLowest_layer_index;
+}
+
+// void Library::set_lowest_layer(const layer_type& layer)
+// {
+//     this->mLowest_layer = layer;
+//     this->mLowest_layer_index = mLayerIndexes[layer];
+// }
+
 
 std::string Library::name(const Library::blockage_type& blkg) const
 {
@@ -577,6 +604,18 @@ Library::layer_type Library::add_layer_instance(
         mLayerAdjCuts[layer] = adjCuts;
         mLayerCutWithinLength[layer] = cutWithinLength;
         mLayerExceptEOLwidth[layer] = ExceptEOLwidth;
+
+        if(index < mLowest_layer_index && type != ophidian::routing::LayerType::NA)
+        {
+            mLowest_layer = layer;
+            mLowest_layer_index = index;
+        }
+        if(index >= mHighest_layer_index && type != ophidian::routing::LayerType::NA)
+        {
+            mHighest_layer = layer;
+            mHighest_layer_index = index;
+        }
+        
         return layer;
     }else{
         return mName2Layer[layerName];

@@ -224,6 +224,12 @@ namespace ophidian::circuit
         }
 
         template <typename Value>
+        entity_system::Property<Net, Value> make_property_net(Value default_value) const noexcept
+        {
+            return entity_system::Property<Net, Value>(m_nets, default_value);
+        }
+
+        template <typename Value>
         entity_system::Aggregation<Net, Value> make_aggregation_net(entity_system::EntitySystem<Value> & parts) const noexcept
         {
             return entity_system::Aggregation<Net, Value>(m_nets, parts);

@@ -31,6 +31,8 @@ namespace ophidian::design::factory
 {
     void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
+    void make_design(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Guide &guide) noexcept;
+
     void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept;
 
     void make_design_iccad2017(Design& design, const parser::Def& def, const parser::Lef& lef) noexcept;
