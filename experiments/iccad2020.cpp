@@ -73,32 +73,20 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
 
     //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
 
-    std::vector<ophidian::circuit::Net> fixed_nets;
-    std::vector<ophidian::circuit::Net> routed_nets;
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements, true);
-    //fixed_nets.insert(fixed_nets.end(), routed_nets.begin(), routed_nets.end());
-    //result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements, true);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     std::cout << "result " << result << std::endl;
 
     if(result){
         iccad_output_writer.write_ICCAD_2020_output("", movements);
     }
-
-    /*auto & global_routing = design.global_routing();
-    int wirelength = 0;
-    for(auto net : nets){
-        auto gcells = global_routing.gcells(net);
-        auto net_name = design.netlist().name(net);
-        wirelength += gcells.size();
-        std::cout << "Net: " << net_name << " = " << gcells.size() << std::endl;
-    }
-    std::cout << "wirelength : " << wirelength << std::endl;*/
    
     //write_statistics_for_circuit(design, circuit_name);
 }
@@ -109,8 +97,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         //"case1N4",
         //"case2",
         // "case3",
-        "case3_no_blockages",
-        // "case3_no_extra_demand"
+        //"case3_no_blockages",
+         "case3_no_extra_demand"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";

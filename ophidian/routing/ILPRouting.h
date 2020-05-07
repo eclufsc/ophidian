@@ -42,6 +42,10 @@ namespace ophidian::routing {
 
     class ILPRouting {
         public:
+            enum PositionCandidateOrigin{
+                NA, INITIAL, TWO_PIN_NET, CENTER_OF_MASS, MEDIAN
+            };
+        public:
             using scalar_type               = int;
             using unit_type                 = util::database_unit_t;
             using design_type               = design::Design;
@@ -56,6 +60,7 @@ namespace ophidian::routing {
             using gcell_type                = GCell;
             using gcell_container_type      = std::vector<GCell>;
             using position_candidate_type   = PositionCandidate;
+            using candidate_origin_type     = PositionCandidateOrigin;
 
             using point_type                = util::LocationDbu;
             using box_type                  = geometry::Box<unit_type>;
@@ -82,7 +87,13 @@ namespace ophidian::routing {
 
             void create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model);
 
-            void create_movement_candidate(const cell_type & cell, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model );
+            void create_center_of_mass_candidate(const cell_type cell, GRBModel & model);
+
+            void create_median_candidate(const cell_type cell, GRBModel & model);
+
+            void create_2_pin_nets_candidates_with_movements(const net_type net, GRBModel & model);
+
+            void create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model );
 
             void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, GRBModel & model);
             
@@ -103,6 +114,8 @@ namespace ophidian::routing {
             void add_candidate_constraints(const std::vector<net_type> & nets, GRBModel & model);
 
             void add_capacity_constraints(const std::vector<net_type> & nets, GRBModel & model);
+
+            void add_movements_constraints(GRBModel & model);
 
 	        void write_gcell_capacities();
 
@@ -153,7 +166,7 @@ namespace ophidian::routing {
             entity_system::Property<position_candidate_type, cell_type>     m_position_candidate_cell{m_position_candidates};
             entity_system::Property<position_candidate_type, ilp_var_type>  m_position_candidate_variables{m_position_candidates};
             entity_system::Property<position_candidate_type, point_type>    m_position_candidate_position{m_position_candidates};
-            // entity_system::Property<position_candidate_type, unit_type>     m_position_candidate_wirelengths{m_position_candidates};
+            entity_system::Property<position_candidate_type, candidate_origin_type>   m_position_candidate_origin{m_position_candidates, candidate_origin_type::NA};
 
             entity_system::Aggregation<position_candidate_type, route_candidate_type>  m_position_candidate_to_routes{m_position_candidates, m_route_candidate};
 
