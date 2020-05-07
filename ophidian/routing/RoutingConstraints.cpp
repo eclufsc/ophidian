@@ -23,12 +23,6 @@ namespace ophidian::routing
     RoutingConstraints::RoutingConstraints(const ophidian::circuit::Netlist &netlist, const ophidian::routing::Library & library) : 
         m_min_net_layer{netlist.make_property_net<layer_type>()}
     {
-        m_max_cell_move = std::numeric_limits<unsigned int>::max();
-        auto layer = library.highest_layer();
-        for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
-        {
-            m_min_net_layer[*net_it] = layer;
-        }
     }
 
     RoutingConstraints::layer_type RoutingConstraints::min_net_layer(RoutingConstraints::net_type net)

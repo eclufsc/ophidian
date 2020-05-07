@@ -31,6 +31,10 @@ namespace ophidian::routing::factory
                                   const ophidian::routing::Library & library,
                                   const ophidian::circuit::Netlist & netlist,
                                   const ophidian::parser::ICCAD2020 & iccad_2020) noexcept;
+    
+    void make_routing_constraints(ophidian::routing::RoutingConstraints & routingConstraints,
+                                  const ophidian::routing::Library & library,
+                                  const ophidian::circuit::Netlist & netlist) noexcept;
 }
 
 #endif // OPHIDIAN_ROUTING_CONSTRAINTS_FACTORY_H

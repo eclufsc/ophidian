@@ -6,10 +6,12 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     std::cout << "result " << result << std::endl;
 
     if(result){

@@ -57,6 +57,8 @@ namespace ophidian::design::factory
         routing::factory::make_library(design.routing_library(), lef, def);
 
         routing::factory::make_global_routing(design.global_routing(), design.routing_library(), design.netlist(), guide, def);
+
+        routing::factory::make_routing_constraints(design.routing_constraints(), design.routing_library(), design.netlist());
     }
 
     void make_design_iccad2015(Design& design, const parser::Def& def, const parser::Lef& lef, const parser::Verilog& verilog) noexcept

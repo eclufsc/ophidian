@@ -65,4 +65,22 @@ namespace ophidian::routing::factory
             routingConstraints.set_ndf_constraint(std::get<0>(gcell_index_tuple)-1, std::get<1>(gcell_index_tuple)-1, std::get<2>(gcell_index_tuple)-1, ndf.second);
         }
     }
+
+    void make_routing_constraints(ophidian::routing::RoutingConstraints & routingConstraints,
+                                  const ophidian::routing::Library & library,
+                                  const ophidian::circuit::Netlist & netlist ) noexcept
+    {
+        routingConstraints.set_max_cell_movement(std::numeric_limits<unsigned int>::max());
+        
+
+        //get first layer
+        auto first_layer = library.lowest_layer();
+
+        //set min layer constraints
+        for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+        {
+            auto net = *net_it;
+            routingConstraints.set_min_net_layer(net, first_layer);
+        }
+    }
 }
