@@ -254,33 +254,49 @@ const Library::track_type Library::nonPrefTrack(const Library::layer_type& layer
 
 const Library::layer_type Library::upperLayer(const Library::layer_type& layer) const
 {
-    auto layerName = mLayerName[layer];
-    std::string indexLayer = layerName.substr(5);
-    int upperLayerIndex = boost::lexical_cast<int>(indexLayer) +1;
-    std::string upperLayerName = "Metal" + boost::lexical_cast<std::string>(upperLayerIndex);
-    return find_layer_instance(upperLayerName);
+    if (layer != mHighest_layer && layer != Library::layer_type{})
+    {
+        int i = index(layer);
+        return mIndex2Layer.at(i +1);
+    }
+    else
+    {
+        return Library::layer_type{};
+    }
+
 }
 
 int Library::index(const Library::layer_type &layer) const
 {
-    auto layerName = mLayerName[layer];
-    std::string indexLayer = layerName.substr(5);
-    return boost::lexical_cast<int>(indexLayer);
+    if(layer != Library::layer_type{})
+        return mLayerIndexes[layer];
+
+    return -1;
 }
 
 const Library::layer_type Library::layer_from_index(int index) const
 {
-    std::string layerName = "Metal" + boost::lexical_cast<std::string>(index);
-    return find_layer_instance(layerName);
+    if (mIndex2Layer.find(index) != mIndex2Layer.end())
+    {
+        return mIndex2Layer.at(index);
+    }
+    else
+    {
+        return Library::layer_type{};
+    }
 }
 
 const Library::layer_type Library::lowerLayer(const Library::layer_type& layer) const
 {
-    auto layerName = mLayerName[layer];
-    std::string indexLayer = layerName.substr(5);
-    int lowerLayerIndex = boost::lexical_cast<int>(indexLayer) -1;
-    std::string lowerLayerName = "Metal" + boost::lexical_cast<std::string>(lowerLayerIndex);
-    return find_layer_instance(lowerLayerName);
+    if (layer != mLowest_layer && layer != Library::layer_type{})
+    {
+        int i = index(layer);
+        return mIndex2Layer.at(i -1);
+    }
+    else
+    {
+        return Library::layer_type{};
+    }
 }
 
 const Library::scalar_type Library::layerIndex(const Library::layer_type& layer) const
@@ -346,13 +362,6 @@ Library::scalar_type Library::highest_layer_index() const
     return this->mHighest_layer_index;
 }
 
-// void Library::set_highest_layer(const layer_type& layer)
-// {
-//     this->mHighest_layer = layer;
-//     this->mHighest_layer_index = mLayerIndexes[layer];
-// }
-
-
 Library::layer_type Library::lowest_layer() const
 {
     return this->mLowest_layer;
@@ -362,13 +371,6 @@ Library::scalar_type Library::lowest_layer_index() const
 {
     return this->mLowest_layer_index;
 }
-
-// void Library::set_lowest_layer(const layer_type& layer)
-// {
-//     this->mLowest_layer = layer;
-//     this->mLowest_layer_index = mLayerIndexes[layer];
-// }
-
 
 std::string Library::name(const Library::blockage_type& blkg) const
 {
@@ -583,6 +585,7 @@ Library::layer_type Library::add_layer_instance(
         mLayerName[layer] = layerName;
         mName2Layer[layerName] = layer;
         mLayerIndexes[layer] = index;
+        mIndex2Layer[index] = layer;
         mLayerType[layer] = type;
         mLayerDirection[layer] = direction;
         mLayerPitch[layer] = pitch;

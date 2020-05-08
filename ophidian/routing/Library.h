@@ -312,6 +312,7 @@ namespace ophidian::routing
         entity_system::Property<layer_type, std::string>        mLayerName{mLayers};
         std::unordered_map<std::string, layer_type>             mName2Layer{};
         entity_system::Property<layer_type, scalar_type>        mLayerIndexes{mLayers};
+        std::unordered_map<scalar_type, layer_type>             mIndex2Layer{};
         entity_system::Property<layer_type, LayerType>          mLayerType{mLayers, LayerType::NA};
         entity_system::Property<layer_type, Direction>          mLayerDirection{mLayers, Direction::NA};
         entity_system::Property<layer_type, unit_type>          mLayerPitch{mLayers};
