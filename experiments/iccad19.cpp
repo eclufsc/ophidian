@@ -54,11 +54,20 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
 
         auto & routing_constraint = design.routing_constraints();
 
-        auto net = *design.netlist().begin_net();
-        auto netName = design.netlist().name(net);
-        
-        auto min_layer = routing_constraint.min_net_layer(net);
+        using unit_type                        = ophidian::util::database_unit_t;
+        using point_type                       = ophidian::util::LocationDbu;
+        using box_type                         = ophidian::geometry::Box<unit_type>;
+        using gcell_container_type             = std::vector<ophidian::routing::GCell>;
 
+        auto point = point_type(unit_type{255646}, unit_type{436800});
+        auto point2 = point_type(unit_type{255647}, unit_type{436801});
+        box_type box {point, point2};
+        gcell_container_type gcells;
+        design.global_routing().gcell_graph()->intersect(gcells, box, 0);
+
+
+        auto circuti_die = design.floorplan().chip_upper_right_corner();
+        
 
 
         run_ilp(design, circuit_name);
