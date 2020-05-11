@@ -584,8 +584,6 @@ Library::layer_type Library::add_layer_instance(
 
         mLayerName[layer] = layerName;
         mName2Layer[layerName] = layer;
-        mLayerIndexes[layer] = index;
-        mIndex2Layer[index] = layer;
         mLayerType[layer] = type;
         mLayerDirection[layer] = direction;
         mLayerPitch[layer] = pitch;
@@ -608,12 +606,21 @@ Library::layer_type Library::add_layer_instance(
         mLayerCutWithinLength[layer] = cutWithinLength;
         mLayerExceptEOLwidth[layer] = ExceptEOLwidth;
 
-        if(index < mLowest_layer_index && type != ophidian::routing::LayerType::NA)
+        if(type == ophidian::routing::LayerType::ROUTING)
+        {
+            mLayerIndexes[layer] = index;
+            mIndex2Layer[index] = layer;
+        }else{
+            mLayerIndexes[layer] = -1;
+            mIndex2Layer[-1] = layer; //Warning: is is only store the latests read layer cut
+        }
+
+        if(index < mLowest_layer_index && type == ophidian::routing::LayerType::ROUTING)
         {
             mLowest_layer = layer;
             mLowest_layer_index = index;
         }
-        if(index >= mHighest_layer_index && type != ophidian::routing::LayerType::NA)
+        if(index >= mHighest_layer_index && type == ophidian::routing::LayerType::ROUTING)
         {
             mHighest_layer = layer;
             mHighest_layer_index = index;

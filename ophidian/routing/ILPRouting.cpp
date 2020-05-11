@@ -958,7 +958,9 @@ namespace ophidian::routing {
 
                     for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
                     {
-                        auto layer_name = "M" + std::to_string(layer_index);
+                        // auto layer_name = "M" + std::to_string(layer_index);
+                        auto layer = routing_library.layer_from_index(layer_index);
+                        auto layer_name = routing_library.name(layer);
                         gcell_container_type gcells;
                         gcell_graph->intersect(gcells, wire_box, layer_index-1);
                         //std::cout << "gcells " << gcells.size() << std::endl;
