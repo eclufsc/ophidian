@@ -5,7 +5,8 @@
 void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_7875")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
@@ -65,9 +66,22 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         gcell_container_type gcells;
         design.global_routing().gcell_graph()->intersect(gcells, box, 0);
 
-
+        auto & netlist = design.netlist();
+        auto & placement = design.placement();
         auto circuti_die = design.floorplan().chip_upper_right_corner();
-        
+        auto net = netlist.find_net("n_7875");
+
+        auto pins = netlist.pins(net);
+        for(auto pin : pins)
+        {
+            auto name = netlist.name(pin);
+            auto pos = placement.location(pin);
+            auto cell = netlist.cell(pin);
+            auto cell_name = netlist.name(cell);
+            auto cell_loc = placement.location(cell);
+            std::cout << "cell : " << cell_name << " ( " << cell_loc.x().value() << " , " << cell_loc.y().value() << " )" << std::endl;
+            std::cout << "pin : " << name << " ( " << pos.x().value() << " , " << pos.y().value() << " )" << std::endl;
+        } 
 
 
         run_ilp(design, circuit_name);

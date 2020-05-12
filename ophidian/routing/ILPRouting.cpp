@@ -368,6 +368,31 @@ namespace ophidian::routing {
 
     void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model )
     {
+        auto & netlist = m_design.netlist();
+        auto & placement = m_design.placement();
+        auto & placement_library = m_design.placement_library();
+        
+        
+        auto initial_position = placement.location(cell);
+        auto stdCell = netlist.std_cell(cell);
+        auto stdCellGeometry = placement_library.geometry(stdCell);
+        auto height = stdCellGeometry.height();
+        auto width = stdCellGeometry.width();
+        auto chipUpperRigthCorner = m_design.floorplan().chip_upper_right_corner();
+
+        auto new_x = new_position.x();
+        auto new_y = new_position.y();
+        if(new_position.x() + width > chipUpperRigthCorner.x())
+        {
+            new_x = chipUpperRigthCorner.x() - width;
+        }
+        if(new_position.y() + height > chipUpperRigthCorner.y())
+        {
+            new_y = chipUpperRigthCorner.y() - height;
+        }
+        point_type candidate_position {new_x, new_y};
+
+
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
         GRBVar candidate_variable;
@@ -380,16 +405,14 @@ namespace ophidian::routing {
         m_position_candidate_cell[candidate] = cell;
         m_name_to_position_candidate[candidate_variable_name] = candidate;
         m_position_candidate_variables[candidate] = candidate_variable;
-        m_position_candidate_position[candidate] = new_position;
+        m_position_candidate_position[candidate] = candidate_position;
         m_cell_position_candidates.addAssociation(cell, candidate);
         m_position_candidate_origin[candidate] = type;
 
-        auto & netlist = m_design.netlist();
-        auto & placement = m_design.placement();
-        auto initial_position = m_design.placement().location(cell);
+        
 
         // place cell in the new position
-        placement.place(cell, new_position);
+        placement.place(cell, candidate_position);
 
         //genarate route for every net with new location
         for(auto net : nets)
@@ -498,7 +521,7 @@ namespace ophidian::routing {
             {
                 continue;
             }
-	    for(auto vertical_layer : vertical_layers)
+	        for(auto vertical_layer : vertical_layers)
             {
                 auto vertical_layer_index = m_design.routing_library().layerIndex(vertical_layer);
                 if(vertical_layer_index < min_layer_index)
