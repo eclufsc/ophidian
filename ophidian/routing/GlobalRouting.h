@@ -32,6 +32,7 @@ namespace ophidian::routing
         using gcell_container_type      = container_type<gcell_type>;
         using layer_type                = Library::layer_type;
         using net_type                  = ophidian::circuit::Net;
+        using net_container_type        = container_type<net_type>;
         using gcell_graph_type          = GCellGraph;
         using gcell_graph_ptr_type      = std::shared_ptr<gcell_graph_type>;
         using index_type                = GCellGraph::index_type;
@@ -64,7 +65,10 @@ namespace ophidian::routing
         void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
         gcell_graph_ptr_type gcell_graph();
-        gcell_container_type gcells(const net_type& net);
+        gcell_container_type gcells(const net_type& net) const;
+
+        const scalar_type wirelength_in_gcell(const net_type & net) const;
+        const scalar_type wirelength_in_gcell(const net_container_type & nets) const;
 
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;

@@ -4,7 +4,7 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):

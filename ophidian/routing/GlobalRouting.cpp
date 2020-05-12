@@ -82,7 +82,7 @@ namespace ophidian::routing
         return m_gcell_graph;
     }
 
-    GlobalRouting::gcell_container_type GlobalRouting::gcells(const GlobalRouting::net_type& net){
+    GlobalRouting::gcell_container_type GlobalRouting::gcells(const GlobalRouting::net_type& net) const{
         auto segments = m_net_to_gr_segment.parts(net);
         std::vector<ophidian::routing::GCell> gcells;
         for(auto segment : segments)
@@ -101,6 +101,19 @@ namespace ophidian::routing
         std::sort(gcells.begin(), gcells.end(), [&](auto &lhs, auto &rhs){return m_gcell_graph->id(lhs) < m_gcell_graph->id(rhs);});
         gcells.erase(std::unique(gcells.begin(), gcells.end()), gcells.end());
         return gcells;
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_type & net) const{
+        return gcells(net).size();
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_container_type & nets) const{
+        scalar_type wirelength = 0;
+        for(auto net : nets)
+        {
+            wirelength += wirelength_in_gcell(net);
+        }
+        return wirelength;
     }
 
     GlobalRouting::segment_container_type::const_iterator GlobalRouting::begin_segment() const noexcept

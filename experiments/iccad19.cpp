@@ -5,10 +5,13 @@
 void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-    // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_7875")};
+    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_7875")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
+
+    int initial_wirelength = design.global_routing().wirelength_in_gcell(nets);
+    std::cout << "Circuit initial wirelength = " << initial_wirelength << std::endl;
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
@@ -17,6 +20,12 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
 
     if(result){
         // need to generate a new guide file
+        int final_wirelength = design.global_routing().wirelength_in_gcell(nets);
+        std::cout << "Total movements = " << movements.size() << std::endl;
+        std::cout << "Circuit final wirelength = " << final_wirelength << std::endl;
+        std::cout << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << initial_wirelength - final_wirelength << std::endl;
+        // double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength);
+        // std::cout << "% Reduction = " << std::to_string(reduction) << " %" << std::cout;
 
         // iccad_output_writer.write_ICCAD_2020_output("", movements);
     }
@@ -50,39 +59,6 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
-
-        auto & library = design.routing_library();
-
-        auto & routing_constraint = design.routing_constraints();
-
-        using unit_type                        = ophidian::util::database_unit_t;
-        using point_type                       = ophidian::util::LocationDbu;
-        using box_type                         = ophidian::geometry::Box<unit_type>;
-        using gcell_container_type             = std::vector<ophidian::routing::GCell>;
-
-        auto point = point_type(unit_type{255646}, unit_type{436800});
-        auto point2 = point_type(unit_type{255647}, unit_type{436801});
-        box_type box {point, point2};
-        gcell_container_type gcells;
-        design.global_routing().gcell_graph()->intersect(gcells, box, 0);
-
-        auto & netlist = design.netlist();
-        auto & placement = design.placement();
-        auto circuti_die = design.floorplan().chip_upper_right_corner();
-        auto net = netlist.find_net("n_7875");
-
-        auto pins = netlist.pins(net);
-        for(auto pin : pins)
-        {
-            auto name = netlist.name(pin);
-            auto pos = placement.location(pin);
-            auto cell = netlist.cell(pin);
-            auto cell_name = netlist.name(cell);
-            auto cell_loc = placement.location(cell);
-            std::cout << "cell : " << cell_name << " ( " << cell_loc.x().value() << " , " << cell_loc.y().value() << " )" << std::endl;
-            std::cout << "pin : " << name << " ( " << pos.x().value() << " , " << pos.y().value() << " )" << std::endl;
-        } 
-
 
         run_ilp(design, circuit_name);
     }
