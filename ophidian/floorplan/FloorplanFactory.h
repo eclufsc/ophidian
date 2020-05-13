@@ -21,12 +21,15 @@
 
 #include <ophidian/parser/Lef.h>
 #include <ophidian/parser/Def.h>
+#include <ophidian/parser/ICCAD2020.h>
 
 #include "Floorplan.h"
 
 namespace ophidian::floorplan::factory
 {
     void make_floorplan(Floorplan& floorplan, const parser::Def & def, const parser::Lef & lef);
+
+    void make_floorplan(Floorplan& floorplan, const parser::ICCAD2020 & iccad_2020);
 }
 
 #endif // OPHIDIAN_FLOORPLAN_LEFDEF2FLOORPLAN_H

@@ -4,7 +4,7 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = false;
+bool DEBUG = true;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -430,6 +430,9 @@ namespace ophidian::routing {
         std::vector<interconnection::Flute::Point> net_points;
         net_points.reserve(net_pins.size());
         std::map<std::pair<double, double>, pin_container_type> net_points_map;
+
+        if(DEBUG) std::cout << "net name: " << netlist.name(net) << std::endl;
+        if(DEBUG) std::cout << "net pins size " << net_pins.size() << std::endl;
         for(auto pin : net_pins)
         {
             auto pin_name = netlist.name(pin);
@@ -441,8 +444,16 @@ namespace ophidian::routing {
             net_points_map[point].push_back(std_pin);
         }
 
+        point_container_type flutePoints;
+        flutePoints.reserve(net_points.size());
+        convert_to_flute(flutePoints, net_points);
+
+        if(DEBUG) std::cout << "before flute instance" << std::endl;
         auto & flute = interconnection::Flute::instance();
-        auto tree = flute.create(net_points);
+        // auto tree = flute.create(net_points);
+        if(DEBUG) std::cout << "before call flute" << std::endl;
+        auto tree = flute.create(flutePoints);
+        if(DEBUG) std::cout << "after call flute" << std::endl;
 
         auto number_of_segments = tree->size(interconnection::SteinerTree::Segment());
         std::set<std::pair<unit_type, unit_type>> net_steiner_points;
@@ -451,7 +462,8 @@ namespace ophidian::routing {
         {
             // this happens when all pins are in the same gcell
             auto segment = m_segments.add();
-            auto point = net_points.at(0);
+            // auto point = net_points.at(0);
+            auto point = convert_to_design(flutePoints.at(0));
             m_segment_starts[segment] = point;
             m_segment_ends[segment] = point;
             auto point_pair = std::make_pair(point.x().value(), point.y().value());
@@ -466,8 +478,15 @@ namespace ophidian::routing {
             {
                 auto tree_segment = *tree_segment_it;
                 auto segment = m_segments.add();
-                auto segment_start = tree->position(tree->u(tree_segment));
-                auto segment_end = tree->position(tree->v(tree_segment));
+
+                // auto segment_start = tree->position(tree->u(tree_segment));
+                // auto segment_end = tree->position(tree->v(tree_segment));
+
+                auto segment_start_double = tree->position(tree->u(tree_segment));
+                auto segment_end_double = tree->position(tree->v(tree_segment));
+                auto segment_start = convert_to_design(segment_start_double);
+                auto segment_end = convert_to_design(segment_end_double);
+
 
                 m_segment_starts[segment] = segment_start;
                 m_segment_ends[segment] = segment_end;
@@ -536,6 +555,57 @@ namespace ophidian::routing {
     	    }
 	    }
     }
+
+    void ILPRouting::convert_to_flute(point_container_type & converted, const point_container_type & points) const
+    {
+        if(DEBUG) std::cout << "Converting to flute" << std::endl;
+        using dbu = ILPRouting::unit_type;
+        auto origin = m_design.floorplan().chip_origin();
+        auto upper_right_corner = m_design.floorplan().chip_upper_right_corner();
+
+        converted.clear();
+        converted.reserve(points.size());
+
+        if(upper_right_corner.x() > dbu(20000) || upper_right_corner.y() > dbu(20000))
+        {
+            if(DEBUG) std::cout << "converting..." << std::endl;
+            auto step_x = (upper_right_corner.x().value() - origin.x().value()) / 2000.0;
+            auto step_y = (upper_right_corner.y().value() - origin.y().value()) / 2000.0;
+
+            for(auto p : points){
+                auto new_x = (p.x().value() - origin.x().value())/step_x;
+                auto new_y = (p.y().value() - origin.y().value())/step_y;
+                auto new_point = point_type(dbu(new_x), dbu(new_y));
+                converted.push_back(new_point);
+            }
+        }else{
+            std::copy(points.begin(), points.end(), std::back_inserter(converted));
+        }
+    }
+
+    ILPRouting::point_type ILPRouting::convert_to_design(point_type & point) const
+    {
+        if(DEBUG) std::cout << "converting to design" << std::endl;
+        using dbu = ILPRouting::unit_type;
+        auto origin = m_design.floorplan().chip_origin();
+        auto upper_right_corner =  m_design.floorplan().chip_upper_right_corner();
+     
+        if(upper_right_corner.x() > dbu(20000) || upper_right_corner.y() > dbu(20000))
+        {
+            if(DEBUG) std::cout << "converting..." << std::endl;
+            auto step_x = (upper_right_corner.x().value() - origin.x().value()) / 2000.0;
+            auto step_y = (upper_right_corner.y().value() - origin.y().value()) / 2000.0;
+
+            auto new_x = (point.x().value() * step_x) + origin.x().value();
+            auto new_y = (point.y().value() * step_y) + origin.y().value();
+            
+            return point_type(dbu(new_x), dbu(new_y));
+        }
+        return point;
+    }
+
+
+
 
     void ILPRouting::create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, GRBModel & model)
     {

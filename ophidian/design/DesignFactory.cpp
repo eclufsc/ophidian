@@ -106,6 +106,8 @@ namespace ophidian::design::factory
 
     void make_design_iccad2020(Design& design, const parser::ICCAD2020 & iccad_2020) noexcept
     {
+        floorplan::factory::make_floorplan(design.floorplan(), iccad_2020);
+
         circuit::factory::make_standard_cells(design.standard_cells(), iccad_2020);
 
         circuit::factory::make_netlist(design.netlist(), iccad_2020, design.standard_cells());
