@@ -36,6 +36,8 @@ namespace ophidian::placement
 
         using point_type = util::LocationDbu;
 
+        using box_type = geometry::Box<unit_type>;
+
         using cell_type = circuit::Netlist::cell_instance_type;
 
         using pin_type = circuit::Netlist::pin_instance_type;
@@ -47,6 +49,8 @@ namespace ophidian::placement
         using cell_geometry_type = geometry::CellGeometry;
 
         using pin_geometry_type = geometry::CellGeometry;
+
+        using pad_geometry_type = geometry::CellGeometry;
 
         using fixed_type = bool;
 
@@ -81,7 +85,15 @@ namespace ophidian::placement
 
         pin_geometry_type geometry(const pin_type& pin) const;
 
+        pad_geometry_type geometry(const input_pad_type& input) const;
+
+        pad_geometry_type geometry(const output_pad_type& output) const;
+
         orientation_type orientation(const cell_type& cell) const;
+
+        orientation_type orientation(const input_pad_type& input) const;
+
+        orientation_type orientation(const output_pad_type& output) const;
 
         const fixed_type isFixed(const cell_type& cell) const;
         // Iterators
@@ -97,10 +109,14 @@ namespace ophidian::placement
 
         void setOrientation(const Placement::cell_type& cell, const orientation_type& orientation);
 
+        void setOrientation(const input_pad_type& input, const orientation_type& orientation);
+
+        void setOrientation(const output_pad_type& output, const orientation_type& orientation);
+
         void fixLocation(const cell_type& cell);
 
         void unfixLocation(const cell_type& cell);
-
+     
     private:
         const circuit::Netlist & m_netlist;
         const Library & m_library;
@@ -108,9 +124,14 @@ namespace ophidian::placement
         entity_system::Property<cell_type, point_type> m_cell_locations;
         entity_system::Property<cell_type, fixed_type> m_fixed_cells;
         entity_system::Property<cell_type, orientation_type> m_cell_orientation;
-        entity_system::Property<input_pad_type, point_type> m_input_pad_locations;
-        entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
 
+        entity_system::Property<input_pad_type, point_type> m_input_pad_locations;
+        entity_system::Property<input_pad_type, pad_geometry_type> m_input_pad_geometry;
+        entity_system::Property<input_pad_type, orientation_type> m_input_pad_orientation;
+
+        entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
+        entity_system::Property<output_pad_type, pad_geometry_type> m_output_pad_geometry;
+        entity_system::Property<output_pad_type, orientation_type> m_output_pad_orientation;
     };
 }
 

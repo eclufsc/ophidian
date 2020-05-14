@@ -42,6 +42,11 @@ namespace ophidian::parser
         m_position = pos;
     }
 
+    void Pad::set_direction(Pad::direction_type dir) noexcept
+    {
+        m_direction = dir;
+    }
+
     const Pad::layer_map_type &Pad::layers() const noexcept
     {
         return m_layers;
@@ -55,6 +60,11 @@ namespace ophidian::parser
     const Pad::dbu_point_type Pad::position() const noexcept
     {
         return m_position;
+    }
+
+    const Pad::direction_type Pad::direction() const noexcept
+    {
+        return m_direction;
     }
 
 }

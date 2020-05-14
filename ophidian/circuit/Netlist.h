@@ -144,6 +144,8 @@ namespace ophidian::circuit
 
         std_cell_pin_type std_cell_pin(const pin_instance_type& pin) const;
 
+        bool is_pad(const pin_instance_type& pin) const;
+
         // Iterators
         cell_instance_container_type::const_iterator begin_cell_instance() const noexcept;
         cell_instance_container_type::const_iterator end_cell_instance() const noexcept;

@@ -16,13 +16,13 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     int initial_wirelength = design.global_routing().wirelength_in_gcell(nets);
     std::cout << "Circuit initial wirelength = " << initial_wirelength << std::endl;
 
-    // auto net = design.netlist().find_net("net64155");
+    auto net = design.netlist().find_net("net64155");
     // auto net = design.netlist().find_net("net2110");
-    // auto net_pins = design.netlist().pins(net);
-    // std::cout << "net name: " << design.netlist().name(net) << std::endl;
-    // std::cout << "net pins size " << net_pins.size() << std::endl;
+    auto net_pins = design.netlist().pins(net);
+    std::cout << "net name: " << design.netlist().name(net) << std::endl;
+    std::cout << "net pins size " << net_pins.size() << std::endl;
 
-    // return ;
+    return ;
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;

@@ -27,9 +27,14 @@ namespace ophidian::placement
             m_library(library),
             m_cell_locations(netlist.make_property_cell_instance<util::LocationDbu>()),
             m_cell_orientation(netlist.make_property_cell_instance<Placement::orientation_type>()),
+            m_fixed_cells(netlist.make_property_cell_instance<fixed_type>()),
+            
             m_input_pad_locations(netlist.make_property_input_pad<util::LocationDbu>()),
+            m_input_pad_geometry(netlist.make_property_input_pad<Placement::pad_geometry_type>()),
+            m_input_pad_orientation(netlist.make_property_input_pad<Placement::orientation_type>()),
             m_output_pad_locations(netlist.make_property_output_pad<util::LocationDbu>()),
-            m_fixed_cells(netlist.make_property_cell_instance<fixed_type>())
+            m_output_pad_geometry(netlist.make_property_output_pad<Placement::pad_geometry_type>()),
+            m_output_pad_orientation(netlist.make_property_output_pad<Placement::orientation_type>())
     {
     }
 
@@ -159,11 +164,32 @@ namespace ophidian::placement
         return translated_boxes;
     }
 
+    Placement::pad_geometry_type Placement::geometry(const Placement::input_pad_type& input) const
+    {
+        // TODO
+        return pad_geometry_type{};
+    }
+
+    Placement::pad_geometry_type Placement::geometry(const Placement::output_pad_type& output) const
+    {
+        // TODO
+        return pad_geometry_type{};
+    }
+
     Placement::orientation_type Placement::orientation(const Placement::cell_type& cell) const
     {
         return m_cell_orientation[cell];
     }
 
+    Placement::orientation_type Placement::orientation(const Placement::input_pad_type& input) const
+    {
+        return m_input_pad_orientation[input];
+    }
+
+    Placement::orientation_type Placement::orientation(const Placement::output_pad_type& output) const
+    {
+        return m_output_pad_orientation[output];
+    }
 
     const Placement::fixed_type Placement::isFixed(const Placement::cell_type& cell) const{
         return m_fixed_cells[cell];
@@ -188,6 +214,16 @@ namespace ophidian::placement
     void Placement::setOrientation(const Placement::cell_type& cell, const orientation_type& orientation)
     {
         m_cell_orientation[cell] = orientation;
+    }
+
+    void Placement::setOrientation(const Placement::input_pad_type& input, const Placement::orientation_type& orientation)
+    {
+        m_input_pad_orientation[input] = orientation;
+    }
+
+    void Placement::setOrientation(const Placement::output_pad_type& output, const Placement::orientation_type& orientation)
+    {
+        m_output_pad_orientation[output] = orientation;
     }
 
     void Placement::fixLocation(const Placement::cell_type& cell)

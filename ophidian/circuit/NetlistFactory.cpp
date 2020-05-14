@@ -122,6 +122,21 @@ namespace ophidian::circuit::factory
             netlist.connect(cell_instance, std_cells.find_cell(component.macro()));
         }
 
+        for(const auto & pad : def.pads())
+        {
+            auto name = pad.name();
+            auto direction = pad.direction();
+            auto pin_instance = netlist.add_pin_instance("PIN:" + name);
+
+            if(direction == parser::Pad::Direction::INPUT){
+                netlist.add_input_pad(pin_instance);
+            }else if(direction == parser::Pad::Direction::OUTPUT){
+                netlist.add_output_pad(pin_instance);
+            }else if(direction == parser::Pad::Direction::OUTPUT){
+                std::cout << "WARNING: Pin " << name << "without direction"<< std::endl;
+            }
+        }
+
         for(const auto& net : def.nets())
         {
             auto net_instance = netlist.add_net(net.name());
@@ -129,6 +144,8 @@ namespace ophidian::circuit::factory
             {
                 if(pin.first == "PIN")
                 {
+                    auto pin_instance = netlist.find_pin_instance(pin.first + ":" + pin.second);
+                    netlist.connect(net_instance, pin_instance);
                     continue;
                 }
 

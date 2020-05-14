@@ -36,6 +36,8 @@ namespace ophidian::parser
 
         enum class Orientation : int { N, W, S, E, FN, FW, FS, FE };
 
+        enum class Direction : int { INPUT, OUTPUT, NA };
+
         using string_type                           = std::string;
 
         using database_unit_type                    = util::database_unit_t;
@@ -46,6 +48,8 @@ namespace ophidian::parser
         using layer_map_type                        = map_type<string_type, layer_container_type>;
 
         using orientation_type                      = Orientation;
+
+        using direction_type                        = Direction;
 
         // Class constructors
         Pad() = delete;
@@ -70,16 +74,19 @@ namespace ophidian::parser
         void addLayer(string_type layer, layer_container_type boxes) noexcept;
         void set_orientation(orientation_type ori) noexcept;
         void set_position(dbu_point_type pos) noexcept;
+        void set_direction(direction_type dir) noexcept;
 
         const layer_map_type& layers() const noexcept;
         const orientation_type orientation() const noexcept;
         const dbu_point_type position() const noexcept;
+        const direction_type direction() const noexcept;
 
     private:
         string_type m_name;
         layer_map_type m_layers;
         orientation_type m_orientation;
         dbu_point_type m_position;
+        direction_type m_direction;
     };
 }
 
