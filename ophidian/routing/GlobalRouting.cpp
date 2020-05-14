@@ -238,4 +238,29 @@ namespace ophidian::routing
         }
     }
 
+    bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells) {
+        auto net_graph = graph_type{};
+        std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
+        for (auto gcell : pin_gcells) {
+            if (gcell_to_node.find(gcell) == gcell_to_node.end()) {
+                auto node = net_graph.addNode();
+                gcell_to_node[gcell] = node;
+            }
+        }
+        for (auto segment : m_net_to_gr_segment.parts(net)) {
+            auto gcell_start = m_gr_segment_gcell_start[segment]; 
+            auto gcell_end = m_gr_segment_gcell_end[segment];
+            if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
+                auto node = net_graph.addNode();
+                gcell_to_node[gcell_start] = node;
+            }
+            if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
+                auto node = net_graph.addNode();
+                gcell_to_node[gcell_end] = node;
+            }
+        }
+
+        return lemon::connected(net_graph);
+    }
+
 }

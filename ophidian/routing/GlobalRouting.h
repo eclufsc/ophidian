@@ -1,6 +1,8 @@
 #ifndef OPHIDIAN_GLOBAL_ROUTING_H
 #define OPHIDIAN_GLOBAL_ROUTING_H
 
+#include <lemon/euler.h>
+
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>
 #include <ophidian/entity_system/Aggregation.h>
@@ -37,6 +39,9 @@ namespace ophidian::routing
         using index_type                = GCellGraph::index_type;
 
         using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
+        using graph_type                = lemon::ListGraph;
+        using node_type                 = graph_type::Node;       
+        using edge_type                 = graph_type::Edge;   
 
         // Constructors
         //! Construct Netlist
@@ -87,6 +92,8 @@ namespace ophidian::routing
         }
 
         entity_system::EntitySystem<gr_segment_type>::NotifierType * notifier(gr_segment_type) const;
+
+        bool is_connected(const net_type & net, const gcell_container_type & pin_gcells);
 
     private:
         void set_all_segment_gcells();

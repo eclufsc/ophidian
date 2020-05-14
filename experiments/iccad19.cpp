@@ -5,7 +5,8 @@
 void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_7875")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
@@ -34,14 +35,14 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         // "ispd19_test9"
     };
 
-    std::string benchmarks_path = "./input_files/circuits/";
+    std::string benchmarks_path = "./input_files/ispd19/";
 
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
-        std::string def_file = benchmarks_path + circuit_name + ".input.def";
-        std::string lef_file = benchmarks_path + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path +"cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        std::string def_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = benchmarks_path + circuit_name + "/" + circuit_name + ".solution_cugr.guide";
 
         auto def = ophidian::parser::Def{def_file};
         auto lef = ophidian::parser::Lef{lef_file};
