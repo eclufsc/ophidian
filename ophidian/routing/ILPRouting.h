@@ -150,7 +150,7 @@ namespace ophidian::routing {
             entity_system::Property<route_candidate_type, std::string>            m_route_candidate_names{m_route_candidate};
             entity_system::Property<route_candidate_type, ilp_var_type>           m_route_candidate_variables{m_route_candidate};
             entity_system::Property<route_candidate_type, unit_type>              m_route_candidate_wirelengths{m_route_candidate};
-    	    entity_system::Property<route_candidate_type, wire_container_type>    m_route_candidate_wires{m_route_candidate};
+    	    //entity_system::Property<route_candidate_type, wire_container_type>    m_route_candidate_wires{m_route_candidate};
 
             std::unordered_map<std::string, route_candidate_type>                 m_name_to_route_candidate;
             entity_system::Aggregation<net_type, route_candidate_type>            m_net_candidates{m_design.netlist().make_aggregation_net<route_candidate_type>(m_route_candidate)};
@@ -161,6 +161,8 @@ namespace ophidian::routing {
             entity_system::Property<wire_type, point_type>  m_wire_ends{m_wires};
             entity_system::Property<wire_type, layer_type>  m_wire_start_layers{m_wires};
             entity_system::Property<wire_type, layer_type>  m_wire_end_layers{m_wires};
+            
+            entity_system::Aggregation<route_candidate_type, wire_type>            m_route_candidate_wires{m_route_candidate, m_wires};
 
 
             entity_system::Property<gcell_type, scalar_type>    m_gcells_demand{m_design.global_routing().gcell_graph()->make_property_gcells<scalar_type>()};

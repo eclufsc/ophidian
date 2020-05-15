@@ -4,7 +4,7 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -807,7 +807,8 @@ namespace ophidian::routing {
         auto wirelength = unit_type{0};
         for(auto wire : wires)
         {
-            m_route_candidate_wires[candidate].push_back(wire);
+            //m_route_candidate_wires[candidate].push_back(wire);
+            m_route_candidate_wires.addAssociation(candidate, wire);
             auto wire_start = m_wire_starts[wire];
             auto wire_end = m_wire_ends[wire];
             wirelength += unit_type{std::abs(wire_end.x().value() - wire_start.x().value()) / 10.0 + std::abs(wire_end.y().value() - wire_start.y().value()) / 10.0};
@@ -823,7 +824,7 @@ namespace ophidian::routing {
 
             //std::cout << "adding wire " << wire_start.x().value() << " " << wire_start.y().value() << " " << start_layer_index << " " << wire_end.x().value() << " " << wire_end.y().value() << " " << end_layer_index << std::endl;
         }
-    	m_route_candidate_wires[candidate].shrink_to_fit();
+    	//m_route_candidate_wires[candidate].shrink_to_fit();
         m_route_candidate_wirelengths[candidate] += wirelength;
     }
 
@@ -1028,7 +1029,8 @@ namespace ophidian::routing {
             auto candidates = m_net_candidates.parts(net);
             for(auto candidate : candidates)
             {
-                auto wires = m_route_candidate_wires[candidate];
+                //auto wires = m_route_candidate_wires[candidate];
+                auto wires = m_route_candidate_wires.parts(candidate);
                 for(auto wire : wires)
                 {
                     auto start_layer = m_wire_start_layers[wire];
@@ -1133,7 +1135,8 @@ namespace ophidian::routing {
                 //clear possible old routings
                 global_routing.unroute(net);
 
-        		for(auto wire : m_route_candidate_wires[routed_candidate])
+        		//for(auto wire : m_route_candidate_wires[routed_candidate])
+        		for(auto wire : m_route_candidate_wires.parts(routed_candidate))
                 {
         		    auto wire_start = m_wire_starts[wire];
 		            auto wire_end = m_wire_ends[wire];
