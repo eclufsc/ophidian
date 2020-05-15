@@ -82,7 +82,7 @@ namespace ophidian::routing
         return m_gcell_graph;
     }
 
-    GlobalRouting::gcell_container_type GlobalRouting::gcells(const GlobalRouting::net_type& net){
+    GlobalRouting::gcell_container_type GlobalRouting::gcells(const GlobalRouting::net_type& net) const{
         auto segments = m_net_to_gr_segment.parts(net);
         std::vector<ophidian::routing::GCell> gcells;
         for(auto segment : segments)
@@ -101,6 +101,19 @@ namespace ophidian::routing
         std::sort(gcells.begin(), gcells.end(), [&](auto &lhs, auto &rhs){return m_gcell_graph->id(lhs) < m_gcell_graph->id(rhs);});
         gcells.erase(std::unique(gcells.begin(), gcells.end()), gcells.end());
         return gcells;
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_type & net) const{
+        return gcells(net).size();
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_container_type & nets) const{
+        scalar_type wirelength = 0;
+        for(auto net : nets)
+        {
+            wirelength += wirelength_in_gcell(net);
+        }
+        return wirelength;
     }
 
     GlobalRouting::segment_container_type::const_iterator GlobalRouting::begin_segment() const noexcept
@@ -250,15 +263,31 @@ namespace ophidian::routing
         for (auto segment : m_net_to_gr_segment.parts(net)) {
             auto gcell_start = m_gr_segment_gcell_start[segment]; 
             auto gcell_end = m_gr_segment_gcell_end[segment];
+            auto start_node = node_type{};
+            auto end_node = node_type{};
             if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
-                auto node = net_graph.addNode();
-                gcell_to_node[gcell_start] = node;
+                start_node = net_graph.addNode();
+                gcell_to_node[gcell_start] = start_node;
+            } else {
+                start_node = gcell_to_node[gcell_start];
             }
             if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
-                auto node = net_graph.addNode();
-                gcell_to_node[gcell_end] = node;
+                end_node = net_graph.addNode();
+                gcell_to_node[gcell_end] = end_node;
+            } else {
+                end_node = gcell_to_node[gcell_end];
             }
+            net_graph.addEdge(start_node, end_node);
         }
+
+        std::cout << "Nodes:";
+        for (graph_type::NodeIt i(net_graph); i!=lemon::INVALID; ++i)
+            std::cout << " " << net_graph.id(i);
+        std::cout << std::endl;
+        std::cout << "Edges:";
+        for (graph_type::ArcIt i(net_graph); i!=lemon::INVALID; ++i)
+            std::cout << " (" << net_graph.id(net_graph.source(i)) << "," << net_graph.id(net_graph.target(i)) << ")";
+        std::cout << std::endl;
 
         return lemon::connected(net_graph);
     }

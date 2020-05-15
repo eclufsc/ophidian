@@ -5,20 +5,64 @@
 void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_7875")};
+     //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_1")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
+    int initial_wirelength = design.global_routing().wirelength_in_gcell(nets);
+    std::cout << "Circuit initial wirelength = " << initial_wirelength << std::endl;
+
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now(); 
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "result " << result << std::endl;
 
     if(result){
         // need to generate a new guide file
+        std::cout << "Runtime : " << duration.count() << " microsseconds"<< std::endl;
+        std::cout << "Runtime : " << std::to_string( (double)duration.count() / 1000000.0 ) << " seconds"<< std::endl;
+        int final_wirelength = design.global_routing().wirelength_in_gcell(nets);
+        std::cout << "Total movements = " << movements.size() << std::endl;
+        std::cout << "Circuit final wirelength = " << final_wirelength << std::endl;
+        auto score = initial_wirelength - final_wirelength;
+        std::cout << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
+        double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
+        std::cout << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+
+        std::cout << "\n\n" << 
+            circuit_name << ";" <<
+            initial_wirelength << ";" <<
+            final_wirelength << ";" <<
+            score << ";" <<
+            reduction << ";" <<
+            duration.count() << ";" <<
+            movements.size() << "\n\n" << std::endl;
+
 
         // iccad_output_writer.write_ICCAD_2020_output("", movements);
+
+        std::cout << "connected nets" << std::endl;
+        for (auto net : nets) {
+            ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
+            for (auto pin : design.netlist().pins(net)) {
+                auto location = design.placement().location(pin);
+                auto box = ophidian::routing::GCellGraph::box_type{location, location};
+                auto pin_geometry = design.placement().geometry(pin);
+                auto layer_name = pin_geometry.front().second;
+                auto pin_layer = design.routing_library().find_layer_instance(layer_name);
+                auto layer_index = design.routing_library().layerIndex(pin_layer);
+
+                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index);
+            }
+            auto connected = design.global_routing().is_connected(net, pin_gcells);
+
+            auto net_name = design.netlist().name(net);
+            std::cout << "net " << net_name << " connected " << connected << std::endl;
+        }
     }
    
 }
@@ -50,24 +94,6 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
-
-        auto & library = design.routing_library();
-
-        auto & routing_constraint = design.routing_constraints();
-
-        using unit_type                        = ophidian::util::database_unit_t;
-        using point_type                       = ophidian::util::LocationDbu;
-        using box_type                         = ophidian::geometry::Box<unit_type>;
-        using gcell_container_type             = std::vector<ophidian::routing::GCell>;
-
-        auto point = point_type(unit_type{255646}, unit_type{436800});
-        auto point2 = point_type(unit_type{255647}, unit_type{436801});
-        box_type box {point, point2};
-        gcell_container_type gcells;
-        design.global_routing().gcell_graph()->intersect(gcells, box, 0);
-
-
-        auto circuti_die = design.floorplan().chip_upper_right_corner();
         
 
 

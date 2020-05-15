@@ -191,6 +191,14 @@ namespace ophidian::parser
                 else { orientation = Def::pad_type::orientation_type::N; }
                 pad.set_orientation(orientation);
 
+                Def::pad_type::Direction direction = Def::pad_type::Direction::NA;
+                if(pin->hasDirection()){
+                    std::string direction_str = pin->direction();
+                    if(direction_str == "INPUT")       { direction = Def::pad_type::Direction::INPUT; }
+                    else if(direction_str == "OUTPUT") { direction = Def::pad_type::Direction::OUTPUT;}
+                }
+                pad.set_direction(direction);
+
                 int xl, yl, xh, yh = 0;
                 for (int i = 0; i < pin->numLayer(); ++i) {
                     Def::pad_type::layer_container_type boxes;

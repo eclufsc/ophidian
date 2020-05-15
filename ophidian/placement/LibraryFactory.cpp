@@ -66,8 +66,8 @@ namespace ophidian::placement::factory
                         auto max_x = dbu_converter.convert(std::max( rect.min_corner().x(), rect.max_corner().x() ));
                         auto max_y = dbu_converter.convert(std::max( rect.min_corner().y(), rect.max_corner().y() ));
 
-                        sum_x += (min_x + max_x) / 2;
-                        sum_y += (min_y + max_y) / 2;
+                        sum_x += (min_x + max_x)/2;
+                        sum_y += (min_y + max_y)/2;
                         cont ++;
 
                         auto min_corner = geometry::CellGeometry::point_type{ min_x, min_y };

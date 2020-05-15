@@ -115,6 +115,16 @@ namespace ophidian::circuit
         return m_pin_instance_to_std_cell_pin[pin];
     }
 
+    bool Netlist::is_pad(const Netlist::pin_instance_type& pin) const
+    {
+        auto name = m_pin_names[pin];
+        if (name.find("PIN:") != std::string::npos) {
+            //.. found.
+            return true;
+        } 
+        return false;
+    }
+
     Netlist::cell_instance_container_type::const_iterator Netlist::begin_cell_instance() const noexcept
     {
         return m_cells.begin();

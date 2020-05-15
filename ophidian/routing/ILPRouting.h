@@ -63,6 +63,7 @@ namespace ophidian::routing {
             using candidate_origin_type     = PositionCandidateOrigin;
 
             using point_type                = util::LocationDbu;
+            using point_container_type      = std::vector<point_type>;
             using box_type                  = geometry::Box<unit_type>;
             using ilp_var_type              = GRBVar;
             using ilp_var_container_type    = std::vector<ilp_var_type>;
@@ -126,6 +127,10 @@ namespace ophidian::routing {
     	    void save_result();
 
             void create_all_cell_initial_candidates(GRBModel & model);
+
+            void convert_to_flute(point_container_type & converted, const point_container_type & points) const;
+
+            point_type convert_to_design(point_type & point) const;
 
             design_type&    m_design;
             std::string     m_circuit_name;

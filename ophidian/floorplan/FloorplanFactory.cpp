@@ -42,4 +42,18 @@ namespace ophidian::floorplan::factory
             );
         }
     }
+
+    void make_floorplan(Floorplan& floorplan, const parser::ICCAD2020 & iccad_2020)
+    {
+        using unit_type = ophidian::floorplan::Floorplan::unit_type;
+        using point_type = ophidian::floorplan::Floorplan::point_type;
+
+        auto dimensions = iccad_2020.grid_dimensions();
+        auto gcell_size = 10.0;
+        auto upper_x = std::get<0>(dimensions) * gcell_size;
+        auto upper_y = std::get<1>(dimensions) * gcell_size;
+
+        floorplan.chip_origin() = point_type(unit_type(0.0), unit_type(0.0));
+        floorplan.chip_upper_right_corner() = point_type(unit_type(upper_x), unit_type(upper_y));
+    }
 }
