@@ -87,6 +87,7 @@ public:
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
     uint32_t id(const gcell_type& gcell);
     bool overfloed(const gcell_type& gcell);
+    index_type layer_index(const gcell_type & gcell);
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;

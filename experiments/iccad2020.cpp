@@ -72,12 +72,11 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
-    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
-    // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
+    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N1")};
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
@@ -94,12 +93,15 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
         for (auto net : nets) {
             ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
             for (auto pin : design.netlist().pins(net)) {
+                auto pin_name = design.netlist().name(pin);                
                 auto location = design.placement().location(pin);
                 auto box = ophidian::routing::GCellGraph::box_type{location, location};
                 auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second;
+                auto layer_name = pin_geometry.front().second;        
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
+
+                std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
                 design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index);
             }

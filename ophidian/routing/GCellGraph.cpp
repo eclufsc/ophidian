@@ -182,6 +182,12 @@ bool GCellGraph::overfloed(const gcell_type& gcell){
     return (m_gcell_capacity[gcell] < (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
 }
 
+GCellGraph::index_type GCellGraph::layer_index(const gcell_type & gcell) {
+    auto node = graph_node(gcell);
+    auto node_position = position(node);
+    return node_position.get<2>() + 1;
+}
+
 GCellGraph::scalar_type GCellGraph::net_demand(const GCellGraph::gcell_type& gcell)
 {
     return m_gcell_net_demand[gcell];

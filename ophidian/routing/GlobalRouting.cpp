@@ -258,6 +258,9 @@ namespace ophidian::routing
             if (gcell_to_node.find(gcell) == gcell_to_node.end()) {
                 auto node = net_graph.addNode();
                 gcell_to_node[gcell] = node;
+
+                auto point = m_gcell_graph->center_of_box(gcell);
+                auto layer = m_gcell_graph->layer_index(gcell);
             }
         }
         for (auto segment : m_net_to_gr_segment.parts(net)) {
@@ -268,26 +271,23 @@ namespace ophidian::routing
             if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
                 start_node = net_graph.addNode();
                 gcell_to_node[gcell_start] = start_node;
+                
             } else {
                 start_node = gcell_to_node[gcell_start];
             }
+                auto start_point = m_gcell_graph->center_of_box(gcell_start);
+                auto start_layer = m_gcell_graph->layer_index(gcell_start);
             if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
                 end_node = net_graph.addNode();
                 gcell_to_node[gcell_end] = end_node;
+                
             } else {
                 end_node = gcell_to_node[gcell_end];
             }
+                auto point = m_gcell_graph->center_of_box(gcell_end);
+                auto layer = m_gcell_graph->layer_index(gcell_start);
             net_graph.addEdge(start_node, end_node);
         }
-
-        std::cout << "Nodes:";
-        for (graph_type::NodeIt i(net_graph); i!=lemon::INVALID; ++i)
-            std::cout << " " << net_graph.id(i);
-        std::cout << std::endl;
-        std::cout << "Edges:";
-        for (graph_type::ArcIt i(net_graph); i!=lemon::INVALID; ++i)
-            std::cout << " (" << net_graph.id(net_graph.source(i)) << "," << net_graph.id(net_graph.target(i)) << ")";
-        std::cout << std::endl;
 
         return lemon::connected(net_graph);
     }
