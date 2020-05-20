@@ -117,7 +117,7 @@ find_package(DEF REQUIRED)
 find_package(LEF REQUIRED)
 
 # Find Flute
-find_package(Flute REQUIRED)
+find_package(flute REQUIRED)
 
 # Find Verilog-parser
 find_package(verilog-parser REQUIRED)

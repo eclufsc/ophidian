@@ -69,10 +69,10 @@ install_LEF()
 install_FLUTE()
 {
     echo "installing Flute"
-    cd $SOURCE_ROOT/3rdparty/Flute
+    cd $SOURCE_ROOT/3rdparty/flute3
     mkdir build
     cd build
-    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_CXX_FLAGS="-fPIC -w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build

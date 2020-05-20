@@ -24,6 +24,9 @@
 
 namespace ophidian::interconnection
 {
+
+    using namespace Flute;
+
     Flute::Flute()
     {
         readLUT();
@@ -61,15 +64,15 @@ namespace ophidian::interconnection
     }
 
     std::unique_ptr<SteinerTree> Flute::callFlute(
-        const std::vector<unsigned> & X,
-        const std::vector<unsigned> & Y,
+        const std::vector<int> & X,
+        const std::vector<int> & Y,
         const Flute::Point & offset)
     {
         Tree tree = flute(
             static_cast<int32_t>(X.size()),
-            const_cast<unsigned *>(X.data()),
-            const_cast<unsigned *>(Y.data()),
-            ACCURACY);
+            const_cast<int *>(X.data()),
+            const_cast<int *>(Y.data()),
+            FLUTE_ACCURACY);
         auto      steiner = SteinerTree::create();
         const int numBranches = 2 * tree.deg - 2;
 
