@@ -1176,6 +1176,7 @@ namespace ophidian::routing {
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
                     movements.push_back(std::make_pair(cell, position));
+                    m_design.placement().place(cell, position);
                     auto type = m_position_candidate_origin[candidate];
                     switch (type)
                     {
