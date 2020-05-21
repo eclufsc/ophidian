@@ -13,7 +13,7 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Set project version
 set(ophidian_VERSION 0.2.1)
@@ -21,7 +21,7 @@ set(ophidian_VERSION 0.2.1)
 # Set project name
 project(ophidian VERSION ${ophidian_VERSION})
 
-# Set c++14 globally
+# Set c++17 globally
 set(CMAKE_CXX_STANDARD 17)
 
 # Set Ophidian source dir
@@ -69,29 +69,6 @@ set(ophidian_install_share_dir share/ophidian)
 set(ophidian_install_copyright_dir share/doc/ophidian)
 
 ################################################################################
-# Set Linker RPATH options
-################################################################################
-
-# use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-# when building, don't use the install RPATH already
-# (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-ENDIF("${isSystemDir}" STREQUAL "-1")
-
-################################################################################
 # Handle raquirements
 ################################################################################
 
@@ -120,7 +97,7 @@ find_package(LEF REQUIRED)
 find_package(flute REQUIRED)
 
 # Find Verilog-parser
-find_package(verilog-parser REQUIRED)
+find_package(verilogparser REQUIRED)
 
 # Find GUI Dependencies
 IF(OPHIDIAN_GUI)

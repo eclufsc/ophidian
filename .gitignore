@@ -16,6 +16,5 @@
 /test/input_files/ispd18/*
 *.orig
 *.json
-3rdparty/*
 .vscode
 tags

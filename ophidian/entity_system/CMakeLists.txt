@@ -14,101 +14,88 @@
 #       `- Install headers.
 #
 ################################################################################
+cmake_minimum_required(VERSION 3.10.2)
 
-################################################################################
-# Set variables
-################################################################################
+project(ophidian_entity_system VERSION ${ophidian_VERSION})
 
-# Set the include path for installed target
-set(ophidian_entity_system_install_include_dir 
-    ${ophidian_install_include_dir}/ophidian/entity_system
+set(target_name ${PROJECT_NAME})
+
+set(export_name ${PROJECT_NAME}-export)
+set(export_namespace ophidian::)
+set(package_config_name ${PROJECT_NAME}-config)
+set(package_config_version_name ${package_config_name}-version)
+
+file(GLOB source_files
+  "src/*.cpp"
 )
-
-################################################################################
-# Fetch files
-################################################################################
-
-# Fetch .cpp files for library creation
-file(GLOB ophidian_entity_system_source
-    "*.cpp"
-)
-
-# Fetch .h files for library creation
-file(GLOB ophidian_entity_system_headers
-    "*.h"
-)
-
-################################################################################
-# Uncrustify
-################################################################################
-
-set(uncrustify_files ${ophidian_entity_system_source} ${ophidian_entity_system_headers})
-
-if(UNCRUSTIFY_IT)
-    include(uncrustify_helper)
-    uncrustify_it(${ophidian_uncrustify_config} "${uncrustify_files}")
-endif()
-
-if(RUN_UNCRUSTIFY_CHECK)
-    include(uncrustify_helper)
-    uncrustify_check(${ophidian_uncrustify_config} "${uncrustify_files}")
-endif()
 
 ################################################################################
 # Library target
 ################################################################################
+add_library(${target_name} ${source_files})
 
-# Add library target
-add_library(ophidian_entity_system SHARED ${ophidian_entity_system_source})
-
-# Set shared library version, this will make cmake create a link
-set_target_properties(ophidian_entity_system PROPERTIES
-    VERSION ${ophidian_VERSION}
-    SOVERSION ${ophidian_VERSION}
+set_target_properties(${target_name} PROPERTIES
+  VERSION ${PROJECT_VERSION}
+  SOVERSION ${PROJECT_VERSION}
 )
 
-# Tell cmake target's dependencies
-target_link_libraries(ophidian_entity_system
-    PUBLIC Lemon::lemon
+target_link_libraries(${target_name}
+  PUBLIC Lemon::lemon
 )
 
-# Tell cmake the path to look for include files for this target
-# This is transitive, so any targets linked with this one will
-# search for headers in the respective paths
-target_include_directories(ophidian_entity_system PUBLIC
-    $<BUILD_INTERFACE:${ophidian_source_dir}>
-    $<INSTALL_INTERFACE:include>
-)
-
-# Add library target
-add_library(ophidian_entity_system_static STATIC ${ophidian_entity_system_source})
-
-# Tell cmake target's dependencies
-target_link_libraries(ophidian_entity_system_static
-    PUBLIC Lemon::lemon_static
-)
-
-# Tell cmake the path to look for include files for this target
-# This is transitive, so any targets linked with this one will
-# search for headers in the respective paths
-target_include_directories(ophidian_entity_system_static PUBLIC
-    $<BUILD_INTERFACE:${ophidian_source_dir}>
-    $<INSTALL_INTERFACE:include>
+target_include_directories(${target_name} PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
 )
 
 ################################################################################
 # Installation rules
 ################################################################################
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-# Install rule for target
-install(
-    TARGETS ophidian_entity_system ophidian_entity_system_static 
-    DESTINATION ${ophidian_install_lib_dir}
-    EXPORT ophidian-targets
+export(TARGETS ${target_name}
+  NAMESPACE ${export_namespace}
+  FILE ${PROJECT_BINARY_DIR}/${export_name}.cmake
 )
 
-# Install rule for headers
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/${package_config_version_name}.cmake
+  COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+  ${PROJECT_SOURCE_DIR}/cmake/package-config.cmake.in
+  ${PROJECT_BINARY_DIR}/${package_config_name}.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIRA}/${PROJECT_NAME}/cmake
+)
+
+install(TARGETS ${target_name}
+  EXPORT ${export_name}
+  LIBRARY
+    COMPONENT Libraries
+    NAMELINK_COMPONENT Development
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE
+    COMPONENT Libraries
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+  COMPONENT Development
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 install(
-    FILES ${ophidian_entity_system_headers} 
-    DESTINATION ${ophidian_entity_system_install_include_dir}
+  FILES
+    ${PROJECT_BINARY_DIR}/${package_config_name}.cmake
+    ${PROJECT_BINARY_DIR}/${package_config_version_name}.cmake
+  COMPONENT Development
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
+)
+
+install(EXPORT ${export_name}
+  COMPONENT Development
+  NAMESPACE ${export_namespace}
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
 )
