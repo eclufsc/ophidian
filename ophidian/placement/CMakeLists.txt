@@ -51,6 +51,7 @@ target_include_directories(${target_name} PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
+add_subdirectory(tests)
 ################################################################################
 # Installation rules
 ################################################################################
