@@ -19,9 +19,3 @@ target_link_libraries(${target_name}
   PRIVATE Catch
   PRIVATE ophidian_util
 )
-
-message("Creating symlink for test files")
-execute_process(
-    COMMAND ln -f -s ${ophidian_source_dir}/test/input_files ${PROJECT_BINARY_DIR}
-    RESULT_VARIABLE result
-)
