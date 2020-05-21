@@ -40,11 +40,13 @@ set_target_properties(${target_name} PROPERTIES
 )
 
 target_link_libraries(${target_name}
-  PUBLIC ophidian_interconnection
-  PUBLIC ophidian_parser
   PUBLIC ophidian_circuit
+  PUBLIC ophidian_parser
+  PUBLIC ophidian_interconnection
   PUBLIC ophidian_entity_system
   PUBLIC ophidian_geometry
+  PUBLIC gurobi_g++5.2
+  PUBLIC gurobi90
 )
 
 target_include_directories(${target_name} PUBLIC
@@ -52,6 +54,7 @@ target_include_directories(${target_name} PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
+add_subdirectory(tests)
 ################################################################################
 # Installation rules
 ################################################################################

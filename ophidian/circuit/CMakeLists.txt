@@ -41,8 +41,8 @@ set_target_properties(${target_name} PROPERTIES
 )
 
 target_link_libraries(${target_name}
-  PUBLIC ophidian_entity_system
   PUBLIC ophidian_parser
+  PUBLIC ophidian_entity_system
 )
 
 target_include_directories(${target_name} PUBLIC
