@@ -163,7 +163,7 @@ This section will guide you on the compilation process of the Ophidian library.
 The Ophidian library depends on the following third party software:
 
 ### Dependencies:
-* [Cmake](https://cmake.org/) (>= 3.5.2)
+* [Cmake](https://cmake.org/) (>= 3.13.4)
 * [Boost](http://www.boost.org/) (>= 1.63)
 * [Lemmon](http://lemon.cs.elte.hu/trac/lemon)
 * [Units](https://gitlab.com/eclufsc/eda/units) 
