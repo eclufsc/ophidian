@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-project(ophidian_parser_tests VERSION ${ophidian_VERSION})
+project(ophidian_design_tests VERSION ${ophidian_VERSION})
 
 find_package(Catch2 REQUIRED)
 
@@ -17,7 +17,7 @@ add_executable(${target_name} ${source_files})
 
 target_link_libraries(${target_name}
   PRIVATE Catch
-  PRIVATE ophidian_parser
+  PRIVATE ophidian_circuit
 )
 
 message("Creating symlink for test files")

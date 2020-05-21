@@ -130,34 +130,9 @@ void Verilog::read_stream(std::istream &verilog_stream) {
              net_it = net_it->next) {
             auto net = static_cast<ast_net_declaration *>(net_it->data);
 
-            auto *identifier_assignment = net->identifier_assignment;
+            auto identifier_assignment = reinterpret_cast<ast_single_assignment *>(net->identifier_assignment);
 
-            switch (identifier_assignment->type) {
-            case ASSIGNMENT_CONTINUOUS: {
-                auto list = identifier_assignment->continuous->assignments;
-                for (unsigned i = 0; i < list->items; i++) {
-                    nets.emplace_back(
-                        static_cast<char *>(ast_list_get(list, i)));
-                }
-                break;
-            }
-            case ASSIGNMENT_NONBLOCKING: {
-                auto id =
-                    identifier_assignment->procedural->lval->data.identifier;
-                nets.emplace_back(id->identifier);
-                break;
-            }
-            case ASSIGNMENT_HYBRID: {
-                break;
-            }
-
-            default:
-                break;
-            }
-
-            for(auto& x : nets) {
-              std::cout << x << std::endl;
-            }
+            nets.emplace_back(identifier_assignment->lval->data.identifier->identifier);
         }
 
         auto module_instances =

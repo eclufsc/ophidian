@@ -17,7 +17,7 @@ TEST_CASE("Verilog: missing file", "[parser][verilog]")
 
 TEST_CASE("Verilog: simple.v", "[parser][verilog][simple]")
 {
-    auto simple = Verilog{"../../../../test/input_files/simple/simple.v"};
+    auto simple = Verilog{"input_files/simple/simple.v"};
 
     SECTION("Verilog: check modules size", "[parser][verilog][simple][module][size]"){
         CHECK(simple.modules().size() == 1);

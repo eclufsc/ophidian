@@ -9,9 +9,7 @@ TEST_CASE("Netlist factory: populate with simple verilog.", "[circuit][Netlist][
 {
     auto netlist = Netlist{};
 
-    std::cout << "hy" << std::endl;
     auto simple = ophidian::parser::Verilog{"input_files/simple/simple.v"};
-    std::cout << "hy" << std::endl;
 
     factory::make_netlist(netlist, simple);
 
