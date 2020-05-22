@@ -65,7 +65,7 @@ target_compile_features(${target_name}
 set_target_properties(${target_name}
   PROPERTIES
     VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 add_subdirectory(tests)

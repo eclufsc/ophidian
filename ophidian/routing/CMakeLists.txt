@@ -34,7 +34,7 @@ file(GLOB source_files
 ################################################################################
 # Library target
 ################################################################################
-add_library(${target_name} ${source_files})
+add_library(${target_name})
 add_library(${export_namespace}${target_name} ALIAS ${target_name})
 
 target_sources(${target_name}
@@ -67,7 +67,7 @@ target_compile_features(${target_name}
 set_target_properties(${target_name}
   PROPERTIES
     VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 add_subdirectory(tests)

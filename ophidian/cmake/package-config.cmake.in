@@ -1,0 +1,18 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Put your transitive dependencies here for find_package
+find_dependency(ophidian_circuit)
+find_dependency(ophidian_design)
+find_dependency(ophidian_entity_system)
+find_dependency(ophidian_floorplan)
+find_dependency(ophidian_geometry)
+find_dependency(ophidian_interconnection)
+find_dependency(ophidian_parser)
+find_dependency(ophidian_placement)
+find_dependency(ophidian_routing)
+find_dependency(ophidian_util)
+
+include(${CMAKE_CURRENT_LIST_DIR}/@export_name@.cmake)
+check_required_components(@PROJECT_NAME@)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(iccad19gr VERSION ${ophidian_VERSION})
+project(iccad19gr)
 
 find_package(Catch2 REQUIRED)
 

@@ -9,9 +9,9 @@
 ################################################################################
 cmake_minimum_required(VERSION 3.10.2)
 
-project(ophidian VERSION 0.2.1)
+project(ophidian_meta VERSION 0.2.1)
 
-set(ophidian_VERSION ${PROJECT_VERSION})
+set(ophidian_meta_VERSION ${PROJECT_VERSION})
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/dependencies")

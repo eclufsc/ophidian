@@ -7,83 +7,66 @@
 #   - Create an graphic user interface.
 #
 ################################################################################
+cmake_minimum_required(VERSION 3.10.2)
+
+project(ophidian_gui VERSION ${ophidian_VERSION})
 
 find_package(SFML 2 REQUIRED graphics window system)
-
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
-################################################################################
-# Set flags
-################################################################################
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-################################################################################
-# Fetch files
-################################################################################
+set(target_name ${PROJECT_NAME})
 
-# Fetch .cpp files for executable creation
 file(GLOB_RECURSE ophidian_gui_source
     "*.cpp"
 )
 
-# Fetch .ui files for executable creation
 file(GLOB_RECURSE ophidian_gui_userinterface
     "*.ui"
 )
 
-# Fetch .cpp files for executable creation
 file(GLOB_RECURSE ophidian_gui_headers
     "*.h"
 )
 
 ################################################################################
-# Uncrustify
+# Executable target
 ################################################################################
+add_executable(${target_name})
 
-set(uncrustify_files ${ophidian_gui_source} ${ophidian_gui_userinterface} ${ophidian_gui_headers})
+target_sources(${target_name}
+  PRIVATE
+    ${ophidian_gui_source}
+    ${ophidian_gui_userinterface}
+)
 
-if(UNCRUSTIFY_IT)
-    include(uncrustify_helper)
-    uncrustify_it(${ophidian_uncrustify_config} "${uncrustify_files}")
-endif()
-
-if(RUN_UNCRUSTIFY_CHECK)
-    include(uncrustify_helper)
-    uncrustify_check(${ophidian_uncrustify_config} "${uncrustify_files}")
-endif()
-
-################################################################################
-# GUI executable
-################################################################################
-
-# Add gui executable
-add_executable( ophidian_gui ${ophidian_gui_source} ${ophidian_gui_userinterface} )
-
-# Add executable dependencies
-target_link_libraries(ophidian_gui PUBLIC
-    PRIVATE Qt5::Widgets
-    PRIVATE SFML::GRAPHICS
-    PRIVATE SFML::WINDOW
-    PRIVATE SFML::SYSTEM
-    PRIVATE ophidian_circuit
-    PRIVATE ophidian_design
-    PRIVATE ophidian_entity_system
-    PRIVATE ophidian_floorplan
-    PRIVATE ophidian_geometry
-    PRIVATE ophidian_interconnection
-    PRIVATE ophidian_parser
-    PRIVATE ophidian_placement
+target_link_libraries(${target_name}
+  PRIVATE
+    Qt5::Widgets
+    SFML::GRAPHICS
+    SFML::WINDOW
+    SFML::SYSTEM
+    ophidian::ophidian_circuit
+    ophidian::ophidian_design
+    ophidian::ophidian_entity_system
+    ophidian::ophidian_floorplan
+    ophidian::ophidian_geometry
+    ophidian::ophidian_interconnection
+    ophidian::ophidian_parser
+    ophidian::ophidian_placement
 )
 
 ################################################################################
 # Installation rules
 ################################################################################
+include(GNUInstallDirs)
 
-# Install rule for executable
-install(
-    TARGETS ophidian_gui
-    DESTINATION ${ophidian_install_bin_dir}
+install(TARGETS ophidian_gui
+  RUNTIME
+    COMPONENT Runtime
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
