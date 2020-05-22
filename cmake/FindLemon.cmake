@@ -1,23 +1,46 @@
-find_path(Lemon_INCLUDE_DIR "lemon/maps.h" PATHS "/usr/include" )
-find_library(Lemon_shared_LIBRARY "liblemon.so" NAMES "libemon.so" PATHS "/usr/lib" "/usr/lib/x86_64-linux-gnu")
-find_library(Lemon_static_LIBRARY "liblemon.a" NAMES "libemon.a" PATHS "/usr/lib" "/usr/lib/x86_64-linux-gnu")
+find_package(LEMON QUIET)
+
+find_path(Lemon_INCLUDE_DIR
+  NAMES
+    "lemon/maps.h"
+  PATHS
+    ${LEMON_INCLUDE_DIR}
+)
+
+find_library(Lemon_LIBRARY
+  NAMES
+    "libemon.a"
+    "libemon.so"
+    "liblemon.a"
+    "liblemon.so"
+    "lemon.lib"
+  PATHS
+    ${LEMON_LIBRARY_DIR}
+)
 
 include(FindPackageHandleStandardArgs)
-
-find_package_handle_standard_args(Lemon DEFAULT_MSG
+find_package_handle_standard_args(Lemon
+  FOUND_VAR
+    Lemon_FOUND
+  REQUIRED_VARS
+    Lemon_LIBRARY
     Lemon_INCLUDE_DIR
-    Lemon_shared_LIBRARY
-    Lemon_static_LIBRARY
 )
 
-add_library(Lemon::lemon SHARED IMPORTED)
-set_target_properties(Lemon::lemon PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES ${Lemon_INCLUDE_DIR}
-    IMPORTED_LOCATION ${Lemon_shared_LIBRARY}
-)
+if(Lemon_FOUND)
+  set(Lemon_LIBRARIES ${Lemon_LIBRARY})
+  set(Lemon_INCLUDE_DIRS ${Lemon_INCLUDE_DIR})
+endif()
 
-add_library(Lemon::lemon_static STATIC IMPORTED)
-set_target_properties(Lemon::lemon_static PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES ${Lemon_INCLUDE_DIR}
-    IMPORTED_LOCATION ${Lemon_static_LIBRARY}
+if(Lemon_FOUND AND NOT TARGET Lemon::lemon)
+  add_library(Lemon::lemon UNKNOWN IMPORTED)
+  set_target_properties(Lemon::lemon PROPERTIES
+    IMPORTED_LOCATION "${Lemon_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${Lemon_INCLUDE_DIR}"
+  )
+endif()
+
+mark_as_advanced(
+  Lemon_INCLUDE_DIR
+  Lemon_LIBRARY
 )

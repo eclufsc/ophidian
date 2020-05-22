@@ -1,87 +1,41 @@
-################################################################################
-# This is the CMakeLists file for the Ophidian library Test binary. 
-#
-# Its main goals are:
-#   - Fetch test files.
-#   - Configure Catch test library.
-#   - Add test target.
-#   - Link test target.
-#   - Prepare test input environment.
-################################################################################
+cmake_minimum_required(VERSION 3.17)
 
-# Fetch test files recursevely
-file(GLOB_RECURSE ophidian_experiments_source
-    "*.cpp"
-    "main.cpp"
+project(iccad19gr VERSION ${ophidian_VERSION})
+
+find_package(Catch2 REQUIRED)
+
+set(target_name ${PROJECT_NAME})
+
+file(GLOB source_files
+  "src/*.cpp"
 )
 
-# Add test target
-add_executable(iccad19gr ${ophidian_experiments_source})
+################################################################################
+# Executable target
+################################################################################
+add_executable(${target_name})
 
-# Fetch test files recursevely
-file(GLOB_RECURSE ophidian_experiments_source
-    "*.cpp"
-    "main.cpp"
+target_sources(${target_name}
+  PRIVATE
+    ${source_files}
 )
 
-# Link target dependencies
-target_link_libraries(iccad19gr
-    PRIVATE Catch
-    PRIVATE ophidian_circuit
-    PRIVATE ophidian_design
-    PRIVATE ophidian_entity_system
-    PRIVATE ophidian_floorplan
-    PRIVATE ophidian_geometry
-    PRIVATE ophidian_interconnection
-    PRIVATE ophidian_routing
-    PRIVATE ophidian_placement
-    PRIVATE ophidian_parser
-    PRIVATE gurobi_g++5.2
-    PRIVATE gurobi90
+target_link_libraries(${target_name}
+  PRIVATE
+    Catch
+    ophidian::ophidian_circuit
+    ophidian::ophidian_design
+    ophidian::ophidian_entity_system
+    ophidian::ophidian_floorplan
+    ophidian::ophidian_geometry
+    ophidian::ophidian_interconnection
+    ophidian::ophidian_routing
+    ophidian::ophidian_placement
+    ophidian::ophidian_parser
 )
-
-if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
-    # Link EVERYTHING staticly!
-    set_target_properties(iccad19gr PROPERTIES
-        LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
-    )
-endif()
-
-################################################################################
-# Prepare test input environment. 
-################################################################################
 
 message("Creating symlink for test files")
 execute_process(
-    COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/test/input_files ${PROJECT_BINARY_DIR}/experiments/.
+    COMMAND ln -f -s ${ophidian_source_dir}/input_files ${PROJECT_BINARY_DIR}
     RESULT_VARIABLE result
 )
-
-find_file(POWV9 "POWV9.dat" PATHS 
-    "/usr/share/Flute" 
-    "/usr/local/share/Flute" 
-    "${ophidian_source_dir}/dependencies/share/Flute"
-)
-find_file(PORT9 "PORT9.dat" PATHS 
-    "/usr/share/Flute" 
-    "/usr/local/share/Flute" 
-    "${ophidian_source_dir}/dependencies/share/Flute"
-)
-
-message("Creating symlink FLUTE LUTs")
-execute_process(
-    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/experiments/.
-    RESULT_VARIABLE result
-)
-execute_process(
-    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/experiments/.
-    RESULT_VARIABLE result
-)
-
-################################################################################
-# Add test to ctest
-################################################################################
-
-enable_testing()
-add_test(NAME unit_test COMMAND iccad19gr)
-

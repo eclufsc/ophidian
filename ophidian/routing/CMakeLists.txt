@@ -53,8 +53,8 @@ target_link_libraries(${target_name}
     ophidian::ophidian_interconnection
     ophidian::ophidian_entity_system
     ophidian::ophidian_geometry
-    gurobi_g++5.2
-    gurobi90
+    Gurobi::gurobi
+    Gurobi::gurobi_c++
 )
 
 target_compile_features(${target_name}
