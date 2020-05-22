@@ -18,6 +18,10 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project(ophidian_parser VERSION ${ophidian_VERSION})
 
+find_package(DEF REQUIRED)
+find_package(LEF REQUIRED)
+find_package(verilogparser REQUIRED)
+
 set(target_name ${PROJECT_NAME})
 
 set(export_name ${PROJECT_NAME}-export)
@@ -50,8 +54,8 @@ target_link_libraries(${target_name}
   PUBLIC
     ophidian::ophidian_design
   PRIVATE
-    ophidian_util
-    ophidian_geometry
+    ophidian::ophidian_util
+    ophidian::ophidian_geometry
     verilogparser::verilogparser
     DEF::def
     LEF::lef

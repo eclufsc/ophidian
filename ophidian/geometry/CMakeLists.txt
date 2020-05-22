@@ -18,6 +18,8 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project(ophidian_geometry VERSION ${ophidian_VERSION})
 
+find_package(Boost REQUIRED)
+
 set(target_name ${PROJECT_NAME})
 
 set(export_name ${PROJECT_NAME}-export)

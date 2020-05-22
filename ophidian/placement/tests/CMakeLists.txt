@@ -20,7 +20,6 @@ target_link_libraries(${target_name}
   PRIVATE ophidian_placement
 )
 
-message("Creating symlink for test files")
 execute_process(
     COMMAND ln -f -s ${ophidian_source_dir}/input_files ${PROJECT_BINARY_DIR}
     RESULT_VARIABLE result

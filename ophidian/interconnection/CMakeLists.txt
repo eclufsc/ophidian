@@ -18,6 +18,9 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project(ophidian_interconnection VERSION ${ophidian_VERSION})
 
+find_package(Lemon REQUIRED)
+find_package(Flute REQUIRED)
+
 set(target_name ${PROJECT_NAME})
 
 set(export_name ${PROJECT_NAME}-export)
