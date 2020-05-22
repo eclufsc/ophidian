@@ -14,7 +14,7 @@
 #       `- Install headers.
 #
 ################################################################################
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.17)
 
 project(ophidian_circuit VERSION ${ophidian_VERSION})
 
@@ -29,26 +29,41 @@ file(GLOB source_files
   "src/*.cpp"
 )
 
-add_subdirectory(tests)
 ################################################################################
 # Library target
 ################################################################################
-add_library(${target_name} ${source_files})
+add_library(${target_name})
+add_library(${export_namespace}${target_name} ALIAS ${target_name})
 
-set_target_properties(${target_name} PROPERTIES
-  VERSION ${PROJECT_VERSION}
-  SOVERSION ${PROJECT_VERSION}
+target_sources(${target_name}
+  PRIVATE
+    ${source_files}
+)
+
+target_include_directories(${target_name}
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(${target_name}
-  PUBLIC ophidian_parser
-  PUBLIC ophidian_entity_system
+  PUBLIC
+    ophidian::ophidian_parser
+    ophidian::ophidian_entity_system
 )
 
-target_include_directories(${target_name} PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+target_compile_features(${target_name}
+  PUBLIC
+    cxx_std_17
 )
+
+set_target_properties(${target_name}
+  PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION}
+)
+
+add_subdirectory(tests)
 
 ################################################################################
 # Installation rules
