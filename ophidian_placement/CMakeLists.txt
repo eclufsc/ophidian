@@ -1,20 +1,4 @@
-################################################################################
-# This is the CMakeLists file for the:
-#
-#   namespace ophidian::placement
-#
-# Its main goals are:
-#   - Fetch library files.
-#   - Add target.
-#       `- Set target_include_path.
-#       `- Set target_link_libraries.
-#       `- Set target_compiler_options.
-#   - Define installation parameters.
-#       `- Install targets.
-#       `- Install headers.
-#
-################################################################################
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.13)
 
 project(ophidian_placement VERSION ${ophidian_meta_VERSION})
 

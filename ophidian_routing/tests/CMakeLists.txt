@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.13)
 
 project(ophidian_routing_tests VERSION ${ophidian_meta_VERSION})
 
