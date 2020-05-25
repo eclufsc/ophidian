@@ -1,6 +1,22 @@
-cmake_minimum_required(VERSION 3.13)
+################################################################################
+# This is the CMakeLists file for the:
+#
+#   namespace ophidian::design
+#
+# Its main goals are:
+#   - Fetch library files.
+#   - Add target.
+#       `- Set target_include_path.
+#       `- Set target_link_libraries.
+#       `- Set target_compiler_options.
+#   - Define installation parameters.
+#       `- Install targets.
+#       `- Install headers.
+#
+################################################################################
+cmake_minimum_required(VERSION 3.10.2)
 
-project(ophidian VERSION ${ophidian_meta_VERSION})
+project(ophidian_design VERSION ${ophidian_meta_VERSION})
 
 set(target_name ${PROJECT_NAME})
 
@@ -15,25 +31,49 @@ set(install_component_dev ${install_component_prefix}Development)
 set(install_component_lib ${install_component_prefix}Libraries)
 set(install_component_bin ${install_component_prefix}RunTime)
 
+file(GLOB source_files
+  "src/*.cpp"
+)
+
 ################################################################################
 # Library target
 ################################################################################
-add_library(${target_name} INTERFACE)
+add_library(${target_name})
 add_library(${export_namespace}${target_name} ALIAS ${target_name})
 
-target_link_libraries(${target_name}
-  INTERFACE
-    ophidian::ophidian_circuit
-    ophidian::ophidian_design
-    ophidian::ophidian_entity_system
-    ophidian::ophidian_floorplan
-    ophidian::ophidian_geometry
-    ophidian::ophidian_interconnection
-    ophidian::ophidian_parser
-    ophidian::ophidian_placement
-    ophidian::ophidian_routing
-    ophidian::ophidian_util
+target_sources(${target_name}
+  PRIVATE
+    ${source_files}
 )
+
+target_include_directories(${target_name}
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+target_link_libraries(${target_name}
+  PUBLIC
+    ophidian::ophidian_circuit
+    ophidian::ophidian_floorplan
+    ophidian::ophidian_placement
+    ophidian::ophidian_parser
+    ophidian::ophidian_routing
+)
+
+target_compile_features(${target_name}
+  PUBLIC
+    cxx_std_17
+)
+
+set_target_properties(${target_name}
+  PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+
+enable_testing()
+add_subdirectory(tests)
 
 ################################################################################
 # Installation rules
@@ -69,6 +109,11 @@ install(TARGETS ${target_name}
   ARCHIVE
     COMPONENT ${install_component_lib}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+  COMPONENT ${install_component_dev}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(
