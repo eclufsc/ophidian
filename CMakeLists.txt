@@ -19,7 +19,6 @@ list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/dependencies")
 
 enable_testing()
 
-add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
 add_subdirectory(experiments)
 

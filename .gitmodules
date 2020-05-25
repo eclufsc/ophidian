@@ -16,3 +16,6 @@
 [submodule "3rdparty/verilog-parser"]
 	path = 3rdparty/verilog-parser
 	url = https://github.com/zhanghongce/verilog-parser.git
+[submodule "3rdparty/Catch2"]
+	path = 3rdparty/Catch2
+	url = https://github.com/catchorg/Catch2.git

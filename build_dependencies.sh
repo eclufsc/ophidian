@@ -72,7 +72,7 @@ install_FLUTE()
     cd $SOURCE_ROOT/3rdparty/flute3
     mkdir build
     cd build
-    cmake -DCMAKE_CXX_FLAGS="-fPIC -w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build
@@ -100,12 +100,6 @@ install_LEMON()
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build_static
-    mkdir build_shared
-    cd build_shared
-    cmake -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" -DBUILD_SHARED_LIBS=TRUE ..
-    make DESTDIR=$DEPENDENCIES_ROOT install
-    cd ..
-    rm -rf build_shared
 }
 
 install_UNITS()
@@ -115,6 +109,18 @@ install_UNITS()
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    make DESTDIR=$DEPENDENCIES_ROOT install
+    cd ..
+    rm -rf build
+}
+
+install_Catch2()
+{
+    echo "installing Catch2"
+    cd $SOURCE_ROOT/3rdparty/Catch2
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=off -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build
@@ -134,6 +140,7 @@ run_install()
     install_VERILOG_PARSER
     install_LEMON
     install_UNITS
+    install_Catch2
 }
 
 run_install
