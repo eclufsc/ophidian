@@ -7,38 +7,16 @@ variables:
         libz-dev
         flex
         bison
-        libbison-dev"
-
-    DEPENDENCIES_DEBIAN:
-        "build-essential
-        git
-        cmake
-        libboost-dev
-        liblemon-dev
-        def
-        lef
-        ophidian-units
-        libflute-dev
-        libverilog-parser-dev"
-
-    DEPENDENCIES_UBUNTU_BIONIC:
-        "build-essential
-        git
-        cmake
-        libboost-dev
-        liblemon-dev
-        def
-        lef
-        ophidian-units
-        libflute-dev
-        libverilog-parser-dev"
+        libbison-dev
+        tcl"
 
     DEPENDENCIES_GUI:
         "libsfml-dev
         qtbase5-dev"
 
-
     GIT_SUBMODULE_STRATEGY: recursive
+
+    DEBIAN_FRONTEND: "noninteractive"
 
 stages:
     - build
@@ -60,81 +38,42 @@ pages:
     only:
         - master
 
-build_on_debian-buster:
-    image: debian:buster
-    stage: build
-    before_script:
-        - apt-get update -qq && apt-get install -qq -y software-properties-common gpg
-        - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A62C1A5EFCB3D41A1FDB35758179B53998C15E64 && apt-get update -qq
-        - add-apt-repository -y -u -m "deb http://ppa.launchpad.net/eclufsc/ophidian/ubuntu bionic main"
-        - apt-get install -qq -y $DEPENDENCIES_DEBIAN $DEPENDENCIES_GUI
-    script:
-        - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr
-                -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
-                ..
-        - make -j2
-        - cd test
-        - ./ophidian_tests
-    artifacts:
-        paths:
-            - build/
-
-build_on_ubuntu-bionic:
+build_ophidian:
     image: ubuntu:bionic
     stage: build
     before_script:
-        - apt-get update -qq && apt-get install -qq -y software-properties-common
-        - add-apt-repository -y ppa:eclufsc/ophidian && apt-get update -qq
-        - apt-get install -qq -y $DEPENDENCIES_UBUNTU_BIONIC $DEPENDENCIES_GUI
-    script:
-        - mkdir build && cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=/usr
-                -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
-                ..
-        - make -j2
-        - cd test
-        - ./ophidian_tests
-    artifacts:
-        paths:
-            - build/
-
-build_using_local_packages_on_source:
-    image: ubuntu:bionic
-    stage: build
-    before_script:
-        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
+        - apt-get update -qq && apt-get install -qq -y apt-transport-https ca-certificates gnupg software-properties-common wget
+        - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+        - apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+        - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES
     script:
         - echo "y" | bash build_dependencies.sh
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
-        - cd test
-        - ./ophidian_tests
+        - ctest --output-on-failure
     artifacts:
         paths:
             - build/
 
-build_using_local_packages_on_system:
+build_ophidian_usr_local:
     image: ubuntu:bionic
     stage: build
     before_script:
+        - apt-get update -qq && apt-get install -qq -y apt-transport-https ca-certificates gnupg software-properties-common wget
+        - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+        - apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
         - apt-get update -qq && apt-get install -qq -y $BUILD_SCRIPT_DEPENDENCIES $DEPENDENCIES_GUI
     script:
         - echo y | bash build_dependencies.sh --install_to /usr/local
         - mkdir build && cd build
         - cmake -DCMAKE_INSTALL_PREFIX=/usr
                 -DCMAKE_BUILD_TYPE=Release
-                -DOPHIDIAN_GUI=ON
                 ..
         - make -j2
-        - cd test
-        - ./ophidian_tests
+        - ctest --output-on-failure
     artifacts:
         paths:
             - build/

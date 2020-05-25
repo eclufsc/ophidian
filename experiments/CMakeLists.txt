@@ -34,7 +34,6 @@ target_link_libraries(${target_name}
     ophidian::ophidian_parser
 )
 
-message("Creating symlink for test files")
 execute_process(
     COMMAND ln -f -s ${ophidian_source_dir}/input_files ${PROJECT_BINARY_DIR}
     RESULT_VARIABLE result

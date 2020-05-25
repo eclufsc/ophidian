@@ -9,7 +9,7 @@
 ################################################################################
 cmake_minimum_required(VERSION 3.10.2)
 
-project(ophidian_gui VERSION ${ophidian_VERSION})
+project(ophidian_gui VERSION ${ophidian_meta_VERSION})
 
 find_package(SFML 2 REQUIRED graphics window system)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
@@ -19,6 +19,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(target_name ${PROJECT_NAME})
+
+set(install_component_prefix ${PROJECT_NAME}_)
+set(install_component_bin ${install_component_prefix}RunTime)
 
 file(GLOB_RECURSE ophidian_gui_source
     "*.cpp"
@@ -49,14 +52,7 @@ target_link_libraries(${target_name}
     SFML::GRAPHICS
     SFML::WINDOW
     SFML::SYSTEM
-    ophidian::ophidian_circuit
-    ophidian::ophidian_design
-    ophidian::ophidian_entity_system
-    ophidian::ophidian_floorplan
-    ophidian::ophidian_geometry
-    ophidian::ophidian_interconnection
-    ophidian::ophidian_parser
-    ophidian::ophidian_placement
+    ophidian::ophidian
 )
 
 ################################################################################
@@ -64,9 +60,9 @@ target_link_libraries(${target_name}
 ################################################################################
 include(GNUInstallDirs)
 
-install(TARGETS ophidian_gui
+install(TARGETS ${target_name}
   RUNTIME
-    COMPONENT Runtime
+    COMPONENT ${install_component_bin}
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 

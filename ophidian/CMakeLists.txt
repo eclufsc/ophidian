@@ -4,6 +4,8 @@ project(ophidian VERSION ${ophidian_meta_VERSION})
 
 set(ophidian_VERSION ${PROJECT_VERSION})
 
+enable_testing()
+
 add_subdirectory(circuit)
 add_subdirectory(design)
 add_subdirectory(entity_system)
@@ -19,8 +21,14 @@ set(target_name ${PROJECT_NAME})
 
 set(export_name ${PROJECT_NAME}-export)
 set(export_namespace ophidian::)
+
 set(package_config_name ${PROJECT_NAME}-config)
 set(package_config_version_name ${package_config_name}-version)
+
+set(install_component_prefix ${PROJECT_NAME}_)
+set(install_component_dev ${install_component_prefix}Development)
+set(install_component_lib ${install_component_prefix}Libraries)
+set(install_component_bin ${install_component_prefix}RunTime)
 
 ################################################################################
 # Library target
@@ -31,10 +39,15 @@ add_library(${export_namespace}${target_name} ALIAS ${target_name})
 target_link_libraries(${target_name}
   INTERFACE
     ophidian::ophidian_circuit
-    ophidian::ophidian_parser
-    ophidian::ophidian_interconnection
+    ophidian::ophidian_design
     ophidian::ophidian_entity_system
+    ophidian::ophidian_floorplan
     ophidian::ophidian_geometry
+    ophidian::ophidian_interconnection
+    ophidian::ophidian_parser
+    ophidian::ophidian_placement
+    ophidian::ophidian_routing
+    ophidian::ophidian_util
 )
 
 ################################################################################
@@ -61,30 +74,28 @@ configure_package_config_file(
 
 install(TARGETS ${target_name}
   EXPORT ${export_name}
+  RUNTIME
+    COMPONENT ${install_component_bin}
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY
-    COMPONENT Libraries
-    NAMELINK_COMPONENT Development
+    COMPONENT ${install_component_lib}
+    NAMELINK_COMPONENT ${install_component_dev}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE
-    COMPONENT Libraries
+    COMPONENT ${install_component_lib}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-  COMPONENT Development
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(
   FILES
     ${PROJECT_BINARY_DIR}/${package_config_name}.cmake
     ${PROJECT_BINARY_DIR}/${package_config_version_name}.cmake
-  COMPONENT Development
+  COMPONENT ${install_component_dev}
   DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
 )
 
 install(EXPORT ${export_name}
-  COMPONENT Development
+  COMPONENT ${install_component_dev}
   NAMESPACE ${export_namespace}
   DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
 )

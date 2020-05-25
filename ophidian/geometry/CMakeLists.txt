@@ -24,8 +24,14 @@ set(target_name ${PROJECT_NAME})
 
 set(export_name ${PROJECT_NAME}-export)
 set(export_namespace ophidian::)
+
 set(package_config_name ${PROJECT_NAME}-config)
 set(package_config_version_name ${package_config_name}-version)
+
+set(install_component_prefix ${PROJECT_NAME}_)
+set(install_component_dev ${install_component_prefix}Development)
+set(install_component_lib ${install_component_prefix}Libraries)
+set(install_component_bin ${install_component_prefix}RunTime)
 
 file(GLOB source_files
   "src/*.cpp"
@@ -65,6 +71,7 @@ set_target_properties(${target_name}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+enable_testing()
 add_subdirectory(tests)
 
 ################################################################################
@@ -91,17 +98,20 @@ configure_package_config_file(
 
 install(TARGETS ${target_name}
   EXPORT ${export_name}
+  RUNTIME
+    COMPONENT ${install_component_bin}
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY
-    COMPONENT Libraries
-    NAMELINK_COMPONENT Development
+    COMPONENT ${install_component_lib}
+    NAMELINK_COMPONENT ${install_component_dev}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE
-    COMPONENT Libraries
+    COMPONENT ${install_component_lib}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-  COMPONENT Development
+  COMPONENT ${install_component_dev}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
@@ -109,12 +119,12 @@ install(
   FILES
     ${PROJECT_BINARY_DIR}/${package_config_name}.cmake
     ${PROJECT_BINARY_DIR}/${package_config_version_name}.cmake
-  COMPONENT Development
+  COMPONENT ${install_component_dev}
   DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
 )
 
 install(EXPORT ${export_name}
-  COMPONENT Development
+  COMPONENT ${install_component_dev}
   NAMESPACE ${export_namespace}
   DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake
 )

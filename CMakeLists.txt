@@ -12,9 +12,12 @@ cmake_minimum_required(VERSION 3.10.2)
 project(ophidian_meta VERSION 0.2.1)
 
 set(ophidian_meta_VERSION ${PROJECT_VERSION})
+set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/dependencies")
+
+enable_testing()
 
 add_subdirectory(3rdparty)
 add_subdirectory(ophidian)
