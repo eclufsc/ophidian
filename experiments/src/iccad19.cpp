@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 

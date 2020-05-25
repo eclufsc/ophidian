@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <ophidian/parser/Def.h>
 #include <ophidian/parser/ParserException.h>

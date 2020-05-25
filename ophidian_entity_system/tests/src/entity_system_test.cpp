@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <ophidian/entity_system/EntitySystem.h>
 #include <ophidian/entity_system/Property.h>

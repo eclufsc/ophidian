@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-project(ophidian_routing_tests VERSION ${ophidian_VERSION})
+project(ophidian_routing_tests VERSION ${ophidian_meta_VERSION})
 
 find_package(Catch2 REQUIRED)
 
@@ -19,8 +19,8 @@ file(GLOB source_files
 add_executable(${target_name} ${source_files})
 
 target_link_libraries(${target_name}
-  PRIVATE Catch
-  PUBLIC ophidian_routing
+  PRIVATE Catch2::Catch2
+  PRIVATE ophidian::ophidian_routing
 )
 
 execute_process(

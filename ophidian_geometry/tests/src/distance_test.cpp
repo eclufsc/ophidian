@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <ophidian/geometry/Distance.h>
 #include <ophidian/util/Units.h>

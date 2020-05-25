@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <ophidian/interconnection/SteinerTree.h>
 #include <ophidian/interconnection/Flute.h>
 #include <ophidian/geometry/Models.h>

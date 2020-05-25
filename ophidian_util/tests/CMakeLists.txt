@@ -19,8 +19,8 @@ file(GLOB source_files
 add_executable(${target_name} ${source_files})
 
 target_link_libraries(${target_name}
-  PRIVATE Catch
-  PRIVATE ophidian_util
+  PRIVATE Catch2::Catch2
+  PRIVATE ophidian::ophidian_util
 )
 
 enable_testing()

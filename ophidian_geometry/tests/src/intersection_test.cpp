@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <ophidian/util/Units.h>
 #include <ophidian/geometry/Models.h>

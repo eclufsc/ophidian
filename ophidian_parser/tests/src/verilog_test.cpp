@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <ophidian/parser/Verilog.h>
 #include <ophidian/parser/ParserException.h>

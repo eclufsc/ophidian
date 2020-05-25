@@ -22,7 +22,7 @@ target_sources(${target_name}
 
 target_link_libraries(${target_name}
   PRIVATE
-    Catch
+    Catch2::Catch2
     ophidian::ophidian_circuit
     ophidian::ophidian_design
     ophidian::ophidian_entity_system
