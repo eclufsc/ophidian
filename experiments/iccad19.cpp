@@ -7,8 +7,8 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
     std::cout << "starting function nun ILP" << std::endl;
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_1")};
+    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_1")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 

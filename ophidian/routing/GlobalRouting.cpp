@@ -292,7 +292,7 @@ namespace ophidian::routing
         }
 
         for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
-            std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
+            //std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
         }
 
         return lemon::connected(net_graph);
