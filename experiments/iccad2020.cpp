@@ -72,11 +72,11 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
-    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N1")};
+    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N1")};
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
@@ -97,13 +97,13 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
                 auto location = design.placement().location(pin);
                 auto box = ophidian::routing::GCellGraph::box_type{location, location};
                 auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second;        
+                auto layer_name = pin_geometry.front().second; 
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
 
                 std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
-                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index);
+                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
             }
             auto connected = design.global_routing().is_connected(net, pin_gcells);
 
@@ -114,12 +114,12 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-        //"case1",
+        "case1",
         //"case1N4",
         //"case2",
         // "case3",
         //"case3_no_blockages",
-         "case3_no_extra_demand"
+        // "case3_no_extra_demand"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";

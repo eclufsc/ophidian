@@ -261,6 +261,8 @@ namespace ophidian::routing
 
                 auto point = m_gcell_graph->center_of_box(gcell);
                 auto layer = m_gcell_graph->layer_index(gcell);
+
+                std::cout << "pin " << point.x().value() << "," << point.y().value() << "," << layer << std::endl;
             }
         }
         for (auto segment : m_net_to_gr_segment.parts(net)) {
@@ -271,22 +273,26 @@ namespace ophidian::routing
             if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
                 start_node = net_graph.addNode();
                 gcell_to_node[gcell_start] = start_node;
-                
             } else {
                 start_node = gcell_to_node[gcell_start];
             }
-                auto start_point = m_gcell_graph->center_of_box(gcell_start);
-                auto start_layer = m_gcell_graph->layer_index(gcell_start);
             if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
                 end_node = net_graph.addNode();
                 gcell_to_node[gcell_end] = end_node;
-                
             } else {
                 end_node = gcell_to_node[gcell_end];
             }
-                auto point = m_gcell_graph->center_of_box(gcell_end);
-                auto layer = m_gcell_graph->layer_index(gcell_start);
             net_graph.addEdge(start_node, end_node);
+
+            auto start_point = m_gcell_graph->center_of_box(gcell_start);
+            auto start_layer = m_gcell_graph->layer_index(gcell_start);
+            auto end_point = m_gcell_graph->center_of_box(gcell_end);
+            auto end_layer = m_gcell_graph->layer_index(gcell_end);
+            std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;
+        }
+
+        for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
+            std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
         }
 
         return lemon::connected(net_graph);
