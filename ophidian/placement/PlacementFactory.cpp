@@ -20,7 +20,7 @@
 
 namespace ophidian::placement::factory
 {
-    void make_placement(Placement& placement, const parser::Def & def, const circuit::Netlist& netlist) noexcept
+    void make_placement(Placement& placement, const parser::Def & def, circuit::Netlist& netlist) noexcept
     {
         for(const auto & component : def.components())
         {
@@ -61,6 +61,32 @@ namespace ophidian::placement::factory
                 placement.fixLocation(cell);
             else
                 placement.unfixLocation(cell);
+        }
+
+        for(const auto & pad : def.pads())
+        {
+            auto name = pad.name();
+            // auto direction = pad.direction();
+            auto pin_instance = netlist.add_pin_instance("PIN:" + name);
+            auto pad_instance = netlist.add_pad(pin_instance);
+
+            for(auto layer_map : pad.layers())
+            {
+                auto layer_name = layer_map.first;
+                for(auto rect : layer_map.second)
+                {
+                    auto min_x = std::min( rect.min_corner().x(), rect.max_corner().x());
+                    auto min_y = std::min( rect.min_corner().y(), rect.max_corner().y());
+                    auto max_x = std::max( rect.min_corner().x(), rect.max_corner().x());
+                    auto max_y = std::max( rect.min_corner().y(), rect.max_corner().y());
+
+                    auto min_corner = Placement::pad_geometry_type::point_type{ min_x, min_y };
+                    auto max_corner = Placement::pad_geometry_type::point_type{ max_x, max_y };
+                    Placement::pad_geometry_type::box_type box{min_corner, max_corner};
+
+                    placement.add_geometry(pad_instance, box, layer_name);
+                }
+            }
         }
     }
 

@@ -16,9 +16,7 @@ TEST_CASE("Design: testing netlist.", "[design]")
     REQUIRE(design.netlist().size_cell_instance() == 1);
     REQUIRE(design.netlist().size_pin_instance() == 1);
     REQUIRE(design.netlist().size_net() == 1);
-    REQUIRE(design.netlist().size_input_pad() == 0 );
-    REQUIRE(design.netlist().size_output_pad() == 0 );
-
+    REQUIRE(design.netlist().size_pad() == 0 );
 }
 
 TEST_CASE("Design: testing floorplan.", "[design]")

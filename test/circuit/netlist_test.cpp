@@ -10,9 +10,7 @@ TEST_CASE("Netlist: Brand-new Netlist must be empty.", "[circuit][Netlist]")
     REQUIRE(nl.size_cell_instance() == 0);
     REQUIRE(nl.size_pin_instance() == 0);
 	REQUIRE(nl.size_net() == 0);
-	REQUIRE(nl.size_input_pad() == 0 );
-	REQUIRE(nl.size_output_pad() == 0 );
-
+	REQUIRE(nl.size_pad() == 0 );
 }
 
 TEST_CASE("Netlist: Add Cell.", "[circuit][Netlist]")
@@ -269,38 +267,30 @@ TEST_CASE("Netlist: Make Custom Cell Observer.", "[circuit][Netlist]")
 }
 
 
-TEST_CASE("Netlist: Add Input.", "[circuit][Netlist]")
+TEST_CASE("Netlist: Add Input. and Output", "[circuit][Netlist]")
 {
 	Netlist nl;
     PinInstance p1 = nl.add_pin_instance("p1");
     PinInstance p2 = nl.add_pin_instance("p2");
-	auto inp1 = nl.add_input_pad(p1 );
-	REQUIRE(nl.size_input_pad() == 1);
-	auto inp2 = nl.add_input_pad(p2 );
-	REQUIRE(nl.size_input_pad() == 2);
+	auto inp1 = nl.add_pad(p1);
+	nl.set_direction(inp1, Netlist::pad_direction_type::INPUT);
+	REQUIRE(nl.size_pad() == 1);
+	REQUIRE(nl.direction(inp1) == Netlist::pad_direction_type::INPUT);
+	auto inp2 = nl.add_pad(p2 );
+	REQUIRE(nl.size_pad() == 2);
+	nl.set_direction(inp2, Netlist::pad_direction_type::OUTPUT);
+	REQUIRE(nl.direction(inp2) == Netlist::pad_direction_type::OUTPUT);
 	REQUIRE( nl.pin(inp1) == p1 );
 	REQUIRE( nl.pin(inp2) == p2 );
-}
-
-TEST_CASE("Netlist: Add Output.", "[circuit][Netlist]")
-{
-	Netlist nl;
-    PinInstance p1 = nl.add_pin_instance("p1");
-	REQUIRE(nl.output(p1) == Output());
-	auto out = nl.add_output_pad(p1 );
-	REQUIRE(nl.size_output_pad() == 1);
-	REQUIRE(nl.pin(out) == p1);
-	REQUIRE(nl.output(p1) == out);
 }
 
 TEST_CASE("Netlist: Input & Output ranges.", "[circuit][Netlist]")
 {
 	Netlist nl;
     PinInstance p1, p2;
-    auto inp = nl.add_input_pad(p1 = nl.add_pin_instance("p1"));
-    auto out = nl.add_output_pad(p2 = nl.add_pin_instance("p2"));
-	REQUIRE(std::count(nl.begin_input_pad(), nl.end_input_pad(), inp) == 1);
-	REQUIRE(std::count(nl.begin_output_pad(), nl.end_output_pad(), out) == 1);
+    auto inp = nl.add_pad(p1 = nl.add_pin_instance("p1"));
+    auto out = nl.add_pad(p2 = nl.add_pin_instance("p2"));
+	REQUIRE(std::count(nl.begin_pad(), nl.end_pad(), inp) == 2);
 }
 
 TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")
@@ -313,19 +303,22 @@ TEST_CASE("Netlist: Input Slews & Output Loads", "[circuit][Netlist]")
     inp2 = nl.add_pin_instance("inp2");
     out = nl.add_pin_instance("out");
 
-	nl.add_input_pad(inp1);
-	nl.add_input_pad(inp2);
-	nl.add_output_pad(out);
+	auto pad_inp1 = nl.add_pad(inp1);
+	auto pad_inp2 = nl.add_pad(inp2);
+	auto pad_out = nl.add_pad(out);
+	nl.set_direction(pad_inp1, Netlist::pad_direction_type::INPUT);
+	nl.set_direction(pad_inp2, Netlist::pad_direction_type::INPUT);
+	nl.set_direction(pad_out, Netlist::pad_direction_type::OUTPUT);
 
-	auto inputSlews = nl.make_property_input_pad<double>();
-	auto outputLoads = nl.make_property_output_pad<double>();
+	auto inputSlews = nl.make_property_pad<double>();
+	auto outputLoads = nl.make_property_pad<double>();
 
-	inputSlews[nl.input(inp1)] = 1.1;
-	inputSlews[nl.input(inp2)] = 2.2;
+	inputSlews[nl.pad(inp1)] = 1.1;
+	inputSlews[nl.pad(inp2)] = 2.2;
 
 	nl.erase(inp2);
 
 	REQUIRE( inputSlews.size() == 1 );
-	REQUIRE( Approx(inputSlews[nl.input(inp1)]) == 1.1 );
+	REQUIRE( Approx(inputSlews[nl.pad(inp1)]) == 1.1 );
 
 }

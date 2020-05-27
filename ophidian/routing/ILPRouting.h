@@ -51,7 +51,7 @@ namespace ophidian::routing {
             using design_type               = design::Design;
             using net_type                  = circuit::Net;
             using cell_type                 = circuit::CellInstance;
-            using pin_type                  = circuit::Pin;
+            using pin_type                  = circuit::PinInstance;
             using pin_container_type        = std::vector<pin_type>;
             using segment_type              = NetSegment;
             using route_candidate_type      = RouteCandidate;

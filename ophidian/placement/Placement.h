@@ -42,9 +42,7 @@ namespace ophidian::placement
 
         using pin_type = circuit::Netlist::pin_instance_type;
 
-        using input_pad_type = circuit::Netlist::input_pad_type;
-
-        using output_pad_type = circuit::Netlist::output_pad_type;
+        using pad_type = circuit::Netlist::pad_type;
 
         using cell_geometry_type = geometry::CellGeometry;
 
@@ -77,23 +75,17 @@ namespace ophidian::placement
 
         point_type location(const pin_type& pin) const;
 
-        const point_type& location(const input_pad_type& input) const;
-
-        const point_type& location(const output_pad_type& output) const;
+        const point_type& location(const pad_type& pad) const;
 
         cell_geometry_type geometry(const cell_type& cell) const;
 
         pin_geometry_type geometry(const pin_type& pin) const;
 
-        pad_geometry_type geometry(const input_pad_type& input) const;
-
-        pad_geometry_type geometry(const output_pad_type& output) const;
+        pad_geometry_type geometry(const pad_type& pad) const;
 
         orientation_type orientation(const cell_type& cell) const;
 
-        orientation_type orientation(const input_pad_type& input) const;
-
-        orientation_type orientation(const output_pad_type& output) const;
+        orientation_type orientation(const pad_type& pad) const;
 
         const fixed_type isFixed(const cell_type& cell) const;
         // Iterators
@@ -103,15 +95,13 @@ namespace ophidian::placement
         // Modifiers
         void place(const cell_type& cell, const point_type& location);
 
-        void place(const input_pad_type& input, const point_type & location);
-
-        void place(const output_pad_type& output, const point_type & location);
+        void place(const pad_type& pad, const point_type & location);
 
         void setOrientation(const Placement::cell_type& cell, const orientation_type& orientation);
 
-        void setOrientation(const input_pad_type& input, const orientation_type& orientation);
+        void setOrientation(const pad_type& pad, const orientation_type& orientation);
 
-        void setOrientation(const output_pad_type& output, const orientation_type& orientation);
+        void add_geometry(const pad_type& pad, const pad_geometry_type::box_type& box, const pad_geometry_type::layer_name_type& layer_name);
 
         void fixLocation(const cell_type& cell);
 
@@ -125,13 +115,9 @@ namespace ophidian::placement
         entity_system::Property<cell_type, fixed_type> m_fixed_cells;
         entity_system::Property<cell_type, orientation_type> m_cell_orientation;
 
-        entity_system::Property<input_pad_type, point_type> m_input_pad_locations;
-        entity_system::Property<input_pad_type, pad_geometry_type> m_input_pad_geometry;
-        entity_system::Property<input_pad_type, orientation_type> m_input_pad_orientation;
-
-        entity_system::Property<output_pad_type, point_type> m_output_pad_locations;
-        entity_system::Property<output_pad_type, pad_geometry_type> m_output_pad_geometry;
-        entity_system::Property<output_pad_type, orientation_type> m_output_pad_orientation;
+        entity_system::Property<pad_type, point_type> m_pad_locations;
+        entity_system::Property<pad_type, pad_geometry_type> m_pad_geometry;
+        entity_system::Property<pad_type, orientation_type> m_pad_orientation;
     };
 }
 

@@ -13,9 +13,9 @@ public:
 
     PinInstance pin1, pin2, pin3, pin4;
 
-    Input input1, input2;
+    PadInstance input1, input2;
 
-    Output output1, output2;
+    PadInstance output1, output2;
 
     Netlist netlist;
     Library library{StandardCells{}};
@@ -33,11 +33,15 @@ public:
         pin3 = netlist.add_pin_instance("pin3");
         pin4 = netlist.add_pin_instance("pin4");
 
-        input1 = netlist.add_input_pad(pin1);
-        input2 = netlist.add_input_pad(pin2);
+        input1 = netlist.add_pad(pin1);
+        input2 = netlist.add_pad(pin2);
+        output1 = netlist.add_pad(pin3);
+        output2 = netlist.add_pad(pin4);
 
-        output1 = netlist.add_output_pad(pin3);
-        output2 = netlist.add_output_pad(pin4);
+        netlist.set_direction(input1, Netlist::pad_direction_type::INPUT);
+        netlist.set_direction(input2, Netlist::pad_direction_type::INPUT);
+        netlist.set_direction(output1, Netlist::pad_direction_type::OUTPUT);
+        netlist.set_direction(output2, Netlist::pad_direction_type::OUTPUT);
     }
 };
 
