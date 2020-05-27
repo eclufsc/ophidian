@@ -48,14 +48,7 @@ namespace ophidian::circuit
         using entity_system::EntityBase::EntityBase;
     };
 
-    class Input :
-        public entity_system::EntityBase
-    {
-    public:
-        using entity_system::EntityBase::EntityBase;
-    };
-
-    class Output :
+    class PadInstance :
         public entity_system::EntityBase
     {
     public:
@@ -82,13 +75,14 @@ namespace ophidian::circuit
         using net_name_type = std::string;
         using net_container_type = entity_system::EntitySystem<net_type>;
 
-        using input_pad_type = Input;
-        using input_pad_name_type   = std::string;
-        using input_pad_container_type = entity_system::EntitySystem<Input>;
+        enum class Direction : int {
+            NA, INPUT, OUTPUT
+        };
 
-        using output_pad_type = Output;
-        using output_pad_name_type   = std::string;
-        using output_pad_container_type = entity_system::EntitySystem<Output>;
+        using pad_type           = PadInstance;
+        using pad_name_type      = std::string;
+        using pad_direction_type = Direction;
+        using pad_container_type = entity_system::EntitySystem<pad_type>;
 
         using cell_instance_pins_view_type = entity_system::Association<CellInstance, PinInstance>::Parts;
 
@@ -130,19 +124,17 @@ namespace ophidian::circuit
 
         net_pins_view_type pins(const net_type& net) const;
 
-        pin_instance_type pin(const input_pad_type& input) const;
-
-        pin_instance_type pin(const output_pad_type& output) const;
+        pin_instance_type pin(const pad_type& pad) const;
 
         net_type net(const pin_instance_type& pin) const;
 
-        input_pad_type input(const pin_instance_type& pin) const;
-
-        output_pad_type output(const pin_instance_type& pin) const;
+        pad_type pad(const pin_instance_type& pin) const;
 
         std_cell_type std_cell(const cell_instance_type& cell) const;
 
         std_cell_pin_type std_cell_pin(const pin_instance_type& pin) const;
+
+        pad_direction_type direction(const pad_type& pad) const;
 
         bool is_pad(const pin_instance_type& pin) const;
 
@@ -156,18 +148,14 @@ namespace ophidian::circuit
         net_container_type::const_iterator begin_net() const noexcept;
         net_container_type::const_iterator end_net() const noexcept;
 
-        input_pad_container_type::const_iterator begin_input_pad() const noexcept;
-        input_pad_container_type::const_iterator end_input_pad() const noexcept;
-
-        output_pad_container_type::const_iterator begin_output_pad() const noexcept;
-        output_pad_container_type::const_iterator end_output_pad() const noexcept;
+        pad_container_type::const_iterator begin_pad() const noexcept;
+        pad_container_type::const_iterator end_pad() const noexcept;
 
         // Capacity
         cell_instance_container_type::size_type size_cell_instance() const noexcept;
         pin_instance_container_type::size_type size_pin_instance() const noexcept;
         net_container_type::size_type size_net() const noexcept;
-        input_pad_container_type::size_type size_input_pad() const noexcept;
-        output_pad_container_type::size_type size_output_pad() const noexcept;
+        pad_container_type::size_type size_pad() const noexcept;
 
         cell_instance_container_type::size_type capacity_cell_instance() const noexcept;
         pin_instance_container_type::size_type capacity_pin_instance() const noexcept;
@@ -186,9 +174,7 @@ namespace ophidian::circuit
 
         net_type add_net(const net_name_type& netName);
 
-        input_pad_type add_input_pad(const pin_instance_type& pin);
-
-        output_pad_type add_output_pad(const pin_instance_type& pin);
+        pad_type add_pad(const pin_instance_type& pin);
 
         void erase(const cell_instance_type& cell);
         void erase(const pin_instance_type& pin);
@@ -200,6 +186,8 @@ namespace ophidian::circuit
         void connect(const pin_instance_type& pin, const std_cell_pin_type& std_cell);
 
         void disconnect(const pin_instance_type& pin);
+
+        void set_direction(const pad_type& pad, const pad_direction_type direction);
 
         template <typename Value>
         entity_system::Property<CellInstance, Value> make_property_cell_instance() const noexcept
@@ -238,29 +226,21 @@ namespace ophidian::circuit
         }
 
         template <typename Value>
-        entity_system::Property<Input, Value> make_property_input_pad() const noexcept
+        entity_system::Property<PadInstance, Value> make_property_pad() const noexcept
         {
-            return entity_system::Property<Input, Value>(m_input_pads);
-        }
-
-        template <typename Value>
-        entity_system::Property<Output, Value> make_property_output_pad() const noexcept
-        {
-            return entity_system::Property<Output, Value>(m_output_pads);
+            return entity_system::Property<PadInstance, Value>(m_pads);
         }
 
         entity_system::EntitySystem<CellInstance>::NotifierType * notifier_cell_instance() const noexcept;
         entity_system::EntitySystem<PinInstance>::NotifierType * notifier_pin_instance() const noexcept;
         entity_system::EntitySystem<Net>::NotifierType * notifier_net() const noexcept;
-        entity_system::EntitySystem<Input>::NotifierType * notifier_input_pad() const noexcept;
-        entity_system::EntitySystem<Output>::NotifierType * notifier_output_pad() const noexcept;
+        entity_system::EntitySystem<PadInstance>::NotifierType * notifier_input_pad() const noexcept;
 
     private:
         entity_system::EntitySystem<CellInstance>             m_cells{};
         entity_system::EntitySystem<PinInstance>              m_pins{};
         entity_system::EntitySystem<Net>                      m_nets{};
-        entity_system::EntitySystem<Input>                    m_input_pads{};
-        entity_system::EntitySystem<Output>                   m_output_pads{};
+        entity_system::EntitySystem<PadInstance>              m_pads{};
         entity_system::Property<CellInstance, std::string>    m_cell_names{m_cells};
         entity_system::Property<PinInstance, std::string>     m_pin_names{m_pins};
         entity_system::Property<Net, std::string>             m_net_names{m_nets};
@@ -270,11 +250,12 @@ namespace ophidian::circuit
         entity_system::Aggregation<Net, PinInstance>          m_net_to_pins{m_nets, m_pins};
 
         entity_system::Composition<CellInstance, PinInstance> m_cell_to_pins{m_cells, m_pins};
-        entity_system::Composition<PinInstance, Input>        m_pin_to_input_pad{m_pins, m_input_pads};
-        entity_system::Composition<PinInstance, Output>       m_pin_to_output_pad{m_pins, m_output_pads};
+        entity_system::Composition<PinInstance, pad_type>     m_pin_to_pad{m_pins, m_pads};
 
         entity_system::Property<CellInstance, Cell>           m_cell_instance_to_std_cell{m_cells};
         entity_system::Property<PinInstance, Pin>             m_pin_instance_to_std_cell_pin{m_pins};
+
+        entity_system::Property<PadInstance, pad_direction_type>   m_pad_direction{m_pads, pad_direction_type::NA};
     };
 }
 

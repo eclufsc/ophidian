@@ -28,7 +28,7 @@
 
 namespace ophidian::placement::factory
 {
-    void make_placement(Placement& placement, const parser::Def& def, const circuit::Netlist& netlist) noexcept;
+    void make_placement(Placement& placement, const parser::Def& def, circuit::Netlist& netlist) noexcept;
 
     void make_placement(Placement& placement, const parser::ICCAD2020 & iccad_2020, const circuit::Netlist& netlist) noexcept;
 }

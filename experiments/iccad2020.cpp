@@ -76,7 +76,8 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N1")};
+    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N6")};
+    // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
@@ -97,7 +98,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
                 auto location = design.placement().location(pin);
                 auto box = ophidian::routing::GCellGraph::box_type{location, location};
                 auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second; 
+                auto layer_name = pin_geometry.front().second;
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
 
@@ -114,12 +115,12 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-        "case1",
+        //"case1",
         //"case1N4",
         //"case2",
         // "case3",
         //"case3_no_blockages",
-        // "case3_no_extra_demand"
+         "case3_no_extra_demand"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";

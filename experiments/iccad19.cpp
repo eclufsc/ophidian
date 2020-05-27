@@ -1,11 +1,13 @@
 #include <catch.hpp>
+// #include < stdio.h >
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 
 void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
+    std::cout << "starting function nun ILP" << std::endl;
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
 
-     //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    //std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("n_1")};
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
@@ -43,12 +45,22 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
             movements.size() << "\n\n" << std::endl;
 
 
-        // iccad_output_writer.write_ICCAD_2020_output("", movements);
+         //iccad_output_writer.write_ICCAD_2020_output("", movements);
+    }
 
-        std::cout << "connected nets" << std::endl;
+    std::cout << "movements" << std::endl;
+    for (auto movement : movements) {
+        auto cell = movement.first;
+        auto cell_name = design.netlist().name(cell);
+        auto location = movement.second;
+        std::cout << "cell " << cell_name << " " << location.x().value() << "," << location.y().value() << std::endl;
+    }
+    
+    std::cout << "connected nets" << std::endl;
         for (auto net : nets) {
             ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
             for (auto pin : design.netlist().pins(net)) {
+                auto pin_name = design.netlist().name(pin);                
                 auto location = design.placement().location(pin);
                 auto box = ophidian::routing::GCellGraph::box_type{location, location};
                 auto pin_geometry = design.placement().geometry(pin);
@@ -56,22 +68,23 @@ void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index);
+                std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+
+                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
             }
             auto connected = design.global_routing().is_connected(net, pin_gcells);
 
             auto net_name = design.netlist().name(net);
             std::cout << "net " << net_name << " connected " << connected << std::endl;
         }
-    }
    
 }
 
 TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
     std::vector<std::string> circuit_names = {
+        // "ispd18_sample3",
         "ispd19_sample4",
-
-        // "ispd18_test5",
+        //"ispd18_test5",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -84,13 +97,19 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
-        std::string def_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.def";
-        std::string lef_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + circuit_name + "/" + circuit_name + ".solution_cugr.guide";
+        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".solution_cugr.guide";
 
-        auto def = ophidian::parser::Def{def_file};
-        auto lef = ophidian::parser::Lef{lef_file};
-        auto guide = ophidian::parser::Guide{guide_file};
+        ophidian::parser::Def def;
+        ophidian::parser::Lef lef;
+        ophidian::parser::Guide guide;
+        // #pragma omp parallel
+        // {
+            def = ophidian::parser::Def{def_file};
+            lef = ophidian::parser::Lef{lef_file};
+            guide = ophidian::parser::Guide{guide_file};
+        // }
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);

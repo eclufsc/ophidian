@@ -28,13 +28,9 @@ namespace ophidian::placement
             m_cell_locations(netlist.make_property_cell_instance<util::LocationDbu>()),
             m_cell_orientation(netlist.make_property_cell_instance<Placement::orientation_type>()),
             m_fixed_cells(netlist.make_property_cell_instance<fixed_type>()),
-            
-            m_input_pad_locations(netlist.make_property_input_pad<util::LocationDbu>()),
-            m_input_pad_geometry(netlist.make_property_input_pad<Placement::pad_geometry_type>()),
-            m_input_pad_orientation(netlist.make_property_input_pad<Placement::orientation_type>()),
-            m_output_pad_locations(netlist.make_property_output_pad<util::LocationDbu>()),
-            m_output_pad_geometry(netlist.make_property_output_pad<Placement::pad_geometry_type>()),
-            m_output_pad_orientation(netlist.make_property_output_pad<Placement::orientation_type>())
+            m_pad_locations(netlist.make_property_pad<util::LocationDbu>()),
+            m_pad_geometry(netlist.make_property_pad<Placement::pad_geometry_type>()),
+            m_pad_orientation(netlist.make_property_pad<Placement::orientation_type>())
     {
     }
 
@@ -46,14 +42,9 @@ namespace ophidian::placement
 
     Placement::point_type Placement::location(const Placement::pin_type& pin) const
     {
-        auto pinInput = m_netlist.input(pin);
-        if (pinInput != input_pad_type()) {
-            return location(pinInput);
-        }
-
-        auto pinOutput = m_netlist.output(pin);
-        if (pinOutput != output_pad_type()) {
-            return location(pinOutput);
+        if (m_netlist.is_pad(pin)) {
+            auto pad = m_netlist.pad(pin);
+            return m_pad_locations[pad];
         }
 
         auto stdCellPin = m_netlist.std_cell_pin(pin);
@@ -69,14 +60,9 @@ namespace ophidian::placement
         return pin_location;
     }
 
-    const Placement::point_type& Placement::location(const Placement::input_pad_type& input) const
+    const Placement::point_type& Placement::location(const Placement::pad_type& pad) const
     {
-        return m_input_pad_locations[input];
-    }
-
-    const Placement::point_type& Placement::location(const Placement::output_pad_type& output) const
-    {
-        return m_output_pad_locations[output];
+        return m_pad_locations[pad];
     }
 
     Placement::cell_geometry_type Placement::geometry(const Placement::cell_type& cell) const
@@ -95,6 +81,10 @@ namespace ophidian::placement
         using Point = ophidian::geometry::Point<double>;
         using Box = ophidian::geometry::Box<double>;
 
+        if (m_netlist.is_pad(pin)) {
+            auto pad = m_netlist.pad(pin);
+            return geometry(pad);
+        }
 
         auto stdPin = m_netlist.std_cell_pin(pin);
         auto stdPinGeometry = m_library.geometry(stdPin);
@@ -164,16 +154,9 @@ namespace ophidian::placement
         return translated_boxes;
     }
 
-    Placement::pad_geometry_type Placement::geometry(const Placement::input_pad_type& input) const
+    Placement::pad_geometry_type Placement::geometry(const Placement::pad_type& pad) const
     {
-        // TODO
-        return pad_geometry_type{};
-    }
-
-    Placement::pad_geometry_type Placement::geometry(const Placement::output_pad_type& output) const
-    {
-        // TODO
-        return pad_geometry_type{};
+        return m_pad_geometry[pad];
     }
 
     Placement::orientation_type Placement::orientation(const Placement::cell_type& cell) const
@@ -181,14 +164,9 @@ namespace ophidian::placement
         return m_cell_orientation[cell];
     }
 
-    Placement::orientation_type Placement::orientation(const Placement::input_pad_type& input) const
+    Placement::orientation_type Placement::orientation(const Placement::pad_type& pad) const
     {
-        return m_input_pad_orientation[input];
-    }
-
-    Placement::orientation_type Placement::orientation(const Placement::output_pad_type& output) const
-    {
-        return m_output_pad_orientation[output];
+        return m_pad_orientation[pad];
     }
 
     const Placement::fixed_type Placement::isFixed(const Placement::cell_type& cell) const{
@@ -201,14 +179,9 @@ namespace ophidian::placement
         m_cell_locations[cell] = location;
     }
 
-    void Placement::place(const Placement::input_pad_type& input, const Placement::point_type & location)
+    void Placement::place(const Placement::pad_type& pad, const Placement::point_type & location)
     {
-        m_input_pad_locations[input] = location;
-    }
-
-    void Placement::place(const Placement::output_pad_type& output, const Placement::point_type & location)
-    {
-        m_output_pad_locations[output] = location;
+        m_pad_locations[pad] = location;
     }
 
     void Placement::setOrientation(const Placement::cell_type& cell, const orientation_type& orientation)
@@ -216,14 +189,14 @@ namespace ophidian::placement
         m_cell_orientation[cell] = orientation;
     }
 
-    void Placement::setOrientation(const Placement::input_pad_type& input, const Placement::orientation_type& orientation)
+    void Placement::setOrientation(const Placement::pad_type& pad, const Placement::orientation_type& orientation)
     {
-        m_input_pad_orientation[input] = orientation;
+        m_pad_orientation[pad] = orientation;
     }
 
-    void Placement::setOrientation(const Placement::output_pad_type& output, const Placement::orientation_type& orientation)
+    void Placement::add_geometry(const Placement::pad_type& pad, const Placement::pad_geometry_type::box_type& box, const Placement::pad_geometry_type::layer_name_type& layer_name)
     {
-        m_output_pad_orientation[output] = orientation;
+        m_pad_geometry[pad].push_back(std::make_pair(box, layer_name));
     }
 
     void Placement::fixLocation(const Placement::cell_type& cell)

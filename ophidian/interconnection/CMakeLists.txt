@@ -89,7 +89,7 @@ add_library(ophidian_interconnection_static STATIC ${ophidian_interconnection_so
 target_link_libraries(ophidian_interconnection_static
     PUBLIC ophidian_geometry_static
     PUBLIC Lemon::lemon_static
-    PRIVATE Flute::flute_static
+    PRIVATE Flute::flute
 )
 
 # Tell cmake the path to look for include files for this target

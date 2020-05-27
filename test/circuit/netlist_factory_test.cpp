@@ -19,9 +19,7 @@ TEST_CASE("Netlist factory: populate with simple verilog.", "[circuit][Netlist][
     
     CHECK(netlist.size_net() == 9);
 
-    CHECK(netlist.size_input_pad() == 3);
-
-    CHECK(netlist.size_output_pad() == 1);
+    CHECK(netlist.size_pad() == 4);
 
     auto cell_u1 = netlist.find_cell_instance("u1");
 
@@ -72,9 +70,7 @@ TEST_CASE("Netlist factory: populate with simple verilog and simple standard cel
     
     CHECK(netlist.size_net() == 9);
 
-    CHECK(netlist.size_input_pad() == 3);
-
-    CHECK(netlist.size_output_pad() == 1);
+    CHECK(netlist.size_pad() == 4);
 
     auto cell_u1 = netlist.find_cell_instance("u1");
 
@@ -141,9 +137,7 @@ TEST_CASE("Netlist factory: populate with ispd18 sample def and sample standard 
 
     CHECK(netlist.size_net() == 11);
 
-    CHECK(netlist.size_input_pad() == 0);
-
-    CHECK(netlist.size_output_pad() == 0);
+    CHECK(netlist.size_pad() == 0);
 
     auto cell_u1 = netlist.find_cell_instance("inst2015");
 

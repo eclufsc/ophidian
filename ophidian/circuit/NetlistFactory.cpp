@@ -43,11 +43,13 @@ namespace ophidian::circuit::factory
         for(auto port : module.ports())
         {
             auto pin = netlist.add_pin_instance(port.name());
-            if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
-                netlist.add_input_pad(pin);
-            }
-            else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
-                netlist.add_output_pad(pin);
+            if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT || port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
+                auto pad = netlist.add_pad(pin);
+                if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT){
+                    netlist.set_direction(pad, Netlist::pad_direction_type::INPUT); 
+                }else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT){
+                    netlist.set_direction(pad, Netlist::pad_direction_type::OUTPUT); 
+                }
             }
             netlist.connect(netlist.find_net(port.name()), pin);
         }
@@ -87,11 +89,13 @@ namespace ophidian::circuit::factory
         for(auto& port : module.ports())
         {
             auto pin = netlist.add_pin_instance(port.name());
-            if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT) {
-                netlist.add_input_pad(pin);
-            }
-            else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
-                netlist.add_output_pad(pin);
+            if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT || port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT) {
+                auto pad = netlist.add_pad(pin);
+                if(port.direction() == parser::Verilog::Module::Port::Direction::INPUT){
+                    netlist.set_direction(pad, Netlist::pad_direction_type::INPUT); 
+                }else if(port.direction() == parser::Verilog::Module::Port::Direction::OUTPUT){
+                    netlist.set_direction(pad, Netlist::pad_direction_type::OUTPUT); 
+                }
             }
             netlist.connect(netlist.find_net(port.name()), pin);
         }
@@ -129,9 +133,11 @@ namespace ophidian::circuit::factory
             auto pin_instance = netlist.add_pin_instance("PIN:" + name);
 
             if(direction == parser::Pad::Direction::INPUT){
-                netlist.add_input_pad(pin_instance);
+                auto pad = netlist.add_pad(pin_instance);
+                netlist.set_direction(pad, Netlist::pad_direction_type::INPUT);
             }else if(direction == parser::Pad::Direction::OUTPUT){
-                netlist.add_output_pad(pin_instance);
+                auto pad = netlist.add_pad(pin_instance);
+                netlist.set_direction(pad, Netlist::pad_direction_type::OUTPUT);
             }else if(direction == parser::Pad::Direction::OUTPUT){
                 std::cout << "WARNING: Pin " << name << "without direction"<< std::endl;
             }

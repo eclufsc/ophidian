@@ -80,14 +80,9 @@ namespace ophidian::circuit
         return m_net_to_pins.parts(net);
     }
 
-    Netlist::pin_instance_type Netlist::pin(const Netlist::input_pad_type& input) const
+    Netlist::pin_instance_type Netlist::pin(const Netlist::pad_type& pad) const
     {
-        return m_pin_to_input_pad.whole(input);
-    }
-
-    Netlist::pin_instance_type Netlist::pin(const Netlist::output_pad_type& output) const
-    {
-        return m_pin_to_output_pad.whole(output);
+        return m_pin_to_pad.whole(pad);
     }
 
     Netlist::net_type Netlist::net(const Netlist::pin_instance_type& pin) const
@@ -95,14 +90,9 @@ namespace ophidian::circuit
         return m_net_to_pins.whole(pin);
     }
 
-    Netlist::input_pad_type Netlist::input(const Netlist::pin_instance_type& pin) const
+    Netlist::pad_type Netlist::pad(const Netlist::pin_instance_type& pin) const
     {
-        return m_pin_to_input_pad.firstPart(pin);
-    }
-
-    Netlist::output_pad_type Netlist::output(const Netlist::pin_instance_type& pin) const
-    {
-        return m_pin_to_output_pad.firstPart(pin);
+        return m_pin_to_pad.firstPart(pin);
     }
 
     Netlist::std_cell_type Netlist::std_cell(const Netlist::cell_instance_type& cell) const
@@ -113,6 +103,11 @@ namespace ophidian::circuit
     Netlist::std_cell_pin_type Netlist::std_cell_pin(const Netlist::pin_instance_type& pin) const
     {
         return m_pin_instance_to_std_cell_pin[pin];
+    }
+
+    Netlist::pad_direction_type Netlist::direction(const Netlist::pad_type& pad) const
+    {
+        return m_pad_direction[pad];
     }
 
     bool Netlist::is_pad(const Netlist::pin_instance_type& pin) const
@@ -155,24 +150,14 @@ namespace ophidian::circuit
         return m_nets.end();
     }
 
-    Netlist::input_pad_container_type::const_iterator Netlist::begin_input_pad() const noexcept
+    Netlist::pad_container_type::const_iterator Netlist::begin_pad() const noexcept
     {
-        return m_input_pads.begin();
+        return m_pads.begin();
     }
 
-    Netlist::input_pad_container_type::const_iterator Netlist::end_input_pad() const noexcept
+    Netlist::pad_container_type::const_iterator Netlist::end_pad() const noexcept
     {
-        return m_input_pads.end();
-    }
-
-    Netlist::output_pad_container_type::const_iterator Netlist::begin_output_pad() const noexcept
-    {
-        return m_output_pads.begin();
-    }
-
-    Netlist::output_pad_container_type::const_iterator Netlist::end_output_pad() const noexcept
-    {
-        return m_output_pads.end();
+        return m_pads.end();
     }
 
     Netlist::cell_instance_container_type::size_type Netlist::size_cell_instance() const noexcept
@@ -190,14 +175,9 @@ namespace ophidian::circuit
         return m_nets.size();
     }
 
-    Netlist::input_pad_container_type::size_type Netlist::size_input_pad() const noexcept
+    Netlist::pad_container_type::size_type Netlist::size_pad() const noexcept
     {
-        return m_input_pads.size();
-    }
-
-    Netlist::output_pad_container_type::size_type Netlist::size_output_pad() const noexcept
-    {
-        return m_output_pads.size();
+        return m_pads.size();
     }
 
     Netlist::cell_instance_container_type::size_type Netlist::capacity_cell_instance() const noexcept
@@ -238,8 +218,7 @@ namespace ophidian::circuit
         m_cells.shrinkToFit();
         m_pins.shrinkToFit();
         m_nets.shrinkToFit();
-        m_input_pads.shrinkToFit();
-        m_output_pads.shrinkToFit();
+        m_pads.shrinkToFit();
     }
 
     Netlist::cell_instance_type Netlist::add_cell_instance(const Netlist::cell_instance_name_type& cellName)
@@ -284,28 +263,16 @@ namespace ophidian::circuit
         }
     }
 
-    Netlist::input_pad_type Netlist::add_input_pad(const Netlist::pin_instance_type& p)
+    Netlist::pad_type Netlist::add_pad(const Netlist::pin_instance_type& p)
     {
-        auto inp = input(p);
+        auto inp = pad(p);
 
-        if(inp != Input()) {
+        if(inp != PadInstance()) {
             return inp;
         }
-        m_pin_to_input_pad.addAssociation(p, inp = m_input_pads.add());
+        m_pin_to_pad.addAssociation(p, inp = m_pads.add());
 
         return inp;
-    }
-
-    Netlist::output_pad_type Netlist::add_output_pad(const Netlist::pin_instance_type& p)
-    {
-        auto out = output(p);
-
-        if(out != Output()) {
-            return out;
-        }
-        m_pin_to_output_pad.addAssociation(p, out = m_output_pads.add());
-
-        return out;
     }
 
     void Netlist::erase(const Netlist::cell_instance_type& c)
@@ -352,6 +319,11 @@ namespace ophidian::circuit
         m_net_to_pins.eraseAssociation(net(p), p);
     }
 
+    void Netlist::set_direction(const Netlist::pad_type& pad, const Netlist::pad_direction_type direction)
+    {
+        m_pad_direction[pad] = direction;
+    }
+
     entity_system::EntitySystem<PinInstance>::NotifierType * Netlist::notifier_pin_instance() const noexcept {
         return m_pins.notifier();
     }
@@ -364,11 +336,7 @@ namespace ophidian::circuit
         return m_nets.notifier();
     }
 
-    entity_system::EntitySystem<Input>::NotifierType * Netlist::notifier_input_pad() const noexcept {
-        return m_input_pads.notifier();
-    }
-
-    entity_system::EntitySystem<Output>::NotifierType * Netlist::notifier_output_pad() const noexcept {
-        return m_output_pads.notifier();
+    entity_system::EntitySystem<PadInstance>::NotifierType * Netlist::notifier_input_pad() const noexcept {
+        return m_pads.notifier();
     }
 }

@@ -66,8 +66,8 @@ namespace ophidian::interconnection
 
                 return singleSegment(*it, *it2);
             }
-            std::vector<unsigned> X(kSize);
-            std::vector<unsigned> Y(kSize);
+            std::vector<int> X(kSize);
+            std::vector<int> Y(kSize);
             X.resize(0);
             Y.resize(0);
 
@@ -84,8 +84,8 @@ namespace ophidian::interconnection
 
             for(const auto & point : container)
             {
-                X.push_back(static_cast<unsigned>(std::round(units::unit_cast<double>(point.x()) + units::unit_cast<double>(offset.x()))));
-                Y.push_back(static_cast<unsigned>(std::round(units::unit_cast<double>(point.y()) + units::unit_cast<double>(offset.y()))));
+                X.push_back(static_cast<int>(std::round(units::unit_cast<double>(point.x()) + units::unit_cast<double>(offset.x()))));
+                Y.push_back(static_cast<int>(std::round(units::unit_cast<double>(point.y()) + units::unit_cast<double>(offset.y()))));
             }
 
             return callFlute(X, Y, offset);
@@ -99,8 +99,8 @@ namespace ophidian::interconnection
         std::unique_ptr<SteinerTree> trivialSteinerTree(const Point & p);
 
         std::unique_ptr<SteinerTree> callFlute(
-            const std::vector<unsigned> & X,
-            const std::vector<unsigned> & Y,
+            const std::vector<int> & X,
+            const std::vector<int> & Y,
             const Point & offset);
 
         Flute();

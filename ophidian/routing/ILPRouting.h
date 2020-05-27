@@ -51,7 +51,7 @@ namespace ophidian::routing {
             using design_type               = design::Design;
             using net_type                  = circuit::Net;
             using cell_type                 = circuit::CellInstance;
-            using pin_type                  = circuit::Pin;
+            using pin_type                  = circuit::PinInstance;
             using pin_container_type        = std::vector<pin_type>;
             using segment_type              = NetSegment;
             using route_candidate_type      = RouteCandidate;
@@ -150,6 +150,7 @@ namespace ophidian::routing {
             entity_system::Property<route_candidate_type, std::string>            m_route_candidate_names{m_route_candidate};
             entity_system::Property<route_candidate_type, ilp_var_type>           m_route_candidate_variables{m_route_candidate};
             entity_system::Property<route_candidate_type, unit_type>              m_route_candidate_wirelengths{m_route_candidate};
+            entity_system::Property<route_candidate_type, net_type>               m_route_candidate_nets{m_route_candidate};
     	    //entity_system::Property<route_candidate_type, wire_container_type>    m_route_candidate_wires{m_route_candidate};
 
             std::unordered_map<std::string, route_candidate_type>                 m_name_to_route_candidate;
