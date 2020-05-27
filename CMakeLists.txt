@@ -13,7 +13,7 @@
 ################################################################################
 
 # Set up minimal cmake version
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.13.4)
 
 # Set project version
 set(ophidian_VERSION 0.2.1)
@@ -102,7 +102,7 @@ list(APPEND CMAKE_MODULE_PATH "${ophidian_source_dir}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${ophidian_source_dir}/dependencies")
 
 # Find Boost
-find_package(Boost 1.59 REQUIRED)
+find_package(Boost 1.63 REQUIRED)
 
 # Find Lemon
 find_package(Lemon REQUIRED)
