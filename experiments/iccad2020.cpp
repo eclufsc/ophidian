@@ -2,7 +2,7 @@
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
-
+#include "server.h"
 
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool out) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
@@ -136,3 +136,7 @@ TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
     }
 }
 
+TEST_CASE("Open a ZeroMQ server", "[server]") {
+    ophidian::Server server;
+    server.run();
+}

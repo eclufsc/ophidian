@@ -38,6 +38,7 @@ target_link_libraries(iccad19gr
     PRIVATE ophidian_parser_static
     PRIVATE ${CPLEX_LIBRARIES}
     PRIVATE dl
+    PRIVATE zmq
 )
 
 if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
