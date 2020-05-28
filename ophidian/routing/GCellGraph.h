@@ -100,6 +100,12 @@ public:
         return entity_system::Property<gcell_type, Value>(m_gcells);
     }
 
+    template <typename Value>
+    entity_system::Property<gcell_type, Value> make_property_gcells(Value default_value) const noexcept
+    {
+        return entity_system::Property<gcell_type, Value>(m_gcells, default_value);
+    }
+
     entity_system::EntitySystem<gcell_type>::NotifierType * notifier_gcells() const noexcept;
 private:
     entity_system::EntitySystem<gcell_type>             m_gcells{};

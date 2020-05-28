@@ -22,7 +22,9 @@ namespace ophidian::routing {
         m_route_candidate.clear();
         m_position_candidates.clear();
 
-        GRBModel model = GRBModel(m_GRBENv);
+        lp_model_type model(m_env);
+        solver_type cplex(model);
+
 
         if(STATUS) std::cout << "update capacities from blockages" << std::endl;
         update_gcell_capacities(fixed_nets);
@@ -49,18 +51,18 @@ namespace ophidian::routing {
         add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
-        model.write("ilp_routing_model.lp");
+        cplex.exportModel("ilp_routing_model.lp");
 
-        model.optimize();
+        bool solved = cplex.solve();
 
-        auto status = model.get(GRB_IntAttr_Status);
+        auto status = cplex.getCplexStatus();
 
-        auto result = (status == GRB_OPTIMAL || status == GRB_SUBOPTIMAL);
+        auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible);
 
         if(result)
         {
             if(STATUS) std::cout << "write solution" << std::endl;
-            model.write("ilp_routing_model.sol");
+            cplex.writeSolution("ilp_routing_model.sol");
 
 	        unsigned routed_segments = 0;
     	    unsigned unrouted_segments = 0;
@@ -71,7 +73,7 @@ namespace ophidian::routing {
         		for(auto candidate : candidates)
                 {
 		        	auto variable = m_route_candidate_variables[candidate];
-        			auto value = variable.get(GRB_DoubleAttr_X);
+        			auto value = cplex.getValue(variable);
 		        	routed |= (value == 1);
         		}
         		if(routed)
@@ -82,16 +84,16 @@ namespace ophidian::routing {
 		        	unrouted_segments++;
         		}
 	        }
-    	    double percentage = (double)routed_segments / (double)(routed_segments + unrouted_segments);
-	        if(STATUS) std::cout << "routed segments " << routed_segments << std::endl;
-	        if(STATUS) std::cout << "unrouted segments " << unrouted_segments << std::endl;
-    	    if(STATUS) std::cout << "percentage of routed segments " << percentage << std::endl;
+    	    double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
+            std::cout << "routed segments " << routed_segments << std::endl;
+            std::cout << "unrouted segments " << unrouted_segments << std::endl;
+            std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
 
-    	    write_segments(nets, routed_nets);
+    	    write_segments(nets, cplex, routed_nets);
 
-            save_movements(movements);
+            save_movements(cplex, movements);
 
-	        save_result();
+	        save_result(cplex);
         }
         return result;
      }
@@ -111,7 +113,7 @@ namespace ophidian::routing {
         //     m_gcells_demand[gcell] = blockage_demand;
         // }
 
-        // here we have to update the demand od nets with won't be routed in this execution!
+        // here we have to update the demand of nets with won't be routed in this execution!
         for (auto net : fixed_nets) {
             std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
             for (auto segment : global_routing.segments(net)) {
@@ -126,7 +128,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, GRBModel & model)
+    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model)
     {
         for(auto net : nets)
             create_net_candidates(net, model);
@@ -134,7 +136,7 @@ namespace ophidian::routing {
 
     
 
-    void ILPRouting::create_net_candidates(const net_type & net, GRBModel & model)
+    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model)
     {
         auto& netlist = m_design.netlist();
         auto& global_routing = m_design.global_routing();
@@ -159,12 +161,12 @@ namespace ophidian::routing {
             auto initial_candidate = m_route_candidate.add();
             m_route_candidate_nets[initial_candidate] = net;
             auto initial_variable_name = net_name + "_initial";
-            GRBVar initial_variable;
-            if (m_integer) {
-                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
-            } else {
-                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
-            }
+            ilp_var_type initial_variable(m_env, initial_variable_name.c_str());
+            // if (m_integer) {
+            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            // } else {
+            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
+            // }
             m_route_candidate_names[initial_candidate] = initial_variable_name;
             m_name_to_route_candidate[initial_variable_name] = initial_candidate;
             m_route_candidate_variables[initial_candidate] = initial_variable;
@@ -195,7 +197,7 @@ namespace ophidian::routing {
         generate_routes_of_net(net, position_candidate_type(), model);   
     }
 
-    void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model)
+    void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
@@ -215,7 +217,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_center_of_mass_candidate(const cell_type cell, GRBModel & model){
+    void ILPRouting::create_center_of_mass_candidate(const cell_type cell, lp_model_type & model){
         auto cell_name = m_design.netlist().name(cell);
         //std::cout << "center of mass of cell " << cell_name << std::endl;
 
@@ -261,7 +263,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_median_candidate(const cell_type cell, GRBModel & model){
+    void ILPRouting::create_median_candidate(const cell_type cell, lp_model_type & model){
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
         std::vector<net_type> cell_nets;
@@ -301,7 +303,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_2_pin_nets_candidates_with_movements(const net_type net, GRBModel & model){
+    void ILPRouting::create_2_pin_nets_candidates_with_movements(const net_type net, lp_model_type & model){
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
         auto candidate_type =  candidate_origin_type::TWO_PIN_NET;
@@ -388,7 +390,7 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model )
+    void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, lp_model_type & model )
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();        
@@ -412,15 +414,14 @@ namespace ophidian::routing {
         }
         point_type candidate_position {new_x, new_y};
 
-
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
-        GRBVar candidate_variable;
-        if (m_integer) {
-            candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
-        } else {
-            candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, candidate_variable_name);
-        }
+        ilp_var_type candidate_variable(m_env, candidate_variable_name.c_str());
+        // if (m_integer) {
+        //     candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
+        // } else {
+        //     candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, candidate_variable_name);
+        // }
         m_position_candidate_names[candidate] = candidate_variable_name;
         m_position_candidate_cell[candidate] = cell;
         m_name_to_position_candidate[candidate_variable_name] = candidate;
@@ -441,7 +442,7 @@ namespace ophidian::routing {
         placement.place(cell, initial_position);
     }
 
-    void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , GRBModel & model)
+    void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , lp_model_type & model)
     {
         auto& routing_constraints = m_design.routing_constraints();
         auto& netlist = m_design.netlist();
@@ -665,11 +666,12 @@ namespace ophidian::routing {
 
 
 
-    void ILPRouting::create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, GRBModel & model)
+    void ILPRouting::create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, lp_model_type & model)
     {
         if(DEBUG) std::cout << "initi function: create_net_candidates_in_layers" << std::endl;
         auto& placement = m_design.placement();
         auto& routing_library = m_design.routing_library();
+        lp_environment_type env = model.getEnv();
 
         auto net_name = m_design.netlist().name(net);
         auto horizontal_layer_name = m_design.routing_library().name(horizontal_layer);
@@ -716,12 +718,13 @@ namespace ophidian::routing {
             auto candidate = m_route_candidate.add();
             m_route_candidate_nets[candidate] = net;
             if(DEBUG) std::cout << "variable " << variable_name << std::endl;
-            GRBVar variable;
-            if (m_integer) {
-                variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
-            } else {                
-                variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, variable_name);
-            }
+            // GRBVar variable;
+            // if (m_integer) {
+            //     variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
+            // } else {                
+            //     variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, variable_name);
+            // }
+            ilp_var_type variable(env, variable_name.c_str());
             m_route_candidate_names[candidate] = variable_name;
             m_name_to_route_candidate[variable_name] = candidate;
             m_route_candidate_variables[candidate] = variable;
@@ -948,10 +951,11 @@ namespace ophidian::routing {
         return wire;
     }
 
-    void ILPRouting::add_objective_function(GRBModel & model)
+    void ILPRouting::add_objective_function(lp_model_type & model)
     {
-        GRBLinExpr objective = 0.0;
+        IloObjective obj = IloMinimize(m_env);
         unsigned candidate_count = 0;
+        IloExpr expr(m_env);
         for(auto candidate : m_route_candidate)
         {
             auto candidate_variable = m_route_candidate_variables[candidate];
@@ -959,24 +963,25 @@ namespace ophidian::routing {
 
             //std::cout << "candidate " << m_route_candidate_names[candidate] << " wirelength " << candidate_wirelength << std::endl;
 
-            objective += candidate_variable * candidate_wirelength;
+            expr += candidate_variable * candidate_wirelength;
         }
-        model.setObjective(objective, GRB_MINIMIZE);
+        obj.setExpr(expr);
+        model.add(obj);
     }
 
-    void ILPRouting::add_candidate_constraints(const std::vector<net_type> & nets, GRBModel & model)
+    void ILPRouting::add_candidate_constraints(const std::vector<net_type> & nets, lp_model_type & model)
     {
         unsigned net_count = 0;
         for(auto net : nets)
         {
-            GRBLinExpr candidates_constraints = 0.0;
+            IloExpr candidates_constraints(m_env);
             auto candidates = m_net_candidates.parts(net);
             for(auto candidate : candidates)
             {
                 auto candidate_variable = m_route_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            model.addConstr(candidates_constraints == 1);
+            model.add(candidates_constraints == 1);
         }
 
         auto & netlist = m_design.netlist();
@@ -1003,7 +1008,7 @@ namespace ophidian::routing {
 
             auto position_candidates = m_cell_position_candidates.parts(cell);
             for(auto pos_candidate : position_candidates) {
-                std::unordered_map<std::string, GRBLinExpr> cell_candidate_expressions;
+                std::unordered_map<std::string, IloExpr> cell_candidate_expressions;
                 auto routes = m_position_candidate_to_routes.parts(pos_candidate);
                 for(auto route : routes)
                 {
@@ -1015,8 +1020,9 @@ namespace ophidian::routing {
                 auto cell_position_variable = m_position_candidate_variables[pos_candidate];
                 for (auto expression_pair_it = cell_candidate_expressions.begin(); expression_pair_it != cell_candidate_expressions.end(); expression_pair_it++) {
                     auto expression = expression_pair_it->second;
-                    model.addConstr(expression == cell_position_variable);
-                }
+                    model.add(expression == cell_position_variable);
+                }taf
+                
             }
             /*for(auto pos_candidate : position_candidates)
             {
@@ -1035,7 +1041,7 @@ namespace ophidian::routing {
         // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
-            GRBLinExpr candidates_constraints = 0.0;
+            IloExpr candidates_constraints(m_env);
             
             auto initial_candidate = m_cell_initial_candidate[cell];
             auto initial_candidate_variable = m_position_candidate_variables[initial_candidate];
@@ -1046,7 +1052,7 @@ namespace ophidian::routing {
                 auto candidate_variable = m_position_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            model.addConstr(candidates_constraints == 1);
+            model.add(candidates_constraints == 1);
 
             // for(auto pin : netlist.pins(cell)){
             //     auto net = netlist.net(pin);
@@ -1056,7 +1062,7 @@ namespace ophidian::routing {
 
         //freeze neighbors
         for(auto net : nets){
-            GRBLinExpr neighbors_constraints = 0.0;
+            IloExpr neighbors_constraints(m_env);
             auto cont_candidates = 0;
             for(auto pin : netlist.pins(net)){
                 auto cell = netlist.cell(pin);
@@ -1068,18 +1074,19 @@ namespace ophidian::routing {
                 }
             }
             if(cont_candidates != 0)
-                model.addConstr(neighbors_constraints <= 1);
+                model.add(neighbors_constraints <= 1);
         }
     }
 
-    void ILPRouting::add_capacity_constraints(const std::vector<net_type> & nets, GRBModel & model)
+    void ILPRouting::add_capacity_constraints(const std::vector<net_type> & nets, lp_model_type & model)
     {
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
         auto & netlist = m_design.netlist();
         auto & routing_library = m_design.routing_library();
         
-        entity_system::Property<gcell_type, GRBLinExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<GRBLinExpr>()};
+        entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>()};
+        entity_system::Property<gcell_type, bool>  gcells_constraints_bool{m_design.global_routing().gcell_graph()->make_property_gcells<bool>(false)};
         
         for(auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++)
         {
@@ -1098,6 +1105,7 @@ namespace ophidian::routing {
                 auto demand = routing_library.demand(blockage);
 
                 gcells_constraints[gcell] += demand * variable;
+                gcells_constraints_bool[gcell] = true;
             }
         }
 
@@ -1161,13 +1169,15 @@ namespace ophidian::routing {
                 auto gcell_min_corner = box.min_corner();
                 if(gcell_set.size() > 0)
                 {
-                    GRBLinExpr gcell_constraint = 0.0;
+                    IloExpr gcell_constraint(m_env);
+                    // GRBLinExpr gcell_constraint = 0.0;
                     for(auto candidate : gcell_set)
                     {
                         auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
                     }
                     gcells_constraints[gcell] += gcell_constraint;
+                    gcells_constraints_bool[gcell] = true;
                 }
             }
         }
@@ -1179,17 +1189,21 @@ namespace ophidian::routing {
             auto location = gcell_graph->position(node);
 
             auto gcell_constraint = gcells_constraints[gcell];
-            if(gcell_constraint.size() > 0 )
+            
+            //TIAGO
+            // if(gcell_constraint.size() > 0 )
+            if(gcells_constraints_bool[gcell])
             {
                 auto capacity = gcell_graph->capacity(gcell);
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
-                model.addConstr(gcell_constraint <= capacity - demand, constraint_name);
+                auto constraint = model.add(gcell_constraint <= capacity - demand);
+                constraint.setName(constraint_name.c_str());
             }
         }
     }
 
-    void ILPRouting::write_segments(const std::vector<net_type> & nets, std::vector<net_type> & routed_nets)
+    void ILPRouting::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets)
     {
         auto & global_routing = m_design.global_routing();
         for(auto net : nets)
@@ -1202,7 +1216,7 @@ namespace ophidian::routing {
             {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
-                auto value = variable.get(GRB_DoubleAttr_X);
+                auto value = solver.getValue(variable);
     	    	if(value == 1)
                 {
                     routed = 1;
@@ -1240,7 +1254,7 @@ namespace ophidian::routing {
          }
     }
 
-    void ILPRouting::save_movements(std::vector<std::pair<cell_type, point_type>> & movements) {
+    void ILPRouting::save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements) {
         int initial_candidate = 0;
         int two_pin = 0;
         int center_of_mass = 0;
@@ -1249,8 +1263,8 @@ namespace ophidian::routing {
         for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {
             auto candidate = *candidate_it;
             auto variable = m_position_candidate_variables[candidate];
-            auto value = variable.get(GRB_DoubleAttr_X);
-            auto name = variable.get(GRB_StringAttr_VarName);
+            auto value = solver.getValue(variable);;
+            std::string name (variable.getName());
             if (value == 1) {
                 if (name.find("initial") == std::string::npos) {
                     auto candidate = m_name_to_position_candidate[name];
@@ -1291,14 +1305,14 @@ namespace ophidian::routing {
                     "NA" << na << " \t" << std::to_string(na / sum) << "%" << std::endl;*/
     }
 
-    void ILPRouting::save_result()
+    void ILPRouting::save_result(const solver_type& solver)
     {
     	std::ofstream results_file("ilp_results.csv", std::ofstream::out | std::ofstream::app);
         auto total_wirelength = unit_type{0};
         for(auto candidate : m_route_candidate)
         {
                 auto variable = m_route_candidate_variables[candidate];
-                auto value = variable.get(GRB_DoubleAttr_X);
+                auto value = solver.getValue(variable);
                 if (value == 1)
                 {
                 auto wirelength = m_route_candidate_wirelengths[candidate];
@@ -1308,8 +1322,9 @@ namespace ophidian::routing {
         results_file << m_circuit_name << "," << total_wirelength.value() << std::endl;
     }
 
-    void ILPRouting::create_all_cell_initial_candidates(GRBModel & model){
+    void ILPRouting::create_all_cell_initial_candidates(lp_model_type & model){
         auto & netlist = m_design.netlist();
+        lp_environment_type env = model.getEnv();
 
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
@@ -1324,12 +1339,14 @@ namespace ophidian::routing {
             //initial position
             auto initial_candidate = m_position_candidates.add();
             auto initial_variable_name = cell_name + "_initial";
-            GRBVar initial_variable;
-            if (m_integer) {
-                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
-            } else {
-                initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
-            }
+            // GRBVar initial_variable;
+            // if (m_integer) {
+            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            // } else {
+            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
+            // }
+            ilp_var_type initial_variable(env, initial_variable_name.c_str());
+
             m_position_candidate_names[initial_candidate] = initial_variable_name;
             m_position_candidate_cell[initial_candidate] = cell;
             m_name_to_position_candidate[initial_variable_name] = initial_candidate;
@@ -1341,9 +1358,10 @@ namespace ophidian::routing {
 
     }
 
-    void ILPRouting::add_movements_constraints(GRBModel & model){
+    void ILPRouting::add_movements_constraints(lp_model_type & model){
         auto max_movemnts = m_design.routing_constraints().max_cell_movement();
-        GRBLinExpr candicates = 0.0;
+
+        IloExpr candicates(m_env);
         for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {
             auto candidate = *candidate_it;        
             auto name = m_position_candidate_names[candidate];
@@ -1351,6 +1369,8 @@ namespace ophidian::routing {
                 candicates += m_position_candidate_variables[candidate];
             }
         }
-        model.addConstr(candicates <= max_movemnts, "max_movements");
+        std::string constraint_name = "max_movements";
+        auto constraint = model.add(candicates <= IloExpr(m_env, max_movemnts));
+        constraint.setName(constraint_name.c_str());
     }
 }

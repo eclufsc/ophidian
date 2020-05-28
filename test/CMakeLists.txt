@@ -40,8 +40,8 @@ target_link_libraries(ophidian_tests
     PRIVATE ophidian_parser_static
     PRIVATE ophidian_placement_static
     PRIVATE ophidian_routing_static
-    PRIVATE gurobi_g++5.2
-    PRIVATE gurobi90
+    PRIVATE ${CPLEX_LIBRARIES}
+    PRIVATE dl
 )
 
 if(OPHIDIAN_TESTS_FULLY_STATIC)

@@ -13,7 +13,16 @@
 #include <ophidian/interconnection/SteinerTree.h>
 #include <ophidian/routing/Library.h>
 
-#include "gurobi_c++.h"
+// Magic tricks to have CPLEX behave well:
+// source https://github.com/alberto-santini/cplex-example
+#ifndef IL_STD
+#define IL_STD
+#endif
+#include <cstring>
+#include <ilcplex/ilocplex.h>
+ILOSTLBEGIN
+// End magic tricks
+
 
 namespace ophidian::routing {
     class RouteCandidate : public entity_system::EntityBase
@@ -65,7 +74,11 @@ namespace ophidian::routing {
             using point_type                = util::LocationDbu;
             using point_container_type      = std::vector<point_type>;
             using box_type                  = geometry::Box<unit_type>;
-            using ilp_var_type              = GRBVar;
+
+            using solver_type               = IloCplex;
+            using lp_model_type             = IloModel;
+            using lp_environment_type       = IloEnv;
+            using ilp_var_type              = IloBoolVar;
             using ilp_var_container_type    = std::vector<ilp_var_type>;
 
             using unitless_point_type       = geometry::Point<double>;
@@ -82,27 +95,27 @@ namespace ophidian::routing {
         private:
             void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
 
-            void create_all_candidates(const std::vector<net_type> & nets, GRBModel & model);
+            void create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model);
 
-            void create_net_candidates(const net_type & net, GRBModel & model);
+            void create_net_candidates(const net_type & net, lp_model_type & model);
 
-            void create_all_candidates_with_movements(const std::vector<net_type> & nets, GRBModel & model);
+            void create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model);
 
-            void create_center_of_mass_candidate(const cell_type cell, GRBModel & model);
+            void create_center_of_mass_candidate(const cell_type cell, lp_model_type & model);
 
-            void create_median_candidate(const cell_type cell, GRBModel & model);
+            void create_median_candidate(const cell_type cell, lp_model_type & model);
 
-            void create_2_pin_nets_candidates_with_movements(const net_type net, GRBModel & model);
+            void create_2_pin_nets_candidates_with_movements(const net_type net, lp_model_type & model);
 
-            void create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, GRBModel & model );
+            void create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, lp_model_type & model );
 
-            void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, GRBModel & model);
+            void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, lp_model_type & model);
             
-            void create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, GRBModel & model);
+            void create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, lp_model_type & model);
 
             void add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<route_candidate_type> & candidates, bool large_net);
 
-            void create_candidate(const net_type & net, const wire_container_type & wires, std::string variable_name, GRBModel & model);
+            void create_candidate(const net_type & net, const wire_container_type & wires, std::string variable_name, lp_model_type & model);
 
             void add_wires_to_candidate(const route_candidate_type & candidate, const wire_container_type & wires);
 
@@ -110,23 +123,23 @@ namespace ophidian::routing {
 
             wire_type create_wire(const point_type & wire_start, const point_type & wire_end, const layer_type & start_layer, const layer_type & end_layer);
 
-            void add_objective_function(GRBModel & model);
+            void add_objective_function(lp_model_type & model);
 
-            void add_candidate_constraints(const std::vector<net_type> & nets, GRBModel & model);
+            void add_candidate_constraints(const std::vector<net_type> & nets, lp_model_type & model);
 
-            void add_capacity_constraints(const std::vector<net_type> & nets, GRBModel & model);
+            void add_capacity_constraints(const std::vector<net_type> & nets, lp_model_type & model);
 
-            void add_movements_constraints(GRBModel & model);
+            void add_movements_constraints(lp_model_type & model);
 
 	        void write_gcell_capacities();
 
-	        void write_segments(const std::vector<net_type> & nets, std::vector<net_type> & routed_nets);
+	        void write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets);
 
-            void save_movements(std::vector<std::pair<cell_type, point_type>> & movements);
+            void save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements);
 
-    	    void save_result();
+    	    void save_result(const solver_type& solver);
 
-            void create_all_cell_initial_candidates(GRBModel & model);
+            void create_all_cell_initial_candidates(lp_model_type & model);
 
             void convert_to_flute(point_container_type & converted, const point_container_type & points) const;
 
@@ -134,7 +147,7 @@ namespace ophidian::routing {
 
             design_type&    m_design;
             std::string     m_circuit_name;
-            GRBEnv          m_GRBENv;
+            lp_environment_type m_env;
 
     //SEGMENTS
             entity_system::EntitySystem<segment_type>                       m_segments;
