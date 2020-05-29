@@ -84,7 +84,7 @@ install_VERILOG_PARSER()
     cd $SOURCE_ROOT/3rdparty/verilog-parser
     mkdir build
     cd build
-    cmake -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
+    cmake -DCMAKE_C_FLAGS="-w -fPIC" -DCMAKE_CXX_FLAGS="-w -fPIC" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="" ..
     make DESTDIR=$DEPENDENCIES_ROOT install
     cd ..
     rm -rf build

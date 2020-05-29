@@ -13,3 +13,6 @@
 [submodule "3rdparty/flute3"]
 	path = 3rdparty/flute3
 	url = https://github.com/TiagoAFontana/flute3.git
+[submodule "3rdparty/verilog-parser"]
+	path = 3rdparty/verilog-parser
+	url = https://github.com/zhanghongce/verilog-parser.git

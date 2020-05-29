@@ -120,7 +120,7 @@ find_package(LEF REQUIRED)
 find_package(flute REQUIRED)
 
 # Find Verilog-parser
-find_package(verilog-parser REQUIRED)
+find_package(verilogparser REQUIRED)
 
 # Find CPLEX
 find_package(CPLEX REQUIRED)
