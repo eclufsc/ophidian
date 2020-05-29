@@ -1,6 +1,3 @@
-[submodule "3rdparty/verilog-parser"]
-	path = 3rdparty/verilog-parser
-    url = https://gitlab.com/eclufsc/eda/verilog-parser.git
 [submodule "3rdparty/DEF"]
 	path = 3rdparty/DEF
 	url = https://gitlab.com/eclufsc/eda/DEF.git
