@@ -48,16 +48,22 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, model);
 
         if(STATUS) std::cout << "add movements constraints" << std::endl;
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
         cplex.exportModel("ilp_routing_model.lp");
 
+        std::cout << "exported" << std::endl;
+
         bool solved = cplex.solve();
+        std::cout << "solved" << std::endl;
 
         auto status = cplex.getCplexStatus();
 
+        std::cout << "status" << std::endl;
+
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible);
+
 
         if(result)
         {
@@ -1106,9 +1112,17 @@ namespace ophidian::routing {
         auto gcell_graph = global_routing.gcell_graph();
         auto & netlist = m_design.netlist();
         auto & routing_library = m_design.routing_library();
+
+        std::unordered_map<gcell_type, IloExpr, entity_system::EntityBaseHash> gcells_constraints;
+        std::unordered_map<gcell_type, bool, entity_system::EntityBaseHash> gcells_constraints_bool;
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+            gcells_constraints[gcell] = IloExpr(m_env);
+            gcells_constraints_bool[gcell] = false;
+        }
         
-        entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>(IloExpr(m_env))};
-        entity_system::Property<gcell_type, bool>  gcells_constraints_bool{m_design.global_routing().gcell_graph()->make_property_gcells<bool>(false)};
+        //entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>(IloExpr(m_env))};
+        //entity_system::Property<gcell_type, bool>  gcells_constraints_bool{m_design.global_routing().gcell_graph()->make_property_gcells<bool>(false)};
         
         for(auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++)
         {
@@ -1181,6 +1195,7 @@ namespace ophidian::routing {
         for(auto layer_pair : gcell_nets)
         {
             auto layer_name = layer_pair.first;
+            //std::cout << "layer " << layer_name << std::endl;
             auto layer_map = layer_pair.second;
             auto layer = m_design.routing_library().find_layer_instance(layer_name);
             auto layer_index = m_design.routing_library().layerIndex(layer);
@@ -1197,8 +1212,9 @@ namespace ophidian::routing {
                     {
                         auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
+                    gcells_constraints[gcell] += variable;
                     }
-                    gcells_constraints[gcell] += gcell_constraint;
+                    //gcells_constraints[gcell] += gcell_constraint;
                     gcells_constraints_bool[gcell] = true;
                 }
             }
