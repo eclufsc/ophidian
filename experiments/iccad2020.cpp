@@ -90,27 +90,27 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
    
     //write_statistics_for_circuit(design, circuit_name);
 
-    std::cout << "connected nets" << std::endl;
-        for (auto net : nets) {
-            ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
-            for (auto pin : design.netlist().pins(net)) {
-                auto pin_name = design.netlist().name(pin);                
-                auto location = design.placement().location(pin);
-                auto box = ophidian::routing::GCellGraph::box_type{location, location};
-                auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second;
-                auto pin_layer = design.routing_library().find_layer_instance(layer_name);
-                auto layer_index = design.routing_library().layerIndex(pin_layer);
+    // std::cout << "connected nets" << std::endl;
+    //     for (auto net : nets) {
+    //         ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
+    //         for (auto pin : design.netlist().pins(net)) {
+    //             auto pin_name = design.netlist().name(pin);                
+    //             auto location = design.placement().location(pin);
+    //             auto box = ophidian::routing::GCellGraph::box_type{location, location};
+    //             auto pin_geometry = design.placement().geometry(pin);
+    //             auto layer_name = pin_geometry.front().second;
+    //             auto pin_layer = design.routing_library().find_layer_instance(layer_name);
+    //             auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-                std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+    //             std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
-                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
-            }
-            auto connected = design.global_routing().is_connected(net, pin_gcells);
+    //             design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
+    //         }
+    //         auto connected = design.global_routing().is_connected(net, pin_gcells);
 
-            auto net_name = design.netlist().name(net);
-            std::cout << "net " << net_name << " connected " << connected << std::endl;
-        }
+    //         auto net_name = design.netlist().name(net);
+    //         std::cout << "net " << net_name << " connected " << connected << std::endl;
+    //     }
 }
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
@@ -120,7 +120,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         //"case2",
         // "case3",
         //"case3_no_blockages",
-        "case3_no_extra_demand"
+        // "case3_no_extra_demand"
     };
 
     std::string benchmarks_path = "./input_files/iccad20/";

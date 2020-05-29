@@ -36,7 +36,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        create_all_candidates_with_movements(nets, model);
+        // create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -981,7 +981,10 @@ namespace ophidian::routing {
                 auto candidate_variable = m_route_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            model.add(candidates_constraints == 1);
+            auto net_name = m_design.netlist().name(net);
+            std::string constraint_name = net_name + "_candidates";
+            auto constraint = model.add(candidates_constraints == 1);
+            constraint.setName(constraint_name.c_str());
         }
 
         auto & netlist = m_design.netlist();
@@ -1015,14 +1018,24 @@ namespace ophidian::routing {
                     auto candidate_variable = m_route_candidate_variables[route];
                     auto route_net = m_route_candidate_nets[route];
                     auto net_name = m_design.netlist().name(route_net);
-                    cell_candidate_expressions[net_name] += candidate_variable;
+                    // cell_candidate_expressions[net_name] += candidate_variable;
+                    if(cell_candidate_expressions.find(net_name) == cell_candidate_expressions.end())
+                    {
+                        //first time net
+                        IloExpr exp(m_env);
+                        cell_candidate_expressions.insert(std::make_pair(net_name, exp));
+                    }
+                    cell_candidate_expressions.at(net_name) = cell_candidate_expressions.at(net_name) + candidate_variable;
                 }
                 auto cell_position_variable = m_position_candidate_variables[pos_candidate];
+                IloExpr expression(m_env);
                 for (auto expression_pair_it = cell_candidate_expressions.begin(); expression_pair_it != cell_candidate_expressions.end(); expression_pair_it++) {
-                    auto expression = expression_pair_it->second;
-                    model.add(expression == cell_position_variable);
-                }taf
-                
+                    expression += expression_pair_it->second;
+                    auto position_candidate_name = m_position_candidate_names[pos_candidate];
+                    std::string constraint_name = "routes_ass_cand_" + position_candidate_name + "_net_" + expression_pair_it->first;
+                    auto constraint = model.add(expression == cell_position_variable);
+                    constraint.setName(constraint_name.c_str());
+                }
             }
             /*for(auto pos_candidate : position_candidates)
             {
@@ -1052,7 +1065,11 @@ namespace ophidian::routing {
                 auto candidate_variable = m_position_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            model.add(candidates_constraints == 1);
+
+            auto cell_name = m_design.netlist().name(cell);
+            std::string constraint_name = cell_name + "_positions_candidates";
+            auto constraint = model.add(candidates_constraints == 1);
+            constraint.setName(constraint_name.c_str());
 
             // for(auto pin : netlist.pins(cell)){
             //     auto net = netlist.net(pin);
@@ -1074,7 +1091,12 @@ namespace ophidian::routing {
                 }
             }
             if(cont_candidates != 0)
-                model.add(neighbors_constraints <= 1);
+            {
+                auto net_name = m_design.netlist().name(net);
+                std::string constraint_name = net_name + "_freeze_neighbors";
+                auto constraint = model.add(neighbors_constraints <= 1);
+                constraint.setName(constraint_name.c_str());
+            }
         }
     }
 
@@ -1085,7 +1107,7 @@ namespace ophidian::routing {
         auto & netlist = m_design.netlist();
         auto & routing_library = m_design.routing_library();
         
-        entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>()};
+        entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>(IloExpr(m_env))};
         entity_system::Property<gcell_type, bool>  gcells_constraints_bool{m_design.global_routing().gcell_graph()->make_property_gcells<bool>(false)};
         
         for(auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++)
