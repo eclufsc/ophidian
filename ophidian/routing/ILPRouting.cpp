@@ -36,7 +36,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        // create_all_candidates_with_movements(nets, model);
+        create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -48,7 +48,7 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, model);
 
         if(STATUS) std::cout << "add movements constraints" << std::endl;
-        //add_movements_constraints(model);
+        add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
         cplex.exportModel("ilp_routing_model.lp");
@@ -1024,7 +1024,7 @@ namespace ophidian::routing {
                     auto candidate_variable = m_route_candidate_variables[route];
                     auto route_net = m_route_candidate_nets[route];
                     auto net_name = m_design.netlist().name(route_net);
-                    // cell_candidate_expressions[net_name] += candidate_variable;
+                    //cell_candidate_expressions[net_name] += candidate_variable;
                     if(cell_candidate_expressions.find(net_name) == cell_candidate_expressions.end())
                     {
                         //first time net
@@ -1034,9 +1034,9 @@ namespace ophidian::routing {
                     cell_candidate_expressions.at(net_name) = cell_candidate_expressions.at(net_name) + candidate_variable;
                 }
                 auto cell_position_variable = m_position_candidate_variables[pos_candidate];
-                IloExpr expression(m_env);
                 for (auto expression_pair_it = cell_candidate_expressions.begin(); expression_pair_it != cell_candidate_expressions.end(); expression_pair_it++) {
-                    expression += expression_pair_it->second;
+                    IloExpr expression(m_env);
+                    expression = expression_pair_it->second;
                     auto position_candidate_name = m_position_candidate_names[pos_candidate];
                     std::string constraint_name = "routes_ass_cand_" + position_candidate_name + "_net_" + expression_pair_it->first;
                     auto constraint = model.add(expression == cell_position_variable);
@@ -1212,7 +1212,7 @@ namespace ophidian::routing {
                     {
                         auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
-                    gcells_constraints[gcell] += variable;
+                        gcells_constraints[gcell] += variable;
                     }
                     //gcells_constraints[gcell] += gcell_constraint;
                     gcells_constraints_bool[gcell] = true;
