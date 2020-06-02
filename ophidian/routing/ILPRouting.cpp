@@ -55,8 +55,12 @@ namespace ophidian::routing {
 
         std::cout << "exported" << std::endl;
 
+        auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
-        std::cout << "solved" << std::endl;
+        auto time_end = std::chrono::high_resolution_clock::now();
+        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
+        auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
+        std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
 
         auto status = cplex.getCplexStatus();
 

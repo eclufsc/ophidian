@@ -262,7 +262,7 @@ namespace ophidian::routing
                 auto point = m_gcell_graph->center_of_box(gcell);
                 auto layer = m_gcell_graph->layer_index(gcell);
 
-                std::cout << "pin " << point.x().value() << "," << point.y().value() << "," << layer << std::endl;
+                // std::cout << "pin " << point.x().value() << "," << point.y().value() << "," << layer << std::endl;
             }
         }
         for (auto segment : m_net_to_gr_segment.parts(net)) {
@@ -288,7 +288,7 @@ namespace ophidian::routing
             auto start_layer = m_gcell_graph->layer_index(gcell_start);
             auto end_point = m_gcell_graph->center_of_box(gcell_end);
             auto end_layer = m_gcell_graph->layer_index(gcell_end);
-            std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;
+            // std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;
         }
 
         for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
