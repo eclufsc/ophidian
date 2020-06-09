@@ -36,6 +36,7 @@ target_link_libraries(iccad19gr
     PRIVATE ophidian_routing_static
     PRIVATE ophidian_placement_static
     PRIVATE ophidian_parser_static
+    PRIVATE ophidian_util_static
     PRIVATE ${CPLEX_LIBRARIES}
     PRIVATE dl
 )

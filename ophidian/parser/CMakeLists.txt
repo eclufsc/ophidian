@@ -89,7 +89,7 @@ add_library(ophidian_parser_static STATIC ${ophidian_parser_source})
 
 # Tell cmake target's dependencies
 target_link_libraries(ophidian_parser_static
-    PUBLIC ophidian_util
+    PUBLIC ophidian_util_static
     PRIVATE verilogparser::verilogparser
     PRIVATE DEF::def
     PRIVATE LEF::lef
