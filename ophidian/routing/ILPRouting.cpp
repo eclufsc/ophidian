@@ -25,7 +25,6 @@ namespace ophidian::routing {
         lp_model_type model(m_env);
         solver_type cplex(model);
 
-
         if(STATUS) std::cout << "update capacities from blockages" << std::endl;
         update_gcell_capacities(fixed_nets);
 
@@ -64,10 +63,11 @@ namespace ophidian::routing {
 
         auto status = cplex.getCplexStatus();
 
-        std::cout << "status" << std::endl;
+        std::cout << "status " << status << std::endl;
 
-        auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible);
+        auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
+        std::cout << "result " << result << std::endl;
 
         if(result)
         {
@@ -211,17 +211,17 @@ namespace ophidian::routing {
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
-        for(auto net : nets)
+        /*for(auto net : nets)
         {
             auto size = netlist.pins(net).size();
             if(size == 2)
                 create_2_pin_nets_candidates_with_movements(net, model);
-        }
+        }*/
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
             if( !placement.isFixed(cell))
             {
-                create_center_of_mass_candidate(cell, model);
+                //create_center_of_mass_candidate(cell, model);
                 create_median_candidate(cell, model);
             }
         }
@@ -774,7 +774,8 @@ namespace ophidian::routing {
             }
             else
             {
-                auto layer = (segment_start.x() == segment_end.x()) ? vertical_layer : horizontal_layer;
+                // if both x and y are the same, should route in the layer closest to the pins
+                auto layer = (segment_start.y() == segment_end.y()) ? horizontal_layer : vertical_layer;
                 //std::cout << "create segment wire" << std::endl;
                 auto wire = create_wire(segment_start, segment_end, layer, layer);
                 auto wires = wire_container_type{wire};
@@ -970,8 +971,6 @@ namespace ophidian::routing {
         {
             auto candidate_variable = m_route_candidate_variables[candidate];
             auto candidate_wirelength = m_route_candidate_wirelengths[candidate].value();
-
-            //std::cout << "candidate " << m_route_candidate_names[candidate] << " wirelength " << candidate_wirelength << std::endl;
 
             expr += candidate_variable * candidate_wirelength;
         }
@@ -1223,6 +1222,212 @@ namespace ophidian::routing {
                 }
             }
         }
+       
+        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, ilp_var_container_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell; 
+        for(auto pos_candidate : m_position_candidates){
+            auto variable = m_position_candidate_variables[pos_candidate];
+            auto location = m_position_candidate_position[pos_candidate];
+            auto cell = m_position_candidate_cell[pos_candidate];
+            auto std_cell = m_design.netlist().std_cell(cell);
+
+            auto cell_name = m_design.netlist().name(cell);
+            auto std_cell_name = m_design.standard_cells().name(std_cell);
+
+            for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
+                auto layer = *layer_it;
+                auto layer_index = routing_library.layerIndex(layer);
+                auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
+
+                //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
+                auto gcell_box = gcell_graph->box(gcell);                
+                //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
+
+                std_cells_per_gcell[gcell][std_cell].push_back(variable);
+            }
+        }
+
+        auto & routing_constraints = m_design.routing_constraints();
+        // same grid extra demand rules
+        if (DEBUG) std::cout << "same grid extra demand rules" << std::endl;
+        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+            auto gcell_layer_index = gcell_graph->layer_index(gcell);
+            auto gcell_layer = routing_library.layer_from_index(gcell_layer_index);
+
+            auto gcell_box = gcell_graph->box(gcell);
+            
+            auto x = gcell_box.min_corner().x().value();
+            auto y = gcell_box.min_corner().y().value();
+            auto z = gcell_layer_index;
+            /*if (x != 40 || y != 120 || z != 2) {
+                continue;
+            } */           
+
+            for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++) {
+                auto key = same_grid_it->first;
+                auto demand = same_grid_it->second;
+
+                std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));
+
+                auto macro1_name = strs.at(0);
+                auto macro2_name = strs.at(1);
+                auto layer_name = strs.at(2);
+
+                auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+                auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+                auto layer = m_design.routing_library().find_layer_instance(layer_name);
+    
+                if (layer == gcell_layer) {
+                    auto std_cells1 = std_cells_per_gcell[gcell][macro1];
+                    auto std_cells2 = std_cells_per_gcell[gcell][macro2];
+
+                    if (std_cells1.empty() || std_cells2.empty()) {
+                        continue;
+                    }
+                    
+                    auto sum_expr1 = IloExpr{m_env};
+                    for (auto std_cell : std_cells1) {
+                        sum_expr1 += std_cell;
+                    }
+
+                    auto sum_expr2 = IloExpr{m_env};                   
+                    for (auto std_cell : std_cells2) {
+                        sum_expr2 += std_cell;
+                    }
+
+                    auto min_var = IloMin(sum_expr1, sum_expr2);
+                    gcells_constraints[gcell] += min_var * demand;
+                    gcells_constraints_bool[gcell] = true;
+                }
+            }
+
+            auto gcell_node = gcell_graph->graph_node(gcell);
+            auto east_node = gcell_graph->east_node(gcell_node);
+            auto east_gcell = gcell_graph->gcell(east_node);
+            auto west_node = gcell_graph->west_node(gcell_node);
+            auto west_gcell = gcell_graph->gcell(west_node);
+
+            for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++) {
+                auto key = adj_grid_it->first;
+                auto demand = adj_grid_it->second;
+
+                std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));
+
+                auto macro1_name = strs.at(0);
+                auto macro2_name = strs.at(1);
+                auto layer_name = strs.at(2);
+
+                auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+                auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+                auto layer = m_design.routing_library().find_layer_instance(layer_name);
+
+                if (layer == gcell_layer) {
+                    auto std_cells1 = std_cells_per_gcell[gcell][macro1];
+                    auto std_cells2 = std_cells_per_gcell[gcell][macro2];
+
+                    if (std_cells1.empty() && std_cells2.empty()) {
+                        continue;
+                    }
+
+                    //std::cout << "rule " << macro1_name << "," << macro2_name << "," << layer_name << std::endl;
+                    //std::cout << "std cells 1 " << std_cells1.size() << " std cells 2 " << std_cells2.size() << std::endl;
+
+                    auto sum_expr1 = IloExpr{m_env}; 
+                    for (auto std_cell : std_cells1) {
+                        sum_expr1 += std_cell;
+                    }
+
+                    auto sum_expr2 = IloExpr{m_env};  
+                    for (auto std_cell : std_cells2) {
+                        sum_expr2 += std_cell;
+                    }
+
+                    if (macro1 == macro2) {
+                        if (east_node != lemon::INVALID) {
+                            auto std_cells1_east = std_cells_per_gcell[east_gcell][macro1];
+
+                            if (std_cells1_east.empty()) {
+                                continue;
+                            }
+
+                            auto sum_expr1_east = IloExpr{m_env};
+                            for (auto std_cell : std_cells1_east) {
+                                sum_expr1_east += std_cell;
+                            }
+
+                            auto min_var = IloMin(sum_expr1, sum_expr1_east);
+                            gcells_constraints[gcell] += min_var * demand;
+                        }
+                        if (west_node != lemon::INVALID) {
+                            auto std_cells1_west = std_cells_per_gcell[west_gcell][macro1];
+
+                            if (std_cells1_west.empty()) {
+                                continue;
+                            }
+
+                            auto sum_expr1_west = IloExpr{m_env};
+                            for (auto std_cell : std_cells1_west) {
+                                sum_expr1_west += std_cell;
+                            }
+
+                            auto min_var = IloMin(sum_expr1, sum_expr1_west);
+                            gcells_constraints[gcell] += min_var * demand;
+                        }
+                    } else {
+                        if (east_node != lemon::INVALID) {
+                            auto std_cells1_east = std_cells_per_gcell[east_gcell][macro1];
+                            auto std_cells2_east = std_cells_per_gcell[east_gcell][macro2];
+                    
+                            //std::cout << "east std cells 1 " << std_cells1_east.size() << " east std cells 2 " << std_cells2_east.size() << std::endl;
+
+                            if (std_cells1_east.empty() && std_cells2_east.empty()) {
+                                continue;
+                            }
+
+                            auto sum_expr1_east = IloExpr{m_env};
+                            for (auto std_cell : std_cells1_east) {
+                                sum_expr1_east += std_cell;
+                            }
+
+                            auto sum_expr2_east = IloExpr{m_env};
+                            for (auto std_cell : std_cells2_east) {
+                                sum_expr2_east += std_cell;
+                            }
+
+                            auto min_var = IloMin(sum_expr1, sum_expr2_east) + IloMin(sum_expr2, sum_expr1_east);
+                            gcells_constraints[gcell] += min_var * demand;
+                        }
+                        if (west_node != lemon::INVALID) {
+                            auto std_cells1_west = std_cells_per_gcell[west_gcell][macro1];
+                            auto std_cells2_west = std_cells_per_gcell[west_gcell][macro2];
+                    
+                            //std::cout << "west std cells 1 " << std_cells1_west.size() << " west std cells 2 " << std_cells2_west.size() << std::endl;
+
+                            if (std_cells1_west.empty() && std_cells2_west.empty()) {
+                                continue;
+                            }
+
+                            auto sum_expr1_west = IloExpr{m_env};
+                            for (auto std_cell : std_cells1_west) {
+                                sum_expr1_west += std_cell;
+                            }
+
+                            auto sum_expr2_west = IloExpr{m_env};
+                            for (auto std_cell : std_cells2_west) {
+                                sum_expr2_west += std_cell;
+                            }
+                            
+                            auto min_var = IloMin(sum_expr1, sum_expr2_west) + IloMin(sum_expr2, sum_expr1_west);
+                            gcells_constraints[gcell] += min_var * demand;
+                        }
+                    }
+                }
+            }
+
+
+        }
 
         for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             auto gcell = *gcell_it;
@@ -1231,6 +1436,17 @@ namespace ophidian::routing {
             auto location = gcell_graph->position(node);
 
             auto gcell_constraint = gcells_constraints[gcell];
+            
+            auto gcell_layer_index = gcell_graph->layer_index(gcell);
+
+            auto gcell_box = gcell_graph->box(gcell);
+            
+            auto x = gcell_box.min_corner().x().value();
+            auto y = gcell_box.min_corner().y().value();
+            auto z = gcell_layer_index;
+            /*if (x == 40 && y == 120 && z == 2) {
+                std::cout << "GCELL CONSTRAINT " << gcell_constraint << std::endl;
+            }*/
             
             //TIAGO
             // if(gcell_constraint.size() > 0 )

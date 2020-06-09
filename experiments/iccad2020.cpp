@@ -119,9 +119,13 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         // "case1",
         //"case1N4",
         //"case2",
-        // "case3",
+         "case3",
         //"case3_no_blockages",
-         "case3_no_extra_demand"
+        // "case3_no_extra_demand"
+        //"case3_only_same_grid"
+        //"case3_only_adj_rule"
+        //"case3_small_rules"
+        //"same_grid_test"
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
