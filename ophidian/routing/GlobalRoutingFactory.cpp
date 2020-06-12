@@ -63,13 +63,13 @@ namespace ophidian::routing::factory
         layers_capacity.resize(iccad_layers.size());
         for(auto layer : iccad_layers)
             layers_capacity.at(layer.index()-1) = layer.capacity();
-        std::cout << "create routing graph" << std::endl;
+        // std::cout << "create routing graph" << std::endl;
         globalRouting.create_gcell_graph(x_gcell_axis, y_gcell_axis, std::get<2>(dimensions), layers_capacity);
-        std::cout << "done" << std::endl;
+        // std::cout << "done" << std::endl;
 
         auto gcell_graph = globalRouting.gcell_graph();
         
-        std::cout << "set gcell capacities" << std::endl;
+        // std::cout << "set gcell capacities" << std::endl;
         for (auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++) {
             auto gcell = *gcell_it;
             auto gcell_node = gcell_graph->graph_node(gcell);
@@ -81,7 +81,7 @@ namespace ophidian::routing::factory
             gcell_graph->capacity(gcell, gcell_capacity + non_default_supply);
         }
         
-        std::cout << "add blockages" << std::endl;
+        // std::cout << "add blockages" << std::endl;
         //set cells demands in gcell_grapg
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
         {
@@ -99,7 +99,7 @@ namespace ophidian::routing::factory
             }
         }
 
-        std::cout << "add segments" << std::endl;
+        // std::cout << "add segments" << std::endl;
         //Global Routing Segments
         for(auto iccad_net : iccad_2020.nets())
         {

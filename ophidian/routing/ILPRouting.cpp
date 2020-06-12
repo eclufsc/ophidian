@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 
 bool DEBUG = false;
-bool STATUS = true;
+bool STATUS = false;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -50,16 +50,16 @@ namespace ophidian::routing {
         add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
-        cplex.exportModel("ilp_routing_model.lp");
+        if(DEBUG)  cplex.exportModel("ilp_routing_model.lp");
 
-        std::cout << "exported" << std::endl;
+        if(STATUS) std::cout << "exported" << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
         auto time_end = std::chrono::high_resolution_clock::now();
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
-        std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        if(DEBUG) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
 
         auto status = cplex.getCplexStatus();
 
@@ -68,117 +68,117 @@ namespace ophidian::routing {
         if(result)
         {
             if(STATUS) std::cout << "write solution" << std::endl;
-            cplex.writeSolution("ilp_routing_model.sol");
+            if(DEBUG) cplex.writeSolution("ilp_routing_model.sol");
 
-	        unsigned routed_segments = 0;
-    	    unsigned unrouted_segments = 0;
+	        // unsigned routed_segments = 0;
+    	    // unsigned unrouted_segments = 0;
 
             if (DEBUG) std::cout << "CHECKING ROUTED NETS" << std::endl;
 
-            auto gcell_graph = m_design.global_routing().gcell_graph();
-            std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
-            for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) {
-                auto net = *net_it;
-        		auto candidates = m_net_candidates.parts(net);
-		        bool routed = 0;
+            // auto gcell_graph = m_design.global_routing().gcell_graph();
+            // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
+            // for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) {
+            //     auto net = *net_it;
+        	// 	auto candidates = m_net_candidates.parts(net);
+		    //     bool routed = 0;
 
-                auto net_name = m_design.netlist().name(net);
+            //     auto net_name = m_design.netlist().name(net);
 
-                if (DEBUG) std::cout << net_name << std::endl;
+            //     if (DEBUG) std::cout << net_name << std::endl;
 
-                route_candidate_type routed_candidate;
-        		for(auto candidate : candidates)
-                {
-		        	auto variable = m_route_candidate_variables[candidate];
-        			auto value = cplex.getValue(variable);
-                    if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
-		        	routed |= (value > 0);
+            //     route_candidate_type routed_candidate;
+        	// 	for(auto candidate : candidates)
+            //     {
+		    //     	auto variable = m_route_candidate_variables[candidate];
+        	// 		auto value = cplex.getValue(variable);
+            //         if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
+		    //     	routed |= (value > 0);
 
-                    if (value > 0) {
-                        routed_candidate = candidate;
-                    }
-        		}
-        		if(routed)
-                {
-		        	routed_segments++;
+            //         if (value > 0) {
+            //             routed_candidate = candidate;
+            //         }
+        	// 	}
+        	// 	if(routed)
+            //     {
+		    //     	routed_segments++;
 
-                    if (DEBUG) {
-                    for (auto wire : m_route_candidate_wires.parts(routed_candidate)) {
-                        auto start_layer = m_wire_start_layers[wire];
-                        auto end_layer = m_wire_end_layers[wire];
-                        auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
-                        auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
-                        auto min_layer_index = std::min(start_layer_index, end_layer_index);
-                        auto max_layer_index = std::max(start_layer_index, end_layer_index);
+            //         if (DEBUG) {
+            //         for (auto wire : m_route_candidate_wires.parts(routed_candidate)) {
+            //             auto start_layer = m_wire_start_layers[wire];
+            //             auto end_layer = m_wire_end_layers[wire];
+            //             auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
+            //             auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
+            //             auto min_layer_index = std::min(start_layer_index, end_layer_index);
+            //             auto max_layer_index = std::max(start_layer_index, end_layer_index);
     
-                        auto wire_start = m_wire_starts[wire];
-                        auto wire_end = m_wire_ends[wire];
-                        auto min_x = std::min(wire_start.x(), wire_end.x());
-                        auto max_x = std::max(wire_start.x(), wire_end.x());
-                        auto min_y = std::min(wire_start.y(), wire_end.y());
-                        auto max_y = std::max(wire_start.y(), wire_end.y());
+            //             auto wire_start = m_wire_starts[wire];
+            //             auto wire_end = m_wire_ends[wire];
+            //             auto min_x = std::min(wire_start.x(), wire_end.x());
+            //             auto max_x = std::max(wire_start.x(), wire_end.x());
+            //             auto min_y = std::min(wire_start.y(), wire_end.y());
+            //             auto max_y = std::max(wire_start.y(), wire_end.y());
 
-                        auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+            //             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
 
-                        auto candidate_name = m_route_candidate_names[routed_candidate];
+            //             auto candidate_name = m_route_candidate_names[routed_candidate];
 
-                        // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+            //             // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
 
-                        for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
-                        {
-                            // auto layer_name = "M" + std::to_string(layer_index);
-                            auto layer = m_design.routing_library().layer_from_index(layer_index);
-                            auto layer_name = m_design.routing_library().name(layer);
-                            gcell_container_type gcells;
-                            gcell_graph->intersect(gcells, wire_box, layer_index-1);
-                            //std::cout << "gcells " << gcells.size() << std::endl;
-                            for(auto gcell : gcells)
-                            {
-                                gcell_nets[gcell].insert(net);
-                      /*          if (net_name == "N1481") {
-                auto box = gcell_graph->box(gcell);
-                auto gcell_min_corner = box.min_corner();
-                auto gcell_layer = gcell_graph->layer_index(gcell);
-                std::cout << "GCELL " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
-                            }*/
-                            }
-                        }
-                    }
-                    }
-        		}else
-                {
-                    if (DEBUG) std::cout << "NET " << net_name << " UNROUTED" << std::endl;
-		        	unrouted_segments++;
-        		}
-	        }
+            //             for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
+            //             {
+            //                 // auto layer_name = "M" + std::to_string(layer_index);
+            //                 auto layer = m_design.routing_library().layer_from_index(layer_index);
+            //                 auto layer_name = m_design.routing_library().name(layer);
+            //                 gcell_container_type gcells;
+            //                 gcell_graph->intersect(gcells, wire_box, layer_index-1);
+            //                 //std::cout << "gcells " << gcells.size() << std::endl;
+            //                 for(auto gcell : gcells)
+            //                 {
+            //                     gcell_nets[gcell].insert(net);
+            //           /*          if (net_name == "N1481") {
+            //     auto box = gcell_graph->box(gcell);
+            //     auto gcell_min_corner = box.min_corner();
+            //     auto gcell_layer = gcell_graph->layer_index(gcell);
+            //     std::cout << "GCELL " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
+            //                 }*/
+            //                 }
+            //             }
+            //         }
+            //         }
+        	// 	}else
+            //     {
+            //         if (DEBUG) std::cout << "NET " << net_name << " UNROUTED" << std::endl;
+		    //     	unrouted_segments++;
+        	// 	}
+	        // }
 
-            if (DEBUG) {
-            std::cout << "GCELL NETS" << std::endl;
-            for (auto gcell_nets_pair : gcell_nets) {
-                auto gcell = gcell_nets_pair.first;
-                auto nets = gcell_nets_pair.second;
+            // if (DEBUG) {
+            // std::cout << "GCELL NETS" << std::endl;
+            // for (auto gcell_nets_pair : gcell_nets) {
+            //     auto gcell = gcell_nets_pair.first;
+            //     auto nets = gcell_nets_pair.second;
 
-                auto box = gcell_graph->box(gcell);
-                auto gcell_min_corner = box.min_corner();
-                auto gcell_layer = gcell_graph->layer_index(gcell);
-                std::cout << "gcell " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
-                for (auto net : nets) {
-                    auto net_name = m_design.netlist().name(net);
-                    std::cout << "net " << net_name << std::endl;
-                }
-            }
-            }
+            //     auto box = gcell_graph->box(gcell);
+            //     auto gcell_min_corner = box.min_corner();
+            //     auto gcell_layer = gcell_graph->layer_index(gcell);
+            //     std::cout << "gcell " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
+            //     for (auto net : nets) {
+            //         auto net_name = m_design.netlist().name(net);
+            //         std::cout << "net " << net_name << std::endl;
+            //     }
+            // }
+            // }
 
-    	    double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
-            std::cout << "routed segments " << routed_segments << std::endl;
-            std::cout << "unrouted segments " << unrouted_segments << std::endl;
-            std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
+    	    // double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
+            // std::cout << "routed segments " << routed_segments << std::endl;
+            // std::cout << "unrouted segments " << unrouted_segments << std::endl;
+            // std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
 
     	    write_segments(nets, cplex, routed_nets);
 
             save_movements(cplex, movements);
 
-	        save_result(cplex);
+	        // save_result(cplex);
         }
         return result;
      }

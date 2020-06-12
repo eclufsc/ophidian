@@ -44,36 +44,36 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     std::vector<ophidian::circuit::Net> routed_nets;
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
-    std::cout << "routing nets" << std::endl;
+    // std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    // std::cout << "result " << result << std::endl;
 
     if(result){
         iccad_output_writer.write_ICCAD_2020_output(output, movements);
     }
    
-    std::cout << "connected nets" << std::endl;
-    for (auto net : nets) {
-        ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
-        for (auto pin : design.netlist().pins(net)) {
-            auto pin_name = design.netlist().name(pin);                
-            auto location = design.placement().location(pin);
-            auto box = ophidian::routing::GCellGraph::box_type{location, location};
-            auto pin_geometry = design.placement().geometry(pin);
-            auto layer_name = pin_geometry.front().second;
-            auto pin_layer = design.routing_library().find_layer_instance(layer_name);
-            auto layer_index = design.routing_library().layerIndex(pin_layer);
+    // std::cout << "connected nets" << std::endl;
+    // for (auto net : nets) {
+    //     ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
+    //     for (auto pin : design.netlist().pins(net)) {
+    //         auto pin_name = design.netlist().name(pin);                
+    //         auto location = design.placement().location(pin);
+    //         auto box = ophidian::routing::GCellGraph::box_type{location, location};
+    //         auto pin_geometry = design.placement().geometry(pin);
+    //         auto layer_name = pin_geometry.front().second;
+    //         auto pin_layer = design.routing_library().find_layer_instance(layer_name);
+    //         auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-            // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+    //         // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
-            design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
-        }
-        auto connected = design.global_routing().is_connected(net, pin_gcells);
+    //         design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
+    //     }
+    //     auto connected = design.global_routing().is_connected(net, pin_gcells);
 
-        auto net_name = design.netlist().name(net);
-        if(!connected)
-            std::cout << "net " << net_name << " is open" << std::endl;
-    }
+    //     auto net_name = design.netlist().name(net);
+    //     if(!connected)
+    //         std::cout << "net " << net_name << " is open" << std::endl;
+    // }
 }
 
 bool test_input(const std::string input_file)
@@ -127,7 +127,6 @@ int main(int argc, char** argv) {
         {
             input_found = true;
             circuit_name = extract_circuit_name(input_file);
-            std::cout << "Circuit Name : " << circuit_name << std::endl;
         }
     }
 

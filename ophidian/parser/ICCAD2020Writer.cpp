@@ -18,7 +18,7 @@ namespace ophidian::parser
             out_file << "CellInst " << netlist.name(move.first) << " " << y << " " << x << std::endl;
         }
 
-        std::cout << "writing output" << std::endl;
+        // std::cout << "writing output" << std::endl;
         std::vector<std::string> segment_strings; 
         for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++){
             auto net = *net_it;
