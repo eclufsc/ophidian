@@ -24,6 +24,7 @@ namespace ophidian::routing {
 
         lp_model_type model(m_env);
         solver_type cplex(model);
+        cplex.setOut(m_env.getNullStream());
 
         if(STATUS) std::cout << "update capacities from blockages" << std::endl;
         update_gcell_capacities(fixed_nets);
