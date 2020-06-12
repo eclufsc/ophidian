@@ -1,0 +1,33 @@
+=================================================
+| ICCAD 2020 CAD Contest                        |
+| Problem B : Routing with Cell Movement        |
+| Team Number: cada0194:                        |
+| Team Name: CABRA:                             |
+| Members:                                      |
+|   University of Calgary                       |
+|       Erfan Aghaeekiasaraee                   |
+|       Upma Gandhi                             |
+|       Laleh Behjat                            |
+|   Federal University of Santa Catarina        |
+|       Arthur Philippi Bianco                  |
+|       Renan Oliveira Netto                    |
+|       Sheiny Fabre Almeida                    |
+|       Tiago Augusto Fontana                   |
+|       Cristina Meinhardt                      |
+|       Jose Luis Guntzel                       |
+=================================================
+
+To run the program use the following syntax
+
+./cell_move_router <input.txt> <output.txt>
+
+Description:
+        Runs the global router with cell movements in the given inputs and writes to the output.
+
+Inputs:
+    <input.txt>  path to the input file. Must be a .txt file.
+
+    <output.txt> path to the output file. Must be a .txt file.
+
+Flags available:
+        --help  displays how to execute the program.
