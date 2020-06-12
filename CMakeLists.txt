@@ -101,6 +101,9 @@ list(APPEND CMAKE_MODULE_PATH "${ophidian_source_dir}/cmake")
 # Set Cmake prefix path for building with local dependencies
 list(APPEND CMAKE_PREFIX_PATH "${ophidian_source_dir}/dependencies")
 
+# Set Cmake prefix path for building with local dependencies
+list(APPEND CMAKE_PREFIX_PATH "/opt")
+
 # Find Boost
 find_package(Boost 1.63 REQUIRED)
 

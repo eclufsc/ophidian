@@ -33,7 +33,7 @@ namespace ophidian::parser
 
         ICCAD2020Writer(design_type & design, std::string circuit_name);
 
-        void write_ICCAD_2020_output(const std::string path = "", const std::vector<std::pair<cell_type, point_type>> & movements = {});
+        void write_ICCAD_2020_output(const std::string out_file_name, const std::vector<std::pair<cell_type, point_type>> & movements = {});
 
     private:
         design_type & m_design;

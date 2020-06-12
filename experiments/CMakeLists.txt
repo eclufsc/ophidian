@@ -16,7 +16,7 @@ file(GLOB_RECURSE ophidian_experiments_source
 )
 
 # Add test target
-add_executable(iccad19gr ${ophidian_experiments_source})
+add_executable(cell_move_router ${ophidian_experiments_source})
 
 # Fetch test files recursevely
 file(GLOB_RECURSE ophidian_experiments_source
@@ -25,7 +25,7 @@ file(GLOB_RECURSE ophidian_experiments_source
 )
 
 # Link target dependencies
-target_link_libraries(iccad19gr
+target_link_libraries(cell_move_router
     PRIVATE Catch
     PRIVATE ophidian_circuit_static
     PRIVATE ophidian_design_static
@@ -43,7 +43,7 @@ target_link_libraries(iccad19gr
 
 if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
     # Link EVERYTHING staticly!
-    set_target_properties(iccad19gr PROPERTIES
+    set_target_properties(cell_move_router PROPERTIES
         LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
     )
 endif()
@@ -58,31 +58,10 @@ execute_process(
     RESULT_VARIABLE result
 )
 
-find_file(POWV9 "POWV9.dat" PATHS 
-    "/usr/share/Flute" 
-    "/usr/local/share/Flute" 
-    "${ophidian_source_dir}/dependencies/share/Flute"
-)
-find_file(PORT9 "PORT9.dat" PATHS 
-    "/usr/share/Flute" 
-    "/usr/local/share/Flute" 
-    "${ophidian_source_dir}/dependencies/share/Flute"
-)
-
-message("Creating symlink FLUTE LUTs")
-execute_process(
-    COMMAND ln -f -s ${POWV9} ${PROJECT_BINARY_DIR}/experiments/.
-    RESULT_VARIABLE result
-)
-execute_process(
-    COMMAND ln -f -s ${PORT9} ${PROJECT_BINARY_DIR}/experiments/.
-    RESULT_VARIABLE result
-)
-
 ################################################################################
 # Add test to ctest
 ################################################################################
 
 enable_testing()
-add_test(NAME unit_test COMMAND iccad19gr)
+add_test(NAME unit_test COMMAND cell_move_router)
 
