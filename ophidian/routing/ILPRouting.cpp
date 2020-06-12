@@ -63,11 +63,7 @@ namespace ophidian::routing {
 
         auto status = cplex.getCplexStatus();
 
-        std::cout << "status " << status << std::endl;
-
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
-
-        std::cout << "result " << result << std::endl;
 
         if(result)
         {
@@ -76,24 +72,103 @@ namespace ophidian::routing {
 
 	        unsigned routed_segments = 0;
     	    unsigned unrouted_segments = 0;
+
+            if (DEBUG) std::cout << "CHECKING ROUTED NETS" << std::endl;
+
+            auto gcell_graph = m_design.global_routing().gcell_graph();
+            std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
             for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) {
                 auto net = *net_it;
         		auto candidates = m_net_candidates.parts(net);
 		        bool routed = 0;
+
+                auto net_name = m_design.netlist().name(net);
+
+                if (DEBUG) std::cout << net_name << std::endl;
+
+                route_candidate_type routed_candidate;
         		for(auto candidate : candidates)
                 {
 		        	auto variable = m_route_candidate_variables[candidate];
         			auto value = cplex.getValue(variable);
-		        	routed |= (value == 1);
+                    if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
+		        	routed |= (value > 0);
+
+                    if (value > 0) {
+                        routed_candidate = candidate;
+                    }
         		}
         		if(routed)
                 {
 		        	routed_segments++;
+
+                    if (DEBUG) {
+                    for (auto wire : m_route_candidate_wires.parts(routed_candidate)) {
+                        auto start_layer = m_wire_start_layers[wire];
+                        auto end_layer = m_wire_end_layers[wire];
+                        auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
+                        auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
+                        auto min_layer_index = std::min(start_layer_index, end_layer_index);
+                        auto max_layer_index = std::max(start_layer_index, end_layer_index);
+    
+                        auto wire_start = m_wire_starts[wire];
+                        auto wire_end = m_wire_ends[wire];
+                        auto min_x = std::min(wire_start.x(), wire_end.x());
+                        auto max_x = std::max(wire_start.x(), wire_end.x());
+                        auto min_y = std::min(wire_start.y(), wire_end.y());
+                        auto max_y = std::max(wire_start.y(), wire_end.y());
+
+                        auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+
+                        auto candidate_name = m_route_candidate_names[routed_candidate];
+
+                        // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+
+                        for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
+                        {
+                            // auto layer_name = "M" + std::to_string(layer_index);
+                            auto layer = m_design.routing_library().layer_from_index(layer_index);
+                            auto layer_name = m_design.routing_library().name(layer);
+                            gcell_container_type gcells;
+                            gcell_graph->intersect(gcells, wire_box, layer_index-1);
+                            //std::cout << "gcells " << gcells.size() << std::endl;
+                            for(auto gcell : gcells)
+                            {
+                                gcell_nets[gcell].insert(net);
+                      /*          if (net_name == "N1481") {
+                auto box = gcell_graph->box(gcell);
+                auto gcell_min_corner = box.min_corner();
+                auto gcell_layer = gcell_graph->layer_index(gcell);
+                std::cout << "GCELL " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
+                            }*/
+                            }
+                        }
+                    }
+                    }
         		}else
                 {
+                    if (DEBUG) std::cout << "NET " << net_name << " UNROUTED" << std::endl;
 		        	unrouted_segments++;
         		}
 	        }
+
+            if (DEBUG) {
+            std::cout << "GCELL NETS" << std::endl;
+            for (auto gcell_nets_pair : gcell_nets) {
+                auto gcell = gcell_nets_pair.first;
+                auto nets = gcell_nets_pair.second;
+
+                auto box = gcell_graph->box(gcell);
+                auto gcell_min_corner = box.min_corner();
+                auto gcell_layer = gcell_graph->layer_index(gcell);
+                std::cout << "gcell " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
+                for (auto net : nets) {
+                    auto net_name = m_design.netlist().name(net);
+                    std::cout << "net " << net_name << std::endl;
+                }
+            }
+            }
+
     	    double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
             std::cout << "routed segments " << routed_segments << std::endl;
             std::cout << "unrouted segments " << unrouted_segments << std::endl;
@@ -140,8 +215,9 @@ namespace ophidian::routing {
 
     void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model)
     {
-        for(auto net : nets)
+        for(auto net : nets) {
             create_net_candidates(net, model);
+        }
     }
 
     
@@ -440,14 +516,16 @@ namespace ophidian::routing {
         m_cell_position_candidates.addAssociation(cell, candidate);
         m_position_candidate_origin[candidate] = type;
 
-        
+        if (DEBUG) std::cout << "create candidate movement " << candidate_variable_name << std::endl; 
 
         // place cell in the new position
         placement.place(cell, candidate_position);
 
         //genarate route for every net with new location
-        for(auto net : nets)
+        for(auto net : nets) {
+            if (DEBUG) std::cout << "net for candidate movement " << m_design.netlist().name(net) << std::endl;
             generate_routes_of_net(net, candidate, model);
+        }
         // restore original position
         placement.place(cell, initial_position);
     }
@@ -496,9 +574,12 @@ namespace ophidian::routing {
         if(DEBUG) std::cout << "after call flute" << std::endl;
 
         auto number_of_segments = tree->size(interconnection::SteinerTree::Segment());
+        auto steiner_tree_length = tree->length().value();
         std::set<std::pair<unit_type, unit_type>> net_steiner_points;
         std::vector<segment_type> segments;
-        if(number_of_segments == 0)
+        if (DEBUG) std::cout << "tree size " << number_of_segments << std::endl;
+        if (DEBUG) std::cout << "tree length " << tree->length().value() << std::endl;
+        if(steiner_tree_length == 0)
         {
             if(DEBUG) std::cout << "same gcell" << std::endl;
             // this happens when all pins are in the same gcell
@@ -596,33 +677,58 @@ namespace ophidian::routing {
     	}
 
         if(DEBUG) std::cout << "net candidates in layers" << std::endl;
-    	auto large_net = net_points.size() > 5;
+        bool has_horizontal_segment = true;
+        bool has_vertical_segment = true;
+        /*for (auto segment : segments) {
+            auto segment_start = m_segment_starts[segment];
+            auto segment_end = m_segment_ends[segment];
+
+            if (segment_start.x().value() != segment_end.x().value()) {
+                has_horizontal_segment = true;                
+            }
+            if (segment_start.y().value() != segment_end.y().value()) {
+                has_vertical_segment = true;
+            }
+        }*/
+
+    	auto large_net = net_points.size() > 5;        
         auto min_layer = routing_constraints.min_net_layer(net);
         auto min_layer_index = m_design.routing_library().layerIndex(min_layer);
+        bool created_net_candidate = false;
     	for(auto horizontal_layer : horizontal_layers)
         {
             auto horizontal_layer_index = m_design.routing_library().layerIndex(horizontal_layer);
-            if(horizontal_layer_index < min_layer_index)
+            if(has_horizontal_segment && horizontal_layer_index < min_layer_index)
             {
                 continue;
             }
 	        for(auto vertical_layer : vertical_layers)
             {
                 auto vertical_layer_index = m_design.routing_library().layerIndex(vertical_layer);
-                if(vertical_layer_index < min_layer_index)
+                if(has_vertical_segment && vertical_layer_index < min_layer_index || (horizontal_layer_index < min_layer_index && vertical_layer_index < min_layer_index))
                 {
                     continue;
-                }
+                }                
                 if(std::abs(horizontal_layer_index - vertical_layer_index) > 1)
                 {
                     continue;
                 }
+
+                created_net_candidate = true;
                 
                 if(DEBUG) std::cout << "before candidates in layers" << std::endl;
             	create_net_candidates_in_layers(net, segments, horizontal_layer, vertical_layer, large_net, net_steiner_points, pos_candidate, model);
                 if(DEBUG) std::cout << "after candidates in layers" << std::endl;
     	    }
 	    }
+
+        if (!created_net_candidate && pos_candidate != position_candidate_type()) {
+            auto position_candidate_variable = m_position_candidate_variables[pos_candidate];
+            auto position_candidate_name = m_position_candidate_names[pos_candidate];
+            auto constraint = model.add(position_candidate_variable == 0);
+            auto constraint_name = position_candidate_name + "_impossible";
+            constraint.setName(constraint_name.c_str());
+        }
     }
 
     void ILPRouting::convert_to_flute(point_container_type & converted, const point_container_type & points) const
@@ -980,6 +1086,7 @@ namespace ophidian::routing {
 
     void ILPRouting::add_candidate_constraints(const std::vector<net_type> & nets, lp_model_type & model)
     {
+        if (DEBUG) std::cout << "add net constraints" << std::endl;
         unsigned net_count = 0;
         for(auto net : nets)
         {
@@ -990,17 +1097,26 @@ namespace ophidian::routing {
                 auto candidate_variable = m_route_candidate_variables[candidate];
                 candidates_constraints += candidate_variable;
             }
-            auto net_name = m_design.netlist().name(net);
-            std::string constraint_name = net_name + "_candidates";
-            auto constraint = model.add(candidates_constraints == 1);
-            constraint.setName(constraint_name.c_str());
+            if (candidates.size()) {
+                auto net_name = m_design.netlist().name(net);
+                std::string constraint_name = net_name + "_candidates";
+                auto constraint = model.add(candidates_constraints == 1);
+                constraint.setName(constraint_name.c_str());
+            }
         }
 
+        if (DEBUG) std::cout << "add cell constraints" << std::endl;
         auto & netlist = m_design.netlist();
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){           
             auto cell = *cell_it;
+            
+            auto cell_name = m_design.netlist().name(cell);
+            if (DEBUG) std::cout << "cell " << cell_name << " pin " << m_design.netlist().pins(cell).size() << std::endl;
+            
             std::vector<net_type> cell_nets;
-            for(auto pin : m_design.netlist().pins(cell)){
+            const auto & pins = m_design.netlist().pins(cell);
+            for(auto pin : pins){
+                //if (DEBUG) std::cout << "pin " << m_design.netlist().name(pin) << std::endl;
                 cell_nets.push_back(m_design.netlist().net(pin));
             }
 
@@ -1018,8 +1134,10 @@ namespace ophidian::routing {
                 model.addConstr(candidates_constraints == cell_initial_var);
             }*/
 
+            if (DEBUG) std::cout << "net to position constraints" << std::endl;
             auto position_candidates = m_cell_position_candidates.parts(cell);
             for(auto pos_candidate : position_candidates) {
+                if (DEBUG) std::cout << "pos candidate " << m_position_candidate_names[pos_candidate] << std::endl;                
                 std::unordered_map<std::string, IloExpr> cell_candidate_expressions;
                 auto routes = m_position_candidate_to_routes.parts(pos_candidate);
                 for(auto route : routes)
@@ -1027,6 +1145,7 @@ namespace ophidian::routing {
                     auto candidate_variable = m_route_candidate_variables[route];
                     auto route_net = m_route_candidate_nets[route];
                     auto net_name = m_design.netlist().name(route_net);
+                    if (DEBUG) std::cout << "net " << net_name << std::endl;
                     //cell_candidate_expressions[net_name] += candidate_variable;
                     if(cell_candidate_expressions.find(net_name) == cell_candidate_expressions.end())
                     {
@@ -1060,6 +1179,7 @@ namespace ophidian::routing {
             }*/
         }
 
+        if (DEBUG) std::cout << "single position constraints" << std::endl;
         // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
@@ -1086,6 +1206,7 @@ namespace ophidian::routing {
             // }
         }
 
+        if (DEBUG) std::cout << "neighbor constraints" << std::endl;
         //freeze neighbors
         for(auto net : nets){
             IloExpr neighbors_constraints(m_env);
@@ -1127,6 +1248,8 @@ namespace ophidian::routing {
         //entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>(IloExpr(m_env))};
         //entity_system::Property<gcell_type, bool>  gcells_constraints_bool{m_design.global_routing().gcell_graph()->make_property_gcells<bool>(false)};
         
+        if (DEBUG) std::cout << "add blockages demands" << std::endl;
+
         for(auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++)
         {
             auto candidate = *candidate_it;
@@ -1148,7 +1271,8 @@ namespace ophidian::routing {
             }
         }
 
-
+        if (DEBUG) std::cout << "find nets in gcells" << std::endl;
+        
         std::unordered_map<std::string, std::unordered_map<gcell_type, std::unordered_set<route_candidate_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash>> gcell_nets;
         for(auto net : nets)
         {
@@ -1195,6 +1319,7 @@ namespace ophidian::routing {
                 }
             }
         }
+        if (DEBUG) std::cout << "add capacity constraints" << std::endl;
         for(auto layer_pair : gcell_nets)
         {
             auto layer_name = layer_pair.first;
@@ -1222,6 +1347,8 @@ namespace ophidian::routing {
                 }
             }
         }
+
+        if (DEBUG) std::cout << "build std cells per gcell" << std::endl;
        
         std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, ilp_var_container_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell; 
         for(auto pos_candidate : m_position_candidates){
@@ -1475,7 +1602,7 @@ namespace ophidian::routing {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = solver.getValue(variable);
-    	    	if(value == 1)
+    	    	if(value > 0)
                 {
                     routed = 1;
 		            routed_candidate = candidate;
@@ -1571,7 +1698,7 @@ namespace ophidian::routing {
         {
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = solver.getValue(variable);
-                if (value == 1)
+                if (value > 0)
                 {
                 auto wirelength = m_route_candidate_wirelengths[candidate];
                 total_wirelength += wirelength;
