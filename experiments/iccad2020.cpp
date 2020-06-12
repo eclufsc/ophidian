@@ -1,3 +1,5 @@
+// #include <sys/time.h>
+
 // #include <catch.hpp>
 // #include <ophidian/design/DesignFactory.h>
 // #include <ophidian/routing/ILPRouting.h>
@@ -69,15 +71,22 @@
 
 
 // void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
+//     auto t1 = std::chrono::high_resolution_clock::now();
+
+//     std::cout << "create ilp routing" << std::endl;
 //     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+//     std::cout << "create writer" << std::endl;
 //     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
+//     std::cout << "get nets" << std::endl;
 //     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
 //     std::vector<ophidian::circuit::Net> fixed_nets;
 //     std::vector<ophidian::circuit::Net> routed_nets;
-
-//     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2003")};
+    
+//     //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N3")};
 //     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2116")};
+
+//     std::cout << "nets " << nets.size() << std::endl;
 
 //     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
 //     std::cout << "routing nets" << std::endl;
@@ -87,10 +96,16 @@
 //     if(result){
 //         iccad_output_writer.write_ICCAD_2020_output("", movements);
 //     }
+
+//     auto t2 = std::chrono::high_resolution_clock::now();
+
+//     auto runtime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
+
+//     std::cout << "RUNTIME " << runtime << std::endl;
    
 //     //write_statistics_for_circuit(design, circuit_name);
 
-//     std::cout << "connected nets" << std::endl;
+// /*    std::cout << "connected nets" << std::endl;
 //         for (auto net : nets) {
 //             ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
 //             for (auto pin : design.netlist().pins(net)) {
@@ -111,14 +126,14 @@
 //             auto net_name = design.netlist().name(net);
 //             if(!connected)
 //                 std::cout << "net " << net_name << " is open" << std::endl;
-//         }
+//         }*/
 // }
 
 // TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 //     std::vector<std::string> circuit_names = {
-//         // "case1",
+//          "case1",
 //         //"case1N4",
-//         //"case2",
+//         "case2",
 //          "case3",
 //         //"case3_no_blockages",
 //         // "case3_no_extra_demand"
@@ -142,6 +157,8 @@
 //         auto design = ophidian::design::Design();
 //         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
 //         run_ilp_for_circuit(design, circuit_name);
+
+//         std::cout << "done " << circuit_name << std::endl;
 //     }
 // }
 
