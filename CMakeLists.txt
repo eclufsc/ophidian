@@ -105,7 +105,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ophidian_source_dir}/dependencies")
 list(APPEND CMAKE_PREFIX_PATH "/opt")
 
 # Find Boost
-find_package(Boost 1.63 REQUIRED)
+find_package(Boost 1.59 REQUIRED)
 
 # Find Lemon
 find_package(Lemon REQUIRED)

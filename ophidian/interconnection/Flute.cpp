@@ -106,7 +106,7 @@ namespace ophidian::interconnection
                 steiner->add(steiner->add(u), steiner->add(v));
             }
         }
-        delete[] tree.branch;
+        free(tree.branch);
 
         return std::move(steiner);
     }
