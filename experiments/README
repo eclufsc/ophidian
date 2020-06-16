@@ -20,7 +20,7 @@
 
 To run the program use the following syntax
 
-./cada0194 <input.txt> <output.txt>
+./cell_move_router <input.txt> <output.txt>
 
 Description:
         Runs the global router with cell movements in the given inputs and writes to the output.
