@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
     if (argc == 1 || string(argv[1]) == "-h" || string(argv[1]) == "-help" || string(argv[1]) == "--help")
     {
         cout << "usage:" << endl;
-        cout << "./cada0194 <input.txt> <output.txt>" << endl;
+        cout << "./cell_move_router <input.txt> <output.txt>" << endl;
         return 0;
     }
 
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     {
         cout << "Cannot proceed, missing inputn and/or output file name" << endl;
         cout << "For help, set --help or -help or -h" << endl;
-        cout << "usage: ./cada0194 <input.txt> <output.txt>" << endl;
+        cout << "usage: ./cell_move_router <input.txt> <output.txt>" << endl;
         return 0;
     } 
 
