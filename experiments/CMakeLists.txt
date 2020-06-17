@@ -9,23 +9,29 @@
 #   - Prepare test input environment.
 ################################################################################
 
-# Fetch test files recursevely
-file(GLOB_RECURSE ophidian_experiments_source
+# Fetch tests (except main.cpp) files recursevely
+file(GLOB_RECURSE ophidian_experiments_test
+    # "iccad2020.cpp"
     "*.cpp"
+)
+
+list(REMOVE_ITEM ophidian_experiments_test "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+
+
+
+# only main
+file(GLOB_RECURSE ophidian_experiments_source
     "main.cpp"
 )
 
-# Add test target
+# Add main target
 add_executable(cell_move_router ${ophidian_experiments_source})
 
-# Fetch test files recursevely
-file(GLOB_RECURSE ophidian_experiments_source
-    "*.cpp"
-    "main.cpp"
-)
+# Add test target
+add_executable(run_tests ${ophidian_experiments_test})
 
-# Link target dependencies
-target_link_libraries(cell_move_router
+
+set(LIBS 
     PRIVATE Catch
     PRIVATE ophidian_circuit_static
     PRIVATE ophidian_design_static
@@ -41,9 +47,23 @@ target_link_libraries(cell_move_router
     PRIVATE dl
 )
 
+# Link target dependencies
+target_link_libraries(cell_move_router ${LIBS})
+
+# Link target dependencies
+target_link_libraries(run_tests ${LIBS})
+
+
 if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
     # Link EVERYTHING staticly!
     set_target_properties(cell_move_router PROPERTIES
+        LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
+    )
+endif()
+
+if(OPHIDIAN_EXPERIMENTS_FULLY_STATIC)
+    # Link EVERYTHING staticly!
+    set_target_properties(run_tests PROPERTIES
         LINK_FLAGS "-static -static-libgcc -static-libstdc++ -pthread"
     )
 endif()
@@ -63,5 +83,5 @@ execute_process(
 ################################################################################
 
 enable_testing()
-add_test(NAME unit_test COMMAND cell_move_router)
+add_test(NAME unit_test COMMAND run_tests)
 
