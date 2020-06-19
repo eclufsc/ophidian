@@ -43,7 +43,7 @@ namespace ophidian::util
         GridGraph_3D(index_type x, index_type y, index_type z, capacity_type capacity_edge = 1, cost_type edge_cost = 1 );
 
         node_type node(index_type x, index_type y, index_type z) const;
-        node_position_type position(node_type node);
+        node_position_type position(node_type node) const;
 
         cost_type node_distance_x(node_type u, node_type v);
         cost_type node_distance_y(node_type u, node_type v);

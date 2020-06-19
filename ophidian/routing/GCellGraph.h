@@ -75,19 +75,19 @@ public:
     gcell_type gcell(node_type & node) const;
     gcell_type nearest_gcell(const point_type location, const index_type layer) const ;
     node_type graph_node(const gcell_type gcell) const;
-    box_type box(const gcell_type& gcell);
-    point_type center_of_box(const gcell_type& gcell);
-    scalar_type capacity(const gcell_type& gcell);
+    box_type box(const gcell_type& gcell) const;
+    point_type center_of_box(const gcell_type& gcell) const;
+    scalar_type capacity(const gcell_type& gcell) const;
     void capacity(const gcell_type& gcell, scalar_type capacity);
-    scalar_type demand(const gcell_type& gcell);
-    scalar_type net_demand(const gcell_type& gcell);
-    scalar_type blockage_demand(const gcell_type& gcell);
+    scalar_type demand(const gcell_type& gcell) const;
+    scalar_type net_demand(const gcell_type& gcell) const;
+    scalar_type blockage_demand(const gcell_type& gcell) const;
     void change_net_demand(const gcell_type& gcell, const scalar_type delta);
     void change_blockage_demand(const gcell_type& gcell, const scalar_type delta);
-    void intersect(gcell_container_type& gcells, const box_type box, const index_type layer);
-    uint32_t id(const gcell_type& gcell);
-    bool overfloed(const gcell_type& gcell);
-    index_type layer_index(const gcell_type & gcell);
+    void intersect(gcell_container_type& gcells, const box_type box, const index_type layer) const;
+    uint32_t id(const gcell_type& gcell) const;
+    bool is_overflow(const gcell_type& gcell) const;
+    index_type layer_index(const gcell_type & gcell) const;
 
     // Iterators
     gcell_container_type::const_iterator begin_gcell() const noexcept;

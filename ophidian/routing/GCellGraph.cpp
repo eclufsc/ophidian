@@ -128,16 +128,16 @@ GCellGraph::gcell_type GCellGraph::nearest_gcell(const GCellGraph::point_type lo
     return gcell(node_index_pair.first, node_index_pair.second, layer);
 }
 
-GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell)
+GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell) const
 {
     auto node = m_gcell_node[gcell];
     auto index = position(node);
     auto x = index.get<0>();
     auto y = index.get<1>();
-    return m_gcell_box[std::make_pair(x,y)];
+    return m_gcell_box.at(std::make_pair(x,y));
 }
 
-GCellGraph::point_type GCellGraph::center_of_box(const GCellGraph::gcell_type& gcell)
+GCellGraph::point_type GCellGraph::center_of_box(const GCellGraph::gcell_type& gcell) const
 {
     box_type gbox = box(gcell);
     // std::pair<unit_type, unit_type> min{std::numeric_limits<unit_type>::max(), std::numeric_limits<unit_type>::max()};
@@ -163,7 +163,7 @@ GCellGraph::node_type GCellGraph::graph_node(const GCellGraph::gcell_type gcell)
     return m_gcell_node[gcell];
 }
 
-GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell)
+GCellGraph::scalar_type GCellGraph::capacity(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcell_capacity[gcell];
 }
@@ -173,27 +173,29 @@ void GCellGraph::capacity(const GCellGraph::gcell_type& gcell, scalar_type capac
     m_gcell_capacity[gcell] = capacity;
 }
 
-GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell)
+GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell];
 }
 
-bool GCellGraph::overfloed(const gcell_type& gcell){
+bool GCellGraph::is_overflow(const gcell_type& gcell) const
+{
     return (m_gcell_capacity[gcell] < (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
 }
 
-GCellGraph::index_type GCellGraph::layer_index(const gcell_type & gcell) {
+GCellGraph::index_type GCellGraph::layer_index(const gcell_type & gcell) const
+{
     auto node = graph_node(gcell);
     auto node_position = position(node);
     return node_position.get<2>() + 1;
 }
 
-GCellGraph::scalar_type GCellGraph::net_demand(const GCellGraph::gcell_type& gcell)
+GCellGraph::scalar_type GCellGraph::net_demand(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcell_net_demand[gcell];
 }
 
-GCellGraph::scalar_type GCellGraph::blockage_demand(const GCellGraph::gcell_type& gcell)
+GCellGraph::scalar_type GCellGraph::blockage_demand(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcell_blockage_demand[gcell];
 }
@@ -208,7 +210,7 @@ void GCellGraph::change_blockage_demand(const GCellGraph::gcell_type& gcell, con
     m_gcell_blockage_demand[gcell] += delta;
 }
 
-void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer)
+void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer) const
 {
     namespace bgi = boost::geometry::index;
     auto min_corner_d = point_scalar_type{units::unit_cast<double>(box.min_corner().x()), units::unit_cast<double>(box.min_corner().y())}; 
@@ -230,7 +232,7 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
     }
 }
 
-uint32_t GCellGraph::id(const GCellGraph::gcell_type& gcell)
+uint32_t GCellGraph::id(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcells.id(gcell);
 }
