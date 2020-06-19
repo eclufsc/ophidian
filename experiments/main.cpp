@@ -37,6 +37,7 @@ void greetings(){
     cout << "\t\tRenan Oliveira Netto" << endl;
     cout << "\t\tSheiny Fabre Almeida" << endl;
     cout << "\t\tTiago Augusto Fontana" << endl;
+    cout << "\t\tVinicius Livramento" << endl;
     cout << "\t\tCristina Meinhardt" << endl;
     cout << "\t\tJose Luis Guntzel" << endl;
     cout << "=================================================" << endl;

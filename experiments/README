@@ -13,6 +13,7 @@
 |       Renan Oliveira Netto                    |
 |       Sheiny Fabre Almeida                    |
 |       Tiago Augusto Fontana                   |
+|       Vinicius Livramento                     |
 |       Cristina Meinhardt                      |
 |       Jose Luis Guntzel                       |
 =================================================
@@ -31,3 +32,4 @@ Inputs:
 
 Flags available:
         --help  displays how to execute the program.
+
