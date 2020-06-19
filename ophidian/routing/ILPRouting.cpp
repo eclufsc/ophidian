@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 
 bool DEBUG = false;
-bool STATUS = false;
+bool STATUS = true;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -13,7 +13,7 @@ namespace ophidian::routing {
     {
     }
 
-    bool ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
+    std::pair<bool, int64_t> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
     {
         m_integer = integer;
 
@@ -60,7 +60,7 @@ namespace ophidian::routing {
         auto time_end = std::chrono::high_resolution_clock::now();
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
-        if(DEBUG) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        if(STATUS) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
 
         auto status = cplex.getCplexStatus();
 
@@ -181,7 +181,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-        return result;
+        return std::make_pair(result, duration_ms);
      }
 
     void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
@@ -1361,11 +1361,12 @@ namespace ophidian::routing {
             auto cell_name = m_design.netlist().name(cell);
             auto std_cell_name = m_design.standard_cells().name(std_cell);
 
-            for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
-                auto layer = *layer_it;
-                auto layer_index = routing_library.layerIndex(layer);
+            // for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
+                // auto layer = *layer_it;
+                // auto layer_index = routing_library.layerIndex(layer);
+                // auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
+            for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++) {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
-
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
                 auto gcell_box = gcell_graph->box(gcell);                
                 //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;

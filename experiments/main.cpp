@@ -1,5 +1,12 @@
-// #define CATCH_CONFIG_MAIN
-// #include <catch.hpp>
+#define CATCH_ON true
+
+#if CATCH_ON
+
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+
+#else
+
 #include <iostream>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
@@ -48,7 +55,7 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     // std::cout << "result " << result << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output(output, movements);
     }
    
@@ -163,3 +170,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+#endif
