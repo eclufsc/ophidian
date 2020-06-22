@@ -251,7 +251,46 @@ namespace ophidian::routing
         }
     }
 
-    bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells) {
+    bool GlobalRouting::is_overflow() const
+    {
+        auto& graph = *this->m_gcell_graph;
+        auto is_overflow = false;
+        for (auto gcellIt = graph.begin_gcell(); gcellIt != graph.end_gcell(); gcellIt++)
+        {
+            // std::cout << "Cell: x: " << graph.position(graph.graph_node(*gcellIt)).get<0>() 
+            // << " y: " << graph.position(graph.graph_node(*gcellIt)).get<1>() 
+            // << " z: " << graph.position(graph.graph_node(*gcellIt)).get<2>() 
+            // << " demand: " << graph.demand(*gcellIt) << " capacity: " << graph.capacity(*gcellIt) << std::endl;
+            
+            if (graph.is_overflow(*gcellIt))
+            {
+                is_overflow = true;
+            }
+        }
+        return is_overflow;
+    }
+    bool GlobalRouting::is_overflow(const net_container_type& nets, net_container_type& ovfl_nets) const
+    {
+        auto& graph = *this->m_gcell_graph;
+        auto is_overflow = false;
+
+        for (const auto& net : nets)
+        {
+            auto net_gcells = this->gcells(net);
+            for (const auto& gcell : net_gcells)
+            {
+                if (graph.is_overflow(gcell))
+                {
+                    ovfl_nets.push_back(net);
+                    is_overflow = true;
+                }
+            }
+        }
+        return is_overflow;
+    }
+
+    bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells) const
+    {
         auto net_graph = graph_type{};
         std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
         for (auto gcell : pin_gcells) {
@@ -291,9 +330,9 @@ namespace ophidian::routing
             // std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;
         }
 
-        for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
+        // for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
             //std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
-        }
+        // }
 
         return lemon::connected(net_graph);
     }

@@ -87,15 +87,17 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N3")};
     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2116")};
 
-    std::cout << "nets " << nets.size() << std::endl;
-
+    std::cout << "# of nets " << nets.size() << std::endl;
+    auto wlb = design.global_routing().wirelength_in_gcell(nets);
+    auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
+    std::cout << ovfl << "in input file" << std::endl;
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     std::cout << "result " << result.first << std::endl;
 
-    if(result.first){
-        iccad_output_writer.write_ICCAD_2020_output("", movements);
+    if(result.fist){
+        iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 
     auto t2 = std::chrono::high_resolution_clock::now();
@@ -103,7 +105,16 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     auto runtime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
 
     std::cout << "RUNTIME " << runtime << std::endl;
-   
+
+
+    ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
+    std::cout << ovfl << std::endl;
+    ophidian::routing::GlobalRouting::net_container_type ovfl_nets{};
+    ovfl = design.global_routing().is_overflow(nets, ovfl_nets) ? "there is overflow" : "No overflow";
+    std::cout << ovfl << std::endl;
+    
+    auto wla = design.global_routing().wirelength_in_gcell(nets);
+    std::cout << "WL before: " << wlb << " WL after: " << wla << " change: " << wlb-wla << std::endl;
     //write_statistics_for_circuit(design, circuit_name);
 
 /*    std::cout << "connected nets" << std::endl;
@@ -134,8 +145,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
          "case1",
         //"case1N4",
-        "case2",
-         "case3",
+        // "case2",
+        // "case3",
         //"case3_no_blockages",
         // "case3_no_extra_demand"
         //"case3_only_same_grid"
@@ -158,9 +169,12 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
         run_ilp_for_circuit(design, circuit_name);
-
-        std::cout << "done " << circuit_name << std::endl;
+        // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
+        
+        // std::cout << "done, " << is_connected << circuit_name << std::endl;
     }
+
+
 }
 
 TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
