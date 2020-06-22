@@ -36,7 +36,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        create_all_candidates_with_movements(nets, model);
+        // create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -51,7 +51,7 @@ namespace ophidian::routing {
         add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
-        if(DEBUG)  cplex.exportModel("ilp_routing_model.lp");
+        if(STATUS)  cplex.exportModel("ilp_routing_model.lp");
 
         if(STATUS) std::cout << "exported" << std::endl;
 
@@ -69,7 +69,7 @@ namespace ophidian::routing {
         if(result)
         {
             if(STATUS) std::cout << "write solution" << std::endl;
-            if(DEBUG) cplex.writeSolution("ilp_routing_model.sol");
+            if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;

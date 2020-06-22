@@ -95,11 +95,11 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         // "ispd19_test8",
         // "ispd19_test9"
 
-        // "ispd18_test1",
+        "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
         // "ispd18_test4",
-        "ispd18_test5",
+        // "ispd18_test5",
         // "ispd18_test6",
         // "ispd18_test7",
         // "ispd18_test8",
@@ -145,7 +145,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         
 
 
-        run_ilp(design, circuit_name);=
+        run_ilp(design, circuit_name);
     }
 }
 

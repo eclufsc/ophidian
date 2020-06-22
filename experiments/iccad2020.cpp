@@ -92,9 +92,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    std::cout << "result " << result.first << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("", movements);
     }
 
@@ -216,9 +216,9 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    std::cout << "result " << result.first << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 
