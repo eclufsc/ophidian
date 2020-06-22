@@ -117,7 +117,7 @@ GridGraph_3D::node_type GridGraph_3D::node(GridGraph_3D::index_type x, GridGraph
     return m_nodes[x][y][z];
 }
 
-GridGraph_3D::node_position_type GridGraph_3D::position(GridGraph_3D::node_type node)
+GridGraph_3D::node_position_type GridGraph_3D::position(GridGraph_3D::node_type node) const
 {
     return m_nodes_indexes[node];
 }
