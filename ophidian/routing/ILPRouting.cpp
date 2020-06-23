@@ -4,7 +4,7 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = true;
+bool DEBUG = false;
 bool STATUS = true;
 
 namespace ophidian::routing {
@@ -13,7 +13,7 @@ namespace ophidian::routing {
     {
     }
 
-    bool ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
+    std::pair<bool, int64_t> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
     {
         m_integer = integer;
 
@@ -51,7 +51,7 @@ namespace ophidian::routing {
         //add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
-        if(DEBUG)  cplex.exportModel("ilp_routing_model.lp");
+        if(STATUS)  cplex.exportModel("ilp_routing_model.lp");
 
         if(STATUS) std::cout << "exported" << std::endl;
 
@@ -60,18 +60,20 @@ namespace ophidian::routing {
         auto time_end = std::chrono::high_resolution_clock::now();
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
-        if(DEBUG) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        if(STATUS) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
 
         auto status = cplex.getCplexStatus();
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
-        if (DEBUG) std::cout << "status " << status << std::endl;
+        if (STATUS) std::cout << "status " << status << std::endl;
+
+        if (STATUS) std::cout << "result " << result << std::endl;
 
         if(result)
         {
             if(STATUS) std::cout << "write solution" << std::endl;
-            if(DEBUG) cplex.writeSolution("ilp_routing_model.sol");
+            if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
@@ -183,7 +185,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-        return result;
+        return std::make_pair(result, duration_ms);
      }
 
     void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
@@ -552,15 +554,16 @@ namespace ophidian::routing {
             auto pin_name = netlist.name(pin);
             auto pin_location = placement.location(pin);
             auto pin_cell = netlist.cell(pin);
-            if (pin_cell != cell_type{} && pin_cell == moved_cell) {
+            /*if (pin_cell != cell_type{} && pin_cell == moved_cell) {
                 auto original_cell_location = m_design.placement().location(pin_cell);
                 auto moved_cell_location = m_position_candidate_position[pos_candidate];                
                 auto translation = point_type{moved_cell_location.x() - original_cell_location.x(), moved_cell_location.y() - original_cell_location.y()};
                 pin_location = point_type{pin_location.x() + translation.x(), pin_location.y() + translation.y()};
-            }
+            }*/
             if (DEBUG) std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
             net_points.push_back(pin_location);
-            auto point = std::make_pair((int)pin_location.x().value(), (int)pin_location.y().value());
+            auto point = std::make_pair(std::round(pin_location.x().value()), std::round(pin_location.y().value()));
+            if (DEBUG) std::cout << "point " << point.first << "," << point.second << std::endl;
             // auto std_pin = netlist.std_cell_pin(pin);
             net_points_map[point].push_back(pin);
         }
@@ -591,7 +594,7 @@ namespace ophidian::routing {
             // auto point = convert_to_design(flutePoints.at(0));
             m_segment_starts[segment] = point;
             m_segment_ends[segment] = point;
-            auto point_pair = std::make_pair((int)point.x().value(), (int)point.y().value());
+            auto point_pair = std::make_pair(std::round(point.x().value()), std::round(point.y().value()));
 
             // std::cout << "printing map in same gcell" << std::endl;
             // for(auto k : net_points_map)
@@ -633,7 +636,8 @@ namespace ophidian::routing {
                 //     std::cout << "key: " << k.first.first << " , " << k.first.second << std::endl;
                 // }
 
-                auto point = std::make_pair((int)segment_start.x().value(), (int)segment_start.y().value());
+                auto point = std::make_pair(std::round(segment_start.x().value()), std::round(segment_start.y().value()));
+                if (DEBUG) std::cout << "point " << point.first << "," << point.second << std::endl;
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
@@ -645,7 +649,7 @@ namespace ophidian::routing {
                     net_steiner_points.insert(std::make_pair(segment_start.x(), segment_start.y()));
                     if (DEBUG) std::cout << "start is steiner point" << std::endl;
                 }
-                point = std::make_pair((int)segment_end.x().value(), (int)segment_end.y().value());
+                point = std::make_pair(std::round(segment_end.x().value()), std::round(segment_end.y().value()));
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
@@ -668,8 +672,6 @@ namespace ophidian::routing {
         {
 	        auto layer = *layer_it;
             auto layer_name = m_design.routing_library().name(layer);
-            auto layer_index = m_design.routing_library().layerIndex(layer);
-            if (layer_index == -1) continue;
     	    auto layer_direction = m_design.routing_library().direction(layer);
 	        if(layer_direction == layer_direction_type::HORIZONTAL)
             {
@@ -1365,10 +1367,11 @@ namespace ophidian::routing {
             auto cell_name = m_design.netlist().name(cell);
             auto std_cell_name = m_design.standard_cells().name(std_cell);
 
-            for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
-                auto layer = *layer_it;
-                auto layer_index = routing_library.layerIndex(layer);
-                if (layer_index == -1) continue;
+            // for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
+                // auto layer = *layer_it;
+                // auto layer_index = routing_library.layerIndex(layer);
+                // auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
+            for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++) {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
 
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
@@ -1585,7 +1588,7 @@ namespace ophidian::routing {
             // if(gcell_constraint.size() > 0 )
             if(gcells_constraints_bool[gcell])
             {
-                auto capacity = gcell_graph->capacity(gcell);
+                auto capacity = gcell_graph->capacity(gcell) * 10;
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto constraint = model.add(gcell_constraint <= capacity - demand);

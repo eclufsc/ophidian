@@ -94,9 +94,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    std::cout << "result " << result.first << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 
@@ -179,42 +179,6 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
 }
 
-TEST_CASE("run ILP for iccad19 benchmarks", "[iccad20]") {
-    std::vector<std::string> circuit_names = {
-         "ispd18_test1",
-         //"ispd19_test1",
-    };
-
-    std::string benchmarks_path = "./input_files/ispd19/";
-    // std::string benchmarks_path = "./input_files/iccad20/";
-    for (auto circuit_name : circuit_names) {
-        std::cout << "running circuit " << circuit_name << std::endl;
-
-         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
-         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-         std::string guide_file = benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".solution_cugr.guide";
-
-         ophidian::parser::Def def;
-         ophidian::parser::Lef lef;
-         ophidian::parser::Guide guide;
-         //#pragma omp parallel
-         //{
-             def = ophidian::parser::Def{def_file};
-             lef = ophidian::parser::Lef{lef_file};
-             guide = ophidian::parser::Guide{guide_file};
-         //}
-
-        auto design = ophidian::design::Design();
-        ophidian::design::factory::make_design(design, def, lef, guide);
-        run_ilp_for_circuit(design, circuit_name);
-        // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
-        
-        // std::cout << "done, " << is_connected << circuit_name << std::endl;
-    }
-
-
-}
-
 TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     std::string circuit_name = "case3_no_extra_demand";
     std::string benchmarks_path = "./input_files/iccad20/";
@@ -268,9 +232,9 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    std::cout << "result " << result.first << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 

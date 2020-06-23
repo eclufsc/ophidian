@@ -90,7 +90,7 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            bool route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer = true);
+            std::pair<bool, int64_t> route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer = true);
 
         private:
             void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
