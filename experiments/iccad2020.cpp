@@ -84,7 +84,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
     
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N3")};
+    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("net3148")};
     // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2116")};
 
     std::cout << "# of nets " << nets.size() << std::endl;
@@ -117,8 +117,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::cout << "WL before: " << wlb << " WL after: " << wla << " change: " << wlb-wla << std::endl;
     //write_statistics_for_circuit(design, circuit_name);
 
-/*    std::cout << "connected nets" << std::endl;
+    std::cout << "connected nets" << std::endl;
         for (auto net : nets) {
+            auto net_name = design.netlist().name(net);
             ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
             for (auto pin : design.netlist().pins(net)) {
                 auto pin_name = design.netlist().name(pin);                
@@ -129,16 +130,17 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-                // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+                if (net_name == "net3148") {
+                std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << " location " << location.x().value() << "," << location.y().value() << std::endl;
+                }
 
                 design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
             }
-            auto connected = design.global_routing().is_connected(net, pin_gcells);
+            auto connected = design.global_routing().is_connected(net, pin_gcells, net_name);
 
-            auto net_name = design.netlist().name(net);
             if(!connected)
                 std::cout << "net " << net_name << " is open" << std::endl;
-        }*/
+        }
 }
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
@@ -168,6 +170,42 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+        run_ilp_for_circuit(design, circuit_name);
+        // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
+        
+        // std::cout << "done, " << is_connected << circuit_name << std::endl;
+    }
+
+
+}
+
+TEST_CASE("run ILP for iccad19 benchmarks", "[iccad20]") {
+    std::vector<std::string> circuit_names = {
+         "ispd18_test1",
+         //"ispd19_test1",
+    };
+
+    std::string benchmarks_path = "./input_files/ispd19/";
+    // std::string benchmarks_path = "./input_files/iccad20/";
+    for (auto circuit_name : circuit_names) {
+        std::cout << "running circuit " << circuit_name << std::endl;
+
+         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+         std::string guide_file = benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".solution_cugr.guide";
+
+         ophidian::parser::Def def;
+         ophidian::parser::Lef lef;
+         ophidian::parser::Guide guide;
+         //#pragma omp parallel
+         //{
+             def = ophidian::parser::Def{def_file};
+             lef = ophidian::parser::Lef{lef_file};
+             guide = ophidian::parser::Guide{guide_file};
+         //}
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design(design, def, lef, guide);
         run_ilp_for_circuit(design, circuit_name);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         

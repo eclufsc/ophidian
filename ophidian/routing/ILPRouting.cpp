@@ -4,8 +4,8 @@
 #include <regex>
 #include <boost/lexical_cast.hpp>
 
-bool DEBUG = false;
-bool STATUS = false;
+bool DEBUG = true;
+bool STATUS = true;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -36,7 +36,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        create_all_candidates_with_movements(nets, model);
+        //create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -48,7 +48,7 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, model);
 
         if(STATUS) std::cout << "add movements constraints" << std::endl;
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
         if(DEBUG)  cplex.exportModel("ilp_routing_model.lp");
@@ -65,6 +65,8 @@ namespace ophidian::routing {
         auto status = cplex.getCplexStatus();
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
+
+        if (DEBUG) std::cout << "status " << status << std::endl;
 
         if(result)
         {
@@ -666,6 +668,8 @@ namespace ophidian::routing {
         {
 	        auto layer = *layer_it;
             auto layer_name = m_design.routing_library().name(layer);
+            auto layer_index = m_design.routing_library().layerIndex(layer);
+            if (layer_index == -1) continue;
     	    auto layer_direction = m_design.routing_library().direction(layer);
 	        if(layer_direction == layer_direction_type::HORIZONTAL)
             {
@@ -1364,6 +1368,7 @@ namespace ophidian::routing {
             for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
                 auto layer = *layer_it;
                 auto layer_index = routing_library.layerIndex(layer);
+                if (layer_index == -1) continue;
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
 
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
