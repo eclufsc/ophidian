@@ -11,7 +11,7 @@
 
 # Fetch tests (except main.cpp) files recursevely
 file(GLOB_RECURSE ophidian_experiments_test
-    # "iccad2020.cpp"
+    "*.h"
     "*.cpp"
 )
 

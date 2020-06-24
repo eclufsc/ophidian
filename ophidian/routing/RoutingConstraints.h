@@ -22,10 +22,17 @@ namespace ophidian::routing
             }
         };
 
+        struct extra_demand_rule {
+            std::string macro1;
+            std::string macro2;
+            std::string layer;
+            int demand;
+        };
+
 
         template <class K, class V> using map_type  = std::unordered_map<K,V>;
         using index_type                            = int;
-        using demand_type                           = int;
+        using demand_type                           = extra_demand_rule;
         using layer_type                            = Library::layer_type;
         using net_type                              = ophidian::circuit::Net;
         using macro_name_type                       = std::string;
@@ -37,7 +44,7 @@ namespace ophidian::routing
 
         using ndf_index_type                        = std::tuple<index_type, index_type, index_type>;
         // using tuple_hash_type                       = tuple_hash<index_type, index_type, index_type>;
-        using ndf_map_type                          = std::unordered_map<ndf_index_type, demand_type, tuple_hash>;
+        using ndf_map_type                          = std::unordered_map<ndf_index_type, int, tuple_hash>;
 
         // Constructors
         //! Construct Netlist
@@ -54,7 +61,7 @@ namespace ophidian::routing
         RoutingConstraints(const ophidian::circuit::Netlist & netlist, const ophidian::routing::Library & library);
 
         //Element access
-        demand_type ndf_constraint(index_type x, index_type y, index_type z) const;
+        int ndf_constraint(index_type x, index_type y, index_type z) const;
 
         same_grid_map::const_iterator begin_same_grid() const;
         same_grid_map::const_iterator end_same_grid() const;
@@ -76,10 +83,10 @@ namespace ophidian::routing
         //Modifiers
         void resize_ndf_constraints(std::size_t size_x, std::size_t size_y, std::size_t size_z);
         void set_max_cell_movement(unsigned int max_move);
-        void set_ndf_constraint(index_type x, index_type y, index_type z, demand_type val);
+        void set_ndf_constraint(index_type x, index_type y, index_type z, int val);
         void set_min_net_layer(net_type net, layer_type layer);
-        void set_same_grid_extra_demand(macro_name_type m1_name, macro_name_type m2_name, layer_name_type l_name, demand_type d);
-        void set_adj_grid_extra_demand(macro_name_type m1_name, macro_name_type m2_name, layer_name_type l_name, demand_type d);
+        void set_same_grid_extra_demand(macro_name_type m1_name, macro_name_type m2_name, layer_name_type l_name, int d);
+        void set_adj_grid_extra_demand(macro_name_type m1_name, macro_name_type m2_name, layer_name_type l_name, int d);
     private:
         entity_system::Property<net_type, layer_type> m_min_net_layer;
         std::size_t m_size_x, m_size_y, m_size_z;//It needs to be lazy initialized because of lazy initialization of GCellGraph

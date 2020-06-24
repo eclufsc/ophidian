@@ -1,10 +1,11 @@
 #include <sys/time.h>
 
-#define CATCH_CONFIG_MAIN
+// #define CATCH_CONFIG_MAINs
 #include <catch.hpp>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
+#include "run_ilp.h"
 
 /*
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
@@ -68,81 +69,6 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
     stats_file.close();
 }
 */
-
-
-
-void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
-    auto t1 = std::chrono::high_resolution_clock::now();
-
-    std::cout << "create ilp routing" << std::endl;
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
-    std::cout << "create writer" << std::endl;
-    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
-
-    std::cout << "get nets" << std::endl;
-    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<ophidian::circuit::Net> fixed_nets;
-    std::vector<ophidian::circuit::Net> routed_nets;
-    
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N3")};
-    // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2116")};
-
-    std::cout << "# of nets " << nets.size() << std::endl;
-    auto wlb = design.global_routing().wirelength_in_gcell(nets);
-    auto demandb = design.global_routing().gcell_graph()->total_demand();
-    auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
-    std::cout << ovfl << "in input file" << std::endl;
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
-    std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
-
-    if(result){
-        iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
-    }
-
-    auto t2 = std::chrono::high_resolution_clock::now();
-
-    auto runtime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
-
-    std::cout << "RUNTIME " << runtime << std::endl;
-
-
-    ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
-    std::cout << ovfl << std::endl;
-    ophidian::routing::GlobalRouting::net_container_type ovfl_nets{};
-    ovfl = design.global_routing().is_overflow(nets, ovfl_nets) ? "there is overflow" : "No overflow";
-    std::cout << ovfl << std::endl;
-    
-    auto wla = design.global_routing().wirelength_in_gcell(nets);
-    std::cout << "WL before: " << wlb << " WL after: " << wla << " change: " << wlb-wla << std::endl;
-    auto demanda = design.global_routing().gcell_graph()->total_demand();
-    std::cout << "Total Demand before: " << demandb << " Total Demand after: " << demanda << " change: " << demandb-demanda << std::endl;
-    //write_statistics_for_circuit(design, circuit_name);
-
-/*    std::cout << "connected nets" << std::endl;
-        for (auto net : nets) {
-            ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
-            for (auto pin : design.netlist().pins(net)) {
-                auto pin_name = design.netlist().name(pin);                
-                auto location = design.placement().location(pin);
-                auto box = ophidian::routing::GCellGraph::box_type{location, location};
-                auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second;
-                auto pin_layer = design.routing_library().find_layer_instance(layer_name);
-                auto layer_index = design.routing_library().layerIndex(pin_layer);
-
-                // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
-
-                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
-            }
-            auto connected = design.global_routing().is_connected(net, pin_gcells);
-
-            auto net_name = design.netlist().name(net);
-            if(!connected)
-                std::cout << "net " << net_name << " is open" << std::endl;
-        }*/
-}
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
@@ -233,9 +159,9 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result << std::endl;
+    std::cout << "result " << result.first << std::endl;
 
-    if(result){
+    if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 

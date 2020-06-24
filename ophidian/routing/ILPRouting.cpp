@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 
 bool DEBUG = false;
-bool STATUS = false;
+bool STATUS = true;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -13,12 +13,9 @@ namespace ophidian::routing {
     {
     }
 
-    bool ILPRouting::route_nets(const std::vector<net_type> & nets,
-                    const std::vector<net_type> & fixed_nets,
-                    std::vector<net_type> & routed_nets,
-                    std::vector<std::pair<cell_type, point_type>> & movements,
-                    bool integer)
+    std::pair<bool, ILPRouting::Statistics> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer, bool initial_routing)
     {
+        ILPRouting::Statistics statistic;
         m_integer = integer;
 
         m_segments.clear();
@@ -54,26 +51,37 @@ namespace ophidian::routing {
         if(STATUS) std::cout << "add movements constraints" << std::endl;
         add_movements_constraints(model);
 
-        if(STATUS) std::cout << "write model" << std::endl;
-        if(DEBUG)  cplex.exportModel("ilp_routing_model.lp");
+        auto memory_usage = m_env.getMemoryUsage() / (1024. * 1024.);
+        statistic.model_memory = memory_usage;
+        if(STATUS) std::cout << "Memory usage after creating constraints: "
+                            << memory_usage << " MB" << std::endl;
 
+        if(STATUS) std::cout << "write model" << std::endl;
+        if(STATUS) cplex.exportModel("ilp_routing_model.lp");
         if(STATUS) std::cout << "exported" << std::endl;
+
+        if (STATUS) std::cout << "Memory usage after creating constraints: " << m_env.getMemoryUsage() / (1024. * 1024.) << " MB" << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
         auto time_end = std::chrono::high_resolution_clock::now();
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
-        if(DEBUG) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        if(STATUS) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        statistic.model_runtime_ms = duration_ms;
 
         auto status = cplex.getCplexStatus();
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
+        if (STATUS) std::cout << "status " << status << std::endl;
+
+        if (STATUS) std::cout << "result " << result << std::endl;
+
         if(result)
         {
             if(STATUS) std::cout << "write solution" << std::endl;
-            if(DEBUG) cplex.writeSolution("ilp_routing_model.sol");
+            if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
@@ -185,7 +193,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-        return result;
+        return std::make_pair(result, statistic);
      }
 
     void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
@@ -218,16 +226,16 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model)
+    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model, bool initial_routing)
     {
         for(auto net : nets) {
-            create_net_candidates(net, model);
+            create_net_candidates(net, model, initial_routing);
         }
     }
 
     
 
-    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model)
+    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model, bool initial_routing)
     {
         auto& netlist = m_design.netlist();
         auto& global_routing = m_design.global_routing();
@@ -247,7 +255,7 @@ namespace ophidian::routing {
         auto segments = global_routing.segments(net);
 
 
-        if(segments.size() > 0)
+        if(segments.size() > 0 && initial_routing)
         {
             auto initial_candidate = m_route_candidate.add();
             m_route_candidate_nets[initial_candidate] = net;
@@ -554,15 +562,16 @@ namespace ophidian::routing {
             auto pin_name = netlist.name(pin);
             auto pin_location = placement.location(pin);
             auto pin_cell = netlist.cell(pin);
-            if (pin_cell != cell_type{} && pin_cell == moved_cell) {
+            /*if (pin_cell != cell_type{} && pin_cell == moved_cell) {
                 auto original_cell_location = m_design.placement().location(pin_cell);
                 auto moved_cell_location = m_position_candidate_position[pos_candidate];                
                 auto translation = point_type{moved_cell_location.x() - original_cell_location.x(), moved_cell_location.y() - original_cell_location.y()};
                 pin_location = point_type{pin_location.x() + translation.x(), pin_location.y() + translation.y()};
-            }
+            }*/
             if (DEBUG) std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
             net_points.push_back(pin_location);
-            auto point = std::make_pair((int)pin_location.x().value(), (int)pin_location.y().value());
+            auto point = std::make_pair(std::round(pin_location.x().value()), std::round(pin_location.y().value()));
+            if (DEBUG) std::cout << "point " << point.first << "," << point.second << std::endl;
             // auto std_pin = netlist.std_cell_pin(pin);
             net_points_map[point].push_back(pin);
         }
@@ -593,7 +602,7 @@ namespace ophidian::routing {
             // auto point = convert_to_design(flutePoints.at(0));
             m_segment_starts[segment] = point;
             m_segment_ends[segment] = point;
-            auto point_pair = std::make_pair((int)point.x().value(), (int)point.y().value());
+            auto point_pair = std::make_pair(std::round(point.x().value()), std::round(point.y().value()));
 
             // std::cout << "printing map in same gcell" << std::endl;
             // for(auto k : net_points_map)
@@ -635,7 +644,8 @@ namespace ophidian::routing {
                 //     std::cout << "key: " << k.first.first << " , " << k.first.second << std::endl;
                 // }
 
-                auto point = std::make_pair((int)segment_start.x().value(), (int)segment_start.y().value());
+                auto point = std::make_pair(std::round(segment_start.x().value()), std::round(segment_start.y().value()));
+                if (DEBUG) std::cout << "point " << point.first << "," << point.second << std::endl;
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
@@ -647,7 +657,7 @@ namespace ophidian::routing {
                     net_steiner_points.insert(std::make_pair(segment_start.x(), segment_start.y()));
                     if (DEBUG) std::cout << "start is steiner point" << std::endl;
                 }
-                point = std::make_pair((int)segment_end.x().value(), (int)segment_end.y().value());
+                point = std::make_pair(std::round(segment_end.x().value()), std::round(segment_end.y().value()));
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
@@ -1307,17 +1317,23 @@ namespace ophidian::routing {
                     auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
 
                     // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+                        
+                    gcell_container_type base_gcells;
+                    gcell_graph->intersect(base_gcells, wire_box, min_layer_index-1);
 
                     for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
                     {
                         // auto layer_name = "M" + std::to_string(layer_index);
                         auto layer = routing_library.layer_from_index(layer_index);
                         auto layer_name = routing_library.name(layer);
-                        gcell_container_type gcells;
-                        gcell_graph->intersect(gcells, wire_box, layer_index-1);
+                        //gcell_container_type gcells;
+                        //gcell_graph->intersect(gcells, wire_box, layer_index-1);
                         //std::cout << "gcells " << gcells.size() << std::endl;
-                        for(auto gcell : gcells)
+                        for(auto base_gcell : base_gcells)
                         {
+                            auto base_gcell_node = gcell_graph->graph_node(base_gcell);
+                            auto base_gcell_position = gcell_graph->position(base_gcell_node);
+                            auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
                             gcell_nets[layer_name][gcell].insert(candidate);
                         }
                     }
@@ -1365,9 +1381,11 @@ namespace ophidian::routing {
             auto cell_name = m_design.netlist().name(cell);
             auto std_cell_name = m_design.standard_cells().name(std_cell);
 
-            for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
-                auto layer = *layer_it;
-                auto layer_index = routing_library.layerIndex(layer);
+            // for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
+                // auto layer = *layer_it;
+                // auto layer_index = routing_library.layerIndex(layer);
+                // auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
+            for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++) {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
 
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
@@ -1397,14 +1415,20 @@ namespace ophidian::routing {
 
             for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++) {
                 auto key = same_grid_it->first;
-                auto demand = same_grid_it->second;
+                //auto demand = same_grid_it->second;
+                auto extra_demand = same_grid_it->second;
+                auto demand = extra_demand.demand;
 
-                std::vector<std::string> strs;
-                boost::split(strs, key, boost::is_any_of(":"));
+                /*std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));               
 
                 auto macro1_name = strs.at(0);
                 auto macro2_name = strs.at(1);
-                auto layer_name = strs.at(2);
+                auto layer_name = strs.at(2);*/
+                
+                auto macro1_name = extra_demand.macro1;
+                auto macro2_name = extra_demand.macro2;
+                auto layer_name = extra_demand.layer;
 
                 auto macro1 = m_design.standard_cells().find_cell(macro1_name);
                 auto macro2 = m_design.standard_cells().find_cell(macro2_name);
@@ -1442,14 +1466,20 @@ namespace ophidian::routing {
 
             for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++) {
                 auto key = adj_grid_it->first;
-                auto demand = adj_grid_it->second;
+                //auto demand = same_grid_it->second;
+                auto extra_demand = adj_grid_it->second;
+                auto demand = extra_demand.demand;
 
-                std::vector<std::string> strs;
-                boost::split(strs, key, boost::is_any_of(":"));
+                /*std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));               
 
                 auto macro1_name = strs.at(0);
                 auto macro2_name = strs.at(1);
-                auto layer_name = strs.at(2);
+                auto layer_name = strs.at(2);*/
+                
+                auto macro1_name = extra_demand.macro1;
+                auto macro2_name = extra_demand.macro2;
+                auto layer_name = extra_demand.layer;
 
                 auto macro1 = m_design.standard_cells().find_cell(macro1_name);
                 auto macro2 = m_design.standard_cells().find_cell(macro2_name);
