@@ -89,6 +89,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     std::cout << "# of nets " << nets.size() << std::endl;
     auto wlb = design.global_routing().wirelength_in_gcell(nets);
+    auto demandb = design.global_routing().gcell_graph()->total_demand();
     auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
     std::cout << ovfl << "in input file" << std::endl;
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
@@ -115,6 +116,8 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     
     auto wla = design.global_routing().wirelength_in_gcell(nets);
     std::cout << "WL before: " << wlb << " WL after: " << wla << " change: " << wlb-wla << std::endl;
+    auto demanda = design.global_routing().gcell_graph()->total_demand();
+    std::cout << "Total Demand before: " << demandb << " Total Demand after: " << demanda << " change: " << demandb-demanda << std::endl;
     //write_statistics_for_circuit(design, circuit_name);
 
 /*    std::cout << "connected nets" << std::endl;

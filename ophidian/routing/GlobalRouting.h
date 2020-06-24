@@ -87,6 +87,9 @@ namespace ophidian::routing
         void increase_demand(const net_type& net);
         void decrease_demand(const net_type& net);
 
+        /**
+         * @brief Erases the net's segments and decreases the gcells demand accordingly.
+         */
         void unroute(const net_type& net);
 
         template <typename Value>

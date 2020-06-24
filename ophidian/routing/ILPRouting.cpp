@@ -13,7 +13,11 @@ namespace ophidian::routing {
     {
     }
 
-    bool ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
+    bool ILPRouting::route_nets(const std::vector<net_type> & nets,
+                    const std::vector<net_type> & fixed_nets,
+                    std::vector<net_type> & routed_nets,
+                    std::vector<std::pair<cell_type, point_type>> & movements,
+                    bool integer)
     {
         m_integer = integer;
 
@@ -1632,6 +1636,7 @@ namespace ophidian::routing {
                     auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
                     global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);
 		        }
+                global_routing.increase_demand(net);
     	    }
             else
             {
