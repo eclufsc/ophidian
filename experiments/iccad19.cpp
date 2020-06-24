@@ -2,89 +2,10 @@
 // #include < stdio.h >
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
-
-bool DEBUG_TEST = false;
-
-void run_ilp(ophidian::design::Design & design, std::string circuit_name) {
-    if(DEBUG_TEST) std::cout << "starting function nun ILP" << std::endl;
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
-
-    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    //std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("net1192")};
-    std::vector<ophidian::circuit::Net> fixed_nets;
-    std::vector<ophidian::circuit::Net> routed_nets;
-
-    int initial_wirelength = design.global_routing().wirelength_in_gcell(nets);
-    if(DEBUG_TEST) std::cout << "Circuit initial wirelength = " << initial_wirelength << std::endl;
-
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
-    if(DEBUG_TEST) std::cout << "routing nets" << std::endl;
-    auto start = std::chrono::high_resolution_clock::now(); 
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    if(DEBUG_TEST) std::cout << "result " << result.first << std::endl;
-
-    if(result.first){
-        // need to generate a new guide file
-        if(DEBUG_TEST) std::cout << "Runtime : " << duration.count() << " microsseconds"<< std::endl;
-        if(DEBUG_TEST) std::cout << "Runtime : " << std::to_string( (double)duration.count() / 1000000.0 ) << " seconds"<< std::endl;
-        int final_wirelength = design.global_routing().wirelength_in_gcell(nets);
-        if(DEBUG_TEST) std::cout << "Total movements = " << movements.size() << std::endl;
-        if(DEBUG_TEST) std::cout << "Circuit final wirelength = " << final_wirelength << std::endl;
-        auto score = initial_wirelength - final_wirelength;
-        if(DEBUG_TEST) std::cout << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
-        double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
-        if(DEBUG_TEST) std::cout << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
-
-        std::cout << "\n\n" << 
-            circuit_name << ";" <<
-            initial_wirelength << ";" <<
-            final_wirelength << ";" <<
-            score << ";" <<
-            reduction << ";" <<
-            duration.count() << ";" << // total time
-            result.second << ";" << //ILP time (ms)
-            movements.size() << "\n\n" << std::endl;
-
-
-         //iccad_output_writer.write_ICCAD_2020_output("", movements);
-    }
-
-    // std::cout << "movements" << std::endl;
-    // for (auto movement : movements) {
-    //     auto cell = movement.first;
-    //     auto cell_name = design.netlist().name(cell);
-    //     auto location = movement.second;
-    //     std::cout << "cell " << cell_name << " " << location.x().value() << "," << location.y().value() << std::endl;
-    // }
-    
-    std::cout << "disconnected nets:" << std::endl;
-        for (auto net : nets) {
-            auto net_name = design.netlist().name(net);
-            ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
-            for (auto pin : design.netlist().pins(net)) {
-                auto pin_name = design.netlist().name(pin);                
-                auto location = design.placement().location(pin);
-                auto box = ophidian::routing::GCellGraph::box_type{location, location};
-                auto pin_geometry = design.placement().geometry(pin);
-                auto layer_name = pin_geometry.front().second;
-                auto pin_layer = design.routing_library().find_layer_instance(layer_name);
-                auto layer_index = design.routing_library().layerIndex(pin_layer);
-
-                // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
-
-                design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
-            }
-            auto connected = design.global_routing().is_connected(net, pin_gcells, net_name);
-
-            if(!connected)
-                std::cout << "net " << net_name << " disconnected with " << design.netlist().pins(net).size() << " pins" << std::endl;
-        }
-   
-}
+#include "run_ilp.h"
 
 TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
+
     std::vector<std::string> circuit_names = {
         // "ispd18_sample3",
         // "ispd19_sample4",
@@ -128,7 +49,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
         std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
 
-        if(DEBUG_TEST) std::cout << def_file << "\n" << lef_file << "\n" << guide_file << std::endl;
+        // std::cout << def_file << "\n" << lef_file << "\n" << guide_file << std::endl;
 
         ophidian::parser::Def def;
         ophidian::parser::Lef lef;
@@ -145,7 +66,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[iccad19]") {
         
 
 
-        run_ilp(design, circuit_name);
+        run_ilp_for_circuit(design, circuit_name);
     }
 }
 

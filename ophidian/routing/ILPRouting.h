@@ -54,6 +54,11 @@ namespace ophidian::routing {
             enum PositionCandidateOrigin{
                 NA, INITIAL, TWO_PIN_NET, CENTER_OF_MASS, MEDIAN
             };
+
+            struct Statistics{
+                int64_t model_runtime_ms;
+                double model_memory = 0;
+            };
         public:
             using scalar_type               = int;
             using unit_type                 = util::database_unit_t;
@@ -90,14 +95,14 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            std::pair<bool, int64_t> route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer = true);
+            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer = true, bool initial_routing = true);
 
         private:
             void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
 
-            void create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model);
+            void create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model, bool initial_routing = true);
 
-            void create_net_candidates(const net_type & net, lp_model_type & model);
+            void create_net_candidates(const net_type & net, lp_model_type & model, bool initial_routing = true);
 
             void create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model);
 

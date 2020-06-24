@@ -2,6 +2,7 @@
 
 namespace ophidian::routing{
 
+#define CAPACITY_FACTOR 100
 
 GCellGraph::GCellGraph(GCellGraph::unit_container_type x, GCellGraph::unit_container_type y, GCellGraph::index_type z, GCellGraph::scalar_container_type capacity):
     ophidian::util::GridGraph_3D(x.size()-1,y.size()-1,z), m_nodes_to_gcell(m_graph)
@@ -79,7 +80,7 @@ GCellGraph::GCellGraph(const ophidian::routing::Library & library, GCellGraph::u
 
                 if(capacity == 0 && max_cord == start)
                     capacity = 1;
-                m_gcell_capacity[gcell] = capacity;
+                m_gcell_capacity[gcell] = capacity * CAPACITY_FACTOR;
                 
                 if(z_it == 0){ // generate Rtree once
                     //generate RTree;
