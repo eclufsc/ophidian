@@ -13,8 +13,9 @@ namespace ophidian::routing {
     {
     }
 
-    std::pair<bool, int64_t> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer)
+    std::pair<bool, ILPRouting::Statistics> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer, bool initial_routing)
     {
+        ILPRouting::Statistics statistic;
         m_integer = integer;
 
         m_segments.clear();
@@ -50,9 +51,13 @@ namespace ophidian::routing {
         if(STATUS) std::cout << "add movements constraints" << std::endl;
         //add_movements_constraints(model);
 
-        if(STATUS) std::cout << "write model" << std::endl;
-        if(STATUS)  cplex.exportModel("ilp_routing_model.lp");
+        auto memory_usage = m_env.getMemoryUsage() / (1024. * 1024.);
+        statistic.model_memory = memory_usage;
+        if(STATUS) std::cout << "Memory usage after creating constraints: "
+                            << memory_usage << " MB" << std::endl;
 
+        if(STATUS) std::cout << "write model" << std::endl;
+        if(STATUS) cplex.exportModel("ilp_routing_model.lp");
         if(STATUS) std::cout << "exported" << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -61,6 +66,7 @@ namespace ophidian::routing {
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
         if(STATUS) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        statistic.model_runtime_ms = duration_ms;
 
         auto status = cplex.getCplexStatus();
 
@@ -185,7 +191,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-        return std::make_pair(result, duration_ms);
+        return std::make_pair(result, statistic);
      }
 
     void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
@@ -218,16 +224,16 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model)
+    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model, bool initial_routing)
     {
         for(auto net : nets) {
-            create_net_candidates(net, model);
+            create_net_candidates(net, model, initial_routing);
         }
     }
 
     
 
-    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model)
+    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model, bool initial_routing)
     {
         auto& netlist = m_design.netlist();
         auto& global_routing = m_design.global_routing();
@@ -247,7 +253,7 @@ namespace ophidian::routing {
         auto segments = global_routing.segments(net);
 
 
-        if(segments.size() > 0)
+        if(segments.size() > 0 && initial_routing)
         {
             auto initial_candidate = m_route_candidate.add();
             m_route_candidate_nets[initial_candidate] = net;
