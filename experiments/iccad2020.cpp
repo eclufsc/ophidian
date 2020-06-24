@@ -130,9 +130,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
                 auto pin_layer = design.routing_library().find_layer_instance(layer_name);
                 auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-                if (net_name == "net3148") {
+                /*if (net_name == "net3148") {
                 std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << " location " << location.x().value() << "," << location.y().value() << std::endl;
-                }
+                }*/
 
                 design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
             }
@@ -145,10 +145,10 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
-         "case1",
+        // "case1",
         //"case1N4",
         // "case2",
-        // "case3",
+         "case3",
         //"case3_no_blockages",
         // "case3_no_extra_demand"
         //"case3_only_same_grid"

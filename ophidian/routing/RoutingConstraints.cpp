@@ -42,7 +42,7 @@ namespace ophidian::routing
             if(search != m_extra_demand_same_grid_map.end())
                 return search->second;
             else
-                return 0;
+                return {"", "", "", 0};
         }
     }
 
@@ -58,7 +58,7 @@ namespace ophidian::routing
             if(search != m_extra_demand_adj_grid_map.end())
                 return search->second;
             else
-                return 0;
+                return {"", "", "", 0};
         }
     }
 
@@ -96,13 +96,13 @@ namespace ophidian::routing
         m_max_cell_move = max_move;
     }
 
-    void RoutingConstraints::set_ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z, RoutingConstraints::demand_type val)
+    void RoutingConstraints::set_ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z, int val)
     {
         // m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y) = val;
         m_ndf_constraint[std::make_tuple(x,y,z)] = val;
     }
 
-    RoutingConstraints::demand_type RoutingConstraints::ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z) const
+    int RoutingConstraints::ndf_constraint(RoutingConstraints::index_type x, RoutingConstraints::index_type y, RoutingConstraints::index_type z) const
     {
         // return m_ndf_constraint.at(x + y * m_size_y + z * m_size_x * m_size_y);
         auto key = std::make_tuple(x,y,z);
@@ -117,13 +117,13 @@ namespace ophidian::routing
         m_min_net_layer[net] = layer;
     }
 
-    void RoutingConstraints::set_same_grid_extra_demand(RoutingConstraints::macro_name_type m1_name, RoutingConstraints::macro_name_type m2_name, RoutingConstraints::layer_name_type l_name, RoutingConstraints::demand_type d)
+    void RoutingConstraints::set_same_grid_extra_demand(RoutingConstraints::macro_name_type m1_name, RoutingConstraints::macro_name_type m2_name, RoutingConstraints::layer_name_type l_name, int d)
     {
-        m_extra_demand_same_grid_map.insert({m1_name+":"+m2_name+":"+l_name, d});
+        m_extra_demand_same_grid_map.insert({m1_name+":"+m2_name+":"+l_name, {m1_name, m2_name, l_name, d}});
     }
 
-    void RoutingConstraints::set_adj_grid_extra_demand(RoutingConstraints::macro_name_type m1_name, RoutingConstraints::macro_name_type m2_name, RoutingConstraints::layer_name_type l_name, RoutingConstraints::demand_type d)
+    void RoutingConstraints::set_adj_grid_extra_demand(RoutingConstraints::macro_name_type m1_name, RoutingConstraints::macro_name_type m2_name, RoutingConstraints::layer_name_type l_name, int d)
     {
-        m_extra_demand_adj_grid_map.insert({m1_name+":"+m2_name+":"+l_name, d});
+        m_extra_demand_adj_grid_map.insert({m1_name+":"+m2_name+":"+l_name, {m1_name, m2_name, l_name, d}});
     }
 }

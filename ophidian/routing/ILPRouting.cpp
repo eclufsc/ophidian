@@ -36,7 +36,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        //create_all_candidates_with_movements(nets, model);
+        create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -48,12 +48,14 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, model);
 
         if(STATUS) std::cout << "add movements constraints" << std::endl;
-        //add_movements_constraints(model);
+        add_movements_constraints(model);
 
         if(STATUS) std::cout << "write model" << std::endl;
         if(STATUS)  cplex.exportModel("ilp_routing_model.lp");
 
         if(STATUS) std::cout << "exported" << std::endl;
+
+        if (STATUS) std::cout << "Memory usage after creating constraints: " << m_env.getMemoryUsage() / (1024. * 1024.) << " MB" << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
@@ -1309,17 +1311,23 @@ namespace ophidian::routing {
                     auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
 
                     // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+                        
+                    gcell_container_type base_gcells;
+                    gcell_graph->intersect(base_gcells, wire_box, min_layer_index-1);
 
                     for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
                     {
                         // auto layer_name = "M" + std::to_string(layer_index);
                         auto layer = routing_library.layer_from_index(layer_index);
                         auto layer_name = routing_library.name(layer);
-                        gcell_container_type gcells;
-                        gcell_graph->intersect(gcells, wire_box, layer_index-1);
+                        //gcell_container_type gcells;
+                        //gcell_graph->intersect(gcells, wire_box, layer_index-1);
                         //std::cout << "gcells " << gcells.size() << std::endl;
-                        for(auto gcell : gcells)
+                        for(auto base_gcell : base_gcells)
                         {
+                            auto base_gcell_node = gcell_graph->graph_node(base_gcell);
+                            auto base_gcell_position = gcell_graph->position(base_gcell_node);
+                            auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
                             gcell_nets[layer_name][gcell].insert(candidate);
                         }
                     }
@@ -1401,14 +1409,20 @@ namespace ophidian::routing {
 
             for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++) {
                 auto key = same_grid_it->first;
-                auto demand = same_grid_it->second;
+                //auto demand = same_grid_it->second;
+                auto extra_demand = same_grid_it->second;
+                auto demand = extra_demand.demand;
 
-                std::vector<std::string> strs;
-                boost::split(strs, key, boost::is_any_of(":"));
+                /*std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));               
 
                 auto macro1_name = strs.at(0);
                 auto macro2_name = strs.at(1);
-                auto layer_name = strs.at(2);
+                auto layer_name = strs.at(2);*/
+                
+                auto macro1_name = extra_demand.macro1;
+                auto macro2_name = extra_demand.macro2;
+                auto layer_name = extra_demand.layer;
 
                 auto macro1 = m_design.standard_cells().find_cell(macro1_name);
                 auto macro2 = m_design.standard_cells().find_cell(macro2_name);
@@ -1446,14 +1460,20 @@ namespace ophidian::routing {
 
             for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++) {
                 auto key = adj_grid_it->first;
-                auto demand = adj_grid_it->second;
+                //auto demand = same_grid_it->second;
+                auto extra_demand = adj_grid_it->second;
+                auto demand = extra_demand.demand;
 
-                std::vector<std::string> strs;
-                boost::split(strs, key, boost::is_any_of(":"));
+                /*std::vector<std::string> strs;
+                boost::split(strs, key, boost::is_any_of(":"));               
 
                 auto macro1_name = strs.at(0);
                 auto macro2_name = strs.at(1);
-                auto layer_name = strs.at(2);
+                auto layer_name = strs.at(2);*/
+                
+                auto macro1_name = extra_demand.macro1;
+                auto macro2_name = extra_demand.macro2;
+                auto layer_name = extra_demand.layer;
 
                 auto macro1 = m_design.standard_cells().find_cell(macro1_name);
                 auto macro2 = m_design.standard_cells().find_cell(macro2_name);
@@ -1588,7 +1608,7 @@ namespace ophidian::routing {
             // if(gcell_constraint.size() > 0 )
             if(gcells_constraints_bool[gcell])
             {
-                auto capacity = gcell_graph->capacity(gcell) * 10;
+                auto capacity = gcell_graph->capacity(gcell);
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto constraint = model.add(gcell_constraint <= capacity - demand);
