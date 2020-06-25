@@ -2,6 +2,7 @@
 #include <catch.hpp>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
+#include <ophidian/util/Log.h>
 #include "run_ilp.h"
 
 using namespace Catch::clara;
@@ -79,6 +80,8 @@ int main(int argc, char* argv[]) {
         ophidian::design::factory::make_design(design, def, lef, guide);
         
         run_ilp_for_circuit(design, circuit_name, false);
+
+        std::cout << "Memory usage in peak= " << ophidian::util::MemoryUsage::get_peak() << " MB" << std::endl;
     }
     return 0;
 }

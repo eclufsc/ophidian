@@ -206,17 +206,16 @@ namespace ophidian::routing
         //update_gcells_demand(segment, 1);
     }
 
-    void GlobalRouting::unroute(const net_type& net){
-        std::vector<gr_segment_type> segments_to_remove;
-        for(auto segment : segments(net))
-        {
-            segments_to_remove.push_back(segment);
-            update_gcells_demand(segment, -1);
-        }
+    void GlobalRouting::unroute(const net_type& net) {
+        
+        this->decrease_demand(net);
 
-        for(auto segment : segments_to_remove){
+        std::vector<gr_segment_type> segments_to_remove;
+        for(auto segment : this->segments(net))
+            segments_to_remove.push_back(segment);
+        
+        for(auto segment : segments_to_remove)
             m_gr_segments.erase(segment);
-        }
     }
 
     void GlobalRouting::update_gcells_demand(const gr_segment_type & segment, const int delta){
@@ -231,8 +230,6 @@ namespace ophidian::routing
         gcell_container_type gcells;
         if(layer_start == layer_end){
             m_gcell_graph->intersect(gcells, box_segment, start_index-1);
-            std::pair<int, int> min{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
-            std::pair<int, int> max{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
             for(auto gcell : gcells)
             {
                 m_gcell_graph->change_net_demand(gcell, delta);

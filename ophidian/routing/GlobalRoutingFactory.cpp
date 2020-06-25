@@ -134,6 +134,11 @@ namespace ophidian::routing::factory
 
                 globalRouting.add_segment(box_segment, *layer_start_it, *layer_end_it, net);
             }
+            /*
+                For one net, no matter how much routing segments crossing one gGrid (GCell),
+                it will only consume one demand in that gGrid.
+            */
+            globalRouting.increase_demand(net);
         }
     }
 }

@@ -37,14 +37,14 @@ TEST_CASE("Make a routing constraints from an iccad2020 file.", "[routing][facto
     }
 
     SECTION("Extra demand same grid."){
-        REQUIRE(routing_constr.extra_demand_same_grid("MC1", "MC2", "M1") == 3);
-        REQUIRE(routing_constr.extra_demand_same_grid("MC2", "MC1", "M1") == 3);
-        REQUIRE(routing_constr.extra_demand_same_grid("MC3", "MC1", "M1") == 0);
+        REQUIRE(routing_constr.extra_demand_same_grid("MC1", "MC2", "M1").demand == 3);
+        REQUIRE(routing_constr.extra_demand_same_grid("MC2", "MC1", "M1").demand == 3);
+        REQUIRE(routing_constr.extra_demand_same_grid("MC3", "MC1", "M1").demand == 0);
     }
 
     SECTION("Extra demand adjacent grid."){
-        REQUIRE(routing_constr.extra_demand_adj_grid("MC1", "MC2", "M1") == 1);
-        REQUIRE(routing_constr.extra_demand_adj_grid("MC2", "MC1", "M1") == 1);
-        REQUIRE(routing_constr.extra_demand_adj_grid("MC3", "MC1", "M1") == 0);
+        REQUIRE(routing_constr.extra_demand_adj_grid("MC1", "MC2", "M1").demand == 1);
+        REQUIRE(routing_constr.extra_demand_adj_grid("MC2", "MC1", "M1").demand == 1);
+        REQUIRE(routing_constr.extra_demand_adj_grid("MC3", "MC1", "M1").demand == 0);
     }
 }
