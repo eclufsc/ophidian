@@ -47,7 +47,8 @@
 //     This code piece will show "10 3.14 Gengjie".
 //
 
-#pragma once
+#ifndef OPHIDIAN_UTIL_LOG_H
+#define OPHIDIAN_UTIL_LOG_H
 
 #include <chrono>
 #include <iostream>
@@ -106,3 +107,6 @@ void printflog(T... t) {
 }
 
 }  // namespace ophidian::util
+
+
+#endif // OPHIDIAN_UTIL_LOG_H
