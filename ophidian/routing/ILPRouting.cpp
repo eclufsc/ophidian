@@ -1227,6 +1227,8 @@ namespace ophidian::routing {
             IloExpr neighbors_constraints(m_env);
             auto cont_candidates = 0;
             for(auto pin : netlist.pins(net)){
+                if(netlist.is_pad(pin))
+                    continue;
                 auto cell = netlist.cell(pin);
                 auto candidates = m_cell_position_candidates.parts(cell);
                 for (auto candidate : candidates) {
