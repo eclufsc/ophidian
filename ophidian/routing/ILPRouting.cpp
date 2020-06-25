@@ -37,7 +37,7 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
 
         if(STATUS) std::cout << "create all candidates with movements" << std::endl;
-        create_all_candidates_with_movements(nets, model);
+        //create_all_candidates_with_movements(nets, model);
 
         if(STATUS) std::cout << "add objective function" << std::endl;
         add_objective_function(model);
@@ -49,7 +49,7 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, model);
 
         if(STATUS) std::cout << "add movements constraints" << std::endl;
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
 
         auto memory_usage = m_env.getMemoryUsage() / (1024. * 1024.);
         statistic.model_memory = memory_usage;
@@ -1252,12 +1252,21 @@ namespace ophidian::routing {
         auto & netlist = m_design.netlist();
         auto & routing_library = m_design.routing_library();
 
+        unsigned number_of_gcells = 0;
+        unsigned free_gcells = 0;
+
+        std::unordered_map<gcell_type, int, entity_system::EntityBaseHash> gcells_max_demand;
+
         std::unordered_map<gcell_type, IloExpr, entity_system::EntityBaseHash> gcells_constraints;
         std::unordered_map<gcell_type, bool, entity_system::EntityBaseHash> gcells_constraints_bool;
         for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             auto gcell = *gcell_it;
             gcells_constraints[gcell] = IloExpr(m_env);
             gcells_constraints_bool[gcell] = false;
+
+            gcells_max_demand[gcell] = 0;
+
+            number_of_gcells++;
         }
         
         //entity_system::Property<gcell_type, IloExpr>  gcells_constraints{m_design.global_routing().gcell_graph()->make_property_gcells<IloExpr>(IloExpr(m_env))};
@@ -1283,6 +1292,8 @@ namespace ophidian::routing {
 
                 gcells_constraints[gcell] += demand * variable;
                 gcells_constraints_bool[gcell] = true;
+
+                gcells_max_demand[gcell] += demand;
             }
         }
 
@@ -1353,6 +1364,8 @@ namespace ophidian::routing {
                 auto gcell_set = gcell_pair.second;
                 auto box = gcell_graph->box(gcell);
                 auto gcell_min_corner = box.min_corner();
+
+                unsigned variables = 0;
                 if(gcell_set.size() > 0)
                 {
                     IloExpr gcell_constraint(m_env);
@@ -1362,12 +1375,15 @@ namespace ophidian::routing {
                         auto variable = m_route_candidate_variables[candidate];
                         gcell_constraint += variable;
                         gcells_constraints[gcell] += variable;
+
+                        gcells_max_demand[gcell] += 1;
                     }
                     //gcells_constraints[gcell] += gcell_constraint;
                     gcells_constraints_bool[gcell] = true;
                 }
             }
         }
+
 
         if (DEBUG) std::cout << "build std cells per gcell" << std::endl;
        
@@ -1455,6 +1471,8 @@ namespace ophidian::routing {
                     auto min_var = IloMin(sum_expr1, sum_expr2);
                     gcells_constraints[gcell] += min_var * demand;
                     gcells_constraints_bool[gcell] = true;
+
+                    gcells_max_demand[gcell] += demand;
                 }
             }
 
@@ -1476,7 +1494,7 @@ namespace ophidian::routing {
                 auto macro1_name = strs.at(0);
                 auto macro2_name = strs.at(1);
                 auto layer_name = strs.at(2);*/
-                
+
                 auto macro1_name = extra_demand.macro1;
                 auto macro2_name = extra_demand.macro2;
                 auto layer_name = extra_demand.layer;
@@ -1521,6 +1539,8 @@ namespace ophidian::routing {
 
                             auto min_var = IloMin(sum_expr1, sum_expr1_east);
                             gcells_constraints[gcell] += min_var * demand;
+                            
+                            gcells_max_demand[gcell] += demand;
                         }
                         if (west_node != lemon::INVALID) {
                             auto std_cells1_west = std_cells_per_gcell[west_gcell][macro1];
@@ -1536,6 +1556,8 @@ namespace ophidian::routing {
 
                             auto min_var = IloMin(sum_expr1, sum_expr1_west);
                             gcells_constraints[gcell] += min_var * demand;
+                    
+                            gcells_max_demand[gcell] += demand;
                         }
                     } else {
                         if (east_node != lemon::INVALID) {
@@ -1560,6 +1582,8 @@ namespace ophidian::routing {
 
                             auto min_var = IloMin(sum_expr1, sum_expr2_east) + IloMin(sum_expr2, sum_expr1_east);
                             gcells_constraints[gcell] += min_var * demand;
+                    
+                            gcells_max_demand[gcell] += demand;
                         }
                         if (west_node != lemon::INVALID) {
                             auto std_cells1_west = std_cells_per_gcell[west_gcell][macro1];
@@ -1583,6 +1607,8 @@ namespace ophidian::routing {
                             
                             auto min_var = IloMin(sum_expr1, sum_expr2_west) + IloMin(sum_expr2, sum_expr1_west);
                             gcells_constraints[gcell] += min_var * demand;
+                    
+                            gcells_max_demand[gcell] += demand;
                         }
                     }
                 }
@@ -1609,18 +1635,27 @@ namespace ophidian::routing {
             /*if (x == 40 && y == 120 && z == 2) {
                 std::cout << "GCELL CONSTRAINT " << gcell_constraint << std::endl;
             }*/
+                
+            auto capacity = gcell_graph->capacity(gcell);
+            auto max_demand = gcells_max_demand[gcell];
+            if (capacity >= max_demand) {
+                free_gcells++;
+            }
             
             //TIAGO
             // if(gcell_constraint.size() > 0 )
-            if(gcells_constraints_bool[gcell])
+            if(gcells_constraints_bool[gcell] && capacity < max_demand)
             {
-                auto capacity = gcell_graph->capacity(gcell);
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto constraint = model.add(gcell_constraint <= capacity - demand);
-                constraint.setName(constraint_name.c_str());
+                constraint.setName(constraint_name.c_str());                
             }
+
         }
+
+        std::cout << "number of gcells " << number_of_gcells << std::endl;
+        std::cout << "number of free gcells " << free_gcells << std::endl;        
     }
 
     void ILPRouting::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets)
