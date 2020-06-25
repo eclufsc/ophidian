@@ -174,6 +174,31 @@ void GCellGraph::capacity(const GCellGraph::gcell_type& gcell, scalar_type capac
     m_gcell_capacity[gcell] = capacity;
 }
 
+GCellGraph::scalar_type GCellGraph::total_demand() const
+{
+    return (this->total_net_demand() + this->total_blockage_demand());
+}
+
+GCellGraph::scalar_type GCellGraph::total_net_demand() const
+{
+    auto accum_demand = 0;
+    std::for_each(this->m_gcells.begin(), this->m_gcells.end(),
+    [&](auto gcell){
+        accum_demand += this->m_gcell_net_demand[gcell];
+    });
+    return accum_demand;
+}
+
+GCellGraph::scalar_type GCellGraph::total_blockage_demand() const
+{
+    auto accum_demand = 0;
+    std::for_each(this->m_gcells.begin(), this->m_gcells.end(),
+    [&](auto gcell){
+        accum_demand += this->m_gcell_blockage_demand[gcell];
+    });
+    return accum_demand;
+}
+
 GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell) const
 {
     return m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell];

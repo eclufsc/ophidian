@@ -71,14 +71,27 @@ public:
     GCellGraph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
 
     // Element access
-    gcell_type gcell(index_type x, index_type y, index_type z) const ;
+    gcell_type gcell(index_type x, index_type y, index_type z) const;
     gcell_type gcell(node_type & node) const;
-    gcell_type nearest_gcell(const point_type location, const index_type layer) const ;
+    gcell_type nearest_gcell(const point_type location, const index_type layer) const;
     node_type graph_node(const gcell_type gcell) const;
     box_type box(const gcell_type& gcell) const;
     point_type center_of_box(const gcell_type& gcell) const;
     scalar_type capacity(const gcell_type& gcell) const;
     void capacity(const gcell_type& gcell, scalar_type capacity);
+    /**
+     *  @brief Iterates over all GCells and returns the sum of the net and blockage demand
+    */
+    scalar_type total_demand() const;
+    /**
+     *  @brief Iterates over all GCells and returns the sum of the net demand
+    */
+    scalar_type total_net_demand() const;
+    /**
+     *  @brief Iterates over all GCells and returns the sum of the blockage demand
+    */
+    scalar_type total_blockage_demand() const;
+
     scalar_type demand(const gcell_type& gcell) const;
     scalar_type net_demand(const gcell_type& gcell) const;
     scalar_type blockage_demand(const gcell_type& gcell) const;

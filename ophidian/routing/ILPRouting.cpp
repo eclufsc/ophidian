@@ -1668,6 +1668,7 @@ namespace ophidian::routing {
                     auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
                     global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);
 		        }
+                global_routing.increase_demand(net);
     	    }
             else
             {

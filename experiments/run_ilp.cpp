@@ -19,8 +19,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     if(DEBUG_TEST) std::cout << "Circuit initial wirelength = " << initial_wirelength << std::endl;
 
     auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
-    std::cout << ovfl << "in input file" << std::endl;
-    
+    std::cout << ovfl << " in input file" << std::endl;
+
+    auto demand_before = design.global_routing().gcell_graph()->total_demand();
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     if(DEBUG_TEST) std::cout << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
@@ -68,7 +69,11 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::routing::GlobalRouting::net_container_type ovfl_nets{};
     ovfl = design.global_routing().is_overflow(nets, ovfl_nets) ? "there is overflow" : "No overflow";
     std::cout << ovfl << std::endl;
+    auto demand_after = design.global_routing().gcell_graph()->total_demand();
+    std::cout << "Total Demand before: " << demand_before << " Total Demand after: "
+    << demand_after << " change: " << demand_before-demand_after << std::endl;
     
+
     std::cout << "disconnected nets:" << std::endl;
     for (auto net : nets) {
         auto net_name = design.netlist().name(net);
