@@ -3,9 +3,12 @@
 #include <fstream>
 #include <regex>
 #include <boost/lexical_cast.hpp>
+#include <ophidian/util/log.h>
 
 bool DEBUG = false;
 bool STATUS = true;
+
+using namespace ophidian::util;
 
 namespace ophidian::routing {
     ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
@@ -27,68 +30,63 @@ namespace ophidian::routing {
         solver_type cplex(model);
         cplex.setOut(m_env.getNullStream());
 
-        if(STATUS) std::cout << "update capacities from blockages " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
 
-        if(STATUS) std::cout << "create all cells initial candidates " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
 
-        if(STATUS) std::cout << "create all candidates " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
 
-        if(STATUS) std::cout << "create all candidates with movements " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("create all candidates with movements");
         create_all_candidates_with_movements(nets, model);
 
-        if(STATUS) std::cout << "add objective function " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("add objective function");
         add_objective_function(model);
 
-        if(STATUS) std::cout << "add candidate constraints " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
 
-        if(STATUS) std::cout << "add capacity constraints " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
 
-        if(STATUS) std::cout << "add movements constraints " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if(STATUS) printlog("add movements constraints");
         add_movements_constraints(model);
 
-        auto memory_usage = m_env.getMemoryUsage() / (1024. * 1024.);
-        statistic.model_memory = memory_usage;
-        if(STATUS) std::cout << "Memory usage after creating constraints: "
-                            << memory_usage << " MB" << std::endl;
-
-        if(STATUS) std::cout << "write model" << std::endl;
+        if(STATUS) printlog("write model");
         if(STATUS) cplex.exportModel("ilp_routing_model.lp");
-        if(STATUS) std::cout << "exported" << std::endl;
+        if(STATUS) printlog("exported");
 
-        if (STATUS) std::cout << "Memory usage after creating constraints: " << m_env.getMemoryUsage() / (1024. * 1024.) << " MB" << std::endl;
-
-        if (STATUS) std::cout << "solve model " << util::MemoryUsage::get_current() << " MB" << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
+        log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
         auto time_end = std::chrono::high_resolution_clock::now();
         auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
         auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
-        if(STATUS) std::cout << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        if(STATUS) log() << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
         statistic.model_runtime_ms = duration_ms;
 
         auto status = cplex.getCplexStatus();
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
-        if (STATUS) std::cout << "status " << status << std::endl;
+        if (STATUS) log() << "status " << status << std::endl;
 
-        if (STATUS) std::cout << "result " << result << std::endl;
+        if (STATUS) log() << "result " << result << std::endl;
 
         if(result)
         {
-            if(STATUS) std::cout << "write solution" << std::endl;
+            if(STATUS) printlog("writing solution");
             if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
 
-            if (DEBUG) std::cout << "CHECKING ROUTED NETS" << std::endl;
+            if (DEBUG) printlog("CHECKING ROUTED NETS");
 
             // auto gcell_graph = m_design.global_routing().gcell_graph();
             // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;

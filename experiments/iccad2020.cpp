@@ -5,8 +5,10 @@
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
+#include <ophidian/util/log.h>
 #include "run_ilp.h"
 
+using namespace ophidian::util;
 /*
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
@@ -88,11 +90,11 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     // std::string benchmarks_path = "./input_files/iccad20/";
     for (auto circuit_name : circuit_names) {
-        std::cout << "running circuit " << circuit_name << std::endl;
+        log() << "running circuit " << circuit_name << std::endl;
 
         std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
 
-        std::cout << "file " << iccad_2020_file << std::endl;
+        log() << "file " << iccad_2020_file << std::endl;
 
         auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
 
@@ -101,7 +103,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         run_ilp_for_circuit(design, circuit_name);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         
-        // std::cout << "done, " << is_connected << circuit_name << std::endl;
+        // log() << "done, " << is_connected << circuit_name << std::endl;
     }
 
 
@@ -158,9 +160,9 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
     
-    std::cout << "routing nets" << std::endl;
+    log() << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    std::cout << "result " << result.first << std::endl;
+    log() << "result " << result.first << std::endl;
 
     if(result.first){
         iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
@@ -171,9 +173,9 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
         auto gcells = global_routing.gcells(net);
         auto net_name = design.netlist().name(net);
         wirelength += gcells.size();
-        std::cout << "Net: " << net_name << " = " << gcells.size() << std::endl;
+        log() << "Net: " << net_name << " = " << gcells.size() << std::endl;
     }
-    std::cout << "wirelength : " << wirelength << std::endl;
+    log() << "wirelength : " << wirelength << std::endl;
 }
 
 /*
@@ -186,7 +188,7 @@ TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
 
     for (auto circuit_name : circuit_names) {
-        std::cout << "running circuit " << circuit_name << std::endl;
+        log() << "running circuit " << circuit_name << std::endl;
 
         std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
 

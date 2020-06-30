@@ -2,36 +2,34 @@
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
+#include <ophidian/util/log.h>
 
 using namespace std;
+using namespace ophidian::util;
 // int THREADS_DEFAULT_VALUE = 1;
 
 void greetings(){
-    using std::cout;
     using std::endl;
 
-    cout << "=================================================" << endl;
-    cout << "ICCAD 2020 CAD Contest" << endl;
-    cout << "Problem B : Routing with Cell Movement" << endl;
-    cout << endl;
-    cout << "Team Number: cada0194:" << endl;
-    cout << "Team Name: CABRA:" << endl;
-    cout << "Members:" << endl;
-
-    cout << "\tUniversity of Calgary" << endl;
-    cout << "\t\tErfan Aghaeekiasaraee" << endl;
-    cout << "\t\tUpma Gandhi" << endl;
-    cout << "\t\tLaleh Behjat" << endl;
-
-    cout << "\tFederal University of Santa Catarina" << endl;
-    cout << "\t\tArthur Philippi Bianco" << endl;
-    cout << "\t\tRenan Oliveira Netto" << endl;
-    cout << "\t\tSheiny Fabre Almeida" << endl;
-    cout << "\t\tTiago Augusto Fontana" << endl;
-    cout << "\t\tVinicius Livramento" << endl;
-    cout << "\t\tCristina Meinhardt" << endl;
-    cout << "\t\tJose Luis Guntzel" << endl;
-    cout << "=================================================" << endl;
+    printlog("===================================================");
+    printlog("              ICCAD 2020 CAD Contest               ");
+    printlog("      Problem B : Routing with Cell Movement       ");
+    printlog("            Team Number:   cada0194                ");
+    printlog("              Team Name:      CABRA                ");
+    printlog("                    Members:                       ");
+    printlog("Affiliation:  University of Calgary                ");
+    printlog("    Erfan Aghaeekiasaraee                          ");
+    printlog("    Upma Gandhi                                    ");
+    printlog("    Laleh Behjat                                   ");
+    printlog("Affiliation:  Federal University of Santa Catarina ");
+    printlog("    Arthur Philippi Bianco                         ");
+    printlog("    Renan Oliveira Netto                           ");
+    printlog("    Sheiny Fabre Almeida                           ");
+    printlog("    Tiago Augusto Fontana                          ");
+    printlog("    Vinicius Livramento                            ");
+    printlog("    Cristina Meinhardt                             ");
+    printlog("    Jose Luis Guntzel                              ");
+    printlog("===================================================");
 };
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
@@ -43,15 +41,15 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     std::vector<ophidian::circuit::Net> routed_nets;
 
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
-    // std::cout << "routing nets" << std::endl;
+    // std::log() << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    // std::cout << "result " << result << std::endl;
+    // std::log() << "result " << result << std::endl;
 
     if(result.first){
         iccad_output_writer.write_ICCAD_2020_output(output, movements);
     }
    
-    // std::cout << "connected nets" << std::endl;
+    // std::log() << "connected nets" << std::endl;
     // for (auto net : nets) {
     //     ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
     //     for (auto pin : design.netlist().pins(net)) {
@@ -63,7 +61,7 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     //         auto pin_layer = design.routing_library().find_layer_instance(layer_name);
     //         auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-    //         // std::cout << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+    //         // std::log() << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
     //         design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
     //     }
@@ -71,7 +69,7 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
 
     //     auto net_name = design.netlist().name(net);
     //     if(!connected)
-    //         std::cout << "net " << net_name << " is open" << std::endl;
+    //         std::log() << "net " << net_name << " is open" << std::endl;
     // }
 }
 
@@ -106,16 +104,16 @@ int main(int argc, char** argv) {
     // HELP
     if (argc == 1 || string(argv[1]) == "-h" || string(argv[1]) == "-help" || string(argv[1]) == "--help")
     {
-        cout << "usage:" << endl;
-        cout << "./cell_move_router <input.txt> <output.txt>" << endl;
+        log() << "usage:" << endl;
+        log() << "./cell_move_router <input.txt> <output.txt>" << endl;
         return 0;
     }
 
     if (argc < 2)
     {
-        cout << "Cannot proceed, missing inputn and/or output file name" << endl;
-        cout << "For help, set --help or -help or -h" << endl;
-        cout << "usage: ./cell_move_router <input.txt> <output.txt>" << endl;
+        log() << "Cannot proceed, missing inputn and/or output file name" << endl;
+        log() << "For help, set --help or -help or -h" << endl;
+        log() << "usage: ./cell_move_router <input.txt> <output.txt>" << endl;
         return 0;
     } 
 
@@ -141,15 +139,15 @@ int main(int argc, char** argv) {
     // must have flags:
     if (input_file == "")
     {
-        cout << "Cannot proceed, missing Input file" << endl;
-        cout << "For help, set --help or -help or -h" << endl;
+        log() << "Cannot proceed, missing Input file" << endl;
+        log() << "For help, set --help or -help or -h" << endl;
         return 0;
     }
 
     if (output == "")
     {
-        cout << "Cannot proceed, missing output file name" << endl;
-        cout << "For help, set --help or -help or -h" << endl;
+        log() << "Cannot proceed, missing output file name" << endl;
+        log() << "For help, set --help or -help or -h" << endl;
         return 0;
     }
 
