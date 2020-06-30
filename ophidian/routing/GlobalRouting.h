@@ -72,8 +72,19 @@ namespace ophidian::routing
         gcell_graph_ptr_type gcell_graph();
         gcell_container_type gcells(const net_type& net) const;
 
-        const scalar_type wirelength_in_gcell(const net_type & net) const;
-        const scalar_type wirelength_in_gcell(const net_container_type & nets) const;
+        /**
+         * @brief Returns the number of gcells occupied by the net
+         * @param net to count wirelength
+         * @return the number of gcells or 1 if there are no gcells
+         */
+        const scalar_type wirelength(const net_type & net) const;
+
+        /**
+         * @brief Invokes wirelength(net) on every net, and returns the sum
+         * @param nets to count wirelength
+         * @return the sum
+         */
+        const scalar_type wirelength(const net_container_type & nets) const;
 
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;
