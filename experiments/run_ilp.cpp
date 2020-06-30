@@ -3,8 +3,9 @@
 
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
+#include <ophidian/util/Log.h>
 
-bool DEBUG_TEST = false;
+bool DEBUG_TEST = true;
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) std::cout << "starting function nun ILP" << std::endl;
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
@@ -96,4 +97,6 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
         if(!connected)
             std::cout << "net " << net_name << " disconnected with " << design.netlist().pins(net).size() << " pins" << std::endl;
     }
+
+    std::cout << "Memory usage in peak= " << ophidian::util::MemoryUsage::get_peak() << " MB" << std::endl;
 }
