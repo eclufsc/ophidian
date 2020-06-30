@@ -35,7 +35,7 @@ namespace ophidian::routing::factory
             std::cout << "        : GCellGraph WILL NOT be initialized." << std::endl;
         }
 
-        for(auto net : guide.nets())
+        /*for(auto net : guide.nets())
         {
             auto net_instance = netlist.find_net(net.name());
             for(auto region : net.regions())
@@ -43,7 +43,7 @@ namespace ophidian::routing::factory
                 auto layer_instance = library.find_layer_instance(region.metal());
                 globalRouting.add_segment(region.region(), layer_instance, layer_instance, net_instance);
             }
-        }
+        }*/
     }
 
     void make_global_routing(GlobalRouting& globalRouting, const Library & library, const RoutingConstraints & routing_constraints, const ophidian::circuit::Netlist & netlist, const ophidian::circuit::StandardCells & std_cells, const ophidian::placement::Placement & placement, const ophidian::parser::ICCAD2020 & iccad_2020) noexcept

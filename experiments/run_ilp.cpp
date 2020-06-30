@@ -6,7 +6,7 @@
 #include <ophidian/util/log.h>
 
 using namespace ophidian::util;
-bool DEBUG_TEST = false;
+bool DEBUG_TEST = true;
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function nun ILP" << std::endl;
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
