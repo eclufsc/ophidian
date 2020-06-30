@@ -7,7 +7,7 @@
 
 #include <ophidian/geometry/Models.h>
 
-#include <ophidian/util/Log.h>
+#include <ophidian/util/log.h>
 
 #include <ophidian/design/Design.h>
 #include <ophidian/routing/GCellGraph.h>
