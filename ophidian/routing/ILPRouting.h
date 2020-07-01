@@ -7,7 +7,7 @@
 
 #include <ophidian/geometry/Models.h>
 
-#include <ophidian/util/Log.h>
+#include <ophidian/util/log.h>
 
 #include <ophidian/design/Design.h>
 #include <ophidian/routing/GCellGraph.h>
@@ -33,11 +33,11 @@ namespace ophidian::routing {
         using entity_system::EntityBase::EntityBase;
     };
 
-    class NetSegment : public entity_system::EntityBase
+    /*class NetSegment : public entity_system::EntityBase
     {
     public:
         using entity_system::EntityBase::EntityBase;
-    };
+    };*/
 
     class NetWire : public entity_system::EntityBase
     {
@@ -49,7 +49,7 @@ namespace ophidian::routing {
     {   
     public:
         using entity_system::EntityBase::EntityBase;
-    };
+    };    
 
     class ILPRouting {
         public:
@@ -61,6 +61,7 @@ namespace ophidian::routing {
                 int64_t model_runtime_ms;
                 double model_memory = 0;
             };
+            
         public:
             using scalar_type               = int;
             using unit_type                 = util::database_unit_t;
@@ -69,7 +70,6 @@ namespace ophidian::routing {
             using cell_type                 = circuit::CellInstance;
             using pin_type                  = circuit::PinInstance;
             using pin_container_type        = std::vector<pin_type>;
-            using segment_type              = NetSegment;
             using route_candidate_type      = RouteCandidate;
             using wire_type                 = NetWire;
             using wire_container_type       = std::vector<wire_type>;
@@ -94,6 +94,14 @@ namespace ophidian::routing {
 
             using layer_type                = Library::layer_type;
             using layer_direction_type      = Direction;
+            
+            struct segment{
+                point_type start;
+                point_type end;
+                pin_container_type start_pins;
+                pin_container_type end_pins;
+            };
+            using segment_type              = segment;
 
             ILPRouting(design_type & design, std::string circuit_name);
 
@@ -157,13 +165,13 @@ namespace ophidian::routing {
             lp_environment_type m_env;
 
     //SEGMENTS
-            entity_system::EntitySystem<segment_type>                       m_segments;
+            /*entity_system::EntitySystem<segment_type>                       m_segments;
             entity_system::Property<segment_type, point_type>               m_segment_starts{m_segments};
             entity_system::Property<segment_type, point_type>               m_segment_ends{m_segments};
             entity_system::Property<segment_type, pin_container_type>       m_segment_start_pin{m_segments};
             entity_system::Property<segment_type, pin_container_type>       m_segment_end_pin{m_segments};
 
-            entity_system::Aggregation<net_type, segment_type>              m_net_segments{m_design.netlist().make_aggregation_net<segment_type>(m_segments)};
+            entity_system::Aggregation<net_type, segment_type>              m_net_segments{m_design.netlist().make_aggregation_net<segment_type>(m_segments)};*/
 
     //ROUTE CANDIDATES
             entity_system::EntitySystem<route_candidate_type>                     m_route_candidate;
@@ -180,8 +188,8 @@ namespace ophidian::routing {
             entity_system::EntitySystem<wire_type>          m_wires;
             entity_system::Property<wire_type, point_type>  m_wire_starts{m_wires};
             entity_system::Property<wire_type, point_type>  m_wire_ends{m_wires};
-            entity_system::Property<wire_type, layer_type>  m_wire_start_layers{m_wires};
-            entity_system::Property<wire_type, layer_type>  m_wire_end_layers{m_wires};
+            entity_system::Property<wire_type, int>  m_wire_start_layers{m_wires};
+            entity_system::Property<wire_type, int>  m_wire_end_layers{m_wires};
             
             entity_system::Aggregation<route_candidate_type, wire_type>            m_route_candidate_wires{m_route_candidate, m_wires};
 

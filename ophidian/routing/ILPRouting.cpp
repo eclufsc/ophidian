@@ -21,7 +21,7 @@ namespace ophidian::routing {
         ILPRouting::Statistics statistic;
         m_integer = integer;
 
-        m_segments.clear();
+        //m_segments.clear();
         m_wires.clear();
         m_route_candidate.clear();
         m_position_candidates.clear();
@@ -32,27 +32,43 @@ namespace ophidian::routing {
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("create all candidates with movements");
         create_all_candidates_with_movements(nets, model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("add movements constraints");
         add_movements_constraints(model);
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(STATUS) printlog("write model");
         if(STATUS) cplex.exportModel("ilp_routing_model.lp");
@@ -77,6 +93,9 @@ namespace ophidian::routing {
         if (STATUS) log() << "status " << status << std::endl;
 
         if (STATUS) log() << "result " << result << std::endl;
+
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
 
         if(result)
         {
@@ -246,11 +265,11 @@ namespace ophidian::routing {
 
         auto net_name = netlist.name(net);
 
-        int net_number = -1;
+        /*int net_number = -1;
         std::regex word_regex("(\\d+)");
         auto words_begin = std::sregex_iterator(net_name.begin(), net_name.end(), word_regex);
         if(words_begin != std::sregex_iterator())
-            net_number = boost::lexical_cast<int>(words_begin->str());
+            net_number = boost::lexical_cast<int>(words_begin->str());*/
 
         auto segments = global_routing.segments(net);
 
@@ -389,13 +408,13 @@ namespace ophidian::routing {
 
         point_type median_point {unit_type(median_x), unit_type(median_y)};
         
-        auto nearst_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
+        auto nearest_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
 
         auto cell_location = placement.location(cell);
-        auto actual_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+        auto current_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
 
-        if(actual_gcell != nearst_gcell){
-            auto center_gcell = m_design.global_routing().gcell_graph()->center_of_box(nearst_gcell);
+        if(current_gcell != nearest_gcell){
+            auto center_gcell = m_design.global_routing().gcell_graph()->center_of_box(nearest_gcell);
             // creating candidate
             auto cell_name = netlist.name(cell);
             create_movement_candidate(cell, candidate_origin_type::MEDIAN, center_gcell, cell_nets, cell_name + "_median", model);
@@ -496,7 +515,7 @@ namespace ophidian::routing {
         
         auto initial_position = placement.location(cell);
         auto stdCell = netlist.std_cell(cell);
-        auto stdCellGeometry = m_design.placement_library().geometry(stdCell);
+        auto & stdCellGeometry = m_design.placement_library().geometry(stdCell);
         auto height = stdCellGeometry.height();
         auto width = stdCellGeometry.width();
         auto chipUpperRigthCorner = m_design.floorplan().chip_upper_right_corner();
@@ -545,6 +564,7 @@ namespace ophidian::routing {
 
     void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , lp_model_type & model)
     {
+
         auto& routing_constraints = m_design.routing_constraints();
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
@@ -562,12 +582,12 @@ namespace ophidian::routing {
             auto pin_name = netlist.name(pin);
             auto pin_location = placement.location(pin);
             auto pin_cell = netlist.cell(pin);
-            /*if (pin_cell != cell_type{} && pin_cell == moved_cell) {
+            if (pin_cell != cell_type{} && pin_cell == moved_cell) {
                 auto original_cell_location = m_design.placement().location(pin_cell);
                 auto moved_cell_location = m_position_candidate_position[pos_candidate];                
                 auto translation = point_type{moved_cell_location.x() - original_cell_location.x(), moved_cell_location.y() - original_cell_location.y()};
                 pin_location = point_type{pin_location.x() + translation.x(), pin_location.y() + translation.y()};
-            }*/
+            }
             if (DEBUG) std::cout << "pin " << pin_name << " location " << pin_location.x().value() << ", " << pin_location.y().value() << std::endl;
             net_points.push_back(pin_location);
             auto point = std::make_pair(std::round(pin_location.x().value()), std::round(pin_location.y().value()));
@@ -597,11 +617,14 @@ namespace ophidian::routing {
         {
             if(DEBUG) std::cout << "same gcell" << std::endl;
             // this happens when all pins are in the same gcell
-            auto segment = m_segments.add();
+            //auto segment = m_segments.add();
+            auto segment = segment_type{};
             auto point = net_points.at(0);
             // auto point = convert_to_design(flutePoints.at(0));
-            m_segment_starts[segment] = point;
-            m_segment_ends[segment] = point;
+            //m_segment_starts[segment] = point;
+            //m_segment_ends[segment] = point;
+            segment.start = point;
+            segment.end = point;
             auto point_pair = std::make_pair(std::round(point.x().value()), std::round(point.y().value()));
 
             // std::cout << "printing map in same gcell" << std::endl;
@@ -612,9 +635,10 @@ namespace ophidian::routing {
             // std::cout << "acessing with : " << point_pair.first << " , " << point_pair.second << std::endl;
 
 
-            m_segment_start_pin[segment] = net_points_map.at(point_pair);
-            m_segment_end_pin[segment] = net_points_map.at(point_pair);
-            // m_net_segments.addAssociation(net, segment);
+            //m_segment_start_pin[segment] = net_points_map.at(point_pair);
+            //m_segment_end_pin[segment] = net_points_map.at(point_pair);
+            segment.start_pins = net_points_map.at(point_pair);
+            segment.end_pins = net_points_map.at(point_pair);
             segments.push_back(segment);
         }
         else
@@ -623,7 +647,8 @@ namespace ophidian::routing {
       	    for(auto tree_segment_it = tree->segments().first; tree_segment_it != tree->segments().second; ++tree_segment_it)
             {
                 auto tree_segment = *tree_segment_it;
-                auto segment = m_segments.add();
+                //auto segment = m_segments.add();
+                auto segment = segment_type{};
 
                 auto segment_start = tree->position(tree->u(tree_segment));
                 auto segment_end = tree->position(tree->v(tree_segment));
@@ -636,8 +661,10 @@ namespace ophidian::routing {
                 if (DEBUG) std::cout << "tree segment " << segment_start.x().value() << "," << segment_start.y().value() << "->" << segment_end.x().value() << "," << segment_end.y().value() << std::endl;               
 
 
-                m_segment_starts[segment] = segment_start;
-                m_segment_ends[segment] = segment_end;
+                //m_segment_starts[segment] = segment_start;
+                //m_segment_ends[segment] = segment_end;
+                segment.start = segment_start;
+                segment.end = segment_end;
 
                 // for(auto k : net_points_map)
                 // {
@@ -649,7 +676,8 @@ namespace ophidian::routing {
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
-                    m_segment_start_pin[segment] = net_points_map.at(point);
+                    //m_segment_start_pin[segment] = net_points_map.at(point);
+                    segment.start_pins = net_points_map.at(point);
                     if (DEBUG) std::cout << "start is pin" << std::endl;
                 }
                 else
@@ -661,17 +689,18 @@ namespace ophidian::routing {
                 if(net_points_map.count(point))
                 {
                     // std::cout << "acessing with : " << point.first << " , " << point.second << std::endl;
-                    m_segment_end_pin[segment] = net_points_map.at(point);
+                    //m_segment_end_pin[segment] = net_points_map.at(point);
+                    segment.end_pins = net_points_map.at(point);
                     if (DEBUG) std::cout << "end is pin" << std::endl;
                 }else
                 {
                     net_steiner_points.insert(std::make_pair(segment_end.x(), segment_end.y()));
                     if (DEBUG) std::cout << "end is steiner point" << std::endl;
                 }
-                // m_net_segments.addAssociation(net, segment);
                 segments.push_back(segment);
 	        }
         }
+        segments.shrink_to_fit();
 
         if(DEBUG) std::cout << "creating vectors layers" << std::endl;
     	std::vector<layer_type> horizontal_layers;
@@ -819,9 +848,10 @@ namespace ophidian::routing {
         {
 	    for(auto segment : segments)
             {
-                auto segment_start = m_segment_starts[segment];
-                auto segment_end = m_segment_ends[segment];
-                if(segment_start.x() != segment_end.x() && segment_start.y() != segment_end.y())
+                //auto segment_start = m_segment_starts[segment];
+                //auto segment_end = m_segment_ends[segment];
+                //if(segment_start.x() != segment_end.x() && segment_start.y() != segment_end.y())
+                if(segment.start.x() != segment.end.x() && segment.start.y() != segment.end.y())
                 {
                     number_of_candidates *= 2;
                 }
@@ -877,10 +907,12 @@ namespace ophidian::routing {
         if(DEBUG)  std::cout << "before for segments" << std::endl;
 
         unsigned branch_count = 0;
-        for(auto segment : segments)
+        for(auto & segment : segments)
         {
-            auto segment_start = m_segment_starts[segment];
-            auto segment_end = m_segment_ends[segment];
+            //auto segment_start = m_segment_starts[segment];
+            //auto segment_end = m_segment_ends[segment];
+            auto & segment_start = segment.start;
+            auto & segment_end = segment.end;
             if(DEBUG) std::cout << "segment " << segment_start.x().value() << ", " << segment_start.y().value() << "->"
                     << segment_end.x().value() << ", " << segment_end.y().value() << std::endl;
             if(segment_start.x() != segment_end.x() && segment_start.y() != segment_end.y())
@@ -895,13 +927,14 @@ namespace ophidian::routing {
             }
             else
             {
-                // if both x and y are the same, should route in the layer closest to the pins
+                // TODO: if both x and y are the same, should route in the layer closest to the pins
                 auto layer = (segment_start.y() == segment_end.y()) ? horizontal_layer : vertical_layer;
                 //std::cout << "create segment wire" << std::endl;
                 auto wire = create_wire(segment_start, segment_end, layer, layer);
                 auto wires = wire_container_type{wire};
-                auto segment_start_pins = m_segment_start_pin[segment];
-                for(auto segment_start_pin : segment_start_pins)
+                //auto segment_start_pins = m_segment_start_pin[segment];
+                auto & segment_start_pins = segment.start_pins;
+                for(auto & segment_start_pin : segment_start_pins)
                 {
             auto pin_name = m_design.netlist().name(segment_start_pin);
             if (DEBUG) std::cout << "segment start pin " << pin_name << std::endl;
@@ -916,8 +949,9 @@ namespace ophidian::routing {
                         wires.push_back(start_via);
                     }
                 }
-                auto segment_end_pins = m_segment_end_pin[segment];
-                for(auto segment_end_pin : segment_end_pins)
+                //auto segment_end_pins = m_segment_end_pin[segment];
+                auto & segment_end_pins = segment.end_pins;
+                for(auto & segment_end_pin : segment_end_pins)
                 {
             auto pin_name = m_design.netlist().name(segment_end_pin);
             if (DEBUG) std::cout << "segment end pin " << pin_name << std::endl;
@@ -939,7 +973,7 @@ namespace ophidian::routing {
             }
         }
         if(DEBUG)  std::cout << "before for steiner points" << std::endl; 
-        for(auto steiner_point : steiner_points)
+        for(auto & steiner_point : steiner_points)
         {
             auto point = point_type{steiner_point.first, steiner_point.second};
             auto via = create_wire(point, point, horizontal_layer, vertical_layer);
@@ -961,8 +995,9 @@ namespace ophidian::routing {
         auto layer2 = (connect_on_y) ? horizontal_layer : vertical_layer;
         wire_container_type wires;
         split_segment(segment_start, segment_end, layer1, layer2, connect_on_y, wires);
-        auto segment_start_pins = m_segment_start_pin[segment];
-        for(auto segment_start_pin : segment_start_pins)
+        //auto segment_start_pins = m_segment_start_pin[segment];
+        auto & segment_start_pins = segment.start_pins;
+        for(auto & segment_start_pin : segment_start_pins)
         {
             auto pin_name = m_design.netlist().name(segment_start_pin);
             if (DEBUG) std::cout << "segment start pin " << pin_name << std::endl;
@@ -977,8 +1012,9 @@ namespace ophidian::routing {
                 wires.push_back(start_via);
             }
         }
-        auto segment_end_pins = m_segment_end_pin[segment];
-        for(auto segment_end_pin : segment_end_pins)
+        //auto segment_end_pins = m_segment_end_pin[segment];
+        auto & segment_end_pins = segment.end_pins;
+        for(auto & segment_end_pin : segment_end_pins)
         {
             auto pin_name = m_design.netlist().name(segment_end_pin);
             if (DEBUG) std::cout << "segment end pin " << pin_name << std::endl;
@@ -1030,11 +1066,9 @@ namespace ophidian::routing {
             auto wire_start = m_wire_starts[wire];
             auto wire_end = m_wire_ends[wire];
             wirelength += unit_type{std::abs(wire_end.x().value() - wire_start.x().value()) / 10.0 + std::abs(wire_end.y().value() - wire_start.y().value()) / 10.0};
-            auto wire_start_layer = m_wire_start_layers[wire];
-            auto wire_end_layer = m_wire_end_layers[wire];
-            auto start_layer_index = m_design.routing_library().layerIndex(wire_start_layer);
-            auto end_layer_index = m_design.routing_library().layerIndex(wire_end_layer);
-            if(wire_start_layer != wire_end_layer)
+            auto start_layer_index = m_wire_start_layers[wire];
+            auto end_layer_index = m_wire_end_layers[wire];
+            if(start_layer_index != end_layer_index)
             {
                 double abs = std::abs(start_layer_index - end_layer_index);
                 wirelength += unit_type{abs};
@@ -1067,7 +1101,7 @@ namespace ophidian::routing {
         m_wire_starts[wire] = wire_start;
         m_wire_ends[wire] = wire_end;
 
-        auto min_x = std::min(wire_start.x().value(), wire_end.x().value());
+        /*auto min_x = std::min(wire_start.x().value(), wire_end.x().value());
         auto max_x = std::max(wire_start.x().value(), wire_end.x().value());
         auto min_y = std::min(wire_start.y().value(), wire_end.y().value());
         auto max_y = std::max(wire_start.y().value(), wire_end.y().value());
@@ -1076,10 +1110,10 @@ namespace ophidian::routing {
 
         auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
         auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
-        if (DEBUG) std::cout << "creating wire " << wire_box.min_corner().x() << " " << wire_box.min_corner().y() << " " << start_layer_index << " -> " << wire_box.max_corner().x() << " " << wire_box.max_corner().y() << " " << end_layer_index << std::endl;
+        if (DEBUG) std::cout << "creating wire " << wire_box.min_corner().x() << " " << wire_box.min_corner().y() << " " << start_layer_index << " -> " << wire_box.max_corner().x() << " " << wire_box.max_corner().y() << " " << end_layer_index << std::endl;*/
 
-        m_wire_start_layers[wire] = start_layer;
-        m_wire_end_layers[wire] = end_layer;
+        m_wire_start_layers[wire] = m_design.routing_library().layerIndex(start_layer);
+        m_wire_end_layers[wire] = m_design.routing_library().layerIndex(end_layer);
         return wire;
     }
 
@@ -1318,10 +1352,8 @@ namespace ophidian::routing {
                 auto & wires = m_route_candidate_wires.parts(candidate);
                 for(auto wire : wires)
                 {
-                    auto start_layer = m_wire_start_layers[wire];
-                    auto end_layer = m_wire_end_layers[wire];
-                    auto start_layer_index = routing_library.layerIndex(start_layer);
-                    auto end_layer_index = routing_library.layerIndex(end_layer);
+                    auto start_layer_index = m_wire_start_layers[wire];
+                    auto end_layer_index = m_wire_end_layers[wire];
                     auto min_layer_index = std::min(start_layer_index, end_layer_index);
                     auto max_layer_index = std::max(start_layer_index, end_layer_index);
 
@@ -1676,8 +1708,10 @@ namespace ophidian::routing {
                 {
         		    auto wire_start = m_wire_starts[wire];
 		            auto wire_end = m_wire_ends[wire];
-        		    auto wire_start_layer = m_wire_start_layers[wire];
-		            auto wire_end_layer = m_wire_end_layers[wire];
+        		    auto start_layer_index = m_wire_start_layers[wire];
+		            auto end_layer_index = m_wire_end_layers[wire];
+        		    auto wire_start_layer = m_design.routing_library().layer_from_index(start_layer_index);
+		            auto wire_end_layer = m_design.routing_library().layer_from_index(end_layer_index);
 
                     auto min_x = std::min(wire_start.x(), wire_end.x());
                     auto max_x = std::max(wire_start.x(), wire_end.x());
