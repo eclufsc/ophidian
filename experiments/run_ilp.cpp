@@ -17,13 +17,13 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    int initial_wirelength = design.global_routing().wirelength_in_gcell(nets);
+    int initial_wirelength = design.global_routing().wirelength(nets);
     if(DEBUG_TEST) log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
 
     auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
     log() << ovfl << " in input file" << std::endl;
 
-    auto demand_before = design.global_routing().gcell_graph()->total_demand();
+    auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
     std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
@@ -36,7 +36,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
         // need to generate a new guide file
         if(DEBUG_TEST) log() << "Runtime : " << duration.count() << " microsseconds"<< std::endl;
         if(DEBUG_TEST) log() << "Runtime : " << std::to_string( (double)duration.count() / 1000000.0 ) << " seconds"<< std::endl;
-        int final_wirelength = design.global_routing().wirelength_in_gcell(nets);
+        int final_wirelength = design.global_routing().wirelength(nets);
         if(DEBUG_TEST) log() << "Total movements = " << movements.size() << std::endl;
         if(DEBUG_TEST) log() << "Circuit final wirelength = " << final_wirelength << std::endl;
         auto score = initial_wirelength - final_wirelength;
@@ -71,7 +71,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::routing::GlobalRouting::net_container_type ovfl_nets{};
     ovfl = design.global_routing().is_overflow(nets, ovfl_nets) ? "there is overflow" : "No overflow";
     log() << ovfl << std::endl;
-    auto demand_after = design.global_routing().gcell_graph()->total_demand();
+    auto demand_after = design.global_routing().gcell_graph()->total_net_demand();
     ophidian::util::mem_use::get_current();
     log() << "Total Demand before: " << demand_before << " Total Demand after: "
     << demand_after << " change: " << demand_before-demand_after << std::endl;

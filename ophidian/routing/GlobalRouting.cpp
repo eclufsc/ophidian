@@ -103,15 +103,19 @@ namespace ophidian::routing
         return gcells;
     }
 
-    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_type & net) const{
-        return gcells(net).size();
+    const GlobalRouting::scalar_type GlobalRouting::wirelength(const GlobalRouting::net_type & net) const{
+        scalar_type wirelength = gcells(net).size();
+        if (wirelength == 0)
+            return 1;
+        else    
+            return wirelength;
     }
 
-    const GlobalRouting::scalar_type GlobalRouting::wirelength_in_gcell(const GlobalRouting::net_container_type & nets) const{
+    const GlobalRouting::scalar_type GlobalRouting::wirelength(const GlobalRouting::net_container_type & nets) const{
         scalar_type wirelength = 0;
         for(auto net : nets)
         {
-            wirelength += wirelength_in_gcell(net);
+            wirelength += this->wirelength(net);
         }
         return wirelength;
     }
@@ -151,6 +155,8 @@ namespace ophidian::routing
     void GlobalRouting::increase_demand(const GlobalRouting::net_type& net)
     {
         auto gcell_container = gcells(net);
+        // if (gcell_container.empty() == true)
+            /* find the gcell where this cell is placed and icrease its wirelength*/
         for(auto gcell : gcell_container)
             m_gcell_graph->change_net_demand(gcell, 1);
     }
