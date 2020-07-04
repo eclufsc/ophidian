@@ -106,6 +106,24 @@ namespace ophidian::routing::factory
             auto net_name = iccad_net.name();
             auto segments = iccad_2020.segments(net_name);
             auto net = netlist.find_net(net_name);
+            /*
+                If there are no segments already routed, then
+                create a single segment on top of the cell.
+                This is simply so that the demand is corretcly counted.
+            */
+            if (segments.empty())
+            {
+                auto pins = netlist.pins(net);
+                auto pin = *pins.begin();
+                auto location = placement.location(netlist.cell(pin));
+                auto min_x = location.x();
+                auto min_y = location.y();
+                auto max_x = min_x;
+                auto max_y = min_y; 
+                ophidian::routing::GlobalRouting::segment_geometry_type box_segment{{min_x, min_y}, {max_x, max_y}};
+                globalRouting.add_segment(box_segment, library.lowest_layer(), library.lowest_layer(), net);
+            }
+            else
             for(auto segment : segments)
             {
                 auto start = segment.first;
