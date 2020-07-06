@@ -8,7 +8,7 @@
 using namespace ophidian::util;
 bool DEBUG_TEST = true;
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
-    if(DEBUG_TEST) log() << "starting function nun ILP" << std::endl;
+    if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     if(DEBUG_TEST) log() << "create writer" << std::endl;
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
