@@ -106,6 +106,60 @@ namespace ophidian::routing::factory
             auto net_name = iccad_net.name();
             auto segments = iccad_2020.segments(net_name);
             auto net = netlist.find_net(net_name);
+            
+            // It is optional have segments in the initial file when all pins of one net is in te same gcell.
+            /*
+                If there are no segments already routed, then
+                create a single segment on top of the cell.
+                This is simply so that the demand is corretcly counted.
+            */
+            if(segments.empty())
+            {
+                // assert i all pin's net are in the same gcell
+                auto pin_it = netlist.pins(net).begin();
+                auto position = placement.location(*pin_it);
+                bool same_gcell = true;
+                auto min_layer_idx = library.highest_layer_index(); 
+                auto max_layer_idx = library.lowest_layer_index();
+                for(auto pin : netlist.pins(net))
+                {
+                    if(placement.location(pin).x() != position.x() || placement.location(pin).y() != position.y())
+                        same_gcell = false;
+                    // get the minimum and maximum pin layers in this net
+                    for(auto geometry : placement.geometry(pin))
+                    {
+                        auto layer_name = geometry.second;
+                        auto layer = library.find_layer_instance(layer_name);
+                        auto layer_index = library.index(layer);
+                        if(layer_index > max_layer_idx)
+                            max_layer_idx = layer_index;
+                        if(layer_index < min_layer_idx)
+                            min_layer_idx = layer_index;
+                    }                    
+                }
+                if(!same_gcell)
+                    std::cout << "NET " << netlist.name(net) << " NOT IN THE SAME GCELL" << std::endl;
+
+                // get the minimul routing layer for this net
+                auto net_min_layer = routing_constraints.min_net_layer(net);
+                auto net_min_layer_idx = library.index(net_min_layer);
+                if(net_min_layer_idx > max_layer_idx)
+                    max_layer_idx = net_min_layer_idx;
+                
+                // contruct a segment od minimum layer to maximum layer
+                auto location = placement.location(netlist.cell(*pin_it));
+                auto min_x = location.x();
+                auto min_y = location.y();
+                auto max_x = min_x;
+                auto max_y = min_y; 
+                ophidian::routing::GlobalRouting::segment_geometry_type box_segment{{min_x, min_y}, {max_x, max_y}};
+
+                //add segmento in global routing
+                auto layer_start = library.layer_from_index(min_layer_idx);
+                auto layer_end = library.layer_from_index(max_layer_idx);
+                globalRouting.add_segment(box_segment, layer_start, layer_end, net);
+            }
+            
             for(auto segment : segments)
             {
                 auto start = segment.first;

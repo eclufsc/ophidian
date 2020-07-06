@@ -5,8 +5,9 @@
 #include <boost/lexical_cast.hpp>
 #include <ophidian/util/log.h>
 
-bool DEBUG = false;
 bool STATUS = true;
+bool DEBUG = false;
+bool WRITE_MODEL = false;
 
 using namespace ophidian::util;
 
@@ -28,54 +29,45 @@ namespace ophidian::routing {
 
         lp_model_type model(m_env);
         solver_type cplex(model);
-        cplex.setOut(m_env.getNullStream());
+//        cplex.setOut(m_env.getNullStream());
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+//        if(STATUS) printlog("create all candidates with movements");
+//        create_all_candidates_with_movements(nets, model);
+//        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add movements constraints");
         add_movements_constraints(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("write model");
-        if(STATUS) cplex.exportModel("ilp_routing_model.lp");
-        if(STATUS) printlog("exported");
+       if(WRITE_MODEL) printlog("write model");
+       if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
+       if(WRITE_MODEL) printlog("exported");
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
         log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -99,8 +91,8 @@ namespace ophidian::routing {
 
         if(result)
         {
-            if(STATUS) printlog("writing solution");
-            if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
+            if(WRITE_MODEL) printlog("writing solution");
+            if(WRITE_MODEL) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
@@ -312,7 +304,7 @@ namespace ophidian::routing {
             add_wires_to_candidate(initial_candidate, wires);
         }
 
-        generate_routes_of_net(net, position_candidate_type(), model);   
+        // generate_routes_of_net(net, position_candidate_type(), model);   
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)

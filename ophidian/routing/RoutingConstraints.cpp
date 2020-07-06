@@ -25,7 +25,7 @@ namespace ophidian::routing
     {
     }
 
-    RoutingConstraints::layer_type RoutingConstraints::min_net_layer(RoutingConstraints::net_type net)
+    RoutingConstraints::layer_type RoutingConstraints::min_net_layer(RoutingConstraints::net_type net) const
     {
         return m_min_net_layer[net];
     }
