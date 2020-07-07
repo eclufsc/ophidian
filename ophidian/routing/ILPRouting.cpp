@@ -28,7 +28,7 @@ namespace ophidian::routing {
 
         lp_model_type model(m_env);
         solver_type cplex(model);
-        cplex.setOut(m_env.getNullStream());
+        //cplex.setOut(m_env.getNullStream());
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
@@ -46,7 +46,7 @@ namespace ophidian::routing {
               << std::endl;
 
         if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, model);
+        //create_all_candidates_with_movements(nets, model);
         if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
               << std::endl;
 
@@ -66,7 +66,7 @@ namespace ophidian::routing {
               << std::endl;
 
         if(STATUS) printlog("add movements constraints");
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
         if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
               << std::endl;
 
@@ -312,7 +312,7 @@ namespace ophidian::routing {
             add_wires_to_candidate(initial_candidate, wires);
         }
 
-        generate_routes_of_net(net, position_candidate_type(), model);   
+        //generate_routes_of_net(net, position_candidate_type(), model);   
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
