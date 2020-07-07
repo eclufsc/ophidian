@@ -30,44 +30,45 @@ namespace ophidian::routing {
         lp_model_type model(m_env);
         solver_type cplex(model);
 //        cplex.setOut(m_env.getNullStream());
+        // cplex.setParam(IloCplex::Param::Threads, 4);
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-//        if(STATUS) printlog("create all candidates with movements");
-//        create_all_candidates_with_movements(nets, model);
-//        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) printlog("create all candidates with movements");
+        create_all_candidates_with_movements(nets, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add movements constraints");
         add_movements_constraints(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-       if(WRITE_MODEL) printlog("write model");
-       if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
-       if(WRITE_MODEL) printlog("exported");
+        if(WRITE_MODEL) printlog("write model");
+        if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
+        if(WRITE_MODEL) printlog("exported");
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
         log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -82,11 +83,11 @@ namespace ophidian::routing {
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
-        if (STATUS) log() << "status " << status << std::endl;
+        if(STATUS) log() << "status " << status << std::endl;
 
-        if (STATUS) log() << "result " << result << std::endl;
+        if(STATUS) log() << "result " << result << std::endl;
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
               << std::endl;
 
         if(result)
@@ -97,7 +98,7 @@ namespace ophidian::routing {
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
 
-            if (DEBUG) printlog("CHECKING ROUTED NETS");
+            if(DEBUG) printlog("CHECKING ROUTED NETS");
 
             // auto gcell_graph = m_design.global_routing().gcell_graph();
             // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
@@ -304,7 +305,7 @@ namespace ophidian::routing {
             add_wires_to_candidate(initial_candidate, wires);
         }
 
-        // generate_routes_of_net(net, position_candidate_type(), model);   
+        generate_routes_of_net(net, position_candidate_type(), model);
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
@@ -383,6 +384,8 @@ namespace ophidian::routing {
 
         for(auto pin : netlist.pins(cell)){
             auto net = netlist.net(pin);
+            if(net == ophidian::circuit::Net())
+                continue;
             cell_nets.push_back(net);
             for(auto net_pin : netlist.pins(net)){
                 if(net_pin == pin)
@@ -392,6 +395,8 @@ namespace ophidian::routing {
                 y_positions.push_back(location.y().value());
             }
         }
+        if(x_positions.empty() || y_positions.empty())
+            return;
 
         std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
         auto median_x = x_positions[x_positions.size()/2];

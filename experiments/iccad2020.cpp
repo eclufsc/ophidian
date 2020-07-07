@@ -77,8 +77,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         // "case1",
         //"case1N4",
         // "case2",
-        "case3",
-        // "case5",
+        // "case3",
+        "case5",
         //"case3_no_blockages",
         // "case3_no_extra_demand"
         //"case3_only_same_grid"
@@ -87,8 +87,9 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         //"same_grid_test"
     };
 
-    std::string benchmarks_path = "./input_files/iccad2020/cases/";
-    // std::string benchmarks_path = "./input_files/iccad20/";
+    // std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
+    // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) {
         log() << "running circuit " << circuit_name << std::endl;
 
