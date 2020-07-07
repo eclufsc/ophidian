@@ -4,6 +4,7 @@
 #include <catch.hpp>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
+#include <ophidian/routing/AStarRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/util/log.h>
 #include "run_ilp.h"
@@ -202,3 +203,16 @@ TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
     }
 }
 */
+
+TEST_CASE("iccad20 AStarRouting", "[astar]") {
+    std::string circuit_name = "case1";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+    std::cout<<iccad_2020_file<<std::endl;
+    auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+    auto design = ophidian::design::Design();
+    ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    auto astar_routing = ophidian::routing::AStarRouting(design);
+    auto net_n1 = design.netlist().find_net("N1");
+    astar_routing.route_net(net_n1);
+}
