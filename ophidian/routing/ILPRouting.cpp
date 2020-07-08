@@ -44,9 +44,9 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, model);
-        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        // if(STATUS) printlog("create all candidates with movements");
+        // create_all_candidates_with_movements(nets, model);
+        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
@@ -266,7 +266,8 @@ namespace ophidian::routing {
 
         auto segments = global_routing.segments(net);
 
-
+        auto min_layer = routing_library.highest_layer();
+        auto max_layer = routing_library.lowest_layer();
         if(segments.size() > 0 && initial_routing)
         {
             auto initial_candidate = m_route_candidate.add();
@@ -296,16 +297,35 @@ namespace ophidian::routing {
                                (end_box.min_corner().y()+end_box.max_corner().y())/2};
 
                 auto start_layer = global_routing.layer_start(segment);
+                if( routing_library.is_less(start_layer, min_layer) )
+                    min_layer = start_layer;
+                if( routing_library.is_greater(start_layer, max_layer) )
+                    max_layer = start_layer;
                 auto end_layer = global_routing.layer_end(segment);
+                if( routing_library.is_less(end_layer, min_layer) )
+                    min_layer = start_layer;
+                if( routing_library.is_greater(end_layer, max_layer) )
+                    max_layer = end_layer;
                 auto start_layer_name = routing_library.name(start_layer);
                 auto end_layer_name = routing_library.name(end_layer);
                 auto wire = create_wire(start, end, start_layer, end_layer);
                 wires.push_back(wire);
             }
             add_wires_to_candidate(initial_candidate, wires);
+        }else{
+            min_layer = routing_library.lowest_layer();
+            max_layer = routing_library.highest_layer();
         }
 
-        generate_routes_of_net(net, position_candidate_type(), model);
+        //define delta in layers
+        int delta_layers = 0;
+        for(auto i = 0; i < delta_layers; i++)
+        {
+            min_layer = routing_library.lowerLayer(min_layer);
+            max_layer = routing_library.upperLayer(max_layer);
+        }
+
+        generate_routes_of_net(net, position_candidate_type(), model, std::make_pair(min_layer, max_layer));
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
@@ -508,7 +528,8 @@ namespace ophidian::routing {
     void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, lp_model_type & model )
     {
         auto & netlist = m_design.netlist();
-        auto & placement = m_design.placement();        
+        auto & placement = m_design.placement();
+        auto & routing_library = m_design.routing_library();        
         
         auto initial_position = placement.location(cell);
         auto stdCell = netlist.std_cell(cell);
@@ -553,13 +574,15 @@ namespace ophidian::routing {
         //genarate route for every net with new location
         for(auto net : nets) {
             if (DEBUG) std::cout << "net for candidate movement " << m_design.netlist().name(net) << std::endl;
-            generate_routes_of_net(net, candidate, model);
+            auto min_layer = routing_library.lowest_layer();
+            auto max_layer = routing_library.highest_layer();
+            generate_routes_of_net(net, candidate, model, std::make_pair(min_layer, max_layer));
         }
         // restore original position
         placement.place(cell, initial_position);
     }
 
-    void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , lp_model_type & model)
+    void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , lp_model_type & model, std::pair<layer_type, layer_type> layer_range)
     {
 
         auto& routing_constraints = m_design.routing_constraints();
@@ -702,9 +725,15 @@ namespace ophidian::routing {
         if(DEBUG) std::cout << "creating vectors layers" << std::endl;
     	std::vector<layer_type> horizontal_layers;
 	    std::vector<layer_type> vertical_layers;
-    	for(auto layer_it = m_design.routing_library().begin_layer(); layer_it != m_design.routing_library().end_layer(); layer_it++)
+
+        auto & routing_library = m_design.routing_library();
+        auto min_idx = routing_library.index(layer_range.first);
+        auto max_idx = routing_library.index(layer_range.second);
+    	// for(auto layer_it = m_design.routing_library().begin_layer(); layer_it != m_design.routing_library().end_layer(); layer_it++)
+        for(auto layer_idx = min_idx; layer_idx <= max_idx; layer_idx++)
         {
-	        auto layer = *layer_it;
+	        // auto layer = *layer_it;
+            auto layer = routing_library.layer_from_index(layer_idx);
             auto layer_name = m_design.routing_library().name(layer);
     	    auto layer_direction = m_design.routing_library().direction(layer);
 	        if(layer_direction == layer_direction_type::HORIZONTAL)

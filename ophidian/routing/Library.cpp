@@ -258,9 +258,11 @@ const Library::layer_type Library::upperLayer(const Library::layer_type& layer) 
     {
         int i = index(layer);
         return mIndex2Layer.at(i +1);
-    }
-    else
+    } 
+    else if (layer == mHighest_layer)
     {
+        return layer;
+    }else{
         return Library::layer_type{};
     }
 
@@ -293,8 +295,10 @@ const Library::layer_type Library::lowerLayer(const Library::layer_type& layer) 
         int i = index(layer);
         return mIndex2Layer.at(i -1);
     }
-    else
+    else if (layer == mLowest_layer)
     {
+        return layer;
+    }else {
         return Library::layer_type{};
     }
 }
@@ -318,6 +322,15 @@ const Library::scalar_type Library::layerIndex(const Library::layer_type& layer)
     return layerIndex;
     */
     return mLayerIndexes[layer];
+}
+
+bool Library::is_less(Library::layer_type const& lhs, Library::layer_type const& rhs) const
+{
+    return mLayerIndexes[lhs] < mLayerIndexes[rhs];
+}
+bool Library::is_greater(Library::layer_type const& lhs, Library::layer_type const& rhs) const
+{
+    return mLayerIndexes[lhs] > mLayerIndexes[rhs];
 }
 
 const void Library::viaCandidates(Library::via_container_type& vias, const Library::layer_type& layer, const Library::layer_type& upperLayer) const

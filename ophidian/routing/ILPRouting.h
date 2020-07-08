@@ -124,7 +124,7 @@ namespace ophidian::routing {
 
             void create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, lp_model_type & model );
 
-            void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, lp_model_type & model);
+            void generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate, lp_model_type & model, std::pair<layer_type, layer_type> layer_range);
             
             void create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, lp_model_type & model);
 
