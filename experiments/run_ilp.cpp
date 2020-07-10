@@ -9,7 +9,7 @@ using namespace ophidian::util;
 bool DEBUG_TEST = true;
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     if(DEBUG_TEST) log() << "create writer" << std::endl;
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
@@ -24,7 +24,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     log() << ovfl << " in input file" << std::endl;
 
     auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements, true, initial_routing);

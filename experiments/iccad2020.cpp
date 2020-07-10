@@ -118,7 +118,7 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
 
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
     auto & global_routing = design.global_routing();
 
@@ -156,7 +156,7 @@ TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
 
 
     std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
