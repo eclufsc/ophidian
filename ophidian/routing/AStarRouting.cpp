@@ -20,6 +20,7 @@ namespace ophidian::routing
         m_graph{},
         m_design{design},
         m_node_map{m_graph},
+        m_edge_map{m_graph},
         m_gcell_graph{design.global_routing().gcell_graph()},
         m_gcell_to_AStarNode{design.global_routing().gcell_graph()->make_property_gcells(AStarNode{})}
     {
@@ -177,8 +178,6 @@ namespace ophidian::routing
         std::cout<<"root node: "<<m_node_map[root_node]<<std::endl;
         std::queue<flute_node_type> queue;
         queue.push(root_node);
-        //m_gcell_to_AStarNode[m_node_map[root_node].mapped_gcell].g = 0;//starting point
-        //m_gcell_to_AStarNode[m_node_map[root_node].mapped_gcell].gcell_from = m_node_map[root_node].mapped_gcell;
 
         while(!queue.empty())
         {
@@ -264,7 +263,6 @@ namespace ophidian::routing
             astar_node.discovered = false;
             astar_node.finished = false;
             astar_node.gcell_from = gcell_type{};
-            //DO NOT clear astar_node.backtrack_path
         }
     }
 
@@ -405,7 +403,7 @@ namespace ophidian::routing
                 if(visited_nodes[opposite_flute_node] == false)
                 {
                     queue.push(opposite_flute_node);
-                    result(current_flute_node, opposite_flute_node);
+                    print_path(current_flute_node, opposite_flute_node);
                 }
             }
         }
@@ -414,6 +412,7 @@ namespace ophidian::routing
     //backtrack printing from two flute_nodes
     void AStarRouting::back_track_path(AStarRouting::flute_node_type s, AStarRouting::flute_node_type g)
     {
+        std::vector<gcell_type> path;
         auto s_node = m_gcell_graph->graph_node(m_node_map[s].mapped_gcell);
         auto s_pos = m_gcell_graph->position(s_node);
 
@@ -430,38 +429,43 @@ namespace ophidian::routing
         {
             non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
             std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-            if(non_stop)
+            path.push_back(gcell);
+            if(non_stop == false)
                 break;
-            m_gcell_to_AStarNode[gcell].backtrack_path = m_gcell_to_AStarNode[gcell].gcell_from;
             gcell = m_gcell_to_AStarNode[gcell].gcell_from;
             g_node = m_gcell_graph->graph_node(gcell);
             g_pos = m_gcell_graph->position(g_node);
         }
+
+        for(flute_graph_type::IncEdgeIt edge(m_graph, s); edge != lemon::INVALID; ++edge)
+        {
+            auto opposite_node = m_graph.oppositeNode(s, edge);
+            if(opposite_node == g)
+            {
+                m_edge_map[edge] = path;
+                break;
+            }
+        }
     }
 
-    void AStarRouting::result(AStarRouting::flute_node_type s, AStarRouting::flute_node_type g)
+    void AStarRouting::print_path(AStarRouting::flute_node_type s, AStarRouting::flute_node_type g)
     {
-        auto s_node = m_gcell_graph->graph_node(m_node_map[s].mapped_gcell);
-        auto s_pos = m_gcell_graph->position(s_node);
-
-        auto gcell = m_node_map[g].mapped_gcell;
-        auto g_node = m_gcell_graph->graph_node(gcell);
-        auto g_pos = m_gcell_graph->position(g_node);
-
-        std::cout<<"RESULT from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
-        std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-
-        bool non_stop = true;
-        while(non_stop)
+        std::vector<gcell_type> gcells;
+        for(flute_graph_type::IncEdgeIt edge(m_graph, s); edge != lemon::INVALID; ++edge)
         {
-            non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
-            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-            if(non_stop)
+            auto opposite_node = m_graph.oppositeNode(s, edge);
+            if(opposite_node == g)
+            {
+                gcells = m_edge_map[edge];
                 break;
-            gcell = m_gcell_to_AStarNode[gcell].backtrack_path;
-            g_node = m_gcell_graph->graph_node(gcell);
-            g_pos = m_gcell_graph->position(g_node);
+            }
+        }
+        std::cout<<"RESULT from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
+        for(auto gcell : gcells)
+        {
+            auto g_node = m_gcell_graph->graph_node(gcell);
+            auto g_pos = m_gcell_graph->position(g_node);
+            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
         }
     }
 }

@@ -11,13 +11,9 @@
 #include <memory>
 #include <limits>
 
-//0 don't consider any constraint.
-//1 consider routing layer directions.
-//2 consider cap and demand.
-//3 consider extra demand constraint.
-//4 consider min layer constr.
-//5 consider only relevant nodes.
-
+//TODO:
+//1-convert vector of gcells into GlobalRouting segments
+//2-consider extra demand constraints
 namespace ophidian::routing
 {
 
@@ -29,7 +25,7 @@ namespace ophidian::routing
         AStarNode():g{std::numeric_limits<unsigned int>::max()},h{0},finished{false},discovered{false},gcell_from{}{};
 
         unsigned int g, h;//g is the cost from start up to this node, h is heuristic value
-        gcell_type gcell_from, backtrack_path;//useful for backtracking result
+        gcell_type gcell_from;//useful for backtracking result
         bool finished, discovered;
     };
 
@@ -40,13 +36,14 @@ namespace ophidian::routing
             using design_type                       = design::Design;
             using pin_name_type                     = std::string;
             using point_type                        = util::LocationDbu;
-            using flute_graph_type                  = lemon::ListGraph;
-            using flute_node_type                   = lemon::ListGraph::Node;
-            using node_map_type                     = flute_graph_type::NodeMap<FluteNode>;
             using gcell_type                        = GCell;
             using gcell_property_type               = entity_system::Property<gcell_type, AStarNode>;
             using gcell_graph_ptr_type              = std::shared_ptr<ophidian::routing::GCellGraph>;
             using layer_type                        = Layer;
+            using flute_graph_type                  = lemon::ListGraph;
+            using flute_node_type                   = lemon::ListGraph::Node;
+            using node_map_type                     = flute_graph_type::NodeMap<FluteNode>;
+            using edge_map_type                     = flute_graph_type::EdgeMap<std::vector<gcell_type>>;
 
             AStarRouting(design_type & design);
 
@@ -62,11 +59,11 @@ namespace ophidian::routing
             bool goal_reached(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
             void print_routing(flute_node_type root_node);
             void back_track_path(flute_node_type s, flute_node_type g);
-
-            void result(flute_node_type s, flute_node_type g);
+            void print_path(flute_node_type s, flute_node_type g);
 
             flute_graph_type                      m_graph;
             node_map_type                         m_node_map;
+            edge_map_type                         m_edge_map;
             gcell_property_type                   m_gcell_to_AStarNode;
             design_type&                          m_design;
             gcell_graph_ptr_type                  m_gcell_graph;
