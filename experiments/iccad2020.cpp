@@ -216,3 +216,20 @@ TEST_CASE("iccad20 AStarRouting", "[astar]") {
     auto net_n1 = design.netlist().find_net("N1");
     astar_routing.route_net(net_n1);
 }
+
+
+TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
+    std::string circuit_name = "case1";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+    std::cout<<iccad_2020_file<<std::endl;
+    auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+    auto design = ophidian::design::Design();
+    ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    auto& netlist = design.netlist();
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        auto astar_routing = ophidian::routing::AStarRouting(design);
+        astar_routing.route_net(*net_it);
+    }
+}

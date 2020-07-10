@@ -209,6 +209,12 @@ bool GCellGraph::is_overflow(const gcell_type& gcell) const
     return (m_gcell_capacity[gcell] < (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
 }
 
+
+bool GCellGraph::has_free_space(const gcell_type& gcell) const
+{
+    return ((m_gcell_capacity[gcell] - 1) >= (m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell]));
+}
+
 GCellGraph::index_type GCellGraph::layer_index(const gcell_type & gcell) const
 {
     auto node = graph_node(gcell);
