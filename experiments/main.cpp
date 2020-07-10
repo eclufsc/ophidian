@@ -33,14 +33,14 @@ void greetings(){
 };
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     // std::log() << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     // std::log() << "result " << result << std::endl;
