@@ -5,21 +5,26 @@
 #include <boost/lexical_cast.hpp>
 #include <ophidian/util/log.h>
 
-bool STATUS = true;
-bool DEBUG = false;
-bool WRITE_MODEL = true;
+#ifndef STATUS
+#define STATUS true
+#define DEBUG false
+#define WRITE_MODEL true
+#endif
 
 using namespace ophidian::util;
 
 namespace ophidian::routing {
-    ILPRouting::ILPRouting(design::Design & design, std::string circuit_name):
+
+    template <typename var_type>
+    ILPRouting<var_type>::ILPRouting(design::Design & design, std::string circuit_name):
         m_design(design), m_circuit_name(circuit_name)
     {
     }
 
-    std::pair<bool, ILPRouting::Statistics> ILPRouting::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer, bool initial_routing)
+    template <typename var_type>
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer, bool initial_routing)
     {
-        ILPRouting::Statistics statistic;
+        ILPRouting<var_type>::Statistics statistic;
         m_integer = integer;
 
         //m_segments.clear();
@@ -27,47 +32,48 @@ namespace ophidian::routing {
         m_route_candidate.clear();
         m_position_candidates.clear();
 
-        lp_model_type model(m_env);
+        model_type model(m_env);
         solver_type cplex(model);
-        //cplex.setOut(m_env.getNullStream());
+//        cplex.setOut(m_env.getNullStream());
+        // cplex.setParam(IloCplex::Param::Threads, 4);
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-//        if(STATUS) printlog("create all candidates with movements");
-//        create_all_candidates_with_movements(nets, model);
-//        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        // if(STATUS) printlog("create all candidates with movements");
+        // create_all_candidates_with_movements(nets, model);
+        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("add movements constraints");
-        //add_movements_constraints(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        // if(STATUS) printlog("add movements constraints");
+        // add_movements_constraints(model);
+        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-       if(WRITE_MODEL) printlog("write model");
-       if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
-       if(WRITE_MODEL) printlog("exported");
+        if(WRITE_MODEL) printlog("write model");
+        if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
+        if(WRITE_MODEL) printlog("exported");
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
         log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -82,11 +88,11 @@ namespace ophidian::routing {
 
         auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
 
-        if (STATUS) log() << "status " << status << std::endl;
+        if(STATUS) log() << "status " << status << std::endl;
 
-        if (STATUS) log() << "result " << result << std::endl;
+        if(STATUS) log() << "result " << result << std::endl;
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
               << std::endl;
 
         if(result)
@@ -97,32 +103,39 @@ namespace ophidian::routing {
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
 
-            if (DEBUG) printlog("CHECKING ROUTED NETS");
+            if(DEBUG) printlog("CHECKING ROUTED NETS");
 
             // auto gcell_graph = m_design.global_routing().gcell_graph();
             // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
-            // for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) {
-            //     auto net = *net_it;
-        	// 	auto candidates = m_net_candidates.parts(net);
-		    //     bool routed = 0;
+            int routed_nets = 0;
+            for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) 
+            {
+                auto net = *net_it;
+        		auto candidates = m_net_candidates.parts(net);
+		        bool routed = 0;
 
-            //     auto net_name = m_design.netlist().name(net);
+                auto net_name = m_design.netlist().name(net);
 
-            //     if (DEBUG) std::cout << net_name << std::endl;
+                // if (DEBUG) std::cout << net_name << std::endl;
 
-            //     route_candidate_type routed_candidate;
-        	// 	for(auto candidate : candidates)
-            //     {
-		    //     	auto variable = m_route_candidate_variables[candidate];
-        	// 		auto value = cplex.getValue(variable);
-            //         if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
-		    //     	routed |= (value > 0);
+                route_candidate_type routed_candidate;
+        		for(auto candidate : candidates)
+                {
+		        	auto variable = m_route_candidate_variables[candidate];
+        			auto value = cplex.getValue(variable);
+                    // if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
+		        	routed |= (value == 1.0);
 
             //         if (value > 0) {
             //             routed_candidate = candidate;
             //         }
-        	// 	}
-        	// 	if(routed)
+                    if(routed)
+                        break;
+        		}
+                if(routed)
+                    routed_nets++;
+            }
+        		// if(routed)
             //     {
 		    //     	routed_segments++;
 
@@ -198,16 +211,22 @@ namespace ophidian::routing {
             // std::cout << "unrouted segments " << unrouted_segments << std::endl;
             // std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
 
-    	    write_segments(nets, cplex, routed_nets);
+            double ratio = (double) routed_nets / (double) m_design.netlist().size_net();
+            std::cout << "routed nets " << routed_nets << std::endl;
+            std::cout << "unrouted nets " << (m_design.netlist().size_net() - routed_nets) << std::endl;
+            std::cout << "routed nets " << ratio*100.0<<"%" << std::endl;
 
-            save_movements(cplex, movements);
+    	    // write_segments(nets, cplex, routed_nets);
+
+            // save_movements(cplex, movements);
 
 	        // save_result(cplex);
         }
         return std::make_pair(result, statistic);
      }
 
-    void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
+    template <typename var_type>
+    void ILPRouting<var_type>::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
     {
         auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
@@ -260,7 +279,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_all_candidates(const std::vector<net_type> & nets, lp_model_type & model, bool initial_routing)
+    template <typename var_type>
+    void ILPRouting<var_type>::create_all_candidates(const std::vector<net_type> & nets, model_type & model, bool initial_routing)
     {
         for(auto net : nets) {
             create_net_candidates(net, model, initial_routing);
@@ -268,8 +288,8 @@ namespace ophidian::routing {
     }
 
     
-
-    void ILPRouting::create_net_candidates(const net_type & net, lp_model_type & model, bool initial_routing)
+    template <typename var_type>
+    void ILPRouting<var_type>::create_net_candidates(const net_type & net, model_type & model, bool initial_routing)
     {
         auto& netlist = m_design.netlist();
         auto& global_routing = m_design.global_routing();
@@ -288,17 +308,18 @@ namespace ophidian::routing {
 
         auto segments = global_routing.segments(net);
 
-
+        auto min_layer = routing_library.highest_layer();
+        auto max_layer = routing_library.lowest_layer();
         if(segments.size() > 0 && initial_routing)
         {
             auto initial_candidate = m_route_candidate.add();
             m_route_candidate_nets[initial_candidate] = net;
             auto initial_variable_name = net_name + "_initial";
-            ilp_var_type initial_variable(m_env, initial_variable_name.c_str());
+            var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
             // if (m_integer) {
-            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
+            //     ilp_var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
             // } else {
-            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
+            //     lp_var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
             // }
             m_route_candidate_names[initial_candidate] = initial_variable_name;
             m_name_to_route_candidate[initial_variable_name] = initial_candidate;
@@ -318,7 +339,15 @@ namespace ophidian::routing {
                                (end_box.min_corner().y()+end_box.max_corner().y())/2};
 
                 auto start_layer = global_routing.layer_start(segment);
+                if( routing_library.is_less(start_layer, min_layer) )
+                    min_layer = start_layer;
+                if( routing_library.is_greater(start_layer, max_layer) )
+                    max_layer = start_layer;
                 auto end_layer = global_routing.layer_end(segment);
+                if( routing_library.is_less(end_layer, min_layer) )
+                    min_layer = start_layer;
+                if( routing_library.is_greater(end_layer, max_layer) )
+                    max_layer = end_layer;
                 auto start_layer_name = routing_library.name(start_layer);
                 auto end_layer_name = routing_library.name(end_layer);
                 auto wire = create_wire(start, end, start_layer, end_layer);
@@ -326,11 +355,20 @@ namespace ophidian::routing {
             }
             add_wires_to_candidate(initial_candidate, wires);
         }
-
-        generate_routes_of_net(net, position_candidate_type(), model);   
+        /*
+        //define delta in layers
+        int delta_layers = 0;
+        for(auto i = 0; i < delta_layers; i++)
+        {
+            min_layer = routing_library.lowerLayer(min_layer);
+            max_layer = routing_library.upperLayer(max_layer);
+        }
+        */
+        generate_routes_of_net(net, position_candidate_type(), model, std::make_pair(min_layer, max_layer));
     }
 
-    void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::create_all_candidates_with_movements(const std::vector<net_type> & nets, model_type & model)
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
@@ -350,7 +388,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_center_of_mass_candidate(const cell_type cell, lp_model_type & model){
+    template <typename var_type>
+    void ILPRouting<var_type>::create_center_of_mass_candidate(const cell_type cell, model_type & model){
         auto cell_name = m_design.netlist().name(cell);
         //std::cout << "center of mass of cell " << cell_name << std::endl;
 
@@ -396,7 +435,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_median_candidate(const cell_type cell, lp_model_type & model){
+    template <typename var_type>
+    void ILPRouting<var_type>::create_median_candidate(const cell_type cell, model_type & model){
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
         std::vector<net_type> cell_nets;
@@ -406,6 +446,8 @@ namespace ophidian::routing {
 
         for(auto pin : netlist.pins(cell)){
             auto net = netlist.net(pin);
+            if(net == ophidian::circuit::Net())
+                continue;
             cell_nets.push_back(net);
             for(auto net_pin : netlist.pins(net)){
                 if(net_pin == pin)
@@ -415,6 +457,8 @@ namespace ophidian::routing {
                 y_positions.push_back(location.y().value());
             }
         }
+        if(x_positions.empty() || y_positions.empty())
+            return;
 
         std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
         auto median_x = x_positions[x_positions.size()/2];
@@ -436,7 +480,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_2_pin_nets_candidates_with_movements(const net_type net, lp_model_type & model){
+    template <typename var_type>
+    void ILPRouting<var_type>::create_2_pin_nets_candidates_with_movements(const net_type net, model_type & model){
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
         auto candidate_type =  candidate_origin_type::TWO_PIN_NET;
@@ -523,10 +568,12 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, lp_model_type & model )
+    template <typename var_type>
+    void ILPRouting<var_type>::create_movement_candidate(const cell_type & cell, const candidate_origin_type type, const point_type& new_position, const std::vector<net_type>& nets, std::string variable_name, model_type & model )
     {
         auto & netlist = m_design.netlist();
-        auto & placement = m_design.placement();        
+        auto & placement = m_design.placement();
+        auto & routing_library = m_design.routing_library();        
         
         auto initial_position = placement.location(cell);
         auto stdCell = netlist.std_cell(cell);
@@ -549,7 +596,7 @@ namespace ophidian::routing {
 
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
-        ilp_var_type candidate_variable(m_env, candidate_variable_name.c_str());
+        var_type candidate_variable(m_env, 0.0, 1.0, candidate_variable_name.c_str());
         // if (m_integer) {
         //     candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
         // } else {
@@ -571,13 +618,16 @@ namespace ophidian::routing {
         //genarate route for every net with new location
         for(auto net : nets) {
             if (DEBUG) std::cout << "net for candidate movement " << m_design.netlist().name(net) << std::endl;
-            generate_routes_of_net(net, candidate, model);
+            auto min_layer = routing_library.lowest_layer();
+            auto max_layer = routing_library.highest_layer();
+            generate_routes_of_net(net, candidate, model, std::make_pair(min_layer, max_layer));
         }
         // restore original position
         placement.place(cell, initial_position);
     }
 
-    void ILPRouting::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::generate_routes_of_net(const net_type & net, const position_candidate_type pos_candidate , model_type & model, std::pair<layer_type, layer_type> layer_range)
     {
 
         auto& routing_constraints = m_design.routing_constraints();
@@ -720,9 +770,15 @@ namespace ophidian::routing {
         if(DEBUG) std::cout << "creating vectors layers" << std::endl;
     	std::vector<layer_type> horizontal_layers;
 	    std::vector<layer_type> vertical_layers;
-    	for(auto layer_it = m_design.routing_library().begin_layer(); layer_it != m_design.routing_library().end_layer(); layer_it++)
+
+        auto & routing_library = m_design.routing_library();
+        auto min_idx = routing_library.index(layer_range.first);
+        auto max_idx = routing_library.index(layer_range.second);
+    	// for(auto layer_it = m_design.routing_library().begin_layer(); layer_it != m_design.routing_library().end_layer(); layer_it++)
+        for(auto layer_idx = min_idx; layer_idx <= max_idx; layer_idx++)
         {
-	        auto layer = *layer_it;
+	        // auto layer = *layer_it;
+            auto layer = routing_library.layer_from_index(layer_idx);
             auto layer_name = m_design.routing_library().name(layer);
     	    auto layer_direction = m_design.routing_library().direction(layer);
 	        if(layer_direction == layer_direction_type::HORIZONTAL)
@@ -790,10 +846,11 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::convert_to_flute(point_container_type & converted, const point_container_type & points) const
+    template <typename var_type>
+    void ILPRouting<var_type>::convert_to_flute(point_container_type & converted, const point_container_type & points) const
     {
         if(DEBUG) std::cout << "Converting to flute" << std::endl;
-        using dbu = ILPRouting::unit_type;
+        using dbu = ILPRouting<var_type>::unit_type;
         auto origin = m_design.floorplan().chip_origin();
         auto upper_right_corner = m_design.floorplan().chip_upper_right_corner();
 
@@ -817,10 +874,11 @@ namespace ophidian::routing {
         }
     }
 
-    ILPRouting::point_type ILPRouting::convert_to_design(point_type & point) const
+    template <typename var_type>
+    typename ILPRouting<var_type>::point_type ILPRouting<var_type>::convert_to_design(point_type & point) const
     {
         if(DEBUG) std::cout << "converting to design" << std::endl;
-        using dbu = ILPRouting::unit_type;
+        using dbu = ILPRouting<var_type>::unit_type;
         auto origin = m_design.floorplan().chip_origin();
         auto upper_right_corner =  m_design.floorplan().chip_upper_right_corner();
      
@@ -840,13 +898,13 @@ namespace ophidian::routing {
 
 
 
-
-    void ILPRouting::create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::create_net_candidates_in_layers(const net_type & net, const std::vector<segment_type> & segments, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool large_net, const std::set<std::pair<unit_type, unit_type>> & steiner_points, const position_candidate_type pos_candidate, model_type & model)
     {
         if(DEBUG) std::cout << "initi function: create_net_candidates_in_layers" << std::endl;
         auto& placement = m_design.placement();
         auto& routing_library = m_design.routing_library();
-        lp_environment_type env = model.getEnv();
+        environment_type env = model.getEnv();
 
         auto net_name = m_design.netlist().name(net);
         auto horizontal_layer_name = m_design.routing_library().name(horizontal_layer);
@@ -900,7 +958,7 @@ namespace ophidian::routing {
             // } else {                
             //     variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, variable_name);
             // }
-            ilp_var_type variable(env, variable_name.c_str());
+            var_type variable(env, 0.0, 1.0, variable_name.c_str());
             m_route_candidate_names[candidate] = variable_name;
             m_name_to_route_candidate[variable_name] = candidate;
             m_route_candidate_variables[candidate] = variable;
@@ -1000,7 +1058,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<route_candidate_type> & candidates, bool large_net)
+    template <typename var_type>
+    void ILPRouting<var_type>::add_wires_of_splitted_segment(const segment_type & segment, const point_type & segment_start, const point_type & segment_end, const layer_type & horizontal_layer, const layer_type & vertical_layer, bool connect_on_y, unsigned branch_count, const std::vector<route_candidate_type> & candidates, bool large_net)
     {
         if(DEBUG)  std::cout << "init function: add_wires_of_splitted_segment" << std::endl;
         auto& placement = m_design.placement();
@@ -1071,7 +1130,8 @@ namespace ophidian::routing {
     	}
     }
 
-    void ILPRouting::add_wires_to_candidate(const route_candidate_type & candidate, const wire_container_type & wires)
+    template <typename var_type>
+    void ILPRouting<var_type>::add_wires_to_candidate(const route_candidate_type & candidate, const wire_container_type & wires)
     {
         auto wirelength = unit_type{0};
         for(auto wire : wires)
@@ -1095,7 +1155,8 @@ namespace ophidian::routing {
         m_route_candidate_wirelengths[candidate] += wirelength;
     }
 
-    void ILPRouting::split_segment(const point_type & segment_start, const point_type & segment_end, const layer_type & wire1_layer, const layer_type & wire2_layer, bool connect_on_y, wire_container_type & wires) {
+    template <typename var_type>
+    void ILPRouting<var_type>::split_segment(const point_type & segment_start, const point_type & segment_end, const layer_type & wire1_layer, const layer_type & wire2_layer, bool connect_on_y, wire_container_type & wires) {
         auto wire1_start = segment_start;
         auto wire1_end = (connect_on_y) ? point_type{segment_start.x(), segment_end.y()} : point_type{segment_end.x(), segment_start.y()};
         auto wire1 = create_wire(wire1_start, wire1_end, wire1_layer, wire1_layer);
@@ -1110,7 +1171,8 @@ namespace ophidian::routing {
         wires.push_back(via);
     }
 
-    ILPRouting::wire_type ILPRouting::create_wire(const point_type & wire_start, const point_type & wire_end, const layer_type & start_layer, const layer_type & end_layer)
+    template <typename var_type>
+    typename ILPRouting<var_type>::wire_type ILPRouting<var_type>::create_wire(const point_type & wire_start, const point_type & wire_end, const layer_type & start_layer, const layer_type & end_layer)
     {
         auto wire = m_wires.add();
         m_wire_starts[wire] = wire_start;
@@ -1132,7 +1194,8 @@ namespace ophidian::routing {
         return wire;
     }
 
-    void ILPRouting::add_objective_function(lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::add_objective_function(model_type & model)
     {
         IloObjective obj = IloMinimize(m_env);
         unsigned candidate_count = 0;
@@ -1148,7 +1211,8 @@ namespace ophidian::routing {
         model.add(obj);
     }
 
-    void ILPRouting::add_candidate_constraints(const std::vector<net_type> & nets, lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::add_candidate_constraints(const std::vector<net_type> & nets, model_type & model)
     {
         if (DEBUG) std::cout << "add net constraints" << std::endl;
         unsigned net_count = 0;
@@ -1296,7 +1360,8 @@ namespace ophidian::routing {
         }
     }
 
-    void ILPRouting::add_capacity_constraints(const std::vector<net_type> & nets, lp_model_type & model)
+    template <typename var_type>
+    void ILPRouting<var_type>::add_capacity_constraints(const std::vector<net_type> & nets, model_type & model)
     {
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
@@ -1440,7 +1505,7 @@ namespace ophidian::routing {
 
         if (DEBUG) std::cout << "build std cells per gcell" << std::endl;
        
-        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, ilp_var_container_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell; 
+        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, var_container_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell; 
         for(auto pos_candidate : m_position_candidates){
             auto variable = m_position_candidate_variables[pos_candidate];
             auto location = m_position_candidate_position[pos_candidate];
@@ -1692,7 +1757,8 @@ namespace ophidian::routing {
         std::cout << "number of free gcells " << free_gcells << std::endl;        
     }
 
-    void ILPRouting::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets)
+    template <typename var_type>
+    void ILPRouting<var_type>::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets)
     {
         auto & global_routing = m_design.global_routing();
         for(auto net : nets)
@@ -1746,7 +1812,8 @@ namespace ophidian::routing {
          }
     }
 
-    void ILPRouting::save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements) {
+    template <typename var_type>
+    void ILPRouting<var_type>::save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements) {
         int initial_candidate = 0;
         int two_pin = 0;
         int center_of_mass = 0;
@@ -1797,7 +1864,8 @@ namespace ophidian::routing {
                     "NA" << na << " \t" << std::to_string(na / sum) << "%" << std::endl;*/
     }
 
-    void ILPRouting::save_result(const solver_type& solver)
+    template <typename var_type>
+    void ILPRouting<var_type>::save_result(const solver_type& solver)
     {
     	std::ofstream results_file("ilp_results.csv", std::ofstream::out | std::ofstream::app);
         auto total_wirelength = unit_type{0};
@@ -1814,9 +1882,10 @@ namespace ophidian::routing {
         results_file << m_circuit_name << "," << total_wirelength.value() << std::endl;
     }
 
-    void ILPRouting::create_all_cell_initial_candidates(lp_model_type & model){
+    template <typename var_type>
+    void ILPRouting<var_type>::create_all_cell_initial_candidates(model_type & model){
         auto & netlist = m_design.netlist();
-        lp_environment_type env = model.getEnv();
+        environment_type env = model.getEnv();
 
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
             auto cell = *cell_it;
@@ -1837,7 +1906,7 @@ namespace ophidian::routing {
             // } else {
             //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
             // }
-            ilp_var_type initial_variable(env, initial_variable_name.c_str());
+            var_type initial_variable(env, 0.0, 1.0, initial_variable_name.c_str());
 
             m_position_candidate_names[initial_candidate] = initial_variable_name;
             m_position_candidate_cell[initial_candidate] = cell;
@@ -1850,7 +1919,8 @@ namespace ophidian::routing {
 
     }
 
-    void ILPRouting::add_movements_constraints(lp_model_type & model){
+    template <typename var_type>
+    void ILPRouting<var_type>::add_movements_constraints(model_type & model){
         auto max_movemnts = m_design.routing_constraints().max_cell_movement();
 
         IloExpr candicates(m_env);

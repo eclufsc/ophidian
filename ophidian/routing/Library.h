@@ -149,6 +149,8 @@ namespace ophidian::routing
         const unit_type adjacentSpacing(const layer_type& layer) const;
         const scalar_type adjacentCuts(const layer_type& layer) const;
         const unit_type cutWithinLength(const layer_type& layer) const;
+        bool is_less(layer_type const& lhs, layer_type const& rhs) const;
+        bool is_greater(layer_type const& lhs, layer_type const& rhs) const;
 
         const track_type prefTrack(const layer_type& layer) const;
         const track_type nonPrefTrack(const layer_type& layer) const;
