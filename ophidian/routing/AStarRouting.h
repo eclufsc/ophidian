@@ -49,7 +49,7 @@ namespace ophidian::routing
 
             bool route_net(const net_type & net);
         private:
-            void init_flute_graph(const net_type & net);
+            void init_flute_graph();
             void map_flute_nodes_into_gcells();
             void route_flute_segments();
             void a_star(flute_node_type start, flute_node_type goal);
@@ -57,11 +57,13 @@ namespace ophidian::routing
             std::vector<gcell_type> neighbors(gcell_type gcell);
             void update_f_score(gcell_type gcell, gcell_type neighbor_gcell, gcell_type goal_gcell, bool goal_is_steiner);
             bool goal_reached(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
-            void print_routing(flute_node_type root_node);
+            void print_routing();
             void back_track_path(flute_node_type s, flute_node_type g);
             void print_path(flute_node_type s, flute_node_type g);
 
+            net_type                              m_net;
             flute_graph_type                      m_graph;
+            flute_node_type                       m_root_node;
             node_map_type                         m_node_map;
             edge_map_type                         m_edge_map;
             gcell_property_type                   m_gcell_to_AStarNode;
