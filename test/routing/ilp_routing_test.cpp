@@ -18,10 +18,11 @@ TEST_CASE("Test for iccad2020 ilp routing.", "[routing][globalRouting][ilp]")
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
     
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     std::cout << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
     std::cout << "result " << result.first << std::endl;
     REQUIRE(result.first);
 }

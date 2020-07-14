@@ -110,95 +110,33 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
 }
 
-TEST_CASE("iccad20 case 3 no extra demand benchmark", "[iccad20case3]") {
-    std::string circuit_name = "case3_no_extra_demand";
-    std::string benchmarks_path = "./input_files/iccad20/";
-    std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
-    auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
-    auto design = ophidian::design::Design();
-    ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-
-    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
-    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
-    auto & global_routing = design.global_routing();
-
-    using tuple = std::tuple<int, int, int>;
-    std::vector<std::pair<tuple, tuple>> initial_segments;
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 18, 2), std::make_tuple(21, 19, 2)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 17, 2), std::make_tuple(21, 18, 2)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 19, 1), std::make_tuple(21, 19, 2)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 17, 1), std::make_tuple(21, 17, 2)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 18, 1), std::make_tuple(21, 18, 2)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 17, 1), std::make_tuple(22, 17, 1)));
-    initial_segments.push_back(std::make_pair(std::make_tuple(21, 18, 1), std::make_tuple(22, 18, 1)));
-
-    auto net = design.netlist().find_net("N2548");
-    auto segments = global_routing.segments(net);
-
-    std::vector<std::pair<tuple, tuple>> gr_segments;
-    for(auto segment : segments){
-        auto box = global_routing.box(segment);
-        auto start = box.min_corner();
-        auto end = box.max_corner();
-        auto start_layer = global_routing.layer_start(segment);
-        auto end_layer = global_routing.layer_end(segment);
-        // auto gcell_start = global_routing.gcell_start(segment);
-        // auto gcell_end = global_routing.gcell_end(segment);
-        auto start_layer_index = design.routing_library().layerIndex(start_layer);
-        auto end_layer_index = design.routing_library().layerIndex(end_layer);
-
-        gr_segments.push_back(std::make_pair(
-            std::make_tuple( (((int)start.x().value() - 5) / 10 +1), (((int)start.y().value() - 5) / 10 +1), start_layer_index),
-            std::make_tuple( (((int)end.x().value() - 5) / 10 +1), (((int)end.y().value() - 5) / 10 +1), end_layer_index)));
-    }
-
-    // TODO: compare if initial_segments and gr_segments are equal!
-
-
-    std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2548")};
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
-    
-    std::vector<ophidian::circuit::Net> fixed_nets;
-    std::vector<ophidian::circuit::Net> routed_nets;
-    
-    log() << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
-    log() << "result " << result.first << std::endl;
-
-    if(result.first){
-        iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
-    }
-
-    int wirelength = 0;
-    for(auto net : nets){
-        auto gcells = global_routing.gcells(net);
-        auto net_name = design.netlist().name(net);
-        wirelength += gcells.size();
-        log() << "Net: " << net_name << " = " << gcells.size() << std::endl;
-    }
-    log() << "wirelength : " << wirelength << std::endl;
-}
-
-/*
-TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
+TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20_LP_ILP]") {
     std::vector<std::string> circuit_names = {
-        "case1",
-        "case2",
-        "case3",
+        // "case1",
+        // "case2",
+        // "case3",
+        // "case4",
+        "case5",
     };
-    std::string benchmarks_path = "./input_files/iccad2020/cases/";
 
+    // std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
+    // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) {
         log() << "running circuit " << circuit_name << std::endl;
 
         std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
 
+        log() << "file " << iccad_2020_file << std::endl;
+
         auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-
-        write_statistics_for_circuit(design, circuit_name);
+        
+        // run_ilp_for_circuit(design, circuit_name);
+        run_circuit(design, circuit_name);
     }
+
+
 }
-*/
