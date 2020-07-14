@@ -70,7 +70,7 @@ namespace ophidian::routing
         adj_grid_map::const_iterator end_adj_grid() const;
 
         //if there is no constraints, it returns the first metal layer
-        layer_type min_net_layer(net_type net);
+        layer_type min_net_layer(net_type net) const;
 
         //order of parameter does not matter
         demand_type extra_demand_same_grid(macro_name_type m1, macro_name_type m2, layer_name_type l_name);

@@ -5,8 +5,9 @@
 #include <boost/lexical_cast.hpp>
 #include <ophidian/util/log.h>
 
-bool DEBUG = false;
 bool STATUS = true;
+bool DEBUG = false;
+bool WRITE_MODEL = true;
 
 using namespace ophidian::util;
 
@@ -32,50 +33,41 @@ namespace ophidian::routing {
 
         if(STATUS) printlog("update capacities from blockages");
         update_gcell_capacities(fixed_nets);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all candidates");
         create_all_candidates(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("create all candidates with movements");
-        //create_all_candidates_with_movements(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+//        if(STATUS) printlog("create all candidates with movements");
+//        create_all_candidates_with_movements(nets, model);
+//        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
         add_candidate_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
         add_capacity_constraints(nets, model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add movements constraints");
         //add_movements_constraints(model);
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("write model");
-        if(STATUS) cplex.exportModel("ilp_routing_model.lp");
-        if(STATUS) printlog("exported");
+       if(WRITE_MODEL) printlog("write model");
+       if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
+       if(WRITE_MODEL) printlog("exported");
 
-        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
-              << std::endl;
+        if (STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
         log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -99,8 +91,8 @@ namespace ophidian::routing {
 
         if(result)
         {
-            if(STATUS) printlog("writing solution");
-            if(STATUS) cplex.writeSolution("ilp_routing_model.sol");
+            if(WRITE_MODEL) printlog("writing solution");
+            if(WRITE_MODEL) cplex.writeSolution("ilp_routing_model.sol");
 
 	        // unsigned routed_segments = 0;
     	    // unsigned unrouted_segments = 0;
@@ -217,7 +209,7 @@ namespace ophidian::routing {
 
     void ILPRouting::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
     {
-        // auto& routing_library = m_design.routing_library();
+        auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
         // auto& netlist = m_design.netlist();
         // auto& placement = m_design.placement();
@@ -232,14 +224,37 @@ namespace ophidian::routing {
 
         // here we have to update the demand of nets with won't be routed in this execution!
         for (auto net : fixed_nets) {
-            std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
+            //std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
+            std::vector<gcell_type> intersecting_gcells;
             for (auto segment : global_routing.segments(net)) {
-                auto gcell_start = global_routing.gcell_start(segment);
-                auto gcell_end = global_routing.gcell_end(segment);
-                gcells.insert(gcell_start);
-                gcells.insert(gcell_end);
+                auto segment_box = global_routing.box(segment);
+                auto layer_start = global_routing.layer_start(segment);
+                auto layer_end = global_routing.layer_end(segment);
+                auto layer_start_index = routing_library.layerIndex(layer_start);
+                auto layer_end_index = routing_library.layerIndex(layer_end);
+
+                auto min_layer_index = std::min(layer_start_index, layer_end_index);
+                auto max_layer_index = std::max(layer_start_index, layer_end_index);
+
+                auto base_gcells = gcell_container_type{};
+                gcell_graph->intersect(base_gcells, segment_box, min_layer_index-1);
+
+                for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
+                {
+                    auto layer = routing_library.layer_from_index(layer_index);
+                    auto layer_name = routing_library.name(layer);
+                    for(auto base_gcell : base_gcells)
+                    {
+                        auto base_gcell_node = gcell_graph->graph_node(base_gcell);
+                        auto base_gcell_position = gcell_graph->position(base_gcell_node);
+                        auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
+                        if (std::find(intersecting_gcells.begin(), intersecting_gcells.end(), gcell) == intersecting_gcells.end()) {
+                           intersecting_gcells.push_back(gcell);
+                        }
+                    }
+                }
             }
-            for (auto gcell : gcells) {
+            for (auto gcell : intersecting_gcells) {
                 m_gcells_demand[gcell] += 1;
             }
         }
@@ -312,7 +327,7 @@ namespace ophidian::routing {
             add_wires_to_candidate(initial_candidate, wires);
         }
 
-        //generate_routes_of_net(net, position_candidate_type(), model);   
+        generate_routes_of_net(net, position_candidate_type(), model);   
     }
 
     void ILPRouting::create_all_candidates_with_movements(const std::vector<net_type> & nets, lp_model_type & model)
@@ -1443,7 +1458,7 @@ namespace ophidian::routing {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
 
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
-                auto gcell_box = gcell_graph->box(gcell);                
+                //auto gcell_box = gcell_graph->box(gcell);                
                 //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
 
                 std_cells_per_gcell[gcell][std_cell].push_back(variable);
@@ -1656,14 +1671,15 @@ namespace ophidian::routing {
             auto z = gcell_layer_index;
                 
             auto capacity = gcell_graph->capacity(gcell);
+            auto fixed_demand = m_gcells_demand[gcell];
             auto max_demand = gcells_max_demand[gcell];
-            if (capacity >= max_demand) {
+            if (capacity - fixed_demand >= max_demand) {
                 free_gcells++;
             }
             
             //TIAGO
-            // if(gcell_constraint.size() > 0 )
-            if(gcells_constraints_bool[gcell] && capacity < max_demand)
+             if(gcells_constraints_bool[gcell] )
+            //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
