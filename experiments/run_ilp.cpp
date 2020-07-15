@@ -8,18 +8,63 @@
 using namespace ophidian::util;
 bool DEBUG_TEST = true;
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
-    using cell_type = ophidian::circuit::CellInstance;
-    using point_type = ophidian::util::LocationDbu;
-    using net_type = ophidian::circuit::Net;
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     if(DEBUG_TEST) log() << "create writer" << std::endl;
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
-    std::vector<net_type> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<net_type> fixed_nets;
-    std::vector<net_type> routed_nets;
-    std::vector<net_type> unrouted_nets;
+    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+
+    std::vector<std::pair<ophidian::circuit::Net, double>> nets_costs;
+    for (auto net : nets) {
+        auto pins = design.netlist().pins(net);
+        std::vector<ophidian::interconnection::Flute::Point> net_points;
+        net_points.reserve(pins.size());
+        for (auto pin : pins) {
+            auto pin_location = design.placement().location(pin);
+            net_points.push_back(pin_location);
+        }
+
+        auto & flute = ophidian::interconnection::Flute::instance();
+        auto tree = flute.create(net_points);
+        auto stwl = tree->length().value();
+        stwl /= 10;
+        if (stwl == 0) {
+            stwl = 1;
+        }
+
+        auto routed_length = design.global_routing().wirelength(net);
+
+        auto cost = routed_length / stwl;
+
+        nets_costs.push_back(std::make_pair(net, cost));
+    }
+
+    std::sort(nets_costs.begin(), nets_costs.end(), [](std::pair<ophidian::circuit::Net, double> cost_a, std::pair<ophidian::circuit::Net, double> cost_b) {return cost_a.second < cost_b.second;});
+
+    std::vector<ophidian::circuit::Net> nets_to_route;
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    unsigned number_of_nets = 20000; // overflow in 15320
+    unsigned count = 0;
+    for (auto net_cost : nets_costs) {        
+        if (count < number_of_nets) {
+            nets_to_route.push_back(net_cost.first);
+        } else {
+            fixed_nets.push_back(net_cost.first);
+        }
+        /*auto net_name = design.netlist().name(net_cost.first);
+        if (net_name == "N26") {
+            nets_to_route.push_back(net_cost.first);
+        } else {
+            fixed_nets.push_back(net_cost.first);
+        }*/
+        count++;
+    }
+
+    std::cout << "nets to route " << nets_to_route.size() << std::endl;
+
+    std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
 
     int initial_wirelength = design.global_routing().wirelength(nets);
     if(DEBUG_TEST) log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
@@ -28,10 +73,10 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     log() << ovfl << " in input file" << std::endl;
 
     auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
-    std::vector<std::pair<cell_type, point_type>> movements; 
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
+    auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if(DEBUG_TEST) log() << "result " << result.first << std::endl;

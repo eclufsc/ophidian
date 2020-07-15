@@ -1,3 +1,5 @@
+#include "ILPRouting.h"
+
 #include <fstream>
 #include <regex>
 #include <boost/lexical_cast.hpp>
@@ -6,7 +8,7 @@
 #ifndef STATUS
 #define STATUS true
 #define DEBUG false
-#define WRITE_MODEL false
+#define WRITE_MODEL true
 #endif
 
 using namespace ophidian::util;
@@ -117,7 +119,7 @@ namespace ophidian::routing {
     template <typename var_type>
     void ILPRouting<var_type>::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
     {
-        // auto& routing_library = m_design.routing_library();
+        auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
         // auto& netlist = m_design.netlist();
         // auto& placement = m_design.placement();
@@ -132,14 +134,37 @@ namespace ophidian::routing {
 
         // here we have to update the demand of nets with won't be routed in this execution!
         for (auto net : fixed_nets) {
-            std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
+            //std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells;
+            std::vector<gcell_type> intersecting_gcells;
             for (auto segment : global_routing.segments(net)) {
-                auto gcell_start = global_routing.gcell_start(segment);
-                auto gcell_end = global_routing.gcell_end(segment);
-                gcells.insert(gcell_start);
-                gcells.insert(gcell_end);
+                auto segment_box = global_routing.box(segment);
+                auto layer_start = global_routing.layer_start(segment);
+                auto layer_end = global_routing.layer_end(segment);
+                auto layer_start_index = routing_library.layerIndex(layer_start);
+                auto layer_end_index = routing_library.layerIndex(layer_end);
+
+                auto min_layer_index = std::min(layer_start_index, layer_end_index);
+                auto max_layer_index = std::max(layer_start_index, layer_end_index);
+
+                auto base_gcells = gcell_container_type{};
+                gcell_graph->intersect(base_gcells, segment_box, min_layer_index-1);
+
+                for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
+                {
+                    auto layer = routing_library.layer_from_index(layer_index);
+                    auto layer_name = routing_library.name(layer);
+                    for(auto base_gcell : base_gcells)
+                    {
+                        auto base_gcell_node = gcell_graph->graph_node(base_gcell);
+                        auto base_gcell_position = gcell_graph->position(base_gcell_node);
+                        auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
+                        if (std::find(intersecting_gcells.begin(), intersecting_gcells.end(), gcell) == intersecting_gcells.end()) {
+                           intersecting_gcells.push_back(gcell);
+                        }
+                    }
+                }
             }
-            for (auto gcell : gcells) {
+            for (auto gcell : intersecting_gcells) {
                 m_gcells_demand[gcell] += 1;
             }
         }
@@ -215,9 +240,6 @@ namespace ophidian::routing {
                 wires.push_back(wire);
             }
             add_wires_to_candidate(initial_candidate, wires);
-        }else{
-            min_layer = routing_library.lowest_layer();
-            max_layer = routing_library.highest_layer();
         }
         /*
         //define delta in layers
@@ -1378,7 +1400,7 @@ namespace ophidian::routing {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
 
                 //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
-                auto gcell_box = gcell_graph->box(gcell);                
+                //auto gcell_box = gcell_graph->box(gcell);                
                 //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
 
                 std_cells_per_gcell[gcell][std_cell].push_back(variable);
@@ -1591,14 +1613,15 @@ namespace ophidian::routing {
             auto z = gcell_layer_index;
                 
             auto capacity = gcell_graph->capacity(gcell);
+            auto fixed_demand = m_gcells_demand[gcell];
             auto max_demand = gcells_max_demand[gcell];
-            if (capacity >= max_demand) {
+            if (capacity - fixed_demand >= max_demand) {
                 free_gcells++;
             }
             
             //TIAGO
-            // if(gcell_constraint.size() > 0 )
-            if(gcells_constraints_bool[gcell] && capacity < max_demand)
+             if(gcells_constraints_bool[gcell] )
+            //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto demand = m_gcells_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;

@@ -9,7 +9,7 @@
 #include "run_ilp.h"
 
 using namespace ophidian::util;
-/*
+
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
 
@@ -43,16 +43,17 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
             stwl = 1;
         } 
 
-        auto routes = design.global_routing().routes(net);
+        auto routes = design.global_routing().segments(net);
         auto routed_length_no_vias = 0;
         auto via_length = 0;
         for (auto route : routes) {
-            auto start = design.global_routing().start(route);
-            auto end = design.global_routing().end(route);
+            auto box = design.global_routing().box(route);
+            auto start = box.min_corner();
+            auto end = box.max_corner();
             routed_length_no_vias += (std::abs(start.x().value() - end.x().value()) + std::abs(start.y().value() - end.y().value()));
 
-            auto start_layer = design.global_routing().start_layer(route);
-            auto end_layer = design.global_routing().end_layer(route);
+            auto start_layer = design.global_routing().layer_start(route);
+            auto end_layer = design.global_routing().layer_end(route);
             auto start_layer_index = design.routing_library().layerIndex(start_layer);
             auto end_layer_index = design.routing_library().layerIndex(end_layer);
             via_length += std::abs(start_layer_index - end_layer_index);
@@ -70,15 +71,15 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
     }
     stats_file.close();
 }
-*/
 
 TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     std::vector<std::string> circuit_names = {
         // "case1",
         //"case1N4",
         // "case2",
-        // "case3",
-        "case5",
+        //"case3",
+         //"case5",
+         "case5_no_extra_demand",
         //"case3_no_blockages",
         // "case3_no_extra_demand"
         //"case3_only_same_grid"
@@ -88,7 +89,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
     };
 
     // std::string benchmarks_path = "./input_files/iccad2020/cases/";
-    std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
+    std::string benchmarks_path = "./input_files/iccad20/cases/"; //Tiago
     // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) {
         log() << "running circuit " << circuit_name << std::endl;
