@@ -111,17 +111,17 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
 }
 
-TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20_LP_ILP]") {
+TEST_CASE("run LP for iccad20 benchmarks", "[iccad20_LP_ILP]") {
     std::vector<std::string> circuit_names = {
         // "case1",
         // "case2",
-        // "case3",
+         "case3",
         // "case4",
-        "case5",
+        //"case5",
     };
 
-    // std::string benchmarks_path = "./input_files/iccad2020/cases/";
-    std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
+     std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    //std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
     // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) {
         log() << "running circuit " << circuit_name << std::endl;
@@ -137,6 +137,38 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20_LP_ILP]") {
         
         // run_ilp_for_circuit(design, circuit_name);
         run_circuit(design, circuit_name);
+    }
+
+
+}
+
+TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
+    std::vector<std::string> circuit_names = {
+        // "case1",
+        // "case2",
+         "case3",
+        // "case4",
+        //"case5",
+    };
+
+     std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    //std::string benchmarks_path = "./input_files/iccad20/"; //Tiago
+    // std::string benchmarks_path = "./benchmarks/"; //Tesla
+    for (auto circuit_name : circuit_names) {
+        log() << "running circuit " << circuit_name << std::endl;
+
+        std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+
+        log() << "file " << iccad_2020_file << std::endl;
+
+        auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+        
+        // run_ilp_for_circuit(design, circuit_name);
+        //run_circuit(design, circuit_name);
+        run_mcf_multithreading(design);
     }
 
 

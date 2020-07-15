@@ -5,8 +5,17 @@
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/util/log.h>
 
+#include <ophidian/routing/MCFMultiThreading.h>
+
 using namespace ophidian::util;
 bool DEBUG_TEST = true;
+
+void run_mcf_multithreading(ophidian::design::Design & design) {
+    UCal::MCFMultiThreading mcf(design);
+
+    mcf.run();
+}
+
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
@@ -204,6 +213,8 @@ void run_circuit(ophidian::design::Design & design, std::string circuit_name) {
         if(DEBUG_TEST) log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
         double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
         if(DEBUG_TEST) log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+
+        iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 
     auto nets_size = nets.size();

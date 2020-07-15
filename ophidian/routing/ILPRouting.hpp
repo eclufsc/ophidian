@@ -1649,7 +1649,7 @@ namespace ophidian::routing {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = solver.getValue(variable);
-    	    	if(value > 0)
+    	    	if(value == 1)
                 {
                     routed = 1;
 		            routed_candidate = candidate;
