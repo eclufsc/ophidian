@@ -22,10 +22,9 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool integer, bool initial_routing)
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
     {
         ILPRouting<var_type>::Statistics statistic;
-        m_integer = integer;
 
         //m_segments.clear();
         m_wires.clear();
@@ -100,125 +99,17 @@ namespace ophidian::routing {
             if(WRITE_MODEL) printlog("writing solution");
             if(WRITE_MODEL) cplex.writeSolution("ilp_routing_model.sol");
 
-	        // unsigned routed_segments = 0;
-    	    // unsigned unrouted_segments = 0;
+    	    write_segments(nets, cplex, routed_nets, unrouted_nets);
+            save_movements(cplex, movements);
 
-            if(DEBUG) printlog("CHECKING ROUTED NETS");
-
-            // auto gcell_graph = m_design.global_routing().gcell_graph();
-            // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
-            int number_of_routed_nets = 0;
-            for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) 
-            {
-                auto net = *net_it;
-        		auto candidates = m_net_candidates.parts(net);
-		        bool routed = 0;
-
-                auto net_name = m_design.netlist().name(net);
-
-                // if (DEBUG) std::cout << net_name << std::endl;
-
-                route_candidate_type routed_candidate;
-        		for(auto candidate : candidates)
-                {
-		        	auto variable = m_route_candidate_variables[candidate];
-        			auto value = cplex.getValue(variable);
-                    // if (DEBUG) std::cout << m_route_candidate_names[candidate] << " " << value << std::endl;
-		        	routed |= (value == 1.0);
-
-            //         if (value > 0) {
-            //             routed_candidate = candidate;
-            //         }
-                    if(routed)
-                        break;
-        		}
-                if(routed)
-                    number_of_routed_nets++;
-            }
-        		// if(routed)
-            //     {
-		    //     	routed_segments++;
-
-            //         if (DEBUG) {
-            //         for (auto wire : m_route_candidate_wires.parts(routed_candidate)) {
-            //             auto start_layer = m_wire_start_layers[wire];
-            //             auto end_layer = m_wire_end_layers[wire];
-            //             auto start_layer_index = m_design.routing_library().layerIndex(start_layer);
-            //             auto end_layer_index = m_design.routing_library().layerIndex(end_layer);
-            //             auto min_layer_index = std::min(start_layer_index, end_layer_index);
-            //             auto max_layer_index = std::max(start_layer_index, end_layer_index);
-    
-            //             auto wire_start = m_wire_starts[wire];
-            //             auto wire_end = m_wire_ends[wire];
-            //             auto min_x = std::min(wire_start.x(), wire_end.x());
-            //             auto max_x = std::max(wire_start.x(), wire_end.x());
-            //             auto min_y = std::min(wire_start.y(), wire_end.y());
-            //             auto max_y = std::max(wire_start.y(), wire_end.y());
-
-            //             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
-
-            //             auto candidate_name = m_route_candidate_names[routed_candidate];
-
-            //             // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
-
-            //             for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
-            //             {
-            //                 // auto layer_name = "M" + std::to_string(layer_index);
-            //                 auto layer = m_design.routing_library().layer_from_index(layer_index);
-            //                 auto layer_name = m_design.routing_library().name(layer);
-            //                 gcell_container_type gcells;
-            //                 gcell_graph->intersect(gcells, wire_box, layer_index-1);
-            //                 //std::cout << "gcells " << gcells.size() << std::endl;
-            //                 for(auto gcell : gcells)
-            //                 {
-            //                     gcell_nets[gcell].insert(net);
-            //           /*          if (net_name == "N1481") {
-            //     auto box = gcell_graph->box(gcell);
-            //     auto gcell_min_corner = box.min_corner();
-            //     auto gcell_layer = gcell_graph->layer_index(gcell);
-            //     std::cout << "GCELL " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
-            //                 }*/
-            //                 }
-            //             }
-            //         }
-            //         }
-        	// 	}else
-            //     {
-            //         if (DEBUG) std::cout << "NET " << net_name << " UNROUTED" << std::endl;
-		    //     	unrouted_segments++;
-        	// 	}
-	        // }
-
-            // if (DEBUG) {
-            // std::cout << "GCELL NETS" << std::endl;
-            // for (auto gcell_nets_pair : gcell_nets) {
-            //     auto gcell = gcell_nets_pair.first;
-            //     auto nets = gcell_nets_pair.second;
-
-            //     auto box = gcell_graph->box(gcell);
-            //     auto gcell_min_corner = box.min_corner();
-            //     auto gcell_layer = gcell_graph->layer_index(gcell);
-            //     std::cout << "gcell " << gcell_min_corner.x().value() << "," << gcell_min_corner.y().value() << "," << gcell_layer << std::endl;
-            //     for (auto net : nets) {
-            //         auto net_name = m_design.netlist().name(net);
-            //         std::cout << "net " << net_name << std::endl;
-            //     }
-            // }
-            // }
-
-    	    // double ratio = (double)routed_segments / (double)(routed_segments + unrouted_segments);
-            // std::cout << "routed segments " << routed_segments << std::endl;
-            // std::cout << "unrouted segments " << unrouted_segments << std::endl;
-            // std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
-
-            double ratio = (double) number_of_routed_nets / (double) m_design.netlist().size_net();
-            std::cout << "routed nets " << number_of_routed_nets << std::endl;
-            std::cout << "unrouted nets " << (m_design.netlist().size_net() - number_of_routed_nets) << std::endl;
-            std::cout << "routed nets " << ratio*100.0<<"%" << std::endl;
-
-    	    write_segments(nets, cplex, routed_nets);
-
-            // save_movements(cplex, movements);
+            auto total_nets = m_design.netlist().size_net();
+            double ratio = (double) routed_nets.size() / (double) total_nets;
+            log() << std::endl;
+            log() << "total nets " << total_nets << std::endl;
+            log() << "routed nets " << routed_nets.size() << std::endl;
+            log() << "routed nets " << ratio*100.0<<"%" << std::endl;
+            log() << "unrouted nets " << (total_nets - routed_nets.size()) << std::endl;
+            log() << std::endl;
 
 	        // save_result(cplex);
         }
@@ -316,11 +207,6 @@ namespace ophidian::routing {
             m_route_candidate_nets[initial_candidate] = net;
             auto initial_variable_name = net_name + "_initial";
             var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
-            // if (m_integer) {
-            //     ilp_var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
-            // } else {
-            //     lp_var_type initial_variable(m_env, 0.0, 1.0, initial_variable_name.c_str());
-            // }
             m_route_candidate_names[initial_candidate] = initial_variable_name;
             m_name_to_route_candidate[initial_variable_name] = initial_candidate;
             m_route_candidate_variables[initial_candidate] = initial_variable;
@@ -597,11 +483,7 @@ namespace ophidian::routing {
         auto candidate = m_position_candidates.add();
         auto candidate_variable_name = variable_name;
         var_type candidate_variable(m_env, 0.0, 1.0, candidate_variable_name.c_str());
-        // if (m_integer) {
-        //     candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, candidate_variable_name);
-        // } else {
-        //     candidate_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, candidate_variable_name);
-        // }
+
         m_position_candidate_names[candidate] = candidate_variable_name;
         m_position_candidate_cell[candidate] = cell;
         m_name_to_position_candidate[candidate_variable_name] = candidate;
@@ -952,12 +834,7 @@ namespace ophidian::routing {
             auto candidate = m_route_candidate.add();
             m_route_candidate_nets[candidate] = net;
             if(DEBUG) std::cout << "variable " << variable_name << std::endl;
-            // GRBVar variable;
-            // if (m_integer) {
-            //     variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, variable_name);
-            // } else {                
-            //     variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, variable_name);
-            // }
+
             var_type variable(env, 0.0, 1.0, variable_name.c_str());
             m_route_candidate_names[candidate] = variable_name;
             m_name_to_route_candidate[variable_name] = candidate;
@@ -1758,7 +1635,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets)
+    void ILPRouting<var_type>::write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets)
     {
         auto & global_routing = m_design.global_routing();
         for(auto net : nets)
@@ -1807,6 +1684,7 @@ namespace ophidian::routing {
     	    }
             else
             {
+                unrouted_nets.push_back(net);
                 std::cout << "WARNING: net " << net_name << " unrouted" << std::endl;
             }
          }
@@ -1900,12 +1778,7 @@ namespace ophidian::routing {
             //initial position
             auto initial_candidate = m_position_candidates.add();
             auto initial_variable_name = cell_name + "_initial";
-            // GRBVar initial_variable;
-            // if (m_integer) {
-            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, initial_variable_name);
-            // } else {
-            //     initial_variable = model.addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, initial_variable_name);
-            // }
+
             var_type initial_variable(env, 0.0, 1.0, initial_variable_name.c_str());
 
             m_position_candidate_names[initial_candidate] = initial_variable_name;

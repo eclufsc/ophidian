@@ -39,10 +39,11 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
 
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     // std::log() << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
     // std::log() << "result " << result << std::endl;
 
     if(result.first){

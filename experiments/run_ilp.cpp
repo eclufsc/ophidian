@@ -64,6 +64,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::cout << "nets to route " << nets_to_route.size() << std::endl;
 
     std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
 
     int initial_wirelength = design.global_routing().wirelength(nets);
     if(DEBUG_TEST) log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
@@ -75,7 +76,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
-    auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, movements, true, initial_routing);
+    auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if(DEBUG_TEST) log() << "result " << result.first << std::endl;
@@ -156,4 +157,87 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
               << std::endl;
         log() << std::endl;
     printlog("Terminating normally...");
+}
+
+
+void run_circuit(ophidian::design::Design & design, std::string circuit_name) {
+    using cell_type = ophidian::circuit::CellInstance;
+    using point_type = ophidian::util::LocationDbu;
+    using net_type = ophidian::circuit::Net;
+
+    if(DEBUG_TEST) log() << "starting function run_circuit" << std::endl;
+    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
+    ophidian::routing::ILPRouting<IloNumVar> lpRouting(design, circuit_name);
+
+    if(DEBUG_TEST) log() << "create writer" << std::endl;
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+
+    std::vector<net_type> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<net_type> fixed_nets;
+    std::vector<net_type> routed_nets;
+    std::vector<net_type> unrouted_nets;
+
+    int initial_wirelength = design.global_routing().wirelength(nets);
+    if(DEBUG_TEST) log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
+
+    auto ovfl = design.global_routing().is_overflow() ? "there is overflow" : "No overflow";
+    log() << ovfl << " in input file" << std::endl;
+
+    auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
+    std::vector<std::pair<cell_type, point_type>> movements; 
+    if(DEBUG_TEST) log() << "routing nets" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now(); 
+    auto result = lpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    if(DEBUG_TEST) log() << "result " << result.first << std::endl;
+
+
+    if(result.first){
+        // need to generate a new guide file
+        if(DEBUG_TEST) log() << "Runtime : " << duration.count() << " microsseconds"<< std::endl;
+        if(DEBUG_TEST) log() << "Runtime : " << std::to_string( (double)duration.count() / 1000000.0 ) << " seconds"<< std::endl;
+        int final_wirelength = design.global_routing().wirelength(nets);
+        if(DEBUG_TEST) log() << "Total movements = " << movements.size() << std::endl;
+        if(DEBUG_TEST) log() << "Circuit final wirelength = " << final_wirelength << std::endl;
+        auto score = initial_wirelength - final_wirelength;
+        if(DEBUG_TEST) log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
+        double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
+        if(DEBUG_TEST) log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+    }
+
+    auto nets_size = nets.size();
+    auto routed_size = routed_nets.size();
+    auto unrouted_size = unrouted_nets.size();
+
+    if(nets_size != (routed_size + unrouted_size))
+        log() << "NETS SIZE WRONG!!" << std::endl;
+        
+
+    if(unrouted_size > 0)
+    {
+        log();
+        log() << "Initing second iteration ..." << std::endl;
+        log();
+
+        start = std::chrono::high_resolution_clock::now(); 
+        auto result2 = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
+        stop = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        log() << "result " << result2.first << std::endl;
+
+        if(result.first){
+            // need to generate a new guide file
+            if(DEBUG_TEST) log() << "Runtime : " << duration.count() << " microsseconds"<< std::endl;
+            if(DEBUG_TEST) log() << "Runtime : " << std::to_string( (double)duration.count() / 1000000.0 ) << " seconds"<< std::endl;
+            int final_wirelength = design.global_routing().wirelength(nets);
+            if(DEBUG_TEST) log() << "Total movements = " << movements.size() << std::endl;
+            if(DEBUG_TEST) log() << "Circuit final wirelength = " << final_wirelength << std::endl;
+            auto score = initial_wirelength - final_wirelength;
+            if(DEBUG_TEST) log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
+            double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
+            if(DEBUG_TEST) log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+        }
+    }
+
 }
