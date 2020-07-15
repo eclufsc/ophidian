@@ -107,7 +107,7 @@ namespace ophidian::routing {
 
             // auto gcell_graph = m_design.global_routing().gcell_graph();
             // std::unordered_map<gcell_type, std::unordered_set<net_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcell_nets;
-            int routed_nets = 0;
+            int number_of_routed_nets = 0;
             for(auto net_it = m_design.netlist().begin_net(); net_it != m_design.netlist().end_net(); net_it++) 
             {
                 auto net = *net_it;
@@ -133,7 +133,7 @@ namespace ophidian::routing {
                         break;
         		}
                 if(routed)
-                    routed_nets++;
+                    number_of_routed_nets++;
             }
         		// if(routed)
             //     {
@@ -211,12 +211,12 @@ namespace ophidian::routing {
             // std::cout << "unrouted segments " << unrouted_segments << std::endl;
             // std::cout << "routed segments " << ratio*100.0<<"%" << std::endl;
 
-            double ratio = (double) routed_nets / (double) m_design.netlist().size_net();
-            std::cout << "routed nets " << routed_nets << std::endl;
-            std::cout << "unrouted nets " << (m_design.netlist().size_net() - routed_nets) << std::endl;
+            double ratio = (double) number_of_routed_nets / (double) m_design.netlist().size_net();
+            std::cout << "routed nets " << number_of_routed_nets << std::endl;
+            std::cout << "unrouted nets " << (m_design.netlist().size_net() - number_of_routed_nets) << std::endl;
             std::cout << "routed nets " << ratio*100.0<<"%" << std::endl;
 
-    	    // write_segments(nets, cplex, routed_nets);
+    	    write_segments(nets, cplex, routed_nets);
 
             // save_movements(cplex, movements);
 
