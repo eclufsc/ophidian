@@ -50,11 +50,10 @@ namespace ophidian::routing
             //4-Convert gcell path into segments
             print_routing();
             //5-Connect cell pins to min layers (check flute graph)
-            //TODO
+            connect_pins_to_min_layer();
             //6-Write segments in GlobalRouting
-            //TODO
-            //7-Write output file
-            //TODO
+            write_routing_segments();
+            //TODO: clean AStarRouting to be reused by other nets
             //8-Clean up the code
         }else if( net_size == 2)
         {
@@ -523,6 +522,7 @@ namespace ophidian::routing
                 auto previous_pos = m_gcell_graph->position(m_gcell_graph->graph_node(previous_gcell));
                 std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
                 std::cout<<" to ("<<previous_pos.get<0>()<<","<<previous_pos.get<1>()<<","<<previous_pos.get<2>()<<")"<<std::endl;
+                m_routing_segments.push_back(std::make_pair(start_gcell, previous_gcell));
                 start_gcell = previous_gcell;
             }
             if(std::next(gcell_it) == gcells.end())
@@ -531,12 +531,67 @@ namespace ophidian::routing
                 auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(*gcell_it));
                 std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
                 std::cout<<" to ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
-                start_gcell = previous_gcell;
+                m_routing_segments.push_back(std::make_pair(start_gcell, *gcell_it));
                 break;
             }
             previous_gcell = *gcell_it;
             previous_direction = *direction_it;
             direction_it = std::next(direction_it);
         }
+    }
+
+    void AStarRouting::connect_pins_to_min_layer()
+    {
+        auto& netlist = m_design.netlist();
+        auto& routing_library = m_design.routing_library();
+        auto& placement = m_design.placement();
+        auto min_layer_index = routing_library.layerIndex(m_min_layer);
+        for(auto pin : netlist.pins(m_net))
+        {
+            auto pin_geometry = placement.geometry(pin);
+            auto pin_layer_name = pin_geometry.front().second;
+            auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
+            auto pin_layer_index = routing_library.layerIndex(pin_layer);
+            if(min_layer_index > pin_layer_index)
+            {
+                std::cout<<"connect pin: "<<netlist.name(pin)<<std::endl;
+                auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
+                auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_start));
+                std::cout<<"Start_pos ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
+                auto gcell_end = m_gcell_graph->nearest_gcell(placement.location(pin), min_layer_index-1);
+                pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_end));
+                std::cout<<"Start_end ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
+                m_routing_segments.push_back(std::make_pair(gcell_start, gcell_end));
+            }
+        }
+    }
+
+    void AStarRouting::write_routing_segments()
+    {
+        auto& global_routing = m_design.global_routing();
+        auto& routing_library = m_design.routing_library();
+
+        global_routing.unroute(m_net);
+
+        for(auto segment : m_routing_segments)
+        {
+            auto start_layer_index = m_gcell_graph->layer_index(segment.first);
+            auto start_layer = routing_library.layer_from_index(start_layer_index);
+            auto start_pos = m_gcell_graph->center_of_box(segment.first);
+
+            auto end_layer_index = m_gcell_graph->layer_index(segment.second);
+            auto end_layer = routing_library.layer_from_index(end_layer_index);
+            auto end_pos = m_gcell_graph->center_of_box(segment.second);
+
+
+            auto min_x = std::min(start_pos.x(), end_pos.x());
+            auto max_x = std::max(start_pos.x(), end_pos.x());
+            auto min_y = std::min(start_pos.y(), end_pos.y());
+            auto max_y = std::max(start_pos.y(), end_pos.y());
+
+            auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+            global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
+        }
+        global_routing.increase_demand(m_net);
     }
 }

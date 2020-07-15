@@ -33,9 +33,11 @@ namespace ophidian::routing
     {
         public:
             using net_type                          = circuit::Net;
+            using unit_type                         = util::database_unit_t;
             using design_type                       = design::Design;
             using pin_name_type                     = std::string;
             using point_type                        = util::LocationDbu;
+            using box_type                          = geometry::Box<unit_type>;
             using gcell_type                        = GCell;
             using gcell_property_type               = entity_system::Property<gcell_type, AStarNode>;
             using gcell_graph_ptr_type              = std::shared_ptr<ophidian::routing::GCellGraph>;
@@ -44,6 +46,7 @@ namespace ophidian::routing
             using flute_node_type                   = lemon::ListGraph::Node;
             using node_map_type                     = flute_graph_type::NodeMap<FluteNode>;
             using edge_map_type                     = flute_graph_type::EdgeMap<std::vector<gcell_type>>;
+            using routing_segment_type              = std::pair<gcell_type, gcell_type>;
 
             AStarRouting(design_type & design);
 
@@ -60,6 +63,8 @@ namespace ophidian::routing
             void print_routing();
             void back_track_path(flute_node_type s, flute_node_type g);
             void print_path(flute_node_type s, flute_node_type g);
+            void connect_pins_to_min_layer();
+            void write_routing_segments();
 
             net_type                              m_net;
             flute_graph_type                      m_graph;
@@ -70,6 +75,7 @@ namespace ophidian::routing
             design_type&                          m_design;
             gcell_graph_ptr_type                  m_gcell_graph;
             layer_type                            m_min_layer;
+            std::vector<routing_segment_type>     m_routing_segments;
     };
 
     struct FluteNode
