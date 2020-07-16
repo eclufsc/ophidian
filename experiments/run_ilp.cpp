@@ -53,7 +53,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     std::vector<ophidian::circuit::Net> nets_to_route;
     std::vector<ophidian::circuit::Net> fixed_nets;
-    unsigned number_of_nets = 20000; // overflow in 15320
+    unsigned number_of_nets = 45000; // overflow in 20000 with extra demand
     unsigned count = 0;
     for (auto net_cost : nets_costs) {        
         if (count < number_of_nets) {
@@ -86,6 +86,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
     auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
+    result = ilpRouting.route_nets(fixed_nets, nets_to_route, routed_nets, unrouted_nets, movements, initial_routing);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if(DEBUG_TEST) log() << "result " << result.first << std::endl;

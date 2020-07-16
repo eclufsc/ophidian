@@ -115,6 +115,8 @@ namespace ophidian::routing {
         private:
             void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
 
+            void add_extra_demand();
+
             void create_all_candidates(const std::vector<net_type> & nets, model_type & model, bool initial_routing = true);
 
             void create_net_candidates(const net_type & net, model_type & model, bool initial_routing = true);
