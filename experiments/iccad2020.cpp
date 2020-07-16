@@ -146,8 +146,8 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
     std::vector<std::string> circuit_names = {
         // "case1",
         // "case2",
-         "case3",
-        // "case4",
+        // "case3",
+         "case4",
         //"case5",
     };
 
