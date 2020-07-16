@@ -30,9 +30,15 @@ namespace ophidian::routing
     {
     }
 
+    //when routing all nets is required first remove all of them
     bool AStarRouting::route_net(const AStarRouting::net_type & net)
     {
         m_net = net;
+
+        //TODO: Save the current_routing as a backup
+        //auto& global_routing = m_design.global_routing();
+        //global_routing.unroute(m_net);
+
         //would be nice, first check for existent routing and undo that routing.
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
@@ -41,6 +47,8 @@ namespace ophidian::routing
 
         if(net_size > 2)
         {
+            auto& global_routing = m_design.global_routing();
+            global_routing.unroute(m_net);
             //1-Call Flute.
             init_flute_graph();
             //2-Sort of layer assignment
@@ -48,12 +56,13 @@ namespace ophidian::routing
             //3-Connect each pair of nodes using A*.(consider min layer)
             route_flute_segments();
             //4-Convert gcell path into segments
-            print_routing();
-            //5-Connect cell pins to min layers (check flute graph)
+            bfs_backtrack();
+            //5-Connect cell pins to min layers
             connect_pins_to_min_layer();
             //6-Write segments in GlobalRouting
             write_routing_segments();
-            //TODO: clean AStarRouting to be reused by other nets
+            //7-clean AStarRouting to be reused by other nets
+            clear_router_members();
             //8-Clean up the code
         }else if( net_size == 2)
         {
@@ -69,7 +78,7 @@ namespace ophidian::routing
             nodes.insert(node_of_pin(s));
             */
         }
-        //expand window
+        clear_router_members();
         return true;
     }
 
@@ -157,10 +166,11 @@ namespace ophidian::routing
             // auto s_pos = m_gcell_graph->position(s_node);
             // std::cout<<"mapping node: "<<flute_node<<" into "<<" pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
 
+            //TODO: handle this checking the up node
             if(m_gcell_graph->has_free_space(gcell))
                 flute_node.mapped_gcell = gcell;
             else
-                std::cout<<"WARNING: mapped node is overflowed!!!"<<std::endl;//TODO: handle this checking the up node
+                std::cout<<"WARNING: mapped node is overflowed!!!"<<std::endl;
             /*
             auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(flute_node.mapped_gcell));
             std::cout<<flute_node<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
@@ -204,8 +214,6 @@ namespace ophidian::routing
                 }
             }
         }
-        //TODO:if min layer create towers(connect pins to min layers)
-        //print_routing(root_node);
     }
 
     //find a shortest path from start.mapped_gcell to goal.mapped_gcell
@@ -213,7 +221,10 @@ namespace ophidian::routing
     {
         bool goal_is_steiner = m_node_map[goal].pin_name == "steiner" ? true : false;
         std::list<gcell_type> open_nodes;
+        open_nodes.push_back(m_node_map[start].mapped_gcell);
         std::vector<gcell_type> dirty_nodes;
+
+        // code just for debug
         auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
         auto pos = m_gcell_graph->position(node);
         std::cout<<m_node_map[start]<<std::endl;
@@ -222,8 +233,7 @@ namespace ophidian::routing
         pos = m_gcell_graph->position(node);
         std::cout<<m_node_map[goal]<<std::endl;
         std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-
-        open_nodes.push_back(m_node_map[start].mapped_gcell);
+        // code just for debug
 
         gcell_type current_node;
         while(open_nodes.empty() == false)
@@ -255,8 +265,10 @@ namespace ophidian::routing
             });
             m_gcell_to_AStarNode[current_node].finished = true;
         }
+
+        //TODO: return false (return AFTER clean dirty nodes)
         if(open_nodes.empty())
-            std::cout<<"there is no path to the goal"<<std::endl;//TODO: handle this with a boolean return
+            std::cout<<"there is no path to the goal"<<std::endl;
         if(goal_is_steiner)
             m_node_map[goal].mapped_gcell = current_node;
 
@@ -395,7 +407,7 @@ namespace ophidian::routing
     }
 
     //BFS printing
-    void AStarRouting::print_routing()
+    void AStarRouting::bfs_backtrack()
     {
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         std::queue<flute_node_type> queue;
@@ -412,7 +424,7 @@ namespace ophidian::routing
                 if(visited_nodes[opposite_flute_node] == false)
                 {
                     queue.push(opposite_flute_node);
-                    print_path(current_flute_node, opposite_flute_node);
+                    gcell_path_to_routing_segments(current_flute_node, opposite_flute_node);
                 }
             }
         }
@@ -457,7 +469,7 @@ namespace ophidian::routing
         }
     }
 
-    void AStarRouting::print_path(AStarRouting::flute_node_type s, AStarRouting::flute_node_type g)
+    void AStarRouting::gcell_path_to_routing_segments(AStarRouting::flute_node_type s, AStarRouting::flute_node_type g)
     {
         std::vector<gcell_type> gcells;
         for(flute_graph_type::IncEdgeIt edge(m_graph, s); edge != lemon::INVALID; ++edge)
@@ -571,8 +583,6 @@ namespace ophidian::routing
         auto& global_routing = m_design.global_routing();
         auto& routing_library = m_design.routing_library();
 
-        global_routing.unroute(m_net);
-
         for(auto segment : m_routing_segments)
         {
             auto start_layer_index = m_gcell_graph->layer_index(segment.first);
@@ -593,5 +603,16 @@ namespace ophidian::routing
             global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
         }
         global_routing.increase_demand(m_net);
+    }
+
+    void AStarRouting::clear_router_members()
+    {
+        m_net = net_type{};
+        m_root_node = flute_node_type{};
+        m_min_layer = layer_type{};
+        m_routing_segments.clear();
+        // m_edge_map.clear();
+        // m_node_map.clear();
+        m_graph.clear();
     }
 }

@@ -60,11 +60,12 @@ namespace ophidian::routing
             std::vector<gcell_type> neighbors(gcell_type gcell);
             void update_f_score(gcell_type gcell, gcell_type neighbor_gcell, gcell_type goal_gcell, bool goal_is_steiner);
             bool goal_reached(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
-            void print_routing();
+            void bfs_backtrack();//TODO change this function to be a BFS visitor
             void back_track_path(flute_node_type s, flute_node_type g);
-            void print_path(flute_node_type s, flute_node_type g);
+            void gcell_path_to_routing_segments(flute_node_type s, flute_node_type g);
             void connect_pins_to_min_layer();
             void write_routing_segments();
+            void clear_router_members();
 
             net_type                              m_net;
             flute_graph_type                      m_graph;

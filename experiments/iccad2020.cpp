@@ -229,10 +229,12 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
     auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+    auto astar_routing = ophidian::routing::AStarRouting(design);
+
     auto& netlist = design.netlist();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
-    {
-        auto astar_routing = ophidian::routing::AStarRouting(design);
         astar_routing.route_net(*net_it);
-    }
+
+    iccad_output_writer.write_ICCAD_2020_output("test_output_case1.txt", {});
 }
