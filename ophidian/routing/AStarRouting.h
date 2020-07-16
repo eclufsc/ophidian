@@ -52,7 +52,7 @@ namespace ophidian::routing
 
             bool route_net(const net_type & net);
         private:
-            void init_flute_graph();
+            bool init_flute_graph();
             void map_flute_nodes_into_gcells();
             void route_flute_segments();
             void a_star(flute_node_type start, flute_node_type goal);
