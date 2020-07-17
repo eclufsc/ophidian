@@ -36,58 +36,53 @@ namespace ophidian::routing
         m_net = net;
 
         //TODO: Save the current_routing as a backup
-        //auto& global_routing = m_design.global_routing();
-        //global_routing.unroute(m_net);
 
-        //would be nice, first check for existent routing and undo that routing.
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
         auto net_size = netlist.pins(net).size();
         m_min_layer = routing_constraints.min_net_layer(net);
 
-        if(net_size > 2)
+        //TODO: check if all pins are in same collumn if so do
+        bool all_pins_are_in_same_collumn = all_pins_same_collumn();
+        if(all_pins_are_in_same_collumn == false)
         {
             //1-Call Flute.
-            auto flute_graph = init_flute_graph();
-
-            std::cout<<"flute_graph "<<flute_graph<<std::endl;
+            bool flute_graph;
+            if(net_size > 2)
+                flute_graph = init_flute_graph();
+            else if(net_size == 2)
+                flute_graph = init_two_pin_flute_graph();
+            else//net only have 1 pin (For iccad2020 it should never happen)
+                return false;
 
             if(flute_graph == false)
                 return false;
 
-
             auto& global_routing = m_design.global_routing();
             global_routing.unroute(m_net);
 
-
             //2-Sort of layer assignment
-            map_flute_nodes_into_gcells();
+            node_layer_assignment();
             //3-Connect each pair of nodes using A*.(consider min layer)
             route_flute_segments();
             //4-Convert gcell path into segments
             bfs_backtrack();
             //5-Connect cell pins to min layers
             connect_pins_to_min_layer();
-            //6-Write segments in GlobalRouting
-            write_routing_segments();
-            //7-clean AStarRouting to be reused by other nets
-            clear_router_members();
-            //8-Clean up the code
-        }else if( net_size == 2)
-        {
-            // find_path(nodes, s ,t);
-            //perform the Astar receiving only the graph and 2 gcells.
-            //consider min layer constr.
-        }else
-        {
-            /*
-            // For iccad2020 it should never happen.
-            //LOCAL NET: only one node
-            auto s = *netlist.pins(*net_it).begin();
-            nodes.insert(node_of_pin(s));
-            */
+
+            connect_floating_pins();
         }
+        else
+        {
+            return false;
+            //trivial_routing();//BUG
+        }
+
+        //6-Write segments in GlobalRouting
+        write_routing_segments();
+        //7-clean AStarRouting to be reused by other nets
         clear_router_members();
+        //8-Clean up the code
         return true;
     }
 
@@ -102,7 +97,7 @@ namespace ophidian::routing
         //Run Flute
         std::vector<interconnection::Flute::Point> net_points;
         auto net_pins = netlist.pins(m_net);
-        std::cout<<"Test: "<<net_pins.size()<<std::endl;
+        // std::cout<<"Test: "<<net_pins.size()<<std::endl;
         net_points.reserve(netlist.pins(m_net).size());
         for(auto pin : net_pins)
         {
@@ -111,13 +106,13 @@ namespace ophidian::routing
             auto pin_name = netlist.name(pin);
             pins_map[pin_location] = pin_name;
 
-
-
             auto cell = netlist.cell(pin);
-            std::cout<<"pin: "<<pin_name<<" cell: "<<netlist.name(cell)<<std::endl;
+            // std::cout<<"pin: "<<pin_name<<" cell: "<<netlist.name(cell)<<std::endl;
         }
+
+        //std::cout<<"netsize: "<<net_pins.size()<<" map "<<pins_map.size()<<std::endl;
         auto & flute = interconnection::Flute::instance();
-        std::cout<<"calling flute: "<<net_points.size()<<std::endl;
+        // std::cout<<"calling flute: "<<net_points.size()<<std::endl;
         auto tree = flute.create(net_points);
 
         auto steiner_tree_length = tree->length().value();
@@ -130,7 +125,7 @@ namespace ophidian::routing
         //Create FluteGraph
         for(auto tree_segment_it = tree->segments().first; tree_segment_it != tree->segments().second; ++tree_segment_it)
         {
-            std::cout<<"tree is not empty"<<std::endl;
+            // std::cout<<"tree is not empty"<<std::endl;
             auto tree_segment = *tree_segment_it;
             auto segment_start = tree->position(tree->u(tree_segment));
             auto segment_end = tree->position(tree->v(tree_segment));
@@ -165,8 +160,31 @@ namespace ophidian::routing
         return true;
     }
 
+    //not actually using flute
+    bool AStarRouting::init_two_pin_flute_graph()
+    {
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+
+        auto pin_1 = *netlist.pins(m_net).begin();
+        auto p1_l = placement.location(pin_1);
+        auto pin_2 = *std::next(netlist.pins(m_net).begin());
+        auto p2_l = placement.location(pin_2);
+
+        if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
+            return false;
+
+        auto node1 = m_graph.addNode();
+        m_node_map[node1] = FluteNode{p1_l, netlist.name(pin_1)};
+        auto node2 = m_graph.addNode();
+        m_node_map[node2] = FluteNode{p2_l, netlist.name(pin_2)};
+        m_graph.addEdge(node1, node2);
+
+        return true;
+    }
+
     //This mapping is considering net min. layer constraint and gcell capacity
-    void AStarRouting::map_flute_nodes_into_gcells()
+    void AStarRouting::node_layer_assignment()
     {
         auto& routing_library = m_design.routing_library();
         auto min_layer_index = routing_library.layerIndex(m_min_layer);
@@ -184,7 +202,7 @@ namespace ophidian::routing
                 auto pin_layer_name = pin_geometry.front().second;
                 auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
                 auto pin_layer_index = routing_library.layerIndex(pin_layer);
-                layer_index = std::max(layer_index, pin_layer_index);
+                layer_index = std::max(layer_index, pin_layer_index);//see: void connect_pins_to_min_layer();
             }
             auto gcell = m_gcell_graph->nearest_gcell(flute_node.point, layer_index-1);
 
@@ -198,7 +216,7 @@ namespace ophidian::routing
             else
             {
                 //std::cout<<"WARNING: mapped node is overflowed!!!"<<std::endl;
-                gcell = m_gcell_graph->nearest_gcell(flute_node.point, layer_index+2);
+                gcell = m_gcell_graph->nearest_gcell(flute_node.point, layer_index+2);//WORKAROUND solution!
                 if(m_gcell_graph->has_free_space(gcell) == false)
                     std::cout<<"WARNING: mapped node is overflowed!!!"<<std::endl;
                 flute_node.mapped_gcell = gcell;
@@ -210,7 +228,7 @@ namespace ophidian::routing
 
             auto s_node = m_gcell_graph->graph_node(flute_node.mapped_gcell);
             auto s_pos = m_gcell_graph->position(s_node);
-            std::cout<<" again mapping node: "<<flute_node<<" into "<<" pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
+            // std::cout<<" again mapping node: "<<flute_node<<" into "<<" pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
         }
     }
 
@@ -220,14 +238,14 @@ namespace ophidian::routing
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
         {
-            std::cout<<"test"<<std::endl;
+            // std::cout<<"test"<<std::endl;
             if(m_node_map[node].pin_name != "steiner")
             {
                 m_root_node = node;
                 break;
             }
         }
-        std::cout<<"root node: "<<m_node_map[m_root_node]<<std::endl;
+        // std::cout<<"root node: "<<m_node_map[m_root_node]<<std::endl;
         std::queue<flute_node_type> queue;
         queue.push(m_root_node);
 
@@ -260,12 +278,12 @@ namespace ophidian::routing
         // code just for debug
         auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
         auto pos = m_gcell_graph->position(node);
-        std::cout<<m_node_map[start]<<std::endl;
-        std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
+        // std::cout<<m_node_map[start]<<std::endl;
+        // std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
         node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
         pos = m_gcell_graph->position(node);
-        std::cout<<m_node_map[goal]<<std::endl;
-        std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
+        // std::cout<<m_node_map[goal]<<std::endl;
+        // std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
         // code just for debug
 
         gcell_type current_node;
@@ -305,7 +323,7 @@ namespace ophidian::routing
         if(goal_is_steiner)
             m_node_map[goal].mapped_gcell = current_node;
 
-        std::cout<<"backtrack path result"<<std::endl;
+        // std::cout<<"backtrack path result"<<std::endl;
         back_track_path(start, goal);
 
         //clean dirty nodes
@@ -474,16 +492,16 @@ namespace ophidian::routing
         auto g_node = m_gcell_graph->graph_node(gcell);
         auto g_pos = m_gcell_graph->position(g_node);
 
-        std::cout<<"debugging net: "<<m_design.netlist().name(m_net)<<std::endl;
-        std::cout<<"backtrack from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
-        std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
+        // std::cout<<"debugging net: "<<m_design.netlist().name(m_net)<<std::endl;
+        // std::cout<<"backtrack from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
+        // std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
+        // std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
 
         bool non_stop = true;
         while(non_stop)
         {
             non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
-            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
+            // std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
             path.push_back(gcell);
             if(non_stop == false)
                 break;
@@ -515,13 +533,13 @@ namespace ophidian::routing
                 break;
             }
         }
-        std::cout<<"RESULT from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        for(auto gcell : gcells)
-        {
-            auto g_node = m_gcell_graph->graph_node(gcell);
-            auto g_pos = m_gcell_graph->position(g_node);
-            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-        }
+        // std::cout<<"RESULT from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
+        // for(auto gcell : gcells)
+        // {
+        //     auto g_node = m_gcell_graph->graph_node(gcell);
+        //     auto g_pos = m_gcell_graph->position(g_node);
+        //     std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
+        // }
 
         //discover the direction of the segments
         std::vector<SegmentDirection> directions;
@@ -539,20 +557,20 @@ namespace ophidian::routing
             previous_gcell = current_gcell;
         }
 
-        for(auto direction : directions)
-        {
-            if(direction == SegmentDirection::NA)
-                std::cout<<"NA"<<std::endl;
+        // for(auto direction : directions)
+        // {
+        //     if(direction == SegmentDirection::NA)
+        //         std::cout<<"NA"<<std::endl;
 
-            if(direction == SegmentDirection::X)
-                std::cout<<"X"<<std::endl;
+        //     if(direction == SegmentDirection::X)
+        //         std::cout<<"X"<<std::endl;
 
-            if(direction == SegmentDirection::Y)
-                std::cout<<"Y"<<std::endl;
+        //     if(direction == SegmentDirection::Y)
+        //         std::cout<<"Y"<<std::endl;
 
-            if(direction == SegmentDirection::Z)
-                std::cout<<"Z"<<std::endl;
-        }
+        //     if(direction == SegmentDirection::Z)
+        //         std::cout<<"Z"<<std::endl;
+        // }
 
         //find routing segments
         auto direction_it = std::next(directions.begin());
@@ -566,8 +584,8 @@ namespace ophidian::routing
             {
                 auto start_pos = m_gcell_graph->position(m_gcell_graph->graph_node(start_gcell));
                 auto previous_pos = m_gcell_graph->position(m_gcell_graph->graph_node(previous_gcell));
-                std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
-                std::cout<<" to ("<<previous_pos.get<0>()<<","<<previous_pos.get<1>()<<","<<previous_pos.get<2>()<<")"<<std::endl;
+                // std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
+                // std::cout<<" to ("<<previous_pos.get<0>()<<","<<previous_pos.get<1>()<<","<<previous_pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(start_gcell, previous_gcell));
                 start_gcell = previous_gcell;
             }
@@ -575,8 +593,8 @@ namespace ophidian::routing
             {
                 auto start_pos = m_gcell_graph->position(m_gcell_graph->graph_node(start_gcell));
                 auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(*gcell_it));
-                std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
-                std::cout<<" to ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
+                // std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
+                // std::cout<<" to ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(start_gcell, *gcell_it));
                 break;
             }
@@ -586,6 +604,8 @@ namespace ophidian::routing
         }
     }
 
+    //This is required because when there is a min layer constraint
+    //the pins were assigned using std::max(min_layer, pin_layer).
     void AStarRouting::connect_pins_to_min_layer()
     {
         auto& netlist = m_design.netlist();
@@ -600,13 +620,13 @@ namespace ophidian::routing
             auto pin_layer_index = routing_library.layerIndex(pin_layer);
             if(min_layer_index > pin_layer_index)
             {
-                std::cout<<"connect pin: "<<netlist.name(pin)<<std::endl;
+                // std::cout<<"connect pin: "<<netlist.name(pin)<<std::endl;
                 auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
                 auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_start));
-                std::cout<<"Start_pos ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
+                // std::cout<<"Start_pos ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 auto gcell_end = m_gcell_graph->nearest_gcell(placement.location(pin), min_layer_index-1);
                 pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_end));
-                std::cout<<"Start_end ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
+                // std::cout<<"Start_end ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(gcell_start, gcell_end));
             }
         }
@@ -627,7 +647,6 @@ namespace ophidian::routing
             auto end_layer = routing_library.layer_from_index(end_layer_index);
             auto end_pos = m_gcell_graph->center_of_box(segment.second);
 
-
             auto min_x = std::min(start_pos.x(), end_pos.x());
             auto max_x = std::max(start_pos.x(), end_pos.x());
             auto min_y = std::min(start_pos.y(), end_pos.y());
@@ -647,4 +666,91 @@ namespace ophidian::routing
         m_routing_segments.clear();
         m_graph.clear();
     }
+
+    //This is required because the whole routing was done assuming that all
+    //pins are in same layer, but that is not true, for instance:
+    //P1 (5,5,1) P2 (5,5,3) and P1 and P2 are from same net.
+    //So this function seeks to connect P2 to P1 by creating a via from the
+    //highest pin to lowest pin.
+    void AStarRouting::connect_floating_pins()
+    {
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+        auto& routing_library = m_design.routing_library();
+        std::map<point_type, std::vector<ophidian::circuit::PinInstance>, comp> pin_map;
+        for(auto pin : netlist.pins(m_net))
+        {
+            auto pin_location = placement.location(pin);
+            pin_map[pin_location].push_back(pin);
+        }
+
+        for(auto pin_vector : pin_map)
+        {
+            if(pin_vector.second.size() > 1)
+            {
+                int min_layer_index = std::numeric_limits<int>::max();
+                int max_layer_index = std::numeric_limits<int>::min();
+                //int max_layer_index = routing_library.layerIndex(m_min_layer);
+                for(auto pin : pin_vector.second)
+                {
+                    auto pin_geometry = placement.geometry(pin);
+                    auto pin_layer_name = pin_geometry.front().second;
+                    auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
+                    auto layer_index = routing_library.layerIndex(pin_layer);
+                    min_layer_index = std::min(min_layer_index, layer_index);
+                    max_layer_index = std::max(max_layer_index, layer_index);
+                }
+                //if(min_layer_index != max_layer_index || all_pins_same_collumn)//bool used to avoid unncessary segments
+                if(min_layer_index != max_layer_index)//bool used to avoid unncessary segments
+                {
+                    auto lower_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, min_layer_index-1);
+                    auto upper_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, max_layer_index-1);
+                    m_routing_segments.push_back(std::make_pair(lower_gcell, upper_gcell));
+                }
+            }
+        }
+    }
+
+    //TODO: DEBUG THIS
+    void AStarRouting::trivial_routing()
+    {
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+        auto& routing_library = m_design.routing_library();
+
+        auto pin_ref = *netlist.pins(m_net).begin();
+        auto ref_loc = placement.location(pin_ref);
+
+        int min_layer_index = std::numeric_limits<int>::max();
+        int max_layer_index = std::numeric_limits<int>::min();
+        for(auto pin : netlist.pins(m_net))
+        {
+            auto pin_geometry = placement.geometry(pin);
+            auto pin_layer_name = pin_geometry.front().second;
+            auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
+            auto layer_index = routing_library.layerIndex(pin_layer);
+            min_layer_index = std::min(min_layer_index, layer_index);
+            max_layer_index = std::max(max_layer_index, layer_index);
+        }
+        auto lower_gcell = m_gcell_graph->nearest_gcell(ref_loc, min_layer_index-1);
+        auto upper_gcell = m_gcell_graph->nearest_gcell(ref_loc, max_layer_index-1);
+        m_routing_segments.push_back(std::make_pair(lower_gcell, upper_gcell));
+    }
+
+    bool AStarRouting::all_pins_same_collumn()
+    {
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+        auto pin_ref = *netlist.pins(m_net).begin();
+        auto ref_loc = placement.location(pin_ref);
+        for(auto pin : netlist.pins(m_net))
+        {
+            auto pin_loc = placement.location(pin);
+            if(ref_loc.x() != pin_loc.x() || ref_loc.y() != pin_loc.y())
+                return false;
+        }
+        //std::cout<<"same gcell net: "<<netlist.name(m_net)<<std::endl;
+        return true;
+    }
+
 }

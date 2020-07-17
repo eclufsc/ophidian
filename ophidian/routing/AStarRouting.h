@@ -11,9 +11,7 @@
 #include <memory>
 #include <limits>
 
-//TODO:
-//1-convert vector of gcells into GlobalRouting segments
-//2-consider extra demand constraints
+//TODO:consider extra demand constraint
 namespace ophidian::routing
 {
 
@@ -53,7 +51,8 @@ namespace ophidian::routing
             bool route_net(const net_type & net);
         private:
             bool init_flute_graph();
-            void map_flute_nodes_into_gcells();
+            bool init_two_pin_flute_graph();
+            void node_layer_assignment();
             void route_flute_segments();
             void a_star(flute_node_type start, flute_node_type goal);
             unsigned int heuristic(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
@@ -66,6 +65,10 @@ namespace ophidian::routing
             void connect_pins_to_min_layer();
             void write_routing_segments();
             void clear_router_members();
+            void connect_floating_pins();
+            bool all_pins_same_collumn();
+            void trivial_routing();
+
 
             net_type                              m_net;
             flute_graph_type                      m_graph;
