@@ -78,7 +78,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         //"case1N4",
         // "case2",
         //"case3",
-         "case5",
+        "case4",
+        // "case5",
          //"case5_no_extra_demand",
         //"case3_no_blockages",
         // "case3_no_extra_demand"

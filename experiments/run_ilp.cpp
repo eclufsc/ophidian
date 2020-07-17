@@ -16,6 +16,27 @@ void run_mcf_multithreading(ophidian::design::Design & design) {
     mcf.run();
 }
 
+std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> run_ilp_for_part_of_nets(const std::vector<std::pair<ophidian::circuit::Net, double>> & nets_costs, unsigned start_index, unsigned end_index, ophidian::routing::ILPRouting<IloBoolVar> & ilpRouting, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing) {    
+    std::vector<ophidian::circuit::Net> nets_to_route;
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    for (unsigned index = 0; index < nets_costs.size(); index++) {
+        auto net_cost = nets_costs.at(index);
+        if (index >= start_index && index < end_index) {
+            nets_to_route.push_back(net_cost.first);
+        } else {
+            fixed_nets.push_back(net_cost.first);
+        }
+    }
+
+    std::cout << "nets to route " << nets_to_route.size() << std::endl;
+    
+    std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
+    
+    auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
+    return result;
+}
+
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
@@ -51,30 +72,6 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     std::sort(nets_costs.begin(), nets_costs.end(), [](std::pair<ophidian::circuit::Net, double> cost_a, std::pair<ophidian::circuit::Net, double> cost_b) {return cost_a.second < cost_b.second;});
 
-    std::vector<ophidian::circuit::Net> nets_to_route;
-    std::vector<ophidian::circuit::Net> fixed_nets;
-    unsigned number_of_nets = 45000; // overflow in 20000 with extra demand
-    unsigned count = 0;
-    for (auto net_cost : nets_costs) {        
-        if (count < number_of_nets) {
-            nets_to_route.push_back(net_cost.first);
-        } else {
-            fixed_nets.push_back(net_cost.first);
-        }
-        /*auto net_name = design.netlist().name(net_cost.first);
-        if (net_name == "N26") {
-            nets_to_route.push_back(net_cost.first);
-        } else {
-            fixed_nets.push_back(net_cost.first);
-        }*/
-        count++;
-    }
-
-    std::cout << "nets to route " << nets_to_route.size() << std::endl;
-
-    std::vector<ophidian::circuit::Net> routed_nets;
-    std::vector<ophidian::circuit::Net> unrouted_nets;
-
     int initial_wirelength = design.global_routing().wirelength(nets);
     if(DEBUG_TEST) log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
 
@@ -82,11 +79,21 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     log() << ovfl << " in input file" << std::endl;
 
     auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
-    auto start = std::chrono::high_resolution_clock::now(); 
-    auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
-    result = ilpRouting.route_nets(fixed_nets, nets_to_route, routed_nets, unrouted_nets, movements, initial_routing);
+    auto start = std::chrono::high_resolution_clock::now();
+
+    unsigned number_of_nets = nets_costs.size();
+    unsigned number_of_nets_per_step = 50000;
+    unsigned number_of_steps = std::ceil( (double) number_of_nets / (double) number_of_nets_per_step);
+    std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> result;
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
+    for (auto step_index = 0; step_index < number_of_steps; step_index++) {
+        unsigned start_index = step_index * number_of_nets_per_step;
+        unsigned end_index = start_index + number_of_nets_per_step;
+        result = run_ilp_for_part_of_nets(nets_costs, start_index, end_index, ilpRouting, movements, initial_routing);
+    }
+
+    //auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if(DEBUG_TEST) log() << "result " << result.first << std::endl;
