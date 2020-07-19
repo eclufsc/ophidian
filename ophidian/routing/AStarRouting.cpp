@@ -42,7 +42,6 @@ namespace ophidian::routing
         auto net_size = netlist.pins(net).size();
         m_min_layer = routing_constraints.min_net_layer(net);
 
-        //TODO: check if all pins are in same collumn if so do
         bool all_pins_are_in_same_collumn = all_pins_same_collumn();
         if(all_pins_are_in_same_collumn == false)
         {
@@ -74,8 +73,9 @@ namespace ophidian::routing
         }
         else
         {
-            return false;
-            //trivial_routing();//BUG
+            auto& global_routing = m_design.global_routing();
+            global_routing.unroute(m_net);
+            trivial_routing();
         }
 
         //6-Write segments in GlobalRouting
@@ -118,7 +118,8 @@ namespace ophidian::routing
         auto steiner_tree_length = tree->length().value();
         if(steiner_tree_length == 0)
         {
-            std::cout<<"same gcell"<<std::endl;
+            std::cout<<"WARNING: same gcell"<<std::endl;
+            std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
         }
 
@@ -172,7 +173,11 @@ namespace ophidian::routing
         auto p2_l = placement.location(pin_2);
 
         if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
+        {
+            std::cout<<"WARNING: same gcell"<<std::endl;
+            std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
+        }
 
         auto node1 = m_graph.addNode();
         m_node_map[node1] = FluteNode{p1_l, netlist.name(pin_1)};
@@ -274,14 +279,15 @@ namespace ophidian::routing
         std::list<gcell_type> open_nodes;
         open_nodes.push_back(m_node_map[start].mapped_gcell);
         std::vector<gcell_type> dirty_nodes;
+        dirty_nodes.push_back(m_node_map[start].mapped_gcell);
 
         // code just for debug
-        auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
-        auto pos = m_gcell_graph->position(node);
+        // auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
+        // auto pos = m_gcell_graph->position(node);
         // std::cout<<m_node_map[start]<<std::endl;
         // std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-        node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
-        pos = m_gcell_graph->position(node);
+        // node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
+        // pos = m_gcell_graph->position(node);
         // std::cout<<m_node_map[goal]<<std::endl;
         // std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
         // code just for debug
@@ -334,7 +340,7 @@ namespace ophidian::routing
             astar_node.h = 0;
             astar_node.discovered = false;
             astar_node.finished = false;
-            //astar_node.gcell_from = gcell_type{};
+            astar_node.gcell_from = gcell_type{};
         }
     }
 
@@ -711,7 +717,6 @@ namespace ophidian::routing
         }
     }
 
-    //TODO: DEBUG THIS
     void AStarRouting::trivial_routing()
     {
         auto& netlist = m_design.netlist();

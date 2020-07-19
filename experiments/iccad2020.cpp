@@ -285,11 +285,11 @@ TEST_CASE("iccad20 AStarRouting", "[astar]") {
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
     auto astar_routing = ophidian::routing::AStarRouting(design);
-    auto net_n1 = design.netlist().find_net("N2594");//BUG: this net has a layer 3 pin disconnected
-    astar_routing.route_net(net_n1);
-    iccad_output_writer.write_ICCAD_2020_output("test_output_case3.txt", {});
+    auto net = design.netlist().find_net("N2594");
+    astar_routing.route_net(net);
+    iccad_output_writer.write_ICCAD_2020_output("case3_no_extra_demand_out.txt", {});
 
-    draw_gcell_svg(design, "N2594");
+    //draw_gcell_svg(design, netlist.name(net));
 
 }
 
@@ -307,10 +307,9 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
     auto& netlist = design.netlist();
     int routed_nets = 0;
     int non_routed = 0;
+    auto astar_routing = ophidian::routing::AStarRouting(design);
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
-        // std::cout<<"routing net: "<<netlist.name(*net_it)<<std::endl;
-        auto astar_routing = ophidian::routing::AStarRouting(design);
         auto result = astar_routing.route_net(*net_it);
         if(result)
             routed_nets++;
@@ -319,7 +318,7 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
     }
     std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
 
-    iccad_output_writer.write_ICCAD_2020_output("test_output_case3.txt", {});
+    iccad_output_writer.write_ICCAD_2020_output("case3_no_extra_demand_out.txt", {});
 
     //draw_gcell_svg(design, "N2594");
 }
