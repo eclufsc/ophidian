@@ -40,7 +40,9 @@ namespace ophidian::routing {
         update_gcell_capacities(fixed_nets);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
+        if(STATUS) printlog("add extra demand");
         add_extra_demand();
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
@@ -115,6 +117,8 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
+
+        //m_env.end();
         return std::make_pair(result, statistic);
      }
 
@@ -186,6 +190,8 @@ namespace ophidian::routing {
         auto & routing_library = m_design.routing_library();
 
         std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+
+        std::unordered_map<circuit::StandardCells::cell_type, std::unordered_set<routing::GCellGraph::gcell_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcells_per_std_cell;
         /*for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             auto gcell = *gcell_it;
             auto gcell_box = gcell_graph->box(gcell);
@@ -220,11 +226,108 @@ namespace ophidian::routing {
                 //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
 
                 std_cells_per_gcell[gcell][std_cell] += 1;
+                gcells_per_std_cell[std_cell].insert(gcell);
             }
         }
 
         auto & routing_constraints = m_design.routing_constraints();
-        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+        for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++) {
+            auto key = same_grid_it->first;
+            auto & extra_demand = same_grid_it->second;
+            auto demand = extra_demand.demand;
+
+            auto macro1_name = extra_demand.macro1;
+            auto macro2_name = extra_demand.macro2;
+            auto layer_name = extra_demand.layer;
+
+            auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+            auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+            auto layer = m_design.routing_library().find_layer_instance(layer_name);
+
+            auto gcells_macro1 = gcells_per_std_cell[macro1];
+            auto gcells_macro2 = gcells_per_std_cell[macro2];
+            
+            auto rule_gcells = std::unordered_set<gcell_type, entity_system::EntityBaseHash>{};
+            for (auto gcell : gcells_macro1) {
+                rule_gcells.insert(gcell);
+            }
+            for (auto gcell : gcells_macro2) {
+                rule_gcells.insert(gcell);
+            }
+
+            for (auto gcell : rule_gcells) {
+                auto gcell_layer_index = gcell_graph->layer_index(gcell);
+                auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
+                auto gcell_layer = m_design.routing_library().find_layer_instance(gcell_layer_name);
+
+                if (layer == gcell_layer) {
+                    auto pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[gcell][macro2]);
+                    m_gcells_demand[gcell] += pair_count * demand;
+                }
+            }
+
+        }
+
+        for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++) {
+            auto key = adj_grid_it->first;
+            auto & extra_demand = adj_grid_it->second;
+            auto demand = extra_demand.demand;
+
+            auto macro1_name = extra_demand.macro1;
+            auto macro2_name = extra_demand.macro2;
+            auto layer_name = extra_demand.layer;
+
+            auto macro1 = m_design.standard_cells().find_cell(macro1_name);
+            auto macro2 = m_design.standard_cells().find_cell(macro2_name);
+            auto layer = m_design.routing_library().find_layer_instance(layer_name);
+            
+            auto gcells_macro1 = gcells_per_std_cell[macro1];
+            auto gcells_macro2 = gcells_per_std_cell[macro2];
+
+            auto rule_gcells = std::unordered_set<gcell_type, entity_system::EntityBaseHash>{};
+            for (auto gcell : gcells_macro1) {
+                rule_gcells.insert(gcell);
+            }
+            for (auto gcell : gcells_macro2) {
+                rule_gcells.insert(gcell);
+            }
+
+            for (auto gcell : rule_gcells) {
+                auto gcell_node = gcell_graph->graph_node(gcell);
+                auto east_node = gcell_graph->east_node(gcell_node);
+                auto east_gcell = gcell_graph->gcell(east_node);
+                auto west_node = gcell_graph->west_node(gcell_node);
+                auto west_gcell = gcell_graph->gcell(west_node);
+
+                auto gcell_layer_index = gcell_graph->layer_index(gcell);
+                auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
+                auto gcell_layer = m_design.routing_library().find_layer_instance(gcell_layer_name);
+            if (layer == gcell_layer) {
+                auto east_pair_count = 0;
+                auto west_pair_count = 0;
+                if (macro1 == macro2) {
+                    if (east_node != lemon::INVALID) {
+                        east_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[east_gcell][macro1]);
+                    }
+                    if (west_node != lemon::INVALID) {
+                        west_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[west_gcell][macro1]);
+                    }
+                } else {
+                    if (east_node != lemon::INVALID) {
+                        east_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[east_gcell][macro2])
+                         + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[east_gcell][macro1]);
+                    }
+                    if (west_node != lemon::INVALID) {
+                        west_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[west_gcell][macro2])
+                         + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[west_gcell][macro1]);
+                    }
+                }
+                m_gcells_demand[gcell] += (east_pair_count + west_pair_count) * demand;
+            }
+            }
+        }
+
+        /*for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             auto gcell = *gcell_it;
             auto gcell_layer_index = gcell_graph->layer_index(gcell);
             auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
@@ -293,7 +396,7 @@ namespace ophidian::routing {
                     m_gcells_demand[gcell] += (east_pair_count + west_pair_count) * demand;
                 }
             }
-        }
+        }*/
     }
 
 
