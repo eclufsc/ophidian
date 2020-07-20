@@ -38,6 +38,7 @@ namespace ophidian::routing
             using box_type                          = geometry::Box<unit_type>;
             using gcell_type                        = GCell;
             using gcell_property_type               = entity_system::Property<gcell_type, AStarNode>;
+            using gcell_extra_demand_type           = entity_system::Property<gcell_type, int>;
             using gcell_graph_ptr_type              = std::shared_ptr<ophidian::routing::GCellGraph>;
             using layer_type                        = Layer;
             using flute_graph_type                  = lemon::ListGraph;
@@ -68,6 +69,8 @@ namespace ophidian::routing
             void connect_floating_pins();
             bool all_pins_same_collumn();
             void trivial_routing();
+            void update_extra_demand_constraint();
+            bool gcell_has_free_space(gcell_type gcell);
 
 
             net_type                              m_net;
@@ -80,6 +83,7 @@ namespace ophidian::routing
             gcell_graph_ptr_type                  m_gcell_graph;
             layer_type                            m_min_layer;
             std::vector<routing_segment_type>     m_routing_segments;
+            gcell_extra_demand_type               m_gcells_extra_demand;
     };
 
     struct FluteNode

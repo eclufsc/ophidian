@@ -295,7 +295,7 @@ TEST_CASE("iccad20 AStarRouting", "[astar]") {
 
 //TODO: unroute whole circuit, sort nets by length, reroute everything starting from the larger ones.
 TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
-    std::string circuit_name = "case3_no_extra_demand";
+    std::string circuit_name = "case4";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
     std::cout<<iccad_2020_file<<std::endl;
@@ -318,7 +318,7 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
     }
     std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
 
-    iccad_output_writer.write_ICCAD_2020_output("case3_no_extra_demand_out.txt", {});
+    iccad_output_writer.write_ICCAD_2020_output("case4_output.txt", {});
 
     //draw_gcell_svg(design, "N2594");
 }

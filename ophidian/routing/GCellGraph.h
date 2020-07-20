@@ -100,7 +100,6 @@ public:
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer) const;
     uint32_t id(const gcell_type& gcell) const;
     bool is_overflow(const gcell_type& gcell) const;
-    bool has_free_space(const gcell_type& gcell) const;
     index_type layer_index(const gcell_type & gcell) const;
 
     // Iterators
