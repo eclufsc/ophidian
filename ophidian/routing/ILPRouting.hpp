@@ -19,18 +19,26 @@ namespace ophidian::routing {
     ILPRouting<var_type>::ILPRouting(design::Design & design, std::string circuit_name):
         m_design(design), m_circuit_name(circuit_name)
     {
+        m_extra_demand_created = false;
     }
 
     template <typename var_type>
     std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
     {
+        if(STATUS) printlog("init function route_nets");
         ILPRouting<var_type>::Statistics statistic;
 
+        if(!m_extra_demand_created)
+            add_extra_demand();
+
+        if(STATUS) printlog("Cleaning the data structures ...");
         //m_segments.clear();
         m_wires.clear();
         m_route_candidate.clear();
         m_position_candidates.clear();
 
+        if(STATUS) printlog("Instantiating the envirorment ...");
+        
         model_type model(m_env);
         solver_type cplex(model);
 //        cplex.setOut(m_env.getNullStream());
@@ -40,9 +48,7 @@ namespace ophidian::routing {
         update_gcell_capacities(fixed_nets);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        if(STATUS) printlog("add extra demand");
-        add_extra_demand();
-        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        // add_extra_demand();
 
         if(STATUS) printlog("create all cells initial candidates");
         create_all_cell_initial_candidates(model);
@@ -117,8 +123,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-
-        //m_env.end();
+        // m_env.end();
         return std::make_pair(result, statistic);
      }
 
@@ -184,6 +189,9 @@ namespace ophidian::routing {
     template <typename var_type>
     void ILPRouting<var_type>::add_extra_demand()
     {
+        printlog("Genearting extra demand values for all gcells");
+        m_extra_demand_created = true;
+
         auto& netlist = m_design.netlist();
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
@@ -262,7 +270,7 @@ namespace ophidian::routing {
 
                 if (layer == gcell_layer) {
                     auto pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[gcell][macro2]);
-                    m_gcells_demand[gcell] += pair_count * demand;
+                    m_gcells_extra_demand[gcell] += pair_count * demand;
                 }
             }
 
@@ -322,7 +330,7 @@ namespace ophidian::routing {
                          + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[west_gcell][macro1]);
                     }
                 }
-                m_gcells_demand[gcell] += (east_pair_count + west_pair_count) * demand;
+                m_gcells_extra_demand[gcell] += (east_pair_count + west_pair_count) * demand;
             }
             }
         }
@@ -350,7 +358,7 @@ namespace ophidian::routing {
 
                 if (layer == gcell_layer) {
                     auto pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[gcell][macro2]);
-                    m_gcells_demand[gcell] += pair_count * demand;
+                    m_gcells_extra_demand[gcell] += pair_count * demand;
                 }
             }
 
@@ -393,7 +401,7 @@ namespace ophidian::routing {
                             + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[west_gcell][macro1]);
                         }
                     }
-                    m_gcells_demand[gcell] += (east_pair_count + west_pair_count) * demand;
+                    m_gcells_extra_demand[gcell] += (east_pair_count + west_pair_count) * demand;
                 }
             }
         }*/
@@ -1854,8 +1862,9 @@ namespace ophidian::routing {
             //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto demand = m_gcells_demand[gcell];
+                auto extra_demand = m_gcells_extra_demand[gcell];
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
-                auto constraint = model.add(gcell_constraint <= capacity - demand);
+                auto constraint = model.add(gcell_constraint <= capacity - demand - extra_demand);
                 constraint.setName(constraint_name.c_str());                
             }
         }

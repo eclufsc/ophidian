@@ -112,10 +112,12 @@ namespace ophidian::routing {
 
             std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
 
-        private:
-            void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
-
             void add_extra_demand();
+
+        private:
+            bool m_extra_demand_created;
+
+            void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
 
             void create_all_candidates(const std::vector<net_type> & nets, model_type & model, bool initial_routing = true);
 
@@ -202,6 +204,7 @@ namespace ophidian::routing {
 
 
             entity_system::Property<gcell_type, scalar_type>    m_gcells_demand{m_design.global_routing().gcell_graph()->make_property_gcells<scalar_type>()};
+            entity_system::Property<gcell_type, scalar_type>    m_gcells_extra_demand{m_design.global_routing().gcell_graph()->make_property_gcells<scalar_type>()};
 
     // POSITION CANDIDATES
             entity_system::EntitySystem<position_candidate_type>            m_position_candidates;
