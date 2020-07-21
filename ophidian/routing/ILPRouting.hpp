@@ -38,7 +38,8 @@ namespace ophidian::routing {
         m_position_candidates.clear();
 
         if(STATUS) printlog("Instantiating the envirorment ...");
-        
+
+        m_env = environment_type{};        
         model_type model(m_env);
         solver_type cplex(model);
 //        cplex.setOut(m_env.getNullStream());
@@ -123,7 +124,7 @@ namespace ophidian::routing {
 
 	        // save_result(cplex);
         }
-        // m_env.end();
+        m_env.end();
         return std::make_pair(result, statistic);
      }
 

@@ -83,7 +83,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     auto start = std::chrono::high_resolution_clock::now();
 
     unsigned number_of_nets = nets_costs.size();
-    unsigned number_of_nets_per_step = 40000;
+    unsigned number_of_nets_per_step = 20000;
     unsigned number_of_steps = std::ceil( (double) number_of_nets / (double) number_of_nets_per_step);
     std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> result;
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 

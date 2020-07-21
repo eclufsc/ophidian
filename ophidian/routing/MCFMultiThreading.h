@@ -57,6 +57,10 @@ class MCFMultiThreading{
     private: 
         void construct_net_boxes_rtree(const std::vector<net_type> &nets);
         void cluster_based_on_nets_box();
+        void write_nets();
+        void cluster_based_on_panel();
+        void run_ilp_on_panels();
+        void report();
 
         design_type&    m_design;
 
@@ -68,7 +72,23 @@ class MCFMultiThreading{
         // string net_name to net_type
         std::unordered_map<std::string, net_type> m_net_name_to_net_type_dict;
 
+        std::vector<ophidian::circuit::Net> m_routed_nets;
 
+        // Paneling variables 
+        std::vector<std::vector<Box2DWrapper>> m_panel_boxes; 
+
+        RTreeDB m_rtree_panel_box;
+        std::unordered_map<unsigned int, Box2DWrapper> m_index_to_panel;
+
+        std::unordered_map<unsigned int,std::set<std::string>> m_panel_index_to_nets_dict;
+
+        // each panel wire length
+        std::unordered_map<unsigned int, int> m_panel_wirelength_dict;
+
+        // panel index to wl after ilp
+        std::unordered_map<unsigned int, int> m_panel_wirelength_after_ilp_dict;
+
+        std::vector<ophidian::circuit::Net> m_fixed_nets;
 
  
 };//end class 

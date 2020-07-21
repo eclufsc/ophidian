@@ -3,6 +3,7 @@
 #include <ophidian/routing/ILPRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/util/log.h>
+#include <ophidian/routing/MCFMultiThreading.h>
 
 using namespace std;
 using namespace ophidian::util;
@@ -31,6 +32,19 @@ void greetings(){
     printlog("    Jose Luis Guntzel                              ");
     printlog("===================================================");
 };
+
+void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name){
+    // UCal::MCFRouting mcf_routing(design,circuit_name);
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+    std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
+
+    UCal::MCFMultiThreading mcf_multi_threading(design); 
+    mcf_multi_threading.run();
+
+    
+}//end run_mcf_for_circuit
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
@@ -157,7 +171,8 @@ int main(int argc, char** argv) {
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
-    run_for_circuit(design, circuit_name, output);
+    //run_for_circuit(design, circuit_name, output);
+    run_mcf_for_circuit(design,circuit_name);
 
     return 0;
 }
