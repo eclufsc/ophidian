@@ -275,8 +275,9 @@ TEST_CASE("write statistics for iccad20 benchmarks", "[iccad20]") {
 }
 */
 
-TEST_CASE("iccad20 AStarRouting", "[astar]") {
-    std::string circuit_name = "case3_no_extra_demand";
+TEST_CASE("iccad20 AStarRouting", "[astar]")
+{
+    std::string circuit_name = "case3";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
     std::cout<<iccad_2020_file<<std::endl;
@@ -287,14 +288,11 @@ TEST_CASE("iccad20 AStarRouting", "[astar]") {
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto net = design.netlist().find_net("N2594");
     astar_routing.route_net(net);
-    iccad_output_writer.write_ICCAD_2020_output("case3_no_extra_demand_out.txt", {});
-
-    //draw_gcell_svg(design, netlist.name(net));
-
+    iccad_output_writer.write_ICCAD_2020_output("case3.txt", {});
 }
 
-//TODO: unroute whole circuit, sort nets by length, reroute everything starting from the larger ones.
-TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
+TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
+{
     std::string circuit_name = "case4";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
@@ -318,7 +316,69 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]") {
     }
     std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
 
-    iccad_output_writer.write_ICCAD_2020_output("case4_output.txt", {});
+    iccad_output_writer.write_ICCAD_2020_output("case4.txt", {});
+}
 
-    //draw_gcell_svg(design, "N2594");
+std::vector<std::pair<int, ophidian::circuit::Net>> sort_nets(ophidian::design::Design & design)
+{
+    auto& netlist = design.netlist();
+    auto& placement = design.placement();
+    std::vector<std::pair<int, ophidian::circuit::Net>> sorted_nets;
+
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        //Run Flute
+        std::vector<ophidian::interconnection::Flute::Point> net_points;
+        auto net_pins = netlist.pins(*net_it);
+        net_points.reserve(netlist.pins(*net_it).size());
+        for(auto pin : net_pins)
+        {
+            auto pin_location = placement.location(pin);
+            net_points.push_back(pin_location);
+        }
+
+        auto & flute = ophidian::interconnection::Flute::instance();
+        auto tree = flute.create(net_points);
+        int length = tree->length().value();
+        sorted_nets.push_back(std::make_pair(length, *net_it));
+        // sorted_nets.push_back(pair);
+    }
+    std::sort(sorted_nets.begin(), sorted_nets.end(), [](auto & pair1, auto & pair2)
+    {
+            return pair1.first < pair2.first;
+    });
+    return sorted_nets;
+}
+
+//TODO: If we intend to generate the whole routing solution from strach we have to consider congestion
+TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_unroure_all_nets]")
+{
+    std::string circuit_name = "case4";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+    std::cout<<iccad_2020_file<<std::endl;
+    auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+    auto design = ophidian::design::Design();
+    ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+
+    auto& netlist = design.netlist();
+    auto& global_routing = design.global_routing();
+    int routed_nets = 0;
+    int non_routed = 0;
+    auto astar_routing = ophidian::routing::AStarRouting(design);
+    auto sorted_nets = sort_nets(design);
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+        global_routing.unroute(*net_it);
+    for(auto pair_length_net : sorted_nets)
+    {
+        auto result = astar_routing.route_net(pair_length_net.second);
+        if(result)
+            routed_nets++;
+        else
+            non_routed++;
+    }
+    std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+
+    iccad_output_writer.write_ICCAD_2020_output("sorted_case4.txt", {});
 }

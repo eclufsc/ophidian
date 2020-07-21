@@ -120,8 +120,8 @@ namespace ophidian::routing
         auto steiner_tree_length = tree->length().value();
         if(steiner_tree_length == 0)
         {
-            std::cout<<"WARNING: same gcell"<<std::endl;
-            std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
+            if (AStarDebug) std::cout<<"WARNING: same gcell"<<std::endl;
+            if (AStarDebug) std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
         }
 
@@ -176,8 +176,8 @@ namespace ophidian::routing
 
         if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
         {
-            std::cout<<"WARNING: same gcell"<<std::endl;
-            std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
+            if (AStarDebug) std::cout<<"WARNING: same gcell"<<std::endl;
+            if (AStarDebug) std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
         }
 
@@ -229,11 +229,13 @@ namespace ophidian::routing
                 if(gcell_has_free_space(gcell) == false)
                 {
                     if(flute_node.pin_name == "steiner")
-                        std::cout<<"WARNING: steiner node mapped is overflowed!!!"<<std::endl;
+                    {
+                        if (AStarDebug) std::cout<<"WARNING: steiner node mapped is overflowed!!!"<<std::endl;
+                    }
                 }
                 else
                 {
-                    std::cout<<"WARNING: pin node mapped is overflowed!!!"<<std::endl;
+                    if (AStarDebug) std::cout<<"WARNING: pin node mapped is overflowed!!!"<<std::endl;
                 }
                 flute_node.mapped_gcell = gcell;
             }
@@ -336,9 +338,13 @@ namespace ophidian::routing
 
         //TODO: return false (return AFTER clean dirty nodes)
         if(open_nodes.empty())
-            std::cout<<"there is no path to the goal"<<std::endl;
+        {
+            if (AStarDebug) std::cout<<"there is no path to the goal"<<std::endl;
+        }
         if(goal_is_steiner)
+        {
             m_node_map[goal].mapped_gcell = current_node;
+        }
 
         // std::cout<<"backtrack path result"<<std::endl;
         back_track_path(start, goal);
@@ -706,8 +712,7 @@ namespace ophidian::routing
             if(pin_vector.second.size() > 1)
             {
                 int min_layer_index = std::numeric_limits<int>::max();
-                int max_layer_index = std::numeric_limits<int>::min();
-                //int max_layer_index = routing_library.layerIndex(m_min_layer);
+                int max_layer_index = routing_library.layerIndex(m_min_layer);
                 for(auto pin : pin_vector.second)
                 {
                     auto pin_geometry = placement.geometry(pin);
@@ -738,7 +743,7 @@ namespace ophidian::routing
         auto ref_loc = placement.location(pin_ref);
 
         int min_layer_index = std::numeric_limits<int>::max();
-        int max_layer_index = std::numeric_limits<int>::min();
+        int max_layer_index = routing_library.layerIndex(m_min_layer);
         for(auto pin : netlist.pins(m_net))
         {
             auto pin_geometry = placement.geometry(pin);
