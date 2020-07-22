@@ -11,7 +11,6 @@
 #include <memory>
 #include <limits>
 
-//TODO:consider extra demand constraint
 namespace ophidian::routing
 {
 
@@ -96,7 +95,7 @@ namespace ophidian::routing
             void connect_floating_pins();
             bool all_pins_same_collumn();
             void trivial_routing();
-            void update_extra_demand_constraint();
+            void update_extra_demand_constraint();//make it public? TODO: update extra demand incrementally.
             bool gcell_has_free_space(gcell_type gcell);
 
 

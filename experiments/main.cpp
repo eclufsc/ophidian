@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ophidian/design/DesignFactory.h>
 #include <ophidian/routing/ILPRouting.h>
+#include <ophidian/routing/AStarRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/util/log.h>
 
@@ -33,22 +34,28 @@ void greetings(){
 };
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
-    ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
+    ophidian::routing::AStarRouting astar_routing{design};
+    //ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
 
-    std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements; 
+    //std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements;
     // std::log() << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
+    //auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     // std::log() << "result " << result << std::endl;
+    auto& netlist = design.netlist();
+    std::vector<ophidian::routing::AStarSegment> segments;
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+        astar_routing.route_net(*net_it, segments);
 
-    if(result.first){
-        iccad_output_writer.write_ICCAD_2020_output(output, movements);
-    }
-   
+    iccad_output_writer.write_ICCAD_2020_output(output, {});
+    // if(result.first){
+    //     iccad_output_writer.write_ICCAD_2020_output(output, movements);
+    // }
+
     // std::log() << "connected nets" << std::endl;
     // for (auto net : nets) {
     //     ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};

@@ -302,16 +302,14 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
-    std::cout<<"end init structures"<<std::endl;
 
     auto& netlist = design.netlist();
     int routed_nets = 0;
     int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
+    std::vector<ophidian::routing::AStarSegment> segments;
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
-        std::cout<<"routing net "<<netlist.name(*net_it)<<std::endl;
-        std::vector<ophidian::routing::AStarSegment> segments;
         auto result = astar_routing.route_net(*net_it, segments);
         if(result)
             routed_nets++;
@@ -354,10 +352,10 @@ std::vector<std::pair<int, ophidian::circuit::Net>> sort_nets(ophidian::design::
     return sorted_nets;
 }
 
-//TODO: If we intend to generate the whole routing solution from strach we have to consider congestion
-TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_unroure_all_nets]")
+//PS: this optimization almost double the runtime and gives only less than 1% of improvement!
+TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sorting_nets]")
 {
-    std::string circuit_name = "case4";
+    std::string circuit_name = "case2";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
     std::cout<<iccad_2020_file<<std::endl;
@@ -374,8 +372,10 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_unrour
     auto sorted_nets = sort_nets(design);
     std::vector<ophidian::routing::AStarSegment> segments;
 
-    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
-        global_routing.unroute(*net_it);
+    //TODO: If we intend to generate the whole routing solution from strach we have to consider congestion
+    // for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    //     global_routing.unroute(*net_it);
+
     for(auto pair_length_net : sorted_nets)
     {
         auto result = astar_routing.route_net(pair_length_net.second, segments);
