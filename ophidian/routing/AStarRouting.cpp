@@ -3,6 +3,9 @@
 #include <list>
 #include <unordered_set>
 
+#include <ophidian/util/log.h>
+using namespace ophidian::util;
+
 bool AStarDebug = false;
 
 namespace ophidian::routing
@@ -34,7 +37,7 @@ namespace ophidian::routing
     }
 
     //when routing all nets is required first remove all of them
-    bool AStarRouting::route_net(const AStarRouting::net_type & net)
+    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing)
     {
         m_net = net;
 
@@ -48,7 +51,7 @@ namespace ophidian::routing
         bool all_pins_are_in_same_collumn = all_pins_same_collumn();
         if(all_pins_are_in_same_collumn == false)
         {
-            //1-Call Flute.
+            printlog("1-Call Flute.");
             bool flute_graph;
             if(net_size > 2)
                 flute_graph = init_flute_graph();
@@ -60,31 +63,34 @@ namespace ophidian::routing
             if(flute_graph == false)
                 return false;
 
-            auto& global_routing = m_design.global_routing();
-            global_routing.unroute(m_net);
+            // auto& global_routing = m_design.global_routing();
+            //global_routing.unroute(m_net)
 
-            //2-Sort of layer assignment
+            printlog("2-Sort of layer assignment");
             node_layer_assignment();
-            //3-Connect each pair of nodes using A*.(consider min layer)
+            printlog("3-Connect each pair of nodes using A*.(consider min layer)");
             route_flute_segments();
-            //4-Convert gcell path into segments
+            printlog("4-Convert gcell path into segments");
             bfs_backtrack();
-            //5-Connect cell pins to min layers
+            printlog("5-Connect cell pins to min layers");
             connect_pins_to_min_layer();
 
             connect_floating_pins();
         }
         else
         {
-            auto& global_routing = m_design.global_routing();
-            global_routing.unroute(m_net);
+            // auto& global_routing = m_design.global_routing();
+            // global_routing.unroute(m_net);
             trivial_routing();
         }
-        //6-Write segments in GlobalRouting
-        write_routing_segments();
-        //7-clean AStarRouting to be reused by other nets
+        printlog("6-generate segments");
+        generate_routing_segments(segments);
+        printlog("7-Write segments in GlobalRouting");
+        if(applying_routing)
+            apply_segments_to_global_routing(segments);
+        printlog("8-clean AStarRouting to be reused by other nets");
         clear_router_members();
-        //8-Clean up the code
+        printlog("9-Clean up the code");
         return true;
     }
 
@@ -256,14 +262,14 @@ namespace ophidian::routing
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
         {
-            // std::cout<<"test"<<std::endl;
+            std::cout<<"test"<<std::endl;
             if(m_node_map[node].pin_name != "steiner")
             {
                 m_root_node = node;
                 break;
             }
         }
-        // std::cout<<"root node: "<<m_node_map[m_root_node]<<std::endl;
+        std::cout<<"root node: "<<m_node_map[m_root_node]<<std::endl;
         std::queue<flute_node_type> queue;
         queue.push(m_root_node);
 
@@ -272,16 +278,20 @@ namespace ophidian::routing
             auto current_node = queue.front();
             queue.pop();
             visited_nodes[current_node] = true;
-            //std::cout<<"visiting node: "<< m_node_map[current_node]<<std::endl;
+            std::cout<<"visiting node: "<< m_node_map[current_node]<<std::endl;
             for(flute_graph_type::IncEdgeIt edge(m_graph, current_node); edge != lemon::INVALID; ++edge)
             {
                 auto opposite_node = m_graph.oppositeNode(current_node, edge);
+                std::cout<<"opposite_node node: "<< m_node_map[opposite_node] << "visited? " << visited_nodes[opposite_node] <<std::endl;
                 if(visited_nodes[opposite_node] == false)
                 {
                     queue.push(opposite_node);
+                    std::cout<< "before A*" << std::endl;
                     a_star(current_node, opposite_node);
+                    std::cout<< "after A*" << std::endl;
                 }
             }
+            std::cout<<"next"<<std::endl;
         }
     }
 
@@ -293,16 +303,19 @@ namespace ophidian::routing
         open_nodes.push_back(m_node_map[start].mapped_gcell);
         std::vector<gcell_type> dirty_nodes;
         dirty_nodes.push_back(m_node_map[start].mapped_gcell);
+       
+        m_gcell_to_AStarNode[m_node_map[start].mapped_gcell].g = 0;
+
 
         // code just for debug
-        // auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
-        // auto pos = m_gcell_graph->position(node);
-        // std::cout<<m_node_map[start]<<std::endl;
-        // std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-        // node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
-        // pos = m_gcell_graph->position(node);
-        // std::cout<<m_node_map[goal]<<std::endl;
-        // std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
+        auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
+        auto pos = m_gcell_graph->position(node);
+        std::cout<<m_node_map[start]<<std::endl;
+        std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
+        node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
+        pos = m_gcell_graph->position(node);
+        std::cout<<m_node_map[goal]<<std::endl;
+        std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
         // code just for debug
 
         gcell_type current_node;
@@ -315,7 +328,7 @@ namespace ophidian::routing
 
             //discover neighbors
             auto current_neighbors = neighbors(current_node);
-            //std::cout<<"neighbors size: "<<current_neighbors.size()<<std::endl;
+            std::cout<<"neighbors size: "<<current_neighbors.size()<<std::endl;
             for(auto neighbor : current_neighbors)
             {
                 update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
@@ -346,7 +359,7 @@ namespace ophidian::routing
             m_node_map[goal].mapped_gcell = current_node;
         }
 
-        // std::cout<<"backtrack path result"<<std::endl;
+        std::cout<<"backtrack path result"<<std::endl;
         back_track_path(start, goal);
 
         //clean dirty nodes
@@ -515,22 +528,27 @@ namespace ophidian::routing
         auto g_node = m_gcell_graph->graph_node(gcell);
         auto g_pos = m_gcell_graph->position(g_node);
 
-        // std::cout<<"debugging net: "<<m_design.netlist().name(m_net)<<std::endl;
-        // std::cout<<"backtrack from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        // std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
-        // std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
+        std::cout<<"debugging net: "<<m_design.netlist().name(m_net)<<std::endl;
+        std::cout<<"backtrack from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
+        std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
+        std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
 
         bool non_stop = true;
         while(non_stop)
         {
             non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
-            // std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
+            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
             path.push_back(gcell);
+            std::cout<<"non_stop = " << non_stop << std::endl;
             if(non_stop == false)
                 break;
+            std::cout<<"1"<<std::endl;
             gcell = m_gcell_to_AStarNode[gcell].gcell_from;
+            std::cout<<"2 - gcell " << gcell.id() << " invalid? " << (gcell == ophidian::routing::FluteNode::gcell_type{}) <<std::endl;
             g_node = m_gcell_graph->graph_node(gcell);
+            std::cout<<"3"<<std::endl;
             g_pos = m_gcell_graph->position(g_node);
+            std::cout<<"new ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
         }
 
         for(flute_graph_type::IncEdgeIt edge(m_graph, s); edge != lemon::INVALID; ++edge)
@@ -655,7 +673,7 @@ namespace ophidian::routing
         }
     }
 
-    void AStarRouting::write_routing_segments()
+    void AStarRouting::generate_routing_segments(std::vector<AStarSegment> & segments)
     {
         auto& global_routing = m_design.global_routing();
         auto& routing_library = m_design.routing_library();
@@ -676,9 +694,29 @@ namespace ophidian::routing
             auto max_y = std::max(start_pos.y(), end_pos.y());
 
             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
-            global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
+
+            // global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
+            segments.push_back(AStarSegment(wire_box, start_layer, end_layer, m_net));
         }
-        global_routing.increase_demand(m_net);
+        // global_routing.increase_demand(m_net);
+    }
+
+    void AStarRouting::apply_segments_to_global_routing(const std::vector<AStarSegment> & segments)
+    {
+        auto& global_routing = m_design.global_routing();
+        std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
+        printlog("init");
+        for(auto segment : segments)
+        {
+            global_routing.add_segment(segment.wire_box, segment.start_layer, segment.end_layer, segment.net);
+            nets.insert(segment.net);
+        }
+        printlog("nets size %d", nets.size());
+        for(auto net: nets)
+        {
+            global_routing.increase_demand(net);
+        }
+        printlog(" end apply_segments_to_global_routing");
     }
 
     void AStarRouting::clear_router_members()

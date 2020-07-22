@@ -27,6 +27,32 @@ namespace ophidian::routing
         bool finished, discovered;
     };
 
+    struct AStarSegment
+    {
+        using unit_type                         = util::database_unit_t;
+        using box_type                          = geometry::Box<unit_type>;
+        using layer_type                        = Layer;
+        using net_type                          = circuit::Net;
+        
+        AStarSegment():
+            wire_box{box_type{{unit_type{0}, unit_type{0}}, {unit_type{0}, unit_type{0}}}},
+            start_layer{layer_type{}},
+            end_layer{layer_type{}},
+            net{net_type{}}
+        {};
+
+        AStarSegment(box_type box, layer_type start, layer_type end, net_type n):
+            wire_box{box},
+            start_layer{start},
+            end_layer{end},
+            net{n}
+        {};
+
+        box_type wire_box;
+        layer_type start_layer, end_layer;
+        net_type net;
+    };
+
     class AStarRouting
     {
         public:
@@ -49,7 +75,8 @@ namespace ophidian::routing
 
             AStarRouting(design_type & design);
 
-            bool route_net(const net_type & net);
+            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
+            void apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
@@ -64,7 +91,7 @@ namespace ophidian::routing
             void back_track_path(flute_node_type s, flute_node_type g);
             void gcell_path_to_routing_segments(flute_node_type s, flute_node_type g);
             void connect_pins_to_min_layer();
-            void write_routing_segments();
+            void generate_routing_segments(std::vector<AStarSegment> & segments);
             void clear_router_members();
             void connect_floating_pins();
             bool all_pins_same_collumn();
