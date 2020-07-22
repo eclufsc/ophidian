@@ -509,8 +509,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
 {
     std::vector<std::string> circuit_names = {
         // "case1",
-        "case2",
-        // "case3",
+        // "case2",
+        "case3",
         // "case4",
         // "case5",
     };

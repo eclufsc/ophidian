@@ -80,8 +80,8 @@ namespace ophidian::routing
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
             void node_layer_assignment();
-            void route_flute_segments();
-            void a_star(flute_node_type start, flute_node_type goal);
+            bool route_flute_segments();
+            bool a_star(flute_node_type start, flute_node_type goal);
             unsigned int heuristic(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
             std::vector<gcell_type> neighbors(gcell_type gcell);
             void update_f_score(gcell_type gcell, gcell_type neighbor_gcell, gcell_type goal_gcell, bool goal_is_steiner);

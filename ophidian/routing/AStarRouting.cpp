@@ -69,7 +69,12 @@ namespace ophidian::routing
             printlog("2-Sort of layer assignment");
             node_layer_assignment();
             printlog("3-Connect each pair of nodes using A*.(consider min layer)");
-            route_flute_segments();
+            bool routed = route_flute_segments();
+            if(!routed)
+            {
+                clear_router_members();
+                return false;
+            }
             printlog("4-Convert gcell path into segments");
             bfs_backtrack();
             printlog("5-Connect cell pins to min layers");
@@ -257,7 +262,7 @@ namespace ophidian::routing
     }
 
     //call a_star routing for each pair of flute nodes in BFS order from any node_pin
-    void AStarRouting::route_flute_segments()
+    bool AStarRouting::route_flute_segments()
     {
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
@@ -287,16 +292,19 @@ namespace ophidian::routing
                 {
                     queue.push(opposite_node);
                     std::cout<< "before A*" << std::endl;
-                    a_star(current_node, opposite_node);
+                    bool exist_path = a_star(current_node, opposite_node);
                     std::cout<< "after A*" << std::endl;
+                    if(exist_path == false)
+                        return false;
                 }
             }
             std::cout<<"next"<<std::endl;
         }
+        return true;
     }
 
     //find a shortest path from start.mapped_gcell to goal.mapped_gcell
-    void AStarRouting::a_star(flute_node_type start, flute_node_type goal)
+    bool AStarRouting::a_star(flute_node_type start, flute_node_type goal)
     {
         bool goal_is_steiner = m_node_map[goal].pin_name == "steiner" ? true : false;
         std::list<gcell_type> open_nodes;
@@ -319,11 +327,15 @@ namespace ophidian::routing
         // code just for debug
 
         gcell_type current_node;
+        bool target_found = false;
         while(open_nodes.empty() == false)
         {
             current_node = open_nodes.front();
             if(goal_reached(current_node, m_node_map[goal].mapped_gcell, goal_is_steiner))
+            {
+                target_found = true;
                 break;
+            }
             open_nodes.pop_front();
 
             //discover neighbors
@@ -360,7 +372,8 @@ namespace ophidian::routing
         }
 
         std::cout<<"backtrack path result"<<std::endl;
-        back_track_path(start, goal);
+        if(target_found)
+            back_track_path(start, goal);
 
         //clean dirty nodes
         for(auto gcell : dirty_nodes)
@@ -372,6 +385,8 @@ namespace ophidian::routing
             astar_node.finished = false;
             astar_node.gcell_from = gcell_type{};
         }
+
+        return target_found;
     }
 
     //3D Manhattan distance, if goal is steiner point, disregard Z dimension.
