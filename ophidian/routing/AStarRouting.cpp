@@ -33,17 +33,50 @@ namespace ophidian::routing
         update_extra_demand_constraint();
     }
 
-    //when routing all nets is required first remove all of them
-    bool AStarRouting::route_net(const AStarRouting::net_type & net)
+
+    struct GlobalRoutingSegment
+    {
+        using unit_type                         = util::database_unit_t;
+        using box_type                          = geometry::Box<unit_type>;
+        using layer_type                        = Layer;
+        using net_type                          = circuit::Net;
+
+        GlobalRoutingSegment(box_type box, layer_type start, layer_type end, net_type n):
+            box{box},
+            start_layer{start},
+            end_layer{end},
+            net{n}
+        {};
+
+        box_type box;
+        layer_type start_layer, end_layer;
+        net_type net;
+    };
+
+    //Returns the routing result, when it fails return an empty vector and undo all routing changes.
+    std::vector<AStarRouting::routing_segment_type> AStarRouting::route_net(const AStarRouting::net_type & net, bool write_routing)
     {
         m_net = net;
-
-        //TODO: Save the current_routing as a backup
 
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
         auto net_size = netlist.pins(net).size();
         m_min_layer = routing_constraints.min_net_layer(net);
+        auto& global_routing = m_design.global_routing();
+        std::vector<GlobalRoutingSegment> backup_segments;
+
+        if(write_routing == false)
+        {
+            for(auto segment : global_routing.segments(m_net))
+            {
+                backup_segments.push_back(GlobalRoutingSegment{
+                        global_routing.box(segment),
+                        global_routing.layer_start(segment),
+                        global_routing.layer_end(segment),
+                        global_routing.net(segment)});
+            }
+        }
+        global_routing.unroute(m_net);
 
         bool all_pins_are_in_same_collumn = all_pins_same_collumn();
         if(all_pins_are_in_same_collumn == false)
@@ -55,13 +88,10 @@ namespace ophidian::routing
             else if(net_size == 2)
                 flute_graph = init_two_pin_flute_graph();
             else//net only have 1 pin (For iccad2020 it should never happen)
-                return false;
+                return {};
 
             if(flute_graph == false)
-                return false;
-
-            auto& global_routing = m_design.global_routing();
-            global_routing.unroute(m_net);
+                return {};
 
             //2-Sort of layer assignment
             node_layer_assignment();
@@ -76,16 +106,24 @@ namespace ophidian::routing
         }
         else
         {
-            auto& global_routing = m_design.global_routing();
-            global_routing.unroute(m_net);
             trivial_routing();
         }
         //6-Write segments in GlobalRouting
-        write_routing_segments();
+        if(write_routing)
+            write_routing_segments();
+        else
+        {
+            for(auto segment : backup_segments)
+            {
+                global_routing.add_segment(segment.box, segment.start_layer, segment.end_layer, segment.net);
+            }
+            global_routing.increase_demand(m_net);
+        }
         //7-clean AStarRouting to be reused by other nets
+        auto result = m_routing_segments;
         clear_router_members();
         //8-Clean up the code
-        return true;
+        return result;
     }
 
     //return false when all cells are inside the same gcell

@@ -308,8 +308,8 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     auto astar_routing = ophidian::routing::AStarRouting(design);
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
-        auto result = astar_routing.route_net(*net_it);
-        if(result)
+        auto result_segments = astar_routing.route_net(*net_it);
+        if(result_segments.empty())
             routed_nets++;
         else
             non_routed++;
@@ -375,8 +375,8 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
 
     for(auto pair_length_net : sorted_nets)
     {
-        auto result = astar_routing.route_net(pair_length_net.second);
-        if(result)
+        auto result_segments = astar_routing.route_net(pair_length_net.second);
+        if(result_segments.empty())
             routed_nets++;
         else
             non_routed++;

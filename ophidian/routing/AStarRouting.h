@@ -48,7 +48,7 @@ namespace ophidian::routing
 
             AStarRouting(design_type & design);
 
-            bool route_net(const net_type & net);
+            std::vector<routing_segment_type> route_net(const net_type & net, bool write_routing = true);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
