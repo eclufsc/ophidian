@@ -81,6 +81,44 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
     out_svg.close();
 }
 
+void astar_route_all_nets(ophidian::design::Design & design, ophidian::routing::AStarRouting & router)
+{
+    auto & netlist = design.netlist();
+    int routed_nets = 0;
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        auto net = *net_it;
+        auto routing_segments = router.route_net(*net_it);
+        if(routing_segments.empty() == false)
+            routed_nets++;
+    }
+    std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" nets"<<std::endl;
+}
+
+
+//the wirelength and wirelength demand (demand - blockage_demand) should be always equal
+int sanity_check(ophidian::design::Design & design)
+{
+    auto & netlist = design.netlist();
+    auto & global_routing = design.global_routing();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+
+    std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
+    auto wirelength = design.global_routing().wirelength(nets);
+
+    std::cout<<"Wirelength "<<wirelength<<std::endl;
+
+    int wirelength_demand = 0;
+    for(auto gcell_it = gcell_graph_ptr->begin_gcell(); gcell_it != gcell_graph_ptr->end_gcell(); gcell_it++)
+    {
+        auto gcell = *gcell_it;
+        wirelength_demand += (gcell_graph_ptr->demand(gcell) - gcell_graph_ptr->blockage_demand(gcell));
+    }
+
+    std::cout<<"Wirelength demmand "<<wirelength_demand<<std::endl;
+    return wirelength == wirelength_demand;
+}
+
 /*
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
@@ -280,12 +318,12 @@ TEST_CASE("iccad20 AStarRouting", "[astar]")
     std::string circuit_name = "case3";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
-    std::cout<<iccad_2020_file<<std::endl;
     auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
     auto astar_routing = ophidian::routing::AStarRouting(design);
+
     auto net = design.netlist().find_net("N2594");
     astar_routing.route_net(net);
     iccad_output_writer.write_ICCAD_2020_output("case3.txt", {});
@@ -293,30 +331,30 @@ TEST_CASE("iccad20 AStarRouting", "[astar]")
 
 TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
 {
-    std::string circuit_name = "case1";
+    std::string circuit_name = "case3_no_extra_demand";
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
     std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
-    std::cout<<iccad_2020_file<<std::endl;
     auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
-
-    auto& netlist = design.netlist();
-    int routed_nets = 0;
-    int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
-    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
-    {
-        auto result_segments = astar_routing.route_net(*net_it);
-        if(result_segments.empty())
-            routed_nets++;
-        else
-            non_routed++;
-    }
-    std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
 
-    iccad_output_writer.write_ICCAD_2020_output("case1.txt", {});
+
+    auto & netlist = design.netlist();
+    std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
+    auto initial_wirelength = design.global_routing().wirelength(nets);
+
+
+    std::cout<<"first sanity check:"<<std::endl;
+    sanity_check(design);
+
+    astar_route_all_nets(design, astar_routing);
+
+    std::cout<<"second sanity check:"<<std::endl;
+    sanity_check(design);
+
+    iccad_output_writer.write_ICCAD_2020_output("case3_no_extra_demand.txt", {});
 }
 
 std::vector<std::pair<int, ophidian::circuit::Net>> sort_nets(ophidian::design::Design & design)
@@ -341,7 +379,6 @@ std::vector<std::pair<int, ophidian::circuit::Net>> sort_nets(ophidian::design::
         auto tree = flute.create(net_points);
         int length = tree->length().value();
         sorted_nets.push_back(std::make_pair(length, *net_it));
-        // sorted_nets.push_back(pair);
     }
     std::sort(sorted_nets.begin(), sorted_nets.end(), [](auto & pair1, auto & pair2)
     {
@@ -365,7 +402,6 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
     auto& netlist = design.netlist();
     auto& global_routing = design.global_routing();
     int routed_nets = 0;
-    int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto sorted_nets = sort_nets(design);
 
@@ -378,10 +414,258 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
         auto result_segments = astar_routing.route_net(pair_length_net.second);
         if(result_segments.empty())
             routed_nets++;
-        else
-            non_routed++;
     }
-    std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+    std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" nets"<<std::endl;
 
     iccad_output_writer.write_ICCAD_2020_output("sorted_case2.txt", {});
+}
+
+std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_costs(ophidian::design::Design & design)
+{
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
+
+    std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells_cost;
+    for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); ++cell_it)
+    {
+        auto cell = *cell_it;
+        if(placement.isFixed(cell))
+            continue;
+
+        std::unordered_set<ophidian::circuit::Net, ophidian::entity_system::EntityBaseHash> cell_nets;
+        for(auto pin : netlist.pins(cell))
+        {
+            auto net = netlist.net(pin);
+            cell_nets.insert(net);
+        }
+
+        double routed_length = 0;
+        double minimum_length = 0;
+        for (auto net : cell_nets) {
+            auto pins = netlist.pins(net);
+            std::vector<ophidian::interconnection::Flute::Point> net_points;
+            net_points.reserve(pins.size());
+            for (auto pin : pins) {
+                auto pin_location = design.placement().location(pin);
+                net_points.push_back(pin_location);
+            }
+            auto & flute = ophidian::interconnection::Flute::instance();
+            auto tree = flute.create(net_points);
+            auto stwl = tree->length().value();
+            stwl /= 10;
+            if (stwl == 0) {
+                stwl = 1;
+            }
+            routed_length += design.global_routing().wirelength(net);
+            minimum_length += stwl;
+        }
+        auto cost = routed_length / minimum_length;
+        cells_cost.push_back(std::make_pair(cell, cost));
+    }
+    return cells_cost;
+}
+
+ophidian::util::LocationDbu calculate_median_candidate(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell){
+    using unit_type = ophidian::util::database_unit_t;
+    using net_type = ophidian::circuit::Net;
+
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
+    std::vector<net_type> cell_nets;//can a cell have two or more pins in a same net? If so we have to use a set for this
+    std::vector<double> x_positions;
+    std::vector<double> y_positions;
+
+    for(auto pin : netlist.pins(cell)){
+        auto net = netlist.net(pin);
+        if(net == ophidian::circuit::Net())
+            continue;
+        cell_nets.push_back(net);
+        for(auto net_pin : netlist.pins(net)){
+            if(net_pin == pin)
+                continue;
+            auto location = placement.location(net_pin);
+            x_positions.push_back(location.x().value());
+            y_positions.push_back(location.y().value());
+        }
+    }
+    if(x_positions.empty() || y_positions.empty())
+        return placement.location(cell);
+
+    //TODO consider odd and even size vector
+    std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
+    auto median_x = x_positions[x_positions.size()/2];
+    std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
+    auto median_y = y_positions[y_positions.size()/2];
+
+    ophidian::util::LocationDbu median_point {unit_type(median_x), unit_type(median_y)};
+
+    auto nearest_gcell = design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
+
+    auto cell_location = placement.location(cell);
+    auto current_gcell = design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+
+    if(current_gcell != nearest_gcell){
+        auto center_gcell = design.global_routing().gcell_graph()->center_of_box(nearest_gcell);
+        return center_gcell;
+    }
+    return placement.location(cell);
+}
+
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & router)
+{
+    //using unit_type = ophidian::util::database_unit_t;
+    //ophidian::util::LocationDbu;
+
+    auto & global_routing = design.global_routing();
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
+    auto & routing_library = design.routing_library();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+
+    auto initial_location = placement.location(cell);
+    auto median_location = calculate_median_candidate(design, cell);
+    if(median_location.x() != initial_location.x() && median_location.y() != initial_location.y() )
+        return false;
+    // get nets
+    std::vector<ophidian::circuit::Net> nets;
+    for(auto pin : netlist.pins(cell)){
+        auto net = netlist.net(pin);
+        if(net == ophidian::circuit::Net())
+            continue;
+        nets.push_back(net);
+    }
+    // backup routing information
+    std::vector<ophidian::routing::GlobalRoutingSegment> old_routing;
+    for(auto net : nets)
+    {
+        for(auto segment : global_routing.segments(net))
+        {
+            old_routing.push_back({global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net});
+        }
+        global_routing.unroute(net);
+    }
+
+    //move cell to median
+    placement.place(cell, median_location);
+    std::vector<ophidian::routing::GlobalRoutingSegment> new_routing;
+    bool routed_all_nets = true;
+    //log() << "cells net size : " << cell_nets.size() << std::endl;
+    for(auto net : nets)
+    {
+        //printlog("antes a* com net ", netlist.name(net));
+        auto routing_result = router.route_net(net, false);
+        //log() << "result : " << result << std::endl;
+        if(routing_result.empty())
+        {
+            //printlog("NOT ROUTED!");
+            routed_all_nets = false;
+            break;
+        }
+        for(auto gcell_pair : routing_result)
+        {
+            auto start_layer_index = gcell_graph_ptr->layer_index(gcell_pair.first);
+            auto start_layer = routing_library.layer_from_index(start_layer_index);
+            auto start_pos = gcell_graph_ptr->center_of_box(gcell_pair.first);
+
+            auto end_layer_index = gcell_graph_ptr->layer_index(gcell_pair.second);
+            auto end_layer = routing_library.layer_from_index(end_layer_index);
+            auto end_pos = gcell_graph_ptr->center_of_box(gcell_pair.second);
+
+            auto min_x = std::min(start_pos.x(), end_pos.x());
+            auto max_x = std::max(start_pos.x(), end_pos.x());
+            auto min_y = std::min(start_pos.y(), end_pos.y());
+            auto max_y = std::max(start_pos.y(), end_pos.y());
+
+            auto box = ophidian::geometry::Box<ophidian::util::database_unit_t>{{min_x, min_y}, {max_x, max_y}};
+            new_routing.push_back({box, start_layer, end_layer, net});
+        }
+    }
+    //log() << "after for " << routed_all_nets << std::endl;
+    if(routed_all_nets)
+    {
+        //printflog("segments size %d" , segments.size() );
+        for(auto segment : new_routing)
+            global_routing.add_segment(segment.box, segment.start_layer, segment.end_layer, segment.net);
+        for(auto net : nets)
+            global_routing.increase_demand(net);
+        return true;
+    }else{
+        //undo cell position and nets
+        for(auto segment : old_routing)
+            global_routing.add_segment(segment.box, segment.start_layer, segment.end_layer, segment.net);
+        for(auto net : nets)
+            global_routing.increase_demand(net);
+        return false;
+    }
+}
+
+TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_cells]")
+{
+    std::string circuit_name = "case3_no_extra_demand";
+    std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+    std::cout<<iccad_2020_file<<std::endl;
+    auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+    auto design = ophidian::design::Design();
+    ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+
+    auto& netlist = design.netlist();
+    auto& global_routing = design.global_routing();
+    auto& placement = design.placement();
+    //std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
+    //int initial_wirelength = global_routing.wirelength(nets);
+    //log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
+    auto astar_routing = ophidian::routing::AStarRouting(design);
+
+    // ========= Route all nets using AStar ========= //
+    astar_route_all_nets(design, astar_routing);
+
+    // ========= Compute cost to move ========= //
+    std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells_cost = compute_cell_costs(design);
+    std::sort(cells_cost.begin(), cells_cost.end(), [](auto & cost_a, auto & cost_b) {return cost_a.second < cost_b.second;});
+
+    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
+    auto moved_cells = 0;
+    for(auto pair : cells_cost)
+    {
+        auto cell = pair.first;
+
+        std::cout<<"Before movement sanity check:"<<std::endl;
+        bool before = sanity_check(design);
+
+        std::cout<<"Try move: "<<netlist.name(cell)<<std::endl;
+        auto moved = move_cell(design, cell, astar_routing);
+
+        std::cout<<"After movement sanity check:"<<std::endl;
+        bool after = sanity_check(design);
+
+        if(before != after)
+        {
+            std::cout<<"BREAK"<<std::endl;
+            break;
+        }
+
+        if(moved)
+        {
+            std::cout<<"good move"<<std::endl;
+            moved_cells++;
+            movements.push_back(std::make_pair(cell, placement.location(cell)));
+        }
+        else
+            std::cout<<"bad move"<<std::endl;
+        if(moved_cells == design.routing_constraints().max_cell_movement())
+            break;
+    }
+/*
+        iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out.txt", movements);
+        int final_wirelength = global_routing.wirelength(nets);
+        log() << "Circuit final wirelength = " << final_wirelength << std::endl;
+        auto score = initial_wirelength - final_wirelength;
+        log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
+        double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
+        log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+*/
+    std::cout<<"moved cells: "<<moved_cells<<std::endl;
+    iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_movements_out.txt", movements);
 }

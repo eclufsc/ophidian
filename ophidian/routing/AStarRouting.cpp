@@ -601,8 +601,8 @@ namespace ophidian::routing
             auto min_y = std::min(start_pos.y(), end_pos.y());
             auto max_y = std::max(start_pos.y(), end_pos.y());
 
-            auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
-            global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
+            auto box = box_type{{min_x, min_y}, {max_x, max_y}};
+            global_routing.add_segment(box, start_layer, end_layer, m_net);
         }
         global_routing.increase_demand(m_net);
     }
