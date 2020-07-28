@@ -323,18 +323,18 @@ namespace ophidian::routing
         {
             current_node = open_nodes.front();
             auto current_pos = m_gcell_graph->position(m_gcell_graph->graph_node(current_node));
-            std::cout<<"current node: "<<current_pos.get<0>()<<", "<<current_pos.get<1>()<<", "<<current_pos.get<2>()<<std::endl;
+            //std::cout<<"current node: "<<current_pos.get<0>()<<", "<<current_pos.get<1>()<<", "<<current_pos.get<2>()<<std::endl;
             if(goal_reached(current_node, m_node_map[goal].mapped_gcell, goal_is_steiner))
                 break;
             open_nodes.pop_front();
 
             //discover neighbors
             auto current_neighbors = neighbors(current_node);
-            std::cout<<"neighbors size: "<<current_neighbors.size()<<std::endl;
+            //std::cout<<"neighbors size: "<<current_neighbors.size()<<std::endl;
             for(auto neighbor : current_neighbors)
             {
                 auto neighbor_pos = m_gcell_graph->position(m_gcell_graph->graph_node(neighbor));
-                std::cout<<"neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
+                //std::cout<<"neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
 
                 update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
                 if(m_gcell_to_AStarNode[neighbor].discovered == false)
@@ -414,16 +414,12 @@ namespace ophidian::routing
         if(down_node != lemon::INVALID)//check for graph boundary
         {
             auto neighbor_gcell = m_gcell_graph->gcell(down_node);
-                auto neighbor_pos = m_gcell_graph->position(m_gcell_graph->graph_node(neighbor_gcell));
-                std::cout<<"down neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
             if(gcell_has_free_space(neighbor_gcell))
             {
                 auto node_position = m_gcell_graph->position(down_node);
                 if(node_position.get<2>() >= min_layer_index)//check for min layer constraint
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
-            } else {
-                std::cout << "not free" << std::endl;
             }
         }
 
@@ -432,14 +428,10 @@ namespace ophidian::routing
         if(up_node != lemon::INVALID)//check for graph boundary
         {
             auto neighbor_gcell = m_gcell_graph->gcell(up_node);
-                auto neighbor_pos = m_gcell_graph->position(m_gcell_graph->graph_node(neighbor_gcell));
-                std::cout<<"up neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
             if(gcell_has_free_space(neighbor_gcell)) {
                 if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                     result.push_back(neighbor_gcell);
-            } else {
-                std::cout << "not free" << std::endl;
-            }
+            } 
         }
 
         //get west and east nodes
@@ -449,26 +441,18 @@ namespace ophidian::routing
             if(west_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(west_node);
-                    auto neighbor_pos = m_gcell_graph->position(m_gcell_graph->graph_node(neighbor_gcell));
-                    std::cout<<"up neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
                 if(gcell_has_free_space(neighbor_gcell)) {
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
-                } else {
-                    std::cout << "not free" << std::endl;
                 }
             }
             auto east_node = m_gcell_graph->east_node(node);
             if(east_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(east_node);
-                    auto neighbor_pos = m_gcell_graph->position(m_gcell_graph->graph_node(neighbor_gcell));
-                    std::cout<<"up neighbor node: "<<neighbor_pos.get<0>()<<", "<<neighbor_pos.get<1>()<<", "<<neighbor_pos.get<2>()<<std::endl;
                 if(gcell_has_free_space(neighbor_gcell)) {
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
-                } else {
-                    std::cout << "not free" << std::endl;
                 }
             }
         }
@@ -991,8 +975,6 @@ namespace ophidian::routing
 
     bool AStarRouting::gcell_has_free_space(AStarRouting::gcell_type gcell)
     {
-        std::cout << "gcell capacity " << m_gcell_graph->capacity(gcell) -1 << std::endl;
-        std::cout << "demand " << m_gcell_graph->demand(gcell) << std::endl;
         return ((m_gcell_graph->capacity(gcell) - 1) >= (m_gcell_graph->demand(gcell) + m_gcells_extra_demand[gcell]));
     }
 }

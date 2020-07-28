@@ -35,6 +35,17 @@ void greetings(){
 };
 
 void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name){
+    /*ophidian::routing::AStarRouting astar_routing{design};
+    auto& netlist = design.netlist();
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
+        auto net = *net_it;
+        auto net_name = design.netlist().name(net);
+        std::cout << "net " << net_name << std::endl;
+        design.global_routing().unroute(net);
+        std::vector<ophidian::routing::AStarSegment> segments;    
+        astar_routing.route_net(net, segments);
+    }*/
+
     // UCal::MCFRouting mcf_routing(design,circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
@@ -48,6 +59,8 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 }//end run_mcf_for_circuit
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
+    
+
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     //ophidian::routing::ILPRouting<IloNumVar> ilpRouting(design, circuit_name);
     ophidian::routing::AStarRouting astar_routing{design};
@@ -80,74 +93,54 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
             stwl = 1;
         }
 
+        auto routes = design.global_routing().segments(net);
+        auto routed_length_no_vias = 0;
+        auto via_length = 0;
+        for (auto route : routes) {
+            auto box = design.global_routing().box(route);
+            auto start = box.min_corner();
+            auto end = box.max_corner();
+            routed_length_no_vias += (std::abs(start.x().value() - end.x().value()) + std::abs(start.y().value() - end.y().value()));
+
+            auto start_layer = design.global_routing().layer_start(route);
+            auto end_layer = design.global_routing().layer_end(route);
+            auto start_layer_index = design.routing_library().layerIndex(start_layer);
+            auto end_layer_index = design.routing_library().layerIndex(end_layer);
+            via_length += std::abs(start_layer_index - end_layer_index);
+        }
+        routed_length_no_vias /= 10;
+        if (routed_length_no_vias == 0) {
+            routed_length_no_vias = 1;
+        }
+
         auto routed_length = design.global_routing().wirelength(net);
 
         auto cost = routed_length / stwl;
+        //auto cost = routed_length_no_vias / stwl;
 
-        if (cost >= 2) {
+        if (cost > 2) {
             bad_nets.push_back(net);
         }
     }
 
     std::cout << bad_nets.size() << " bad nets" << std::endl;
 
-    /*std::cout << "GCELL DEMANDS" << std::endl;
-    for (auto gcell_it = design.global_routing().gcell_graph()->begin_gcell(); gcell_it != design.global_routing().gcell_graph()->end_gcell(); gcell_it++) {
-        auto gcell = *gcell_it;
-        auto capacity = design.global_routing().gcell_graph()->capacity(gcell);
-        auto demand = design.global_routing().gcell_graph()->demand(gcell);
-        
-        auto gcell_node = design.global_routing().gcell_graph()->graph_node(gcell);
-        auto gcell_position = design.global_routing().gcell_graph()->position(gcell_node);
-
-        std::cout << "position " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << std::endl;
-
-        std::cout << "capacity " << capacity << std::endl;
-        std::cout << "demand " << demand << std::endl;
-    }*/
-
     // std::log() << "result " << result << std::endl;   
-    auto gcell_to_debug = design.global_routing().gcell_graph()->gcell(1, 1, 0);
-        auto capacity = design.global_routing().gcell_graph()->capacity(gcell_to_debug);
-        auto demand = design.global_routing().gcell_graph()->demand(gcell_to_debug);
-        std::cout << "DEBUG capacity " << capacity << " demand " << demand << std::endl;
     auto& netlist = design.netlist();
-    std::vector<ophidian::routing::AStarSegment> segments;    
-    bool failed = false;
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
         auto net = *net_it;
+    //for(auto net : bad_nets) {
         auto net_name = design.netlist().name(net);
         std::cout << "net " << net_name << std::endl;
         design.global_routing().unroute(net);
+        std::vector<ophidian::routing::AStarSegment> segments;    
         astar_routing.route_net(net, segments);
-        
-        auto capacity = design.global_routing().gcell_graph()->capacity(gcell_to_debug);
-        auto demand = design.global_routing().gcell_graph()->demand(gcell_to_debug);
-        std::cout << "DEBUG AFTER UNROUTE capacity " << capacity << " demand " << demand << std::endl;
-    
-        for (auto gcell_it = design.global_routing().gcell_graph()->begin_gcell(); gcell_it != design.global_routing().gcell_graph()->end_gcell(); gcell_it++) {
-        auto gcell = *gcell_it;
-        auto capacity = design.global_routing().gcell_graph()->capacity(gcell);
-        auto demand = design.global_routing().gcell_graph()->demand(gcell);
-        auto gcell_node = design.global_routing().gcell_graph()->graph_node(gcell);
-        auto gcell_position = design.global_routing().gcell_graph()->position(gcell_node);
-        if (demand > capacity) {
-            std::cout << "VIOLATED CAPACITY OF GCELL " << gcell_position.get<0>() << "," << gcell_position.get<1>() << "," << gcell_position.get<2>() << std::endl;
-            std::cout << "CAPACITY " << capacity << std::endl;
-            std::cout << "DEMAND " << demand << std::endl;
-            failed = true;
-            break;
-        }
-        }
-        if (failed) break;
-
-        capacity = design.global_routing().gcell_graph()->capacity(gcell_to_debug);
-        demand = design.global_routing().gcell_graph()->demand(gcell_to_debug);
-        std::cout << "DEBUG capacity " << capacity << " demand " << demand << std::endl;
     }
     //for (auto net : unrouted_nets) {
     //    astar_routing.route_net(net, segments);
     //}
+    
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
 
     iccad_output_writer.write_ICCAD_2020_output(output, movements);
     // if(result.first){
@@ -261,8 +254,8 @@ int main(int argc, char** argv) {
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
-    run_for_circuit(design, circuit_name, output);
-    //run_mcf_for_circuit(design,circuit_name);
+    //run_for_circuit(design, circuit_name, output);
+    run_mcf_for_circuit(design,circuit_name);
 
     return 0;
 }

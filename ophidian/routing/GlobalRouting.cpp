@@ -89,8 +89,10 @@ namespace ophidian::routing
         {
             auto layer_start = m_gr_segment_layers_start[segment];
             auto layer_end = m_gr_segment_layers_end[segment];
-            auto min_index = m_library.layerIndex(layer_start);
-            auto max_index = m_library.layerIndex(layer_end);
+            auto layer_start_index = m_library.layerIndex(layer_start);
+            auto layer_end_index = m_library.layerIndex(layer_end);
+            auto min_index = std::min(layer_start_index, layer_end_index);
+            auto max_index = std::max(layer_start_index, layer_end_index);
             for(auto i = min_index; i <= max_index; i++)
             {
                 auto box = m_gr_segment_box[segment];

@@ -167,6 +167,8 @@ namespace ophidian::routing {
 
             void convert_to_flute(point_container_type & converted, const point_container_type & points) const;
 
+            void find_gcells_intersecting_with_candidate(route_candidate_type & candidate, gcell_container_type & intersecting_gcells);
+
             point_type convert_to_design(point_type & point) const;
 
             design_type&    m_design;

@@ -1318,10 +1318,14 @@ namespace ophidian::routing {
         IloExpr expr(m_env);
         for(auto candidate : m_route_candidate)
         {
-            auto candidate_variable = m_route_candidate_variables[candidate];
-            auto candidate_wirelength = m_route_candidate_wirelengths[candidate].value();
+            gcell_container_type intersecting_gcells;
+            find_gcells_intersecting_with_candidate(candidate, intersecting_gcells);
 
-            expr += candidate_variable * candidate_wirelength;
+            auto candidate_variable = m_route_candidate_variables[candidate];
+            //auto candidate_wirelength = m_route_candidate_wirelengths[candidate].value();
+            auto candidate_wirelength = intersecting_gcells.size();
+
+            expr += candidate_variable * (double)candidate_wirelength;
         }
         obj.setExpr(expr);
         model.add(obj);
@@ -1477,6 +1481,60 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
+    void ILPRouting<var_type>::find_gcells_intersecting_with_candidate(route_candidate_type & candidate, gcell_container_type & intersecting_gcells) {
+        auto& global_routing = m_design.global_routing();
+        auto gcell_graph = global_routing.gcell_graph();
+        auto & routing_library = m_design.routing_library();
+
+        auto & wires = m_route_candidate_wires.parts(candidate);
+        for(auto wire : wires)
+        {
+            auto start_layer_index = m_wire_start_layers[wire];
+            auto end_layer_index = m_wire_end_layers[wire];
+            auto min_layer_index = std::min(start_layer_index, end_layer_index);
+            auto max_layer_index = std::max(start_layer_index, end_layer_index);
+
+            auto wire_start = m_wire_starts[wire];
+            auto wire_end = m_wire_ends[wire];
+            auto min_x = std::min(wire_start.x(), wire_end.x());
+            auto max_x = std::max(wire_start.x(), wire_end.x());
+            auto min_y = std::min(wire_start.y(), wire_end.y());
+            auto max_y = std::max(wire_start.y(), wire_end.y());
+
+            auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+
+            // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
+
+            gcell_container_type base_gcells;
+            gcell_graph->intersect(base_gcells, wire_box, min_layer_index-1);
+
+            for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
+            {
+                // auto layer_name = "M" + std::to_string(layer_index);
+                auto layer = routing_library.layer_from_index(layer_index);
+                auto layer_name = routing_library.name(layer);
+                //gcell_container_type gcells;
+                //gcell_graph->intersect(gcells, wire_box, layer_index-1);
+                //std::cout << "gcells " << base_gcells.size() << std::endl;
+                for(auto base_gcell : base_gcells)
+                {
+                    auto base_gcell_node = gcell_graph->graph_node(base_gcell);
+                    auto base_gcell_position = gcell_graph->position(base_gcell_node);
+                    auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
+                    //gcell_nets[layer_name][gcell].insert(candidate);
+                    //gcell_nets[gcell].insert(candidate);
+                    //auto & candidates = gcell_nets[gcell];
+                    //if (std::find(candidates.begin(), candidates.end(), candidate) == candidates.end()) {
+                    if (std::find(intersecting_gcells.begin(), intersecting_gcells.end(), gcell) == intersecting_gcells.end()) {
+                        //gcell_nets[gcell].push_back(candidate);
+                        intersecting_gcells.push_back(gcell);
+                    }
+                }
+            }
+        }
+    }
+
+    template <typename var_type>
     void ILPRouting<var_type>::add_capacity_constraints(const std::vector<net_type> & nets, model_type & model)
     {
         auto& global_routing = m_design.global_routing();
@@ -1542,59 +1600,14 @@ namespace ophidian::routing {
 
             for(auto candidate : candidates)
             {
-                std::vector<gcell_type> intersecting_gcells;
-                //auto wires = m_route_candidate_wires[candidate];
                 auto & variable = m_route_candidate_variables[candidate];
-                auto & wires = m_route_candidate_wires.parts(candidate);
-                for(auto wire : wires)
-                {
-                    auto start_layer_index = m_wire_start_layers[wire];
-                    auto end_layer_index = m_wire_end_layers[wire];
-                    auto min_layer_index = std::min(start_layer_index, end_layer_index);
-                    auto max_layer_index = std::max(start_layer_index, end_layer_index);
-
-                    auto wire_start = m_wire_starts[wire];
-                    auto wire_end = m_wire_ends[wire];
-                    auto min_x = std::min(wire_start.x(), wire_end.x());
-                    auto max_x = std::max(wire_start.x(), wire_end.x());
-                    auto min_y = std::min(wire_start.y(), wire_end.y());
-                    auto max_y = std::max(wire_start.y(), wire_end.y());
-
-                    auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
-
-                    // auto wire_box = box_type{m_wire_starts[wire], m_wire_ends[wire]};
-                        
-                    gcell_container_type base_gcells;
-                    gcell_graph->intersect(base_gcells, wire_box, min_layer_index-1);
-
-                    for(auto layer_index = min_layer_index; layer_index <= max_layer_index; layer_index++)
-                    {
-                        // auto layer_name = "M" + std::to_string(layer_index);
-                        auto layer = routing_library.layer_from_index(layer_index);
-                        auto layer_name = routing_library.name(layer);
-                        //gcell_container_type gcells;
-                        //gcell_graph->intersect(gcells, wire_box, layer_index-1);
-                        //std::cout << "gcells " << base_gcells.size() << std::endl;
-                        for(auto base_gcell : base_gcells)
-                        {
-                            auto base_gcell_node = gcell_graph->graph_node(base_gcell);
-                            auto base_gcell_position = gcell_graph->position(base_gcell_node);
-                            auto gcell = gcell_graph->gcell(base_gcell_position.get<0>(), base_gcell_position.get<1>(), layer_index-1);
-                            //gcell_nets[layer_name][gcell].insert(candidate);
-                            //gcell_nets[gcell].insert(candidate);
-                            //auto & candidates = gcell_nets[gcell];
-                            //if (std::find(candidates.begin(), candidates.end(), candidate) == candidates.end()) {
-                            if (std::find(intersecting_gcells.begin(), intersecting_gcells.end(), gcell) == intersecting_gcells.end()) {
-                                //gcell_nets[gcell].push_back(candidate);
-                                intersecting_gcells.push_back(gcell);
-                                gcells_constraints[gcell] += variable;
-                                gcells_max_demand[gcell] += 1;
-                                gcells_constraints_bool[gcell] = true;
-                            }
-                        }
-                    }
+                std::vector<gcell_type> intersecting_gcells;
+                find_gcells_intersecting_with_candidate(candidate, intersecting_gcells);
+                for (auto gcell : intersecting_gcells) {
+                    gcells_constraints[gcell] += variable;
+                    gcells_max_demand[gcell] += 1;
+                    gcells_constraints_bool[gcell] = true;
                 }
-                intersecting_gcells.clear();
             }
         }
         /*if (DEBUG) std::cout << "add capacity constraints" << std::endl;
