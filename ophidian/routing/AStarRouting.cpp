@@ -3,9 +3,6 @@
 #include <list>
 #include <unordered_set>
 
-#include <ophidian/util/log.h>
-using namespace ophidian::util;
-
 bool AStarDebug = false;
 
 namespace ophidian::routing
@@ -40,9 +37,6 @@ namespace ophidian::routing
     bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing)
     {
         m_net = net;
-
-        //TODO: Save the current_routing as a backup
-
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
         auto net_size = netlist.pins(net).size();
@@ -51,7 +45,6 @@ namespace ophidian::routing
         bool all_pins_are_in_same_collumn = all_pins_same_collumn();
         if(all_pins_are_in_same_collumn == false)
         {
-            printlog("1-Call Flute.");
             bool flute_graph;
             if(net_size > 2)
                 flute_graph = init_flute_graph();
@@ -62,40 +55,28 @@ namespace ophidian::routing
 
             if(flute_graph == false)
                 return false;
-
-            // auto& global_routing = m_design.global_routing();
-            //global_routing.unroute(m_net)
-
-            printlog("2-Sort of layer assignment");
-            node_layer_assignment();
-            printlog("3-Connect each pair of nodes using A*.(consider min layer)");
-            bool routed = route_flute_segments();
-            if(!routed)
+            bool working_correct = node_layer_assignment();
+            if(working_correct == false)
             {
                 clear_router_members();
                 return false;
             }
-            printlog("4-Convert gcell path into segments");
+            working_correct = route_flute_segments();
+            if(working_correct == false)
+            {
+                clear_router_members();
+                return false;
+            }
             bfs_backtrack();
-            printlog("5-Connect cell pins to min layers");
             connect_pins_to_min_layer();
-
             connect_floating_pins();
         }
         else
-        {
-            // auto& global_routing = m_design.global_routing();
-            // global_routing.unroute(m_net);
             trivial_routing();
-        }
-        printlog("6-generate segments");
         generate_routing_segments(segments);
-        printlog("7-Write segments in GlobalRouting");
         if(applying_routing)
             apply_segments_to_global_routing(segments);
-        printlog("8-clean AStarRouting to be reused by other nets");
         clear_router_members();
-        printlog("9-Clean up the code");
         return true;
     }
 
@@ -110,7 +91,6 @@ namespace ophidian::routing
         //Run Flute
         std::vector<interconnection::Flute::Point> net_points;
         auto net_pins = netlist.pins(m_net);
-        // std::cout<<"Test: "<<net_pins.size()<<std::endl;
         net_points.reserve(netlist.pins(m_net).size());
         for(auto pin : net_pins)
         {
@@ -118,14 +98,8 @@ namespace ophidian::routing
             net_points.push_back(pin_location);
             auto pin_name = netlist.name(pin);
             pins_map[pin_location] = pin_name;
-
-            auto cell = netlist.cell(pin);
-            // std::cout<<"pin: "<<pin_name<<" cell: "<<netlist.name(cell)<<std::endl;
         }
-
-        //std::cout<<"netsize: "<<net_pins.size()<<" map "<<pins_map.size()<<std::endl;
         auto & flute = interconnection::Flute::instance();
-        // std::cout<<"calling flute: "<<net_points.size()<<std::endl;
         auto tree = flute.create(net_points);
 
         auto steiner_tree_length = tree->length().value();
@@ -139,7 +113,6 @@ namespace ophidian::routing
         //Create FluteGraph
         for(auto tree_segment_it = tree->segments().first; tree_segment_it != tree->segments().second; ++tree_segment_it)
         {
-            // std::cout<<"tree is not empty"<<std::endl;
             auto tree_segment = *tree_segment_it;
             auto segment_start = tree->position(tree->u(tree_segment));
             auto segment_end = tree->position(tree->v(tree_segment));
@@ -197,22 +170,19 @@ namespace ophidian::routing
         auto node2 = m_graph.addNode();
         m_node_map[node2] = FluteNode{p2_l, netlist.name(pin_2)};
         m_graph.addEdge(node1, node2);
-
         return true;
     }
 
     //This mapping is considering net min. layer constraint and gcell capacity
-    void AStarRouting::node_layer_assignment()
+    bool AStarRouting::node_layer_assignment()
     {
         auto& routing_library = m_design.routing_library();
-        auto min_layer_index = routing_library.layerIndex(m_min_layer);
         auto& placement = m_design.placement();
         auto& netlist = m_design.netlist();
-        //std::cout<<"mapping gcells"<<std::endl;
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
         {
             auto& flute_node = m_node_map[node];
-            int layer_index = min_layer_index;
+            int layer_index = routing_library.layerIndex(m_min_layer);
             if(flute_node.pin_name != "steiner")//is a pin
             {
                 auto pin = netlist.find_pin_instance(flute_node.pin_name);
@@ -223,42 +193,17 @@ namespace ophidian::routing
                 layer_index = std::max(layer_index, pin_layer_index);//see: void connect_pins_to_min_layer();
             }
             auto gcell = m_gcell_graph->nearest_gcell(flute_node.point, layer_index-1);
+            flute_node.mapped_gcell = gcell;
 
-            // auto s_node = m_gcell_graph->graph_node(gcell);
-            // auto s_pos = m_gcell_graph->position(s_node);
-            // std::cout<<"mapping node: "<<flute_node<<" into "<<" pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
-
-            //TODO: handle this checking the up node
-            if(gcell_has_free_space(gcell))
-                flute_node.mapped_gcell = gcell;
-            else
+            //Because for steiner nodes the Z does not matter and the A* will find a free node in that collumn
+            //This check just make sense when moving cells:
+            if(flute_node.pin_name != "steiner" && gcell_has_free_space(gcell) == false)
             {
-                //std::cout<<"WARNING: mapped node is overflowed!!!"<<std::endl;
-                //expand the serch in BFS order until find a free gcell
-                gcell = m_gcell_graph->nearest_gcell(flute_node.point, layer_index+2);//WORKAROUND solution!
-                //TODO: check if the node is steiner or not!
-                if(gcell_has_free_space(gcell) == false)
-                {
-                    if(flute_node.pin_name == "steiner")
-                    {
-                        if (AStarDebug) std::cout<<"WARNING: steiner node mapped is overflowed!!!"<<std::endl;
-                    }
-                }
-                else
-                {
-                    if (AStarDebug) std::cout<<"WARNING: pin node mapped is overflowed!!!"<<std::endl;
-                }
-                flute_node.mapped_gcell = gcell;
+                if (AStarDebug) std::cout<<"WARNING: pin node mapped is overflowed, please undo that cell movement!!!"<<std::endl;
+                return false;
             }
-            /*
-            auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(flute_node.mapped_gcell));
-            std::cout<<flute_node<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-            */
-
-            auto s_node = m_gcell_graph->graph_node(flute_node.mapped_gcell);
-            auto s_pos = m_gcell_graph->position(s_node);
-            // std::cout<<" again mapping node: "<<flute_node<<" into "<<" pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
         }
+        return true;
     }
 
     //call a_star routing for each pair of flute nodes in BFS order from any node_pin
@@ -267,14 +212,12 @@ namespace ophidian::routing
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
         {
-            std::cout<<"test"<<std::endl;
             if(m_node_map[node].pin_name != "steiner")
             {
                 m_root_node = node;
                 break;
             }
         }
-        std::cout<<"root node: "<<m_node_map[m_root_node]<<std::endl;
         std::queue<flute_node_type> queue;
         queue.push(m_root_node);
 
@@ -283,22 +226,17 @@ namespace ophidian::routing
             auto current_node = queue.front();
             queue.pop();
             visited_nodes[current_node] = true;
-            std::cout<<"visiting node: "<< m_node_map[current_node]<<std::endl;
             for(flute_graph_type::IncEdgeIt edge(m_graph, current_node); edge != lemon::INVALID; ++edge)
             {
                 auto opposite_node = m_graph.oppositeNode(current_node, edge);
-                std::cout<<"opposite_node node: "<< m_node_map[opposite_node] << "visited? " << visited_nodes[opposite_node] <<std::endl;
                 if(visited_nodes[opposite_node] == false)
                 {
                     queue.push(opposite_node);
-                    std::cout<< "before A*" << std::endl;
                     bool exist_path = a_star(current_node, opposite_node);
-                    std::cout<< "after A*" << std::endl;
                     if(exist_path == false)
                         return false;
                 }
             }
-            std::cout<<"next"<<std::endl;
         }
         return true;
     }
@@ -311,20 +249,7 @@ namespace ophidian::routing
         open_nodes.push_back(m_node_map[start].mapped_gcell);
         std::vector<gcell_type> dirty_nodes;
         dirty_nodes.push_back(m_node_map[start].mapped_gcell);
-       
         m_gcell_to_AStarNode[m_node_map[start].mapped_gcell].g = 0;
-
-
-        // code just for debug
-        auto node = m_gcell_graph->graph_node(m_node_map[start].mapped_gcell);
-        auto pos = m_gcell_graph->position(node);
-        std::cout<<m_node_map[start]<<std::endl;
-        std::cout<<"start node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-        node = m_gcell_graph->graph_node(m_node_map[goal].mapped_gcell);
-        pos = m_gcell_graph->position(node);
-        std::cout<<m_node_map[goal]<<std::endl;
-        std::cout<<"goal node: "<<pos.get<0>()<<", "<<pos.get<1>()<<", "<<pos.get<2>()<<std::endl;
-        // code just for debug
 
         gcell_type current_node;
         bool target_found = false;
@@ -340,7 +265,6 @@ namespace ophidian::routing
 
             //discover neighbors
             auto current_neighbors = neighbors(current_node);
-            std::cout<<"neighbors size: "<<current_neighbors.size()<<std::endl;
             for(auto neighbor : current_neighbors)
             {
                 update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
@@ -361,17 +285,11 @@ namespace ophidian::routing
             m_gcell_to_AStarNode[current_node].finished = true;
         }
 
-        //TODO: return false (return AFTER clean dirty nodes)
+        //IMPORTANT: return false (return AFTER clean dirty nodes)
         if(open_nodes.empty())
-        {
             if (AStarDebug) std::cout<<"there is no path to the goal"<<std::endl;
-        }
         if(goal_is_steiner)
-        {
             m_node_map[goal].mapped_gcell = current_node;
-        }
-
-        std::cout<<"backtrack path result"<<std::endl;
         if(target_found)
             back_track_path(start, goal);
 
@@ -385,7 +303,6 @@ namespace ophidian::routing
             astar_node.finished = false;
             astar_node.gcell_from = gcell_type{};
         }
-
         return target_found;
     }
 
@@ -413,11 +330,6 @@ namespace ophidian::routing
         auto layer_index = m_gcell_graph->layer_index(gcell);
         auto layer = routing_library.layer_from_index(layer_index);
         auto layer_direction = routing_library.direction(layer);
-
-        // if(layer_direction == Direction::HORIZONTAL)
-        //     std::cout<<routing_library.name(layer)<<" is horizontal"<<std::endl;
-        // if(layer_direction == Direction::VERTICAL)
-        //     std::cout<<routing_library.name(layer)<<" is vertical"<<std::endl;
 
         //down node
         auto down_node = m_gcell_graph->down_node(node);
@@ -508,7 +420,6 @@ namespace ophidian::routing
                 (source_pos.get<2>() == goal_pos.get<2>() || goal_is_steiner));
     }
 
-    //BFS printing
     void AStarRouting::bfs_backtrack()
     {
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
@@ -543,27 +454,16 @@ namespace ophidian::routing
         auto g_node = m_gcell_graph->graph_node(gcell);
         auto g_pos = m_gcell_graph->position(g_node);
 
-        std::cout<<"debugging net: "<<m_design.netlist().name(m_net)<<std::endl;
-        std::cout<<"backtrack from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        std::cout<<"S pos: ("<<s_pos.get<0>()<<","<<s_pos.get<1>()<<","<<s_pos.get<2>()<<")"<<std::endl;
-        std::cout<<"G pos: ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-
         bool non_stop = true;
         while(non_stop)
         {
             non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
-            std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
             path.push_back(gcell);
-            std::cout<<"non_stop = " << non_stop << std::endl;
             if(non_stop == false)
                 break;
-            std::cout<<"1"<<std::endl;
             gcell = m_gcell_to_AStarNode[gcell].gcell_from;
-            std::cout<<"2 - gcell " << gcell.id() << " invalid? " << (gcell == ophidian::routing::FluteNode::gcell_type{}) <<std::endl;
             g_node = m_gcell_graph->graph_node(gcell);
-            std::cout<<"3"<<std::endl;
             g_pos = m_gcell_graph->position(g_node);
-            std::cout<<"new ("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
         }
 
         for(flute_graph_type::IncEdgeIt edge(m_graph, s); edge != lemon::INVALID; ++edge)
@@ -589,14 +489,6 @@ namespace ophidian::routing
                 break;
             }
         }
-        // std::cout<<"RESULT from (G) "<<m_node_map[g]<<" to (S) "<<m_node_map[s]<<std::endl;
-        // for(auto gcell : gcells)
-        // {
-        //     auto g_node = m_gcell_graph->graph_node(gcell);
-        //     auto g_pos = m_gcell_graph->position(g_node);
-        //     std::cout<<"("<<g_pos.get<0>()<<","<<g_pos.get<1>()<<","<<g_pos.get<2>()<<")"<<std::endl;
-        // }
-
         //discover the direction of the segments
         std::vector<SegmentDirection> directions;
         directions.reserve(gcells.size());
@@ -613,21 +505,6 @@ namespace ophidian::routing
             previous_gcell = current_gcell;
         }
 
-        // for(auto direction : directions)
-        // {
-        //     if(direction == SegmentDirection::NA)
-        //         std::cout<<"NA"<<std::endl;
-
-        //     if(direction == SegmentDirection::X)
-        //         std::cout<<"X"<<std::endl;
-
-        //     if(direction == SegmentDirection::Y)
-        //         std::cout<<"Y"<<std::endl;
-
-        //     if(direction == SegmentDirection::Z)
-        //         std::cout<<"Z"<<std::endl;
-        // }
-
         //find routing segments
         auto direction_it = std::next(directions.begin());
         previous_gcell = gcells.front();
@@ -638,19 +515,11 @@ namespace ophidian::routing
         {
             if(previous_direction != *direction_it)
             {
-                auto start_pos = m_gcell_graph->position(m_gcell_graph->graph_node(start_gcell));
-                auto previous_pos = m_gcell_graph->position(m_gcell_graph->graph_node(previous_gcell));
-                // std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
-                // std::cout<<" to ("<<previous_pos.get<0>()<<","<<previous_pos.get<1>()<<","<<previous_pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(start_gcell, previous_gcell));
                 start_gcell = previous_gcell;
             }
             if(std::next(gcell_it) == gcells.end())
             {
-                auto start_pos = m_gcell_graph->position(m_gcell_graph->graph_node(start_gcell));
-                auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(*gcell_it));
-                // std::cout<<"Segment ("<<start_pos.get<0>()<<","<<start_pos.get<1>()<<","<<start_pos.get<2>()<<") -> ";
-                // std::cout<<" to ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(start_gcell, *gcell_it));
                 break;
             }
@@ -676,13 +545,8 @@ namespace ophidian::routing
             auto pin_layer_index = routing_library.layerIndex(pin_layer);
             if(min_layer_index > pin_layer_index)
             {
-                // std::cout<<"connect pin: "<<netlist.name(pin)<<std::endl;
                 auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
-                auto pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_start));
-                // std::cout<<"Start_pos ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 auto gcell_end = m_gcell_graph->nearest_gcell(placement.location(pin), min_layer_index-1);
-                pos = m_gcell_graph->position(m_gcell_graph->graph_node(gcell_end));
-                // std::cout<<"Start_end ("<<pos.get<0>()<<","<<pos.get<1>()<<","<<pos.get<2>()<<")"<<std::endl;
                 m_routing_segments.push_back(std::make_pair(gcell_start, gcell_end));
             }
         }
@@ -710,28 +574,22 @@ namespace ophidian::routing
 
             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
 
-            // global_routing.add_segment(wire_box, start_layer, end_layer, m_net);
             segments.push_back(AStarSegment(wire_box, start_layer, end_layer, m_net));
         }
-        // global_routing.increase_demand(m_net);
     }
 
+    //Be carefull if you call this twice for the same net it will mess up the demand!
     void AStarRouting::apply_segments_to_global_routing(const std::vector<AStarSegment> & segments)
     {
         auto& global_routing = m_design.global_routing();
         std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
-        printlog("init");
         for(auto segment : segments)
         {
             global_routing.add_segment(segment.wire_box, segment.start_layer, segment.end_layer, segment.net);
             nets.insert(segment.net);
         }
-        printlog("nets size %d", nets.size());
         for(auto net: nets)
-        {
             global_routing.increase_demand(net);
-        }
-        printlog(" end apply_segments_to_global_routing");
     }
 
     void AStarRouting::clear_router_members()
@@ -775,8 +633,7 @@ namespace ophidian::routing
                     min_layer_index = std::min(min_layer_index, layer_index);
                     max_layer_index = std::max(max_layer_index, layer_index);
                 }
-                //if(min_layer_index != max_layer_index || all_pins_same_collumn)//bool used to avoid unncessary segments
-                if(min_layer_index != max_layer_index)//bool used to avoid unncessary segments
+                if(min_layer_index != max_layer_index)
                 {
                     auto lower_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, min_layer_index-1);
                     auto upper_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, max_layer_index-1);
@@ -823,7 +680,6 @@ namespace ophidian::routing
             if(ref_loc.x() != pin_loc.x() || ref_loc.y() != pin_loc.y())
                 return false;
         }
-        //std::cout<<"same gcell net: "<<netlist.name(m_net)<<std::endl;
         return true;
     }
 

@@ -288,6 +288,8 @@ TEST_CASE("iccad20 AStarRouting", "[astar]")
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto net = design.netlist().find_net("N2594");
     std::vector<ophidian::routing::AStarSegment> segments;
+    auto & global_routing = design.global_routing();
+    global_routing.unroute(net);
     astar_routing.route_net(net, segments);
     iccad_output_writer.write_ICCAD_2020_output("case3.txt", {});
 }
@@ -300,6 +302,7 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     std::cout<<iccad_2020_file<<std::endl;
     auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
     auto design = ophidian::design::Design();
+    auto& global_routing = design.global_routing();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
@@ -307,9 +310,10 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     int routed_nets = 0;
     int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
-    std::vector<ophidian::routing::AStarSegment> segments;
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
+        global_routing.unroute(*net_it);
+        std::vector<ophidian::routing::AStarSegment> segments;
         auto result = astar_routing.route_net(*net_it, segments);
         if(result)
             routed_nets++;

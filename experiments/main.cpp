@@ -47,9 +47,13 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     //auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
     // std::log() << "result " << result << std::endl;
     auto& netlist = design.netlist();
-    std::vector<ophidian::routing::AStarSegment> segments;
+    auto& global_routing = design.global_routing();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        global_routing.unroute(*net_it);
+        std::vector<ophidian::routing::AStarSegment> segments;
         astar_routing.route_net(*net_it, segments);
+    }
 
     iccad_output_writer.write_ICCAD_2020_output(output, {});
     // if(result.first){
