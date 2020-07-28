@@ -35,7 +35,7 @@ void greetings(){
 };
 
 void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name){
-    /*ophidian::routing::AStarRouting astar_routing{design};
+    ophidian::routing::AStarRouting astar_routing{design};
     auto& netlist = design.netlist();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
         auto net = *net_it;
@@ -44,7 +44,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
         design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;    
         astar_routing.route_net(net, segments);
-    }*/
+    }
 
     // UCal::MCFRouting mcf_routing(design,circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
