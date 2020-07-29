@@ -23,7 +23,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
     {
         if(STATUS) printlog("init function route_nets");
         ILPRouting<var_type>::Statistics statistic;
@@ -60,7 +60,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, model);
+        create_all_candidates_with_movements(nets, cells, model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -493,7 +493,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::create_all_candidates_with_movements(const std::vector<net_type> & nets, model_type & model)
+    void ILPRouting<var_type>::create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, model_type & model)
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
@@ -503,8 +503,7 @@ namespace ophidian::routing {
             if(size == 2)
                 create_2_pin_nets_candidates_with_movements(net, model);
         }*/
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
-            auto cell = *cell_it;
+        for (auto cell : cells) {
             if( !placement.isFixed(cell))
             {
                 //create_center_of_mass_candidate(cell, model);

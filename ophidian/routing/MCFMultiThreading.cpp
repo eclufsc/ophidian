@@ -261,7 +261,7 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
         std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "routing nets" << std::endl;
         ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
-        auto result = ilpRouting.route_nets(nets_local, fixed_nets, routed_nets, unrouted_nets, movements);
+        auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
 
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "result " << result.first << std::endl;
 
@@ -523,7 +523,7 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
             
         }
 
-        auto result = ilpRouting.route_nets(nets_local, fixed_nets, routed_nets, unrouted_nets, movements);
+        auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
 
         if(DEBUG_PANEL) std::cout << "result ilproute: " << result.first << std::endl;
 

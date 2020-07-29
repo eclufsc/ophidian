@@ -110,7 +110,7 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
+            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
 
             void add_extra_demand();
 
@@ -123,7 +123,7 @@ namespace ophidian::routing {
 
             void create_net_candidates(const net_type & net, model_type & model, bool initial_routing = true);
 
-            void create_all_candidates_with_movements(const std::vector<net_type> & nets, model_type & model);
+            void create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, model_type & model);
 
             void create_center_of_mass_candidate(const cell_type cell, model_type & model);
 
