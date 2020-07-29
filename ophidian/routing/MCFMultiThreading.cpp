@@ -31,6 +31,7 @@ MCFMultiThreading::~MCFMultiThreading(){
 
 void MCFMultiThreading::run(){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
     
 
     // std::set<std::string> s1;
@@ -62,11 +63,11 @@ void MCFMultiThreading::run(){
     //     cluster_based_on_nets_box();
 
     cluster_based_on_panel();
-    run_ilp_on_panels();
+    run_ilp_on_panels(movements);
 
 
     report();
-    write_nets();
+    write_nets(movements);
     // if(DEBUG_MCF_MLT_NET_BOX_RTREE) m_rtree_net_box.report();
     
     
@@ -275,8 +276,7 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
 }//end cluster_based_on_nets_box
 
 
-void MCFMultiThreading::write_nets(){
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+void MCFMultiThreading::write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
         
         ophidian::parser::ICCAD2020Writer iccad_output_writer(m_design, "case");
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "number of movement: " << movements.size() << std::endl;
@@ -486,7 +486,7 @@ void MCFMultiThreading::report(){
 
 }//end report function
 
-void MCFMultiThreading::run_ilp_on_panels(){
+void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
     int num_panels = m_index_to_panel.size();
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
@@ -512,7 +512,6 @@ void MCFMultiThreading::run_ilp_on_panels(){
         std::vector<ophidian::circuit::Net> fixed_nets;
         std::vector<ophidian::circuit::Net> routed_nets;
         std::vector<ophidian::circuit::Net> unrouted_nets;
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
 
         for(auto net: nets){
             std::string net_name = m_design.netlist().name(net);

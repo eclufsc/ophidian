@@ -57,9 +57,9 @@ class MCFMultiThreading{
     private: 
         void construct_net_boxes_rtree(const std::vector<net_type> &nets);
         void cluster_based_on_nets_box();
-        void write_nets();
+        void write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements);
         void cluster_based_on_panel();
-        void run_ilp_on_panels();
+        void run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements);
         void report();
 
         design_type&    m_design;

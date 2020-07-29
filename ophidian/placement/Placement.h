@@ -52,6 +52,14 @@ namespace ophidian::placement
 
         using fixed_type = bool;
 
+        using cell_container_type = std::vector<cell_type>;
+
+        using unitless_point_type       = geometry::Point<double>;
+        using unitless_box_type       = geometry::Box<double>;
+        using rtree_node_type       = std::pair<unitless_point_type, cell_type>;
+        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+
+
         // Class member types
         enum class Orientation : int {
             N, S, W, E, FN, FS, FW, FE
@@ -88,12 +96,14 @@ namespace ophidian::placement
         orientation_type orientation(const pad_type& pad) const;
 
         const fixed_type isFixed(const cell_type& cell) const;
+
+        void cells_within(const box_type & region, cell_container_type & cells) const;
         // Iterators
 
         // Capacity
 
         // Modifiers
-        void place(const cell_type& cell, const point_type& location);
+        void place(const cell_type& cell, const point_type& location, bool update_rtree = false);
 
         void place(const pad_type& pad, const point_type & location);
 
@@ -106,6 +116,8 @@ namespace ophidian::placement
         void fixLocation(const cell_type& cell);
 
         void unfixLocation(const cell_type& cell);
+
+        void reset_rtree();
      
     private:
         const circuit::Netlist & m_netlist;
@@ -118,6 +130,8 @@ namespace ophidian::placement
         entity_system::Property<pad_type, point_type> m_pad_locations;
         entity_system::Property<pad_type, pad_geometry_type> m_pad_geometry;
         entity_system::Property<pad_type, orientation_type> m_pad_orientation;
+
+        rtree_type m_cells_rtree;
     };
 }
 

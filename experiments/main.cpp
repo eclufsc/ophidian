@@ -35,7 +35,7 @@ void greetings(){
 };
 
 void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name){
-    ophidian::routing::AStarRouting astar_routing{design};
+    /*ophidian::routing::AStarRouting astar_routing{design};
     auto& netlist = design.netlist();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
         auto net = *net_it;
@@ -44,7 +44,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
         design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;    
         astar_routing.route_net(net, segments);
-    }
+    }*/
 
     // UCal::MCFRouting mcf_routing(design,circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
@@ -73,9 +73,9 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
 
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     // std::log() << "routing nets" << std::endl;
-    //auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
+    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
 
-    std::vector<ophidian::circuit::Net> bad_nets;
+    /*std::vector<ophidian::circuit::Net> bad_nets;
     for (auto net : nets) {
         auto pins = design.netlist().pins(net);
         std::vector<ophidian::interconnection::Flute::Point> net_points;
@@ -123,24 +123,25 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
         }
     }
 
-    std::cout << bad_nets.size() << " bad nets" << std::endl;
+    std::cout << bad_nets.size() << " bad nets" << std::endl;*/
+    
+    /*std::cout << unrouted_nets.size() << " unrouted nets" << std::endl;
 
     // std::log() << "result " << result << std::endl;   
     auto& netlist = design.netlist();
-    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
-        auto net = *net_it;
+    //for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
+    //    auto net = *net_it;
     //for(auto net : bad_nets) {
+    for(auto net : unrouted_nets) {
         auto net_name = design.netlist().name(net);
         std::cout << "net " << net_name << std::endl;
         design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;    
         astar_routing.route_net(net, segments);
-    }
+    }*/
     //for (auto net : unrouted_nets) {
     //    astar_routing.route_net(net, segments);
     //}
-    
-    auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, unrouted_nets, movements);
 
     iccad_output_writer.write_ICCAD_2020_output(output, movements);
     // if(result.first){
@@ -254,8 +255,8 @@ int main(int argc, char** argv) {
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
-    //run_for_circuit(design, circuit_name, output);
-    run_mcf_for_circuit(design,circuit_name);
+    run_for_circuit(design, circuit_name, output);
+    //run_mcf_for_circuit(design,circuit_name);
 
     return 0;
 }

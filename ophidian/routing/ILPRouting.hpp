@@ -60,7 +60,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("create all candidates with movements");
-        // create_all_candidates_with_movements(nets, model);
+        create_all_candidates_with_movements(nets, model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -76,7 +76,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("add movements constraints");
-        // add_movements_constraints(model);
+        add_movements_constraints(model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(WRITE_MODEL) printlog("write model");
@@ -1902,7 +1902,7 @@ namespace ophidian::routing {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = solver.getValue(variable);
-    	    	if(value > 0)
+    	    	if(std::abs(value - 1.0) <= std::numeric_limits<double>::epsilon())
                 {
                     routed = 1;
 		            routed_candidate = candidate;
