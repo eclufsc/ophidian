@@ -68,11 +68,28 @@ namespace ophidian::routing
                 return false;
             }
             bfs_backtrack();
-            connect_pins_to_min_layer();
-            connect_floating_pins();
+            working_correct = connect_pins_to_min_layer();
+            if(working_correct == false)
+            {
+                clear_router_members();
+                return false;
+            }
+            working_correct = connect_floating_pins();
+            if(working_correct == false)
+            {
+                clear_router_members();
+                return false;
+            }
         }
         else
-            trivial_routing();
+        {
+            bool working_correct = trivial_routing();
+            if(working_correct == false)
+            {
+                clear_router_members();
+                return false;
+            }
+        }
         generate_routing_segments(segments);
         if(applying_routing)
             apply_segments_to_global_routing(segments);
@@ -531,7 +548,7 @@ namespace ophidian::routing
 
     //This is required because when there is a min layer constraint
     //the pins were assigned using std::max(min_layer, pin_layer).
-    void AStarRouting::connect_pins_to_min_layer()
+    bool AStarRouting::connect_pins_to_min_layer()
     {
         auto& netlist = m_design.netlist();
         auto& routing_library = m_design.routing_library();
@@ -543,6 +560,12 @@ namespace ophidian::routing
             auto pin_layer_name = pin_geometry.front().second;
             auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
             auto pin_layer_index = routing_library.layerIndex(pin_layer);
+            for(auto layer_index = std::min(pin_layer_index, min_layer_index); layer_index != std::max(pin_layer_index, min_layer_index); layer_index++)
+            {
+                auto gcell = m_gcell_graph->nearest_gcell(placement.location(pin), layer_index-1);
+                if(gcell_has_free_space(gcell) == false)
+                    return false;
+            }
             if(min_layer_index > pin_layer_index)
             {
                 auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
@@ -550,6 +573,7 @@ namespace ophidian::routing
                 m_routing_segments.push_back(std::make_pair(gcell_start, gcell_end));
             }
         }
+        return true;
     }
 
     void AStarRouting::generate_routing_segments(std::vector<AStarSegment> & segments)
@@ -579,7 +603,7 @@ namespace ophidian::routing
     }
 
     //Be carefull if you call this twice for the same net it will mess up the demand!
-    void AStarRouting::apply_segments_to_global_routing(const std::vector<AStarSegment> & segments)
+    bool AStarRouting::apply_segments_to_global_routing(const std::vector<AStarSegment> & segments)
     {
         auto& global_routing = m_design.global_routing();
         std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
@@ -588,8 +612,14 @@ namespace ophidian::routing
             global_routing.add_segment(segment.wire_box, segment.start_layer, segment.end_layer, segment.net);
             nets.insert(segment.net);
         }
+        //IMPORANT: these two following loops CAN NOT be merged.
         for(auto net: nets)
             global_routing.increase_demand(net);
+        for(auto net: nets)
+            for(auto gcell : global_routing.gcells(net))
+                if(m_gcell_graph->capacity(gcell) < (m_gcell_graph->demand(gcell) + m_gcells_extra_demand[gcell]))
+                    return false;
+        return true;
     }
 
     void AStarRouting::clear_router_members()
@@ -606,7 +636,7 @@ namespace ophidian::routing
     //P1 (5,5,1) P2 (5,5,3) and P1 and P2 are from same net.
     //So this function seeks to connect P2 to P1 by creating a via from the
     //highest pin to lowest pin.
-    void AStarRouting::connect_floating_pins()
+    bool AStarRouting::connect_floating_pins()
     {
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
@@ -620,7 +650,7 @@ namespace ophidian::routing
 
         for(auto pin_vector : pin_map)
         {
-            if(pin_vector.second.size() > 1)
+            if(pin_vector.second.size() > 1)//more than one pin in same collumn
             {
                 int min_layer_index = std::numeric_limits<int>::max();
                 int max_layer_index = routing_library.layerIndex(m_min_layer);
@@ -635,15 +665,22 @@ namespace ophidian::routing
                 }
                 if(min_layer_index != max_layer_index)
                 {
+                    for(auto layer_index = min_layer_index; layer_index != max_layer_index; layer_index++)
+                    {
+                        auto gcell = m_gcell_graph->nearest_gcell(pin_vector.first, layer_index-1);
+                        if(gcell_has_free_space(gcell) == false)
+                            return false;
+                    }
                     auto lower_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, min_layer_index-1);
                     auto upper_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, max_layer_index-1);
                     m_routing_segments.push_back(std::make_pair(lower_gcell, upper_gcell));
                 }
             }
         }
+        return true;
     }
 
-    void AStarRouting::trivial_routing()
+    bool AStarRouting::trivial_routing()
     {
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
@@ -663,9 +700,16 @@ namespace ophidian::routing
             min_layer_index = std::min(min_layer_index, layer_index);
             max_layer_index = std::max(max_layer_index, layer_index);
         }
+        for(auto layer_index = min_layer_index; layer_index != max_layer_index; layer_index++)
+        {
+            auto gcell = m_gcell_graph->nearest_gcell(ref_loc, layer_index-1);
+            if(gcell_has_free_space(gcell) == false)
+                return false;
+        }
         auto lower_gcell = m_gcell_graph->nearest_gcell(ref_loc, min_layer_index-1);
         auto upper_gcell = m_gcell_graph->nearest_gcell(ref_loc, max_layer_index-1);
         m_routing_segments.push_back(std::make_pair(lower_gcell, upper_gcell));
+        return true;
     }
 
     bool AStarRouting::all_pins_same_collumn()

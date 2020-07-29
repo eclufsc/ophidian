@@ -75,7 +75,7 @@ namespace ophidian::routing
             AStarRouting(design_type & design);
 
             bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
-            void apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
+            bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
@@ -89,12 +89,12 @@ namespace ophidian::routing
             void bfs_backtrack();//TODO change this function to be a BFS visitor
             void back_track_path(flute_node_type s, flute_node_type g);
             void gcell_path_to_routing_segments(flute_node_type s, flute_node_type g);
-            void connect_pins_to_min_layer();
+            bool connect_pins_to_min_layer();
             void generate_routing_segments(std::vector<AStarSegment> & segments);
             void clear_router_members();
-            void connect_floating_pins();
+            bool connect_floating_pins();
             bool all_pins_same_collumn();
-            void trivial_routing();
+            bool trivial_routing();
             void update_extra_demand_constraint();//make it public? TODO: update extra demand incrementally.
             bool gcell_has_free_space(gcell_type gcell);
 
