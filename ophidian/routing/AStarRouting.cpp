@@ -560,14 +560,14 @@ namespace ophidian::routing
             auto pin_layer_name = pin_geometry.front().second;
             auto pin_layer = routing_library.find_layer_instance(pin_layer_name);
             auto pin_layer_index = routing_library.layerIndex(pin_layer);
-            for(auto layer_index = std::min(pin_layer_index, min_layer_index); layer_index != std::max(pin_layer_index, min_layer_index); layer_index++)
-            {
-                auto gcell = m_gcell_graph->nearest_gcell(placement.location(pin), layer_index-1);
-                if(gcell_has_free_space(gcell) == false)
-                    return false;
-            }
             if(min_layer_index > pin_layer_index)
             {
+                for(auto layer_index = pin_layer_index; layer_index != min_layer_index; layer_index++)
+                {
+                    auto gcell = m_gcell_graph->nearest_gcell(placement.location(pin), layer_index-1);
+                    if(gcell_has_free_space(gcell) == false)
+                        return false;
+                }
                 auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
                 auto gcell_end = m_gcell_graph->nearest_gcell(placement.location(pin), min_layer_index-1);
                 m_routing_segments.push_back(std::make_pair(gcell_start, gcell_end));
