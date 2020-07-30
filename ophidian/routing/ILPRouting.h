@@ -110,7 +110,7 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
+            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
 
             void add_extra_demand();
 
@@ -123,11 +123,11 @@ namespace ophidian::routing {
 
             void create_net_candidates(const net_type & net, model_type & model, bool initial_routing = true);
 
-            void create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, model_type & model);
+            void create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, model_type & model);
 
             void create_center_of_mass_candidate(const cell_type cell, model_type & model);
 
-            void create_median_candidate(const cell_type cell, model_type & model);
+            void create_median_candidate(const cell_type cell, box_type & area, model_type & model);
 
             void create_2_pin_nets_candidates_with_movements(const net_type net, model_type & model);
 
@@ -168,6 +168,8 @@ namespace ophidian::routing {
             void convert_to_flute(point_container_type & converted, const point_container_type & points) const;
 
             void find_gcells_intersecting_with_candidate(route_candidate_type & candidate, gcell_container_type & intersecting_gcells);
+
+            bool cell_is_only_connected_to_local_nets(cell_type & cell, const std::vector<net_type> & nets);
 
             point_type convert_to_design(point_type & point) const;
 

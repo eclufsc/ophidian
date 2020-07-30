@@ -23,7 +23,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
     {
         if(STATUS) printlog("init function route_nets");
         ILPRouting<var_type>::Statistics statistic;
@@ -60,7 +60,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, cells, model);
+        create_all_candidates_with_movements(nets, cells, area, model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -493,7 +493,18 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, model_type & model)
+    bool ILPRouting<var_type>::cell_is_only_connected_to_local_nets(cell_type & cell, const std::vector<net_type> & nets) {
+        for (auto pin : m_design.netlist().pins(cell)) {
+            auto net = m_design.netlist().net(pin);
+            if (std::find(nets.begin(), nets.end(), net) == nets.end()) {
+                return false;
+            }
+        } 
+        return true;
+    }
+
+    template <typename var_type>
+    void ILPRouting<var_type>::create_all_candidates_with_movements(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, model_type & model)
     {
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
@@ -504,10 +515,10 @@ namespace ophidian::routing {
                 create_2_pin_nets_candidates_with_movements(net, model);
         }*/
         for (auto cell : cells) {
-            if( !placement.isFixed(cell))
+            if( !placement.isFixed(cell) && cell_is_only_connected_to_local_nets(cell, nets))
             {
                 //create_center_of_mass_candidate(cell, model);
-                create_median_candidate(cell, model);
+                create_median_candidate(cell, area, model);
             }
         }
     }
@@ -560,7 +571,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::create_median_candidate(const cell_type cell, model_type & model){
+    void ILPRouting<var_type>::create_median_candidate(const cell_type cell, box_type & area, model_type & model){
         auto & netlist = m_design.netlist();
         auto & placement = m_design.placement();
         std::vector<net_type> cell_nets;
@@ -586,8 +597,10 @@ namespace ophidian::routing {
 
         std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
         auto median_x = x_positions[x_positions.size()/2];
+        median_x = std::min(area.max_corner().x().value(), std::max(area.min_corner().x().value(), median_x));
         std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
         auto median_y = y_positions[y_positions.size()/2];
+        median_y = std::min(area.max_corner().y().value(), std::max(area.min_corner().y().value(), median_y));
 
         point_type median_point {unit_type(median_x), unit_type(median_y)};
         

@@ -32,6 +32,8 @@ MCFMultiThreading::~MCFMultiThreading(){
 void MCFMultiThreading::run(){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+
+    m_design.placement().reset_rtree();
     
 
     // std::set<std::string> s1;
@@ -261,9 +263,9 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
         std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "routing nets" << std::endl;
         ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
-        auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
+        /*auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
 
-        if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "result " << result.first << std::endl;
+        if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "result " << result.first << std::endl;*/
 
         for(auto net_tmp : routed_nets){
             m_routed_nets.push_back(net_tmp);
@@ -276,10 +278,11 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
 }//end cluster_based_on_nets_box
 
 
-void MCFMultiThreading::write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
+void MCFMultiThreading::write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
         
         ophidian::parser::ICCAD2020Writer iccad_output_writer(m_design, "case");
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "number of movement: " << movements.size() << std::endl;
+        if(DEBUG_PANEL) std::cout << "number of movement: " << movements.size() << std::endl;
         // if(result.first){
         if(true){
             iccad_output_writer.write_ICCAD_2020_output("mcf_output.txt", movements);
@@ -486,9 +489,10 @@ void MCFMultiThreading::report(){
 
 }//end report function
 
-void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
+void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
     int num_panels = m_index_to_panel.size();
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
     // 
     for(int i = 0; i < num_panels; i++){    
@@ -508,7 +512,6 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
         }//end for 
 
 
-        if(DEBUG_PANEL) std::cout << "num_local_nets: " << nets_local.size() << std::endl;
         std::vector<ophidian::circuit::Net> fixed_nets;
         std::vector<ophidian::circuit::Net> routed_nets;
         std::vector<ophidian::circuit::Net> unrouted_nets;
@@ -523,9 +526,20 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
             
         }
 
-        auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
+        auto panel_box = m_index_to_panel[i];
+        auto panel_min_corner = point_type{ophidian::util::database_unit_t{panel_box.getXl()}, ophidian::util::database_unit_t{panel_box.getYl()}};
+        auto panel_max_corner = point_type{ophidian::util::database_unit_t{panel_box.getXh()}, ophidian::util::database_unit_t{panel_box.getYh()}};
+        auto panel_region = ophidian::placement::Placement::box_type{panel_min_corner, panel_max_corner};
+        auto local_cells = std::vector<ophidian::circuit::CellInstance>{};
+        m_design.placement().cells_within(panel_region, local_cells);
+
+        if(DEBUG_PANEL) std::cout << "num_local_nets: " << nets_local.size() << std::endl;
+        if (DEBUG_PANEL) std::cout << local_cells.size() << " local cells " << std::endl;
+
+        auto result = ilpRouting.route_nets(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
 
         if(DEBUG_PANEL) std::cout << "result ilproute: " << result.first << std::endl;
+        if(DEBUG_PANEL) std::cout << "movements: " << movements.size() << std::endl;
 
         std::vector<net_type> nets_set_update;
 

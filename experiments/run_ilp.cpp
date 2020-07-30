@@ -16,7 +16,7 @@ void run_mcf_multithreading(ophidian::design::Design & design) {
     mcf.run();
 }
 
-std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> run_ilp_for_part_of_nets(const std::vector<std::pair<ophidian::circuit::Net, double>> & nets_costs, unsigned start_index, unsigned end_index, ophidian::routing::ILPRouting<IloBoolVar> & ilpRouting, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing, const std::vector<ophidian::circuit::CellInstance> & cells) {    
+std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> run_ilp_for_part_of_nets(const std::vector<std::pair<ophidian::circuit::Net, double>> & nets_costs, unsigned start_index, unsigned end_index, ophidian::routing::ILPRouting<IloBoolVar> & ilpRouting, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing, const std::vector<ophidian::circuit::CellInstance> & cells, ophidian::placement::Placement::box_type & area) {    
     std::vector<ophidian::circuit::Net> nets_to_route;
     std::vector<ophidian::circuit::Net> fixed_nets;
     for (unsigned index = 0; index < nets_costs.size(); index++) {
@@ -33,7 +33,7 @@ std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> 
     std::vector<ophidian::circuit::Net> routed_nets;
     std::vector<ophidian::circuit::Net> unrouted_nets;
     
-    auto result = ilpRouting.route_nets(nets_to_route, cells, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
+    auto result = ilpRouting.route_nets(nets_to_route, cells, area, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
     return result;
 }
 
@@ -44,6 +44,10 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    
+    auto chip_origin = design.floorplan().chip_origin();
+    auto chip_upper_right_corner = design.floorplan().chip_upper_right_corner();
+    auto chip_area = ophidian::placement::Placement::box_type{chip_origin, chip_upper_right_corner};
 
     std::vector<std::pair<ophidian::circuit::Net, double>> nets_costs;
     for (auto net : nets) {
@@ -91,7 +95,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     for (auto step_index = 0; step_index < number_of_steps; step_index++) {
         unsigned start_index = step_index * number_of_nets_per_step;
         unsigned end_index = start_index + number_of_nets_per_step;
-        result = run_ilp_for_part_of_nets(nets_costs, start_index, end_index, ilpRouting, movements, initial_routing, cells);
+        result = run_ilp_for_part_of_nets(nets_costs, start_index, end_index, ilpRouting, movements, initial_routing, cells, chip_area);
     }
 
     //auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);
@@ -190,6 +194,10 @@ void run_circuit(ophidian::design::Design & design, std::string circuit_name) {
     if(DEBUG_TEST) log() << "create writer" << std::endl;
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
+    auto chip_origin = design.floorplan().chip_origin();
+    auto chip_upper_right_corner = design.floorplan().chip_upper_right_corner();
+    auto chip_area = ophidian::placement::Placement::box_type{chip_origin, chip_upper_right_corner};
+
     std::vector<net_type> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::CellInstance> cells(design.netlist().begin_cell_instance(), design.netlist().end_cell_instance());
     std::vector<net_type> fixed_nets;
@@ -206,7 +214,7 @@ void run_circuit(ophidian::design::Design & design, std::string circuit_name) {
     std::vector<std::pair<cell_type, point_type>> movements; 
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now(); 
-    auto result = lpRouting.route_nets(nets, cells, fixed_nets, routed_nets, unrouted_nets, movements);
+    auto result = lpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     if(DEBUG_TEST) log() << "result " << result.first << std::endl;
@@ -242,7 +250,7 @@ void run_circuit(ophidian::design::Design & design, std::string circuit_name) {
         log();
 
         start = std::chrono::high_resolution_clock::now(); 
-        auto result2 = ilpRouting.route_nets(nets, cells, fixed_nets, routed_nets, unrouted_nets, movements);
+        auto result2 = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
         stop = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
         log() << "result " << result2.first << std::endl;
