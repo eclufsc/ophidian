@@ -10,6 +10,7 @@
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
 #include <ophidian/routing/GCellGraph.h>
+#include <ophidian/placement/Placement.h>
 
 namespace ophidian::routing
 {
@@ -117,6 +118,8 @@ namespace ophidian::routing
         /* Checks entire circuit. Quicker, checks each Gcell only once*/
         bool is_overflow() const;
         
+        void update_blockage_demand(ophidian::circuit::Netlist & netlist, ophidian::placement::Placement & placement, ophidian::circuit::CellInstance cell, bool remove_demand);
+
     private:
         void set_gcells(const gr_segment_type& segment);
         void update_gcells_demand(const gr_segment_type & segment, const int delta);

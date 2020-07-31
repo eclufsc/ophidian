@@ -81,25 +81,25 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
     out_svg.close();
 }
 
-void update_blockage_demand(ophidian::design::Design & design, ophidian::circuit::CellInstance cell, bool remove_demand)
-{
-    auto& global_routing = design.global_routing();
-    auto& library = design.routing_library();
-    auto gcell_graph_ptr = global_routing.gcell_graph();
-    auto& placement = design.placement();
-    auto& netlist = design.netlist();
+// void update_blockage_demand(ophidian::design::Design & design, ophidian::circuit::CellInstance cell, bool remove_demand)
+// {
+//     auto& global_routing = design.global_routing();
+//     auto& library = design.routing_library();
+//     auto gcell_graph_ptr = global_routing.gcell_graph();
+//     auto& placement = design.placement();
+//     auto& netlist = design.netlist();
 
-    auto location = placement.location(cell);
-    auto std_cell = netlist.std_cell(cell);
-    for(auto blockage : library.blockages(std_cell))
-    {
-        auto layer = library.layer(blockage);
-        auto layer_index = library.layerIndex(layer);
-        auto gcell = gcell_graph_ptr->nearest_gcell(location, layer_index-1);
-        auto demand = remove_demand ? -library.demand(blockage) : library.demand(blockage);
-        gcell_graph_ptr->change_blockage_demand(gcell, demand);
-    }
-}
+//     auto location = placement.location(cell);
+//     auto std_cell = netlist.std_cell(cell);
+//     for(auto blockage : library.blockages(std_cell))
+//     {
+//         auto layer = library.layer(blockage);
+//         auto layer_index = library.layerIndex(layer);
+//         auto gcell = gcell_graph_ptr->nearest_gcell(location, layer_index-1);
+//         auto demand = remove_demand ? -library.demand(blockage) : library.demand(blockage);
+//         gcell_graph_ptr->change_blockage_demand(gcell, demand);
+//     }
+// }
 
 //the wirelength and wirelength demand (demand - blockage_demand) should be always equal
 bool sanity_check(ophidian::design::Design & design)
@@ -538,9 +538,9 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         }
 
         //move cell to median
-        update_blockage_demand(design, cell, true);
+        global_routing.update_blockage_demand(netlist, placement, cell, true);
         placement.place(cell, median_location);
-        update_blockage_demand(design, cell, false);
+        global_routing.update_blockage_demand(netlist, placement, cell, false);
         std::vector<AStarSegment> segments;
         bool routed_all_nets = true;
         for(auto net : cell_nets)
@@ -561,17 +561,17 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
                 for(auto net : cell_nets)
                     global_routing.unroute(net);
 
-                update_blockage_demand(design, cell, true);
+                global_routing.update_blockage_demand(netlist, placement, cell, true);
                 placement.place(cell, initial_location);
-                update_blockage_demand(design, cell, false);
+                global_routing.update_blockage_demand(netlist, placement, cell, false);
                 astar_routing.apply_segments_to_global_routing(initial_segments);
                 return false;
             }
             return true;
         }else{
-            update_blockage_demand(design, cell, true);
+            global_routing.update_blockage_demand(netlist, placement, cell, true);
             placement.place(cell, initial_location);
-            update_blockage_demand(design, cell, false);
+            global_routing.update_blockage_demand(netlist, placement, cell, false);
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
             if(undo == false)
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
