@@ -74,6 +74,7 @@ namespace ophidian::routing {
             using design_type               = design::Design;
             using net_type                  = circuit::Net;
             using cell_type                 = circuit::CellInstance;
+            using cell_container_type        = std::vector<cell_type>;
             using pin_type                  = circuit::PinInstance;
             using pin_container_type        = std::vector<pin_type>;
             using route_candidate_type      = RouteCandidate;
@@ -112,12 +113,12 @@ namespace ophidian::routing {
 
             std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
 
-            void add_extra_demand();
+            void add_extra_demand(const cell_container_type & cells);
 
         private:
             bool m_extra_demand_created;
 
-            void update_gcell_capacities(const std::vector<net_type> & fixed_nets);
+            void update_gcell_capacities(const std::vector<net_type> & fixed_nets, const cell_container_type & cells);
 
             void create_all_candidates(const std::vector<net_type> & nets, model_type & model, bool initial_routing = true);
 
@@ -149,9 +150,9 @@ namespace ophidian::routing {
 
             void add_objective_function(model_type & model);
 
-            void add_candidate_constraints(const std::vector<net_type> & nets, model_type & model);
+            void add_candidate_constraints(const std::vector<net_type> & nets, const cell_container_type & cells, model_type & model);
 
-            void add_capacity_constraints(const std::vector<net_type> & nets, model_type & model);
+            void add_capacity_constraints(const std::vector<net_type> & nets, const box_type & area, model_type & model);
 
             void add_movements_constraints(model_type & model);
 
@@ -163,7 +164,7 @@ namespace ophidian::routing {
 
     	    void save_result(const solver_type& solver);
 
-            void create_all_cell_initial_candidates(model_type & model);
+            void create_all_cell_initial_candidates(const cell_container_type & cells, model_type & model);
 
             void convert_to_flute(point_container_type & converted, const point_container_type & points) const;
 

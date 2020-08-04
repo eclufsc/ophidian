@@ -29,7 +29,7 @@ namespace ophidian::routing {
         ILPRouting<var_type>::Statistics statistic;
 
         if(!m_extra_demand_created)
-            add_extra_demand();
+            add_extra_demand(cells);
 
         if(STATUS) printlog("Cleaning the data structures ...");
         //m_segments.clear();
@@ -46,13 +46,13 @@ namespace ophidian::routing {
         // cplex.setParam(IloCplex::Param::Threads, 4);
 
         if(STATUS) printlog("update capacities from blockages");
-        update_gcell_capacities(fixed_nets);
+        update_gcell_capacities(fixed_nets, cells);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // add_extra_demand();
 
         if(STATUS) printlog("create all cells initial candidates");
-        create_all_cell_initial_candidates(model);
+        create_all_cell_initial_candidates(cells, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("create all candidates");
@@ -68,11 +68,11 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add candidate constraints");
-        add_candidate_constraints(nets, model);
+        add_candidate_constraints(nets, cells, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add capacity constraints");
-        add_capacity_constraints(nets, model);
+        add_capacity_constraints(nets, area, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("add movements constraints");
@@ -129,12 +129,12 @@ namespace ophidian::routing {
      }
 
     template <typename var_type>
-    void ILPRouting<var_type>::update_gcell_capacities(const std::vector<net_type> & fixed_nets)
+    void ILPRouting<var_type>::update_gcell_capacities(const std::vector<net_type> & fixed_nets, const cell_container_type & cells)
     {
         auto& routing_library = m_design.routing_library();
         auto& global_routing = m_design.global_routing();
-        // auto& netlist = m_design.netlist();
-        // auto& placement = m_design.placement();
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
         auto gcell_graph = global_routing.gcell_graph();
 
         //copy the blockageDenamd to ILP propoerty!
@@ -148,6 +148,27 @@ namespace ophidian::routing {
 
             m_gcells_demand[gcell] = 0;
         }
+
+        /*for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
+            auto cell = *cell_it;
+            if (std::find(cells.begin(), cells.end(), cell) != cells.end()) {
+                continue;
+            }
+
+            auto position = placement.location(cell);
+
+            auto std_cell = netlist.std_cell(cell);
+            auto blockages = routing_library.blockages(std_cell);
+            for(auto blockage : blockages)
+            {
+                auto layer = routing_library.layer(blockage);
+                auto layer_index = routing_library.layerIndex(layer);
+                auto gcell = gcell_graph->nearest_gcell(position, layer_index-1);
+                auto demand = routing_library.demand(blockage);
+
+                m_gcells_demand[gcell] += demand;
+            }
+        }*/
 
         // here we have to update the demand of nets with won't be routed in this execution!
         for (auto net : fixed_nets) {
@@ -188,7 +209,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::add_extra_demand()
+    void ILPRouting<var_type>::add_extra_demand(const cell_container_type & cells)
     {
         printlog("Genearting extra demand values for all gcells");
         m_extra_demand_created = true;
@@ -215,8 +236,7 @@ namespace ophidian::routing {
             std_cells_per_gcell[gcell] = std_cell_count;
         }*/
 
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
-            auto cell = *cell_it;           
+        for (auto & cell : cells) {
             auto location = m_design.placement().location(cell);
             auto std_cell = m_design.netlist().std_cell(cell);
 
@@ -1344,7 +1364,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::add_candidate_constraints(const std::vector<net_type> & nets, model_type & model)
+    void ILPRouting<var_type>::add_candidate_constraints(const std::vector<net_type> & nets, const cell_container_type & cells, model_type & model)
     {
         if (DEBUG) std::cout << "add net constraints" << std::endl;
         unsigned net_count = 0;
@@ -1367,9 +1387,9 @@ namespace ophidian::routing {
 
         if (DEBUG) std::cout << "add cell constraints" << std::endl;
         auto & netlist = m_design.netlist();
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){           
-            auto cell = *cell_it;
-            
+        //for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
+        //    auto cell = *cell_it;
+        for (auto & cell : cells) {
             auto cell_name = m_design.netlist().name(cell);
             if (DEBUG) std::cout << "cell " << cell_name << " pin " << m_design.netlist().pins(cell).size() << std::endl;
             
@@ -1441,8 +1461,9 @@ namespace ophidian::routing {
 
         if (DEBUG) std::cout << "single position constraints" << std::endl;
         // std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
-            auto cell = *cell_it;
+        //for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
+        //    auto cell = *cell_it;
+        for (auto & cell : cells) {
             IloExpr candidates_constraints(m_env);
             
             auto initial_candidate = m_cell_initial_candidate[cell];
@@ -1547,7 +1568,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::add_capacity_constraints(const std::vector<net_type> & nets, model_type & model)
+    void ILPRouting<var_type>::add_capacity_constraints(const std::vector<net_type> & nets, const box_type & area, model_type & model)
     {
         auto& global_routing = m_design.global_routing();
         auto gcell_graph = global_routing.gcell_graph();
@@ -1556,6 +1577,11 @@ namespace ophidian::routing {
 
         unsigned number_of_gcells = 0;
         unsigned free_gcells = 0;
+
+        gcell_container_type gcells;
+        for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++) {
+            gcell_graph->intersect(gcells, area, layer_index-1);
+        }
 
         //std::unordered_map<gcell_type, int, entity_system::EntityBaseHash> gcells_max_demand;
         entity_system::Property<gcell_type, int>  gcells_max_demand{gcell_graph->make_property_gcells<int>(0)};
@@ -1566,6 +1592,7 @@ namespace ophidian::routing {
         entity_system::Property<gcell_type, bool>  gcells_constraints_bool{gcell_graph->make_property_gcells<bool>(false)};
         for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             auto gcell = *gcell_it;
+        //for(auto & gcell : gcells){
             gcells_constraints[gcell] = IloExpr(m_env);
             //gcells_constraints_bool[gcell] = false;
 
@@ -1860,9 +1887,9 @@ namespace ophidian::routing {
 
         }*/
 
-        for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
-            auto gcell = *gcell_it;
-
+        //for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
+            //auto gcell = *gcell_it;
+        for (auto & gcell : gcells) {
             auto node = gcell_graph->graph_node(gcell);
             auto location = gcell_graph->position(node);
 
@@ -1871,10 +1898,11 @@ namespace ophidian::routing {
             auto gcell_layer_index = gcell_graph->layer_index(gcell);
 
             auto gcell_box = gcell_graph->box(gcell);
-            
+                
             auto x = gcell_box.min_corner().x().value();
             auto y = gcell_box.min_corner().y().value();
             auto z = gcell_layer_index;
+
                 
             auto capacity = gcell_graph->capacity(gcell);
             auto fixed_demand = m_gcells_demand[gcell];
@@ -1887,9 +1915,10 @@ namespace ophidian::routing {
              if(gcells_constraints_bool[gcell] )
             //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
+                auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto demand = m_gcells_demand[gcell];
                 auto extra_demand = m_gcells_extra_demand[gcell];
-                auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
+                //std::cout << "constraint " << constraint_name << " " << capacity << " " << demand << " " << extra_demand << std::endl;
                 auto constraint = model.add(gcell_constraint <= capacity - demand - extra_demand);
                 constraint.setName(constraint_name.c_str());                
             }
@@ -1914,7 +1943,9 @@ namespace ophidian::routing {
                 auto candidate_name = m_route_candidate_names[candidate];
                 auto variable = m_route_candidate_variables[candidate];
                 auto value = solver.getValue(variable);
-    	    	if(std::abs(value - 1.0) <= std::numeric_limits<double>::epsilon())
+                //std::cout << candidate_name << " " << value << std::endl;
+    	    	//if(std::abs(value - 1.0) <= std::numeric_limits<double>::epsilon())
+    	    	if(value > 0.9)
                 {
                     routed = 1;
 		            routed_candidate = candidate;
@@ -1967,7 +1998,7 @@ namespace ophidian::routing {
             auto variable = m_position_candidate_variables[candidate];
             auto value = solver.getValue(variable);;
             std::string name (variable.getName());
-            if (value == 1) {
+            if (value > 0.9) {             
                 if (name.find("initial") == std::string::npos) {
                     auto candidate = m_name_to_position_candidate[name];
                     auto cell = m_position_candidate_cell[candidate];
@@ -2026,12 +2057,13 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    void ILPRouting<var_type>::create_all_cell_initial_candidates(model_type & model){
+    void ILPRouting<var_type>::create_all_cell_initial_candidates(const cell_container_type & cells, model_type & model){
         auto & netlist = m_design.netlist();
         environment_type env = model.getEnv();
 
-        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++){
-            auto cell = *cell_it;
+        for (auto & cell : cells) {
+        //for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
+            //auto cell = *cell_it;
             auto cell_name = m_design.netlist().name(cell);
             if (DEBUG) std::cout << "create candidates for cell " << cell_name << std::endl;
             

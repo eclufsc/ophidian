@@ -499,6 +499,17 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
         if(DEBUG_PANEL) std::cout << "panel_" << i << std::endl;
         auto nets_panel = m_panel_index_to_nets_dict[i];
         if(DEBUG_PANEL) std::cout << "num_nets" << nets_panel.size() << std::endl;
+        
+        auto panel_box = m_index_to_panel[i];
+        auto panel_min_corner = point_type{ophidian::util::database_unit_t{panel_box.getXl() + 1}, ophidian::util::database_unit_t{panel_box.getYl() + 1}};
+        auto panel_max_corner = point_type{ophidian::util::database_unit_t{panel_box.getXh() - 1}, ophidian::util::database_unit_t{panel_box.getYh() - 1}};
+        auto panel_region = ophidian::placement::Placement::box_type{panel_min_corner, panel_max_corner};
+
+        /*if (panel_max_corner.y().value() - panel_min_corner.y().value() > 100) {
+            // not first level
+            continue;
+        }*/
+        
         std::set<std::string> nets_name_set;
         std::vector<net_type> nets_local;
         int count_nets = 0;
@@ -526,20 +537,38 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
             
         }
 
-        auto panel_box = m_index_to_panel[i];
-        auto panel_min_corner = point_type{ophidian::util::database_unit_t{panel_box.getXl()}, ophidian::util::database_unit_t{panel_box.getYl()}};
-        auto panel_max_corner = point_type{ophidian::util::database_unit_t{panel_box.getXh()}, ophidian::util::database_unit_t{panel_box.getYh()}};
-        auto panel_region = ophidian::placement::Placement::box_type{panel_min_corner, panel_max_corner};
         auto local_cells = std::vector<ophidian::circuit::CellInstance>{};
         m_design.placement().cells_within(panel_region, local_cells);
 
+        if (DEBUG_PANEL) std::cout << "area " << panel_min_corner.x().value() << "," << panel_min_corner.y().value() << "," << panel_max_corner.x().value() << "," << panel_max_corner.y().value() << std::endl;
         if(DEBUG_PANEL) std::cout << "num_local_nets: " << nets_local.size() << std::endl;
         if (DEBUG_PANEL) std::cout << local_cells.size() << " local cells " << std::endl;
 
+        /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(90,82,6);
+        auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+        auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+
+        if (DEBUG_PANEL) std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+
         auto result = ilpRouting.route_nets(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
+
+        m_design.placement().reset_rtree();
+        
+        /*capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+        demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+        if (DEBUG_PANEL) std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
 
         if(DEBUG_PANEL) std::cout << "result ilproute: " << result.first << std::endl;
         if(DEBUG_PANEL) std::cout << "movements: " << movements.size() << std::endl;
+
+        if (result.first == 0) {
+            /*for (auto movement : movements) {
+                auto cell = movement.first;
+                auto cell_name = m_design.netlist().name(cell);
+                std::cout << "moved cell " << cell_name << std::endl;
+            }*/
+            break;
+        }
 
         std::vector<net_type> nets_set_update;
 
