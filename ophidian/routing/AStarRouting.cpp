@@ -28,8 +28,20 @@ namespace ophidian::routing
         m_edge_map{m_graph},
         m_gcell_graph{design.global_routing().gcell_graph()},
         m_gcell_to_AStarNode{design.global_routing().gcell_graph()->make_property_gcells(AStarNode{})},
-        m_gcells_extra_demand{design.global_routing().gcell_graph()->make_property_gcells(int{0})}
+        m_same_gcell_extra_demand{design.global_routing().gcell_graph()->make_property_gcells(int{0})},
+        m_adj_gcell_extra_demand{design.global_routing().gcell_graph()->make_property_gcells(int{0})},
+        m_gcells_cell_instances{design.global_routing().gcell_graph()->make_property_gcells<cell_set_type>()}
     {
+        auto& placement = design.placement();
+        auto& netlist = design.netlist();
+        auto gcell_graph_ptr = design.global_routing().gcell_graph();
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
+        {
+            auto cell = *cell_it;
+            auto location = placement.location(cell);
+            auto gcell = gcell_graph_ptr->nearest_gcell(location, 0);
+            m_gcells_cell_instances[gcell].insert(cell);
+        }
         update_extra_demand_constraint();
     }
 
@@ -91,9 +103,12 @@ namespace ophidian::routing
             }
         }
         generate_routing_segments(segments);
+        bool solution_has_no_overflow = true;
         if(applying_routing)
-            apply_segments_to_global_routing(segments);
+            solution_has_no_overflow = apply_segments_to_global_routing(segments);
         clear_router_members();
+        if(solution_has_no_overflow == false)
+            return false;
         return true;
     }
 
@@ -442,7 +457,6 @@ namespace ophidian::routing
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         std::queue<flute_node_type> queue;
         queue.push(m_root_node);
-
         while(!queue.empty())
         {
             auto current_flute_node = queue.front();
@@ -617,7 +631,7 @@ namespace ophidian::routing
             global_routing.increase_demand(net);
         for(auto net: nets)
             for(auto gcell : global_routing.gcells(net))
-                if(m_gcell_graph->capacity(gcell) < (m_gcell_graph->demand(gcell) + m_gcells_extra_demand[gcell]))
+                if(m_gcell_graph->capacity(gcell) < (m_gcell_graph->demand(gcell) + m_same_gcell_extra_demand[gcell] + m_adj_gcell_extra_demand[gcell]))
                     return false;
         return true;
     }
@@ -727,6 +741,31 @@ namespace ophidian::routing
         return true;
     }
 
+    void AStarRouting::move_cell(AStarRouting::cell_instance_type cell, AStarRouting::gcell_type source_gcell, AStarRouting::gcell_type target_gcell)
+    {
+        m_gcells_cell_instances[source_gcell].erase(cell);
+        m_gcells_cell_instances[target_gcell].insert(cell);
+    }
+
+    //Only receive GCells from layer 0 as parameter!
+    void AStarRouting::update_extra_demand_constraint(AStarRouting::gcell_type gcell)
+    {
+        auto & global_routing = m_design.global_routing();
+        auto gcell_graph_ptr = global_routing.gcell_graph();
+
+        update_same_extra_demand(gcell);
+        update_adj_extra_demand(gcell);
+
+        //Update potential affected gcells adj extra demand
+        auto node = gcell_graph_ptr->graph_node(gcell);
+        auto east_node = gcell_graph_ptr->east_node(node);
+        if(east_node != lemon::INVALID)
+            update_adj_extra_demand(gcell_graph_ptr->gcell(east_node));
+        auto west_node = gcell_graph_ptr->west_node(node);
+        if(west_node != lemon::INVALID)
+            update_adj_extra_demand(gcell_graph_ptr->gcell(west_node));
+    }
+
     void AStarRouting::update_extra_demand_constraint()
     {
         auto& netlist = m_design.netlist();
@@ -735,7 +774,6 @@ namespace ophidian::routing
         auto & routing_library = m_design.routing_library();
 
         std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
-
         std::unordered_map<circuit::StandardCells::cell_type, std::unordered_set<routing::GCellGraph::gcell_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcells_per_std_cell;
 
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
@@ -747,17 +785,9 @@ namespace ophidian::routing
             auto cell_name = m_design.netlist().name(cell);
             auto std_cell_name = m_design.standard_cells().name(std_cell);
 
-            // for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
-            // auto layer = *layer_it;
-            // auto layer_index = routing_library.layerIndex(layer);
-            // auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
             for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++)
             {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
-
-                //std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index;
-                //auto gcell_box = gcell_graph->box(gcell);
-                //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
 
                 std_cells_per_gcell[gcell][std_cell] += 1;
                 gcells_per_std_cell[std_cell].insert(gcell);
@@ -801,7 +831,7 @@ namespace ophidian::routing
                 if (layer == gcell_layer)
                 {
                     auto pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[gcell][macro2]);
-                    m_gcells_extra_demand[gcell] += pair_count * demand;
+                    m_same_gcell_extra_demand[gcell] += pair_count * demand;
                 }
             }
 
@@ -873,15 +903,152 @@ namespace ophidian::routing
                                 + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[west_gcell][macro1]);
                         }
                     }
-                    m_gcells_extra_demand[gcell] += (east_pair_count + west_pair_count) * demand;
+                    m_adj_gcell_extra_demand[gcell] += (east_pair_count + west_pair_count) * demand;
                 }
             }
         }
     }
 
-
     bool AStarRouting::gcell_has_free_space(AStarRouting::gcell_type gcell)
     {
-        return ((m_gcell_graph->capacity(gcell) - 1) >= (m_gcell_graph->demand(gcell) + m_gcells_extra_demand[gcell]));
+        return ((m_gcell_graph->capacity(gcell) - 1) >= (m_gcell_graph->demand(gcell) + m_same_gcell_extra_demand[gcell] + m_adj_gcell_extra_demand[gcell]));
+    }
+
+    void AStarRouting::update_same_extra_demand(const AStarRouting::gcell_type & gcell)
+    {
+        auto & netlist = m_design.netlist();
+        auto & routing_library = m_design.routing_library();
+        auto & standard_cells = m_design.standard_cells();
+        auto & routing_constraints = m_design.routing_constraints();
+        auto & global_routing = m_design.global_routing();
+        auto gcell_graph_ptr = global_routing.gcell_graph();
+
+        //Clear current same extra demand
+        auto node = gcell_graph_ptr->graph_node(gcell);
+        auto gcell_position = gcell_graph_ptr->position(node);
+        for(auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++)
+        {
+            auto layer_index = routing_library.layerIndex(*layer_it);
+            auto affected_node = gcell_graph_ptr->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = gcell_graph_ptr->gcell(affected_node);
+            m_same_gcell_extra_demand[affected_gcell] = 0;
+        }
+
+        //Count macros from gcells
+        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        for(auto cell_it = m_gcells_cell_instances[gcell].begin(); cell_it != m_gcells_cell_instances[gcell].end(); cell_it++)
+        {
+            auto std_cell = netlist.std_cell(*cell_it);
+            std_cells_per_gcell[gcell][std_cell] += 1;
+        }
+        for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++)
+        {
+            auto key = same_grid_it->first;
+            auto & extra_demand = same_grid_it->second;
+            auto demand = extra_demand.demand;
+            auto layer_name = extra_demand.layer;
+            auto layer = routing_library.find_layer_instance(layer_name);
+            auto layer_index = routing_library.layerIndex(layer);
+            auto macro1 = standard_cells.find_cell(extra_demand.macro1);
+            auto macro2 = standard_cells.find_cell(extra_demand.macro2);
+            int macro1_count = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+            int macro2_count = std_cells_per_gcell[gcell].find(macro2) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro2];
+            int pair_count = std::min(macro1_count, macro2_count);
+            auto affected_node = gcell_graph_ptr->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = gcell_graph_ptr->gcell(affected_node);
+            m_same_gcell_extra_demand[affected_gcell] += pair_count * demand;
+        }
+    }
+
+    void AStarRouting::update_adj_extra_demand(const AStarRouting::gcell_type & gcell)
+    {
+        auto & netlist = m_design.netlist();
+        auto & routing_library = m_design.routing_library();
+        auto & standard_cells = m_design.standard_cells();
+        auto & routing_constraints = m_design.routing_constraints();
+        auto & global_routing = m_design.global_routing();
+        auto gcell_graph_ptr = global_routing.gcell_graph();
+
+        //Clear current adj extra demand
+        auto node = gcell_graph_ptr->graph_node(gcell);
+        auto gcell_position = gcell_graph_ptr->position(node);
+        for(auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++)
+        {
+            auto layer_index = routing_library.layerIndex(*layer_it);
+            auto affected_node = gcell_graph_ptr->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = gcell_graph_ptr->gcell(affected_node);
+            m_adj_gcell_extra_demand[affected_gcell] = 0;
+        }
+
+        //Count macros from adj gcells
+        std::unordered_map<routing::GCellGraph::gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        gcell_set_type gcells_to_count{gcell};
+        auto east_node = gcell_graph_ptr->east_node(node);
+        auto east_gcell = gcell_graph_ptr->gcell(east_node);
+        if(east_node != lemon::INVALID)
+            gcells_to_count.insert(gcell_graph_ptr->gcell(east_node));
+        auto west_node = gcell_graph_ptr->west_node(node);
+        auto west_gcell = gcell_graph_ptr->gcell(west_node);
+        if(west_node != lemon::INVALID)
+            gcells_to_count.insert(gcell_graph_ptr->gcell(west_node));
+        for(auto gcell : gcells_to_count)
+        {
+            for(auto cell_it = m_gcells_cell_instances[gcell].begin(); cell_it != m_gcells_cell_instances[gcell].end(); cell_it++)
+            {
+                auto std_cell = netlist.std_cell(*cell_it);
+                std_cells_per_gcell[gcell][std_cell] += 1;
+            }
+        }
+
+        //Adjacent GCell extra demand
+        for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++)
+        {
+            auto key = adj_grid_it->first;
+            auto & extra_demand = adj_grid_it->second;
+            auto demand = extra_demand.demand;
+            auto layer_name = extra_demand.layer;
+            auto macro1 = standard_cells.find_cell(extra_demand.macro1);
+            auto macro2 = standard_cells.find_cell(extra_demand.macro2);
+            auto layer = m_design.routing_library().find_layer_instance(layer_name);
+            auto layer_index = routing_library.layerIndex(layer);
+
+            auto east_pair_count = 0;
+            auto west_pair_count = 0;
+            if (macro1 == macro2)
+            {
+                int gcell_count = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+                if (east_node != lemon::INVALID)
+                {
+                    int east_count = std_cells_per_gcell[east_gcell].find(macro2) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro2];
+                    east_pair_count = std::min(gcell_count, east_count);
+                }
+                if (west_node != lemon::INVALID)
+                {
+                    int west_count = std_cells_per_gcell[west_gcell].find(macro2) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro2];
+                    west_pair_count = std::min(gcell_count, west_count);
+                }
+            }
+            else
+            {
+                int gcell_count_macro1 = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+                int gcell_count_macro2 = std_cells_per_gcell[gcell].find(macro2) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro2];
+                if (east_node != lemon::INVALID)
+                {
+                    int east_count_macro1 = std_cells_per_gcell[east_gcell].find(macro1) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro1];
+                    int east_count_macro2 = std_cells_per_gcell[east_gcell].find(macro2) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro2];
+                    east_pair_count = std::min(gcell_count_macro1, east_count_macro2) + std::min(gcell_count_macro2, east_count_macro1);
+                }
+                if (west_node != lemon::INVALID)
+                {
+                    int west_count_macro1 = std_cells_per_gcell[west_gcell].find(macro1) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro1];
+                    int west_count_macro2 = std_cells_per_gcell[west_gcell].find(macro2) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro2];
+                    west_pair_count = std::min(gcell_count_macro1, west_count_macro2) + std::min(gcell_count_macro2, west_count_macro1);
+                }
+            }
+            auto affected_node = gcell_graph_ptr->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = gcell_graph_ptr->gcell(affected_node);
+            m_adj_gcell_extra_demand[affected_gcell] += (east_pair_count + west_pair_count) * demand;
+        }
+
     }
 }

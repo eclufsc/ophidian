@@ -9,6 +9,7 @@
 #include <ophidian/routing/Library.h>
 #include <lemon/concepts/graph.h>
 #include <memory>
+#include <unordered_set>
 #include <limits>
 
 namespace ophidian::routing
@@ -56,6 +57,7 @@ namespace ophidian::routing
     {
         public:
             using net_type                          = circuit::Net;
+            using cell_instance_type                = circuit::CellInstance;
             using unit_type                         = util::database_unit_t;
             using design_type                       = design::Design;
             using pin_name_type                     = std::string;
@@ -64,6 +66,9 @@ namespace ophidian::routing
             using gcell_type                        = GCell;
             using gcell_property_type               = entity_system::Property<gcell_type, AStarNode>;
             using gcell_extra_demand_type           = entity_system::Property<gcell_type, int>;
+            using cell_set_type                     = std::unordered_set<cell_instance_type, entity_system::EntityBaseHash>;
+            using gcell_set_type                    = std::unordered_set<gcell_type, entity_system::EntityBaseHash>;
+            using gcell_cell_instances_type         = entity_system::Property<gcell_type, cell_set_type>;
             using gcell_graph_ptr_type              = std::shared_ptr<ophidian::routing::GCellGraph>;
             using layer_type                        = Layer;
             using flute_graph_type                  = lemon::ListGraph;
@@ -76,6 +81,8 @@ namespace ophidian::routing
 
             bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
             bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
+            void update_extra_demand_constraint(gcell_type gcell);
+            void move_cell(cell_instance_type cell, gcell_type source_gcell, gcell_type target_gcell);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
@@ -97,6 +104,8 @@ namespace ophidian::routing
             bool trivial_routing();
             void update_extra_demand_constraint();//make it public? TODO: update extra demand incrementally.
             bool gcell_has_free_space(gcell_type gcell);
+            void update_same_extra_demand(const gcell_type & gcell);
+            void update_adj_extra_demand(const gcell_type & gcell);
 
 
             net_type                              m_net;
@@ -109,7 +118,9 @@ namespace ophidian::routing
             gcell_graph_ptr_type                  m_gcell_graph;
             layer_type                            m_min_layer;
             std::vector<routing_segment_type>     m_routing_segments;
-            gcell_extra_demand_type               m_gcells_extra_demand;
+            gcell_extra_demand_type               m_same_gcell_extra_demand;
+            gcell_extra_demand_type               m_adj_gcell_extra_demand;
+            gcell_cell_instances_type             m_gcells_cell_instances;//This could be in GCellGraph class.
     };
 
     struct FluteNode
