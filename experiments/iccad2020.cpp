@@ -220,8 +220,8 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
     std::vector<std::string> circuit_names = {
         // "case1",
         // "case2",
-        // "case3",
-         "case4",
+         "case3",
+         //"case4",
         //"case5",
     };
 
@@ -243,6 +243,7 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
         // run_ilp_for_circuit(design, circuit_name);
         //run_circuit(design, circuit_name);
         run_mcf_multithreading(design);
+        write_statistics_for_circuit(design, circuit_name);
     }
 
 

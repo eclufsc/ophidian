@@ -152,7 +152,7 @@ namespace ophidian::routing {
 
             void add_candidate_constraints(const std::vector<net_type> & nets, const cell_container_type & cells, model_type & model);
 
-            void add_capacity_constraints(const std::vector<net_type> & nets, const box_type & area, model_type & model);
+            void add_capacity_constraints(const std::vector<net_type> & nets, const cell_container_type & cells, const box_type & area, model_type & model);
 
             void add_movements_constraints(model_type & model);
 
