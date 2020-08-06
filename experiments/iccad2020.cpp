@@ -504,7 +504,7 @@ ophidian::util::LocationDbu calculate_median_candidate(ophidian::design::Design 
     return placement.location(cell);
 }
 
-bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell )
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing )
 {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
@@ -541,10 +541,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         }
 
         //move cell to median
-        update_blockage_demand(design, cell, true);
+        global_routing.update_blockage_demand(netlist, placement, cell, true);
         astar_routing.move_cell(cell, initial_gcell, median_gcell);
         placement.place(cell, median_location);
-        update_blockage_demand(design, cell, false);
+        global_routing.update_blockage_demand(netlist, placement, cell, false);
         astar_routing.update_extra_demand_constraint(initial_gcell);
         astar_routing.update_extra_demand_constraint(median_gcell);
         std::vector<AStarSegment> segments;
@@ -567,10 +567,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
                 for(auto net : cell_nets)
                     global_routing.unroute(net);
 
-                update_blockage_demand(design, cell, true);
+                global_routing.update_blockage_demand(netlist, placement, cell, true);
                 astar_routing.move_cell(cell, median_gcell, initial_gcell);
                 placement.place(cell, initial_location);
-                update_blockage_demand(design, cell, false);
+                global_routing.update_blockage_demand(netlist, placement, cell, false);
                 astar_routing.update_extra_demand_constraint(initial_gcell);
                 astar_routing.update_extra_demand_constraint(median_gcell);
                 bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
@@ -583,10 +583,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             for(auto net : cell_nets)
                 global_routing.unroute(net);
 
-            update_blockage_demand(design, cell, true);
+            global_routing.update_blockage_demand(netlist, placement, cell, true);
             astar_routing.move_cell(cell, median_gcell, initial_gcell);
             placement.place(cell, initial_location);
-            update_blockage_demand(design, cell, false);
+            global_routing.update_blockage_demand(netlist, placement, cell, false);
             astar_routing.update_extra_demand_constraint(initial_gcell);
             astar_routing.update_extra_demand_constraint(median_gcell);
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
