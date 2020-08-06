@@ -88,7 +88,7 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
 //     auto gcell_graph_ptr = global_routing.gcell_graph();
 //     auto& placement = design.placement();
 //     auto& netlist = design.netlist();
-
+//
 //     auto location = placement.location(cell);
 //     auto std_cell = netlist.std_cell(cell);
 //     for(auto blockage : library.blockages(std_cell))
@@ -514,10 +514,13 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
     auto & global_routing = design.global_routing();
     auto & netlist = design.netlist();
     auto & placement = design.placement();
-    auto astar_routing = ophidian::routing::AStarRouting(design);
+    auto gcell_graph_ptr = global_routing.gcell_graph();
 
     auto initial_location = placement.location(cell);
     auto median_location = calculate_median_candidate(design, cell);
+    auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
+    auto median_gcell = gcell_graph_ptr->nearest_gcell(median_location, 0);
+
     if(median_location.x() != initial_location.x() && median_location.y() != initial_location.y() )
     {
         // backup cell and nets informations
@@ -538,9 +541,12 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         }
 
         //move cell to median
-        global_routing.update_blockage_demand(netlist, placement, cell, true);
+        update_blockage_demand(design, cell, true);
+        astar_routing.move_cell(cell, initial_gcell, median_gcell);
         placement.place(cell, median_location);
-        global_routing.update_blockage_demand(netlist, placement, cell, false);
+        update_blockage_demand(design, cell, false);
+        astar_routing.update_extra_demand_constraint(initial_gcell);
+        astar_routing.update_extra_demand_constraint(median_gcell);
         std::vector<AStarSegment> segments;
         bool routed_all_nets = true;
         for(auto net : cell_nets)
@@ -561,17 +567,28 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
                 for(auto net : cell_nets)
                     global_routing.unroute(net);
 
-                global_routing.update_blockage_demand(netlist, placement, cell, true);
+                update_blockage_demand(design, cell, true);
+                astar_routing.move_cell(cell, median_gcell, initial_gcell);
                 placement.place(cell, initial_location);
-                global_routing.update_blockage_demand(netlist, placement, cell, false);
-                astar_routing.apply_segments_to_global_routing(initial_segments);
+                update_blockage_demand(design, cell, false);
+                astar_routing.update_extra_demand_constraint(initial_gcell);
+                astar_routing.update_extra_demand_constraint(median_gcell);
+                bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+                if(undo == false)
+                    std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
                 return false;
             }
             return true;
         }else{
-            global_routing.update_blockage_demand(netlist, placement, cell, true);
+            for(auto net : cell_nets)
+                global_routing.unroute(net);
+
+            update_blockage_demand(design, cell, true);
+            astar_routing.move_cell(cell, median_gcell, initial_gcell);
             placement.place(cell, initial_location);
-            global_routing.update_blockage_demand(netlist, placement, cell, false);
+            update_blockage_demand(design, cell, false);
+            astar_routing.update_extra_demand_constraint(initial_gcell);
+            astar_routing.update_extra_demand_constraint(median_gcell);
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
             if(undo == false)
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
@@ -586,8 +603,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
     std::vector<std::string> circuit_names = {
         // "case1",
         // "case2",
-        // "case3",
-        "case3_no_extra_demand",
+         "case3",
+        // "case3_no_extra_demand",
         // "case4",
         // "case5",
     };
@@ -688,16 +705,36 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         printlog("Initing movements ...");
         auto moved_cells = 0;
         std::vector<std::pair<cell_type, point_type>>  movements;
-        for(auto pair : cells_costs)
+        bool at_least_one_cell_moved = true;
+        while(at_least_one_cell_moved)
         {
-            auto cell = pair.first;
-
-            auto moved = move_cell(design, cell);
-
-            if(moved)
+            at_least_one_cell_moved = false;
+            for(auto pair : cells_costs)
             {
-                moved_cells++;
-                movements.push_back(std::make_pair(cell, placement.location(cell)));
+                auto cell = pair.first;
+
+                auto moved = move_cell(design, cell, astar_routing);
+                at_least_one_cell_moved = moved ? moved : at_least_one_cell_moved;
+                if(moved)
+                {
+                    moved_cells++;
+                    movements.push_back(std::make_pair(cell, placement.location(cell)));
+                    std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
+                }
+                if(moved_cells == design.routing_constraints().max_cell_movement())
+                    break;
+                // if(moved_cells % 100 == 0)
+                // {
+                //     iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out_"+std::to_string(moved_cells)+".txt", movements);
+                //     log()<<"Number of moved cells: "<<moved_cells<<std::endl;
+                //     int final_wirelength = global_routing.wirelength(nets);
+                //     log() << "Circuit final wirelength = " << final_wirelength << std::endl;
+                //     auto score = initial_wirelength - final_wirelength;
+                //     log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
+                //     double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
+                //     log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+                //     moved_cells++;
+                // }
             }
             if(moved_cells == design.routing_constraints().max_cell_movement())
             {
@@ -714,6 +751,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out.txt", movements);
 
         log()<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+        log()<<"Number of moved cells: "<<moved_cells<<std::endl;
         int final_wirelength = global_routing.wirelength(nets);
         log() << "Circuit final wirelength = " << final_wirelength << std::endl;
         auto score = initial_wirelength - final_wirelength;
