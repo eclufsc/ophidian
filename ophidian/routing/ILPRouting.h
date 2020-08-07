@@ -225,6 +225,8 @@ namespace ophidian::routing {
             entity_system::Property<cell_type, position_candidate_type>     m_cell_initial_candidate{m_design.netlist().make_property_cell_instance<position_candidate_type>()};
             entity_system::Aggregation<cell_type, position_candidate_type>  m_cell_position_candidates{m_design.netlist().make_aggregation_cell<position_candidate_type>(m_position_candidates)};
 
+            unsigned m_moved_cells{0};
+
     };
 } // end namespace ophidian::routing
 

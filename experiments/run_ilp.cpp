@@ -8,12 +8,84 @@
 #include <ophidian/routing/MCFMultiThreading.h>
 
 using namespace ophidian::util;
+using point_type = ophidian::util::LocationDbu;
+using unit_type = ophidian::util::database_unit_t;
 bool DEBUG_TEST = true;
 
 void run_mcf_multithreading(ophidian::design::Design & design) {
     UCal::MCFMultiThreading mcf(design);
 
     mcf.run();
+}
+
+point_type cell_median_location(ophidian::circuit::CellInstance & cell, ophidian::design::Design & design) {
+    std::vector<double> x_positions;
+    std::vector<double> y_positions;
+
+    for(auto pin : design.netlist().pins(cell)){
+        auto net = design.netlist().net(pin);
+        if(net == ophidian::circuit::Net())
+            continue;
+        auto x_min = std::numeric_limits<double>::max();
+        auto y_min = std::numeric_limits<double>::max();
+        auto x_max = -std::numeric_limits<double>::max();
+        auto y_max = -std::numeric_limits<double>::max();
+        for(auto net_pin : design.netlist().pins(net)){
+            if(net_pin == pin)
+                continue;
+            auto location = design.placement().location(net_pin);
+            x_min = std::min(x_min, location.x().value());
+            y_min = std::min(y_min, location.y().value());
+            x_max = std::max(x_max, location.x().value());
+            y_max = std::max(y_max, location.y().value());
+            //x_positions.push_back(location.x().value());
+            //y_positions.push_back(location.y().value());
+        }
+        x_positions.push_back(x_min);
+        x_positions.push_back(x_max);
+        y_positions.push_back(y_min);
+        y_positions.push_back(y_max);
+    }
+
+    if(x_positions.empty() || y_positions.empty())
+        return design.placement().location(cell);
+
+    std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
+    auto median_x = x_positions[x_positions.size()/2];
+    //median_x = std::min(area.max_corner().x().value(), std::max(area.min_corner().x().value(), median_x));
+    std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
+    auto median_y = y_positions[y_positions.size()/2];
+    //median_y = std::min(area.max_corner().y().value(), std::max(area.min_corner().y().value(), median_y));
+
+    point_type median_point {unit_type(median_x), unit_type(median_y)};
+
+    return median_point;
+}
+
+double measure_cell_wirelength(ophidian::circuit::CellInstance & cell, ophidian::design::Design & design) {   
+    double cell_wirelength = 0;
+    for (auto cell_pin : design.netlist().pins(cell)) {
+        auto net = design.netlist().net(cell_pin);
+
+        auto pins = design.netlist().pins(net);
+        std::vector<ophidian::interconnection::Flute::Point> net_points;
+        net_points.reserve(pins.size());
+        for (auto pin : pins) {
+            auto pin_location = design.placement().location(pin);
+            net_points.push_back(pin_location);
+        }
+
+        auto & flute = ophidian::interconnection::Flute::instance();
+        auto tree = flute.create(net_points);
+        auto stwl = tree->length().value();
+        stwl /= 10;
+        if (stwl == 0) {
+            stwl = 1;
+        }        
+
+        cell_wirelength += stwl;
+    }
+    return cell_wirelength;
 }
 
 std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> run_ilp_for_part_of_nets(const std::vector<std::pair<ophidian::circuit::Net, double>> & nets_costs, unsigned start_index, unsigned end_index, ophidian::routing::ILPRouting<IloBoolVar> & ilpRouting, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing, const std::vector<ophidian::circuit::CellInstance> & cells, ophidian::placement::Placement::box_type & area) {    
@@ -37,6 +109,24 @@ std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> 
     return result;
 }
 
+std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> run_ilp_for_part_of_cells(const std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells_costs, unsigned start_index, unsigned end_index, ophidian::routing::ILPRouting<IloBoolVar> & ilpRouting, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing, const std::vector<ophidian::circuit::Net> & fixed_nets, ophidian::placement::Placement::box_type & area) {    
+    std::vector<ophidian::circuit::CellInstance> cells;
+    for (unsigned index = 0; index < cells_costs.size(); index++) {
+        auto cell_cost = cells_costs.at(index);
+        if (index >= start_index && index < end_index) {
+            cells.push_back(cell_cost.first);
+        }
+    }
+
+    std::cout << "cells " << cells.size() << std::endl;
+    
+    std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
+    
+    auto result = ilpRouting.route_nets(fixed_nets, cells, area, {}, routed_nets, unrouted_nets, movements, initial_routing);
+    return result;
+}
+
 void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
@@ -44,10 +134,30 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    std::vector<ophidian::circuit::CellInstance> cells(design.netlist().begin_cell_instance(), design.netlist().end_cell_instance());
     
     auto chip_origin = design.floorplan().chip_origin();
     auto chip_upper_right_corner = design.floorplan().chip_upper_right_corner();
     auto chip_area = ophidian::placement::Placement::box_type{chip_origin, chip_upper_right_corner};
+    
+    std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells_costs;
+    for (auto cell : cells) {
+        auto initial_location = design.placement().location(cell); 
+
+        auto initial_wirelength = measure_cell_wirelength(cell, design);
+
+        auto new_location = cell_median_location(cell, design);
+        design.placement().place(cell, new_location);
+
+        auto new_wirelength = measure_cell_wirelength(cell, design);
+
+        auto cost = initial_wirelength / new_wirelength;
+        cells_costs.push_back(std::make_pair(cell, cost));
+
+        design.placement().place(cell, initial_location);
+    }    
+    
+    std::sort(cells_costs.begin(), cells_costs.end(), [](std::pair<ophidian::circuit::CellInstance, double> cost_a, std::pair<ophidian::circuit::CellInstance, double> cost_b) {return cost_a.second < cost_b.second;});
 
     std::vector<std::pair<ophidian::circuit::Net, double>> nets_costs;
     for (auto net : nets) {
@@ -85,17 +195,30 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     auto demand_before = design.global_routing().gcell_graph()->total_net_demand();
     if(DEBUG_TEST) log() << "routing nets" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
-
-    unsigned number_of_nets = nets_costs.size();
-    unsigned number_of_nets_per_step = 20000;
-    unsigned number_of_steps = std::ceil( (double) number_of_nets / (double) number_of_nets_per_step);
-    std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> result;
+    
+    std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
+    
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
-    std::vector<ophidian::circuit::CellInstance> cells(design.netlist().begin_cell_instance(), design.netlist().end_cell_instance());
+    auto result = ilpRouting.route_nets(nets, {}, chip_area, {}, routed_nets, unrouted_nets, movements, initial_routing);
+
+    std::cout << "movements " << movements.size() << std::endl;
+
+    unsigned number_of_cells = cells_costs.size();
+    unsigned number_of_cells_per_step = 820;
+    unsigned number_of_steps = std::ceil( (double) number_of_cells / (double) number_of_cells_per_step);
+    //std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> result;
     for (auto step_index = 0; step_index < number_of_steps; step_index++) {
-        unsigned start_index = step_index * number_of_nets_per_step;
-        unsigned end_index = start_index + number_of_nets_per_step;
-        result = run_ilp_for_part_of_nets(nets_costs, start_index, end_index, ilpRouting, movements, initial_routing, cells, chip_area);
+        unsigned start_index = step_index * number_of_cells_per_step;
+        unsigned end_index = start_index + number_of_cells_per_step;
+        result = run_ilp_for_part_of_cells(cells_costs, start_index, end_index, ilpRouting, movements, initial_routing, nets, chip_area);
+
+        std::cout << "movements " << movements.size() << std::endl;
+
+        if (movements.size() == 820) {
+            break;
+        }
+        break;
     }
 
     //auto result = ilpRouting.route_nets(nets_to_route, fixed_nets, routed_nets, unrouted_nets, movements, initial_routing);

@@ -73,7 +73,13 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
 
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
     // std::log() << "routing nets" << std::endl;
-    auto result = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
+    for (unsigned iteration = 0; iteration < 5; iteration++) {
+        auto result = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
+        for (auto movement : movements) {
+            auto cell = movement.first;
+            design.placement().fixLocation(cell);
+        }
+    }
 
     /*std::vector<ophidian::circuit::Net> bad_nets;
     for (auto net : nets) {
@@ -125,14 +131,14 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
 
     std::cout << bad_nets.size() << " bad nets" << std::endl;*/
     
-    /*std::cout << unrouted_nets.size() << " unrouted nets" << std::endl;
+    //std::cout << unrouted_nets.size() << " unrouted nets" << std::endl;
 
     // std::log() << "result " << result << std::endl;   
-    auto& netlist = design.netlist();
-    //for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
-    //    auto net = *net_it;
+    /*auto& netlist = design.netlist();
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
+        auto net = *net_it;
     //for(auto net : bad_nets) {
-    for(auto net : unrouted_nets) {
+    //for(auto net : unrouted_nets) {
         auto net_name = design.netlist().name(net);
         std::cout << "net " << net_name << std::endl;
         design.global_routing().unroute(net);

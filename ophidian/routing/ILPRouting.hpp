@@ -60,7 +60,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, cells, area, model);
+        //create_all_candidates_with_movements(nets, cells, area, model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -76,7 +76,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         // if(STATUS) printlog("add movements constraints");
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
         // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(WRITE_MODEL) printlog("write model");
@@ -112,6 +112,8 @@ namespace ophidian::routing {
 
     	    write_segments(nets, cplex, routed_nets, unrouted_nets);
             save_movements(cplex, movements);
+
+            //log() << "moved cells " << m_moved_cells << std::endl;
 
             auto total_nets = m_design.netlist().size_net();
             double ratio = (double) routed_nets.size() / (double) total_nets;
@@ -604,23 +606,35 @@ namespace ophidian::routing {
             if(net == ophidian::circuit::Net())
                 continue;
             cell_nets.push_back(net);
+            auto x_min = std::numeric_limits<double>::max();
+            auto y_min = std::numeric_limits<double>::max();
+            auto x_max = -std::numeric_limits<double>::max();
+            auto y_max = -std::numeric_limits<double>::max();
             for(auto net_pin : netlist.pins(net)){
                 if(net_pin == pin)
                     continue;
                 auto location = placement.location(net_pin);
-                x_positions.push_back(location.x().value());
-                y_positions.push_back(location.y().value());
+                x_min = std::min(x_min, location.x().value());
+                y_min = std::min(y_min, location.y().value());
+                x_max = std::max(x_max, location.x().value());
+                y_max = std::max(y_max, location.y().value());
+                //x_positions.push_back(location.x().value());
+                //y_positions.push_back(location.y().value());
             }
+            x_positions.push_back(x_min);
+            x_positions.push_back(x_max);
+            y_positions.push_back(y_min);
+            y_positions.push_back(y_max);
         }
         if(x_positions.empty() || y_positions.empty())
             return;
 
         std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
         auto median_x = x_positions[x_positions.size()/2];
-        median_x = std::min(area.max_corner().x().value(), std::max(area.min_corner().x().value(), median_x));
+        //median_x = std::min(area.max_corner().x().value(), std::max(area.min_corner().x().value(), median_x));
         std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
         auto median_y = y_positions[y_positions.size()/2];
-        median_y = std::min(area.max_corner().y().value(), std::max(area.min_corner().y().value(), median_y));
+        //median_y = std::min(area.max_corner().y().value(), std::max(area.min_corner().y().value(), median_y));
 
         point_type median_point {unit_type(median_x), unit_type(median_y)};
         
@@ -2049,6 +2063,7 @@ namespace ophidian::routing {
             std::string name (variable.getName());
             if (value > 0.9) {             
                 if (name.find("initial") == std::string::npos) {
+                    m_moved_cells++;
                     auto candidate = m_name_to_position_candidate[name];
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
@@ -2077,9 +2092,9 @@ namespace ophidian::routing {
             }
         }
 
-        auto sum = initial_candidate + two_pin + center_of_mass + na + median;
+        /*auto sum = initial_candidate + two_pin + center_of_mass + na + median;
         auto move_sum = two_pin + center_of_mass + median;
-        /*std::cout<< "Movements Report:" << sum << "\n" <<
+        std::cout<< "Movements Report:" << sum << "\n" <<
                     "Initial position = " << initial_candidate << "\t" << std::to_string(initial_candidate / sum) << "% \n" <<
                     "2 pin net = " << two_pin << "\t" << std::to_string(two_pin / sum) << "% \t" << std::to_string(two_pin / move_sum) << "% \n" <<
                     "Center of mass = " << center_of_mass << "\t" << std::to_string(center_of_mass / sum) << "% \t" << std::to_string(center_of_mass / move_sum) << "% \n" <<
@@ -2140,7 +2155,7 @@ namespace ophidian::routing {
 
     template <typename var_type>
     void ILPRouting<var_type>::add_movements_constraints(model_type & model){
-        auto max_movemnts = m_design.routing_constraints().max_cell_movement();
+        auto max_movemnts = m_design.routing_constraints().max_cell_movement() - m_moved_cells;
 
         IloExpr candicates(m_env);
         for (auto candidate_it = m_position_candidates.begin(); candidate_it != m_position_candidates.end(); candidate_it++) {

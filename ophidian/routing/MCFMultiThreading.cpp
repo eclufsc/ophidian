@@ -67,7 +67,6 @@ void MCFMultiThreading::run(){
     cluster_based_on_panel();
     run_ilp_on_panels(movements);
 
-
     report();
     write_nets(movements);
     // if(DEBUG_MCF_MLT_NET_BOX_RTREE) m_rtree_net_box.report();
@@ -495,6 +494,7 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
     //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
     // 
+    for (unsigned iteration = 0; iteration < 1; iteration++) {
     for(int i = 0; i < num_panels; i++){    
         if(DEBUG_PANEL) std::cout << "panel_" << i << std::endl;
         auto nets_panel = m_panel_index_to_nets_dict[i];
@@ -597,6 +597,12 @@ void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routin
 
 
     }//end for 
+        for (auto movement : movements) {
+            auto cell = movement.first;
+            m_design.placement().fixLocation(cell);
+        }
+
+    }
 
 }//end run_ilp_on_panels
 

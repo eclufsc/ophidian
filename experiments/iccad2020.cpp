@@ -81,12 +81,11 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
     out_svg.close();
 }
 
-
-void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name) {
+void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::unordered_map<ophidian::circuit::Net, double, ophidian::entity_system::EntityBaseHash> & nets_initial_wirelength) {
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
 
     std::ofstream stats_file("stats/" + circuit_name + "_nets.csv");
-    stats_file << "net,pins,stwl,routed_length,routed_length_no_vias,box_width,box_height" << std::endl;
+    stats_file << "net,pins,stwl,routed_length,routed_length_no_vias,initial_wirelength,box_width,box_height" << std::endl;
     for (auto net : nets) {
         auto net_name = design.netlist().name(net);
         auto pins = design.netlist().pins(net);
@@ -136,10 +135,12 @@ void write_statistics_for_circuit(ophidian::design::Design & design, std::string
         }
         auto routed_length = routed_length_no_vias + via_length;
 
+        auto initial_wirelength = nets_initial_wirelength[net];
+
         auto box_width = max_x - min_x;
         auto box_height = max_y - min_y;
 
-        stats_file << net_name << "," << pins.size() << "," << stwl << "," << routed_length << "," << routed_length_no_vias << "," << box_width << "," << box_height << std::endl;
+        stats_file << net_name << "," << pins.size() << "," << stwl << "," << routed_length << "," << routed_length_no_vias << "," << initial_wirelength << "," << box_width << "," << box_height << std::endl;
     }
     stats_file.close();
 }
@@ -150,8 +151,8 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
         // "case1",
         //"case1N4",
         // "case2",
-        //"case3",
-        "case4",
+        "case3",
+        //"case4",
         // "case5",
          //"case5_no_extra_demand",
         //"case3_no_blockages",
@@ -239,11 +240,18 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+
+        std::unordered_map<ophidian::circuit::Net, double, ophidian::entity_system::EntityBaseHash> nets_initial_wirelength;
+        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        for (auto net : nets) {
+            auto net_wirelength = design.global_routing().wirelength(net);
+            nets_initial_wirelength[net] = net_wirelength; 
+        }
         
-        // run_ilp_for_circuit(design, circuit_name);
+         run_ilp_for_circuit(design, circuit_name);
         //run_circuit(design, circuit_name);
-        run_mcf_multithreading(design);
-        write_statistics_for_circuit(design, circuit_name);
+        //run_mcf_multithreading(design);
+        //write_statistics_for_circuit(design, circuit_name, nets_initial_wirelength);
     }
 
 
