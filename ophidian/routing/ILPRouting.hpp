@@ -23,8 +23,10 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing, bool move_cells, bool initial_routing_only)
     {
+        m_initial_routing_only = initial_routing_only;
+
         if(STATUS) printlog("init function route_nets");
         ILPRouting<var_type>::Statistics statistic;
 
@@ -59,9 +61,11 @@ namespace ophidian::routing {
         create_all_candidates(nets, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        // if(STATUS) printlog("create all candidates with movements");
-        //create_all_candidates_with_movements(nets, cells, area, model);
-        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if (move_cells) {
+            if(STATUS) printlog("create all candidates with movements");
+            create_all_candidates_with_movements(nets, cells, area, model);
+            if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        }
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
@@ -75,9 +79,11 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, cells, area, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        // if(STATUS) printlog("add movements constraints");
-        //add_movements_constraints(model);
-        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if (move_cells) {
+            if(STATUS) printlog("add movements constraints");
+            add_movements_constraints(model);
+            if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        }
 
         if(WRITE_MODEL) printlog("write model");
         if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
@@ -129,6 +135,131 @@ namespace ophidian::routing {
         m_env.end();
         return std::make_pair(result, statistic);
      }
+
+    template <typename var_type>
+    ILPResult ILPRouting<var_type>::route_nets_v2(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
+    {
+        if(STATUS) printlog("init function route_nets");
+        ILPRouting<var_type>::Statistics statistic;
+
+
+        //if(!m_extra_demand_created)
+        //    add_extra_demand(cells);
+
+        if(STATUS) printlog("Cleaning the data structures ...");
+        //m_segments.clear();
+        m_wires.clear();
+        m_route_candidate.clear();
+        m_position_candidates.clear();
+
+        if(STATUS) printlog("Instantiating the envirorment ...");
+        
+        m_env = environment_type{};        
+        model_type model(m_env);
+        solver_type cplex(model);
+        cplex.setOut(m_env.getNullStream());
+        cplex.setParam(IloCplex::Param::Threads, 4);
+
+
+        if(STATUS) printlog("update capacities from blockages");
+        update_gcell_capacities(fixed_nets, cells);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+        // add_extra_demand();
+
+        if(STATUS) printlog("create all cells initial candidates");
+        create_all_cell_initial_candidates(cells, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+
+
+        if(STATUS) printlog("create all candidates");
+        create_all_candidates(nets, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+
+
+        // if(STATUS) printlog("create all candidates with movements");
+        //create_all_candidates_with_movements(nets, cells, area, model);
+        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+        if(STATUS) printlog("add objective function");
+        add_objective_function(model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+        if(STATUS) printlog("add candidate constraints");
+        add_candidate_constraints(nets, cells, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+
+        if(STATUS) printlog("add capacity constraints");
+        add_capacity_constraints(nets, cells, area, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+        // if(STATUS) printlog("add movements constraints");
+        //add_movements_constraints(model);
+        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+
+        if(WRITE_MODEL) printlog("write model");
+        if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
+        if(WRITE_MODEL) printlog("exported");
+
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        log() << std::endl;
+
+
+        auto time_begin = std::chrono::high_resolution_clock::now();
+        bool solved = cplex.solve();
+        auto time_end = std::chrono::high_resolution_clock::now();
+        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
+        auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
+        if(STATUS) log() << "solved = " << solved << " in " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+        statistic.model_runtime_ms = duration_ms;
+
+
+
+
+        auto status = cplex.getCplexStatus();
+
+        auto result = (status == IloCplex::CplexStatus::Optimal || status == IloCplex::CplexStatus::Feasible || status == IloCplex::CplexStatus::OptimalTol);
+
+
+
+        if(STATUS) log() << "status " << status << std::endl;
+
+        if(STATUS) log() << "result " << result << std::endl;
+
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
+              << std::endl;
+
+        if(result)
+        {
+            if(WRITE_MODEL) printlog("writing solution");
+            if(WRITE_MODEL) cplex.writeSolution("ilp_routing_model.sol");
+
+    	    auto ilp_results = write_segments_v2(nets, cplex, routed_nets, unrouted_nets);
+            // save_movements(cplex, movements);
+
+            //log() << "moved cells " << m_moved_cells << std::endl;
+
+            auto total_nets = m_design.netlist().size_net();
+            double ratio = (double) routed_nets.size() / (double) total_nets;
+            log() << std::endl;
+            log() << "total nets " << total_nets << std::endl;
+            log() << "routed nets " << routed_nets.size() << std::endl;
+            log() << "routed nets " << ratio*100.0<<"%" << std::endl;
+            log() << "unrouted nets " << (total_nets - routed_nets.size()) << std::endl;
+            log() << std::endl;
+
+	        // save_result(cplex);
+            m_env.end();
+            return ilp_results;
+        }
+        ILPResult ilp_result;
+        m_env.end();
+        return ilp_result;
+        // return std::make_pair(result, statistic);
+     }//end route_nets_v2
 
     template <typename var_type>
     void ILPRouting<var_type>::update_gcell_capacities(const std::vector<net_type> & fixed_nets, const cell_container_type & cells)
@@ -977,6 +1108,7 @@ namespace ophidian::routing {
         auto min_layer = routing_constraints.min_net_layer(net);
         auto min_layer_index = m_design.routing_library().layerIndex(min_layer);
         bool created_net_candidate = false;
+        if (!m_initial_routing_only || pos_candidate != position_candidate_type()) {
     	for(auto horizontal_layer : horizontal_layers)
         {
             auto horizontal_layer_index = m_design.routing_library().layerIndex(horizontal_layer);
@@ -1003,6 +1135,7 @@ namespace ophidian::routing {
                 if(DEBUG) std::cout << "after candidates in layers" << std::endl;
     	    }
 	    }
+        }
 
         if (!created_net_candidate && pos_candidate != position_candidate_type()) {
             auto position_candidate_variable = m_position_candidate_variables[pos_candidate];
@@ -2048,6 +2181,81 @@ namespace ophidian::routing {
             }
          }
     }
+
+    template <typename var_type>
+    ILPResult ILPRouting<var_type>::write_segments_v2(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets)
+    {
+        ILPResult ilp_result;
+        auto & global_routing = m_design.global_routing();
+        for(auto net : nets)
+        {
+    	    auto net_name = m_design.netlist().name(net);
+            auto candidates = m_net_candidates.parts(net);
+            bool routed = 0;
+    	    route_candidate_type routed_candidate;
+            for(auto candidate : candidates)
+            {
+                auto candidate_name = m_route_candidate_names[candidate];
+                auto variable = m_route_candidate_variables[candidate];
+                auto value = solver.getValue(variable);
+                //std::cout << candidate_name << " " << value << std::endl;
+    	    	//if(std::abs(value - 1.0) <= std::numeric_limits<double>::epsilon())
+    	    	if(value > 0.9)
+                {
+                    routed = 1;
+		            routed_candidate = candidate;
+                    break;
+        		}
+            }
+            
+            if(routed)
+            {
+                routed_nets.push_back(net);
+                
+                //clear possible old routings
+                
+                // global_routing.unroute(net);
+                
+
+        		//for(auto wire : m_route_candidate_wires[routed_candidate])
+                std::vector<ILPSegment> ilp_segments;
+        		for(auto wire : m_route_candidate_wires.parts(routed_candidate))
+                {
+        		    auto wire_start = m_wire_starts[wire];
+		            auto wire_end = m_wire_ends[wire];
+        		    auto start_layer_index = m_wire_start_layers[wire];
+		            auto end_layer_index = m_wire_end_layers[wire];
+        		    auto wire_start_layer = m_design.routing_library().layer_from_index(start_layer_index);
+		            auto wire_end_layer = m_design.routing_library().layer_from_index(end_layer_index);
+
+                    auto min_x = std::min(wire_start.x(), wire_end.x());
+                    auto max_x = std::max(wire_start.x(), wire_end.x());
+                    auto min_y = std::min(wire_start.y(), wire_end.y());
+                    auto max_y = std::max(wire_start.y(), wire_end.y());
+
+                    auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+                    // global_routing.add_segment(wire_box, wire_start_layer, wire_end_layer, net);
+                    ILPSegment ilp_segment;
+                    ilp_segment.start_layer = wire_start_layer;
+                    ilp_segment.stop_layer = wire_end_layer;
+                    ilp_segment.wire_box = wire_box;
+
+                    ilp_segments.push_back(ilp_segment);
+		        }
+                auto net_wire_pair = std::make_pair(net,ilp_segments);
+                ilp_result.m_routed_nets.push_back(net_wire_pair);
+                
+                // global_routing.increase_demand(net);
+    	    }
+            else
+            {
+                // unrouted_nets.push_back(net);
+                ilp_result.m_unrouted_nets.push_back(net);
+                std::cout << "WARNING: net " << net_name << " unrouted" << std::endl;
+            }
+         }
+         return ilp_result;
+    }//end write_segment_v2
 
     template <typename var_type>
     void ILPRouting<var_type>::save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements) {

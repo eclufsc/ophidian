@@ -24,6 +24,8 @@ project(ophidian VERSION ${ophidian_VERSION})
 # Set c++14 globally
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+
 # Set Ophidian source dir
 set(ophidian_source_dir ${PROJECT_SOURCE_DIR})
 

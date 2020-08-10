@@ -72,14 +72,18 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     std::vector<ophidian::circuit::Net> unrouted_nets;
 
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
+
+    auto result = ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, false, false);
+
+    ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, true, true);
     // std::log() << "routing nets" << std::endl;
-    for (unsigned iteration = 0; iteration < 5; iteration++) {
+    /*for (unsigned iteration = 0; iteration < 5; iteration++) {
         auto result = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
         for (auto movement : movements) {
             auto cell = movement.first;
             design.placement().fixLocation(cell);
         }
-    }
+    }*/
 
     /*std::vector<ophidian::circuit::Net> bad_nets;
     for (auto net : nets) {
