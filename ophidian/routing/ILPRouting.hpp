@@ -6,9 +6,9 @@
 #include <ophidian/util/log.h>
 
 #ifndef STATUS
-#define STATUS true
+#define STATUS false
 #define DEBUG false
-#define WRITE_MODEL true
+#define WRITE_MODEL false
 #endif
 
 using namespace ophidian::util;
@@ -90,7 +90,7 @@ namespace ophidian::routing {
         if(WRITE_MODEL) printlog("exported");
 
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
-        log() << std::endl;
+        if(STATUS) log() << std::endl;
 
         auto time_begin = std::chrono::high_resolution_clock::now();
         bool solved = cplex.solve();
@@ -107,6 +107,8 @@ namespace ophidian::routing {
         if(STATUS) log() << "status " << status << std::endl;
 
         if(STATUS) log() << "result " << result << std::endl;
+
+        if(STATUS) log() << "obj value " << cplex.getObjValue() << std::endl;
 
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB"
               << std::endl;
@@ -179,9 +181,9 @@ namespace ophidian::routing {
 
 
 
-        // if(STATUS) printlog("create all candidates with movements");
-        //create_all_candidates_with_movements(nets, cells, area, model);
-        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) printlog("create all candidates with movements");
+        create_all_candidates_with_movements(nets, cells, area, model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
         add_objective_function(model);
@@ -196,9 +198,9 @@ namespace ophidian::routing {
         add_capacity_constraints(nets, cells, area, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
-        // if(STATUS) printlog("add movements constraints");
-        //add_movements_constraints(model);
-        // if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
+        if(STATUS) printlog("add movements constraints");
+        add_movements_constraints(model);
+        if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(WRITE_MODEL) printlog("write model");
         if(WRITE_MODEL) cplex.exportModel("ilp_routing_model.lp");
@@ -238,18 +240,18 @@ namespace ophidian::routing {
             if(WRITE_MODEL) cplex.writeSolution("ilp_routing_model.sol");
 
     	    auto ilp_results = write_segments_v2(nets, cplex, routed_nets, unrouted_nets);
-            // save_movements(cplex, movements);
+            save_movements(cplex, movements);
 
             //log() << "moved cells " << m_moved_cells << std::endl;
 
             auto total_nets = m_design.netlist().size_net();
             double ratio = (double) routed_nets.size() / (double) total_nets;
-            log() << std::endl;
-            log() << "total nets " << total_nets << std::endl;
-            log() << "routed nets " << routed_nets.size() << std::endl;
-            log() << "routed nets " << ratio*100.0<<"%" << std::endl;
-            log() << "unrouted nets " << (total_nets - routed_nets.size()) << std::endl;
-            log() << std::endl;
+            if(STATUS) log() << std::endl;
+            if(STATUS) log() << "total nets " << total_nets << std::endl;
+            if(STATUS) log() << "routed nets " << routed_nets.size() << std::endl;
+            if(STATUS) log() << "routed nets " << ratio*100.0<<"%" << std::endl;
+            if(STATUS) log() << "unrouted nets " << (total_nets - routed_nets.size()) << std::endl;
+            if(STATUS) log() << std::endl;
 
 	        // save_result(cplex);
             m_env.end();
@@ -2276,7 +2278,7 @@ namespace ophidian::routing {
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
                     movements.push_back(std::make_pair(cell, position));
-                    m_design.placement().place(cell, position);
+                    //m_design.placement().place(cell, position);
                     auto type = m_position_candidate_origin[candidate];
                     switch (type)
                     {

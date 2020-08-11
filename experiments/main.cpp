@@ -50,7 +50,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     UCal::MCFMultiThreading mcf_multi_threading(design); 
     mcf_multi_threading.run();
 
-    
+    log() << "end" << std::endl;
 }//end run_mcf_for_circuit
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
@@ -75,7 +75,7 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
 
     auto result = ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, false, false);
 
-    ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, true, true);
+    //ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, true, true);
     // std::log() << "routing nets" << std::endl;
     /*for (unsigned iteration = 0; iteration < 5; iteration++) {
         auto result = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);

@@ -651,21 +651,37 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         for(int i = 0; i < even_ids.size(); i++){
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
-            // std::cout << "id: " << id << std::endl;
-            run_ilp_on_panel(id,movements);
+            //std::cout << "id: " << id << std::endl;
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
 
-            // std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
-        }//end for 
+            #pragma omp critical
+            for (auto movement : local_movements) {
+                m_design.placement().place(movement.first, movement.second);
+                movements.push_back(movement);
+            } 
+
+            //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
+        }//end for
         update_global_routing();
 
         // odd panels
         #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
-            run_ilp_on_panel(id,movements);
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
+            
+            #pragma omp critical
+            for (auto movement : local_movements) {
+                m_design.placement().place(movement.first, movement.second);
+                movements.push_back(movement);
+            } 
 
-            // std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
+            //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
         }
+
+        m_design.placement().reset_rtree();
         update_global_routing();
         // break;
         if(level == 5){
