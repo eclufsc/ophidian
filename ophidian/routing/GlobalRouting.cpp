@@ -70,11 +70,13 @@ namespace ophidian::routing
     void GlobalRouting::create_gcell_graph(GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z, GCellGraph::scalar_container_type capacities)
     {
         m_gcell_graph.reset(new gcell_graph_type(x, y, z, capacities));
+        //set_gcell_cell_instances()
     }
 
     void GlobalRouting::create_gcell_graph(const ophidian::routing::Library & library, GlobalRouting::unit_container_type x, GlobalRouting::unit_container_type y, GlobalRouting::index_type z)
     {
         m_gcell_graph.reset(new gcell_graph_type(library, x, y, z));
+        //set_gcell_cell_instances()
     }
 
     GlobalRouting::gcell_graph_ptr_type GlobalRouting::gcell_graph()
@@ -254,6 +256,17 @@ namespace ophidian::routing
         }
     }
 
+    void GlobalRouting::set_gcell_cell_instances(ophidian::circuit::Netlist & netlist, ophidian::placement::Placement & placement)
+    {
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
+        {
+            auto cell = *cell_it;
+            auto location = placement.location(cell);
+            auto gcell = m_gcell_graph->nearest_gcell(location, 0);
+            m_gcell_graph->insert_cell_instance(gcell, cell);
+        }
+    }
+
     bool GlobalRouting::is_overflow() const
     {
         auto& graph = *this->m_gcell_graph;
@@ -272,6 +285,7 @@ namespace ophidian::routing
         }
         return is_overflow;
     }
+
     bool GlobalRouting::is_overflow(const net_container_type& nets, net_container_type& ovfl_nets) const
     {
         auto& graph = *this->m_gcell_graph;
@@ -350,8 +364,23 @@ namespace ophidian::routing
         return lemon::connected(net_graph);
     }
 
+    void GlobalRouting::move_cell(GlobalRouting::gcell_type source, GlobalRouting::gcell_type target, GlobalRouting::cell_instance_type cell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    {
+        //remove blockage demand
+        update_blockage_demand(netlist, placement, cell, true);
+        //move cell from sets
+        m_gcell_graph->remove_cell_instance(source, cell);
+        m_gcell_graph->insert_cell_instance(target, cell);
+        //change placement
+        auto target_location = m_gcell_graph->center_of_box(target);
+        placement.place(cell, target_location);
+        //add blockage demand
+        update_blockage_demand(netlist, placement, cell, false);
+        incremental_update_extra_demand(source, netlist, placement, routing_constraints, std_cells);
+        incremental_update_extra_demand(target, netlist, placement, routing_constraints, std_cells);
+    }
 
-    void GlobalRouting::update_blockage_demand(ophidian::circuit::Netlist & netlist, ophidian::placement::Placement & placement, ophidian::circuit::CellInstance cell, bool remove_demand)
+    void GlobalRouting::update_blockage_demand(GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::cell_instance_type cell, bool remove_demand)
     {
         auto location = placement.location(cell);
         auto std_cell = netlist.std_cell(cell);
@@ -362,6 +391,281 @@ namespace ophidian::routing
             auto gcell = m_gcell_graph->nearest_gcell(location, layer_index-1);
             auto demand = remove_demand ? -m_library.demand(blockage) : m_library.demand(blockage);
             m_gcell_graph->change_blockage_demand(gcell, demand);
+        }
+    }
+
+    void GlobalRouting::update_extra_demand(GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    {
+        std::unordered_map<gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        std::unordered_map<circuit::StandardCells::cell_type, std::unordered_set<gcell_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcells_per_std_cell;
+
+        for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); cell_it++)
+        {
+            auto cell = *cell_it;
+            auto location = placement.location(cell);
+            auto std_cell = netlist.std_cell(cell);
+
+            auto cell_name = netlist.name(cell);
+            auto std_cell_name = std_cells.name(std_cell);
+
+            for (auto layer_index = m_library.lowest_layer_index(); layer_index <= m_library.highest_layer_index(); layer_index++)
+            {
+                auto gcell = m_gcell_graph->nearest_gcell(location, layer_index-1);
+
+                std_cells_per_gcell[gcell][std_cell] += 1;
+                gcells_per_std_cell[std_cell].insert(gcell);
+            }
+        }
+
+        for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++)
+        {
+            auto key = same_grid_it->first;
+            auto & extra_demand = same_grid_it->second;
+            auto demand = extra_demand.demand;
+
+            auto macro1_name = extra_demand.macro1;
+            auto macro2_name = extra_demand.macro2;
+            auto layer_name = extra_demand.layer;
+
+            auto macro1 = std_cells.find_cell(macro1_name);
+            auto macro2 = std_cells.find_cell(macro2_name);
+            auto layer = m_library.find_layer_instance(layer_name);
+
+            auto gcells_macro1 = gcells_per_std_cell[macro1];
+            auto gcells_macro2 = gcells_per_std_cell[macro2];
+
+            auto rule_gcells = std::unordered_set<gcell_type, entity_system::EntityBaseHash>{};
+            for (auto gcell : gcells_macro1)
+            {
+                rule_gcells.insert(gcell);
+            }
+            for (auto gcell : gcells_macro2)
+            {
+                rule_gcells.insert(gcell);
+            }
+
+            for (auto gcell : rule_gcells)
+            {
+                auto gcell_layer_index = m_gcell_graph->layer_index(gcell);
+                auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
+                auto gcell_layer = m_library.find_layer_instance(gcell_layer_name);
+
+                if (layer == gcell_layer)
+                {
+                    auto pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[gcell][macro2]);
+                    auto delta = pair_count * demand;
+                    m_gcell_graph->change_same_demand(gcell, delta);
+                }
+            }
+        }
+
+        for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++)
+        {
+            auto key = adj_grid_it->first;
+            auto & extra_demand = adj_grid_it->second;
+            auto demand = extra_demand.demand;
+
+            auto macro1_name = extra_demand.macro1;
+            auto macro2_name = extra_demand.macro2;
+            auto layer_name = extra_demand.layer;
+
+            auto macro1 = std_cells.find_cell(macro1_name);
+            auto macro2 = std_cells.find_cell(macro2_name);
+            auto layer = m_library.find_layer_instance(layer_name);
+
+            auto gcells_macro1 = gcells_per_std_cell[macro1];
+            auto gcells_macro2 = gcells_per_std_cell[macro2];
+
+            auto rule_gcells = std::unordered_set<gcell_type, entity_system::EntityBaseHash>{};
+            for (auto gcell : gcells_macro1)
+            {
+                rule_gcells.insert(gcell);
+            }
+            for (auto gcell : gcells_macro2)
+            {
+                rule_gcells.insert(gcell);
+            }
+
+            for (auto gcell : rule_gcells)
+            {
+                auto gcell_node = m_gcell_graph->graph_node(gcell);
+                auto east_node = m_gcell_graph->east_node(gcell_node);
+                auto east_gcell = m_gcell_graph->gcell(east_node);
+                auto west_node = m_gcell_graph->west_node(gcell_node);
+                auto west_gcell = m_gcell_graph->gcell(west_node);
+
+                auto gcell_layer_index = m_gcell_graph->layer_index(gcell);
+                auto gcell_layer_name = "M" + boost::lexical_cast<std::string>(gcell_layer_index);
+                auto gcell_layer = m_library.find_layer_instance(gcell_layer_name); if (layer == gcell_layer) { auto east_pair_count = 0;
+                    auto west_pair_count = 0;
+                    if (macro1 == macro2)
+                    {
+                        if (east_node != lemon::INVALID)
+                        {
+                            east_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[east_gcell][macro1]);
+                        }
+                        if (west_node != lemon::INVALID)
+                        {
+                            west_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[west_gcell][macro1]);
+                        }
+                    }
+                    else
+                    {
+                        if (east_node != lemon::INVALID)
+                        {
+                            east_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[east_gcell][macro2])
+                                + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[east_gcell][macro1]);
+                        }
+                        if (west_node != lemon::INVALID)
+                        {
+                            west_pair_count = std::min(std_cells_per_gcell[gcell][macro1], std_cells_per_gcell[west_gcell][macro2])
+                                + std::min(std_cells_per_gcell[gcell][macro2], std_cells_per_gcell[west_gcell][macro1]);
+                        }
+                    }
+                    auto delta = (east_pair_count + west_pair_count) * demand;
+                    m_gcell_graph->change_adj_demand(gcell, delta);
+                }
+            }
+        }
+    }
+
+    void GlobalRouting::incremental_update_extra_demand(GlobalRouting::gcell_type gcell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    {
+        update_same_extra_demand(gcell, netlist, placement, routing_constraints, std_cells);
+        update_adj_extra_demand(gcell, netlist, placement, routing_constraints, std_cells);
+
+        //Update potential affected gcells adj extra demand
+        auto node = m_gcell_graph->graph_node(gcell);
+        auto east_node = m_gcell_graph->east_node(node);
+        if(east_node != lemon::INVALID)
+            update_adj_extra_demand(m_gcell_graph->gcell(east_node), netlist, placement, routing_constraints, std_cells);
+        auto west_node = m_gcell_graph->west_node(node);
+        if(west_node != lemon::INVALID)
+            update_adj_extra_demand(m_gcell_graph->gcell(west_node), netlist, placement, routing_constraints, std_cells);
+    }
+
+    void GlobalRouting::update_same_extra_demand(GlobalRouting::gcell_type gcell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    {
+        //Clear current same extra demand
+        auto node = m_gcell_graph->graph_node(gcell);
+        auto gcell_position = m_gcell_graph->position(node);
+        for(auto layer_it = m_library.begin_layer(); layer_it != m_library.end_layer(); layer_it++)
+        {
+            auto layer_index = m_library.layerIndex(*layer_it);
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+            m_gcell_graph->clear_same_demand(affected_gcell);
+        }
+
+        //Count macros from gcells
+        std::unordered_map<gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        for(auto cell_it = m_gcell_graph->cell_instances(gcell).begin(); cell_it != m_gcell_graph->cell_instances(gcell).end(); cell_it++)
+        {
+            auto std_cell = netlist.std_cell(*cell_it);
+            std_cells_per_gcell[gcell][std_cell] += 1;
+        }
+        for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++)
+        {
+            auto key = same_grid_it->first;
+            auto & extra_demand = same_grid_it->second;
+            auto demand = extra_demand.demand;
+            auto layer_name = extra_demand.layer;
+            auto layer = m_library.find_layer_instance(layer_name);
+            auto layer_index = m_library.layerIndex(layer);
+            auto macro1 = std_cells.find_cell(extra_demand.macro1);
+            auto macro2 = std_cells.find_cell(extra_demand.macro2);
+            int macro1_count = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+            int macro2_count = std_cells_per_gcell[gcell].find(macro2) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro2];
+            int pair_count = std::min(macro1_count, macro2_count);
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+            auto delta = pair_count * demand;
+            m_gcell_graph->change_same_demand(affected_gcell, delta);
+        }
+    }
+
+    void GlobalRouting::update_adj_extra_demand(GlobalRouting::gcell_type gcell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    {
+        //Clear current adj extra demand
+        auto node = m_gcell_graph->graph_node(gcell);
+        auto gcell_position = m_gcell_graph->position(node);
+        for(auto layer_it = m_library.begin_layer(); layer_it != m_library.end_layer(); layer_it++)
+        {
+            auto layer_index = m_library.layerIndex(*layer_it);
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+            m_gcell_graph->clear_adj_demand(affected_gcell);
+        }
+
+        //Count macros from adj gcells
+        std::unordered_map<gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
+        std::unordered_set<gcell_type, entity_system::EntityBaseHash> gcells_to_count{gcell};
+        auto east_node = m_gcell_graph->east_node(node);
+        auto east_gcell = m_gcell_graph->gcell(east_node);
+        if(east_node != lemon::INVALID)
+            gcells_to_count.insert(m_gcell_graph->gcell(east_node));
+        auto west_node = m_gcell_graph->west_node(node);
+        auto west_gcell = m_gcell_graph->gcell(west_node);
+        if(west_node != lemon::INVALID)
+            gcells_to_count.insert(m_gcell_graph->gcell(west_node));
+        for(auto gcell : gcells_to_count)
+        {
+            for(auto cell_it = m_gcell_graph->cell_instances(gcell).begin(); cell_it != m_gcell_graph->cell_instances(gcell).end(); cell_it++)
+            {
+                auto std_cell = netlist.std_cell(*cell_it);
+                std_cells_per_gcell[gcell][std_cell] += 1;
+            }
+        }
+
+        //Adjacent GCell extra demand
+        for (auto adj_grid_it = routing_constraints.begin_adj_grid(); adj_grid_it != routing_constraints.end_adj_grid(); adj_grid_it++)
+        {
+            auto key = adj_grid_it->first;
+            auto & extra_demand = adj_grid_it->second;
+            auto demand = extra_demand.demand;
+            auto layer_name = extra_demand.layer;
+            auto macro1 = std_cells.find_cell(extra_demand.macro1);
+            auto macro2 = std_cells.find_cell(extra_demand.macro2);
+            auto layer = m_library.find_layer_instance(layer_name);
+            auto layer_index = m_library.layerIndex(layer);
+
+            auto east_pair_count = 0;
+            auto west_pair_count = 0;
+            if (macro1 == macro2)
+            {
+                int gcell_count = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+                if (east_node != lemon::INVALID)
+                {
+                    int east_count = std_cells_per_gcell[east_gcell].find(macro2) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro2];
+                    east_pair_count = std::min(gcell_count, east_count);
+                }
+                if (west_node != lemon::INVALID)
+                {
+                    int west_count = std_cells_per_gcell[west_gcell].find(macro2) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro2];
+                    west_pair_count = std::min(gcell_count, west_count);
+                }
+            }
+            else
+            {
+                int gcell_count_macro1 = std_cells_per_gcell[gcell].find(macro1) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro1];
+                int gcell_count_macro2 = std_cells_per_gcell[gcell].find(macro2) == std_cells_per_gcell[gcell].end() ? 0 : std_cells_per_gcell[gcell][macro2];
+                if (east_node != lemon::INVALID)
+                {
+                    int east_count_macro1 = std_cells_per_gcell[east_gcell].find(macro1) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro1];
+                    int east_count_macro2 = std_cells_per_gcell[east_gcell].find(macro2) == std_cells_per_gcell[east_gcell].end() ? 0 : std_cells_per_gcell[east_gcell][macro2];
+                    east_pair_count = std::min(gcell_count_macro1, east_count_macro2) + std::min(gcell_count_macro2, east_count_macro1);
+                }
+                if (west_node != lemon::INVALID)
+                {
+                    int west_count_macro1 = std_cells_per_gcell[west_gcell].find(macro1) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro1];
+                    int west_count_macro2 = std_cells_per_gcell[west_gcell].find(macro2) == std_cells_per_gcell[west_gcell].end() ? 0 : std_cells_per_gcell[west_gcell][macro2];
+                    west_pair_count = std::min(gcell_count_macro1, west_count_macro2) + std::min(gcell_count_macro2, west_count_macro1);
+                }
+            }
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+            auto delta = (east_pair_count + west_pair_count) * demand;
+            m_gcell_graph->change_adj_demand(affected_gcell, delta);
         }
     }
 }

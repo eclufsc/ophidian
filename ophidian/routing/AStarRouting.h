@@ -81,8 +81,6 @@ namespace ophidian::routing
 
             bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
             bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
-            void update_extra_demand_constraint(gcell_type gcell);
-            void move_cell(cell_instance_type cell, gcell_type source_gcell, gcell_type target_gcell);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
@@ -102,10 +100,6 @@ namespace ophidian::routing
             bool connect_floating_pins();
             bool all_pins_same_collumn();
             bool trivial_routing();
-            void update_extra_demand_constraint();//make it public? TODO: update extra demand incrementally.
-            bool gcell_has_free_space(gcell_type gcell);
-            void update_same_extra_demand(const gcell_type & gcell);
-            void update_adj_extra_demand(const gcell_type & gcell);
 
 
             net_type                              m_net;

@@ -10,6 +10,7 @@
 #include <ophidian/circuit/Netlist.h>
 #include <ophidian/routing/Library.h>
 #include <ophidian/routing/GCellGraph.h>
+#include <ophidian/routing/RoutingConstraints.h>
 #include <ophidian/placement/Placement.h>
 
 namespace ophidian::routing
@@ -25,6 +26,10 @@ namespace ophidian::routing
     {
     public:
         template <class T> using container_type = std::vector<T>;
+        using placement_type            = ophidian::placement::Placement;
+        using netlist_type              = ophidian::circuit::Netlist;
+        using routing_constraints_type  = ophidian::routing::RoutingConstraints;
+        using std_cells_type            = ophidian::circuit::StandardCells;
         using scalar_type               = int;
         using unit_type                 = util::database_unit_t;
         using unit_container_type       = container_type<unit_type>;
@@ -39,6 +44,7 @@ namespace ophidian::routing
         using gcell_graph_type          = GCellGraph;
         using gcell_graph_ptr_type      = std::shared_ptr<gcell_graph_type>;
         using index_type                = GCellGraph::index_type;
+        using cell_instance_type        = ophidian::circuit::CellInstance;
 
         using net_segment_view_type  = entity_system::Association<net_type, gr_segment_type>::Parts;
         using graph_type                = lemon::ListGraph;
@@ -117,12 +123,21 @@ namespace ophidian::routing
         bool is_overflow(const net_container_type& nets_to_check, net_container_type& ovfl_nets) const;
         /* Checks entire circuit. Quicker, checks each Gcell only once*/
         bool is_overflow() const;
-        
-        void update_blockage_demand(ophidian::circuit::Netlist & netlist, ophidian::placement::Placement & placement, ophidian::circuit::CellInstance cell, bool remove_demand);
 
+        void move_cell(gcell_type source, gcell_type target, cell_instance_type cell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+        
+        void update_blockage_demand(netlist_type & netlist, placement_type & placement, cell_instance_type cell, bool remove_demand);
+        /*Update cell_instance_set for each gcell according to placement information.*/
+        void set_gcell_cell_instances(netlist_type & netlist, placement_type& placement);
+        /*Update extra demand for the whole circuit.*/
+        void update_extra_demand(netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+        /*Incrementaly update extra demand constraints for a given GCell.*/
+        void incremental_update_extra_demand(gcell_type gcell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
     private:
         void set_gcells(const gr_segment_type& segment);
         void update_gcells_demand(const gr_segment_type & segment, const int delta);
+        void update_same_extra_demand(gcell_type gcell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+        void update_adj_extra_demand(gcell_type gcell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
 
         entity_system::EntitySystem<gr_segment_type>                    m_gr_segments;
         entity_system::Property<gr_segment_type, segment_geometry_type> m_gr_segment_box;
