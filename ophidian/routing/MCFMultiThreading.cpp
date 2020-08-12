@@ -67,13 +67,13 @@ void MCFMultiThreading::run(){
     //     cluster_based_on_nets_box();
 
     cluster_based_on_panel();
-    data_analysis("before");
+    //data_analysis("before");
     // run_ilp_on_panels(movements);
     // run_ilp_on_panel(1,movements);
 
     run_ilp_on_panels_parallel(movements);
     run_astar_on_panels_parallel(movements);
-    data_analysis("after");
+    //data_analysis("after");
 
     
     write_nets(movements);
@@ -701,7 +701,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         m_design.placement().reset_rtree();
         update_global_routing();
         // break;
-        if(level == 7){
+        if(level == 1){
             break;
         }
         
@@ -834,10 +834,11 @@ void MCFMultiThreading::run_ilp_on_panel(unsigned int panel_id,std::vector<std::
 void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
+    std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
         auto ids = panel_level.second;
-        if(level < 8) continue;
+        if(level <= 1) continue;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
         std::cout << "level: " << level << "\n";
@@ -847,11 +848,17 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
             }else{
                 odd_ids.push_back(id);
             }//end if
+       
+            auto & nets_panel = m_panel_index_to_nets_dict[id];
+            for (auto net_name : nets_panel) {
+                astar_nets.push_back(m_net_name_to_net_type_dict[net_name]);
+            }
         }//end for 
+
         
         // //even panels
         // // #pragma omp parallel for num_threads(8)
-        for(auto id : even_ids){
+        /*for(auto id : even_ids){
             std::cout << "id: " << id << std::endl;
             run_astar_on_panel(id);
         }//end for 
@@ -860,11 +867,18 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         // #pragma omp parallel for num_threads(8)
         for(auto id : odd_ids){
             run_astar_on_panel(id);
-        }
+        }*/
     
         // if(level == 8)
         //     break;
     }
+
+    ophidian::routing::AStarRouting astar_routing{m_design};
+    for(auto net : astar_nets){
+        std::vector<ophidian::routing::AStarSegment> segments;
+        astar_routing.route_net(net, segments);
+    }
+
 }//end run_astar_on_panels_parallel
 
 void MCFMultiThreading::run_astar_on_panel(unsigned int panel_id){
@@ -914,7 +928,7 @@ void MCFMultiThreading::run_astar_on_panel(unsigned int panel_id){
     }
     // ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
     // ilpRouting.route_nets_v2(nets_local, local_net_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
-    // ophidian::routing::AStarRouting astar_routing{m_design};
+    ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : nets_local){
         std::vector<ophidian::routing::AStarSegment> segments;
         astar_routing.route_net(net, segments);

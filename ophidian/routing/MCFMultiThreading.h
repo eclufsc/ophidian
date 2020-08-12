@@ -109,7 +109,7 @@ class MCFMultiThreading{
         std::vector<ophidian::routing::ILPResult> m_ilp_results;
         // std::vector<std::pair<net_type,box_type>> m_routed_nets;
         // std::vector<net_type> m_unrouted_nets;
-        ophidian::routing::AStarRouting astar_routing{m_design};
+        //ophidian::routing::AStarRouting astar_routing{m_design};
 
  
 };//end class 
