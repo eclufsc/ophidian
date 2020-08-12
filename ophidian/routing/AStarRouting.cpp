@@ -129,20 +129,8 @@ namespace ophidian::routing
         }
         generate_routing_segments(segments);
         bool solution_has_no_overflow = true;
-        if(applying_routing){
-            auto init_wl = m_design.global_routing().wirelength(net);
-            auto seg_wl = get_wire_length_segments(segments);
-            // std::cout << "init_wl: " << init_wl << std::endl;
-            // std::cout << "seg_wl: " << seg_wl << std::endl;
-
-            if(init_wl >  get_wire_length_segments(segments)){
-                // std::cout << "write the net " << m_design.netlist().name(net) << std::endl;
-                m_design.global_routing().unroute(net);
-                solution_has_no_overflow = apply_segments_to_global_routing(segments);
-            }
-                
-        }
-            
+        if(applying_routing)
+            solution_has_no_overflow = apply_segments_to_global_routing(segments);
         clear_router_members();
         if(solution_has_no_overflow == false)
             return false;
@@ -658,7 +646,6 @@ namespace ophidian::routing
     {
         auto& global_routing = m_design.global_routing();
         std::unordered_set<net_type, entity_system::EntityBaseHash> nets;
-        
         for(auto segment : segments)
         {
             global_routing.add_segment(segment.wire_box, segment.start_layer, segment.end_layer, segment.net);

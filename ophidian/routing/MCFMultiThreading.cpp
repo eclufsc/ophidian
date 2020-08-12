@@ -16,7 +16,7 @@ bool DEBUG_MCF_MLT_NETS_ROWS = false;
 bool DEBUG_PANEL = false;
 bool DEBUG_PANEL_PARALLEL = true;
 
-#define num_nets_to_route 2500
+#define num_nets_to_route 10000
 #define WINDOW_SIZE 100 // means each panels covers 10 gcells in y-axis
 
 MCFMultiThreading::MCFMultiThreading(design_type & design):
@@ -875,6 +875,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
 
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : astar_nets){
+        m_design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
         astar_routing.route_net(net, segments);
     }

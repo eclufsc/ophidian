@@ -20,7 +20,7 @@ using namespace ophidian::parser;
 using dbu = ophidian::util::database_unit_t;
 using point_type = ophidian::geometry::Point<dbu>;
 using box_type = ophidian::geometry::Box<dbu>;
-
+using gcell_type = ophidian::routing::GCell;
 
 
 bool boxCompare(const box_type& a, const box_type& b)
@@ -119,6 +119,24 @@ TEST_CASE("GCell Graph Test", "[routing][gcell]")
         std::vector<ophidian::routing::GCell> expected_gcells;
         expected_gcells.push_back(gcell);
         expected_gcells.push_back(graph.gcell(2, 3, 1));
+        CHECK(std::is_permutation(gcells.begin(), gcells.end(), expected_gcells.begin()));
+    }
+    SECTION("verify set of nearest GCells"){
+        auto point = point_type{dbu{650}, dbu{600}};
+        auto gcells = graph.nearest_gcell(point, 0, 9);
+        CHECK(gcells.size() == 9);
+        
+        std::vector<gcell_type> expected_gcells;
+        expected_gcells.push_back(graph.gcell(1,2,0));
+        expected_gcells.push_back(graph.gcell(2,2,0));
+        expected_gcells.push_back(graph.gcell(3,2,0));
+        expected_gcells.push_back(graph.gcell(1,3,0));
+        expected_gcells.push_back(graph.gcell(2,3,0)); //gcell
+        expected_gcells.push_back(graph.gcell(3,3,0));
+        expected_gcells.push_back(graph.gcell(1,4,0));
+        expected_gcells.push_back(graph.gcell(2,4,0));
+        expected_gcells.push_back(graph.gcell(3,4,0));
+
         CHECK(std::is_permutation(gcells.begin(), gcells.end(), expected_gcells.begin()));
     }
 }

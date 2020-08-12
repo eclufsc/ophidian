@@ -54,106 +54,28 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 }//end run_mcf_for_circuit
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
-    
-
-    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
-    //ophidian::routing::ILPRouting<IloNumVar> ilpRouting(design, circuit_name);
     ophidian::routing::AStarRouting astar_routing{design};
+    //ophidian::routing::ILPRouting ilpRouting(design, circuit_name);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
-    auto chip_origin = design.floorplan().chip_origin();
-    auto chip_upper_right_corner = design.floorplan().chip_upper_right_corner();
-    auto chip_area = ophidian::placement::Placement::box_type{chip_origin, chip_upper_right_corner};
-
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-    std::vector<ophidian::circuit::CellInstance> cells(design.netlist().begin_cell_instance(), design.netlist().end_cell_instance());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
-    std::vector<ophidian::circuit::Net> unrouted_nets;
 
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
-
-    auto result = ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, false, false);
-
-    //ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, true, true, true);
+    //std::vector<std::pair<ophidian::routing::ILPRouting::cell_type, ophidian::routing::ILPRouting::point_type>> movements;
     // std::log() << "routing nets" << std::endl;
-    /*for (unsigned iteration = 0; iteration < 5; iteration++) {
-        auto result = ilpRouting.route_nets(nets, cells, chip_area, fixed_nets, routed_nets, unrouted_nets, movements);
-        for (auto movement : movements) {
-            auto cell = movement.first;
-            design.placement().fixLocation(cell);
-        }
-    }*/
-
-    /*std::vector<ophidian::circuit::Net> bad_nets;
-    for (auto net : nets) {
-        auto pins = design.netlist().pins(net);
-        std::vector<ophidian::interconnection::Flute::Point> net_points;
-        net_points.reserve(pins.size());
-        for (auto pin : pins) {
-            auto pin_location = design.placement().location(pin);
-            net_points.push_back(pin_location);
-        }
-
-        auto & flute = ophidian::interconnection::Flute::instance();
-        auto tree = flute.create(net_points);
-        auto stwl = tree->length().value();
-        stwl /= 10;
-        if (stwl == 0) {
-            stwl = 1;
-        }
-
-        auto routes = design.global_routing().segments(net);
-        auto routed_length_no_vias = 0;
-        auto via_length = 0;
-        for (auto route : routes) {
-            auto box = design.global_routing().box(route);
-            auto start = box.min_corner();
-            auto end = box.max_corner();
-            routed_length_no_vias += (std::abs(start.x().value() - end.x().value()) + std::abs(start.y().value() - end.y().value()));
-
-            auto start_layer = design.global_routing().layer_start(route);
-            auto end_layer = design.global_routing().layer_end(route);
-            auto start_layer_index = design.routing_library().layerIndex(start_layer);
-            auto end_layer_index = design.routing_library().layerIndex(end_layer);
-            via_length += std::abs(start_layer_index - end_layer_index);
-        }
-        routed_length_no_vias /= 10;
-        if (routed_length_no_vias == 0) {
-            routed_length_no_vias = 1;
-        }
-
-        auto routed_length = design.global_routing().wirelength(net);
-
-        auto cost = routed_length / stwl;
-        //auto cost = routed_length_no_vias / stwl;
-
-        if (cost > 2) {
-            bad_nets.push_back(net);
-        }
+    //auto result = ilpRouting.route_nets(nets, fixed_nets, routed_nets, movements);
+    // std::log() << "result " << result << std::endl;
+    auto& netlist = design.netlist();
+    auto& global_routing = design.global_routing();
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        global_routing.unroute(*net_it);
+        std::vector<ophidian::routing::AStarSegment> segments;
+        astar_routing.route_net(*net_it, segments);
     }
 
-    std::cout << bad_nets.size() << " bad nets" << std::endl;*/
-    
-    //std::cout << unrouted_nets.size() << " unrouted nets" << std::endl;
-
-    // std::log() << "result " << result << std::endl;   
-    /*auto& netlist = design.netlist();
-    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
-        auto net = *net_it;
-    //for(auto net : bad_nets) {
-    //for(auto net : unrouted_nets) {
-        auto net_name = design.netlist().name(net);
-        std::cout << "net " << net_name << std::endl;
-        design.global_routing().unroute(net);
-        std::vector<ophidian::routing::AStarSegment> segments;    
-        astar_routing.route_net(net, segments);
-    }*/
-    //for (auto net : unrouted_nets) {
-    //    astar_routing.route_net(net, segments);
-    //}
-
-    iccad_output_writer.write_ICCAD_2020_output(output, movements);
+    iccad_output_writer.write_ICCAD_2020_output(output, {});
     // if(result.first){
     //     iccad_output_writer.write_ICCAD_2020_output(output, movements);
     // }

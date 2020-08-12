@@ -129,6 +129,22 @@ GCellGraph::gcell_type GCellGraph::nearest_gcell(const GCellGraph::point_type lo
     return gcell(node_index_pair.first, node_index_pair.second, layer);
 }
 
+GCellGraph::gcell_container_type GCellGraph::nearest_gcell(const GCellGraph::point_type location, const GCellGraph::index_type layer, const int k) const
+{
+    namespace bgi = boost::geometry::index;
+    point_scalar_type point{location.x().value(), location.y().value()};
+    std::vector<rtree_node_type> result;
+    m_grid.query(bgi::nearest(point, k), std::back_inserter(result));
+    gcell_container_type gcells;
+    gcells.reserve(result.size());
+    for(auto node : result)
+    {
+        auto node_index_pair = node.second;
+        gcells.push_back( gcell(node_index_pair.first, node_index_pair.second, layer) );
+    }
+    return gcells;
+}
+
 GCellGraph::box_type GCellGraph::box(const GCellGraph::gcell_type& gcell) const
 {
     auto node = m_gcell_node[gcell];

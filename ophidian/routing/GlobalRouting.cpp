@@ -352,4 +352,18 @@ namespace ophidian::routing
         return lemon::connected(net_graph);
     }
 
+
+    void GlobalRouting::update_blockage_demand(ophidian::circuit::Netlist & netlist, ophidian::placement::Placement & placement, ophidian::circuit::CellInstance cell, bool remove_demand)
+    {
+        auto location = placement.location(cell);
+        auto std_cell = netlist.std_cell(cell);
+        for(auto blockage : m_library.blockages(std_cell))
+        {
+            auto layer = m_library.layer(blockage);
+            auto layer_index = m_library.layerIndex(layer);
+            auto gcell = m_gcell_graph->nearest_gcell(location, layer_index-1);
+            auto demand = remove_demand ? -m_library.demand(blockage) : m_library.demand(blockage);
+            m_gcell_graph->change_blockage_demand(gcell, demand);
+        }
+    }
 }
