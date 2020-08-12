@@ -629,7 +629,7 @@ namespace ophidian::routing
             global_routing.increase_demand(net);
         for(auto net: nets)
             for(auto gcell : global_routing.gcells(net))
-                if(m_gcell_graph->capacity(gcell) < (m_gcell_graph->demand(gcell) + m_same_gcell_extra_demand[gcell] + m_adj_gcell_extra_demand[gcell]))
+                if(m_gcell_graph->is_overflow(gcell))
                     return false;
         return true;
     }
