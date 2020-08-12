@@ -16,7 +16,8 @@ bool DEBUG_MCF_MLT_NETS_ROWS = false;
 bool DEBUG_PANEL = false;
 bool DEBUG_PANEL_PARALLEL = true;
 
-#define num_nets_to_route 10000
+#define num_nets_to_route 2500
+#define WINDOW_SIZE 100 // means each panels covers 10 gcells in y-axis
 
 MCFMultiThreading::MCFMultiThreading(design_type & design):
     m_design(design)
@@ -71,6 +72,7 @@ void MCFMultiThreading::run(){
     // run_ilp_on_panel(1,movements);
 
     run_ilp_on_panels_parallel(movements);
+    run_astar_on_panels_parallel(movements);
     data_analysis("after");
 
     
@@ -174,7 +176,7 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
     
     auto chip_upper_right_corner = m_design.floorplan().chip_upper_right_corner();
     // The window is 10Gcellx width of layout
-    int window_size = 100;
+    int window_size = WINDOW_SIZE;
     
     int layout_width = chip_upper_right_corner.x().value();
     int layout_height = chip_upper_right_corner.y().value();
@@ -631,10 +633,25 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
     m_total_panel_nets = 0;
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
+    std::vector<std::vector<unsigned int>> panels_vec;
+    
+    // for(auto panel_level: m_panel_level){
+    //     std::vector<unsigned int> panel_indxs; 
+    //     for(auto panel_idx : panel_level.second){
+    //         panel_indxs.push_back(panel_idx);
+    //     }
+    //     panels_vec.push_back(panel_indxs);
+    
+    // }
+    
 
     for(auto panel_level: m_panel_level){
+    // for(int j = 5; j >= 1; j--){
+        // auto panel_level = panels_vec[j-1];
         auto level = panel_level.first;
+        // auto level = j;
         auto ids = panel_level.second;
+        // auto ids = panel_level;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
         if(DEBUG_PANEL_PARALLEL) std::cout << "level: " << level << "\n";
@@ -684,7 +701,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         m_design.placement().reset_rtree();
         update_global_routing();
         // break;
-        if(level == 5){
+        if(level == 7){
             break;
         }
         
@@ -820,6 +837,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
         auto ids = panel_level.second;
+        if(level < 8) continue;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
         std::cout << "level: " << level << "\n";
@@ -833,18 +851,19 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         
         // //even panels
         // // #pragma omp parallel for num_threads(8)
-        // for(auto id : even_ids){
-        //     std::cout << "id: " << id << std::endl;
-        //     run_astar_on_panel(id);
-        // }//end for 
+        for(auto id : even_ids){
+            std::cout << "id: " << id << std::endl;
+            run_astar_on_panel(id);
+        }//end for 
 
         // // odd panels
         // #pragma omp parallel for num_threads(8)
-        // for(auto id : odd_ids){
-        //     run_astar_on_panel(id);
-        // }
+        for(auto id : odd_ids){
+            run_astar_on_panel(id);
+        }
     
-        // break;
+        // if(level == 8)
+        //     break;
     }
 }//end run_astar_on_panels_parallel
 
@@ -895,7 +914,7 @@ void MCFMultiThreading::run_astar_on_panel(unsigned int panel_id){
     }
     // ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
     // ilpRouting.route_nets_v2(nets_local, local_net_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
-    ophidian::routing::AStarRouting astar_routing{m_design};
+    // ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : nets_local){
         std::vector<ophidian::routing::AStarSegment> segments;
         astar_routing.route_net(net, segments);
@@ -1025,13 +1044,29 @@ void MCFMultiThreading::data_analysis(std::string file_name_data){
                             << panel_box.getXh() << ", " << panel_box.getYh() << std::endl;
 
         }//end for 
-
-            
-    
-       
     }//end fpr 
 
     panel_info_file.close();
+
+
+    ofstream panel_nets_info_file;
+    file_name = "panel_nets_analysis_" + std::to_string(num_nets_to_route) + file_name_data + ".txt";
+    panel_nets_info_file.open (file_name);
+    panel_nets_info_file << "panel_index,nets" << std::endl;
+    for(auto panel_level : m_panel_level){
+        auto panel_indexs = m_panel_level[panel_level.first];
+        for(auto panel_index : panel_indexs){
+            auto nets_panel = m_panel_index_to_nets_dict[panel_index];
+            panel_nets_info_file << panel_index << ", ";
+            for(auto net : nets_panel){
+                panel_nets_info_file << net << ", ";
+            }
+            panel_nets_info_file <<  "\n ";
+        }//end for 
+    }//end fpr 
+
+    panel_nets_info_file.close();
+
 
      
     
