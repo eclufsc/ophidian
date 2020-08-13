@@ -103,7 +103,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         bool routed_all_nets = true;
         for(auto net : cell_nets)
         {
+            auto net_name = design.netlist().name(net);
+            //std::cout << "net " << net_name << std::endl;
             auto result = astar_routing.route_net(net, segments, false);
+            //std::cout << "result " << result << std::endl;
             if(!result)
             {
                 routed_all_nets = false;
@@ -114,8 +117,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         {
             bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
             auto wirelength_after = global_routing.wirelength(cell_nets);
+            //std::cout << "routed all nets " << working_correct << " wirelength " << wirelength_before << " -> " << wirelength_after << std::endl;
             if(wirelength_before < wirelength_after || working_correct == false)
             {
+                //std::cout << "undoing nets" << std::endl;
                 for(auto net : cell_nets)
                     global_routing.unroute(net);
 
@@ -124,9 +129,16 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
                 if(undo == false)
                     std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
                 return false;
+            } else {
+                /*for (auto segment : segments) {
+                    auto start_layer_index = design.routing_library().index(segment.start_layer);
+                    auto end_layer_index = design.routing_library().index(segment.end_layer);
+                    std::cout << "segment " << segment.wire_box.min_corner().y().value() << " " << segment.wire_box.min_corner().x().value() << " " << start_layer_index << " " << segment.wire_box.max_corner().y().value() << " " << segment.wire_box.max_corner().x().value() << " " << end_layer_index << std::endl;
+                }*/
             }
             return true;
         }else{
+            //std::cout << "didn't route all nets" << std::endl;
             for(auto net : cell_nets)
                 global_routing.unroute(net);
 
@@ -190,13 +202,18 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
 void move_cells_for_until_x_minutes(ophidian::design::Design & design,
                                     int time_limit,
                                     std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements,
+                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements,
                                     ophidian::routing::AStarRouting & astar_routing)
 {
     int moved_cells = movements.size();
     for(auto pair : cells)
     {
         auto cell = pair.first;
+        if (design.placement().isFixed(cell)) {
+            continue;
+        }
+        auto cell_name = design.netlist().name(cell);
+        //std::cout << "cell " << cell_name << std::endl;
         auto moved = move_cell(design, cell, astar_routing);
         if(moved)
         {
@@ -209,6 +226,7 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
         // bool time_out = diff.count() > time_limit * 60.0 ? true : false;
         //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
         if(moved_cells == design.routing_constraints().max_cell_movement())
+        //if(moved_cells == 337)
             break;
     }
 }
@@ -255,6 +273,11 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     UCal::MCFMultiThreading mcf_multi_threading(design); 
     mcf_multi_threading.run(movements);
+    
+    for (auto movement : movements) {
+        auto cell = movement.first;
+        design.placement().fixLocation(cell);
+    }
 
     ophidian::routing::AStarRouting astar_routing{design};
     auto cell_costs = compute_cell_move_costs_descending_order(design);
