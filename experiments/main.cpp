@@ -193,7 +193,7 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
                                     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements,
                                     ophidian::routing::AStarRouting & astar_routing)
 {
-    int moved_cells = 0;
+    int moved_cells = movements.size();
     for(auto pair : cells)
     {
         auto cell = pair.first;
@@ -237,7 +237,7 @@ void greetings(){
     printlog("===================================================");
 };
 
-void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name){
+void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output){
     /*ophidian::routing::AStarRouting astar_routing{design};
     auto& netlist = design.netlist();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
@@ -250,8 +250,19 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     }*/
 
     // UCal::MCFRouting mcf_routing(design,circuit_name);
+
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+
     UCal::MCFMultiThreading mcf_multi_threading(design); 
-    mcf_multi_threading.run();
+    mcf_multi_threading.run(movements);
+
+    ophidian::routing::AStarRouting astar_routing{design};
+    auto cell_costs = compute_cell_move_costs_descending_order(design);
+    move_cells_for_until_x_minutes(design, 600, cell_costs, movements, astar_routing);
+
+    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+
+    iccad_output_writer.write_ICCAD_2020_output(output, movements);
 
     log() << "end" << std::endl;
 }//end run_mcf_for_circuit
@@ -411,7 +422,7 @@ int main(int argc, char** argv) {
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
     //run_for_circuit(design, circuit_name, output);
-    run_mcf_for_circuit(design,circuit_name);
+    run_mcf_for_circuit(design,circuit_name, output);
 
     return 0;
 }

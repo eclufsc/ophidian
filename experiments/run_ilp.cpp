@@ -16,7 +16,8 @@ bool DEBUG_TEST = true;
 void run_mcf_multithreading(ophidian::design::Design & design) {
     UCal::MCFMultiThreading mcf(design);
 
-    mcf.run();
+    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+    mcf.run(movements);
 }
 
 point_type cell_median_location(ophidian::circuit::CellInstance & cell, ophidian::design::Design & design) {

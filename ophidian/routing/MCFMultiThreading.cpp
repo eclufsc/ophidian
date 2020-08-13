@@ -31,9 +31,9 @@ MCFMultiThreading::~MCFMultiThreading(){
     // abortAndJoin();
 }//end MCFMultiThreading destructor
 
-void MCFMultiThreading::run(){
+void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+    //std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
 
     m_design.placement().reset_rtree();
     
@@ -77,7 +77,7 @@ void MCFMultiThreading::run(){
     //data_analysis("after");
 
     
-    write_nets(movements);
+    //write_nets(movements);
     // if(DEBUG_MCF_MLT_NET_BOX_RTREE) m_rtree_net_box.report();
     
     
