@@ -13,6 +13,14 @@
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 using namespace ophidian::util;
 
+//Time in seconds
+bool time_out(int time_limit)
+{
+    auto end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end_time-start_time;
+    return diff.count() > time_limit;
+}
+
 void improve_routing(ophidian::design::Design & design, ophidian::routing::AStarRouting & astar_routing)
 {
     auto & global_routing = design.global_routing();
@@ -56,11 +64,11 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
             non_routed++;
             astar_routing.apply_segments_to_global_routing(initial_segments);
         }
-        auto end_time = std::chrono::steady_clock::now();
-        std::chrono::duration<double> diff = end_time-start_time;
-        bool time_out = diff.count() > 1200 ? true : false;//20 minutes
-        if(time_out)
+        if(time_out(300))//5 minutes
+        {
+            log() << "Time Out reached for optmize routing." << std::endl;
             break;
+        }
     }
     std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
 }
@@ -456,8 +464,7 @@ ophidian::routing::GlobalRouting::gcell_type calculate_median_gcell(ophidian::de
     }
     return current_gcell;
 }
-
-bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing )
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
 {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
@@ -519,10 +526,12 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         for(auto net : cell_nets)
             global_routing.unroute(net);
 
-        global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+        bool undo_overflow = global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+        if(undo_overflow == true)
+            std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
         bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
         if(undo == false)
-            std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+            std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
     }
     return false;
 }
@@ -532,7 +541,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
     std::vector<std::string> circuit_names = {
         // "case1",
         // "case2",
-        "case3",
+        "case4",
         // "case3_no_extra_demand",
         // "case4",
         // "case5",
@@ -544,8 +553,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
     // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) 
     {
+        log() << "Circuit name : " << circuit_name << std::endl;
         start_time = std::chrono::steady_clock::now();
-
         using AStarSegment = ophidian::routing::AStarSegment;
         using net_type = ophidian::circuit::Net;
         using cell_type = ophidian::circuit::CellInstance;
@@ -565,9 +574,9 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
 
         auto astar_routing = ophidian::routing::AStarRouting(design);
 
-        printlog("Improving initial A* routing ...");
+        printlog("Improving initial routing with A* ...");
         improve_routing(design, astar_routing);
-        sanity_check(design);
+        //sanity_check(design);
 
         printlog("Compute cells move cost ...");
         std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells_costs;
@@ -591,43 +600,41 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         }
         std::sort(cells_costs.begin(), cells_costs.end(), [](std::pair<ophidian::circuit::CellInstance, double> cost_a, std::pair<ophidian::circuit::CellInstance, double> cost_b) {return cost_a.second > cost_b.second;});
 
-        printlog("Sanity check before movements ...");
-        sanity_check(design);
-        printlog("Initing movements ...");
+        //printlog("Sanity check before movements ...");
+        //sanity_check(design);
         printlog("Do not forget to map cell instances into GCells global_trouting.set_gcell_cell_instances(netlist, placement)!!!");
         global_routing.set_gcell_cell_instances(netlist, placement);
 
+        printlog("Initing movements ...");
         auto moved_cells = 0;
         std::vector<std::pair<cell_type, point_type>>  movements;
 
         bool at_least_one_cell_moved = true;
         while(at_least_one_cell_moved)
         {
+            if(moved_cells == design.routing_constraints().max_cell_movement() || time_out(600))
+                break;
+
             at_least_one_cell_moved = false;
             for(auto pair : cells_costs)
             {
                 auto cell = pair.first;
-
                 auto moved = move_cell(design, cell, astar_routing);
                 at_least_one_cell_moved = moved ? moved : at_least_one_cell_moved;
                 if(moved)
                 {
                     moved_cells++;
                     movements.push_back(std::make_pair(cell, placement.location(cell)));
-                    std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
+                    //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
                 }
                 if(moved_cells == design.routing_constraints().max_cell_movement())
                     break;
+                if(time_out(600))//10 minutes
+                {
+                    log() << "Time Out reached for movements." << std::endl;
+                    break;
+                }
             }
-            if(moved_cells == design.routing_constraints().max_cell_movement())
-            {
-                break;
-            }
-            auto end_time = std::chrono::steady_clock::now();
-            std::chrono::duration<double> diff = end_time-start_time;
-            bool time_out = diff.count() > 3300 ? true : false;//55 minutes
-            if(time_out)
-                break;
         }
         printlog("Writing solution ...");
         iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out.txt", movements);

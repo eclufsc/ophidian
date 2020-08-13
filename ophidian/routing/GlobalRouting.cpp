@@ -394,9 +394,9 @@ namespace ophidian::routing
 
             if(m_gcell_graph->is_overflow(affected_gcell))
                 return true;
-            auto east_node = m_gcell_graph->east_node(gcell_node);
+            auto east_node = m_gcell_graph->east_node(affected_node);
             auto east_gcell = m_gcell_graph->gcell(east_node);
-            auto west_node = m_gcell_graph->west_node(gcell_node);
+            auto west_node = m_gcell_graph->west_node(affected_node);
             auto west_gcell = m_gcell_graph->gcell(west_node);
             if (east_node != lemon::INVALID)
                 if(m_gcell_graph->is_overflow(east_gcell))
