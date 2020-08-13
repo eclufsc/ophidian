@@ -80,14 +80,16 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
 
     if(initial_gcell != median_gcell)
     {
-        // backup cell and nets informations
+        // Get connected nets
         std::vector<net_type> cell_nets;
-        for(auto pin : netlist.pins(cell)){
+        for(auto pin : netlist.pins(cell))
+        {
             auto net = netlist.net(pin);
             if(net == ophidian::circuit::Net())
                 continue;
             cell_nets.push_back(net);
         }
+        // Backup routing information
         std::vector<AStarSegment> initial_segments;
         auto wirelength_before = global_routing.wirelength(cell_nets);
         for(auto net : cell_nets)
@@ -98,55 +100,34 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         }
 
         //move cell to median
-        global_routing.move_cell(initial_gcell, median_gcell, cell, netlist, placement, routing_constr, std_cells);
-        std::vector<AStarSegment> segments;
-        bool routed_all_nets = true;
-        for(auto net : cell_nets)
+        auto overflow_movement = global_routing.move_cell(initial_gcell, median_gcell, cell, netlist, placement, routing_constr, std_cells);
+        if(overflow_movement == false)
         {
-            auto net_name = design.netlist().name(net);
-            //std::cout << "net " << net_name << std::endl;
-            auto result = astar_routing.route_net(net, segments, false);
-            //std::cout << "result " << result << std::endl;
-            if(!result)
-            {
-                routed_all_nets = false;
-                break;
-            }
-        }
-        if(routed_all_nets)
-        {
-            bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
-            auto wirelength_after = global_routing.wirelength(cell_nets);
-            //std::cout << "routed all nets " << working_correct << " wirelength " << wirelength_before << " -> " << wirelength_after << std::endl;
-            if(wirelength_before < wirelength_after || working_correct == false)
-            {
-                //std::cout << "undoing nets" << std::endl;
-                for(auto net : cell_nets)
-                    global_routing.unroute(net);
-
-                global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-                bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-                if(undo == false)
-                    std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
-                return false;
-            } else {
-                /*for (auto segment : segments) {
-                    auto start_layer_index = design.routing_library().index(segment.start_layer);
-                    auto end_layer_index = design.routing_library().index(segment.end_layer);
-                    std::cout << "segment " << segment.wire_box.min_corner().y().value() << " " << segment.wire_box.min_corner().x().value() << " " << start_layer_index << " " << segment.wire_box.max_corner().y().value() << " " << segment.wire_box.max_corner().x().value() << " " << end_layer_index << std::endl;
-                }*/
-            }
-            return true;
-        }else{
-            //std::cout << "didn't route all nets" << std::endl;
+            std::vector<AStarSegment> segments;
+            bool routed_all_nets = true;
             for(auto net : cell_nets)
-                global_routing.unroute(net);
-
-            global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-            if(undo == false)
-                std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+            {
+                routed_all_nets = astar_routing.route_net(net, segments, false);
+                if(routed_all_nets == false)
+                    break;
+            }
+            if(routed_all_nets)
+            {
+                bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
+                auto wirelength_after = global_routing.wirelength(cell_nets);
+                if(wirelength_before > wirelength_after && working_correct)
+                    return true;
+            }
         }
+        for(auto net : cell_nets)
+            global_routing.unroute(net);
+
+        bool undo_overflow = global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+        if(undo_overflow == true)
+            std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
+        bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+        if(undo == false)
+            std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
     }
     return false;
 }
@@ -226,7 +207,7 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
         // bool time_out = diff.count() > time_limit * 60.0 ? true : false;
         //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
         if(moved_cells == design.routing_constraints().max_cell_movement())
-        //if(moved_cells == 337)
+        //if(moved_cells == 334)
             break;
     }
 }
