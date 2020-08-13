@@ -71,6 +71,7 @@ void MCFMultiThreading::run(){
     // run_ilp_on_panels(movements);
     // run_ilp_on_panel(1,movements);
 
+    m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
     run_ilp_on_panels_parallel(movements);
     run_astar_on_panels_parallel(movements);
     //data_analysis("after");
@@ -675,6 +676,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             #pragma omp critical
             for (auto movement : local_movements) {
                 m_design.placement().place(movement.first, movement.second);
+                m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
                 movements.push_back(movement);
             } 
 
@@ -692,6 +694,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             #pragma omp critical
             for (auto movement : local_movements) {
                 m_design.placement().place(movement.first, movement.second);
+                m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
                 movements.push_back(movement);
             } 
 
@@ -701,7 +704,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         m_design.placement().reset_rtree();
         update_global_routing();
         // break;
-        if(level == 1){
+        if(level == 5){
             break;
         }
         
@@ -838,7 +841,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
         auto ids = panel_level.second;
-        if(level <= 1) continue;
+        if(level <= 5) continue;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
         std::cout << "level: " << level << "\n";
@@ -875,9 +878,19 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
 
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : astar_nets){
+        std::vector<ophidian::routing::AStarSegment> initial_segments;
+        for(auto segment : m_design.global_routing().segments(net)) {
+            initial_segments.push_back(ophidian::routing::AStarSegment(m_design.global_routing().box(segment), m_design.global_routing().layer_start(segment), m_design.global_routing().layer_end(segment), net));
+        }
         m_design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        astar_routing.route_net(net, segments);
+        auto result = astar_routing.route_net(net, segments);
+        if (!result) {
+            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+            if(undo == false) {
+                std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+            }
+        }
     }
 
 }//end run_astar_on_panels_parallel

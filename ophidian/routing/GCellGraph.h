@@ -6,8 +6,10 @@
 
 #include <ophidian/routing/Library.h>
 #include <ophidian/util/GridGraph_3D.h>
+#include <ophidian/circuit/Netlist.h>
 
 #include <boost/geometry/index/rtree.hpp>
+#include <unordered_set>
 namespace ophidian::routing{
 
 
@@ -48,6 +50,10 @@ public:
     using gcell_type            = GCell;
     using gcell_container_type  = std::vector<gcell_type>;
 
+    using cell_instance_type    = ophidian::circuit::CellInstance;
+    using cell_set_type         = std::unordered_set<cell_instance_type, entity_system::EntityBaseHash>;
+    using cell_instances_set_type = ophidian::entity_system::Property<gcell_type, cell_set_type>;
+
     using map_type              = std::unordered_map<std::pair<index_type, index_type>, box_type, hash_pair >;
 
     using point_scalar_type     = geometry::Point<double>;
@@ -80,6 +86,7 @@ public:
     point_type center_of_box(const gcell_type& gcell) const;
     scalar_type capacity(const gcell_type& gcell) const;
     void capacity(const gcell_type& gcell, scalar_type capacity);
+    const cell_set_type & cell_instances(gcell_type gcell);
     /**
      *  @brief Iterates over all GCells and returns the sum of the net and blockage demand
     */
@@ -92,15 +99,23 @@ public:
      *  @brief Iterates over all GCells and returns the sum of the blockage demand
     */
     scalar_type total_blockage_demand() const;
+    /**
+     *  @brief Iterates over all GCells and returns the sum of the same and adj extra demand
+    */
+    scalar_type total_extra_demand() const;
 
     scalar_type demand(const gcell_type& gcell) const;
     scalar_type net_demand(const gcell_type& gcell) const;
     scalar_type blockage_demand(const gcell_type& gcell) const;
+    scalar_type extra_demand(const gcell_type& gcell) const;
     void change_net_demand(const gcell_type& gcell, const scalar_type delta);
     void change_blockage_demand(const gcell_type& gcell, const scalar_type delta);
+    void change_same_demand(const gcell_type& gcell, const scalar_type delta);
+    void change_adj_demand(const gcell_type& gcell, const scalar_type delta);
     void intersect(gcell_container_type& gcells, const box_type box, const index_type layer) const;
     uint32_t id(const gcell_type& gcell) const;
     bool is_overflow(const gcell_type& gcell) const;
+    bool gcell_has_free_space(gcell_type gcell) const;
     index_type layer_index(const gcell_type & gcell) const;
 
     // Iterators
@@ -121,12 +136,20 @@ public:
     }
 
     entity_system::EntitySystem<gcell_type>::NotifierType * notifier_gcells() const noexcept;
+
+    void insert_cell_instance(gcell_type gcell, cell_instance_type cell);
+    void remove_cell_instance(gcell_type gcell, cell_instance_type cell);
+    void clear_same_demand(gcell_type gcell);
+    void clear_adj_demand(gcell_type gcell);
 private:
     entity_system::EntitySystem<gcell_type>             m_gcells{};
     entity_system::Property<gcell_type, node_type>      m_gcell_node{m_gcells};
     entity_system::Property<gcell_type, scalar_type>    m_gcell_capacity{m_gcells};
     entity_system::Property<gcell_type, scalar_type>    m_gcell_net_demand{m_gcells, 0};
     entity_system::Property<gcell_type, scalar_type>    m_gcell_blockage_demand{m_gcells, 0};
+    entity_system::Property<gcell_type, scalar_type>    m_same_gcell_extra_demand{m_gcells, 0};
+    entity_system::Property<gcell_type, scalar_type>    m_adj_gcell_extra_demand{m_gcells, 0};
+    cell_instances_set_type                             m_gcells_cell_instances{m_gcells, cell_set_type{}};
 
     map_type                                            m_gcell_box;
     node_map_type<gcell_type>                           m_nodes_to_gcell;

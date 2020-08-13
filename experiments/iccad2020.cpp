@@ -7,9 +7,53 @@
 #include <ophidian/routing/AStarRouting.h>
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/util/log.h>
+#include <chrono>
 #include "run_ilp.h"
 
+std::chrono::time_point<std::chrono::steady_clock> start_time;
 using namespace ophidian::util;
+
+void improve_routing(ophidian::design::Design & design, ophidian::routing::AStarRouting & astar_routing)
+{
+    auto & global_routing = design.global_routing();
+    auto & netlist = design.netlist();
+    auto routed_nets = 0;
+    auto non_routed = 0;
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
+    {
+        auto net = *net_it;
+        auto before_wl = global_routing.wirelength(net);
+        std::vector<ophidian::routing::AStarSegment> initial_segments;
+        for(auto segment : global_routing.segments(net))
+            initial_segments.push_back(ophidian::routing::AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
+
+        global_routing.unroute(net);
+        std::vector<ophidian::routing::AStarSegment> segments;
+        auto result = astar_routing.route_net(net, segments, false);
+        if(result)
+        {
+            astar_routing.apply_segments_to_global_routing(segments);
+            auto after_wl = global_routing.wirelength(net);
+            routed_nets++;
+            if(before_wl < after_wl)
+            {
+                global_routing.unroute(net);
+                astar_routing.apply_segments_to_global_routing(initial_segments);
+                non_routed++;
+                routed_nets--;
+            }
+        }else{
+            non_routed++;
+            astar_routing.apply_segments_to_global_routing(initial_segments);
+        }
+        auto end_time = std::chrono::steady_clock::now();
+        std::chrono::duration<double> diff = end_time-start_time;
+        bool time_out = diff.count() > 1800 ? true : false;//30 minutes
+        if(time_out)
+            break;
+    }
+    //std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+}
 
 //if not specified the net name, it draws the whole circuit ((not recommended)
 void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
@@ -79,6 +123,45 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
     }
     out_svg<<"</svg>";
     out_svg.close();
+}
+
+//the wirelength and wirelength demand (demand - blockage_demand) should be always equal
+bool sanity_check(ophidian::design::Design & design)
+{
+    auto & netlist = design.netlist();
+    auto & global_routing = design.global_routing();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+
+    std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
+    auto wirelength = design.global_routing().wirelength(nets);
+
+    std::cout<<"Wirelength "<<wirelength<<std::endl;
+
+    int wirelength_demand = 0;
+    for(auto gcell_it = gcell_graph_ptr->begin_gcell(); gcell_it != gcell_graph_ptr->end_gcell(); gcell_it++)
+    {
+        auto gcell = *gcell_it;
+        wirelength_demand += (gcell_graph_ptr->demand(gcell) - gcell_graph_ptr->blockage_demand(gcell) - gcell_graph_ptr->extra_demand(gcell));
+    }
+
+    std::cout<<"Wirelength demmand "<<wirelength_demand<<std::endl;
+    return wirelength == wirelength_demand;
+}
+
+bool cell_has_more_than_1_pin_in_same_net(ophidian::design::Design & design, ophidian::circuit::CellInstance cell)
+{
+    auto & netlist = design.netlist();
+    std::unordered_map<std::string, int> pin_map;
+    for(auto pin : netlist.pins(cell))
+    {
+        auto net = netlist.net(pin);
+        auto net_name = netlist.name(net);
+        pin_map[net_name]++;
+    }
+    for(auto map_it : pin_map)
+        if(map_it.second > 1)
+            return true;
+    return false;
 }
 
 void write_statistics_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::unordered_map<ophidian::circuit::Net, double, ophidian::entity_system::EntityBaseHash> & nets_initial_wirelength) {
@@ -272,6 +355,8 @@ TEST_CASE("iccad20 AStarRouting", "[astar]")
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto net = design.netlist().find_net("N2594");
     std::vector<ophidian::routing::AStarSegment> segments;
+    auto & global_routing = design.global_routing();
+    global_routing.unroute(net);
     astar_routing.route_net(net, segments);
     iccad_output_writer.write_ICCAD_2020_output("case3.txt", {});
 }
@@ -284,6 +369,7 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     std::cout<<iccad_2020_file<<std::endl;
     auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
     auto design = ophidian::design::Design();
+    auto& global_routing = design.global_routing();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
@@ -291,9 +377,12 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
     int routed_nets = 0;
     int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
-    std::vector<ophidian::routing::AStarSegment> segments;
+
+    sanity_check(design);
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
+        global_routing.unroute(*net_it);
+        std::vector<ophidian::routing::AStarSegment> segments;
         auto result = astar_routing.route_net(*net_it, segments);
         if(result)
             routed_nets++;
@@ -301,6 +390,7 @@ TEST_CASE("iccad20 AStarRouting on all nets", "[astar_all_nets]")
             non_routed++;
     }
     std::cout<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+    sanity_check(design);
 
     iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out.txt", {});
 }
@@ -354,7 +444,6 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
     int non_routed = 0;
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto sorted_nets = sort_nets(design);
-    std::vector<ophidian::routing::AStarSegment> segments;
 
     //TODO: If we intend to generate the whole routing solution from strach we have to consider congestion
     // for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
@@ -362,6 +451,8 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
 
     for(auto pair_length_net : sorted_nets)
     {
+        global_routing.unroute(pair_length_net.second);
+        std::vector<ophidian::routing::AStarSegment> segments;
         auto result = astar_routing.route_net(pair_length_net.second, segments);
         if(result)
             routed_nets++;
@@ -373,8 +464,7 @@ TEST_CASE("iccad20 unroute and route all nets in a sorted order", "[astar_sortin
     iccad_output_writer.write_ICCAD_2020_output("sorted_case4.txt", {});
 }
 
-
-ophidian::util::LocationDbu calculate_median_candidate(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell){
+ophidian::routing::GlobalRouting::gcell_type calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell){
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
     using net_type = ophidian::circuit::Net;
@@ -399,8 +489,11 @@ ophidian::util::LocationDbu calculate_median_candidate(ophidian::design::Design 
             y_positions.push_back(location.y().value());
         }
     }
+    auto cell_location = placement.location(cell);
+    auto current_gcell = design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+
     if(x_positions.empty() || y_positions.empty())
-        return placement.location(cell);
+        return current_gcell;
 
     std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
     auto median_x = x_positions[x_positions.size()/2];
@@ -411,32 +504,31 @@ ophidian::util::LocationDbu calculate_median_candidate(ophidian::design::Design 
     
     auto nearest_gcell = design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
 
-    auto cell_location = placement.location(cell);
-    auto current_gcell = design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
-
     if(current_gcell != nearest_gcell){
-        auto center_gcell = design.global_routing().gcell_graph()->center_of_box(nearest_gcell);
-        // creating candidate
-        return center_gcell;
+        return nearest_gcell;
     }
-    return placement.location(cell);
+    return current_gcell;
 }
 
-bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell )
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing )
 {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
     using net_type = ophidian::circuit::Net;
     using AStarSegment = ophidian::routing::AStarSegment;
 
-    auto & global_routing = design.global_routing();
-    auto & netlist = design.netlist();
-    auto & placement = design.placement();
-    auto astar_routing = ophidian::routing::AStarRouting(design);
+    auto& global_routing = design.global_routing();
+    auto& netlist = design.netlist();
+    auto& placement = design.placement();
+    auto& routing_constr = design.routing_constraints();
+    auto& std_cells = design.standard_cells();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
 
     auto initial_location = placement.location(cell);
-    auto median_location = calculate_median_candidate(design, cell);
-    if(median_location.x() != initial_location.x() && median_location.y() != initial_location.y() )
+    auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
+    auto median_gcell = calculate_median_gcell(design, cell);
+
+    if(initial_gcell != median_gcell)
     {
         // backup cell and nets informations
         std::vector<net_type> cell_nets;
@@ -447,42 +539,51 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             cell_nets.push_back(net);
         }
         std::vector<AStarSegment> initial_segments;
+        auto wirelength_before = global_routing.wirelength(cell_nets);
         for(auto net : cell_nets)
         {
             for(auto segment : global_routing.segments(net))
-            {
                 initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
-            }
             global_routing.unroute(net);
         }
 
         //move cell to median
-        placement.place(cell, median_location);
+        global_routing.move_cell(initial_gcell, median_gcell, cell, netlist, placement, routing_constr, std_cells);
         std::vector<AStarSegment> segments;
         bool routed_all_nets = true;
-        log() << "cells net size : " << cell_nets.size() << std::endl;
         for(auto net : cell_nets)
         {
-            printlog("antes a* com net ", netlist.name(net));
             auto result = astar_routing.route_net(net, segments, false);
-            log() << "result : " << result << std::endl;
             if(!result)
             {
-                printlog("NOT ROUTED!");
                 routed_all_nets = false;
                 break;
             }
         }
-        log() << "after for " << routed_all_nets << std::endl;
         if(routed_all_nets)
         {
-            printflog("segments size %d" , segments.size() );
-            astar_routing.apply_segments_to_global_routing(segments);
+            bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
+            auto wirelength_after = global_routing.wirelength(cell_nets);
+            if(wirelength_before < wirelength_after || working_correct == false)
+            {
+                for(auto net : cell_nets)
+                    global_routing.unroute(net);
+
+                global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+                bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+                if(undo == false)
+                    std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+                return false;
+            }
             return true;
         }else{
-            //undo cell position and nets
-            placement.place(cell, initial_location);
-            astar_routing.apply_segments_to_global_routing(initial_segments);
+            for(auto net : cell_nets)
+                global_routing.unroute(net);
+
+            global_routing.move_cell(median_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+            if(undo == false)
+                std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
         }
 
     }
@@ -493,10 +594,12 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
 {
     std::vector<std::string> circuit_names = {
         // "case1",
-        "case2",
+        // "case2",
         // "case3",
+        // "case3_no_extra_demand",
         // "case4",
         // "case5",
+        // "case6",
     };
 
     std::string benchmarks_path = "./input_files/iccad2020/cases/";
@@ -504,12 +607,13 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
     // std::string benchmarks_path = "./benchmarks/"; //Tesla
     for (auto circuit_name : circuit_names) 
     {
+        start_time = std::chrono::steady_clock::now();
+
         using AStarSegment = ophidian::routing::AStarSegment;
         using net_type = ophidian::circuit::Net;
         using cell_type = ophidian::circuit::CellInstance;
         using point_type = ophidian::util::LocationDbu;
         std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
-        printlog(iccad_2020_file);
         auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
@@ -517,7 +621,6 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         auto & global_routing = design.global_routing();
         auto & netlist = design.netlist();
         auto & placement = design.placement();
-        printlog("end init structures");
 
         std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
         int initial_wirelength = global_routing.wirelength(nets);
@@ -526,42 +629,19 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         int routed_nets = 0;
         int non_routed = 0;
         auto astar_routing = ophidian::routing::AStarRouting(design);
-        for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
-        {
-            auto net = *net_it;
-            //save initial routing
-            log() << "rounting net : " << netlist.name(net) << std::endl;
-            std::vector<AStarSegment> initial_segments;
-            for(auto segment : global_routing.segments(net))
-            {
-                initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
-            }
 
-            //unroute the net
-            global_routing.unroute(net);
-            // try to route this net with A*
-            std::vector<AStarSegment> segments;
-            auto result = astar_routing.route_net(net, segments, false);
-            if(result)
-            {
-                routed_nets++;
-                astar_routing.apply_segments_to_global_routing(segments);
-            }else{
-                non_routed++;
-                //restore the initial routing
-                astar_routing.apply_segments_to_global_routing(initial_segments);
-            }
-        }
+        printlog("Improving initial A* routing ...");
+        improve_routing(design, astar_routing);
 
-        /* ========= MOVING CELLS ========= */
-
-        printlog("INITING MOVEMENTS ....");
+        printlog("Compute cells move cost ...");
         std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells_costs;
 
         for(auto cell_it = netlist.begin_cell_instance(); cell_it != netlist.end_cell_instance(); ++cell_it)
         {
             auto cell = *cell_it;
             if(placement.isFixed(cell))
+                continue;
+            if(cell_has_more_than_1_pin_in_same_net(design, cell))
                 continue;
             
             std::unordered_set<net_type, ophidian::entity_system::EntityBaseHash> cell_nets;
@@ -573,52 +653,64 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
 
             double routed_length = 0;
             double minimum_length = 0;
-            for (auto net : cell_nets) {
-                auto pins = netlist.pins(net);
-                std::vector<ophidian::interconnection::Flute::Point> net_points;
-                net_points.reserve(pins.size());
-                for (auto pin : pins) {
-                    auto pin_location = design.placement().location(pin);
-                    net_points.push_back(pin_location);
-                }
-                auto & flute = ophidian::interconnection::Flute::instance();
-                auto tree = flute.create(net_points);
-                auto stwl = tree->length().value();
-                stwl /= 10;
-                if (stwl == 0) {
-                    stwl = 1;
-                }
+            for(auto net : cell_nets)
+            {
+                // auto pins = netlist.pins(net);
+                // std::vector<ophidian::interconnection::Flute::Point> net_points;
+                // net_points.reserve(pins.size());
+                // for(auto pin : pins)
+                // {
+                //     auto pin_location = design.placement().location(pin);
+                //     net_points.push_back(pin_location);
+                // }
+                // auto & flute = ophidian::interconnection::Flute::instance();
+                // auto tree = flute.create(net_points);
+                // auto stwl = tree->length().value();
+                // stwl /= 10;
+                // if(stwl == 0)
+                //     stwl = 1;
                 routed_length += design.global_routing().wirelength(net);
-                minimum_length += stwl;
+                // minimum_length += stwl;
             }
-            auto cost = routed_length / minimum_length;
+            //auto cost = routed_length / minimum_length;
+            auto cost = routed_length;
             cells_costs.push_back(std::make_pair(cell, cost));
         }
-        std::sort(cells_costs.begin(), cells_costs.end(), [](std::pair<ophidian::circuit::CellInstance, double> cost_a, std::pair<ophidian::circuit::CellInstance, double> cost_b) {return cost_a.second < cost_b.second;});
+        //std::sort(cells_costs.begin(), cells_costs.end(), [](std::pair<ophidian::circuit::CellInstance, double> cost_a, std::pair<ophidian::circuit::CellInstance, double> cost_b) {return cost_a.second < cost_b.second;});
+        std::sort(cells_costs.begin(), cells_costs.end(), [](std::pair<ophidian::circuit::CellInstance, double> cost_a, std::pair<ophidian::circuit::CellInstance, double> cost_b) {return cost_a.second > cost_b.second;});
 
-        printlog("nets sorted");
+        // printlog("Sanity check before movements ...");
+        // sanity_check(design);
+        printlog("Initing movements ...");
+        printlog("Do not forget to map cell instances into GCells global_trouting.set_gcell_cell_instances(netlist, placement)!!!");
+        global_routing.set_gcell_cell_instances(netlist, placement);
+
         auto moved_cells = 0;
         std::vector<std::pair<cell_type, point_type>>  movements;
         for(auto pair : cells_costs)
         {
             auto cell = pair.first;
-            auto moved = move_cell(design, cell);
+            auto moved = move_cell(design, cell, astar_routing);
             if(moved)
             {
                 moved_cells++;
-                printflog("moved cells : %d", moved_cells);
                 movements.push_back(std::make_pair(cell, placement.location(cell)));
+                std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
             }
-            if(moved_cells == design.routing_constraints().max_cell_movement())
-            {
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+            bool time_out = diff.count() > 3300 ? true : false;//55 minutes
+            if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
                 break;
-            }
         }
+        // printlog("Sanity check after movements ...");
+        // sanity_check(design);
 
-        printlog("Wrinting solution");
+        printlog("Writing solution ...");
         iccad_output_writer.write_ICCAD_2020_output(circuit_name + "_out.txt", movements);
 
         log()<<"routed "<<routed_nets<<" of "<<netlist.size_net()<<" non routed "<<non_routed<<std::endl;
+        log()<<"Number of moved cells: "<<moved_cells<<std::endl;
         int final_wirelength = global_routing.wirelength(nets);
         log() << "Circuit final wirelength = " << final_wirelength << std::endl;
         auto score = initial_wirelength - final_wirelength;
