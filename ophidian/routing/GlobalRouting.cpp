@@ -366,7 +366,7 @@ namespace ophidian::routing
         return lemon::connected(net_graph);
     }
 
-    void GlobalRouting::move_cell(GlobalRouting::gcell_type source, GlobalRouting::gcell_type target, GlobalRouting::cell_instance_type cell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
+    bool GlobalRouting::move_cell(GlobalRouting::gcell_type source, GlobalRouting::gcell_type target, GlobalRouting::cell_instance_type cell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
     {
         //remove blockage demand
         update_blockage_demand(netlist, placement, cell, true);
@@ -380,6 +380,34 @@ namespace ophidian::routing
         update_blockage_demand(netlist, placement, cell, false);
         incremental_update_extra_demand(source, netlist, placement, routing_constraints, std_cells);
         incremental_update_extra_demand(target, netlist, placement, routing_constraints, std_cells);
+        auto overflow = overflow_movement(target);
+        return overflow;
+    }
+
+    bool GlobalRouting::overflow_movement(GlobalRouting::gcell_type gcell)
+    {
+        auto gcell_node = m_gcell_graph->graph_node(gcell);
+        auto gcell_position = m_gcell_graph->position(gcell_node);
+        for(auto layer_it = m_library.begin_layer(); layer_it != m_library.end_layer(); layer_it++)
+        {
+            auto layer_index = m_library.layerIndex(*layer_it);
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+
+            if(m_gcell_graph->is_overflow(affected_gcell))
+                return true;
+            auto east_node = m_gcell_graph->east_node(gcell_node);
+            auto east_gcell = m_gcell_graph->gcell(east_node);
+            auto west_node = m_gcell_graph->west_node(gcell_node);
+            auto west_gcell = m_gcell_graph->gcell(west_node);
+            if (east_node != lemon::INVALID)
+                if(m_gcell_graph->is_overflow(east_gcell))
+                    return true;
+            if (west_node != lemon::INVALID)
+                if(m_gcell_graph->is_overflow(west_gcell))
+                    return true;
+        }
+        return false;
     }
 
     void GlobalRouting::update_blockage_demand(GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::cell_instance_type cell, bool remove_demand)

@@ -124,7 +124,7 @@ namespace ophidian::routing
         /* Checks entire circuit. Quicker, checks each Gcell only once*/
         bool is_overflow() const;
 
-        void move_cell(gcell_type source, gcell_type target, cell_instance_type cell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+        bool move_cell(gcell_type source, gcell_type target, cell_instance_type cell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
         
         void update_blockage_demand(netlist_type & netlist, placement_type & placement, cell_instance_type cell, bool remove_demand);
         /*Update cell_instance_set for each gcell according to placement information.*/
@@ -138,6 +138,7 @@ namespace ophidian::routing
         void update_gcells_demand(const gr_segment_type & segment, const int delta);
         void update_same_extra_demand(gcell_type gcell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
         void update_adj_extra_demand(gcell_type gcell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+        bool overflow_movement(gcell_type gcell);
 
         entity_system::EntitySystem<gr_segment_type>                    m_gr_segments;
         entity_system::Property<gr_segment_type, segment_geometry_type> m_gr_segment_box;
