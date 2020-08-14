@@ -75,7 +75,7 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     run_ilp_on_panels_parallel(movements);
     run_astar_on_panels_parallel(movements);
 
-    /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(34, 42, 2);
     auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
     auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
     auto layer_index = m_design.global_routing().gcell_graph()->layer_index(debug_gcell);
@@ -688,7 +688,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
-                m_design.placement().place(movement.first, movement.second);
+                //m_design.placement().place(movement.first, movement.second);
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
@@ -710,7 +710,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
-                m_design.placement().place(movement.first, movement.second);
+                //m_design.placement().place(movement.first, movement.second);
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
@@ -897,7 +897,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
 
     /*std::cout << "astar nets " << astar_nets.size() << std::endl;
 
-    auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(34, 42, 2);
     auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
     auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
     auto layer_index = m_design.global_routing().gcell_graph()->layer_index(debug_gcell);
@@ -908,6 +908,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
 
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : astar_nets){
+        auto net_name = m_design.netlist().name(net);
         /*auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
         auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
         std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
@@ -928,6 +929,8 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
             if(!undo) {
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+                std::cout << "NET " << net_name << std::endl;
+                //break;
             }
         }            
     }
