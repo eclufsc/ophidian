@@ -92,10 +92,10 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         // Backup routing information
         std::vector<AStarSegment> initial_segments;
         auto wirelength_before = global_routing.wirelength(cell_nets);
-        std::cout << "initial gcells " << std::endl;
+        //std::cout << "initial gcells " << std::endl;
         for(auto net : cell_nets)
         {
-            for(auto gcell : global_routing.gcells(net)) {
+            /*for(auto gcell : global_routing.gcells(net)) {
                 auto gcell_box = gcell_graph_ptr->box(gcell);
                 auto layer_index = gcell_graph_ptr->layer_index(gcell);
                 std::cout << "initial gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl; 
@@ -103,7 +103,7 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
                 auto capacity = gcell_graph_ptr->capacity(gcell);
                 auto demand = gcell_graph_ptr->demand(gcell);
                 std::cout << "capacity " << capacity << " demand " << demand << std::endl;
-            }
+            }*/
             for(auto segment : global_routing.segments(net))
                 initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
             global_routing.unroute(net);
@@ -196,14 +196,14 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
                                     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements,
                                     ophidian::routing::AStarRouting & astar_routing)
 {
-    auto debug_gcell = design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    /*auto debug_gcell = design.global_routing().gcell_graph()->gcell(23, 10, 0);
     auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
     auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
     auto layer_index = design.global_routing().gcell_graph()->layer_index(debug_gcell);
     auto gcell_box = design.global_routing().gcell_graph()->box(debug_gcell);
 
     std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;
+    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
 
     int moved_cells = movements.size();
     for(auto pair : cells)
@@ -213,7 +213,7 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
             continue;
         }
         auto cell_name = design.netlist().name(cell);
-        std::cout << "cell " << cell_name << std::endl;
+        //std::cout << "cell " << cell_name << std::endl;
         auto moved = move_cell(design, cell, astar_routing);
         if(moved)
         {
@@ -222,13 +222,13 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
             std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
         }
     
-        auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
+        /*auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
         auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-        std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;
+        std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
         // auto end_time = std::chrono::steady_clock::now();
         // std::chrono::duration<double> diff = end_time-start_time;
         // bool time_out = diff.count() > time_limit * 60.0 ? true : false;
-        if (cell_name == "C1249") break;
+        //if (cell_name == "C1249") break;
         //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
         if(moved_cells == design.routing_constraints().max_cell_movement())
         //if(moved_cells == 1)
@@ -288,6 +288,16 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     ophidian::routing::AStarRouting astar_routing{design};
     auto cell_costs = compute_cell_move_costs_descending_order(design);
+    
+    /*auto debug_gcell = design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
+    auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
+    auto layer_index = design.global_routing().gcell_graph()->layer_index(debug_gcell);
+    auto gcell_box = design.global_routing().gcell_graph()->box(debug_gcell);
+
+    std::cout << "debug gcell before moves " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
+    std::cout << "debug gcell before moves capacity " << capacity << " demand " << demand << std::endl;*/
+
     move_cells_for_until_x_minutes(design, 600, cell_costs, movements, astar_routing);
 
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);

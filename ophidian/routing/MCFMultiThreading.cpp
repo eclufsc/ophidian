@@ -74,6 +74,17 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
     run_ilp_on_panels_parallel(movements);
     run_astar_on_panels_parallel(movements);
+
+    /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+    auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+    auto layer_index = m_design.global_routing().gcell_graph()->layer_index(debug_gcell);
+    auto gcell_box = m_design.global_routing().gcell_graph()->box(debug_gcell);
+
+    std::cout << "debug gcell after astar " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
+    std::cout << "debug gcell after astar capacity " << capacity << " demand " << demand << std::endl;*/
+
+
     //data_analysis("after");
 
     
@@ -879,8 +890,23 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         //     break;
     }
 
+    /*std::cout << "astar nets " << astar_nets.size() << std::endl;
+
+    auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(23, 10, 0);
+    auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+    auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+    auto layer_index = m_design.global_routing().gcell_graph()->layer_index(debug_gcell);
+    auto gcell_box = m_design.global_routing().gcell_graph()->box(debug_gcell);
+
+    std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
+    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : astar_nets){
+        /*auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+        auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+        std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+
         std::vector<ophidian::routing::AStarSegment> initial_segments;
         for(auto segment : m_design.global_routing().segments(net)) {
             initial_segments.push_back(ophidian::routing::AStarSegment(m_design.global_routing().box(segment), m_design.global_routing().layer_start(segment), m_design.global_routing().layer_end(segment), net));

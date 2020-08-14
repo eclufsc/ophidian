@@ -426,6 +426,12 @@ namespace ophidian::routing
 
     void GlobalRouting::update_extra_demand(GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
     {
+        for(auto gcell_it = m_gcell_graph->begin_gcell(); gcell_it != m_gcell_graph->end_gcell(); gcell_it++){
+            auto gcell = *gcell_it;
+            m_gcell_graph->clear_same_demand(gcell);
+            m_gcell_graph->clear_adj_demand(gcell);
+        }
+
         std::unordered_map<gcell_type, std::unordered_map<circuit::StandardCells::cell_type, int, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> std_cells_per_gcell;
         std::unordered_map<circuit::StandardCells::cell_type, std::unordered_set<gcell_type, entity_system::EntityBaseHash>, entity_system::EntityBaseHash> gcells_per_std_cell;
 
