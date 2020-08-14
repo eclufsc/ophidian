@@ -613,7 +613,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         bool at_least_one_cell_moved = true;
         while(at_least_one_cell_moved)
         {
-            if(moved_cells == design.routing_constraints().max_cell_movement() || time_out(600))
+            if(moved_cells == design.routing_constraints().max_cell_movement() || time_out(3300))
                 break;
 
             at_least_one_cell_moved = false;
@@ -636,6 +636,10 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
                     log() << "Time Out reached for movements." << std::endl;
                     break;
                 }
+            }
+            if(moved_cells == design.routing_constraints().max_cell_movement() || time_out(3300))
+            {
+                break;
             }
         }
         printlog("Writing solution ...");
