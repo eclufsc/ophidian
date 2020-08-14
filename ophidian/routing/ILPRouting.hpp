@@ -182,7 +182,7 @@ namespace ophidian::routing {
 
 
         if(STATUS) printlog("create all candidates with movements");
-        //create_all_candidates_with_movements(nets, cells, area, model);
+        create_all_candidates_with_movements(nets, cells, area, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -199,7 +199,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add movements constraints");
-        //add_movements_constraints(model);
+        add_movements_constraints(model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(WRITE_MODEL) printlog("write model");

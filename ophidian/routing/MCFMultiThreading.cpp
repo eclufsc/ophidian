@@ -686,11 +686,12 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
 
             #pragma omp critical
             for (auto movement : local_movements) {
-                //auto source_location = m_design.placement().location(movement.first);
-                //auto source_gcell = gcell_graph_ptr->nearest_gcell(source_location, 0);
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
                 m_design.placement().place(movement.first, movement.second);
-                //auto target_gcell = gcell_graph_ptr->nearest_gcell(movement.second, 0);
-                m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
                 movements.push_back(movement);
             } 
 
@@ -707,8 +708,12 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             
             #pragma omp critical
             for (auto movement : local_movements) {
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
                 m_design.placement().place(movement.first, movement.second);
-                m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
                 movements.push_back(movement);
             } 
 
