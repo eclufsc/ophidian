@@ -627,10 +627,22 @@ namespace ophidian::routing
         //IMPORANT: these two following loops CAN NOT be merged.
         for(auto net: nets)
             global_routing.increase_demand(net);
-        for(auto net: nets)
-            for(auto gcell : global_routing.gcells(net))
-                if(m_gcell_graph->is_overflow(gcell))
+        for(auto net: nets) {
+            auto net_name = m_design.netlist().name(net);
+            std::cout << "net " << net_name << std::endl;            
+            for(auto gcell : global_routing.gcells(net)) {
+                auto gcell_box = m_gcell_graph->box(gcell);
+                auto layer_index = m_gcell_graph->layer_index(gcell);
+                std::cout << "gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
+                auto capacity = m_gcell_graph->capacity(gcell);
+                auto demand = m_gcell_graph->demand(gcell);
+                std::cout << "capacity " << capacity << " demand " << demand << std::endl;
+                if(m_gcell_graph->is_overflow(gcell)) {
+                    std::cout << "OVERFLOW" << std::endl;
                     return false;
+                }
+            }
+        }
         return true;
     }
 

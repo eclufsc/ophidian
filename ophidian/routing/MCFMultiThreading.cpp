@@ -675,7 +675,10 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
 
             #pragma omp critical
             for (auto movement : local_movements) {
+                //auto source_location = m_design.placement().location(movement.first);
+                //auto source_gcell = gcell_graph_ptr->nearest_gcell(source_location, 0);
                 m_design.placement().place(movement.first, movement.second);
+                //auto target_gcell = gcell_graph_ptr->nearest_gcell(movement.second, 0);
                 m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
                 movements.push_back(movement);
             } 
@@ -884,13 +887,18 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         }
         m_design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        auto result = astar_routing.route_net(net, segments);
-        if (!result) {
+        auto result = astar_routing.route_net(net, segments, false);
+        if (result) {
+            bool apply = astar_routing.apply_segments_to_global_routing(segments);
+            if (!apply) {
+                std::cout << "WARNING: FAILED TO APPLY" << std::endl;
+            }
+        } else {
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-            if(undo == false) {
+            if(!undo) {
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
             }
-        }
+        }            
     }
 
 }//end run_astar_on_panels_parallel
