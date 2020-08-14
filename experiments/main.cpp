@@ -39,20 +39,20 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
     for(auto pair : sorted_nets)
     {
         auto net = pair.second;
-        auto before_wl = global_routing.wirelength(net);
         std::vector<ophidian::routing::AStarSegment> initial_segments;
         for(auto segment : global_routing.segments(net))
             initial_segments.push_back(ophidian::routing::AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
 
+        auto max_wirelength = pair.first;
         global_routing.unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        auto result = astar_routing.route_net(net, segments, false);
+        auto result = astar_routing.route_net(net, segments, max_wirelength, false);
         if(result)
         {
             astar_routing.apply_segments_to_global_routing(segments);
             auto after_wl = global_routing.wirelength(net);
             routed_nets++;
-            if(before_wl < after_wl)
+            if(max_wirelength < after_wl)
             {
                 global_routing.unroute(net);
                 astar_routing.apply_segments_to_global_routing(initial_segments);
@@ -137,7 +137,7 @@ ophidian::routing::GlobalRouting::gcell_type calculate_median_gcell(ophidian::de
 }
 
 
-bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing, int max_wirelength)
 {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
@@ -184,7 +184,7 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             bool routed_all_nets = true;
             for(auto net : cell_nets)
             {
-                routed_all_nets = astar_routing.route_net(net, segments, false);
+                routed_all_nets = astar_routing.route_net(net, segments, max_wirelength, false);
                 if(routed_all_nets == false)
                     break;
             }
@@ -212,12 +212,12 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
 void test_greedy_solution()
 {
     std::vector<std::string> circuit_names = {
-        "case1",
-        "case2",
-        "case3",
-        // "case3_no_extra_demand",
-        "case4",
-        "case5",
+        //"case1",
+        //"case2",
+        //"case3",
+        //"case3_no_extra_demand",
+        //"case4",
+        //"case5",
         "case6",
     };
 
@@ -294,7 +294,8 @@ void test_greedy_solution()
             for(auto pair : cells_costs)
             {
                 auto cell = pair.first;
-                auto moved = move_cell(design, cell, astar_routing);
+                auto max_wirelength = pair.second;
+                auto moved = move_cell(design, cell, astar_routing, max_wirelength);
                 at_least_one_cell_moved = moved ? moved : at_least_one_cell_moved;
                 if(moved)
                 {

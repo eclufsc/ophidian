@@ -79,8 +79,9 @@ namespace ophidian::routing
 
             AStarRouting(design_type & design);
 
-            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
+            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, int max_wirelength = std::numeric_limits<int>::max(), bool applying_routing = true);
             bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
+            int                                   m_no_path_count=0;//just for test
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
@@ -103,6 +104,7 @@ namespace ophidian::routing
 
 
             net_type                              m_net;
+            int                                   m_max_segment_wirelength;
             flute_graph_type                      m_graph;
             flute_node_type                       m_root_node;
             node_map_type                         m_node_map;

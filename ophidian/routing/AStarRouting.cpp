@@ -41,9 +41,10 @@ namespace ophidian::routing
     }
 
     //when routing all nets is required first remove all of them
-    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing)
+    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, int max_wirelength, bool applying_routing)
     {
         m_net = net;
+        m_max_segment_wirelength = max_wirelength;
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
         auto net_size = netlist.pins(net).size();
@@ -292,30 +293,36 @@ namespace ophidian::routing
             open_nodes.pop_front();
 
             //discover neighbors
-            auto current_neighbors = neighbors(current_node);
-            for(auto neighbor : current_neighbors)
+            if(m_gcell_to_AStarNode[current_node].g < m_max_segment_wirelength * 5)
             {
-                update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
-                if(m_gcell_to_AStarNode[neighbor].discovered == false)
+                auto current_neighbors = neighbors(current_node);
+                for(auto neighbor : current_neighbors)
                 {
-                    open_nodes.push_back(neighbor);
-                    m_gcell_to_AStarNode[neighbor].discovered = true;
+                    update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
+                    if(m_gcell_to_AStarNode[neighbor].discovered == false)
+                    {
+                        open_nodes.push_back(neighbor);
+                        m_gcell_to_AStarNode[neighbor].discovered = true;
+                    }
+                    dirty_nodes.push_back(neighbor);
                 }
-                dirty_nodes.push_back(neighbor);
+                //re-sort list
+                open_nodes.sort([&](auto & gcell1, auto & gcell2)
+                        {
+                        auto& node1 = m_gcell_to_AStarNode[gcell1];
+                        auto& node2 = m_gcell_to_AStarNode[gcell2];
+                        return node1.g + node1.h < node2.g + node2.h;
+                        });
             }
-            //re-sort list
-            open_nodes.sort([&](auto & gcell1, auto & gcell2)
-            {
-                auto& node1 = m_gcell_to_AStarNode[gcell1];
-                auto& node2 = m_gcell_to_AStarNode[gcell2];
-                    return node1.g + node1.h < node2.g + node2.h;
-            });
             m_gcell_to_AStarNode[current_node].finished = true;
         }
 
         //IMPORTANT: return false (return AFTER clean dirty nodes)
         if(open_nodes.empty())
+        {
             if (AStarDebug) std::cout<<"there is no path to the goal"<<std::endl;
+            m_no_path_count++;
+        }
         if(goal_is_steiner)
             m_node_map[goal].mapped_gcell = current_node;
         if(target_found)
@@ -345,10 +352,11 @@ namespace ophidian::routing
         return x_dist + y_dist + z_dist;
     }
 
-    //This method return the gncell_neighbors from a given gcell.
+    //This method return the gcell_neighbors from a given gcell.
     //It is considering layer directons, min net constraint, gcell_graph boundaries, 
     // gcell capacities and if the node has already been finished by A* algorithm.
-    //When a condition is not satisfied the violating gcell is removed from the result.
+    //It also prunes the search space to at most 5 times the current net wirelength.
+    //When thes condition are not satisfacted the violating gcell is not returned.
     std::vector<AStarRouting::gcell_type> AStarRouting::neighbors(AStarRouting::gcell_type gcell)
     {
         auto gcell_graph_ptr = m_design.global_routing().gcell_graph();

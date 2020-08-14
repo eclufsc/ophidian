@@ -40,20 +40,20 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
     for(auto pair : sorted_nets)
     {
         auto net = pair.second;
-        auto before_wl = global_routing.wirelength(net);
         std::vector<ophidian::routing::AStarSegment> initial_segments;
         for(auto segment : global_routing.segments(net))
             initial_segments.push_back(ophidian::routing::AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
 
+        auto max_wirelength = pair.first;
         global_routing.unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        auto result = astar_routing.route_net(net, segments, false);
+        auto result = astar_routing.route_net(net, segments, max_wirelength, false);
         if(result)
         {
             astar_routing.apply_segments_to_global_routing(segments);
             auto after_wl = global_routing.wirelength(net);
             routed_nets++;
-            if(before_wl < after_wl)
+            if(max_wirelength < after_wl)
             {
                 global_routing.unroute(net);
                 astar_routing.apply_segments_to_global_routing(initial_segments);
@@ -64,7 +64,7 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
             non_routed++;
             astar_routing.apply_segments_to_global_routing(initial_segments);
         }
-        if(time_out(300))//5 minutes
+        if(time_out(1200))//20 minutes
         {
             log() << "Time Out reached for optmize routing." << std::endl;
             break;
@@ -464,7 +464,8 @@ ophidian::routing::GlobalRouting::gcell_type calculate_median_gcell(ophidian::de
     }
     return current_gcell;
 }
-bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
+
+bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing, int max_wirelength)
 {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
@@ -511,7 +512,7 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             bool routed_all_nets = true;
             for(auto net : cell_nets)
             {
-                routed_all_nets = astar_routing.route_net(net, segments, false);
+                routed_all_nets = astar_routing.route_net(net, segments, max_wirelength, false);
                 if(routed_all_nets == false)
                     break;
             }
@@ -539,11 +540,11 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
 TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_cells]")
 {
     std::vector<std::string> circuit_names = {
-        // "case1",
-        // "case2",
-        "case4",
+        //"case1",
+        //"case2",
+        //"case3",
         // "case3_no_extra_demand",
-        // "case4",
+        "case4",
         // "case5",
         // "case6",
     };
@@ -619,7 +620,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
             for(auto pair : cells_costs)
             {
                 auto cell = pair.first;
-                auto moved = move_cell(design, cell, astar_routing);
+                auto max_wirelength = pair.second;
+                auto moved = move_cell(design, cell, astar_routing, max_wirelength);
                 at_least_one_cell_moved = moved ? moved : at_least_one_cell_moved;
                 if(moved)
                 {
@@ -629,7 +631,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
                 }
                 if(moved_cells == design.routing_constraints().max_cell_movement())
                     break;
-                if(time_out(600))//10 minutes
+                if(time_out(3300))//55 minutes
                 {
                     log() << "Time Out reached for movements." << std::endl;
                     break;
@@ -650,5 +652,6 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         log() << "Estimated score ( "<< initial_wirelength << " - " << final_wirelength << " ) = " << score << std::endl;
         double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
         log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
+        log() << "No path = " << astar_routing.m_no_path_count << std::endl;
     }
 }
