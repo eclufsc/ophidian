@@ -38,11 +38,32 @@ namespace ophidian::routing
         auto& routing_constraints = m_design.routing_constraints();
         auto& std_cells = m_design.standard_cells();
         global_routing.update_extra_demand(netlist, placement, routing_constraints, std_cells);
+        m_enable_capacity = true;
+    }
+
+    AStarRouting::AStarRouting(design_type & design, bool enable_capacity):
+        m_graph{},
+        m_design{design},
+        m_node_map{m_graph},
+        m_edge_map{m_graph},
+        m_gcell_graph{design.global_routing().gcell_graph()},
+        m_gcell_to_AStarNode{design.global_routing().gcell_graph()->make_property_gcells(AStarNode{})},
+        m_same_gcell_extra_demand{design.global_routing().gcell_graph()->make_property_gcells(int{0})},
+        m_adj_gcell_extra_demand{design.global_routing().gcell_graph()->make_property_gcells(int{0})},
+        m_gcells_cell_instances{design.global_routing().gcell_graph()->make_property_gcells<cell_set_type>()}
+    {
+        auto& global_routing = m_design.global_routing();
+        auto& netlist = m_design.netlist();
+        auto& placement = m_design.placement();
+        auto& routing_constraints = m_design.routing_constraints();
+        auto& std_cells = m_design.standard_cells();
+        m_enable_capacity = enable_capacity;
     }
 
     //when routing all nets is required first remove all of them
-    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing)
+    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing, bool enable_capacity)
     {
+        m_enable_capacity = enable_capacity;
         m_net = net;
         auto& netlist = m_design.netlist();
         auto& routing_constraints = m_design.routing_constraints();
@@ -225,7 +246,7 @@ namespace ophidian::routing
 
             //Because for steiner nodes the Z does not matter and the A* will find a free node in that collumn
             //This check just make sense when moving cells:
-            if(flute_node.pin_name != "steiner" && gcell_graph_ptr->gcell_has_free_space(gcell) == false)
+            if(flute_node.pin_name != "steiner" && gcell_graph_ptr->gcell_has_free_space(gcell) == false && m_enable_capacity)
             {
                 if (AStarDebug) std::cout<<"WARNING: pin node mapped is overflowed, please undo that cell movement!!!"<<std::endl;
                 return false;
@@ -365,7 +386,7 @@ namespace ophidian::routing
         if(down_node != lemon::INVALID)//check for graph boundary
         {
             auto neighbor_gcell = m_gcell_graph->gcell(down_node);
-            if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+            if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
             {
                 auto node_position = m_gcell_graph->position(down_node);
                 if(node_position.get<2>() >= min_layer_index)//check for min layer constraint
@@ -379,7 +400,7 @@ namespace ophidian::routing
         if(up_node != lemon::INVALID)//check for graph boundary
         {
             auto neighbor_gcell = m_gcell_graph->gcell(up_node);
-            if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+            if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
                 if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                     result.push_back(neighbor_gcell);
         }
@@ -391,7 +412,7 @@ namespace ophidian::routing
             if(west_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(west_node);
-                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
             }
@@ -399,7 +420,7 @@ namespace ophidian::routing
             if(east_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(east_node);
-                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
             }
@@ -410,7 +431,7 @@ namespace ophidian::routing
             if(north_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(north_node);
-                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
             }
@@ -418,7 +439,7 @@ namespace ophidian::routing
             if(south_node != lemon::INVALID)//check for graph boundary
             {
                 auto neighbor_gcell = m_gcell_graph->gcell(south_node);
-                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell))
+                if(gcell_graph_ptr->gcell_has_free_space(neighbor_gcell) || !m_enable_capacity)
                     if(m_gcell_to_AStarNode[neighbor_gcell].finished == false)
                         result.push_back(neighbor_gcell);
             }
@@ -577,7 +598,7 @@ namespace ophidian::routing
                 for(auto layer_index = pin_layer_index; layer_index != min_layer_index; layer_index++)
                 {
                     auto gcell = m_gcell_graph->nearest_gcell(placement.location(pin), layer_index-1);
-                    if(gcell_graph_ptr->gcell_has_free_space(gcell) == false)
+                    if(gcell_graph_ptr->gcell_has_free_space(gcell) == false && m_enable_capacity)
                         return false;
                 }
                 auto gcell_start = m_gcell_graph->nearest_gcell(placement.location(pin), pin_layer_index-1);
@@ -693,7 +714,7 @@ namespace ophidian::routing
                     for(auto layer_index = min_layer_index; layer_index != max_layer_index; layer_index++)
                     {
                         auto gcell = m_gcell_graph->nearest_gcell(pin_vector.first, layer_index-1);
-                        if(gcell_graph_ptr->gcell_has_free_space(gcell) == false)
+                        if(gcell_graph_ptr->gcell_has_free_space(gcell) == false && m_enable_capacity)
                             return false;
                     }
                     auto lower_gcell = m_gcell_graph->nearest_gcell(pin_vector.first, min_layer_index-1);
@@ -729,7 +750,7 @@ namespace ophidian::routing
         for(auto layer_index = min_layer_index; layer_index != max_layer_index; layer_index++)
         {
             auto gcell = m_gcell_graph->nearest_gcell(ref_loc, layer_index-1);
-            if(gcell_graph_ptr->gcell_has_free_space(gcell) == false)
+            if(gcell_graph_ptr->gcell_has_free_space(gcell) == false && m_enable_capacity)
                 return false;
         }
         auto lower_gcell = m_gcell_graph->nearest_gcell(ref_loc, min_layer_index-1);
