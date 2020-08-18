@@ -28,7 +28,8 @@ namespace ophidian::routing
         m_gr_segment_gcell_start{m_gr_segments},
         m_gr_segment_gcell_end{m_gr_segments},
         m_net_to_gr_segment{netlist.make_aggregation_net<GlobalRouting::gr_segment_type>(m_gr_segments)},
-        m_library{library}
+        m_library{library},
+        m_net_lower_bound_wirelength{netlist.make_property_net<GlobalRouting::scalar_type>(0)}
     {
     }
 
@@ -122,6 +123,14 @@ namespace ophidian::routing
             wirelength += this->wirelength(net);
         }
         return wirelength;
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::lower_bound_wirelength(const net_type & net) const{
+        return m_net_lower_bound_wirelength[net];
+    }
+
+    void GlobalRouting::lower_bound_wirelength(const net_type & net, scalar_type wl){
+        m_net_lower_bound_wirelength[net] = wl;
     }
 
     GlobalRouting::segment_container_type::const_iterator GlobalRouting::begin_segment() const noexcept

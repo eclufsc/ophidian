@@ -80,8 +80,11 @@ namespace ophidian::routing
             using routing_segment_type              = std::pair<gcell_type, gcell_type>;
 
             AStarRouting(design_type & design);
+            
+            //method to create and run A* without capacity contraint!!
+            AStarRouting(design_type & design, bool enable_capacity);
 
-            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true);
+            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true, bool enable_capacity = true);
             bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
         private:
             bool init_flute_graph();
@@ -117,6 +120,8 @@ namespace ophidian::routing
             gcell_extra_demand_type               m_same_gcell_extra_demand;
             gcell_extra_demand_type               m_adj_gcell_extra_demand;
             gcell_cell_instances_type             m_gcells_cell_instances;//This could be in GCellGraph class.
+
+            bool                                  m_enable_capacity;
     };
 
     struct FluteNode

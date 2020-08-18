@@ -93,6 +93,9 @@ namespace ophidian::routing
          */
         const scalar_type wirelength(const net_container_type & nets) const;
 
+        const scalar_type lower_bound_wirelength(const net_type & net) const;
+        void lower_bound_wirelength(const net_type & net, scalar_type wl);
+
         // Iterators
         segment_container_type::const_iterator begin_segment() const noexcept;
         segment_container_type::const_iterator end_segment() const noexcept;
@@ -150,6 +153,7 @@ namespace ophidian::routing
         entity_system::Aggregation<net_type, gr_segment_type>           m_net_to_gr_segment;
 
         gcell_graph_ptr_type                                            m_gcell_graph;
+        entity_system::Property<net_type, scalar_type>                  m_net_lower_bound_wirelength;
 
         const Library&                                                  m_library;
     };

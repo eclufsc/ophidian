@@ -287,9 +287,14 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
         }
 
         double routed_length = 0;
+        double lower_bound = 0;
         for(auto net : cell_nets)
+        {
             routed_length += design.global_routing().wirelength(net);
-        auto cost = routed_length;
+            lower_bound += design.global_routing().lower_bound_wirelength(net);
+        }
+        // auto cost = routed_length;
+        auto cost = routed_length - lower_bound;
         cells_costs.push_back(std::make_pair(cell, cost));
     }
     //SORT IN DESCENDING ORDER
@@ -355,6 +360,70 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
     }
 }
 
+void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AStarRouting & astar_routing)
+{
+    //compute lower bound using A* without capacities!
+    // ophidian::routing::AStarRouting astar_routing{design, false};
+    // #pragma omp parallel for num_threads(4) private(astar_routing)
+    for(auto net_it = design.netlist().begin_net(); net_it != design.netlist().end_net(); ++net_it)
+    {
+        auto net = *net_it;
+        std::vector<ophidian::routing::AStarSegment> segments;
+        astar_routing.route_net(net, segments, false, false);
+        //calculing wirelength
+        std::vector<ophidian::routing::GCell> gcells;
+        for(auto segment : segments)
+        {
+            auto layer_start_index = design.routing_library().layerIndex(segment.start_layer);
+            auto layer_end_index = design.routing_library().layerIndex(segment.end_layer);
+            auto min_index = std::min(layer_start_index, layer_end_index);
+            auto max_index = std::max(layer_start_index, layer_end_index);
+            for(auto i = min_index; i <= max_index; i++)
+            {
+                auto box = segment.wire_box;
+                design.global_routing().gcell_graph()->intersect(gcells, box, i-1);
+            }
+        }
+        //remove duplicated gcells
+        std::sort(gcells.begin(), gcells.end(), [&](auto &lhs, auto &rhs){return design.global_routing().gcell_graph()->id(lhs) < design.global_routing().gcell_graph()->id(rhs);});
+        gcells.erase(std::unique(gcells.begin(), gcells.end()), gcells.end());
+
+        design.global_routing().lower_bound_wirelength(net, gcells.size());
+    }
+
+    //comparison of steiner tree
+    // ophidian::entity_system::Property<ophidian::circuit::Net, int> net_stwl{design.netlist().make_property_net<int>(0)};
+    // for (auto net_it = design.netlist().begin_net(); net_it != design.netlist().end_net(); ++net_it)
+    // {
+    //     auto net = *net_it;
+    //     auto pins = design.netlist().pins(net);
+
+    //     std::vector<ophidian::interconnection::Flute::Point> net_points;
+    //     net_points.reserve(pins.size());
+    //     for (auto pin : pins) {
+    //         auto pin_location = design.placement().location(pin);
+    //         net_points.push_back(pin_location);
+    //     }
+
+    //     auto & flute = ophidian::interconnection::Flute::instance();
+    //     auto tree = flute.create(net_points);
+    //     auto stwl = tree->length().value();
+    //     stwl /= 10;
+    //     if (stwl == 0) {
+    //         stwl = 1;
+    //     }
+    //     net_stwl[net] = stwl;
+    // }
+
+    // std::cout << "net,stwl,lowerBound" << std::endl;
+    // for (auto net_it = design.netlist().begin_net(); net_it != design.netlist().end_net(); ++net_it)
+    // {
+    //     auto net = *net_it;
+    //     auto net_name = design.netlist().name(net);
+    //     std::cout << net_name << "," << net_stwl[net] << "," << design.global_routing().lower_bound_wirelength(net) << std::endl;
+    // }
+}
+
 void greetings(){
     using std::endl;
 
@@ -415,9 +484,15 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
         design.placement().fixLocation(cell);
     }
 
+
+    //compute lower bound using A* without capacities!
     ophidian::routing::AStarRouting astar_routing{design};
+    printlog();
+    comput_lower_bound(design, astar_routing);
+    printlog();
+
     auto cell_costs = compute_cell_move_costs_descending_order(design);
-    
+
     /*auto debug_gcell = design.global_routing().gcell_graph()->gcell(23, 10, 0);
     auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
     auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
