@@ -125,12 +125,12 @@ namespace ophidian::routing {
 
             auto total_nets = m_design.netlist().size_net();
             double ratio = (double) routed_nets.size() / (double) total_nets;
-            log() << std::endl;
+            /*log() << std::endl;
             log() << "total nets " << total_nets << std::endl;
             log() << "routed nets " << routed_nets.size() << std::endl;
             log() << "routed nets " << ratio*100.0<<"%" << std::endl;
             log() << "unrouted nets " << (total_nets - routed_nets.size()) << std::endl;
-            log() << std::endl;
+            log() << std::endl;*/
 
 	        // save_result(cplex);
         }
@@ -207,7 +207,6 @@ namespace ophidian::routing {
         if(WRITE_MODEL) printlog("exported");
 
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
-        log() << std::endl;
 
 
         auto time_begin = std::chrono::high_resolution_clock::now();
@@ -2110,8 +2109,8 @@ namespace ophidian::routing {
             }
             
             //TIAGO
-             if(gcells_constraints_bool[gcell] )
-            //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
+             //if(gcells_constraints_bool[gcell] )
+            if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto demand = m_gcells_demand[gcell];
@@ -2122,8 +2121,8 @@ namespace ophidian::routing {
             }
         }
 
-        std::cout << "number of gcells " << number_of_gcells << std::endl;
-        std::cout << "number of free gcells " << free_gcells << std::endl;        
+        //std::cout << "number of gcells " << number_of_gcells << std::endl;
+        //std::cout << "number of free gcells " << free_gcells << std::endl;        
     }
 
     template <typename var_type>

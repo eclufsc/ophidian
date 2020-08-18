@@ -5,6 +5,8 @@
 
 bool AStarDebug = false;
 
+using namespace ophidian::util;
+
 namespace ophidian::routing
 {
 
@@ -60,18 +62,22 @@ namespace ophidian::routing
             else//net only have 1 pin (For iccad2020 it should never happen)
                 return false;
 
-            if(flute_graph == false)
+            if(flute_graph == false) {
+                //log() << "failed flute graph" << std::endl;
                 return false;
+            }
             bool working_correct = node_layer_assignment();
             if(working_correct == false)
             {
                 clear_router_members();
+                //log() << "failed node layer assignment" << std::endl;
                 return false;
             }
             working_correct = route_flute_segments();
             if(working_correct == false)
             {
                 clear_router_members();
+                //log() << "failed route flute segments" << std::endl;
                 return false;
             }
             bfs_backtrack();
@@ -79,12 +85,14 @@ namespace ophidian::routing
             if(working_correct == false)
             {
                 clear_router_members();
+                //log() << "failed connect pins to min layer" << std::endl;
                 return false;
             }
             working_correct = connect_floating_pins();
             if(working_correct == false)
             {
                 clear_router_members();
+                //log() << "failed connect floating pins" << std::endl;
                 return false;
             }
         }
@@ -94,6 +102,7 @@ namespace ophidian::routing
             if(working_correct == false)
             {
                 clear_router_members();
+                //log() << "failed trivial routing" << std::endl;
                 return false;
             }
         }
@@ -279,10 +288,14 @@ namespace ophidian::routing
         dirty_nodes.push_back(m_node_map[start].mapped_gcell);
         m_gcell_to_AStarNode[m_node_map[start].mapped_gcell].g = 0;
 
+        std::unordered_map<AStarRouting::gcell_type, bool, entity_system::EntityBaseHash> visited_nodes;
+        unsigned number_of_visited_nodes = 0;
+
         gcell_type current_node;
         bool target_found = false;
         while(open_nodes.empty() == false)
         {
+            number_of_visited_nodes++;
             current_node = open_nodes.front();
             if(goal_reached(current_node, m_node_map[goal].mapped_gcell, goal_is_steiner))
             {
@@ -290,6 +303,16 @@ namespace ophidian::routing
                 break;
             }
             open_nodes.pop_front();
+
+            if (number_of_visited_nodes >= 5000) {
+                target_found = false;
+                break;
+            }
+            
+            if (visited_nodes[current_node]) {
+                continue;
+            }
+            visited_nodes[current_node] = true;
 
             //discover neighbors
             auto current_neighbors = neighbors(current_node);
@@ -312,6 +335,8 @@ namespace ophidian::routing
             });
             m_gcell_to_AStarNode[current_node].finished = true;
         }
+
+        //log() << "number of visited nodes " << number_of_visited_nodes << std::endl;
 
         //IMPORTANT: return false (return AFTER clean dirty nodes)
         if(open_nodes.empty())

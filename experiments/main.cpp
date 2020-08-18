@@ -400,7 +400,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     UCal::MCFMultiThreading mcf_multi_threading(design); 
     mcf_multi_threading.run(movements);
     
-    std::cout << "movements after ILP " << movements.size() << std::endl;
+    log() << "movements after ILP " << movements.size() << std::endl;
     
     auto end_time = std::chrono::steady_clock::now();
 
@@ -408,7 +408,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     auto current_time = diff.count() / 60.0;
     auto remaining_time = 55 - current_time;
 
-    std::cout << "current time " << current_time << " remaining time " << remaining_time << std::endl;
+    log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
     
     for (auto movement : movements) {
         auto cell = movement.first;

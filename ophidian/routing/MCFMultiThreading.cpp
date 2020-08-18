@@ -73,7 +73,8 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
 
     m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
     run_ilp_on_panels_parallel(movements);
-    run_astar_on_panels_parallel(movements);
+    log() << "run astar on panels" << std::endl;
+    run_astar_on_panels_parallel(movements);   
 
     /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(34, 42, 2);
     auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
@@ -662,11 +663,11 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         // auto panel_level = panels_vec[j-1];
         auto level = panel_level.first;
         // auto level = j;
-        auto ids = panel_level.second;
+        auto & ids = panel_level.second;
         // auto ids = panel_level;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
-        if(DEBUG_PANEL_PARALLEL) std::cout << "level: " << level << "\n";
+        if(DEBUG_PANEL_PARALLEL) log() << "level: " << level << "\n";
         for(auto id : ids){
             if(id%2==0){
                 even_ids.push_back(id);
@@ -859,12 +860,12 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        auto ids = panel_level.second;
         if(level <= 5) continue;
+        auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
-        std::cout << "level: " << level << "\n";
-        for(auto id : ids){
+        log() << "level: " << level << "\n";
+        for(auto & id : ids){
             if(id%2==0){
                 even_ids.push_back(id);
             }else{
@@ -895,20 +896,21 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         //     break;
     }
 
-    /*std::cout << "astar nets " << astar_nets.size() << std::endl;
+    log() << "astar nets " << astar_nets.size() << std::endl;
 
-    auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(34, 42, 2);
+    /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(34, 42, 2);
     auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
     auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
     auto layer_index = m_design.global_routing().gcell_graph()->layer_index(debug_gcell);
     auto gcell_box = m_design.global_routing().gcell_graph()->box(debug_gcell);
 
     std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/    
 
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : astar_nets){
         auto net_name = m_design.netlist().name(net);
+        //log() << "astar on net " << net_name << " with pins " << m_design.netlist().pins(net).size() << std::endl;
         /*auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
         auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
         std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
@@ -921,11 +923,13 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
         std::vector<ophidian::routing::AStarSegment> segments;
         auto result = astar_routing.route_net(net, segments, false);
         if (result) {
+            //log() << "applying segments" << std::endl;
             bool apply = astar_routing.apply_segments_to_global_routing(segments);
             if (!apply) {
                 std::cout << "WARNING: FAILED TO APPLY" << std::endl;
             }
         } else {
+            //log() << "undo segments" << std::endl;
             bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
             if(!undo) {
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
@@ -933,6 +937,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
                 //break;
             }
         }            
+        //log() << "done astar on net " << net_name << std::endl;
     }
 
 }//end run_astar_on_panels_parallel

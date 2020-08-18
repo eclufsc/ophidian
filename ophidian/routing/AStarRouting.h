@@ -12,6 +12,8 @@
 #include <unordered_set>
 #include <limits>
 
+#include <ophidian/util/log.h>
+
 namespace ophidian::routing
 {
 
