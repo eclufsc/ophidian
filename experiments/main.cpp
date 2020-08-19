@@ -291,10 +291,10 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
         for(auto net : cell_nets)
         {
             routed_length += design.global_routing().wirelength(net);
-            lower_bound += design.global_routing().lower_bound_wirelength(net);
+            //lower_bound += design.global_routing().lower_bound_wirelength(net);
         }
-        // auto cost = routed_length;
-        auto cost = routed_length - lower_bound;
+        auto cost = routed_length;
+        //auto cost = routed_length / lower_bound;
         cells_costs.push_back(std::make_pair(cell, cost));
     }
     //SORT IN DESCENDING ORDER
@@ -317,11 +317,11 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
     std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
     std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
 
+    auto start_time = std::chrono::steady_clock::now();
     auto nets = std::vector<ophidian::circuit::Net>{design.netlist().begin_net(), design.netlist().end_net()};
     //auto wirelength = design.global_routing().wirelength(nets);
     //std::cout << "initial wirelength " << wirelength << std::endl;
 
-    auto start_time = std::chrono::steady_clock::now();
     int moved_cells = movements.size();
     for(auto pair : cells)
     {
@@ -487,9 +487,9 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     //compute lower bound using A* without capacities!
     ophidian::routing::AStarRouting astar_routing{design};
-    printlog();
+    /*printlog();
     comput_lower_bound(design, astar_routing);
-    printlog();
+    printlog();*/
 
     auto cell_costs = compute_cell_move_costs_descending_order(design);
 

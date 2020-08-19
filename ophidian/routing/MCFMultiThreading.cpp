@@ -72,7 +72,7 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     // run_ilp_on_panel(1,movements);
 
     m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
-    run_ilp_on_panels_parallel(movements);
+    //run_ilp_on_panels_parallel(movements);
     log() << "run astar on panels" << std::endl;
     run_astar_on_panels_parallel(movements);   
 
@@ -860,7 +860,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        if(level <= 5) continue;
+        //if(level <= 5) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
@@ -1060,7 +1060,7 @@ void MCFMultiThreading::run_ilp(ophidian::placement::Placement::box_type panel_r
 
     // if (DEBUG_PANEL) std::cout << "area " << panel_min_corner.x().value() << "," << panel_min_corner.y().value() << "," << panel_max_corner.x().value() << "," << panel_max_corner.y().value() << std::endl;
     if(DEBUG_PANEL) std::cout << "num_local_nets: " << nets_local.size() << std::endl;
-    if (DEBUG_PANEL) std::cout << local_cells.size() << " local cells " << std::endl;
+    //if (DEBUG_PANEL) std::cout << local_cells.size() << " local cells " << std::endl;
 
     /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(90,82,6);
     auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);

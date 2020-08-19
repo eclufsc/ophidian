@@ -146,7 +146,7 @@ namespace ophidian::routing {
 
 
         //if(!m_extra_demand_created)
-        //    add_extra_demand(cells);
+            //add_extra_demand(cells);
 
         if(STATUS) printlog("Cleaning the data structures ...");
         //m_segments.clear();
@@ -182,7 +182,7 @@ namespace ophidian::routing {
 
 
         if(STATUS) printlog("create all candidates with movements");
-        create_all_candidates_with_movements(nets, cells, area, model);
+        //create_all_candidates_with_movements(nets, cells, area, model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add objective function");
@@ -199,7 +199,7 @@ namespace ophidian::routing {
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(STATUS) printlog("add movements constraints");
-        add_movements_constraints(model);
+        //add_movements_constraints(model);
         if(STATUS) log() << "MEM: cur=" << mem_use::get_current() << "MB, peak=" << mem_use::get_peak() << "MB" << std::endl;
 
         if(WRITE_MODEL) printlog("write model");
@@ -370,7 +370,10 @@ namespace ophidian::routing {
             std_cells_per_gcell[gcell] = std_cell_count;
         }*/
 
-        for (auto & cell : cells) {
+        //for (auto & cell : cells) {
+        for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
+            auto cell = *cell_it;
+              
             auto location = m_design.placement().location(cell);
             auto std_cell = m_design.netlist().std_cell(cell);
 
@@ -1852,25 +1855,12 @@ namespace ophidian::routing {
             auto cell_name = m_design.netlist().name(cell);
             auto std_cell_name = m_design.standard_cells().name(std_cell);
 
-            /*if (cell_name == "C1168" || cell_name == "C1166") {
-                std::cout << "cell " << cell_name << " variable " << variable_name << " location " << location.x().value() << "," << location.y().value() << std::endl;
-            }*/
-
             // for (auto layer_it = routing_library.begin_layer(); layer_it != routing_library.end_layer(); layer_it++) {
                 // auto layer = *layer_it;
                 // auto layer_index = routing_library.layerIndex(layer);
                 // auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
             for (auto layer_index = routing_library.lowest_layer_index(); layer_index <= routing_library.highest_layer_index(); layer_index++) {
                 auto gcell = gcell_graph->nearest_gcell(location, layer_index-1);
-
-                /*if (cell_name == "C1168" || cell_name == "C1166") {
-                    std::cout << "cell " << cell_name << " std cell " << std_cell_name << " location " << location.x().value() << "," << location.y().value() << "," << layer_index << std::endl;
-                    auto gcell_box = gcell_graph->box(gcell);
-                    auto gcell_node = gcell_graph->graph_node(gcell);
-                    auto gcell_position = gcell_graph->position(gcell_node);
-                    //std::cout << " gcell " << gcell_box.min_corner().x().value() << "," << gcell_box.min_corner().y().value() << std::endl;
-                    std::cout << "gcell " << gcell_position.get<1>()+1 << "," << gcell_position.get<0>()+1 << "," << gcell_position.get<2>()+1 << std::endl;
-                }*/
 
                 std_cells_per_gcell[gcell][std_cell].push_back(variable);
                 gcells_per_std_cell[std_cell].insert(gcell);
