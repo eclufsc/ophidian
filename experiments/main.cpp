@@ -279,7 +279,7 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
         if(cell_has_more_than_1_pin_in_same_net(design, cell))
             continue;
 
-        std::unordered_set<ophidian::circuit::Net, ophidian::entity_system::EntityBaseHash> cell_nets;
+        /*std::unordered_set<ophidian::circuit::Net, ophidian::entity_system::EntityBaseHash> cell_nets;
         for(auto pin : netlist.pins(cell))
         {
             auto net = netlist.net(pin);
@@ -294,7 +294,8 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
             //lower_bound += design.global_routing().lower_bound_wirelength(net);
         }
         auto cost = routed_length;
-        //auto cost = routed_length / lower_bound;
+        //auto cost = routed_length / lower_bound;*/
+        auto cost = 1;
         cells_costs.push_back(std::make_pair(cell, cost));
     }
     //SORT IN DESCENDING ORDER
@@ -424,6 +425,32 @@ void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AS
     // }
 }
 
+void run_astar_for_nets(ophidian::design::Design & design, std::vector<ophidian::circuit::Net> & nets, ophidian::routing::AStarRouting & astar_routing) {
+    for (auto & net : nets) {
+        std::vector<ophidian::routing::AStarSegment> initial_segments;
+        for(auto segment : design.global_routing().segments(net)) {
+            initial_segments.push_back(ophidian::routing::AStarSegment(design.global_routing().box(segment), design.global_routing().layer_start(segment), design.global_routing().layer_end(segment), net));
+        }
+        design.global_routing().unroute(net);
+        std::vector<ophidian::routing::AStarSegment> segments;
+        auto result = astar_routing.route_net(net, segments, false);
+        if (result) {
+            //log() << "applying segments" << std::endl;
+            bool apply = astar_routing.apply_segments_to_global_routing(segments);
+            if (!apply) {
+                std::cout << "WARNING: FAILED TO APPLY" << std::endl;
+            }
+        } else {
+            //log() << "undo segments" << std::endl;
+            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+            if(!undo) {
+                std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
+                //break;
+            }
+        }
+    }
+}
+
 void greetings(){
     using std::endl;
 
@@ -463,13 +490,21 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     // UCal::MCFRouting mcf_routing(design,circuit_name);
     
     auto start_time = std::chrono::steady_clock::now();
+    
+    ophidian::routing::AStarRouting astar_routing{design};
+
+    std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
 
     std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
 
-    UCal::MCFMultiThreading mcf_multi_threading(design); 
-    mcf_multi_threading.run(movements);
+    design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
+
+    //UCal::MCFMultiThreading mcf_multi_threading(design); 
+    //mcf_multi_threading.run(movements);
     
-    log() << "movements after ILP " << movements.size() << std::endl;
+    run_astar_for_nets(design, nets, astar_routing);
+    
+    //log() << "movements after ILP " << movements.size() << std::endl;
     
     auto end_time = std::chrono::steady_clock::now();
 
@@ -486,8 +521,8 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
 
     //compute lower bound using A* without capacities!
-    ophidian::routing::AStarRouting astar_routing{design};
-    /*printlog();
+    /*ophidian::routing::AStarRouting astar_routing{design};
+    printlog();
     comput_lower_bound(design, astar_routing);
     printlog();*/
 

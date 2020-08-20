@@ -71,7 +71,6 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     // run_ilp_on_panels(movements);
     // run_ilp_on_panel(1,movements);
 
-    m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
     //run_ilp_on_panels_parallel(movements);
     log() << "run astar on panels" << std::endl;
     run_astar_on_panels_parallel(movements);   
