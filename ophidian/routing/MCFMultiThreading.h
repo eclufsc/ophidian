@@ -40,7 +40,7 @@
 
 using namespace std;
 
-#define NUM_THREADS 5
+// #define NUM_THREADS 5
 //#include <ophidian/routing/CLooper.h>
 // typedef void * (*THREADFUNCPTR)(void *);
 
@@ -57,10 +57,15 @@ class AstarResult{
 
 class MoveCellResult{
     using net_type                  = ophidian::circuit::Net;
+    using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
     public: 
-    net_type m_net;
+    std::vector<net_type> m_nets;
     std::vector<ophidian::routing::AStarSegment> m_initial_segments;
     std::vector<ophidian::routing::AStarSegment> m_astar_segments;
+    int m_astar_wl;
+    gcell_type m_init_gcell;
+    gcell_type m_target_gcell;
+    std::string m_cell_name;
     bool m_is_valid;
 };//end AStarResutls
     
@@ -112,9 +117,10 @@ class MCFMultiThreading{
                                     ophidian::routing::AStarRouting & astar_routing);
         MoveCellResult move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing);                                    
         void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells);
-        double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, gcell_type & initial_gcell, gcell_type & target_gcell, ophidian::routing::AStarRouting & astar_routing);
-        void move_cells_parallel();
-        void run_move_cell_on_panel(unsigned int panel_id);
+        
+        MoveCellResult test_target_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, gcell_type & initial_gcell, gcell_type & target_gcell, ophidian::routing::AStarRouting & astar_routing);
+        void move_cells_parallel(std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
+        void run_move_cell_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements);
         void move_cells_parallel_v2(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
                                     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
         void move_cells_parallel_v3(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
@@ -155,7 +161,7 @@ class MCFMultiThreading{
 
         std::vector<ophidian::routing::ILPResult> m_ilp_results;
         ophidian::routing::AStarRouting m_astar_routing{m_design};
-        std::unordered_map<unsigned int, std::vector<std::pair<ophidian::circuit::CellInstance, double>>> m_panel_index_to_local_cells_dict;
+        std::unordered_map<unsigned int, std::set<std::string>> m_panel_index_to_local_cells_dict;
         // std::vector<std::pair<net_type,box_type>> m_routed_nets;
         // std::vector<net_type> m_unrouted_nets;
         //ophidian::routing::AStarRouting astar_routing{m_design};
@@ -167,6 +173,8 @@ class MCFMultiThreading{
 
         ofstream net_astar_file;
 
+        std::vector<MoveCellResult> m_move_cells;
+        std::unordered_map<std::string,ophidian::circuit::CellInstance> m_cell_name_to_cell_type_dict;
  
 };//end class 
 
