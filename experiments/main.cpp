@@ -27,6 +27,7 @@ void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit
     std::vector<double> x_positions;
     std::vector<double> y_positions;
 
+    std::vector<point_type> median_points;
     for(auto pin : netlist.pins(cell)){
         auto net = netlist.net(pin);
         if(net == ophidian::circuit::Net())
@@ -46,6 +47,8 @@ void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit
             y_max = std::max(y_max, location.y().value());
             //x_positions.push_back(location.x().value());
             //y_positions.push_back(location.y().value());
+            
+            //median_points.push_back({location.x(), location.y()});
         }
         x_positions.push_back(x_min);
         x_positions.push_back(x_max);
@@ -70,7 +73,7 @@ void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit
     //auto median_y_right = y_positions[y_positions.size()/2 + 1];
 
     //point_type median_point {unit_type(median_x), unit_type(median_y)};
-    std::vector<point_type> median_points;
+    //std::vector<point_type> median_points;
     median_points.push_back({unit_type{median_x}, unit_type{median_y}});
     /*median_points.push_back({unit_type{median_x+10}, unit_type{median_y}});
     median_points.push_back({unit_type{median_x-10}, unit_type{median_y}});
@@ -80,6 +83,12 @@ void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit
     median_points.push_back({unit_type{median_x_right}, unit_type{median_y_left}});
     median_points.push_back({unit_type{median_x_left}, unit_type{median_y_right}});
     median_points.push_back({unit_type{median_x_right}, unit_type{median_y_right}});*/
+
+    auto current_location = design.placement().location(cell);
+    /*median_points.push_back({unit_type{current_location.x().value() + 10}, unit_type{current_location.y().value()}});
+    median_points.push_back({unit_type{current_location.x().value() - 10}, unit_type{current_location.y().value()}});
+    median_points.push_back({unit_type{current_location.x().value()}, unit_type{current_location.y().value() + 10}});
+    median_points.push_back({unit_type{current_location.x().value()}, unit_type{current_location.y().value() - 10}});*/
 
     for (auto median_point : median_points) {
         auto nearest_gcell = design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
@@ -105,6 +114,8 @@ double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::C
     auto& routing_constr = design.routing_constraints();
     auto& std_cells = design.standard_cells();
     auto gcell_graph_ptr = global_routing.gcell_graph();
+    
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
 
     // Get connected nets
     std::vector<net_type> cell_nets;
@@ -124,7 +135,7 @@ double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::C
         bool routed_all_nets = true;
         for(auto net : cell_nets)
         {
-            routed_all_nets = astar_routing.route_net(net, segments, false);
+            routed_all_nets = astar_routing.route_net(net, segments, chip_area, false);
             if(routed_all_nets == false)
                 break;
         }
@@ -279,7 +290,7 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
         if(cell_has_more_than_1_pin_in_same_net(design, cell))
             continue;
 
-        /*std::unordered_set<ophidian::circuit::Net, ophidian::entity_system::EntityBaseHash> cell_nets;
+        std::unordered_set<ophidian::circuit::Net, ophidian::entity_system::EntityBaseHash> cell_nets;
         for(auto pin : netlist.pins(cell))
         {
             auto net = netlist.net(pin);
@@ -294,8 +305,8 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_mov
             //lower_bound += design.global_routing().lower_bound_wirelength(net);
         }
         auto cost = routed_length;
-        //auto cost = routed_length / lower_bound;*/
-        auto cost = 1;
+        //auto cost = routed_length / lower_bound;
+        //auto cost = 1;
         cells_costs.push_back(std::make_pair(cell, cost));
     }
     //SORT IN DESCENDING ORDER
@@ -363,6 +374,7 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
 
 void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AStarRouting & astar_routing)
 {
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
     //compute lower bound using A* without capacities!
     // ophidian::routing::AStarRouting astar_routing{design, false};
     // #pragma omp parallel for num_threads(4) private(astar_routing)
@@ -370,7 +382,7 @@ void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AS
     {
         auto net = *net_it;
         std::vector<ophidian::routing::AStarSegment> segments;
-        astar_routing.route_net(net, segments, false, false);
+        astar_routing.route_net(net, segments, chip_area, false, false);
         //calculing wirelength
         std::vector<ophidian::routing::GCell> gcells;
         for(auto segment : segments)
@@ -426,6 +438,7 @@ void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AS
 }
 
 void run_astar_for_nets(ophidian::design::Design & design, std::vector<ophidian::circuit::Net> & nets, ophidian::routing::AStarRouting & astar_routing) {
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
     for (auto & net : nets) {
         std::vector<ophidian::routing::AStarSegment> initial_segments;
         for(auto segment : design.global_routing().segments(net)) {
@@ -433,7 +446,7 @@ void run_astar_for_nets(ophidian::design::Design & design, std::vector<ophidian:
         }
         design.global_routing().unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        auto result = astar_routing.route_net(net, segments, false);
+        auto result = astar_routing.route_net(net, segments, chip_area, false);
         if (result) {
             //log() << "applying segments" << std::endl;
             bool apply = astar_routing.apply_segments_to_global_routing(segments);
@@ -499,10 +512,10 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
 
-    //UCal::MCFMultiThreading mcf_multi_threading(design); 
-    //mcf_multi_threading.run(movements);
+    UCal::MCFMultiThreading mcf_multi_threading(design); 
+    mcf_multi_threading.run(movements);
     
-    run_astar_for_nets(design, nets, astar_routing);
+    //run_astar_for_nets(design, nets, astar_routing);
     
     //log() << "movements after ILP " << movements.size() << std::endl;
     
@@ -567,7 +580,7 @@ void run_for_circuit(ophidian::design::Design & design, std::string circuit_name
     {
         global_routing.unroute(*net_it);
         std::vector<ophidian::routing::AStarSegment> segments;
-        astar_routing.route_net(*net_it, segments);
+        //astar_routing.route_net(*net_it, segments);
     }
 
 

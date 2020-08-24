@@ -212,10 +212,11 @@ int AstarColapseNet::move_net(ophidian::circuit::Net & net, std::vector<std::pai
     //TODO: evaluate congestion in upper layers (like layer 2 and 3)
 
 
+    ophidian::routing::AStarRouting::box_type chip_area{m_design.floorplan().chip_origin(), m_design.floorplan().chip_upper_right_corner()};
     //try to route nets
     std::vector<a_star_segment_type> segments;
     bool routed_all_nets = true;
-    auto result = m_astar_routing.route_net(net, segments, false);
+    auto result = m_astar_routing.route_net(net, segments, chip_area, false);
     if(!result)
     {
         routed_all_nets = false;
@@ -223,7 +224,7 @@ int AstarColapseNet::move_net(ophidian::circuit::Net & net, std::vector<std::pai
     if(routed_all_nets){
         for(auto neighbor_net : m_net_neighbors[net])
         {
-            auto result = m_astar_routing.route_net(neighbor_net, segments, false);
+            auto result = m_astar_routing.route_net(neighbor_net, segments, chip_area, false);
             if(!result)
             {
                 routed_all_nets = false;

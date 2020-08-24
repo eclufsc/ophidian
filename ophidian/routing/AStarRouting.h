@@ -84,14 +84,15 @@ namespace ophidian::routing
             //method to create and run A* without capacity contraint!!
             AStarRouting(design_type & design, bool enable_capacity);
 
+            bool route_net(const net_type & net, std::vector<AStarSegment> & segments, box_type & area, bool applying_routing = true, bool enable_capacity = true);
             bool route_net(const net_type & net, std::vector<AStarSegment> & segments, bool applying_routing = true, bool enable_capacity = true);
             bool apply_segments_to_global_routing(const std::vector<AStarSegment> & segments);
         private:
             bool init_flute_graph();
             bool init_two_pin_flute_graph();
             bool node_layer_assignment();
-            bool route_flute_segments();
-            bool a_star(flute_node_type start, flute_node_type goal);
+            bool route_flute_segments(box_type & area);
+            bool a_star(flute_node_type start, flute_node_type goal, box_type & area);
             unsigned int heuristic(const gcell_type & source, const gcell_type & goal, bool goal_is_steiner) const;
             std::vector<gcell_type> neighbors(gcell_type gcell);
             void update_f_score(gcell_type gcell, gcell_type neighbor_gcell, gcell_type goal_gcell, bool goal_is_steiner);

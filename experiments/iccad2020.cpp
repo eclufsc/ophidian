@@ -28,6 +28,8 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
     auto routed_nets = 0;
     auto non_routed = 0;
 
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
+
     std::vector<std::pair<int, ophidian::circuit::Net>> sorted_nets;
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++)
     {
@@ -47,7 +49,7 @@ void improve_routing(ophidian::design::Design & design, ophidian::routing::AStar
 
         global_routing.unroute(net);
         std::vector<ophidian::routing::AStarSegment> segments;
-        auto result = astar_routing.route_net(net, segments, false);
+        auto result = astar_routing.route_net(net, segments, chip_area, false);
         if(result)
         {
             astar_routing.apply_segments_to_global_routing(segments);
@@ -405,12 +407,13 @@ TEST_CASE("iccad20 AStarRouting", "[astar]")
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
     auto astar_routing = ophidian::routing::AStarRouting(design);
     auto net = design.netlist().find_net("N2594");
     std::vector<ophidian::routing::AStarSegment> segments;
     auto & global_routing = design.global_routing();
     global_routing.unroute(net);
-    astar_routing.route_net(net, segments);
+    astar_routing.route_net(net, segments, chip_area);
     iccad_output_writer.write_ICCAD_2020_output("case3.txt", {});
 }
 
@@ -503,6 +506,8 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
     auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
     auto median_gcell = calculate_median_gcell(design, cell);
 
+    ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
+
     if(initial_gcell != median_gcell)
     {
         // Get connected nets
@@ -532,7 +537,7 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             bool routed_all_nets = true;
             for(auto net : cell_nets)
             {
-                routed_all_nets = astar_routing.route_net(net, segments, false);
+                routed_all_nets = astar_routing.route_net(net, segments, chip_area, false);
                 if(routed_all_nets == false)
                     break;
             }

@@ -39,6 +39,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and colapsing nets", "[astar_colapse
         auto & netlist = design.netlist();
         auto & placement = design.placement();
 
+        ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
+
         std::vector<ophidian::circuit::Net> nets(netlist.begin_net(), netlist.end_net());
         int initial_wirelength = global_routing.wirelength(nets);
         log() << "Circuit initial wirelength = " << initial_wirelength << std::endl;
@@ -57,7 +59,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and colapsing nets", "[astar_colapse
 
             global_routing.unroute(net);
             std::vector<AStarSegment> segments;
-            auto result = astar_routing.route_net(net, segments, false);
+            auto result = astar_routing.route_net(net, segments, chip_area, false);
             if(result)
             {
                 routed_nets++;

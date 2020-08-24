@@ -61,9 +61,14 @@ namespace ophidian::routing
         auto& std_cells = m_design.standard_cells();
         m_enable_capacity = enable_capacity;
     }
+    
+    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing, bool enable_capacity) {
+        auto chip_area = box_type{m_design.floorplan().chip_origin(), m_design.floorplan().chip_upper_right_corner()};
+        return route_net(net, segments, chip_area, applying_routing, enable_capacity);
+    }
 
     //when routing all nets is required first remove all of them
-    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, bool applying_routing, bool enable_capacity)
+    bool AStarRouting::route_net(const AStarRouting::net_type & net, std::vector<AStarSegment> & segments, box_type & area, bool applying_routing, bool enable_capacity)
     {
         m_enable_capacity = enable_capacity;
         m_net = net;
@@ -94,7 +99,7 @@ namespace ophidian::routing
                 //log() << "failed node layer assignment" << std::endl;
                 return false;
             }
-            working_correct = route_flute_segments();
+            working_correct = route_flute_segments(area);
             if(working_correct == false)
             {
                 clear_router_members();
@@ -265,7 +270,7 @@ namespace ophidian::routing
     }
 
     //call a_star routing for each pair of flute nodes in BFS order from any node_pin
-    bool AStarRouting::route_flute_segments()
+    bool AStarRouting::route_flute_segments(box_type & area)
     {
         flute_graph_type::NodeMap<bool> visited_nodes{m_graph};
         for(flute_graph_type::NodeIt node(m_graph); node != lemon::INVALID; ++node)
@@ -290,7 +295,7 @@ namespace ophidian::routing
                 if(visited_nodes[opposite_node] == false)
                 {
                     queue.push(opposite_node);
-                    bool exist_path = a_star(current_node, opposite_node);
+                    bool exist_path = a_star(current_node, opposite_node, area);
                     if(exist_path == false)
                         return false;
                 }
@@ -300,7 +305,7 @@ namespace ophidian::routing
     }
 
     //find a shortest path from start.mapped_gcell to goal.mapped_gcell
-    bool AStarRouting::a_star(flute_node_type start, flute_node_type goal)
+    bool AStarRouting::a_star(flute_node_type start, flute_node_type goal, box_type & area)
     {
         bool goal_is_steiner = m_node_map[goal].pin_name == "steiner" ? true : false;
         std::list<gcell_type> open_nodes;
@@ -339,6 +344,10 @@ namespace ophidian::routing
             auto current_neighbors = neighbors(current_node);
             for(auto neighbor : current_neighbors)
             {
+                auto neighbor_center = m_design.global_routing().gcell_graph()->center_of_box(neighbor);
+                if (neighbor_center.x() < area.min_corner().x() || neighbor_center.x() > area.max_corner().x() || neighbor_center.y() < area.min_corner().x() || neighbor_center.y() > area.max_corner().y()) {
+                    continue;
+                }
                 update_f_score(current_node, neighbor, m_node_map[goal].mapped_gcell, goal_is_steiner);
                 if(m_gcell_to_AStarNode[neighbor].discovered == false)
                 {
