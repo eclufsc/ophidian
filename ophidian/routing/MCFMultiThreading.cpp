@@ -15,7 +15,7 @@ bool DEBUG_MCF_MLT_SPECIFIC_NET = false;
 bool DEBUG_MCF_MLT_NETS_ROWS = false;
 bool DEBUG_PANEL = false;
 bool DEBUG_PANEL_PARALLEL = false;
-bool DEBUG_ASTAR_PARALLEL = true;
+bool DEBUG_ASTAR_PARALLEL = false;
 
 #define num_nets_to_route 10000
 #define WINDOW_SIZE 100 // means each panels covers 10 gcells in y-axis
