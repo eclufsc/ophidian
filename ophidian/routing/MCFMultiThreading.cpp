@@ -69,7 +69,7 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     // if(!DEBUG_MCF_MLT_SPECIFIC_NET)
     //     cluster_based_on_nets_box();
 
-    cluster_based_on_panel();
+    cluster_based_on_panel_v2();
     //data_analysis("before");
     // run_ilp_on_panels(movements);
     // run_ilp_on_panel(1,movements);
@@ -105,8 +105,8 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     comput_lower_bound(design, astar_routing);
     printlog();*/
     log() << "compute_cell_move_costs_descending_order "  << std::endl;
-    // run_compute_cell_move_costs_parallel();
-    auto cell_costs = compute_cell_move_costs_descending_order(m_design);
+    run_compute_cell_move_costs_parallel();
+    // auto cell_costs = compute_cell_move_costs_descending_order(m_design);
 
     /*auto debug_gcell = design.global_routing().gcell_graph()->gcell(23, 10, 0);
     auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
@@ -116,10 +116,11 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
 
     std::cout << "debug gcell before moves " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
     std::cout << "debug gcell before moves capacity " << capacity << " demand " << demand << std::endl;*/
-    log() << "move_cells_parallel "  << std::endl;
-    // move_cells_parallel();
+    // log() << "move_cells_parallel "  << std::endl;
+    // move_cells_parallel(movements);
+    // log() << "number of movements: " << movements.size() << std::endl;
     // move_cells_for_until_x_minutes(m_design, remaining_time, cell_costs, movements, m_astar_routing);
-    move_cells_parallel_v2(cell_costs,movements);
+    // move_cells_parallel_v2(cell_costs,movements);
 
 }//end run function
 
@@ -511,7 +512,9 @@ void MCFMultiThreading::cluster_based_on_panel_v2(){
     int total_panels = 0;
     unsigned int panel_level = 0;
 
+    // horizontal 
     while(number_of_panels >= 1){
+        if(panel_level==3) break;
         if(DEBUG_PANEL) std::cout << "level: " << count << std::endl;
         auto panel_size = panel_base * count;
         number_of_panels = ceil(layout_height/panel_size);
@@ -580,6 +583,114 @@ void MCFMultiThreading::cluster_based_on_panel_v2(){
 
 
             
+            std::set<std::string> nets_name_inside_panel_polished;
+            for(auto net : nets_name_inside_panel){
+                if(nets_inside_intesected_panels.find(net) == nets_inside_intesected_panels.end())
+                    nets_name_inside_panel_polished.insert(net);
+            }
+            // std::set_difference(nets_name_inside_panel.begin(), nets_name_inside_panel.end(),
+            //                  nets_inside_intesected_panels.begin(), nets_inside_intesected_panels.end(),
+            //                  std::inserter(nets_name_inside_panel_polished, nets_name_inside_panel_polished.end()));
+
+
+            if(DEBUG_PANEL)std::cout << "nets name inside panel: " << nets_name_inside_panel.size() << std::endl;
+            if(DEBUG_PANEL)std::cout << "nets_inside_intesected_panels: " << nets_inside_intesected_panels.size() << std::endl;
+            if(DEBUG_PANEL)std::cout << "nets_name_inside_panel_polished: " << nets_name_inside_panel_polished.size() << std::endl;
+
+            m_rtree_panel_box.insert(panel_box_current,panel_index);
+            m_panel_index_to_nets_dict[panel_index] = nets_name_inside_panel_polished;
+
+            // Wirelength of each panel
+            std::vector<net_type> nets;
+            for (auto net_name :nets_name_inside_panel_polished ){
+                nets.push_back(m_net_name_to_net_type_dict[net_name]);
+            }
+            
+            auto wl = m_design.global_routing().wirelength(nets);
+            m_panel_wirelength_dict[panel_index] = wl;
+            m_index_to_panel[panel_index] = panel_box_current;
+            panel_ids.push_back(panel_index);
+        }//end for 
+        // m_panel_boxes.push_back(panels);
+        m_panel_level[panel_level] = panel_ids;
+        count++;
+        // number_of_panels = 0;
+    }//end while
+
+
+    // Vertical Paneling
+    number_of_panels = (layout_width/panel_base)+1;
+    count = 1;
+    while(number_of_panels >= 1){
+        if(panel_level==6) break;
+        if(DEBUG_PANEL) std::cout << "level: " << count << std::endl;
+        auto panel_size = panel_base * count;
+        number_of_panels = ceil(layout_height/panel_size);
+        // std::vector<Box2DWrapper> panels;
+        panel_level++;
+        std::vector<unsigned int> panel_ids;
+        for (int panel_iterator = 0; panel_iterator <= number_of_panels ; panel_iterator++){
+            // compute panel corner 
+            // vertical
+            panel_min_x = panel_iterator*panel_size;
+            panel_min_y = 0;//;
+            panel_max_x = panel_min_x + panel_size;
+            panel_max_y = layout_height;//;
+            Box2DWrapper panel_box_current(panel_min_x,panel_min_y,panel_max_x,panel_max_y);
+            unsigned int panel_index = total_panels;
+            total_panels++;
+            // panels.push_back(panel_box_current);
+
+            if(DEBUG_PANEL) std::cout << "row_" << panel_iterator << ": " 
+                          << panel_min_x << ", "
+                          << panel_min_y << ", "
+                          << panel_max_x << ", "
+                          << panel_max_y << std::endl;
+        
+
+            auto nets_intersected_with_panel_pair = m_rtree_net_box.query(panel_box_current);
+            
+            std::vector<std::string> nets_name_inside_panel;
+            std::set<std::string> nets_inside_intesected_panels;
+            for (auto net_intersect_with_panel_pair : nets_intersected_with_panel_pair){
+                auto net_inex = net_intersect_with_panel_pair.second;
+                auto net_box  = net_intersect_with_panel_pair.first;
+                auto net_name = m_index_net_box_to_net_name_dict[net_inex];
+                Box2DWrapper net_box_wrapper(net_box);
+
+                // if(DEBUG_MCF_MLT_NET_BOX_RTREE){
+                //     std::cout << "value index: " << net_inex<< std::endl;
+                //     std::cout << "net_name: " << net_name << std::endl;
+                //     net_box_wrapper.report();     
+                // }
+                
+                
+
+                if((net_box_wrapper.getXl() >= panel_box_current.getXl()) &&
+                   (net_box_wrapper.getYl() >= panel_box_current.getYl()) &&
+                   (net_box_wrapper.getXh() <= panel_box_current.getXh()) &&
+                   (net_box_wrapper.getYh() <= panel_box_current.getYh())
+                ){
+                    nets_name_inside_panel.push_back(net_name);
+                }
+            }//end for   
+
+            Box2DWrapper panel_box_current_polish( 
+                panel_box_current.getXl()+1,
+                panel_box_current.getYl(),
+                panel_box_current.getXh()-1,
+                panel_box_current.getYh()
+            );
+            auto panels_intersect_with_current_panel_pair = m_rtree_panel_box.query(panel_box_current_polish);
+            if(DEBUG_PANEL ) std::cout << "panels_intersect_with_current_panel_pair size: " << panels_intersect_with_current_panel_pair.size() << std::endl;
+            for(auto panels_intersect_with_current_panel_pair : panels_intersect_with_current_panel_pair){
+                auto nets_inside_intesected_panel = m_panel_index_to_nets_dict[panels_intersect_with_current_panel_pair.second];
+                for(auto net_inside_intesected_panel: nets_inside_intesected_panel){
+                    nets_inside_intesected_panels.insert(net_inside_intesected_panel);
+                }//end for 
+            }//end for 
+
+                            
             std::set<std::string> nets_name_inside_panel_polished;
             for(auto net : nets_name_inside_panel){
                 if(nets_inside_intesected_panels.find(net) == nets_inside_intesected_panels.end())
@@ -1050,8 +1161,8 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
             run_astar_on_panel(odd_ids[i]);
         }
     
-        if(level == 5)
-            break;
+        // if(level == 6)
+        //     break;
     }//end for 
 
     // log() << "astar nets " << astar_nets.size() << std::endl;
@@ -1397,183 +1508,9 @@ std::vector<std::pair<ophidian::circuit::CellInstance, double>> MCFMultiThreadin
     return cells_costs;
 }//end compute_cell_move_costs_descending_order
 
-void MCFMultiThreading::move_cells_for_until_x_minutes(ophidian::design::Design & design,
-                                    int time_limit,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements,
-                                    ophidian::routing::AStarRouting & astar_routing)
-{
-    /*auto debug_gcell = design.global_routing().gcell_graph()->gcell(20, 19, 0);
-    auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-    auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-    auto layer_index = design.global_routing().gcell_graph()->layer_index(debug_gcell);
-    auto gcell_box = design.global_routing().gcell_graph()->box(debug_gcell);
 
-    std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-    std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
 
-    auto start_time = std::chrono::steady_clock::now();
-    auto nets = std::vector<ophidian::circuit::Net>{design.netlist().begin_net(), design.netlist().end_net()};
-    //auto wirelength = design.global_routing().wirelength(nets);
-    //std::cout << "initial wirelength " << wirelength << std::endl;
 
-    int moved_cells = movements.size();
-    for(auto pair : cells)
-    {
-        auto cell = pair.first;
-        if (design.placement().isFixed(cell)) {
-            continue;
-        }
-        auto cell_name = design.netlist().name(cell);
-        //std::cout << "cell " << cell_name << std::endl;
-        auto moved_cell_result = move_cell(design, cell, astar_routing);
-
-        if(moved_cell_result.m_is_valid)
-        {
-            auto location = design.placement().location(cell);
-            moved_cells++;            
-            movements.push_back(std::make_pair(cell, design.placement().location(cell)));
-            //std::cout << "moved to " << location.x().value() << "," << location.y().value() << std::endl;
-            //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
-
-            //auto wirelength = design.global_routing().wirelength(nets);
-            //std::cout << "wirelength " << wirelength << std::endl;
-        }
-    
-        /*auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-        auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-        std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-        std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
-        auto end_time = std::chrono::steady_clock::now();
-        std::chrono::duration<double> diff = end_time-start_time;
-        //std::cout << "time " << diff.count() << std::endl;
-        bool time_out = diff.count() > time_limit * 60.0 ? true : false;
-        //if (cell_name == "C1245") break;
-        //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
-        if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
-        //if(moved_cells == 1)
-            break;
-    }
-}//emd move_cells_for_until_x_minutes
-
-MoveCellResult MCFMultiThreading::move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
-{
-    using unit_type = ophidian::util::database_unit_t;
-    using point_type = ophidian::util::LocationDbu;
-    using net_type = ophidian::circuit::Net;
-    // using AStarSegment = ophidian::routing::AStarSegment;
-
-    MoveCellResult move_cell_result;
-
-    auto& global_routing = design.global_routing();
-    auto& netlist = design.netlist();
-    auto& placement = design.placement();
-    auto& routing_constr = design.routing_constraints();
-    auto& std_cells = design.standard_cells();
-    auto gcell_graph_ptr = global_routing.gcell_graph();
-
-    auto initial_location = placement.location(cell);
-    auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
-    std::vector<gcell_type> target_gcells;
-    //auto median_gcell = calculate_median_gcell(design, cell);
-    calculate_median_gcell(design, cell, target_gcells);
-
-    auto debug_gcell = design.global_routing().gcell_graph()->gcell(20, 19, 0);
-    auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-    auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-    auto layer_index = design.global_routing().gcell_graph()->layer_index(debug_gcell);
-    auto gcell_box = design.global_routing().gcell_graph()->box(debug_gcell);
-
-    // Get connected nets
-    std::vector<net_type> cell_nets;
-    for(auto pin : netlist.pins(cell))
-    {
-        auto net = netlist.net(pin);
-        if(net == ophidian::circuit::Net())
-            continue;
-        cell_nets.push_back(net);
-
-        /*for(auto gcell : global_routing.gcells(net)) {
-                auto gcell_box = gcell_graph_ptr->box(gcell);
-                auto layer_index = gcell_graph_ptr->layer_index(gcell);
-                std::cout << "initial gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-
-                auto capacity = gcell_graph_ptr->capacity(gcell);
-                auto demand = gcell_graph_ptr->demand(gcell);
-                std::cout << "capacity " << capacity << " demand " << demand << std::endl;
-            }*/
-
-    }
-    // Backup routing information
-    std::vector<AStarSegment> initial_segments;
-    auto wirelength_before = global_routing.wirelength(cell_nets);
-    //std::cout << "initial gcells " << std::endl;
-    for(auto net : cell_nets)
-    {
-        for(auto segment : global_routing.segments(net)) {
-            initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
-        }
-    }
-    move_cell_result.m_is_valid = false;
-    // return move_cell_result;
-
-    auto min_wirelength = wirelength_before;
-    auto best_gcell = gcell_type{};
-    for (auto target_gcell : target_gcells) {
-        if (initial_gcell != target_gcell) {
-            for (auto net : cell_nets) {
-                //erfan
-                // global_routing.unroute(net);
-            }
-            
-            auto wirelength = test_target_gcell(design, cell, initial_gcell, target_gcell, astar_routing);
-            if (wirelength < min_wirelength) {
-                min_wirelength = wirelength;
-                best_gcell = target_gcell;
-            }
-            continue;
-            
-            /*capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-            demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-            std::cout << "debug gcell after movement test capacity " << capacity << " demand " << demand << std::endl;*/
-
-            for(auto net : cell_nets) {
-                //erfan
-                // global_routing.unroute(net);
-            }
-            //erfan
-            // bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-            bool undo_overflow = false;
-            if(undo_overflow == true) {
-                std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
-            }
-            //erfan
-            // bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-            bool undo = false;
-            if(undo == false) {
-                std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
-            }
-            
-            /*capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-            demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-            std::cout << "debug gcell after movement undo capacity " << capacity << " demand " << demand << std::endl;*/
-        }
-    }
-    if (best_gcell != gcell_type{}) {
-        for (auto net : cell_nets) {
-            //erfan
-            // global_routing.unroute(net);
-        }
-        auto result = test_target_gcell(design, cell, initial_gcell, best_gcell, astar_routing);
-        if (result == false) {
-            std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
-        }
-        return move_cell_result;
-    } else {
-        //std::cout << "could not find best gcell" << std::endl;
-    }
-    return move_cell_result;
-}
 
 
 void MCFMultiThreading::calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells)
@@ -1655,7 +1592,7 @@ void MCFMultiThreading::calculate_median_gcell(ophidian::design::Design & design
     return current_gcell;*/
 }
 
-double MCFMultiThreading::test_target_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, gcell_type & initial_gcell, gcell_type & target_gcell, ophidian::routing::AStarRouting & astar_routing) {
+MoveCellResult MCFMultiThreading::test_target_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, gcell_type & initial_gcell, gcell_type & target_gcell, ophidian::routing::AStarRouting & astar_routing) {
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
     using net_type = ophidian::circuit::Net;
@@ -1667,45 +1604,86 @@ double MCFMultiThreading::test_target_gcell(ophidian::design::Design & design, o
     auto& routing_constr = design.routing_constraints();
     auto& std_cells = design.standard_cells();
     auto gcell_graph_ptr = global_routing.gcell_graph();
+    std::vector<AstarResult> astar_results;
+    std::vector<AStarSegment> segments;
+    std::vector<AStarSegment> astar_segments;
 
+    // std::cout << "cell name: " << m_design.netlist().name(cell) << std::endl;
     // Get connected nets
     std::vector<net_type> cell_nets;
     for(auto pin : netlist.pins(cell))
     {
         auto net = netlist.net(pin);
+        // std::cout << "net name: " << m_design.netlist().name(net) << std::endl;
         if(net == ophidian::circuit::Net())
             continue;
         cell_nets.push_back(net);
     }
+    // std::cout << "cell_nets size: " << cell_nets.size() << std::endl;
 
-    //move cell to median
-    //erfan
-    // auto overflow_movement = global_routing.move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
     bool overflow_movement = false;
+    //move cell to median
+    #pragma omp critical
+    overflow_movement = global_routing.move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
+    
     if(overflow_movement == false)
     {
-        std::vector<AStarSegment> segments;
         bool routed_all_nets = true;
         for(auto net : cell_nets)
         {
+            // std::cout << "net: " << m_design.netlist().name(net) << std::endl;
             // #pragma omp critical
+            // global_routing.unroute(net);
+            #pragma omp critical
             routed_all_nets = m_astar_routing.route_net(net, segments, false);
-            if(routed_all_nets == false)
+
+            // for(auto seg: segments)
+            //     astar_segments.push_back(seg);           
+
+            // AstarResult astar_result = run_astar_on_net(net);
+            if(routed_all_nets == false || overflow_movement == true){
+                // routed_all_nets = false;
                 break;
-        }
+            }
+        }//end for 
         if(routed_all_nets)
         {
-            //erfan
-            // bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
-            bool working_correct = false;
-            auto wirelength_after = global_routing.wirelength(cell_nets);
+            bool working_correct = true;
+            // 
+            
+            // for(auto astar_result : astar_results){
+            //     for(auto segments_astar : astar_result.m_astar_segments){
+            //         segments.push_back(segments_astar);
+            //     }//end for 
+            // }//end for 
+            // #pragma omp critical
+            // working_correct = astar_routing.apply_segments_to_global_routing(segments);
+            // for(auto astar_result : astar_results){
+            //     #pragma omp critical
+            //     update_astar_on_global_routing(astar_result);
+            // }
+            // auto wirelength_after = global_routing.wirelength(cell_nets);
+            auto wirelength_after = get_wire_length_segments(segments);
             if(working_correct) {
-                return wirelength_after;
+                MoveCellResult move_cell_result;
+                move_cell_result.m_cell_name = m_design.netlist().name(cell);
+                for(auto net : cell_nets)
+                    move_cell_result.m_nets.push_back(net);
+                move_cell_result.m_astar_wl = wirelength_after;
+                move_cell_result.m_is_valid = true;
+                move_cell_result.m_init_gcell = initial_gcell;
+                move_cell_result.m_target_gcell = target_gcell;
+                for(auto seg : segments)
+                    move_cell_result.m_astar_segments.push_back(seg);
+                return move_cell_result;
+                // return wirelength_after;
             }
         }
     }
-    
-    return std::numeric_limits<double>::max();
+    MoveCellResult move_cell_result;
+    move_cell_result.m_is_valid = false;
+    // return std::numeric_limits<double>::max();
+    return move_cell_result;
 }//end test_target_gcell
 
 void MCFMultiThreading::run_compute_cell_move_costs_parallel(){
@@ -1734,21 +1712,21 @@ void MCFMultiThreading::run_compute_cell_move_costs_parallel(){
          
         
         // // //even panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8)
         for(int i = 0; i < even_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
             run_compute_cell_move_costs_on_panel(even_ids[i]);
         }//end for 
 
         // // // odd panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
             run_compute_cell_move_costs_on_panel(odd_ids[i]);
         }
     
-        if(level == 1)
-            break;
+        // if(level == 1)
+        //     break;
     }//end for 
 }//end run_compute_cell_move_costs_parallel
 
@@ -1769,33 +1747,86 @@ void MCFMultiThreading::run_compute_cell_move_costs_on_panel(unsigned int panel_
 
     
         
-    std::set<std::string> nets_name_set;
+    std::set<std::string> cells_inside_panel;
     std::vector<net_type> local_nets;
-    std::vector<ophidian::circuit::CellInstance> local_cells;
+    // std::vector<ophidian::circuit::CellInstance> local_cells;
 
-    int count_nets = 0;
-    for(auto net : nets_panel){
-        nets_name_set.insert(net);
-    
-        count_nets++;
-    }//end for 
 
-    for(auto net_name : nets_name_set){
-        auto net = m_net_name_to_net_type_dict[net_name];
-        for(auto net_pin : m_design.netlist().pins(net)){
-            auto cell = m_design.netlist().cell(net_pin);
-            local_cells.push_back(cell);
+    auto local_cells = std::vector<ophidian::circuit::CellInstance>{};
+    m_design.placement().cells_within(panel_region, local_cells);
+    std::vector<net_type> cell_nets;
+
+    for(auto cell : local_cells){
+        
+        auto cell_name = m_design.netlist().name(cell);
+        if(m_cell_name_to_cell_type_dict.find(cell_name) == m_cell_name_to_cell_type_dict.end())
+            m_cell_name_to_cell_type_dict[cell_name] = cell;
+
+        std::cout << cell_name << ", ";
+
+
+        for(auto pin : m_design.netlist().pins(cell))
+        {
+            
+            auto net = m_design.netlist().net(pin);
+            // std::cout << "net name: " << m_design.netlist().name(net) << std::endl;
+            if(net == ophidian::circuit::Net())
+                continue;
+            cell_nets.push_back(net);
         }//end for 
+        //cell_name to nets
+
+                //cell_name to nets_box
+        std::vector<int> location_xs;
+        std::vector<int> location_ys;
+        for(auto net : cell_nets){
+            auto net_name = m_design.netlist().name(net);
+            auto net_box = m_net_name_to_net_box_dict[net_name];
+            int xl = net_box.getXl();
+            int yl = net_box.getYl();
+            int xh = net_box.getXh();
+            int yh = net_box.getYh();
+            location_xs.push_back(xl);
+            location_xs.push_back(xh);
+            location_ys.push_back(yl);
+            location_ys.push_back(yh);
+        }//end for 
+        std::vector<int>::iterator min_x_itrerator = std::min_element(location_xs.begin(), location_xs.end());
+        std::vector<int>::iterator max_x_itrerator = std::max_element(location_xs.begin(), location_xs.end());
+        std::vector<int>::iterator min_y_itrerator = std::min_element(location_ys.begin(), location_ys.end());
+        std::vector<int>::iterator max_y_itrerator = std::max_element(location_ys.begin(), location_ys.end());
+        int min_x = *min_x_itrerator;
+        int max_x = *max_x_itrerator;
+        int min_y = *min_y_itrerator;
+        int max_y = *max_y_itrerator;
+        Box2DWrapper cell_net_box(min_x,min_y,max_x,max_y);
+
+        std::cout << min_x << "," << min_y << ", " << max_x <<"," << max_y << ",";
+        std::cout << panel_box.getXl() << "," << panel_box.getYl()
+                  << ", " << panel_box.getXh() <<"," << panel_box.getYh() << std::endl;
+
+        
+
+        if( (cell_net_box.getXl() >= panel_box.getXl()) &&
+            (cell_net_box.getYl() >= panel_box.getYl()) &&
+            (cell_net_box.getXh() <= panel_box.getXh()) &&
+            (cell_net_box.getYh() <= panel_box.getYh())
+        ){
+            cells_inside_panel.insert(cell_name);
+        }
+
+
     }//end for 
    
-    auto cell_costs = compute_cell_move_costs_descending_order(m_design);
+    // auto cell_costs = compute_cell_move_costs_descending_order(m_design);
 
-    m_panel_index_to_local_cells_dict[panel_id] = cell_costs;
+    m_panel_index_to_local_cells_dict[panel_id] = cells_inside_panel;
+    std::cout << "panel id: " << panel_id << ", number of cells: " << cells_inside_panel.size() << std::endl;
  
 
 }//end run_compute_cell_move_costs_on_panel
 
-void MCFMultiThreading::move_cells_parallel(){
+void MCFMultiThreading::move_cells_parallel(std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements){
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
     std::vector<ophidian::circuit::Net> astar_nets;
@@ -1821,31 +1852,145 @@ void MCFMultiThreading::move_cells_parallel(){
          
         
         // // //even panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8)
         for(int i = 0; i < even_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
-            run_move_cell_on_panel(even_ids[i]);
+            run_move_cell_on_panel(even_ids[i],movements);
         }//end for 
 
         // // // odd panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
-            run_move_cell_on_panel(odd_ids[i]);
+            run_move_cell_on_panel(odd_ids[i],movements);
         }
     
-        if(level == 1)
-            break;
+        // if(level == 1)
+        //     break;
     }//end for 
 
     
 }//end move_cells_parallel
 
-void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id){
-    auto cell_costs = m_panel_index_to_local_cells_dict[panel_id];
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
-    int remaining_time = 100000;
-    move_cells_for_until_x_minutes(m_design, remaining_time, cell_costs, movements, m_astar_routing);
+void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
+    auto cells_panel = m_panel_index_to_local_cells_dict[panel_id];
+    
+    auto& global_routing = m_design.global_routing();
+    auto& netlist        = m_design.netlist();
+    auto& placement      = m_design.placement();
+    auto& routing_constr = m_design.routing_constraints();
+    auto& std_cells      = m_design.standard_cells();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+    
+    // move_cells_for_until_x_minutes(m_design, remaining_time, cell_costs, movements, m_astar_routing);
+    std::cout << "panel id: " << panel_id << ", cell panel size: " << cells_panel.size() << std::endl;
+    for(auto cell_name : cells_panel){
+        auto cell = m_cell_name_to_cell_type_dict[cell_name];
+        auto initial_location = m_design.placement().location(cell);
+        auto initial_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(initial_location, 0);
+        std::vector<gcell_type> target_gcells;
+        //auto median_gcell = calculate_median_gcell(design, cell);
+        calculate_median_gcell(m_design, cell, target_gcells);
+        std::vector<net_type> cell_nets;
+        // std::cout << "cell name: " << m_design.netlist().name(cell) << std::endl;
+        for(auto pin : m_design.netlist().pins(cell))
+        {
+            
+            auto net = m_design.netlist().net(pin);
+            // std::cout << "net name: " << m_design.netlist().name(net) << std::endl;
+            if(net == ophidian::circuit::Net())
+                continue;
+            cell_nets.push_back(net);
+        }//end for 
+        std::vector<AStarSegment> initial_segments;
+        std::vector<AstarResult> initial_astar_results;
+        for(auto net : cell_nets)
+        {
+            AstarResult astar_init_result;
+            astar_init_result.m_net = net;
+            for(auto segment : global_routing.segments(net)) {
+                initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
+                astar_init_result.m_initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
+                astar_init_result.m_astar_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
+            }
+            astar_init_result.m_is_valid = true;
+            initial_astar_results.push_back(astar_init_result);
+        }
+        auto best_gcell = gcell_type{};
+        std::vector<AstarResult> astar_results;
+        bool route_all_nets = true;
+        for (auto target_gcell : target_gcells) {
+            if (initial_gcell != target_gcell){
+                auto overflow_movement = m_design.global_routing().move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
+                for(auto net : cell_nets){
+                    auto astar_result = run_astar_on_net(net);
+                    astar_results.push_back(astar_result);
+                    if(!astar_result.m_is_valid)
+                        route_all_nets = false;
+                }
+                for(auto astar_result : astar_results){
+                    if(route_all_nets){
+                        #pragma omp critical
+                        update_astar_on_global_routing(astar_result);
+                    }//end if 
+                }//end for
+
+                overflow_movement = m_design.global_routing().move_cell(target_gcell,initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+                for(auto astar_result : initial_astar_results)
+                    update_astar_on_global_routing(astar_result);
+
+                int init_wl = 0;
+                int astar_wl = 0;
+                for(auto astar_result : astar_results){
+                    if(route_all_nets){
+                        auto astar_segments = astar_result.m_astar_segments;
+                        auto initial_segments = astar_result.m_initial_segments;
+                        init_wl  = init_wl + get_wire_length_segments(initial_segments);
+                        astar_wl = astar_wl + get_wire_length_segments(astar_segments);
+                    }//end if 
+                }//end for
+
+                if(init_wl > astar_wl){
+                    best_gcell = target_gcell;
+                }
+            }//end if 
+
+ 
+        }//end for
+        bool moved = false;
+        if (best_gcell != gcell_type{}) {
+            for (auto net : cell_nets) {
+                global_routing.unroute(net);
+            }
+            astar_results.clear();
+            auto overflow_movement = m_design.global_routing().move_cell(initial_gcell, best_gcell, cell, netlist, placement, routing_constr, std_cells);
+            for(auto net : cell_nets){
+                auto astar_result = run_astar_on_net(net);
+                astar_results.push_back(astar_result);
+                if(!astar_result.m_is_valid)
+                    route_all_nets = false;
+            }
+            for(auto astar_result : astar_results){
+                if(route_all_nets){
+                    #pragma omp critical
+                    update_astar_on_global_routing(astar_result);
+                    moved = true;
+                }//end if 
+            }//end for
+            
+        } else {
+            //std::cout << "could not find best gcell" << std::endl;
+        }
+        std::cout << "moved: " << moved << std::endl;
+        #pragma omp critical
+        if(moved)
+        {
+            auto location = m_design.placement().location(cell);
+            movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+        }
+     
+        
+   }//end for 
 
 }//end run_move_cell_on_panel
 
@@ -1863,9 +2008,16 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
     //cell_name to nets
     std::unordered_map<std::string,std::vector<net_type>> cell_name_to_nets_dict;
     
-
     //cell_name to min_wirelength
     std::unordered_map<std::string,int> cell_name_to_min_wire_length_dict;
+
+    // cell name to id and vice versa
+    std::unordered_map<std::string,int> cell_name_to_id_dict;
+    std::unordered_map<int,std::string> id_to_cell_name_dict;
+
+    //cell to cell_net_box
+    std::unordered_map<std::string,Box2DWrapper> cell_name_to_net_box_dict;
+
 
 
 
@@ -1877,13 +2029,15 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
     auto& std_cells      = m_design.standard_cells();
     auto gcell_graph_ptr = global_routing.gcell_graph();
 
+    int cell_name_id = 0;
     for(auto cell_pair : cells){
         auto cell_name = m_design.netlist().name(cell_pair.first);
         cell_name_to_cell_type_dict[cell_name] = cell_pair.first;
         cells_vec.push_back(cell_pair.first);
+        cell_name_id++;
     }//end for 
 
-    #pragma omp parallel for num_threads(8)
+    // #pragma omp parallel for num_threads(8)
     for(int i = 0; i < cells_vec.size(); i++){
         auto cell = cells_vec[i];
         
@@ -1899,14 +2053,43 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
 
 
         std::vector<net_type> cell_nets;
+        // std::cout << "cell name: " << m_design.netlist().name(cell) << std::endl;
         for(auto pin : netlist.pins(cell))
         {
+            
             auto net = netlist.net(pin);
+            // std::cout << "net name: " << m_design.netlist().name(net) << std::endl;
             if(net == ophidian::circuit::Net())
                 continue;
             cell_nets.push_back(net);
         }//end for 
         //cell_name to nets
+
+                //cell_name to nets_box
+        std::vector<int> location_xs;
+        std::vector<int> location_ys;
+        for(auto net : cell_nets){
+            auto net_name = m_design.netlist().name(net);
+            auto net_box = m_net_name_to_net_box_dict[net_name];
+            int xl = net_box.getXl();
+            int yl = net_box.getYl();
+            int xh = net_box.getXh();
+            int yh = net_box.getYh();
+            location_xs.push_back(xl);
+            location_xs.push_back(xh);
+            location_ys.push_back(yl);
+            location_ys.push_back(yh);
+        }//end for 
+        std::vector<int>::iterator min_x_itrerator = std::min_element(location_xs.begin(), location_xs.end());
+        std::vector<int>::iterator max_x_itrerator = std::max_element(location_xs.begin(), location_xs.end());
+        std::vector<int>::iterator min_y_itrerator = std::min_element(location_ys.begin(), location_ys.end());
+        std::vector<int>::iterator max_y_itrerator = std::max_element(location_ys.begin(), location_ys.end());
+        int min_x = *min_x_itrerator;
+        int max_x = *max_x_itrerator;
+        int min_y = *min_y_itrerator;
+        int max_y = *max_y_itrerator;
+        Box2DWrapper cell_net_box(min_x,min_y,max_x,max_y);
+        cell_name_to_net_box_dict[cell_name] = cell_net_box;
 
 
         std::vector<AStarSegment> initial_segments;
@@ -1919,12 +2102,12 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
         }//end for 
         auto min_wirelength = wirelength_before;
         //cell_name to min_wirelength
-        #pragma omp critical
-        {
+        // #pragma omp critical
+        // {
             cell_name_to_target_gcells_dict[cell_name] = target_gcells;
             cell_name_to_min_wire_length_dict[cell_name] = (int)min_wirelength;
             cell_name_to_nets_dict[cell_name] = cell_nets;  
-        }
+        // }
         
         // std::cout << "cell: " << cell_name << ", nets: ";
         // for(auto net : cell_nets){
@@ -1935,48 +2118,259 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
     }//end for 
 
 
+    // cell name levels
+    // int level_size_base = 100; 
+    // std::unordered_map<int, std::set<std::string>> level_to_cell_names_dict;
+    // std::unordered_map<int, RTreeDB> level_to_rtree_dict;
+    // //level to independent cell_boxes
+    // std::unordered_map<int,std::vector<std::set<std::string>>> level_to_independent_cell_box_dict;
+
+    // int level = 1;
+    // std::set<std::string> cells_set;
+    // // std::cout << "cells_vec size: " << cells_vec.size() << std::endl;
+    // for(int i = 0 ; i < cells_vec.size(); i++){
+    //     auto cell = cells_vec[i];
+    //     auto cell_name = m_design.netlist().name(cell);
+
+    //     auto cell_box = cell_name_to_net_box_dict[cell_name];
+    //     if((abs(cell_box.getXh()- cell_box.getXl()) < level_size_base) &&
+    //        (abs(cell_box.getYh()- cell_box.getYl()) < level_size_base)){
+    //         cells_set.insert(cell_name);
+    //     }//end if 
+    // }//end for 
+
+    // // std::cout << "cells_set size: " << cells_set.size() << std::endl;
+    // level_to_cell_names_dict[level] = cells_set;
+
+    // RTreeDB level_rtree;
+    // cell_name_id = 0;
+    // for(auto cell_name : cells_set){
+    //     auto cell_box = cell_name_to_net_box_dict[cell_name];
+    //     auto id = cell_name_to_id_dict[cell_name];
+    //     cell_name_to_id_dict[cell_name] = cell_name_id;
+    //     id_to_cell_name_dict[cell_name_id] = cell_name; 
+    //     level_rtree.insert(cell_box);
+    //     cell_name_id++;
+    // }//end for 
+
+    // level_rtree.report();
+
+    // std::vector<std::set<std::string>> independet_cells_boxs;
+    // std::set<std::string> selected_cells;
+    // for(auto cell_name : cells_set){
+    //     // std::cout << "cell name: " << cell_name << std::endl;
+    //     if(selected_cells.find(cell_name) != selected_cells.end()) continue;
+    //     std::set<std::string> cells_in_a_bunch;
+    //     bool find_overlap_areas = true;
+    //     cells_in_a_bunch.insert(cell_name);
+    //     selected_cells.insert(cell_name);
+        
+    //     auto cell_box = cell_name_to_net_box_dict[cell_name];    
+    //     auto ids_pair = level_rtree.query(cell_box);
+    //     // std::cout << "ids pair: " << ids_pair.size() << std::endl;
+    //     for(auto id_pair : ids_pair){
+    //         auto id = id_pair.second;
+    //         auto cell_name_neighbour = id_to_cell_name_dict[id];
+    //         if(selected_cells.find(cell_name_neighbour) != selected_cells.end()) continue;
+    //         cells_in_a_bunch.insert(cell_name_neighbour);
+    //         selected_cells.insert(cell_name);
+    //     }//end for
+        
+    //     independet_cells_boxs.push_back(cells_in_a_bunch);
+        
+    // }//end for 
+
+    
+    // std::cout << "independet_cells_boxs: " << independet_cells_boxs.size() << std::endl;
+
+
+
+    // return;
+
+    auto start_time = std::chrono::steady_clock::now();
+    
     log() << "move cell and astar " << std::endl;
+    bool moved = false;
+    
+    
+
     #pragma omp parallel for num_threads(8)
     for(int i = 0; i < cells_vec.size(); i++){
-        auto cell = cells_vec[i];
-        auto cell_name = m_design.netlist().name(cell);
-        auto target_gcells = cell_name_to_target_gcells_dict[cell_name];
-        auto cell_nets = cell_name_to_nets_dict[cell_name];
-        auto initial_location = placement.location(cell);
-        auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
-        auto best_gcell = gcell_type{};
-        for (auto target_gcell : target_gcells) {
-            if (initial_gcell != target_gcell) {
-                auto overflow_movement = global_routing.move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
-                if(overflow_movement == false)
-                {
-                    std::vector<AStarSegment> segments;
-                    bool routed_all_nets = true;
-                    #pragma omp critical
-                    for(int j = 0; j < cell_nets.size() ; j++)
-                    {
-                        auto net = cell_nets[j];
-                        // #pragma omp critical
-                        routed_all_nets = m_astar_routing.route_net(net, segments, false);
-                        if(routed_all_nets == false)
-                            break;
-                    }
-                    if(routed_all_nets)
-                    {
-                        //erfan
-                        // bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
-                        bool working_correct = false;
-                        auto wirelength_after = global_routing.wirelength(cell_nets);
-                        // if(working_correct) {
-                        //     return wirelength_after;
-                        // }
-                    }
+            
+            auto cell = cells_vec[i];           
+            auto cell_name = m_design.netlist().name(cell);
+
+            // std::cout << "cell_name: " << cell_name << std::endl;
+            auto target_gcells = cell_name_to_target_gcells_dict[cell_name];
+            std::vector<net_type> cell_nets;
+            for(auto pin : netlist.pins(cell))
+            {
+                
+                auto net = netlist.net(pin);
+                // std::cout << "net name: " << m_design.netlist().name(net) << std::endl;
+                if(net == ophidian::circuit::Net())
+                    continue;
+                cell_nets.push_back(net);
+            }//end for 
+            // auto cell_nets = cell_name_to_nets_dict[cell_name];
+            auto initial_location = placement.location(cell);
+            auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
+            auto wirelength_before = global_routing.wirelength(cell_nets);
+            auto min_wirelength = wirelength_before;
+
+            std::vector<AStarSegment> initial_segments;
+            for(auto net : cell_nets)
+            {
+                for(auto segment : global_routing.segments(net)) {
+                    initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
                 }
-            }//end if 
-        }//end for 
+            }
+
+            auto best_gcell = gcell_type{};
+            for (auto target_gcell : target_gcells) {
+                if (initial_gcell != target_gcell) {
+                    bool overflow_movement = true;
+                    
+                    double wirelength = 0;
+                    // #pragma omp critical
+                    auto move_cell_result = test_target_gcell(m_design, cell, initial_gcell, target_gcell, m_astar_routing);
+                    // #pragma omp critical
+                    // overflow_movement = global_routing.move_cell(target_gcell,initial_gcell , cell, netlist, placement, routing_constr, std_cells);
+                    if(move_cell_result.m_is_valid)
+                        if (move_cell_result.m_astar_wl < min_wirelength) {
+                            for(auto seg : initial_segments)
+                                move_cell_result.m_initial_segments.push_back(seg);
+                            #pragma omp critical
+                            m_move_cells.push_back(move_cell_result);
+                        }
+                        // #pragma omp critical
+                        // for(auto net : cell_nets) {
+                        //     global_routing.unroute(net);
+                        // }
+                        // bool undo_overflow = true;
+                        // #pragma omp critical
+                        // undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+                        // if(undo_overflow == true) {
+                        //     std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
+                        // }
+                        // bool undo = false;
+                        // #pragma omp critical
+                        // undo = m_astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+                        // if(undo == false) {
+                        //     std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
+                        // }
+                    
+                }//end if 
+            }//end for 
+            // if (best_gcell != gcell_type{}) {
+            //     // #pragma omp critical
+            //     // for (auto net : cell_nets) {
+            //     //     global_routing.unroute(net);
+            //     // }
+            //     bool result = false;
+            //     // #pragma omp critical
+            //     result = test_target_gcell(m_design, cell, initial_gcell, best_gcell, m_astar_routing);
+            //     if (result == false) {
+            //         std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
+            //     }
+            //     moved = true;
+            // } else {
+            //     //std::cout << "could not find best gcell" << std::endl;
+            //     moved = false;
+            // }//end if
+            // #pragma omp critical
+            // if(moved)
+            // {
+            //     auto location = m_design.placement().location(cell);
+            //     moved_cells++;            
+            //     movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            //     //std::cout << "moved to " << location.x().value() << "," << location.y().value() << std::endl;
+            //     //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
+
+            //     //auto wirelength = design.global_routing().wirelength(nets);
+            //     //std::cout << "wirelength " << wirelength << std::endl;            
+            // }
+
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+            //std::cout << "time " << diff.count() << std::endl;
+            bool time_out = false;//diff.count() > time_limit * 60.0 ? true : false;
+            //if (cell_name == "C1245") break;
+            //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
+            // if(moved_cells == m_design.routing_constraints().max_cell_movement() || time_out)
+            // //if(moved_cells == 1)
+            //     break;
+        // }//end for 
+        
 
     }//end for 
+
+
+
+    // return;
+    log() << "apply movements to global routing: " << m_move_cells.size() << std::endl;
     
+    int moved_cells = 0;
+    for(auto move_result : m_move_cells){
+        auto cell_name = move_result.m_cell_name;
+        auto initial_gcell = move_result.m_init_gcell;
+        auto target_gcell = move_result.m_target_gcell;
+        auto cell = cell_name_to_cell_type_dict[cell_name];
+        auto init_segments = move_result.m_initial_segments;
+        auto astar_segments = move_result.m_astar_segments;
+        // std::cout << "cell name: " << cell_name << std::endl;
+        for(auto net : move_result.m_nets){
+            global_routing.unroute(net);
+        }
+
+        // auto location = m_design.placement().location(cell);
+        // std::cout << "before move: " << location.x().value() << "," << location.y().value() << std::endl;
+                   
+        bool undo_overflow = global_routing.move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
+
+        // location = m_design.placement().location(cell);
+        // std::cout << "after move: " << location.x().value() << "," << location.y().value() << std::endl;
+
+        // std::cout << "undo_overflow: "<<  undo_overflow << std::endl ;
+
+        bool bmoved = false;
+        if(undo_overflow == true) {
+            // std::cout<<"WARNING: MOVEMENT OVERFLOW!"<<std::endl;
+            global_routing.move_cell(target_gcell,initial_gcell , cell, netlist, placement, routing_constr, std_cells);
+            m_astar_routing.apply_segments_to_global_routing(init_segments);//This should never fail
+        }else{
+            bool undo = m_astar_routing.apply_segments_to_global_routing(astar_segments);//This should never fail
+            // std::cout << "astar result: " << undo << std::endl;
+            // for(auto seg : astar_segments){
+            //     std::cout << "seg net: " << m_design.netlist().name(seg.net) << std::endl;
+            // }
+            if(undo == false) {
+                // std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
+                for(auto net : move_result.m_nets){
+                   global_routing.unroute(net);
+                }
+                global_routing.move_cell(target_gcell,initial_gcell , cell, netlist, placement, routing_constr, std_cells);
+                m_astar_routing.apply_segments_to_global_routing(init_segments);//This should never fail
+            }else{
+                bmoved = true;
+            }
+        }
+        
+        if(bmoved)
+        {
+            auto location = m_design.placement().location(cell);
+            moved_cells++;            
+            movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            //std::cout << "moved to " << location.x().value() << "," << location.y().value() << std::endl;
+            //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
+
+            //auto wirelength = design.global_routing().wirelength(nets);
+            //std::cout << "wirelength " << wirelength << std::endl;
+            if(moved_cells == m_design.routing_constraints().max_cell_movement())
+                break;
+            // break;
+        }
+    }//end for 
 
 }//end move_cells_parallel_v2
 
@@ -2136,6 +2530,9 @@ void MCFMultiThreading::move_cells_parallel_v3(std::vector<std::pair<ophidian::c
         }//end for 
 
     }//end for 
+
+
+ 
     
 
 }//end move_cells_parallel_v3

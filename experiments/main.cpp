@@ -256,6 +256,23 @@ bool cell_has_more_than_1_pin_in_same_net(ophidian::design::Design & design, oph
     return false;
 }
 
+std::vector<std::pair<ophidian::circuit::Net, double>> compute_net_costs_descending_order(ophidian::design::Design & design)
+{
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
+    std::vector<std::pair<ophidian::circuit::Net, double>> nets_costs;
+
+    for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); ++net_it)
+    {
+        auto net = *net_it;
+        auto cost = design.global_routing().wirelength(net);
+        nets_costs.push_back(std::make_pair(net, cost));
+    }
+    //SORT IN DESCENDING ORDER
+    std::sort(nets_costs.begin(), nets_costs.end(), [](std::pair<ophidian::circuit::Net, double> cost_a, std::pair<ophidian::circuit::Net, double> cost_b) {return cost_a.second > cost_b.second;});
+    return nets_costs;
+}
+
 std::vector<std::pair<ophidian::circuit::CellInstance, double>> compute_cell_move_costs_descending_order(ophidian::design::Design & design)
 {
     auto & netlist = design.netlist();
@@ -392,9 +409,12 @@ void comput_lower_bound(ophidian::design::Design & design, ophidian::routing::AS
     // }
 }
 
-void run_astar_for_nets(ophidian::design::Design & design, std::vector<ophidian::circuit::Net> & nets, ophidian::routing::AStarRouting & astar_routing) {
+void run_astar_for_nets(ophidian::design::Design & design, std::vector<std::pair<ophidian::circuit::Net, double>> & net_costs, double time_limit, ophidian::routing::AStarRouting & astar_routing) {
+    auto start_time = std::chrono::steady_clock::now();
+    
     ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
-    for (auto & net : nets) {
+    for (auto & net_cost : net_costs) {
+        auto net = net_cost.first;
         std::vector<ophidian::routing::AStarSegment> initial_segments;
         for(auto segment : design.global_routing().segments(net)) {
             initial_segments.push_back(ophidian::routing::AStarSegment(design.global_routing().box(segment), design.global_routing().layer_start(segment), design.global_routing().layer_end(segment), net));
@@ -415,6 +435,14 @@ void run_astar_for_nets(ophidian::design::Design & design, std::vector<ophidian:
                 std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
                 //break;
             }
+        }
+        auto end_time = std::chrono::steady_clock::now();
+
+        std::chrono::duration<double> diff = end_time-start_time;
+        //std::cout << "time " << diff.count() << std::endl;
+        bool time_out = diff.count() > time_limit * 60.0 ? true : false;
+        if (time_out) {
+            break;
         }
     }
 }
@@ -469,16 +497,24 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
 
     UCal::MCFMultiThreading mcf_multi_threading(design); 
     mcf_multi_threading.run(movements);
+   
+    //auto net_costs = compute_net_costs_descending_order(design);
     
-    //run_astar_for_nets(design, nets, astar_routing);
+    auto end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end_time-start_time;
+    auto current_time = diff.count() / 60.0;
+    auto remaining_time = 27 - current_time;
+    
+    log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
+
+    //run_astar_for_nets(design, net_costs, remaining_time, astar_routing);
     
     //log() << "movements after ILP " << movements.size() << std::endl;
     
-    auto end_time = std::chrono::steady_clock::now();
-
-    std::chrono::duration<double> diff = end_time-start_time;
-    auto current_time = diff.count() / 60.0;
-    auto remaining_time = 55 - current_time;
+    end_time = std::chrono::steady_clock::now();
+    diff = end_time-start_time;
+    current_time = diff.count() / 60.0;
+    remaining_time = 55 - current_time;
 
     log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
     
