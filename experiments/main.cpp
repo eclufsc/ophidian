@@ -114,7 +114,7 @@ double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::C
     auto& routing_constr = design.routing_constraints();
     auto& std_cells = design.standard_cells();
     auto gcell_graph_ptr = global_routing.gcell_graph();
-    
+
     ophidian::routing::AStarRouting::box_type chip_area{design.floorplan().chip_origin(), design.floorplan().chip_upper_right_corner()};
 
     // Get connected nets
@@ -129,27 +129,16 @@ double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::C
 
     //move cell to median
     auto overflow_movement = global_routing.move_cell(initial_gcell, target_gcell, cell, netlist, placement, routing_constr, std_cells);
-    if(overflow_movement == false)
+    if(overflow_movement)
+        return std::numeric_limits<double>::max();
+    for(auto net : cell_nets)
     {
         std::vector<AStarSegment> segments;
-        bool routed_all_nets = true;
-        for(auto net : cell_nets)
-        {
-            routed_all_nets = astar_routing.route_net(net, segments, chip_area, false);
-            if(routed_all_nets == false)
-                break;
-        }
-        if(routed_all_nets)
-        {
-            bool working_correct = astar_routing.apply_segments_to_global_routing(segments);
-            auto wirelength_after = global_routing.wirelength(cell_nets);
-            if(working_correct) {
-                return wirelength_after;
-            }
-        }
+        bool result = astar_routing.route_net(net, segments, chip_area);
+        if(result == false)
+            return std::numeric_limits<double>::max();
     }
-    
-    return std::numeric_limits<double>::max();
+    return global_routing.wirelength(cell_nets);
 }
 
 bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
@@ -172,12 +161,6 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
     //auto median_gcell = calculate_median_gcell(design, cell);
     calculate_median_gcell(design, cell, target_gcells);
 
-    auto debug_gcell = design.global_routing().gcell_graph()->gcell(20, 19, 0);
-    auto capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-    auto demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-    auto layer_index = design.global_routing().gcell_graph()->layer_index(debug_gcell);
-    auto gcell_box = design.global_routing().gcell_graph()->box(debug_gcell);
-
     // Get connected nets
     std::vector<net_type> cell_nets;
     for(auto pin : netlist.pins(cell))
@@ -187,77 +170,51 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
             continue;
         cell_nets.push_back(net);
 
-        /*for(auto gcell : global_routing.gcells(net)) {
-                auto gcell_box = gcell_graph_ptr->box(gcell);
-                auto layer_index = gcell_graph_ptr->layer_index(gcell);
-                std::cout << "initial gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
-
-                auto capacity = gcell_graph_ptr->capacity(gcell);
-                auto demand = gcell_graph_ptr->demand(gcell);
-                std::cout << "capacity " << capacity << " demand " << demand << std::endl;
-            }*/
-
     }
     // Backup routing information
     std::vector<AStarSegment> initial_segments;
     auto wirelength_before = global_routing.wirelength(cell_nets);
-    //std::cout << "initial gcells " << std::endl;
     for(auto net : cell_nets)
-    {
-        for(auto segment : global_routing.segments(net)) {
+        for(auto segment : global_routing.segments(net))
             initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
-        }
-    }
 
     auto min_wirelength = wirelength_before;
     auto best_gcell = gcell_type{};
-    for (auto target_gcell : target_gcells) {
-        if (initial_gcell != target_gcell) {
-            for (auto net : cell_nets) {
-                global_routing.unroute(net);
-            }
-
-            auto wirelength = test_target_gcell(design, cell, initial_gcell, target_gcell, astar_routing);
-            if (wirelength < min_wirelength) {
-                min_wirelength = wirelength;
-                best_gcell = target_gcell;
-            }
-            
-            /*capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-            demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-            std::cout << "debug gcell after movement test capacity " << capacity << " demand " << demand << std::endl;*/
-
-            for(auto net : cell_nets) {
-                global_routing.unroute(net);
-            }
-
-            bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-            if(undo_overflow == true) {
-                std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
-            }
-            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-            if(undo == false) {
-                std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
-            }
-            
-            /*capacity = design.global_routing().gcell_graph()->capacity(debug_gcell);
-            demand = design.global_routing().gcell_graph()->demand(debug_gcell);
-            std::cout << "debug gcell after movement undo capacity " << capacity << " demand " << demand << std::endl;*/
-        }
-    }
-    if (best_gcell != gcell_type{}) {
-        for (auto net : cell_nets) {
+    for (auto target_gcell : target_gcells)
+    {
+        if (initial_gcell == target_gcell)
+            continue;
+        for (auto net : cell_nets)
             global_routing.unroute(net);
+
+        auto wirelength = test_target_gcell(design, cell, initial_gcell, target_gcell, astar_routing);
+        if (wirelength < min_wirelength)
+        {
+            min_wirelength = wirelength;
+            best_gcell = target_gcell;
         }
-        auto result = test_target_gcell(design, cell, initial_gcell, best_gcell, astar_routing);
-        if (result == false) {
-            std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
-        }
-        return true;
-    } else {
-        //std::cout << "could not find best gcell" << std::endl;
+
+        for(auto net : cell_nets)
+            global_routing.unroute(net);
+
+        bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+        if(undo_overflow == true)
+            std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
+        bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+        if(undo == false)
+            std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
     }
-    return false;
+    if (best_gcell == gcell_type{})
+        return false;
+    for (auto net : cell_nets)
+        global_routing.unroute(net);
+    auto result = test_target_gcell(design, cell, initial_gcell, best_gcell, astar_routing);
+    if (result == false)
+    {
+        std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool cell_has_more_than_1_pin_in_same_net(ophidian::design::Design & design, ophidian::circuit::CellInstance cell)
