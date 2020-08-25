@@ -393,6 +393,83 @@ namespace ophidian::routing
         return overflow;
     }
 
+
+    void GlobalRouting::restore_movement(GlobalRouting::gcell_type source,
+                                         GlobalRouting::gcell_type target,
+                                         GlobalRouting::cell_instance_type cell,
+                                         GlobalRouting::netlist_type & netlist,
+                                         GlobalRouting::placement_type & placement,
+                                         GlobalRouting::routing_constraints_type & routing_constraints,
+                                         GlobalRouting::std_cells_type & std_cells,
+                                         std::vector<ophidian::routing::ExtraDemandGCell>& source_ex_demands,
+                                         std::vector<ophidian::routing::ExtraDemandGCell>& target_ex_demands)
+    {
+        //remove blockage demand
+        update_blockage_demand(netlist, placement, cell, true);
+        //move cell from sets
+        m_gcell_graph->remove_cell_instance(source, cell);
+        m_gcell_graph->insert_cell_instance(target, cell);
+        //change placement
+        auto target_location = m_gcell_graph->center_of_box(target);
+        placement.place(cell, target_location);
+        //add blockage demand
+        update_blockage_demand(netlist, placement, cell, false);
+        for(auto extra_demand_gcell : source_ex_demands)
+        {
+            m_gcell_graph->clear_same_demand(extra_demand_gcell.gcell);
+            m_gcell_graph->clear_adj_demand(extra_demand_gcell.gcell);
+            m_gcell_graph->change_same_demand(extra_demand_gcell.gcell, extra_demand_gcell.same_demand);
+            m_gcell_graph->change_adj_demand(extra_demand_gcell.gcell, extra_demand_gcell.adj_demand);
+        }
+        for(auto extra_demand_gcell : target_ex_demands)
+        {
+            m_gcell_graph->clear_same_demand(extra_demand_gcell.gcell);
+            m_gcell_graph->clear_adj_demand(extra_demand_gcell.gcell);
+            m_gcell_graph->change_same_demand(extra_demand_gcell.gcell, extra_demand_gcell.same_demand);
+            m_gcell_graph->change_adj_demand(extra_demand_gcell.gcell, extra_demand_gcell.adj_demand);
+        }
+    }
+
+    std::vector<ophidian::routing::ExtraDemandGCell> GlobalRouting::extra_demand_neighborhood(GlobalRouting::gcell_type gcell)
+    {
+        std::vector<ExtraDemandGCell> extra_demands;
+        auto gcell_node = m_gcell_graph->graph_node(gcell);
+        auto gcell_position = m_gcell_graph->position(gcell_node);
+        for(auto layer_it = m_library.begin_layer(); layer_it != m_library.end_layer(); layer_it++)
+        {
+            auto layer_index = m_library.layerIndex(*layer_it);
+            auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
+            auto affected_gcell = m_gcell_graph->gcell(affected_node);
+            ExtraDemandGCell affected;
+            affected.gcell = affected_gcell;
+            affected.same_demand = m_gcell_graph->same_demand(affected_gcell);
+            affected.adj_demand = m_gcell_graph->adj_demand(affected_gcell);
+            extra_demands.push_back(affected);
+
+            auto east_node = m_gcell_graph->east_node(affected_node);
+            if(east_node != lemon::INVALID)
+            {
+                auto east_gcell = m_gcell_graph->gcell(east_node);
+                ExtraDemandGCell east;
+                east.gcell = east_gcell;
+                east.same_demand = m_gcell_graph->same_demand(east_gcell);
+                east.adj_demand = m_gcell_graph->adj_demand(east_gcell);
+                extra_demands.push_back(east);
+            }
+            auto west_node = m_gcell_graph->west_node(affected_node);
+            if(west_node != lemon::INVALID)
+            {
+                auto west_gcell = m_gcell_graph->gcell(west_node);
+                ExtraDemandGCell west;
+                west.gcell = west_gcell;
+                west.same_demand = m_gcell_graph->same_demand(west_gcell);
+                west.adj_demand = m_gcell_graph->adj_demand(west_gcell);
+                extra_demands.push_back(west);
+            }
+        }
+        return extra_demands;
+    }
+
     bool GlobalRouting::overflow_movement(GlobalRouting::gcell_type gcell)
     {
         auto gcell_node = m_gcell_graph->graph_node(gcell);

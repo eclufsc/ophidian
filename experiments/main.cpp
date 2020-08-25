@@ -203,12 +203,16 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         for(auto segment : global_routing.segments(net))
             initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
 
+    auto ex_demand_initial_gcell = global_routing.extra_demand_neighborhood(initial_gcell);
+
     auto min_wirelength = wirelength_before;
     auto best_gcell = gcell_type{};
+    std::vector<ophidian::routing::ExtraDemandGCell> ex_demand_best_gcell = ex_demand_initial_gcell;
     for (auto target_gcell : target_gcells)
     {
         if (initial_gcell == target_gcell)
             continue;
+        auto ex_demand_target_gcell = global_routing.extra_demand_neighborhood(target_gcell);
         for (auto net : cell_nets)
             global_routing.unroute(net);
 
@@ -217,14 +221,13 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         {
             min_wirelength = wirelength;
             best_gcell = target_gcell;
+            ex_demand_best_gcell = ex_demand_target_gcell;
         }
 
         for(auto net : cell_nets)
             global_routing.unroute(net);
 
-        bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-        if(undo_overflow == true)
-            std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
+        global_routing.restore_movement(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells, ex_demand_initial_gcell, ex_demand_target_gcell);
         bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
         if(undo == false)
             std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;

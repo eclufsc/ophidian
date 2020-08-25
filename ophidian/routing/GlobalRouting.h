@@ -22,6 +22,11 @@ namespace ophidian::routing
         using entity_system::EntityBase::EntityBase;
     };
 
+    struct ExtraDemandGCell{
+        int same_demand, adj_demand;
+        ophidian::routing::GCell gcell;
+    };
+
     class GlobalRouting
     {
     public:
@@ -128,6 +133,12 @@ namespace ophidian::routing
         bool is_overflow() const;
 
         bool move_cell(gcell_type source, gcell_type target, cell_instance_type cell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells);
+
+        // restore the movement without recalc extra demand constraints
+        void restore_movement(gcell_type source, gcell_type target, cell_instance_type cell, netlist_type & netlist, placement_type & placement, routing_constraints_type & routing_constraints, std_cells_type & std_cells, std::vector<ExtraDemandGCell>& source_ex_demands, std::vector<ExtraDemandGCell>& target_ex_demands);
+
+        // can be used to backup extra demand information
+        std::vector<ExtraDemandGCell> extra_demand_neighborhood(gcell_type gcell);
         
         void update_blockage_demand(netlist_type & netlist, placement_type & placement, cell_instance_type cell, bool remove_demand);
         /*Update cell_instance_set for each gcell according to placement information.*/

@@ -235,6 +235,17 @@ GCellGraph::scalar_type GCellGraph::demand(const GCellGraph::gcell_type& gcell) 
     return m_gcell_blockage_demand[gcell] + m_gcell_net_demand[gcell] + m_same_gcell_extra_demand[gcell] + m_adj_gcell_extra_demand[gcell];
 }
 
+
+GCellGraph::scalar_type GCellGraph::same_demand(const GCellGraph::gcell_type& gcell) const
+{
+    return m_same_gcell_extra_demand[gcell];
+}
+
+GCellGraph::scalar_type GCellGraph::adj_demand(const GCellGraph::gcell_type& gcell) const
+{
+    return m_adj_gcell_extra_demand[gcell];
+}
+
 bool GCellGraph::is_overflow(const gcell_type& gcell) const
 {
     return m_gcell_capacity[gcell] < demand(gcell);

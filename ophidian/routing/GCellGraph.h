@@ -105,6 +105,8 @@ public:
     scalar_type total_extra_demand() const;
 
     scalar_type demand(const gcell_type& gcell) const;
+    scalar_type same_demand(const gcell_type& gcell) const;
+    scalar_type adj_demand(const gcell_type& gcell) const;
     scalar_type net_demand(const gcell_type& gcell) const;
     scalar_type blockage_demand(const gcell_type& gcell) const;
     scalar_type extra_demand(const gcell_type& gcell) const;
