@@ -505,7 +505,7 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     // mcf_multi_threading.run(movements);
 
     UCal::Engine engine(design);
-    engine.run();
+    engine.run(start_time);
     
     //run_astar_for_nets(design, nets, astar_routing);
     

@@ -9,16 +9,19 @@
 #include <random>
 
 namespace UCal{
+
+#define max_time_to_run 25
+
 #define DEBUG_PANEL false
 
 Engine::Engine(design_type & design):
     m_design(design)
 {
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator (seed);
-    std::uniform_real_distribution<double> distribution (0.0,1.0);
-    m_temperature = distribution(generator);
-    std::cout << "initial temperature: " << m_temperature << std::endl;
+    // unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    // std::default_random_engine generator (seed);
+    // std::uniform_real_distribution<double> distribution (0.0,1.0);
+    // m_temperature = distribution(generator);
+    // std::cout << "initial temperature: " << m_temperature << std::endl;
 }//end Engine constructor
 
 Engine::~Engine(){
@@ -26,7 +29,10 @@ Engine::~Engine(){
 }//end Engine destructor
 
 
-void Engine::run(){
+void Engine::run(std::chrono::steady_clock::time_point start_time){
+    log() << "A* routing only" << std::endl;
+    
+
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
   
     m_design.placement().reset_rtree();
@@ -35,7 +41,13 @@ void Engine::run(){
     
     cluster_based_on_panel();
 
-    run_astar_on_panels_parallel();
+    auto end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end_time-start_time;
+    auto current_time = diff.count() / 60.0;
+    auto remaining_time = max_time_to_run - current_time;
+    log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
+
+    run_astar_on_panels_parallel(remaining_time);
 }//end run 
 
 void Engine::construct_net_boxes_rtree(const std::vector<net_type> &nets){
@@ -219,6 +231,7 @@ void Engine::cluster_based_on_panel(){
             std::vector<net_type> nets;
             for (auto net_name :nets_name_inside_panel_polished ){
                 nets.push_back(m_net_name_to_net_type_dict[net_name]);
+                m_nets_inside_panels.insert(net_name);
             }
             
             m_index_to_panel[panel_index] = panel_box_current;
@@ -325,6 +338,7 @@ void Engine::cluster_based_on_panel(){
             std::vector<net_type> nets;
             for (auto net_name :nets_name_inside_panel_polished ){
                 nets.push_back(m_net_name_to_net_type_dict[net_name]);
+                m_nets_inside_panels.insert(net_name);
             }
             
             m_index_to_panel[panel_index] = panel_box_current;
@@ -341,7 +355,9 @@ void Engine::cluster_based_on_panel(){
 }//end cluster_based_on_panel_v2
 
 
-void Engine::run_astar_on_panels_parallel(){
+void Engine::run_astar_on_panels_parallel(int time_limit){
+    auto start_time = std::chrono::steady_clock::now();
+    bool time_out = false;
     auto number_of_levels = m_panel_level.size();
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
@@ -364,20 +380,38 @@ void Engine::run_astar_on_panels_parallel(){
             }
         }//end for 
          
-        
+        if(time_out) break;
         // //even panels
-        //#pragma omp parallel for num_threads(8)
+        #pragma omp parallel for num_threads(8)
         for(int i = 0; i < even_ids.size(); i++){
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+            #pragma omp critical
+            time_out = diff.count() > time_limit * 60.0 ? true : false;
+            if(time_out){
+                #pragma omp cancel for
+            }
             // std::cout << "id: " << id << std::endl;
             run_astar_on_panel(even_ids[i]);
         }//end for 
 
+        if(time_out) break;
+
         // // // odd panels
-        //#pragma omp parallel for num_threads(8)
+        #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+            #pragma omp critical
+            time_out = diff.count() > time_limit * 60.0 ? true : false;
+            if(time_out){
+                #pragma omp cancel for
+            }
             // std::cout << "id: " << id << std::endl;
             run_astar_on_panel(odd_ids[i]);
         }
+
+        if(time_out) break;
     }//end for 
 
 }//end run_astar_on_panels_parallel
@@ -391,7 +425,7 @@ void Engine::run_astar_on_panel(unsigned int panel_id){
     
     for(auto net_name : nets_panel){
         auto astar_result = run_astar_on_net(m_net_name_to_net_type_dict[net_name]);
-        //#pragma omp critical
+        #pragma omp critical
         update_astar_on_global_routing(astar_result);
    }//end for 
 }//end run_astar_on_panel
@@ -433,7 +467,7 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
     auto net_name = m_design.netlist().name(net);
     // std::cout << "init wl size: " << initial_segments.size() << std::endl;
     // std::cout << "astar_wl size: " << astar_segments.size() << std::endl;
-    int init_wl = get_wire_length_segments(initial_segments);
+    int init_wl  = get_wire_length_segments(initial_segments);
     int astar_wl = get_wire_length_segments(astar_segments);
 
     // std::cout << m_design.netlist().name(net) <<","<<std::to_string(init_wl) << "," << std::to_string(astar_wl) << std::endl;
