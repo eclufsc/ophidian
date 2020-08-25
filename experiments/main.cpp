@@ -15,6 +15,8 @@ using namespace ophidian::util;
 // std::chrono::time_point<std::chrono::steady_clock> start_time;
 using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
 
+ophidian::util::timer timestamp;
+
 void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells)
 {
     using unit_type = ophidian::util::database_unit_t;
@@ -205,6 +207,7 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
 
     auto min_wirelength = wirelength_before;
     auto best_gcell = gcell_type{};
+    //auto best_gcell = (target_gcells.empty()) ? gcell_type{} : target_gcells[0];
     for (auto target_gcell : target_gcells)
     {
         if (initial_gcell == target_gcell)
@@ -217,28 +220,31 @@ bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstanc
         {
             min_wirelength = wirelength;
             best_gcell = target_gcell;
+        } else {
+        
+            for(auto net : cell_nets)
+                global_routing.unroute(net);
+
+            bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
+            if(undo_overflow == true)
+                std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
+            bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+            if(undo == false)
+                std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
         }
-
-        for(auto net : cell_nets)
-            global_routing.unroute(net);
-
-        bool undo_overflow = global_routing.move_cell(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells);
-        if(undo_overflow == true)
-            std::cout<<"WARNING: UNDO MOVEMENT OVERFLOW!"<<std::endl;
-        bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
-        if(undo == false)
-            std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
     }
-    if (best_gcell == gcell_type{})
+    if (best_gcell == gcell_type{}) {
+    //if (best_gcell == gcell_type{} || best_gcell == initial_gcell) {
         return false;
-    for (auto net : cell_nets)
+    }
+    /*for (auto net : cell_nets)
         global_routing.unroute(net);
     auto result = test_target_gcell(design, cell, initial_gcell, best_gcell, astar_routing);
     if (result == false)
     {
         std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -504,8 +510,10 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     //run_astar_for_nets(design, nets, astar_routing);
     
     //log() << "movements after ILP " << movements.size() << std::endl;
+    
+    auto run_movements = true;
 
-    if(true){
+    if(run_movements){
         auto end_time = std::chrono::steady_clock::now();
 
         std::chrono::duration<double> diff = end_time-start_time;
@@ -513,6 +521,8 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
         auto remaining_time = 55 - current_time;
 
         log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
+
+        log() << timestamp.elapsed() << std::endl;
         
         for (auto movement : movements) {
             auto cell = movement.first;

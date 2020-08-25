@@ -1148,14 +1148,14 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
          
         
         // //even panels
-        #pragma omp parallel for num_threads(8)
+        //#pragma omp parallel for num_threads(8)
         for(int i = 0; i < even_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
             run_astar_on_panel(even_ids[i]);
         }//end for 
 
         // // // odd panels
-        #pragma omp parallel for num_threads(8)
+        //#pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             // std::cout << "id: " << id << std::endl;
             run_astar_on_panel(odd_ids[i]);
@@ -1225,7 +1225,7 @@ void MCFMultiThreading::run_astar_on_panel(unsigned int panel_id){
     for(auto net_name : nets_panel){
         auto astar_result = run_astar_on_net(m_net_name_to_net_type_dict[net_name]);
         if(DEBUG_ASTAR_PARALLEL) net_astar_file  << net_name << ",";
-        #pragma omp critical
+        //#pragma omp critical
         update_astar_on_global_routing(astar_result);
    }//end for 
 }//end run_astar_on_panel
