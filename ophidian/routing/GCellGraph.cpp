@@ -301,8 +301,8 @@ void GCellGraph::change_adj_demand(const GCellGraph::gcell_type& gcell, const sc
 void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCellGraph::box_type box, const GCellGraph::index_type layer) const
 {
     namespace bgi = boost::geometry::index;
-    auto min_corner_d = point_scalar_type{units::unit_cast<double>(box.min_corner().x()), units::unit_cast<double>(box.min_corner().y())}; 
-    auto max_corner_d = point_scalar_type{units::unit_cast<double>(box.max_corner().x()), units::unit_cast<double>(box.max_corner().y())};
+    auto min_corner_d = point_scalar_type{box.min_corner().x().value(), box.min_corner().y().value()}; 
+    auto max_corner_d = point_scalar_type{box.max_corner().x().value(), box.max_corner().y().value()};
     auto box_d = box_scalar_type{min_corner_d, max_corner_d};
 
     // using rtree_node_type       = std::pair<box_scalar_type, std::pair<index_type, index_type>>;
@@ -313,9 +313,10 @@ void GCellGraph::intersect(GCellGraph::gcell_container_type& gcells, const GCell
         auto node_index_pair = r.second;
         auto node_box = r.first;
 
-        //box_scalar_type intersection;
-        //boost::geometry::intersection(node_box, box_d, intersection);
-        //if(boost::geometry::area(intersection) != 0)
+        // this should insert a bug when the segment is just a line (without area)
+        box_scalar_type intersection;
+        boost::geometry::intersection(node_box, box_d, intersection);
+        if(boost::geometry::area(intersection) != 0 || boost::geometry::area(box_d) <= std::numeric_limits<double>::epsilon())
             gcells.push_back(gcell(node_index_pair.first, node_index_pair.second, layer));
     }
 }

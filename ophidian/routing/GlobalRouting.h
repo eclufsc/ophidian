@@ -81,7 +81,7 @@ namespace ophidian::routing
 
         void create_gcell_graph(unit_container_type x, unit_container_type y, index_type z, GCellGraph::scalar_container_type capacities);
         void create_gcell_graph(const ophidian::routing::Library & library, unit_container_type x, unit_container_type y, index_type z);
-        gcell_graph_ptr_type gcell_graph();
+        gcell_graph_ptr_type gcell_graph() const;
         gcell_container_type gcells(const net_type& net) const;
 
         /**

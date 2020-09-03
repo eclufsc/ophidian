@@ -80,7 +80,7 @@ namespace ophidian::routing
         //set_gcell_cell_instances()
     }
 
-    GlobalRouting::gcell_graph_ptr_type GlobalRouting::gcell_graph()
+    GlobalRouting::gcell_graph_ptr_type GlobalRouting::gcell_graph() const
     {
         return m_gcell_graph;
     }

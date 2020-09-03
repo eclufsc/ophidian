@@ -286,7 +286,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
 }
 
-TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
+TEST_CASE("run ILP for iccad20 benchmarks 2", "[iccad20]") {
     std::vector<std::string> circuit_names = {
         // "case1",
         //"case1N4",
