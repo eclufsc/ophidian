@@ -125,6 +125,32 @@ namespace ophidian::routing
         return wirelength;
     }
 
+    const GlobalRouting::scalar_type GlobalRouting::number_of_vias(const net_type & net) const{
+        scalar_type vias = 0;
+        auto segments = m_net_to_gr_segment.parts(net);
+        for(auto segment : segments)
+        {
+            auto layer_start = m_gr_segment_layers_start[segment];
+            auto layer_end = m_gr_segment_layers_end[segment];
+            auto layer_start_index = m_library.layerIndex(layer_start);
+            auto layer_end_index = m_library.layerIndex(layer_end);
+            if(layer_start != layer_end)
+            {
+                vias += (layer_end_index - layer_start_index);
+            }
+        }
+        return vias;
+    }
+
+    const GlobalRouting::scalar_type GlobalRouting::number_of_vias(const net_container_type & nets) const{
+        scalar_type vias = 0;
+        for(auto net : nets)
+        {
+            vias += this->number_of_vias(net);
+        }
+        return vias;
+    }
+
     const GlobalRouting::scalar_type GlobalRouting::lower_bound_wirelength(const net_type & net) const{
         return m_net_lower_bound_wirelength[net];
     }

@@ -54,9 +54,9 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
         // "ispd18_sample3",
-        // "ispd19_sample4",
+        "ispd19_sample4",
 
-        "ispd18_test5",
+        // "ispd18_test5",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -92,10 +92,10 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         ophidian::design::factory::make_design(design, def, lef, guide);
 
         UCal::Engine engine(design);
-        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        // std::vector<ophidian::circuit::Net> nets;
-        // auto net2037 = design.netlist().find_net("n_2037");
-        // nets.push_back(net2037);
+        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        std::vector<ophidian::circuit::Net> nets;
+        auto net2037 = design.netlist().find_net("n_2037");
+        nets.push_back(net2037);
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
         log() << "A* for generate the initial solution" << std::endl;
@@ -113,6 +113,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         
         log() << "initial solution generated in " << diff.count() << " seconds" << std::endl;
 
+        log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
         if(check_connectivity(design, nets)){

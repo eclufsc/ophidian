@@ -98,6 +98,9 @@ namespace ophidian::routing
          */
         const scalar_type wirelength(const net_container_type & nets) const;
 
+        const scalar_type number_of_vias(const net_type & net) const;
+        const scalar_type number_of_vias(const net_container_type & nets) const;
+
         const scalar_type lower_bound_wirelength(const net_type & net) const;
         void lower_bound_wirelength(const net_type & net, scalar_type wl);
 
