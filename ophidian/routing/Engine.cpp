@@ -50,6 +50,29 @@ void Engine::run(std::chrono::steady_clock::time_point start_time){
     run_astar_on_panels_parallel(remaining_time);
 }//end run 
 
+// void Engine::run_date21(std::chrono::steady_clock::time_point start_time){
+//     log() << "A* for generate the initial solution" << std::endl;
+//     run_astar_on_circuit();
+//     log() << "initial solution generated" << std::endl;
+
+//     //ILP lower panels with movement 
+
+//     //A* upper panels with movement
+
+//     //A* all circuit with movements
+// }
+
+void Engine::run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets){
+    // std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    for(auto net : nets){
+        auto astar_result = run_astar_on_net(net);
+        if(astar_result.m_is_valid == false){
+            std::cout << "A* FAIL IN NET " << m_design.netlist().name(net) << std::endl;
+        }
+        update_astar_on_global_routing(astar_result);
+    }
+}
+
 void Engine::construct_net_boxes_rtree(const std::vector<net_type> &nets){
     auto & netlist = m_design.netlist();
     auto & placement = m_design.placement();    
@@ -470,6 +493,12 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
     int init_wl  = get_wire_length_segments(initial_segments);
     int astar_wl = get_wire_length_segments(astar_segments);
 
+    if(initial_segments.size() == 0){
+        // case that not exist initial solution
+        init_wl = std::numeric_limits<int>::max();
+    }
+
+
     // std::cout << m_design.netlist().name(net) <<","<<std::to_string(init_wl) << "," << std::to_string(astar_wl) << std::endl;
 
     // int delta_cost = astar_wl - init_wl;
@@ -499,14 +528,16 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
         if (!apply) {
             std::cout << "WARNING: FAILED TO APPLY" << std::endl;
         }
-    } else {
+    } else if(initial_segments.size() > 0){
         bool undo = m_astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
         if(!undo) {
             std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
             std::cout << "NET " << net_name << std::endl;
             //break;
         }
-    }            
+    }else{
+        std::cout<<"WARNING: ROUTING FAILED, "<< m_design.netlist().name(net) << " are not routed!"<<std::endl;
+    }
 }//end apply_astar
 
 int Engine::get_wire_length_segments(const std::vector<AStarSegment> & segments){

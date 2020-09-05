@@ -141,11 +141,11 @@ std::pair<bool, typename ophidian::routing::ILPRouting<IloBoolVar>::Statistics> 
     return result;
 }
 
-void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, bool initial_routing) {
+void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements, bool initial_routing) {
     if(DEBUG_TEST) log() << "starting function run_ilp_for_circuit" << std::endl;
     ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(design, circuit_name);
     if(DEBUG_TEST) log() << "create writer" << std::endl;
-    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+    // ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     std::vector<ophidian::circuit::CellInstance> cells(design.netlist().begin_cell_instance(), design.netlist().end_cell_instance());
@@ -218,7 +218,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
     std::vector<ophidian::circuit::Net> routed_nets;
     std::vector<ophidian::circuit::Net> unrouted_nets;
     
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
+     
     auto result = ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, initial_routing, false, false);
     
     ilpRouting.route_nets(nets, cells, chip_area, {}, routed_nets, unrouted_nets, movements, initial_routing, true, true);
@@ -275,7 +275,7 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
             result.second.model_runtime_ms << ";" << //ILP time (ms)
             result.second.model_memory << std::endl; //ILP memory usage
 
-        iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
+        // iccad_output_writer.write_ICCAD_2020_output("RUN_TESTS_OUTPUT.txt", movements);
     }
 
     // log() << "movements" << std::endl;

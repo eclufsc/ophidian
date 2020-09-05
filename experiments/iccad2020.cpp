@@ -277,10 +277,13 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-        run_ilp_for_circuit(design, circuit_name);
+        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        run_ilp_for_circuit(design, circuit_name, movements);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         
         // log() << "done, " << is_connected << circuit_name << std::endl;
+        ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+        iccad_output_writer.write_ICCAD_2020_output( circuit_name+"_OUTPUT.txt", movements);
     }
 
 
@@ -317,10 +320,13 @@ TEST_CASE("run ILP for iccad20 benchmarks 2", "[iccad20]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-        run_ilp_for_circuit(design, circuit_name);
+        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        run_ilp_for_circuit(design, circuit_name, movements);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         
         // log() << "done, " << is_connected << circuit_name << std::endl;
+        ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+        iccad_output_writer.write_ICCAD_2020_output( circuit_name+"_OUTPUT.txt", movements);
     }
 
 
@@ -387,8 +393,12 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
             auto net_wirelength = design.global_routing().wirelength(net);
             nets_initial_wirelength[net] = net_wirelength; 
         }
-        
-         run_ilp_for_circuit(design, circuit_name);
+        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        run_ilp_for_circuit(design, circuit_name, movements);
+
+        ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+        iccad_output_writer.write_ICCAD_2020_output( circuit_name+"_OUTPUT.txt", movements);
+
         //run_circuit(design, circuit_name);
         //run_mcf_multithreading(design);
         //write_statistics_for_circuit(design, circuit_name, nets_initial_wirelength);

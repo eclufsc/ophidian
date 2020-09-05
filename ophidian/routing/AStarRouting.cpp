@@ -18,8 +18,20 @@ namespace ophidian::routing
     {
         bool operator()(const AStarRouting::point_type& p1, const AStarRouting::point_type& p2) const
         {
-            if (p1.x() != p2.x()) return p1.x() < p2.x();
-            return p1.y() < p2.y();
+            // if (p1.x() != p2.x()) return p1.x() < p2.x();
+            // return p1.y() < p2.y();
+
+            if( std::abs(p1.x().value() - p2.x().value()) > std::numeric_limits<double>::epsilon() ){
+                return p1.x() < p2.x();
+            }else{
+                // x = nos dois
+                if( std::abs(p1.y().value() - p2.y().value()) > std::numeric_limits<double>::epsilon() )
+                {
+                    // y diferente
+                    return p1.y() < p2.y();
+                }
+            }
+            return false;
         }
     };
 
@@ -145,10 +157,14 @@ namespace ophidian::routing
     //return false when all cells are inside the same gcell
     bool AStarRouting::init_flute_graph()
     {
+        using pin_container_type = std::vector<ophidian::circuit::PinInstance>;
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
-        std::map<point_type, std::string, comp> pins_map;
-        std::map<point_type, flute_node_type, comp> created_nodes;
+        // std::map<point_type, std::string, comp> pins_map;
+        // std::map<point_type, flute_node_type, comp> created_nodes;
+        std::map<std::pair<int, int>, pin_container_type> pins_map;
+        std::map<std::pair<int, int>, flute_node_type> created_nodes;
+
 
         //Run Flute
         std::vector<interconnection::Flute::Point> net_points;
@@ -157,9 +173,11 @@ namespace ophidian::routing
         for(auto pin : net_pins)
         {
             auto pin_location = placement.location(pin);
+            auto point = std::make_pair(std::round(pin_location.x().value()), std::round(pin_location.y().value()));
             net_points.push_back(pin_location);
             auto pin_name = netlist.name(pin);
-            pins_map[pin_location] = pin_name;
+            // pins_map[pin_location] = pin_name;
+            pins_map[point].push_back(pin);
         }
         auto & flute = interconnection::Flute::instance();
         auto tree = flute.create(net_points);
@@ -178,28 +196,30 @@ namespace ophidian::routing
             auto tree_segment = *tree_segment_it;
             auto segment_start = tree->position(tree->u(tree_segment));
             auto segment_end = tree->position(tree->v(tree_segment));
+            auto segment_start_int = std::make_pair(std::round(segment_start.x().value()), std::round(segment_start.y().value()));
+            auto segment_end_int = std::make_pair(std::round(segment_end.x().value()), std::round(segment_end.y().value()));
 
             if (AStarDebug) std::cout << "tree segment " << segment_start.x().value() << "," << segment_start.y().value() << "->" << segment_end.x().value() << "," << segment_end.y().value() << std::endl;
 
-            auto pin1_name = pins_map.find(segment_start) != pins_map.end() ? pins_map[segment_start] : "steiner";
+            auto pin1_name = pins_map.find(segment_start_int) != pins_map.end() ? netlist.name(pins_map[segment_start_int][0]) : "steiner";
             flute_node_type node1;
-            if(created_nodes.count(segment_start))
-                node1 = created_nodes[segment_start];
+            if(created_nodes.count(segment_start_int))
+                node1 = created_nodes[segment_start_int];
             else
             {
                 node1 = m_graph.addNode();
-                created_nodes[segment_start] = node1;
+                created_nodes[segment_start_int] = node1;
                 m_node_map[node1] = FluteNode{segment_start, pin1_name};
             }
 
-            auto pin2_name = pins_map.find(segment_end) != pins_map.end() ? pins_map[segment_end] : "steiner";
+            auto pin2_name = pins_map.find(segment_end_int) != pins_map.end() ? netlist.name(pins_map[segment_end_int][0]) : "steiner";
             flute_node_type node2;
-            if(created_nodes.count(segment_end))
-                node2 = created_nodes[segment_end];
+            if(created_nodes.count(segment_end_int))
+                node2 = created_nodes[segment_end_int];
             else
             {
                 node2 = m_graph.addNode();
-                created_nodes[segment_end] = node2;
+                created_nodes[segment_end_int] = node2;
                 m_node_map[node2] = FluteNode{segment_end, pin2_name};
             }
 

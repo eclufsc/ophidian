@@ -37,8 +37,10 @@ namespace UCal{
             Engine(design_type & design);
             ~Engine();
             void run(std::chrono::steady_clock::time_point start_time);
+            // void run_date21(std::chrono::steady_clock::time_point start_time);
             std::set<std::string>& get_nets_in_panels(){return m_nets_inside_panels;}
             int get_wire_length_segments(const std::vector<AStarSegment> & segments);
+            void run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets);
         private: 
             void construct_net_boxes_rtree(const std::vector<net_type> &nets);
             void cluster_based_on_panel();

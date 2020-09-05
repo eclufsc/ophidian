@@ -110,9 +110,9 @@ namespace ophidian::routing
 
     const GlobalRouting::scalar_type GlobalRouting::wirelength(const GlobalRouting::net_type & net) const{
         scalar_type wirelength = gcells(net).size();
-        if (wirelength == 0)
-            return 1;
-        else    
+        // if (wirelength == 0)
+        //     return 1;
+        // else    
             return wirelength;
     }
 
