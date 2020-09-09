@@ -656,7 +656,7 @@ int main(int argc, char** argv) {
     bool input_found{false};
     string input_file{};
     string circuit_name{};
-    string experiment{};
+    int experiment = (argc == 4)? std::atoi(argv[3]) : -1;
 
     bool output_found{false};
     string output{};
@@ -696,11 +696,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (argv[3])
-    {
-        experiment = argv[3];
-    }
-
     // must have flags:
     if (input_file == "")
     {
@@ -732,39 +727,39 @@ int main(int argc, char** argv) {
     // "exp6" --> "ILP_with_movements_Astar_with_movements"
     // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
 
-    switch (experiment.at(3))
+    switch (experiment)
     {
-    case '1':
+    case 1:
         time_begin = std::chrono::high_resolution_clock::now();
         Astar_without_paneling_and_without_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '2':
+    case 2:
         time_begin = std::chrono::high_resolution_clock::now();
         Astar_with_paneling_and_without_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '3':
+    case 3:
         time_begin = std::chrono::high_resolution_clock::now();
         Astar_with_paneling_and_with_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '4':
+    case 4:
         time_begin = std::chrono::high_resolution_clock::now();
         Astar_with_paneling_and_with_movements_parallel(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '5':
+    case 5:
         time_begin = std::chrono::high_resolution_clock::now();
         ILP_without_movements_Astar_without_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '6':
+    case 6:
         time_begin = std::chrono::high_resolution_clock::now();
         // ILP_with_movements_Astar_with_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    case '7':
+    case 7:
         time_begin = std::chrono::high_resolution_clock::now();
         ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
