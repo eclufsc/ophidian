@@ -8,6 +8,8 @@
 #include <ophidian/routing/Engine.h>
 #include <chrono>
 
+#include "date21.h"
+
 using namespace std;
 using namespace ophidian::util;
 // int THREADS_DEFAULT_VALUE = 1;
@@ -653,6 +655,7 @@ int main(int argc, char** argv) {
     bool input_found{false};
     string input_file{};
     string circuit_name{};
+    string experiment{};
 
     bool output_found{false};
     string output{};
@@ -692,6 +695,11 @@ int main(int argc, char** argv) {
         }
     }
 
+    if (argv[3])
+    {
+        experiment = argv[3];
+    }
+
     // must have flags:
     if (input_file == "")
     {
@@ -711,14 +719,72 @@ int main(int argc, char** argv) {
 
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-    
-    //run_for_circuit(design, circuit_name, output);
-    run_mcf_for_circuit(design,circuit_name, output);
 
     auto time_end = std::chrono::high_resolution_clock::now();
+    
+    // "exp1" --> "Astar_without_paneling_and_without_movements"
+    // "exp2" --> "Astar_with_paneling_and_without_movements"
+    // "exp3" --> "Astar_with_paneling_and_with_movements"
+    // "exp4" --> "Astar_with_paneling_and_with_movements_parallel"
+
+    // "exp5" --> "ILP_without_movements_Astar_without_movements"
+    // "exp6" --> "ILP_with_movements_Astar_with_movements"
+    // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
+
+    switch (experiment.at(3))
+    {
+    case '1':
+        time_begin = std::chrono::high_resolution_clock::now();
+        Astar_without_paneling_and_without_movements(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '2':
+        time_begin = std::chrono::high_resolution_clock::now();
+        Astar_with_paneling_and_without_movements(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '3':
+        time_begin = std::chrono::high_resolution_clock::now();
+        Astar_with_paneling_and_with_movements(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '4':
+        time_begin = std::chrono::high_resolution_clock::now();
+        Astar_with_paneling_and_with_movements_parallel(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '5':
+        time_begin = std::chrono::high_resolution_clock::now();
+        ILP_without_movements_Astar_without_movements(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '6':
+        time_begin = std::chrono::high_resolution_clock::now();
+        ILP_with_movements_Astar_with_movements(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    case '7':
+        time_begin = std::chrono::high_resolution_clock::now();
+        ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    
+    default:
+        //run the code sent to the contest;
+        time_begin = std::chrono::high_resolution_clock::now();
+        run_mcf_for_circuit(design,circuit_name, output);
+        time_end = std::chrono::high_resolution_clock::now();
+        break;
+    }
+
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
     auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
     std::cout << "Total run_time in: " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
+    
+    //Write the csv file
+    auto csv_file = circuit_name + "_results.csv";
+    write_csv_header(csv_file);
+    write_csv(design, circuit_name, csv_file, duration_s);
 
     return 0;
 }
