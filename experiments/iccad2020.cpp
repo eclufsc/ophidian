@@ -13,6 +13,23 @@
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 using namespace ophidian::util;
 
+void write_csv_header(std::string csv_file_name) {
+    std::ofstream csv_file(csv_file_name, std::ofstream::out);
+
+    csv_file << "design,wirelength,number of vias,runtime" << std::endl;
+}
+
+void write_csv(ophidian::design::Design & design, std::string circuit_name, std::string csv_file_name, double runtime) {
+    std::ofstream csv_file(csv_file_name, std::ofstream::app);
+
+    auto nets = std::vector<ophidian::circuit::Net>{design.netlist().begin_net(), design.netlist().end_net()};
+
+    auto wirelength = design.global_routing().wirelength(nets);
+    auto vias = design.global_routing().number_of_vias(nets);
+
+    csv_file << circuit_name << "," << wirelength << "," << vias << "," << runtime << std::endl;
+}
+
 //Time in seconds
 bool time_out(int time_limit)
 {
@@ -687,4 +704,38 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
         double reduction = 1.0 - ( (double) final_wirelength / (double) initial_wirelength) ;
         log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
     }
+}
+
+TEST_CASE("write csv of initial routing", "[iccad20]") {
+    std::vector<std::string> circuit_names = {
+        "case1",
+        "case2",
+        "case3",
+        "case4",
+        "case5",
+        "case6",
+    };
+
+     std::string benchmarks_path = "./input_files/iccad2020/cases/";
+    auto csv_file = "initial_results.csv";
+    write_csv_header(csv_file);
+    for (auto circuit_name : circuit_names) {
+        log() << "running circuit " << circuit_name << std::endl;
+
+        std::string iccad_2020_file = benchmarks_path + circuit_name + ".txt";
+
+        log() << "file " << iccad_2020_file << std::endl;
+
+        auto iccad_2020 = ophidian::parser::ICCAD2020{iccad_2020_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+
+        write_csv(design, circuit_name, csv_file, 0);
+        //run_circuit(design, circuit_name);
+        //run_mcf_multithreading(design);
+        //write_statistics_for_circuit(design, circuit_name, nets_initial_wirelength);
+    }
+
+
 }

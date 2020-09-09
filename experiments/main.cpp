@@ -719,7 +719,6 @@ int main(int argc, char** argv) {
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
     auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
     std::cout << "Total run_time in: " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
-        
 
     return 0;
 }
