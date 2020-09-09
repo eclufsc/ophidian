@@ -22,6 +22,8 @@ list(REMOVE_ITEM ophidian_experiments_test "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 # only main
 file(GLOB_RECURSE ophidian_experiments_source
     "main.cpp"
+    "date21.h"
+    "date21.cpp"
 )
 
 # Add main target

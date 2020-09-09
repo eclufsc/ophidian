@@ -8,7 +8,6 @@
 #include <ophidian/routing/Engine.h>
 #include <chrono>
 
-#include "date21.h"
 
 using namespace std;
 using namespace ophidian::util;
@@ -646,6 +645,8 @@ std::string extract_circuit_name(const std::string input_file)
     return circuit;
 }
 
+#include "date21.h"
+
 int main(int argc, char** argv) {
     //start_time = std::chrono::steady_clock::now();
     auto time_begin = std::chrono::high_resolution_clock::now();   
@@ -760,7 +761,7 @@ int main(int argc, char** argv) {
         break;
     case '6':
         time_begin = std::chrono::high_resolution_clock::now();
-        ILP_with_movements_Astar_with_movements(design,circuit_name, output);
+        // ILP_with_movements_Astar_with_movements(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     case '7':
@@ -782,7 +783,7 @@ int main(int argc, char** argv) {
     std::cout << "Total run_time in: " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
     
     //Write the csv file
-    auto csv_file = circuit_name + "_results.csv";
+    auto csv_file = experiment + "_initial_results.csv";
     write_csv_header(csv_file);
     write_csv(design, circuit_name, csv_file, duration_s);
 

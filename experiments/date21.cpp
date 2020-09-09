@@ -1,4 +1,7 @@
+
 #include "date21.h"
+#include <iostream>
+#include <fstream>
 
 void write_csv_header(std::string csv_file_name) {
     std::ofstream csv_file(csv_file_name, std::ofstream::out);
