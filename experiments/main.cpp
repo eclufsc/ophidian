@@ -718,6 +718,8 @@ int main(int argc, char** argv) {
 
     auto time_end = std::chrono::high_resolution_clock::now();
     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
+    ophidian::routing::AStarRouting astar_routing{design};
+    auto cells = compute_cell_move_costs_descending_order(design);
     
     // "exp1" --> "Astar_without_paneling_and_without_movements"
     // "exp2" --> "Astar_with_paneling_and_without_movements"
@@ -758,14 +760,15 @@ int main(int argc, char** argv) {
     case 6:
         time_begin = std::chrono::high_resolution_clock::now();
         ILP_with_movements_Astar_with_movements(design,circuit_name, output, movements);
+        move_cells_for_until_x_minutes(design, 1000000, cells, movements, astar_routing);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     case 7:
         time_begin = std::chrono::high_resolution_clock::now();
         ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output, movements);
+        move_cells_for_until_x_minutes(design, 1000000, cells, movements, astar_routing);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    
     default:
         //run the code sent to the contest;
         time_begin = std::chrono::high_resolution_clock::now();

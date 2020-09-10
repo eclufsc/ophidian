@@ -160,5 +160,7 @@ void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design &
 
     engine.run_astar_on_panels_parallel(std::numeric_limits<int>::max(), 4);
 
+
+
     check_nets_connectivity(design, nets);
 }
