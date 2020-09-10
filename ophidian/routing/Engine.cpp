@@ -378,14 +378,14 @@ void Engine::cluster_based_on_panel(){
 }//end cluster_based_on_panel_v2
 
 
-void Engine::run_astar_on_panels_parallel(int time_limit){
+void Engine::run_astar_on_panels_parallel(int time_limit, int min_panel){
     auto start_time = std::chrono::steady_clock::now();
     bool time_out = false;
     auto number_of_levels = m_panel_level.size();
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        //if(level <= 5) continue;
+        if(level <= min_panel) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
@@ -438,6 +438,65 @@ void Engine::run_astar_on_panels_parallel(int time_limit){
     }//end for 
 
 }//end run_astar_on_panels_parallel
+
+void Engine::run_astar_on_panels_sequential(int time_limit, int min_panel){
+    auto start_time = std::chrono::steady_clock::now();
+    bool time_out = false;
+    auto number_of_levels = m_panel_level.size();
+    std::vector<ophidian::circuit::Net> astar_nets;
+    for(auto panel_level: m_panel_level){
+        auto level = panel_level.first;
+        if(level <= min_panel) continue;
+        auto & ids = panel_level.second;
+        std::vector<unsigned int> even_ids;
+        std::vector<unsigned int> odd_ids;
+        log() << "level: " << level << "\n";
+        for(auto & id : ids){
+            if(id%2==0){
+                even_ids.push_back(id);
+            }else{
+                odd_ids.push_back(id);
+            }//end if
+       
+            auto & nets_panel = m_panel_index_to_nets_dict[id];
+            for (auto net_name : nets_panel) {
+                astar_nets.push_back(m_net_name_to_net_type_dict[net_name]);
+            }
+        }//end for 
+         
+        if(time_out) break;
+        // //even panels
+        for(int i = 0; i < even_ids.size(); i++){
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+            time_out = diff.count() > time_limit * 60.0 ? true : false;
+            if(time_out){
+                break;
+            }
+            // std::cout << "id: " << id << std::endl;
+            run_astar_on_panel(even_ids[i]);
+        }//end for 
+
+        if(time_out) break;
+
+        // // // odd panels
+       
+        for(int i = 0; i < odd_ids.size(); i++){
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
+           
+            time_out = diff.count() > time_limit * 60.0 ? true : false;
+            if(time_out){
+                break;
+            }
+            // std::cout << "id: " << id << std::endl;
+            run_astar_on_panel(odd_ids[i]);
+        }
+
+        if(time_out) break;
+    }//end for 
+
+}//end run_astar_on_panels_sequential
 
 void Engine::run_astar_on_panel(unsigned int panel_id){
     

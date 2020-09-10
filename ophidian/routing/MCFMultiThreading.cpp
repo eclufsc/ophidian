@@ -1004,6 +1004,82 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
 }//end run_ilp_on_panels_parallel
 
 
+void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){  
+    m_total_panel_nets = 0;
+    auto number_of_levels = m_panel_level.size();
+    if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
+    std::vector<std::vector<unsigned int>> panels_vec;
+        
+
+    for(auto panel_level: m_panel_level){;
+        auto level = panel_level.first;
+        auto & ids = panel_level.second;
+        std::vector<unsigned int> even_ids;
+        std::vector<unsigned int> odd_ids;
+        if(DEBUG_PANEL_PARALLEL) log() << "level: " << level << "\n";
+        for(auto id : ids){
+            if(id%2==0){
+                even_ids.push_back(id);
+            }else{
+                odd_ids.push_back(id);
+            }//end if
+        }//end for 
+        // omp_set_num_threads(8);
+
+        // //even panels
+        for(int i = 0; i < even_ids.size(); i++){
+            auto id = even_ids[i];
+            // printf("Number of threads: %d",  omp_get_num_threads());
+            //std::cout << "id: " << id << std::endl;
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
+
+            for (auto movement : local_movements) {
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
+                //m_design.placement().place(movement.first, movement.second);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                movements.push_back(movement);
+            } 
+
+            //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
+        }//end for
+        update_global_routing();
+
+        // odd panels
+        for(int i = 0; i < odd_ids.size(); i++){
+            auto id = odd_ids[i];
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
+            
+            for (auto movement : local_movements) {
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
+                //m_design.placement().place(movement.first, movement.second);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                movements.push_back(movement);
+            } 
+
+            //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
+        }
+
+        m_design.placement().reset_rtree();
+        update_global_routing();
+        // break;
+        if(level == 5){
+            break;
+        }
+        
+    }//end for 
+
+    std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    std::cout << "total nets targeted by panel: " << m_total_panel_nets << "out of " << nets.size() << std::endl;
+}//end run_ilp_on_panels_sequential
+
 void MCFMultiThreading::run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
     int num_panels = m_index_to_panel.size();
     

@@ -41,10 +41,11 @@ namespace UCal{
             std::set<std::string>& get_nets_in_panels(){return m_nets_inside_panels;}
             int get_wire_length_segments(const std::vector<AStarSegment> & segments);
             void run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets);
+            void run_astar_on_panels_parallel(int remaining_time, int min_panel = -1);
+            void run_astar_on_panels_sequential(int time_limit, int min_panel = -1);          
         private: 
             void construct_net_boxes_rtree(const std::vector<net_type> &nets);
             void cluster_based_on_panel();
-            void run_astar_on_panels_parallel(int remaining_time);           
             void run_astar_on_panel(unsigned int panel_id);
             AstarResultV2 run_astar_on_net(net_type& net);
             void update_astar_on_global_routing(AstarResultV2& astar_result);
