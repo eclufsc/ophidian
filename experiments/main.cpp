@@ -698,7 +698,7 @@ int main(int argc, char** argv) {
 
     if (argv[3])
     {
-        experiment = argv[3];
+        experiment = stoi(argv[3]);
     }
 
     // must have flags:
@@ -722,6 +722,7 @@ int main(int argc, char** argv) {
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
 
     auto time_end = std::chrono::high_resolution_clock::now();
+    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
     
     // "exp1" --> "Astar_without_paneling_and_without_movements"
     // "exp2" --> "Astar_with_paneling_and_without_movements"
@@ -756,7 +757,7 @@ int main(int argc, char** argv) {
         break;
     case 5:
         time_begin = std::chrono::high_resolution_clock::now();
-        ILP_without_movements_Astar_without_movements(design,circuit_name, output);
+        ILP_without_movements_Astar_without_movements(design,circuit_name, output, movements);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     case 6:
@@ -766,7 +767,7 @@ int main(int argc, char** argv) {
         break;
     case 7:
         time_begin = std::chrono::high_resolution_clock::now();
-        ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output);
+        ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output, movements);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     
