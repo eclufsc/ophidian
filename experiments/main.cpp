@@ -696,11 +696,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (argv[3])
-    {
-        experiment = argv[3];
-    }
-
     // must have flags:
     if (input_file == "")
     {
@@ -732,6 +727,8 @@ int main(int argc, char** argv) {
     // "exp6" --> "ILP_with_movements_Astar_with_movements"
     // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
 
+    std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>> movements;
+
     switch (experiment)
     {
     case 1:
@@ -756,17 +753,17 @@ int main(int argc, char** argv) {
         break;
     case 5:
         time_begin = std::chrono::high_resolution_clock::now();
-        ILP_without_movements_Astar_without_movements(design,circuit_name, output);
+        ILP_without_movements_Astar_without_movements(design,circuit_name, output, movements);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     case 6:
         time_begin = std::chrono::high_resolution_clock::now();
-        // ILP_with_movements_Astar_with_movements(design,circuit_name, output);
+        ILP_with_movements_Astar_with_movements(design,circuit_name, output, movements);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     case 7:
         time_begin = std::chrono::high_resolution_clock::now();
-        ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output);
+        ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output, movements);
         time_end = std::chrono::high_resolution_clock::now();
         break;
     
@@ -783,7 +780,7 @@ int main(int argc, char** argv) {
     std::cout << "Total run_time in: " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
     
     //Write the csv file
-    auto csv_file = experiment + "_initial_results.csv";
+    auto csv_file = "exp" + std::to_string(experiment) + "_initial_results.csv";
     write_csv_header(csv_file);
     write_csv(design, circuit_name, csv_file, duration_s);
 
