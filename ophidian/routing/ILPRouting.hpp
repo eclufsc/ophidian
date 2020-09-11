@@ -2099,8 +2099,8 @@ namespace ophidian::routing {
             }
             
             //TIAGO
-             //if(gcells_constraints_bool[gcell] )
-            if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
+             if(gcells_constraints_bool[gcell] )
+            //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto demand = m_gcells_demand[gcell];

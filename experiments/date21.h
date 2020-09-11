@@ -2,6 +2,7 @@
 #define EXPERIMENTS_DATE21
 
 #include <ophidian/design/Design.h>
+#include <ophidian/routing/Engine.h>
 
 
     // "exp1" --> "Astar_without_paneling_and_without_movements"
@@ -24,6 +25,6 @@
     
     void ILP_without_movements_Astar_without_movements(ophidian::design::Design & design, std::string circuit_name, std::string output, std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>> & movements);
     void ILP_with_movements_Astar_with_movements(ophidian::design::Design & design, std::string circuit_name, std::string output, std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>> & movements);
-    void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design & design, std::string circuit_name, std::string output, std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>> & movements);
+    void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design & design, std::string circuit_name, std::string output, std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>> & movements, UCal::Engine & engine);
 
 #endif

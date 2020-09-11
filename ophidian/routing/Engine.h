@@ -42,7 +42,9 @@ namespace UCal{
             int get_wire_length_segments(const std::vector<AStarSegment> & segments);
             void run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets);
             void run_astar_on_panels_parallel(int remaining_time, int min_panel = -1);
-            void run_astar_on_panels_sequential(int time_limit, int min_panel = -1);          
+            void run_astar_on_panels_sequential(int time_limit, int min_panel = -1);         
+
+            ophidian::routing::AStarRouting & astar_routing() { return m_astar_routing; } 
         private: 
             void construct_net_boxes_rtree(const std::vector<net_type> &nets);
             void cluster_based_on_panel();

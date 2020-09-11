@@ -144,23 +144,22 @@ void ILP_with_movements_Astar_with_movements(ophidian::design::Design & design, 
 }
 
 // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
-void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design & design, std::string circuit_name, std::string output, movements_type & movements)
+void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design & design, std::string circuit_name, std::string output, movements_type & movements, UCal::Engine & engine)
 {
     printlog("Initing ILP_with_movements_Astar_with_movements_parallel");
 
     auto mcf = UCal::MCFMultiThreading(design);
-    auto engine = UCal::Engine(design);
+    //auto engine = UCal::Engine(design);
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+    
+    design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
 
     design.placement().reset_rtree();
     mcf.construct_net_boxes_rtree(nets);
     mcf.cluster_based_on_panel_v2();
-    design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
     mcf.run_ilp_on_panels_parallel(movements);
 
     engine.run_astar_on_panels_parallel(std::numeric_limits<int>::max(), 4);
 
-
-
-    check_nets_connectivity(design, nets);
+    //check_nets_connectivity(design, nets);
 }

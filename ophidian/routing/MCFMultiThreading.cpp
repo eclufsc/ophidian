@@ -75,7 +75,7 @@ void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<
     // run_ilp_on_panel(1,movements);
 
     m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
-    //run_ilp_on_panels_parallel(movements);
+    run_ilp_on_panels_parallel(movements);
     log() << "run astar on panels" << std::endl;
     run_astar_on_panels_parallel(movements);
     if(DEBUG_ASTAR_PARALLEL) net_astar_file.close();
@@ -1204,7 +1204,7 @@ void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophid
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        //if(level <= 5) continue;
+        if(level <= 5) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
