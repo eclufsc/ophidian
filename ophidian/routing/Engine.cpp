@@ -5,14 +5,17 @@
 #include <iterator>
 #include <fstream>
 #include <iostream>
-#include <chrono>
 #include <random>
+#include "TimerProfiler.h"
 
 namespace UCal{
 
 #define max_time_to_run 25
 
 #define DEBUG_PANEL false
+#define DEBUG_SECTION false
+#define DEBUG_PANEL_PARALLEL false
+#define num_nets_to_route 10000
 
 Engine::Engine(design_type & design):
     m_design(design)
@@ -29,17 +32,38 @@ Engine::~Engine(){
 }//end Engine destructor
 
 
-void Engine::run(std::chrono::steady_clock::time_point start_time){
+Json Engine::run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements,std::chrono::steady_clock::time_point start_time){
     log() << "A* routing only" << std::endl;
-    
+
+    loadParams();
+
+    UCal::TimerProfiler timer_construct_net_boxes_rtree;
+    UCal::TimerProfiler timer_cluster_based_on_panel;
+    UCal::TimerProfiler timer_run_ilp_on_panels_parallel_loop;
+    UCal::TimerProfiler timer_run_astar_on_panels_parallel_loop;
+    UCal::TimerProfiler timer_run_astar_on_panels_parallel_section;
+    UCal::TimerProfiler timer_run_astar_on_panels_sequential;
 
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
   
     m_design.placement().reset_rtree();
 
-    construct_net_boxes_rtree(nets);
-    
-    cluster_based_on_panel();
+    // if(m_global_params["construct_net_boxes_rtree"] == "true"){
+        std::cout << "construct_net_boxes_rtree\n";
+        timer_construct_net_boxes_rtree.start();
+        construct_net_boxes_rtree(nets);
+        timer_construct_net_boxes_rtree.stop();
+    // }//end if 
+        
+
+    // if(m_global_params["cluster_based_on_panel"] == "true"){
+        std::cout << "cluster_based_on_panel\n";
+        timer_cluster_based_on_panel.start();
+        cluster_based_on_panel();
+        timer_cluster_based_on_panel.stop();
+    // }//end if 
+
+
 
     auto end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> diff = end_time-start_time;
@@ -47,7 +71,48 @@ void Engine::run(std::chrono::steady_clock::time_point start_time){
     auto remaining_time = max_time_to_run - current_time;
     log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
 
-    run_astar_on_panels_parallel(remaining_time);
+    if(m_global_params["run_ilp_on_panels_parallel"] == "true"){
+        std::cout << "ilp parallel\n";
+        timer_run_ilp_on_panels_parallel_loop.start();
+        m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
+        run_ilp_on_panels_parallel(movements);
+        timer_run_ilp_on_panels_parallel_loop.stop();
+    }
+    
+    if(m_global_params["run_astar_on_panels_parallel_loop"] == "true"){
+        std::cout << "loop\n";
+        timer_run_astar_on_panels_parallel_loop.start();
+        run_astar_on_panels_parallel_loop(remaining_time);
+        timer_run_astar_on_panels_parallel_loop.stop();
+    }
+    if(m_global_params["run_astar_on_panels_parallel_section"] == "true"){
+        std::cout << "section\n";
+        timer_run_astar_on_panels_parallel_section.start();
+        run_astar_on_panels_parallel_section(remaining_time);
+        timer_run_astar_on_panels_parallel_section.stop();
+    }
+    if(m_global_params["run_astar_on_panels_sequential"] == "true"){
+        std::cout << "sequential\n";
+        timer_run_astar_on_panels_sequential.start();
+        run_astar_on_panels_sequential(remaining_time);
+        timer_run_astar_on_panels_sequential.stop();
+    }
+
+    m_timer_report_json["construct_net_boxes_rtree"] = timer_construct_net_boxes_rtree.userTime();
+    m_timer_report_json["cluster_based_on_panel"] = timer_cluster_based_on_panel.userTime();
+    m_timer_report_json["run_ilp_on_panels_parallel_loop"] = timer_run_ilp_on_panels_parallel_loop.userTime();
+    m_timer_report_json["run_astar_on_panels_parallel_loop"] = timer_run_astar_on_panels_parallel_loop.userTime();
+    m_timer_report_json["run_astar_on_panels_parallel_section"] = timer_run_astar_on_panels_parallel_section.userTime();
+    m_timer_report_json["run_astar_on_panels_sequential"] = timer_run_astar_on_panels_sequential.userTime();
+    
+
+    return m_timer_report_json;
+    // // write prettified JSON to another file
+    // std::string jsonFileNamestr = m_timer_report_json["file_name_report"];
+    // // std::ifstream jsonFile(jsonFileNamestr, std::ifstream::binary);
+    // std::ofstream write_report_file(jsonFileNamestr);
+    // write_report_file << std::setw(4) << m_timer_report_json << std::endl;   
+
 }//end run 
 
 // void Engine::run_date21(std::chrono::steady_clock::time_point start_time){
@@ -376,16 +441,14 @@ void Engine::cluster_based_on_panel(){
 
    
 }//end cluster_based_on_panel_v2
-
-
-void Engine::run_astar_on_panels_parallel(int time_limit, int min_panel){
+void Engine::run_astar_on_panels_sequential(int time_limit){
     auto start_time = std::chrono::steady_clock::now();
     bool time_out = false;
     auto number_of_levels = m_panel_level.size();
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        if(level <= min_panel) continue;
+        //if(level <= 5) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
@@ -402,6 +465,47 @@ void Engine::run_astar_on_panels_parallel(int time_limit, int min_panel){
                 astar_nets.push_back(m_net_name_to_net_type_dict[net_name]);
             }
         }//end for 
+         
+      
+        for(int i = 0; i < even_ids.size(); i++){
+            run_astar_on_panel(even_ids[i]);
+        }//end for 
+
+
+        for(int i = 0; i < odd_ids.size(); i++){
+            run_astar_on_panel(odd_ids[i]);
+        }
+
+       
+    }//end for 
+
+}//end run_astar_on_panels_parallel
+
+void Engine::run_astar_on_panels_parallel_loop(int time_limit){
+    auto start_time = std::chrono::steady_clock::now();
+    bool time_out = false;
+    auto number_of_levels = m_panel_level.size();
+    std::vector<ophidian::circuit::Net> astar_nets;
+    for(auto panel_level: m_panel_level){
+        auto level = panel_level.first;
+        //if(level <= 5) continue;
+        auto & ids = panel_level.second;
+        std::vector<unsigned int> even_ids;
+        std::vector<unsigned int> odd_ids;
+        log() << "level: " << level << "\n";
+        for(auto & id : ids){
+            if(id%2==0){
+                even_ids.push_back(id);
+            }else{
+                odd_ids.push_back(id);
+            }//end if
+       
+            auto & nets_panel = m_panel_index_to_nets_dict[id];
+            for (auto net_name : nets_panel) {
+                astar_nets.push_back(m_net_name_to_net_type_dict[net_name]);
+            }
+        }//end for 
+
          
         if(time_out) break;
         // //even panels
@@ -439,14 +543,15 @@ void Engine::run_astar_on_panels_parallel(int time_limit, int min_panel){
 
 }//end run_astar_on_panels_parallel
 
-void Engine::run_astar_on_panels_sequential(int time_limit, int min_panel){
+
+void Engine::run_astar_on_panels_parallel_section(int time_limit){
     auto start_time = std::chrono::steady_clock::now();
     bool time_out = false;
     auto number_of_levels = m_panel_level.size();
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        if(level <= min_panel) continue;
+        //if(level <= 5) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;
@@ -466,37 +571,175 @@ void Engine::run_astar_on_panels_sequential(int time_limit, int min_panel){
          
         if(time_out) break;
         // //even panels
-        for(int i = 0; i < even_ids.size(); i++){
-            auto end_time = std::chrono::steady_clock::now();
-            std::chrono::duration<double> diff = end_time-start_time;
-            time_out = diff.count() > time_limit * 60.0 ? true : false;
-            if(time_out){
-                break;
+        omp_set_num_threads( 8 );
+        if(DEBUG_SECTION) std::cout << "even_ids.size(): " << even_ids.size() << std::endl;
+        if(DEBUG_SECTION) std::cout << "odd_ids.size(): " << odd_ids.size() << std::endl;
+        if(DEBUG_SECTION) std::cout << "omp_get_num_threads: "<< omp_get_num_threads() <<std::endl;
+
+        
+        for(int i = 0; i < even_ids.size(); i+=8)
+        {
+            #pragma omp parallel sections
+            {
+                // Number 1
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section0_even\n";
+                    if(i <= even_ids.size())
+                        run_astar_on_panel(even_ids[i]);
+                }
+
+                // Number 2
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section1_even\n";
+                    if(i+1 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+1]);
+                }
+
+                // Number 3
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section2_even\n";
+                    if(i+2 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+2]);
+                }
+
+                // Number 4
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION)  std::cout << "section3_even\n";
+                    if(i+3 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+3]);
+                }
+
+                // Number 5
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION)  std::cout << "section4_even\n";
+                    if(i+4 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+4]);
+                }
+
+                // Number 6
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section5_even\n";
+                    if(i+5 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+5]);
+                }
+
+                // Number 7
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section6_even\n";
+                    if(i+6 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+6]);
+                }
+
+                // Number 8
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section7_even\n";
+                    if(i+7 <= even_ids.size())
+                        run_astar_on_panel(even_ids[i+7]);
+                }
+                    
             }
-            // std::cout << "id: " << id << std::endl;
-            run_astar_on_panel(even_ids[i]);
         }//end for 
 
-        if(time_out) break;
+
+        
+        for(int i = 0; i < odd_ids.size(); i+=8)
+        {
+            #pragma omp parallel sections
+            {
+                // Number 1
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section0_odd\n";
+                    if(i <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i]);
+                }
+
+                // Number 2
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section1_odd\n";
+                    if(i+1 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+1]);
+                }
+
+                // Number 3
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section2_odd\n";
+                    if(i+2 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+2]);
+                }
+
+                // Number 4
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section3_odd\n";
+                    if(i+3 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+3]);
+                }
+
+                // Number 5
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section4_odd\n";
+                    if(i+4 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+4]);
+                }
+
+                // Number 6
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section5_odd\n";
+                    if(i+5 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+5]);
+                }
+
+                // Number 7
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section6_odd\n";
+                    if(i+6 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+6]);
+                }
+
+                // Number 8
+                #pragma omp section
+                {
+                    if(DEBUG_SECTION) std::cout << "section7_odd\n";
+                    if(i+7 <= odd_ids.size())
+                        run_astar_on_panel(odd_ids[i+7]);
+                }
+                    
+            }
+        }//end for 
+
 
         // // // odd panels
-       
-        for(int i = 0; i < odd_ids.size(); i++){
-            auto end_time = std::chrono::steady_clock::now();
-            std::chrono::duration<double> diff = end_time-start_time;
-           
-            time_out = diff.count() > time_limit * 60.0 ? true : false;
-            if(time_out){
-                break;
-            }
-            // std::cout << "id: " << id << std::endl;
-            run_astar_on_panel(odd_ids[i]);
-        }
+        // #pragma omp parallel sections
+        // for(int i = 0; i < odd_ids.size(); i++){
+        //     auto end_time = std::chrono::steady_clock::now();
+        //     std::chrono::duration<double> diff = end_time-start_time;
+        //     #pragma omp critical
+        //     time_out = diff.count() > time_limit * 60.0 ? true : false;
+        //     if(time_out){
+        //         #pragma omp cancel for
+        //     }
+        //     // std::cout << "id: " << id << std::endl;
+        //     run_astar_on_panel(odd_ids[i]);
+        // }
 
-        if(time_out) break;
+        // if(time_out) break;
     }//end for 
 
-}//end run_astar_on_panels_sequential
+}//end run_astar_on_panels_parallel
 
 void Engine::run_astar_on_panel(unsigned int panel_id){
     
@@ -552,10 +795,10 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
     int init_wl  = get_wire_length_segments(initial_segments);
     int astar_wl = get_wire_length_segments(astar_segments);
 
-    if(initial_segments.size() == 0){
-        // case that not exist initial solution
-        init_wl = std::numeric_limits<int>::max();
-    }
+    // if(initial_segments.size() == 0){
+    //     // case that not exist initial solution
+    //     init_wl = std::numeric_limits<int>::max();
+    // }
 
 
     // std::cout << m_design.netlist().name(net) <<","<<std::to_string(init_wl) << "," << std::to_string(astar_wl) << std::endl;
@@ -587,16 +830,18 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
         if (!apply) {
             std::cout << "WARNING: FAILED TO APPLY" << std::endl;
         }
-    } else if(initial_segments.size() > 0){
+    // } else if(initial_segments.size() > 0){
+    } else{
         bool undo = m_astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
         if(!undo) {
             std::cout<<"WARNING: UNDO ROUTING FAILED, THIS SHOULD NEVER HAPPEN!"<<std::endl;
             std::cout << "NET " << net_name << std::endl;
             //break;
         }
-    }else{
-        std::cout<<"WARNING: ROUTING FAILED, "<< m_design.netlist().name(net) << " are not routed!"<<std::endl;
     }
+    // else{
+    //     std::cout<<"WARNING: ROUTING FAILED, "<< m_design.netlist().name(net) << " are not routed!"<<std::endl;
+    // }
 }//end apply_astar
 
 int Engine::get_wire_length_segments(const std::vector<AStarSegment> & segments){
@@ -620,5 +865,302 @@ int Engine::get_wire_length_segments(const std::vector<AStarSegment> & segments)
     auto wirelength = gcells.size();
     return wirelength;
 }//end get_wire_length_segments
+
+
+void Engine::loadParams(){
+    
+    std::ifstream jsonFileName("file_name.json", std::ifstream::binary);
+    Json tmpFileName; 
+    jsonFileName >> tmpFileName;
+    std::string jsonFileNamestr = tmpFileName["file_name"];
+    m_timer_report_json["file_name_report"] = tmpFileName["file_name_report"];
+    std::ifstream jsonFile(jsonFileNamestr, std::ifstream::binary);
+    jsonFile >> m_global_params;
+
+    // std::cout << "construct_net_boxes_rtree"           << m_global_params["construct_net_boxes_rtree"           ]          << std::endl;
+    // std::cout << "cluster_based_on_panel"              << m_global_params["cluster_based_on_panel"              ]              << std::endl;
+    // std::cout << "run_astar_on_panels_parallel_loop"   << m_global_params["run_astar_on_panels_parallel_loop"   ]    << std::endl;
+    // std::cout << "run_astar_on_panels_parallel_section"<< m_global_params["run_astar_on_panels_parallel_section"] << std::endl;
+    // std::cout << "run_astar_on_panels_sequential"      << m_global_params["run_astar_on_panels_sequential"      ]       << std::endl;
+
+
+}//end method 
+
+void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){  
+    m_total_panel_nets = 0;
+    auto number_of_levels = m_panel_level.size();
+    if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
+    std::vector<std::vector<unsigned int>> panels_vec;
+    
+    // for(auto panel_level: m_panel_level){
+    //     std::vector<unsigned int> panel_indxs; 
+    //     for(auto panel_idx : panel_level.second){
+    //         panel_indxs.push_back(panel_idx);
+    //     }
+    //     panels_vec.push_back(panel_indxs);
+    
+    // }
+    
+
+    for(auto panel_level: m_panel_level){
+    // for(int j = 5; j >= 1; j--){
+        // auto panel_level = panels_vec[j-1];
+        auto level = panel_level.first;
+        // auto level = j;
+        auto & ids = panel_level.second;
+        // auto ids = panel_level;
+        std::vector<unsigned int> even_ids;
+        std::vector<unsigned int> odd_ids;
+        if(DEBUG_PANEL_PARALLEL) log() << "level: " << level << "\n";
+        for(auto id : ids){
+            if(id%2==0){
+                even_ids.push_back(id);
+            }else{
+                odd_ids.push_back(id);
+            }//end if
+        }//end for 
+        // omp_set_num_threads(8);
+        // //even panels
+        #pragma omp parallel for num_threads(8)
+        for(int i = 0; i < even_ids.size(); i++){
+            auto id = even_ids[i];
+            // printf("Number of threads: %d",  omp_get_num_threads());
+            //std::cout << "id: " << id << std::endl;
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
+
+            #pragma omp critical
+            for (auto movement : local_movements) {
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
+                //m_design.placement().place(movement.first, movement.second);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                movements.push_back(movement);
+            } 
+
+            //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
+        }//end for
+        update_global_routing();
+
+        // odd panels
+        #pragma omp parallel for num_threads(8)
+        for(int i = 0; i < odd_ids.size(); i++){
+            auto id = odd_ids[i];
+            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            run_ilp_on_panel(id,local_movements);
+            
+            #pragma omp critical
+            for (auto movement : local_movements) {
+                auto source_location = m_design.placement().location(movement.first);
+                auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
+                //m_design.placement().place(movement.first, movement.second);
+                auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
+                m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
+                //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
+                movements.push_back(movement);
+            } 
+
+            //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
+        }
+
+        m_design.placement().reset_rtree();
+        update_global_routing();
+        // break;
+        // if(level == 5){
+        //     break;
+        // }
+        
+    }//end for 
+
+    std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+
+    std::cout << "total nets targeted by panel: " << m_total_panel_nets << "out of " << nets.size() << std::endl;
+}//end run_ilp_on_panels_parallel
+
+
+void Engine::update_global_routing(){
+    auto & global_routing = m_design.global_routing();
+    for(auto m_ilp_result : m_ilp_results){
+        auto routed_nets = m_ilp_result.m_routed_nets;
+        for(auto routed_net : routed_nets){
+            auto net = routed_net.first;
+            auto ilp_segments = routed_net.second;
+            global_routing.unroute(net);
+            for(auto ilp_segment : ilp_segments){
+                global_routing.add_segment(ilp_segment.wire_box, 
+                            ilp_segment.start_layer, 
+                            ilp_segment.stop_layer, net);
+            }
+            global_routing.increase_demand(net);
+
+        }//end for 
+        
+        
+    }//end for 
+    m_ilp_results.clear();
+}//end update_global_routing
+
+void Engine::run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+    int num_panels = m_index_to_panel.size();
+    
+    //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
+    // ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
+    // 
+    for (unsigned iteration = 0; iteration < 1; iteration++) {
+        auto i = panel_id;
+        if(DEBUG_PANEL) std::cout << "panel_" << i << std::endl;
+        auto nets_panel = m_panel_index_to_nets_dict[i];
+        if(DEBUG_PANEL) std::cout << "num_nets" << nets_panel.size() << std::endl;
+        
+        auto panel_box = m_index_to_panel[i];
+        auto panel_min_corner = point_type{ophidian::util::database_unit_t{panel_box.getXl() + 1}, ophidian::util::database_unit_t{panel_box.getYl() + 1}};
+        auto panel_max_corner = point_type{ophidian::util::database_unit_t{panel_box.getXh() - 1}, ophidian::util::database_unit_t{panel_box.getYh() - 1}};
+        auto panel_region = ophidian::placement::Placement::box_type{panel_min_corner, panel_max_corner};
+
+        /*if (panel_max_corner.y().value() - panel_min_corner.y().value() > 100) {
+            // not first level
+            continue;
+        }*/
+        
+        std::set<std::string> nets_name_set;
+
+        int count_nets = 0;
+        for(auto net : nets_panel){
+            if(count_nets > num_nets_to_route){
+                break;
+            }else{
+                nets_name_set.insert(net);
+            }//end if
+            count_nets++;
+        }//end for 
+
+        m_total_panel_nets = m_total_panel_nets + nets_name_set.size();
+
+        // if(nets_name_set.size() > num_nets_to_route/2){
+        
+            // int idx_range = i*int(nets_name_set.size()/2);
+            // std::set<std::string> nets_name_set_first_half;
+            // std::set<std::string> nets_name_set_second_half;
+            // int counter = 0;
+            // for(auto itr = nets_name_set.begin(); itr != nets_name_set.end();itr++){
+            //     if(counter < nets_name_set.size()/2){
+            //         nets_name_set_first_half.insert(*itr);
+            //     }else{
+            //         nets_name_set_second_half.insert(*itr);
+            //     }
+            //     counter++;
+            // }//end for 
+            
+            // run_ilp(panel_region,nets_name_set_first_half,movements);
+            // run_ilp(panel_region,nets_name_set_second_half,movements);
+        
+        // }else{
+            run_ilp(panel_region,nets_name_set,movements);
+        // }
+
+        
+        
+
+       
+        
+        // m_ilp_results.push_back(ilp_result);
+
+        // m_design.placement().reset_rtree();
+        
+        /*capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+        demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+        if (DEBUG_PANEL) std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+
+        // if(DEBUG_PANEL) std::cout << "result ilproute: " << result.first << std::endl;
+        // if(DEBUG_PANEL) std::cout << "movements: " << movements.size() << std::endl;
+
+        // if (result.first == 0) {
+        //     /*for (auto movement : movements) {
+        //         auto cell = movement.first;
+        //         auto cell_name = m_design.netlist().name(cell);
+        //         std::cout << "moved cell " << cell_name << std::endl;
+        //     }*/
+        //     break;
+        // }
+
+        // std::vector<net_type> nets_set_update;
+
+        // for(auto net : routed_nets){
+        //     nets_set_update.push_back(net);
+        //     // m_fixed_nets.push_back(net);
+        // }
+
+        // for(auto net : unrouted_nets){
+        //     nets_set_update.push_back(net);
+        //     // m_fixed_nets.push_back(net);
+        // }
+
+        // if(DEBUG_PANEL) std::cout << "routed_nets size: " << routed_nets.size() << std::endl;
+        // if(DEBUG_PANEL) std::cout << "unrouted_nets size: " << unrouted_nets.size() << std::endl;
+        // if(DEBUG_PANEL) std::cout << "nets_set_update size: " << nets_set_update.size() << std::endl;
+
+        // auto wl_after_ilp = m_design.global_routing().wirelength(nets_set_update);
+        // if(DEBUG_PANEL) std::cout << "wl after ilp: " << wl_after_ilp << std::endl;
+        
+        // m_panel_wirelength_after_ilp_dict[i] = wl_after_ilp;
+
+        // for(auto net_tmp : routed_nets){
+        //     m_routed_nets.push_back(net_tmp);
+        // }
+
+
+        
+        // for (auto movement : movements) {
+        //     auto cell = movement.first;
+        //     m_design.placement().fixLocation(cell);
+        // }
+
+    }//end loop iteration
+}//end run_ilp_on_panel
+
+
+void Engine::run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_name_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+    std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    std::vector<ophidian::circuit::Net> fixed_nets;
+    std::vector<ophidian::circuit::Net> routed_nets;
+    std::vector<ophidian::circuit::Net> unrouted_nets;
+    std::vector<net_type> nets_local;
+
+    for(auto net: nets){
+        std::string net_name = m_design.netlist().name(net);
+        if(nets_name_set.find(net_name) == nets_name_set.end()){
+            fixed_nets.push_back(net);
+        }else{
+            nets_local.push_back(m_net_name_to_net_type_dict[net_name]);
+        }
+        
+    }
+
+    auto local_cells = std::vector<ophidian::circuit::CellInstance>{};
+    m_design.placement().cells_within(panel_region, local_cells);
+
+    // if (DEBUG_PANEL) std::cout << "area " << panel_min_corner.x().value() << "," << panel_min_corner.y().value() << "," << panel_max_corner.x().value() << "," << panel_max_corner.y().value() << std::endl;
+    if(DEBUG_PANEL) std::cout << "num_local_nets: " << nets_local.size() << std::endl;
+    //if (DEBUG_PANEL) std::cout << local_cells.size() << " local cells " << std::endl;
+
+    /*auto debug_gcell = m_design.global_routing().gcell_graph()->gcell(90,82,6);
+    auto capacity = m_design.global_routing().gcell_graph()->capacity(debug_gcell);
+    auto demand = m_design.global_routing().gcell_graph()->demand(debug_gcell);
+    
+    if (DEBUG_PANEL) std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+
+    
+    ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
+    // auto result = ilpRouting.route_nets(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
+    auto ilp_result = ilpRouting.route_nets_v2(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
+    // int s = ilp_result.m_routed_nets.size();
+    #pragma omp critical
+    m_ilp_results.push_back(ilp_result);
+    
+
+
+}//end run_ilp
 
 };//end namespace 

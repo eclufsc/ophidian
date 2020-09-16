@@ -717,7 +717,7 @@ TEST_CASE("write csv of initial routing", "[iccad20]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
 
-        write_csv(design, circuit_name, csv_file, 0);
+        write_csv(design, circuit_name, csv_file, 0, 0);
         //run_circuit(design, circuit_name);
         //run_mcf_multithreading(design);
         //write_statistics_for_circuit(design, circuit_name, nets_initial_wirelength);

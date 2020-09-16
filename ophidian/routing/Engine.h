@@ -12,11 +12,12 @@
 #include "ILPRouting.h"
 #include <ophidian/parser/ICCAD2020Writer.h>
 #include <ophidian/routing/AStarRouting.h>
-#include <chrono>
+#include "json.hpp"
 
 using namespace std;
 
 namespace UCal{
+    typedef nlohmann::json Json;
 
     class AstarResultV2{
         using net_type                  = ophidian::circuit::Net;
@@ -28,6 +29,7 @@ namespace UCal{
     };//end AStarResutls
 
     class Engine{
+        
         public: 
             using design_type               = ophidian::design::Design;
             using net_type                  = ophidian::circuit::Net;
@@ -36,22 +38,25 @@ namespace UCal{
             using AStarSegment = ophidian::routing::AStarSegment;
             Engine(design_type & design);
             ~Engine();
-            void run(std::chrono::steady_clock::time_point start_time);
+            Json run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements,std::chrono::steady_clock::time_point start_time);
             // void run_date21(std::chrono::steady_clock::time_point start_time);
             std::set<std::string>& get_nets_in_panels(){return m_nets_inside_panels;}
             int get_wire_length_segments(const std::vector<AStarSegment> & segments);
             void run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets);
-            void run_astar_on_panels_parallel(int remaining_time, int min_panel = -1);
-            void run_astar_on_panels_sequential(int time_limit, int min_panel = -1);         
-
-            ophidian::routing::AStarRouting & astar_routing() { return m_astar_routing; } 
         private: 
             void construct_net_boxes_rtree(const std::vector<net_type> &nets);
             void cluster_based_on_panel();
+            void run_astar_on_panels_sequential(int remaining_time); 
+            void run_astar_on_panels_parallel_loop(int remaining_time);           
+            void run_astar_on_panels_parallel_section(int remaining_time); 
             void run_astar_on_panel(unsigned int panel_id);
             AstarResultV2 run_astar_on_net(net_type& net);
             void update_astar_on_global_routing(AstarResultV2& astar_result);
-            
+            void loadParams();
+            void update_global_routing();
+            void run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+            void run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+            void run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
             
 
 
@@ -78,6 +83,16 @@ namespace UCal{
 
             ophidian::routing::AStarRouting m_astar_routing{m_design};
             double m_temperature;
+
+
+            int m_total_panel_nets;
+            std::vector<ophidian::routing::ILPResult> m_ilp_results;
+
+            Json m_global_params;
+            Json m_timer_report_json;
+
+
+              
     };//end Engine Class 
 
 

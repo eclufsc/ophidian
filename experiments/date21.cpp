@@ -20,11 +20,11 @@ bool fileExists(std::string fileName)
 void write_csv_header(std::string csv_file_name) {
     if(!fileExists(csv_file_name)){
         std::ofstream csv_file(csv_file_name, std::ofstream::out);
-        csv_file << "design,wirelength,number of vias,runtime" << std::endl;
+        csv_file << "design,wirelength,number of vias,movements,runtime" << std::endl;
     }
 }
 
-void write_csv(ophidian::design::Design & design, std::string circuit_name, std::string csv_file_name, double runtime) {
+void write_csv(ophidian::design::Design & design, std::string circuit_name, std::string csv_file_name, double runtime, unsigned number_of_movements) {
     std::ofstream csv_file(csv_file_name, std::ofstream::app);
 
     auto nets = std::vector<ophidian::circuit::Net>{design.netlist().begin_net(), design.netlist().end_net()};
@@ -32,7 +32,7 @@ void write_csv(ophidian::design::Design & design, std::string circuit_name, std:
     auto wirelength = design.global_routing().wirelength(nets);
     auto vias = design.global_routing().number_of_vias(nets);
 
-    csv_file << circuit_name << "," << wirelength << "," << vias << "," << runtime << std::endl;
+    csv_file << circuit_name << "," << wirelength << "," << vias << "," << number_of_movements << "," << runtime << std::endl;
 }
 
 bool check_nets_connectivity(const ophidian::design::Design & design, const std::vector<ophidian::circuit::Net>& nets){
@@ -118,7 +118,7 @@ void ILP_without_movements_Astar_without_movements(ophidian::design::Design & de
    
     mcf.run_ilp_on_panels_sequential(movements);
 
-    engine.run_astar_on_panels_sequential(std::numeric_limits<int>::max(), 4);
+    //engine.run_astar_on_panels_sequential(std::numeric_limits<int>::max(), 4);
 
     check_nets_connectivity(design, nets);
 }
@@ -138,7 +138,7 @@ void ILP_with_movements_Astar_with_movements(ophidian::design::Design & design, 
     design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
     mcf.run_ilp_on_panels_sequential(movements);
 
-    engine.run_astar_on_panels_sequential(std::numeric_limits<int>::max(), 4);
+    //engine.run_astar_on_panels_sequential(std::numeric_limits<int>::max(), 4);
 
     check_nets_connectivity(design, nets);
 }
@@ -148,18 +148,18 @@ void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design &
 {
     printlog("Initing ILP_with_movements_Astar_with_movements_parallel");
 
-    auto mcf = UCal::MCFMultiThreading(design);
+    //auto mcf = UCal::MCFMultiThreading(design);
     //auto engine = UCal::Engine(design);
     std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
     
     design.global_routing().set_gcell_cell_instances(design.netlist(), design.placement());
 
-    design.placement().reset_rtree();
+    /*design.placement().reset_rtree();
     mcf.construct_net_boxes_rtree(nets);
     mcf.cluster_based_on_panel_v2();
-    mcf.run_ilp_on_panels_parallel(movements);
+    mcf.run_ilp_on_panels_parallel(movements);*/
 
-    engine.run_astar_on_panels_parallel(std::numeric_limits<int>::max(), 4);
+    //engine.run_astar_on_panels_parallel(std::numeric_limits<int>::max(), -1);
 
-    //check_nets_connectivity(design, nets);
+    check_nets_connectivity(design, nets);
 }

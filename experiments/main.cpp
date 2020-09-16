@@ -6,6 +6,7 @@
 #include <ophidian/util/log.h>
 #include <ophidian/routing/MCFMultiThreading.h>
 #include <ophidian/routing/Engine.h>
+#include <ophidian/routing/TimerProfiler.h>
 #include <chrono>
 
 
@@ -15,6 +16,112 @@ using namespace ophidian::util;
 
 // std::chrono::time_point<std::chrono::steady_clock> start_time;
 using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
+
+#define DEBUG_MULTI_MOVE false
+
+
+std::ofstream movement_file;
+
+
+UCal::Json getGlobalParams(){
+    UCal::Json global_params;
+    std::ifstream jsonFileName("file_name.json", std::ifstream::binary);
+    UCal::Json tmpFileName; 
+    jsonFileName >> tmpFileName;
+    std::string jsonFileNamestr = tmpFileName["file_name"];
+    std::ifstream jsonFile(jsonFileNamestr, std::ifstream::binary);
+    jsonFile >> global_params;
+    return global_params;
+}
+
+void calculate_median_gcell_multi(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells)
+{
+    using unit_type = ophidian::util::database_unit_t;
+    using point_type = ophidian::util::LocationDbu;
+    using net_type = ophidian::circuit::Net;
+
+    auto & netlist = design.netlist();
+    auto & placement = design.placement();
+    std::vector<net_type> cell_nets;
+    
+    std::vector<double> x_positions;
+    std::vector<double> y_positions;
+
+    std::vector<point_type> median_points;
+    for(auto pin : netlist.pins(cell)){
+        auto net = netlist.net(pin);
+        if(net == ophidian::circuit::Net())
+            continue;
+        cell_nets.push_back(net);
+        auto x_min = std::numeric_limits<double>::max();
+        auto y_min = std::numeric_limits<double>::max();
+        auto x_max = -std::numeric_limits<double>::max();
+        auto y_max = -std::numeric_limits<double>::max();
+        for(auto net_pin : netlist.pins(net)){
+            if(net_pin == pin)
+                continue;
+            auto location = placement.location(net_pin);
+            x_min = std::min(x_min, location.x().value());
+            y_min = std::min(y_min, location.y().value());
+            x_max = std::max(x_max, location.x().value());
+            y_max = std::max(y_max, location.y().value());
+            //x_positions.push_back(location.x().value());
+            //y_positions.push_back(location.y().value());
+            
+            //median_points.push_back({location.x(), location.y()});
+        }
+        x_positions.push_back(x_min);
+        x_positions.push_back(x_max);
+        y_positions.push_back(y_min);
+        y_positions.push_back(y_max);
+    }
+    auto cell_location = placement.location(cell);
+    auto current_gcell = design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
+
+    if(x_positions.empty() || y_positions.empty()) {
+        //return current_gcell;
+        return;
+    }
+
+    std::nth_element(x_positions.begin(), x_positions.begin() + x_positions.size()/2, x_positions.end());
+    auto median_x = x_positions[x_positions.size()/2];
+    auto median_x_left = x_positions[x_positions.size()/2];
+    auto median_x_right = x_positions[x_positions.size()/2 + 1];
+    std::nth_element(y_positions.begin(), y_positions.begin() + y_positions.size()/2, y_positions.end());
+    auto median_y = y_positions[y_positions.size()/2];
+    auto median_y_left = y_positions[y_positions.size()/2];
+    auto median_y_right = y_positions[y_positions.size()/2 + 1];
+
+    point_type median_point {unit_type(median_x), unit_type(median_y)};
+    // std::vector<point_type> median_points;
+    median_points.push_back({unit_type{median_x}, unit_type{median_y}});
+    median_points.push_back({unit_type{median_x+10}, unit_type{median_y}});
+    median_points.push_back({unit_type{median_x-10}, unit_type{median_y}});
+    median_points.push_back({unit_type{median_x}, unit_type{median_y+10}});
+    median_points.push_back({unit_type{median_x}, unit_type{median_y-10}});
+    median_points.push_back({unit_type{median_x_left}, unit_type{median_y_left}});
+    median_points.push_back({unit_type{median_x_right}, unit_type{median_y_left}});
+    median_points.push_back({unit_type{median_x_left}, unit_type{median_y_right}});
+    median_points.push_back({unit_type{median_x_right}, unit_type{median_y_right}});
+
+    auto current_location = design.placement().location(cell);
+    median_points.push_back({unit_type{current_location.x().value() + 10}, unit_type{current_location.y().value()}});
+    median_points.push_back({unit_type{current_location.x().value() - 10}, unit_type{current_location.y().value()}});
+    median_points.push_back({unit_type{current_location.x().value()}, unit_type{current_location.y().value() + 10}});
+    median_points.push_back({unit_type{current_location.x().value()}, unit_type{current_location.y().value() - 10}});
+
+    for (auto median_point : median_points) {
+        auto nearest_gcell = design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
+        
+        target_gcells.push_back(nearest_gcell);
+    }
+
+    /*if(current_gcell != nearest_gcell){
+        return nearest_gcell;
+    }
+    return current_gcell;*/
+}
+
 
 void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells)
 {
@@ -167,6 +274,101 @@ double test_target_gcell(ophidian::design::Design & design, ophidian::circuit::C
     return global_routing.wirelength(cell_nets);
 }
 
+bool move_cell_multi(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
+{
+    using unit_type = ophidian::util::database_unit_t;
+    using point_type = ophidian::util::LocationDbu;
+    using net_type = ophidian::circuit::Net;
+    using AStarSegment = ophidian::routing::AStarSegment;
+
+    auto& global_routing = design.global_routing();
+    auto& netlist = design.netlist();
+    auto& placement = design.placement();
+    auto& routing_constr = design.routing_constraints();
+    auto& std_cells = design.standard_cells();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+
+    auto initial_location = placement.location(cell);
+    auto initial_gcell = gcell_graph_ptr->nearest_gcell(initial_location, 0);
+    std::vector<gcell_type> target_gcells;
+    //auto median_gcell = calculate_median_gcell(design, cell);
+    calculate_median_gcell_multi(design, cell, target_gcells);
+
+
+    if(DEBUG_MULTI_MOVE) std::cout << "target gcells size: " << target_gcells.size()  << std::endl;
+
+
+    // Get connected nets
+    std::vector<net_type> cell_nets;
+    for(auto pin : netlist.pins(cell))
+    {
+        auto net = netlist.net(pin);
+        if(net == ophidian::circuit::Net())
+            continue;
+        cell_nets.push_back(net);
+
+    }
+    // Backup routing information
+    std::vector<AStarSegment> initial_segments;
+    auto wirelength_before = global_routing.wirelength(cell_nets);
+    for(auto net : cell_nets)
+        for(auto segment : global_routing.segments(net))
+            initial_segments.push_back(AStarSegment(global_routing.box(segment), global_routing.layer_start(segment), global_routing.layer_end(segment), net));
+
+    auto ex_demand_initial_gcell = global_routing.extra_demand_neighborhood(initial_gcell);
+
+    auto min_wirelength = wirelength_before;
+    auto best_gcell = gcell_type{};
+    std::vector<ophidian::routing::ExtraDemandGCell> ex_demand_best_gcell = ex_demand_initial_gcell;
+    int movement_id = 0;
+    int selected_movement = 0;
+    for (auto target_gcell : target_gcells)
+    {
+        movement_id++;
+        if (initial_gcell == target_gcell)
+            continue;
+        auto ex_demand_target_gcell = global_routing.extra_demand_neighborhood(target_gcell);
+        for (auto net : cell_nets)
+            global_routing.unroute(net);
+
+        auto wirelength = test_target_gcell(design, cell, initial_gcell, target_gcell, astar_routing);
+        if (wirelength < min_wirelength)
+        {
+            min_wirelength = wirelength;
+            best_gcell = target_gcell;
+	        ex_demand_best_gcell = ex_demand_target_gcell;
+            selected_movement = movement_id;
+        } 
+        // else {
+        
+        for(auto net : cell_nets)
+            global_routing.unroute(net);
+
+        global_routing.restore_movement(target_gcell, initial_gcell, cell, netlist, placement, routing_constr, std_cells, ex_demand_initial_gcell, ex_demand_target_gcell);
+        bool undo = astar_routing.apply_segments_to_global_routing(initial_segments);//This should never fail
+        if(undo == false)
+            std::cout<<"WARNING: UNDO ROUTING OVERFLOW!"<<std::endl;
+        // }
+
+        
+    }
+    if (best_gcell == gcell_type{})
+        return false;
+    for (auto net : cell_nets)
+        global_routing.unroute(net);
+
+    movement_file << design.netlist().name(cell) << "," << selected_movement << std::endl;
+    auto result = test_target_gcell(design, cell, initial_gcell, best_gcell, astar_routing);
+    
+    if (result == false)
+    {
+        std::cout << "WARNING: FAILED TO MOVE TO BEST GCELL" << std::endl;
+        return false;
+    }
+    return true;
+}//end move_cell_multi
+
+
 bool move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing)
 {
     using unit_type = ophidian::util::database_unit_t;
@@ -317,6 +519,9 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
 
     std::cout << "debug gcell " << gcell_box.min_corner().y().value() << " " << gcell_box.min_corner().x().value() << " " << layer_index << std::endl;
     std::cout << "debug gcell capacity " << capacity << " demand " << demand << std::endl;*/
+    
+    auto global_params = getGlobalParams();
+
 
     auto start_time = std::chrono::steady_clock::now();
     auto nets = std::vector<ophidian::circuit::Net>{design.netlist().begin_net(), design.netlist().end_net()};
@@ -335,7 +540,12 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
         }
         auto cell_name = design.netlist().name(cell);
         //std::cout << "cell " << cell_name << std::endl;
-        auto moved = move_cell(design, cell, astar_routing);
+        bool moved = false;
+        if(global_params["move_cell_multi"] == "true")
+            moved = move_cell_multi(design, cell, astar_routing);
+        else
+            moved = move_cell(design, cell, astar_routing);
+
         if(moved)
         {
             auto location = design.placement().location(cell);
@@ -358,6 +568,8 @@ void move_cells_for_until_x_minutes(ophidian::design::Design & design,
         bool time_out = diff.count() > time_limit * 60.0 ? true : false;
         //if (cell_name == "C1245") break;
         //if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
+        if(global_params["cell_movement_time_out"] == "false")
+            time_out = false;
         if(moved_cells == design.routing_constraints().max_cell_movement() || time_out)
         //if(moved_cells == 1)
             break;
@@ -480,7 +692,7 @@ void greetings(){
     printlog("===================================================");
 };
 
-void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output){
+int run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output){
     /*ophidian::routing::AStarRouting astar_routing{design};
     auto& netlist = design.netlist();
     for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); net_it++) {
@@ -493,7 +705,11 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     }*/
 
     // UCal::MCFRouting mcf_routing(design,circuit_name);
-    
+    movement_file.open("movement_report.txt");
+
+    UCal::TimerProfiler total_timer;
+
+    total_timer.start();
     auto start_time = std::chrono::steady_clock::now();
     
     ophidian::routing::AStarRouting astar_routing{design};
@@ -509,13 +725,14 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
     // mcf_multi_threading.run(movements);
 
     UCal::Engine engine(design);
-    engine.run(start_time);
+    auto report_json = engine.run(movements,start_time);
     
     //run_astar_for_nets(design, nets, astar_routing);
     
     //log() << "movements after ILP " << movements.size() << std::endl;
 
-    if(true){
+    auto global_params = getGlobalParams();
+    if(global_params["cell_movement_serial"] == "true"){
         auto end_time = std::chrono::steady_clock::now();
 
         std::chrono::duration<double> diff = end_time-start_time;
@@ -550,15 +767,34 @@ void run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_
         move_cells_for_until_x_minutes(design, remaining_time, cell_costs, movements, astar_routing);
 
     }//end if 
+
+    movement_file.close();
     
         
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
     iccad_output_writer.write_ICCAD_2020_output(output, movements);
 
+    auto wirelength = design.global_routing().wirelength(nets);
+    auto vias = design.global_routing().number_of_vias(nets);
+    // std::cout <<   wirelength << "," << vias << "," << std::endl;
+
+    total_timer.stop();
+    
+    report_json["new_wire_length"] = wirelength;
+    report_json["new_num_vias"] = vias;
+    report_json["total_time"] = total_timer.userTime();
+
+    std::string jsonFileNamestr = report_json["file_name_report"];
+
+    std::ofstream write_report_file(jsonFileNamestr);
+    write_report_file << std::setw(4) << report_json << std::endl;   
+
     log() << "number of movements: " << movements.size() << std::endl;
 
     log() << "end" << std::endl;
+
+    return movements.size();
 }//end run_mcf_for_circuit
 
 void run_for_circuit(ophidian::design::Design & design, std::string circuit_name, std::string output) {
@@ -718,12 +954,17 @@ int main(int argc, char** argv) {
 
     auto design = ophidian::design::Design();
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
+    
+    //run_for_circuit(design, circuit_name, output);
+    auto number_of_movements = run_mcf_for_circuit(design,circuit_name, output);
 
     auto time_end = std::chrono::high_resolution_clock::now();
     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
     //ophidian::routing::AStarRouting astar_routing{design};
     auto engine = UCal::Engine(design);
     std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells;
+    //auto number_of_movements = 0;
+    auto moved_new_cells = true;
     
     // "exp1" --> "Astar_without_paneling_and_without_movements"
     // "exp2" --> "Astar_with_paneling_and_without_movements"
@@ -734,7 +975,7 @@ int main(int argc, char** argv) {
     // "exp6" --> "ILP_with_movements_Astar_with_movements"
     // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
 
-    switch (experiment)
+    /*switch (experiment)
     {
     case 1:
         time_begin = std::chrono::high_resolution_clock::now();
@@ -771,13 +1012,21 @@ int main(int argc, char** argv) {
         time_begin = std::chrono::high_resolution_clock::now();
         ILP_with_movements_Astar_with_movements_parallel(design,circuit_name, output, movements, engine);
         std::cout << "movements " << movements.size() << std::endl;
-        for (auto movement : movements) {
-            auto cell = movement.first;
-            design.placement().fixLocation(cell);
+        number_of_movements = movements.size();
+        moved_new_cells = true;
+        while (number_of_movements < design.routing_constraints().max_cell_movement() && moved_new_cells) {
+            std::cout << "number of movements " << number_of_movements << std::endl;
+            for (auto movement : movements) {
+                auto cell = movement.first;
+                design.placement().fixLocation(cell);
+            }
+            cells = compute_cell_move_costs_descending_order(design);
+            move_cells_for_until_x_minutes(design, 1000000, cells, movements, engine.astar_routing());
+            time_end = std::chrono::high_resolution_clock::now();
+            moved_new_cells = (number_of_movements == movements.size());
+            number_of_movements = movements.size();
+            std::cout << "new number of movements " << number_of_movements << std::endl;
         }
-        cells = compute_cell_move_costs_descending_order(design);
-        move_cells_for_until_x_minutes(design, 1000000, cells, movements, engine.astar_routing());
-        time_end = std::chrono::high_resolution_clock::now();
         break;
     default:
         //run the code sent to the contest;
@@ -785,7 +1034,7 @@ int main(int argc, char** argv) {
         run_mcf_for_circuit(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    }
+    }*/
 
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
     auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
@@ -794,7 +1043,7 @@ int main(int argc, char** argv) {
     //Write the csv file
     auto csv_file = "exp" + std::to_string(experiment) + "_initial_results.csv";
     write_csv_header(csv_file);
-    write_csv(design, circuit_name, csv_file, duration_s);
+    write_csv(design, circuit_name, csv_file, duration_s, number_of_movements);
 
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
     iccad_output_writer.write_ICCAD_2020_output(output, movements);

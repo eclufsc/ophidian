@@ -15,7 +15,7 @@
     // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
 
     void write_csv_header(std::string csv_file_name);
-    void write_csv(ophidian::design::Design & design, std::string circuit_name, std::string csv_file_name, double runtime);
+    void write_csv(ophidian::design::Design & design, std::string circuit_name, std::string csv_file_name, double runtime, unsigned number_of_movements);
     bool check_nets_connectivity(const ophidian::design::Design & design, const std::vector<ophidian::circuit::Net>& nets);
 
     void Astar_without_paneling_and_without_movements(ophidian::design::Design & design, std::string circuit_name, std::string output);
