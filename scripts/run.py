@@ -7,7 +7,9 @@ from run_experiments import *
 
 # iccad_2020_benchmark_list = ["case1","case2"]
 
-iccad_2020_benchmark_list = ["case1","case2","case3"]
+#iccad_2020_benchmark_list = ["case1","case2","case3"]
+
+iccad_2020_benchmark_list = ["case5"]
   
 #iccad_2020_benchmark_list = ["case1","case2",\
     #"case3","case4","case5","case6"]    

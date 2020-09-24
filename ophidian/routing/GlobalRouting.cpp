@@ -234,6 +234,8 @@ namespace ophidian::routing
                 min.second = std::min(node_position.get<1>(), min.second);
                 max.first = std::max(node_position.get<0>(), max.first);
                 max.second = std::max(node_position.get<1>(), max.second);
+
+                auto gcell_box = m_gcell_graph->box(gcell);
             }
             start_gcell = m_gcell_graph->gcell(min.first, min.second, start_index-1);
             end_gcell = m_gcell_graph->gcell(max.first, max.second, end_index-1);

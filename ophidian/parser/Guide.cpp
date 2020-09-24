@@ -24,7 +24,7 @@ void Guide::read_file(const std::string &guide_file)
 
     std::regex integer("(\\+|-)?[[:digit:]]+");
     std::regex net("n(et|_)[[:digit:]]+");
-    std::regex metal("Metal[[:digit:]]+");
+    std::regex metal("(M|m)etal[[:digit:]]+");
 
     std::vector<std::string> words;
     words.reserve(5);

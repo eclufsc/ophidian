@@ -126,7 +126,6 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
 
             for(auto gcell : global_routing.gcells(*net_it))
             {
-
                 if(gcell_graph_ptr->layer_index(gcell) != layer_color.first)
                     continue;
 
@@ -136,10 +135,10 @@ void draw_gcell_svg(ophidian::design::Design & design, std::string net_name){
 
                 out_svg<<"<rect\n";
                 out_svg<<"style=\"fill:"<<layer_color.second<<";fill-opacity:0.5;\"\n";
-                out_svg<<"width=\""<<units::unit_cast<double>(width)<<"\"\n";
-                out_svg<<"height=\""<<units::unit_cast<double>(height)<<"\"\n";
-                out_svg<<"x=\""<<units::unit_cast<double>(box.min_corner().x())<<"\"\n";
-                out_svg<<"y=\""<<units::unit_cast<double>(-box.max_corner().y())<<"\" />\n";//svg files use y axis flipped
+                out_svg<<"width=\""<<units::unit_cast<double>(width) / 1000<<"\"\n";
+                out_svg<<"height=\""<<units::unit_cast<double>(height) / 1000<<"\"\n";
+                out_svg<<"x=\""<<units::unit_cast<double>(box.min_corner().x()) / 1000<<"\"\n";
+                out_svg<<"y=\""<<units::unit_cast<double>(-box.max_corner().y()) / 1000<<"\" />\n";//svg files use y axis flipped
             }
         }
         out_svg<<"</g>\n";
@@ -724,4 +723,79 @@ TEST_CASE("write csv of initial routing", "[iccad20]") {
     }
 
 
+}
+
+TEST_CASE("evaluate cugr solution", "[iccad19]") {
+    std::vector<std::string> circuit_names = {
+        "ispd19_test1",
+        "ispd19_test4",
+        "ispd19_test5",
+    };
+
+    std::string benchmarks_path = "./input_files/iccad19_benchmarks_v2/";
+
+    for (auto circuit_name : circuit_names) {
+        log() << "running circuit " << circuit_name << std::endl;
+
+        std::string def_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = circuit_name + ".guide";
+        //std::string guide_file = circuit_name + "_original.guide";
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design_ispd2019(design, def_file, lef_file, guide_file);
+
+        auto gcell_graph = design.global_routing().gcell_graph();
+        for (auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++) {
+            auto gcell = *gcell_it;
+
+            auto capacity = gcell_graph->capacity(gcell);
+            auto demand = gcell_graph->demand(gcell);
+
+            //std::cout << "capacity " << capacity << " demand " << demand << std::endl;
+            if (demand > capacity) {
+                std::cout << "CAPACITY VIOLATED" << std::endl;
+            }
+        }
+
+        unsigned count = 0;
+        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
+        for (auto net : nets) {
+            auto net_name = design.netlist().name(net);
+            //std::cout << "net " << net_name << std::endl;
+
+            auto segments = design.global_routing().segments(net);
+            
+            for (auto segment : segments) {
+                auto segment_box = design.global_routing().box(segment);
+                auto segment_width = segment_box.max_corner().x().value() - segment_box.min_corner().x().value(); 
+                auto segment_height = segment_box.max_corner().y().value() - segment_box.min_corner().y().value();
+
+                auto segment_start_layer = design.global_routing().layer_start(segment);
+                auto segment_end_layer = design.global_routing().layer_end(segment);
+                if (segment_start_layer != segment_end_layer) {
+                    std::cout << "different layers in segment" << std::endl;
+                }
+
+                auto layer_direction = design.routing_library().direction(segment_start_layer);
+                if (layer_direction == ophidian::routing::Direction::HORIZONTAL && segment_height > 3000) {
+                    //std::cout << "height larger than 3000" << std::endl;
+                    count++;
+                } else if (layer_direction == ophidian::routing::Direction::VERTICAL && segment_width > 3000) {
+                    //std::cout << "width larger than 3000" << std::endl;
+                    count++;
+                }
+            }
+        }
+
+        std::cout << "COUNT " << count << std::endl;
+
+        auto wirelength = design.global_routing().wirelength(nets);
+        auto number_of_vias = design.global_routing().number_of_vias(nets);
+
+        std::cout << "WL " << wirelength << std::endl;
+        std::cout << "VIAS " << number_of_vias << std::endl;
+
+        //draw_gcell_svg(design, "net3098"); 
+    }
 }

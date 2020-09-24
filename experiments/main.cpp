@@ -889,6 +889,7 @@ std::string extract_circuit_name(const std::string input_file)
 int main(int argc, char** argv) {
     //start_time = std::chrono::steady_clock::now();
     auto time_begin = std::chrono::high_resolution_clock::now();   
+    auto time_end = std::chrono::high_resolution_clock::now();
 
     greetings();
 
@@ -956,9 +957,10 @@ int main(int argc, char** argv) {
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
     //run_for_circuit(design, circuit_name, output);
+    time_begin = std::chrono::high_resolution_clock::now();
     auto number_of_movements = run_mcf_for_circuit(design,circuit_name, output);
+    time_end = std::chrono::high_resolution_clock::now();
 
-    auto time_end = std::chrono::high_resolution_clock::now();
     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
     //ophidian::routing::AStarRouting astar_routing{design};
     auto engine = UCal::Engine(design);

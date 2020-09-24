@@ -1,12 +1,12 @@
 {
-    "cluster_based_on_panel": 0.0128810405731201,
-    "construct_net_boxes_rtree": 0.0165619850158691,
+    "cluster_based_on_panel": 0.0125789642333984,
+    "construct_net_boxes_rtree": 0.0173459053039551,
     "file_name_report": "case3_report.json",
     "new_num_vias": 14952,
     "new_wire_length": 23084,
-    "run_astar_on_panels_parallel_loop": 7.02616405487061,
+    "run_astar_on_panels_parallel_loop": 7.69544506072998,
     "run_astar_on_panels_parallel_section": 0.0,
     "run_astar_on_panels_sequential": 0.0,
     "run_ilp_on_panels_parallel_loop": 0.0,
-    "total_time": 13.7926099300385
+    "total_time": 14.9943211078644
 }
