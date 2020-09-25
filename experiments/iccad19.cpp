@@ -56,7 +56,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         // "ispd18_sample3",
         // "ispd19_sample4",
 
-        "ispd18_test5",
+        "ispd19_test1",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -67,14 +67,13 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
     // std::string benchmarks_path = "./input_files/ispd19";
     std::string benchmarks_path = "./input_files/circuits";
 
-
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
-        // std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
-        // std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
-        std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
+         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
+        //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
         std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
 
@@ -135,7 +134,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         }
         
         auto start_time = std::chrono::steady_clock::now();
-        engine.run_astar_on_circuit(ordered_nets);
+        //engine.run_astar_on_circuit(ordered_nets);
         auto end_time = std::chrono::steady_clock::now();
         std::chrono::duration<double> diff = end_time-start_time;
         log() << "A* wirelength = " << design.global_routing().wirelength(nets) << std::endl;

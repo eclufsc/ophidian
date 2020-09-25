@@ -131,6 +131,7 @@ void Engine::run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & ne
     // std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     for(auto net : nets){
         auto astar_result = run_astar_on_net(net);
+        auto net_name = m_design.netlist().name(net);
         if(astar_result.m_is_valid == false){
             std::cout << "A* FAIL IN NET " << m_design.netlist().name(net) << std::endl;
         }
@@ -825,7 +826,7 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
     //     std::cout << " temperature: " << m_temperature << std::endl;
     // // }
    
-    if (result && (init_wl > astar_wl)) {
+    if (result && (init_wl == 0 || init_wl > astar_wl)) {
         bool apply = m_astar_routing.apply_segments_to_global_routing(astar_segments);
         if (!apply) {
             std::cout << "WARNING: FAILED TO APPLY" << std::endl;
