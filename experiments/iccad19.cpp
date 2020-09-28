@@ -174,3 +174,63 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
 }
+
+TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
+
+    //iccad 2019 benchmarks
+    std::vector<std::string> circuit_names = {
+        // "ispd18_sample3",
+        // "ispd19_sample4",
+        // "ispd19_test4",
+        // "ispd19_test5",
+
+
+        "ispd19_test1",
+        // "ispd18_test8",
+        // "ispd18_test10",
+        // "ispd19_test7",
+        // "ispd19_test8",
+        // "ispd19_test9"
+    };
+
+    std::string benchmarks_path = "./input_files/ispd19";
+    // std::string benchmarks_path = "./input_files/circuits";
+
+    for (auto circuit_name : circuit_names) {
+        std::cout << "running circuit " << circuit_name << std::endl;
+
+         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
+        //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = "./" + circuit_name + "_astar.guide";
+        std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
+
+
+
+        ophidian::parser::Def def;
+        ophidian::parser::Lef lef;
+        ophidian::parser::Guide guide;
+        def = ophidian::parser::Def{def_file};
+        lef = ophidian::parser::Lef{lef_file};
+        guide = ophidian::parser::Guide{guide_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design(design, def, lef, guide);
+
+        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        // std::vector<ophidian::circuit::Net> nets;
+        // auto net2037 = design.netlist().find_net("n_2037");
+        // nets.push_back(net2037);
+        
+        log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
+
+        log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
+
+        check_connectivity(design, nets);
+
+        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
+    }
+}
+

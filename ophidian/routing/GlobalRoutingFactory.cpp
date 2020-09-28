@@ -23,6 +23,16 @@ namespace ophidian::routing::factory
 {
     void make_global_routing(ophidian::routing::GlobalRouting &globalRouting, const Library &library, const ophidian::circuit::Netlist &netlist, const ophidian::parser::Guide &guide, const ophidian::parser::Def& def) noexcept
     {
+        namespace bgi = boost::geometry::index;
+        using point_scalar_type     = ophidian::geometry::Point<double>;
+        using box_scalar_type       = ophidian::geometry::Box<double>;
+        using unity_type            = GlobalRouting::unit_type;
+        using point_type            = ophidian::geometry::Point<unity_type>;
+        using box_type              = geometry::Box<unity_type>;
+        using rtree_node_type       = std::pair<box_scalar_type, GlobalRouting::gr_segment_type>;
+        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+        std::map<GlobalRouting::scalar_type, rtree_type> rtree_layers;
+
         if( def.gcell_x_axis().size() != 0 && def.gcell_y_axis().size() != 0)
         {
             int z = library.index(library.highest_layer());
@@ -38,10 +48,63 @@ namespace ophidian::routing::factory
         for(auto net : guide.nets())
         {
             auto net_instance = netlist.find_net(net.name());
+            int min_layer = library.lowest_layer_index();
+            int max_layer = library.highest_layer_index();
+
+            //creating map for rtrees for layers
+            rtree_layers.clear();
+            for (int i = min_layer; i <= max_layer; i++)
+            {
+                rtree_layers.insert(std::make_pair(i, rtree_type()));
+            }
+
             for(auto region : net.regions())
             {
                 auto layer_instance = library.find_layer_instance(region.metal());
-                globalRouting.add_segment(region.region(), layer_instance, layer_instance, net_instance);
+                auto index = library.index(layer_instance);
+                auto segment = globalRouting.add_segment(region.region(), layer_instance, layer_instance, net_instance);
+                //add segment in rtree
+                auto region_box = region.region();
+                auto min_corner = point_scalar_type(region_box.min_corner().x().value(), region_box.min_corner().y().value());
+                auto max_corner = point_scalar_type(region_box.max_corner().x().value(), region_box.max_corner().y().value());
+                auto box = box_scalar_type(min_corner, max_corner);
+                rtree_layers.at(index).insert(std::make_pair(box, segment));
+            }
+
+            //add vias in intersections
+            for (auto segment : globalRouting.segments(net_instance))
+            {
+                auto upper_layer = globalRouting.layer_start(segment);
+                auto layer_indx = library.index(upper_layer);
+                if(layer_indx == min_layer)
+                    continue;
+                auto lower_layer = library.layer_from_index(layer_indx -1);
+
+                auto rtree = rtree_layers.at(layer_indx -1);
+                auto region_box = globalRouting.box(segment);
+                auto min_corner = point_scalar_type(region_box.min_corner().x().value(), region_box.min_corner().y().value());
+                auto max_corner = point_scalar_type(region_box.max_corner().x().value(), region_box.max_corner().y().value());
+                auto box = box_scalar_type(min_corner, max_corner);
+
+                std::vector<rtree_node_type> result;
+                rtree.query(bgi::intersects(box), std::back_inserter(result));
+                for(auto r : result)
+                {
+                    auto node_segment = r.second;
+                    auto node_box = r.first;
+
+                    // this should insert a bug when the segment is just a line (without area)
+                    box_scalar_type intersection;
+                    boost::geometry::intersection(node_box, box, intersection);
+                    if(boost::geometry::area(intersection) != 0 || boost::geometry::area(box) <= std::numeric_limits<double>::epsilon())
+                    {
+                        //creating a via
+                        auto min_corner = point_type(unity_type(intersection.min_corner().x()), unity_type(intersection.min_corner().y()));
+                        auto max_corner = point_type(unity_type(intersection.max_corner().x()), unity_type(intersection.max_corner().y()));
+                        auto box = box_type(min_corner, max_corner);
+                        globalRouting.add_segment(box, lower_layer, upper_layer, net_instance);
+                    }
+                }
             }
         }
     }
