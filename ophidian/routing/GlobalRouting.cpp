@@ -403,6 +403,43 @@ namespace ophidian::routing
         return lemon::connected(net_graph);
     }
 
+    bool GlobalRouting::is_connected(const net_type & net){
+        auto net_graph = graph_type{};
+        std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
+
+        for (auto segment : m_net_to_gr_segment.parts(net)) {
+            auto gcell_start = m_gr_segment_gcell_start[segment]; 
+            auto gcell_end = m_gr_segment_gcell_end[segment];
+            auto start_node = node_type{};
+            auto end_node = node_type{};
+            if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
+                start_node = net_graph.addNode();
+                gcell_to_node[gcell_start] = start_node;
+            } else {
+                start_node = gcell_to_node[gcell_start];
+            }
+            if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
+                end_node = net_graph.addNode();
+                gcell_to_node[gcell_end] = end_node;
+            } else {
+                end_node = gcell_to_node[gcell_end];
+            }
+            net_graph.addEdge(start_node, end_node);
+        }
+
+        return lemon::connected(net_graph);
+    }
+
+    bool GlobalRouting::is_connected(const net_container_type & nets){
+        bool connected = true;
+        for(auto net : nets){
+            connected = is_connected(net);
+            if(connected == false)
+                break;
+        }
+        return connected;
+    }
+
     bool GlobalRouting::move_cell(GlobalRouting::gcell_type source, GlobalRouting::gcell_type target, GlobalRouting::cell_instance_type cell, GlobalRouting::netlist_type & netlist, GlobalRouting::placement_type & placement, GlobalRouting::routing_constraints_type & routing_constraints, GlobalRouting::std_cells_type & std_cells)
     {
         //remove blockage demand
