@@ -14,7 +14,9 @@ bool check_connectivity(const ophidian::design::Design & design, const std::vect
         auto net_name = design.netlist().name(net);
         ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
         for (auto pin : design.netlist().pins(net)) {
-            auto pin_name = design.netlist().name(pin);                
+            auto pin_name = design.netlist().name(pin);
+            auto pin_owner = design.netlist().cell(pin);
+            //auto location = (pin_owner != ophidian::circuit::CellInstance()) ? design.placement().location(pin_owner) : design.placement().location(pin);
             auto location = design.placement().location(pin);
             auto box = ophidian::routing::GCellGraph::box_type{location, location};
             auto pin_geometry = design.placement().geometry(pin);
@@ -193,8 +195,8 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         // "ispd19_test9"
     };
 
-    std::string benchmarks_path = "./input_files/ispd19";
-    // std::string benchmarks_path = "./input_files/circuits";
+    //std::string benchmarks_path = "./input_files/ispd19";
+    std::string benchmarks_path = "./input_files/circuits";
 
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
@@ -203,9 +205,9 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
          std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-        // std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+         std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
-        std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
+        //std::string guide_file = "./" + circuit_name + "_debug.guide";
 
 
 
@@ -220,9 +222,9 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         ophidian::design::factory::make_design(design, def, lef, guide);
 
         std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        // std::vector<ophidian::circuit::Net> nets;
-        // auto net2037 = design.netlist().find_net("n_2037");
-        // nets.push_back(net2037);
+        /*std::vector<ophidian::circuit::Net> nets;
+        auto net_to_debug = design.netlist().find_net("net2958");
+        nets.push_back(net_to_debug);*/
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 

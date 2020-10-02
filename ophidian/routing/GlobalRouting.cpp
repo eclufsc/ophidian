@@ -220,6 +220,8 @@ namespace ophidian::routing
         auto start_index = m_library.layerIndex(m_gr_segment_layers_start[segment]);
         auto end_index = m_library.layerIndex(m_gr_segment_layers_end[segment]);
 
+        //std::cout << "set gcells of segment " << box_segment.min_corner().x().value() << "," << box_segment.min_corner().y().value() << "->" << box_segment.max_corner().x().value() << "," << box_segment.max_corner().y().value() << std::endl;
+
         //same layer
         if(start_index == end_index)
         {
@@ -239,6 +241,9 @@ namespace ophidian::routing
             }
             start_gcell = m_gcell_graph->gcell(min.first, min.second, start_index-1);
             end_gcell = m_gcell_graph->gcell(max.first, max.second, end_index-1);
+
+            //std::cout << "start gcell " << min.first << "," << min.second << "," << start_index-1 << std::endl;
+            //std::cout << "end gcell " << max.first << "," << max.second << "," << end_index-1 << std::endl;
         } else {
             //via
             m_gcell_graph->intersect(gcells, box_segment, start_index-1);
@@ -247,6 +252,13 @@ namespace ophidian::routing
             gcells.clear();
             m_gcell_graph->intersect(gcells, box_segment, end_index-1);
             end_gcell = gcells.back();
+            
+            auto start_node = m_gcell_graph->graph_node(start_gcell);
+            auto end_node = m_gcell_graph->graph_node(end_gcell);
+            auto start_position = m_gcell_graph->position(start_node);
+            auto end_position = m_gcell_graph->position(end_node);
+            //std::cout << "start gcell " << start_position.get<0>() << "," << start_position.get<1>() << "," << start_position.get<2>() << std::endl;
+            //std::cout << "end gcell " << end_position.get<0>() << "," << end_position.get<1>() << "," << end_position.get<2>() << std::endl;
         }
         m_gr_segment_gcell_start[segment] = start_gcell;
         m_gr_segment_gcell_end[segment] = end_gcell;
@@ -347,13 +359,21 @@ namespace ophidian::routing
 
     bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells, std::string net_name) const
     {
+        namespace bgi = boost::geometry::index;
+        using point_scalar_type     = ophidian::geometry::Point<double>;
+        using box_scalar_type       = ophidian::geometry::Box<double>;
+        using unity_type            = GlobalRouting::unit_type;
+        using point_type            = ophidian::geometry::Point<unity_type>;
+        using box_type              = geometry::Box<unity_type>;
+        using rtree_node_type       = std::pair<box_scalar_type, gcell_type>;
+        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+        std::unordered_map<scalar_type, rtree_type> rtree_layers;
+
         auto net_graph = graph_type{};
         std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
-        /*if (net_name == "net1192") {
-        std::cout << "pin gcells " << pin_gcells.size() << std::endl;
-        std::cout << "segments " << m_net_to_gr_segment.parts(net).size() << std::endl;
-        }*/
-        for (auto gcell : pin_gcells) {
+        //std::cout << "pin gcells " << pin_gcells.size() << std::endl;
+        //std::cout << "segments " << m_net_to_gr_segment.parts(net).size() << std::endl;
+        /*for (auto gcell : pin_gcells) {
             if (gcell_to_node.find(gcell) == gcell_to_node.end()) {
                 auto node = net_graph.addNode();
                 gcell_to_node[gcell] = node;
@@ -361,22 +381,44 @@ namespace ophidian::routing
                 auto point = m_gcell_graph->center_of_box(gcell);
                 auto layer = m_gcell_graph->layer_index(gcell);
 
-                /*if (net_name == "net1192") {
                 std::cout << "pin " << point.x().value() << "," << point.y().value() << "," << layer << std::endl;
-                }*/
             }
-        }
+        }*/
         for (auto segment : m_net_to_gr_segment.parts(net)) {
+            auto segment_box = box(segment); 
+            auto segment_min_corner = segment_box.min_corner();
+            auto segment_max_corner = segment_box.max_corner();
+            auto segment_scalar_box = box_scalar_type{{segment_min_corner.x().value(), segment_min_corner.y().value()}, {segment_max_corner.x().value(), segment_max_corner.y().value()}};
+            
             auto gcell_start = m_gr_segment_gcell_start[segment]; 
             auto gcell_end = m_gr_segment_gcell_end[segment];
+            auto start_point = m_gcell_graph->center_of_box(gcell_start);
+            auto start_layer = m_gcell_graph->layer_index(gcell_start);
+            auto end_point = m_gcell_graph->center_of_box(gcell_end);
+            auto end_layer = m_gcell_graph->layer_index(gcell_end);
+
+            //std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;             
+
             auto start_node = node_type{};
-            auto end_node = node_type{};
             if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
                 start_node = net_graph.addNode();
                 gcell_to_node[gcell_start] = start_node;
             } else {
                 start_node = gcell_to_node[gcell_start];
             }
+            
+            std::vector<rtree_node_type> intersecting_nodes;
+            rtree_layers[start_layer].query(boost::geometry::index::intersects(segment_scalar_box), std::back_inserter(intersecting_nodes));
+            for (auto node : intersecting_nodes) {
+                auto node_box = node.first;
+                //std::cout << "connected to start node " << node_box.min_corner().x() << "," << node_box.min_corner().y() << "->" << node_box.max_corner().x() << "," << node_box.max_corner().y() << std::endl;
+                auto graph_node = gcell_to_node[node.second];
+                if (graph_node != start_node) {
+                    net_graph.addEdge(start_node, graph_node);
+                }
+            }
+
+            auto end_node = node_type{};
             if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
                 end_node = net_graph.addNode();
                 gcell_to_node[gcell_end] = end_node;
@@ -384,21 +426,33 @@ namespace ophidian::routing
                 end_node = gcell_to_node[gcell_end];
             }
             net_graph.addEdge(start_node, end_node);
+            
+            if (start_layer != end_layer) {
+                std::vector<rtree_node_type> intersecting_nodes;
+                rtree_layers[end_layer].query(boost::geometry::index::intersects(segment_scalar_box), std::back_inserter(intersecting_nodes));
+                for (auto node : intersecting_nodes) {
+                    auto node_box = node.first;
+                    //std::cout << "connected to end node " << node_box.min_corner().x() << "," << node_box.min_corner().y() << "->" << node_box.max_corner().x() << "," << node_box.max_corner().y() << std::endl;
+                    auto graph_node = gcell_to_node[node.second];
+                    if (graph_node != end_node) {
+                        net_graph.addEdge(end_node, graph_node);
+                    }
+                }
+            }
 
-            auto start_point = m_gcell_graph->center_of_box(gcell_start);
-            auto start_layer = m_gcell_graph->layer_index(gcell_start);
-            auto end_point = m_gcell_graph->center_of_box(gcell_end);
-            auto end_layer = m_gcell_graph->layer_index(gcell_end);
-            /*if (net_name == "net1192") {
-             std::cout << "segment " << start_point.x().value() << "," << start_point.y().value() << "," << start_layer << "->" << end_point.x().value() << "," << end_point.y().value() << "," << end_layer << std::endl;
-            }*/
+            auto gcell_start_box = m_gcell_graph->box(gcell_start);
+            auto gcell_start_scalar_box = box_scalar_type{{gcell_start_box.min_corner().x().value(), gcell_start_box.min_corner().y().value()}, {gcell_start_box.max_corner().x().value(), gcell_start_box.max_corner().y().value()}};
+            auto start_rtree_node = rtree_node_type{gcell_start_scalar_box, gcell_start};
+            rtree_layers[start_layer].insert(start_rtree_node);
+            auto gcell_end_box = m_gcell_graph->box(gcell_end);
+            auto gcell_end_scalar_box = box_scalar_type{{gcell_end_box.min_corner().x().value(), gcell_end_box.min_corner().y().value()}, {gcell_end_box.max_corner().x().value(), gcell_end_box.max_corner().y().value()}};
+            auto end_rtree_node = rtree_node_type{gcell_end_scalar_box, gcell_end};
+            rtree_layers[end_layer].insert(end_rtree_node);
         }
 
-        /*if (net_name == "net1192") {
-         for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
-            std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
-         }
-        }*/
+         //for (auto arc = graph_type::ArcIt(net_graph); arc != lemon::INVALID; ++arc) {
+         //   std::cout << "arc " << net_graph.id(net_graph.source(arc)) << "," << net_graph.id(net_graph.target(arc)) << std::endl;
+         //}
 
         return lemon::connected(net_graph);
     }

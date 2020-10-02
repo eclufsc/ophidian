@@ -728,8 +728,8 @@ TEST_CASE("write csv of initial routing", "[iccad20]") {
 TEST_CASE("evaluate cugr solution", "[iccad19]") {
     std::vector<std::string> circuit_names = {
         "ispd19_test1",
-        "ispd19_test4",
-        "ispd19_test5",
+        //"ispd19_test4",
+        //"ispd19_test5",
     };
 
     std::string benchmarks_path = "./input_files/iccad19_benchmarks_v2/";
@@ -739,7 +739,8 @@ TEST_CASE("evaluate cugr solution", "[iccad19]") {
 
         std::string def_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.def";
         std::string lef_file = benchmarks_path + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string guide_file = circuit_name + ".guide";
+        //std::string guide_file = circuit_name + ".guide";
+        std::string guide_file = "./input_files/circuits/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         //std::string guide_file = circuit_name + "_original.guide";
 
         auto design = ophidian::design::Design();
@@ -773,9 +774,75 @@ TEST_CASE("evaluate cugr solution", "[iccad19]") {
 
                 auto segment_start_layer = design.global_routing().layer_start(segment);
                 auto segment_end_layer = design.global_routing().layer_end(segment);
-                if (segment_start_layer != segment_end_layer) {
-                    std::cout << "different layers in segment" << std::endl;
+
+                auto layer_direction = design.routing_library().direction(segment_start_layer);
+                if (layer_direction == ophidian::routing::Direction::HORIZONTAL && segment_height > 3000) {
+                    //std::cout << "height larger than 3000" << std::endl;
+                    count++;
+                } else if (layer_direction == ophidian::routing::Direction::VERTICAL && segment_width > 3000) {
+                    //std::cout << "width larger than 3000" << std::endl;
+                    count++;
                 }
+            }
+        }
+
+        std::cout << "COUNT " << count << std::endl;
+
+        auto wirelength = design.global_routing().wirelength(nets);
+        auto number_of_vias = design.global_routing().number_of_vias(nets);
+
+        std::cout << "WL " << wirelength << std::endl;
+        std::cout << "VIAS " << number_of_vias << std::endl;
+
+        draw_gcell_svg(design, "net2958"); 
+    }
+}
+
+TEST_CASE("evaluate cugr solution for iccad2017 benchmarks", "[iccad17]") {
+    std::vector<std::string> circuit_names = {
+        "pci_bridge32_b_md3",
+    };
+
+    std::string benchmarks_path = "/home/renan/workspace/build-ophidian-renan/experiments/input_files/ICCAD_2017_Contest/benchmarks2017/";
+
+    for (auto circuit_name : circuit_names) {
+        log() << "running circuit " << circuit_name << std::endl;
+
+        std::string def_file = "/home/renan/workspace/build-ophidian-renan/experiments/defs/" + circuit_name + "_leg_haocheng_0.def";
+        std::string lef_file = benchmarks_path + circuit_name + "/" + circuit_name + "_combined.lef";
+        std::string guide_file = "/home/renan/workspace/build-ophidian-renan/experiments/guides/" + circuit_name + "_leg_haocheng_0.guide";
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design_ispd2019(design, def_file, lef_file, guide_file);
+
+        auto gcell_graph = design.global_routing().gcell_graph();
+        for (auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++) {
+            auto gcell = *gcell_it;
+
+            auto capacity = gcell_graph->capacity(gcell);
+            auto demand = gcell_graph->demand(gcell);
+
+            //std::cout << "capacity " << capacity << " demand " << demand << std::endl;
+            if (demand > capacity) {
+                std::cout << "CAPACITY VIOLATED" << std::endl;
+            }
+        }
+
+        unsigned count = 0;
+        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
+        for (auto net : nets) {
+            auto net_name = design.netlist().name(net);
+            //std::cout << "net " << net_name << std::endl;
+
+            auto segments = design.global_routing().segments(net);
+            
+            for (auto segment : segments) {
+                auto segment_box = design.global_routing().box(segment);
+                auto segment_width = segment_box.max_corner().x().value() - segment_box.min_corner().x().value(); 
+                auto segment_height = segment_box.max_corner().y().value() - segment_box.min_corner().y().value();
+
+                auto segment_start_layer = design.global_routing().layer_start(segment);
+                auto segment_end_layer = design.global_routing().layer_end(segment);
 
                 auto layer_direction = design.routing_library().direction(segment_start_layer);
                 if (layer_direction == ophidian::routing::Direction::HORIZONTAL && segment_height > 3000) {
