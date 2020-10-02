@@ -176,6 +176,74 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
 }
+//if not specified the net name, it draws the whole circuit ((not recommended)
+void draw_gcell_svg_2(ophidian::design::Design & design, std::string net_name){
+    auto& netlist = design.netlist();
+    auto& routing_library = design.routing_library();
+    auto& global_routing = design.global_routing();
+    auto gcell_graph_ptr = global_routing.gcell_graph();
+    std::ofstream out_svg;
+    if (net_name == "")
+        out_svg.open("output.svg");
+    else
+        out_svg.open(net_name + ".svg");
+
+    //layer index
+    std::unordered_map<int, std::string> layer2color = {
+        {1,"#0000ff"},//blue
+        {2,"#ff0000"},//red
+        {3,"#00d000"},//green
+        {4,"#d0d000"},//yellow
+        {5,"#a52a2a"},//dark red
+        {6,"#ffa500"},//orange
+        {7,"#d000d0"},//pink
+        {8,"#00d0d0"},//light blue
+        {9,"#a52a2a"},//brown
+        {10,"#ffff00"},//light yellow
+        {11,"#008000"},//dark green
+        {12,"#ff00ff"},//purple
+        {13,"#ffc0cb"},//light pink
+        {14,"#00ffff"},//light blue
+        {15,"#800080"},//dark purple
+        {16,"#808000"},//dark yellow
+    };
+
+    out_svg<<"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
+    out_svg<<"<svg>\n";
+
+    for(auto layer_color : layer2color)
+    {
+        out_svg<<"<g\n";
+        out_svg<<"inkscape:label=\""<<layer_color.first<<"\"\n";
+        out_svg<<"inkscape:groupmode=\"layer\"\n";
+        out_svg<<"id=\""<<layer_color.first<<"\">\n";
+        for(auto net_it = netlist.begin_net(); net_it != netlist.end_net(); ++net_it)
+        {
+            if(net_name != "" && netlist.name(*net_it) != net_name)
+                continue;
+
+            for(auto gcell : global_routing.gcells(*net_it))
+            {
+                if(gcell_graph_ptr->layer_index(gcell) != layer_color.first)
+                    continue;
+
+                auto box = gcell_graph_ptr->box(gcell);
+                auto width = box.max_corner().x() - box.min_corner().x();
+                auto height = box.max_corner().y() - box.min_corner().y();
+
+                out_svg<<"<rect\n";
+                out_svg<<"style=\"fill:"<<layer_color.second<<";fill-opacity:0.5;\"\n";
+                out_svg<<"width=\""<<units::unit_cast<double>(width) / 1000<<"\"\n";
+                out_svg<<"height=\""<<units::unit_cast<double>(height) / 1000<<"\"\n";
+                out_svg<<"x=\""<<units::unit_cast<double>(box.min_corner().x()) / 1000<<"\"\n";
+                out_svg<<"y=\""<<units::unit_cast<double>(-box.max_corner().y()) / 1000<<"\" />\n";//svg files use y axis flipped
+            }
+        }
+        out_svg<<"</g>\n";
+    }
+    out_svg<<"</svg>";
+    out_svg.close();
+}
 
 TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
 
@@ -207,7 +275,7 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
          std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
-        //std::string guide_file = "./" + circuit_name + "_debug.guide";
+        // std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
 
 
 
@@ -231,6 +299,15 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
 
         check_connectivity(design, nets);
+        /*for(auto net : nets){
+            auto connected = design.global_routing().is_connected(net);
+            if(connected == false)
+            {
+                auto net_name = design.netlist().name(net);
+                log() << net_name << " is not connected" << std::endl;
+                draw_gcell_svg_2(design, net_name);
+            }
+        }*/
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
