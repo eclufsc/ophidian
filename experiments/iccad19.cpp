@@ -10,9 +10,39 @@
 bool check_connectivity(const ophidian::design::Design & design, const std::vector<ophidian::circuit::Net>& nets){
     log() << "Checking for disconnected nets..." << std::endl;
     bool is_nets_open = false;
+
+    namespace bgi = boost::geometry::index;
+    using box_scalar_type       = ophidian::geometry::Box<double>;
+    using rtree_node_type       = std::pair<box_scalar_type, ophidian::routing::GlobalRouting::gr_segment_type>;
+    using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+    std::unordered_map<int, rtree_type> rtree_layers;
+
+    for (auto segment_it = design.global_routing().begin_segment(); segment_it != design.global_routing().end_segment(); segment_it++) {
+        auto segment = *segment_it;
+
+        auto gcell_start = design.global_routing().gcell_start(segment);
+        auto gcell_end = design.global_routing().gcell_end(segment);
+
+        auto gcell_start_box = design.global_routing().gcell_graph()->box(gcell_start);
+        auto gcell_end_box = design.global_routing().gcell_graph()->box(gcell_end);
+
+        auto gcell_start_scalar_box = box_scalar_type{{gcell_start_box.min_corner().x().value(), gcell_start_box.min_corner().y().value()}, {gcell_start_box.max_corner().x().value(), gcell_start_box.max_corner().y().value()}};
+        auto gcell_end_scalar_box = box_scalar_type{{gcell_end_box.min_corner().x().value(), gcell_end_box.min_corner().y().value()}, {gcell_end_box.max_corner().x().value(), gcell_end_box.max_corner().y().value()}};
+
+        auto layer_start = design.global_routing().gcell_graph()->layer_index(gcell_start);
+        auto layer_end = design.global_routing().gcell_graph()->layer_index(gcell_end);
+
+        auto node_start = rtree_node_type{gcell_start_scalar_box, segment};
+        auto node_end = rtree_node_type{gcell_end_scalar_box, segment};
+
+        rtree_layers[layer_start].insert(node_start);
+        rtree_layers[layer_end].insert(node_end);
+    }
+
     for (auto net : nets) {
         auto net_name = design.netlist().name(net);
         ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
+        auto pins_connected = true;
         for (auto pin : design.netlist().pins(net)) {
             auto pin_name = design.netlist().name(pin);
             auto pin_owner = design.netlist().cell(pin);
@@ -27,6 +57,19 @@ bool check_connectivity(const ophidian::design::Design & design, const std::vect
             // log() << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
             design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
+
+            for (auto pin_box : pin_geometry) {
+                auto box_layer_name = pin_box.second;
+                auto box_layer = design.routing_library().find_layer_instance(box_layer_name);
+                auto box_layer_index = design.routing_library().layerIndex(box_layer);
+
+                auto pin_box_scalar = box_scalar_type{{pin_box.first.min_corner().x().value(), pin_box.first.min_corner().y().value()}, {pin_box.first.max_corner().x().value(), pin_box.first.max_corner().y().value()}};
+
+                std::vector<rtree_node_type> intersecting_nodes;
+                rtree_layers[box_layer_index].query(boost::geometry::index::intersects(pin_box_scalar), std::back_inserter(intersecting_nodes));
+
+                pins_connected &= !intersecting_nodes.empty();
+            }
         }
         if(false){ //debug code
             for(auto gcell : pin_gcells)
@@ -39,7 +82,7 @@ bool check_connectivity(const ophidian::design::Design & design, const std::vect
             }
         }
 
-        auto connected = design.global_routing().is_connected(net, pin_gcells, net_name);
+        auto connected = design.global_routing().is_connected(net, pin_gcells, net_name) && pins_connected;
         
         if(!connected)
         {
