@@ -315,7 +315,9 @@ void run_ilp_for_circuit(ophidian::design::Design & design, std::string circuit_
 
             design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
         }
-        auto connected = design.global_routing().is_connected(net, pin_gcells, net_name);
+        // auto connected = design.global_routing().is_connected(net, pin_gcells, net_name);
+        auto connected = design.global_routing().is_connected(net);
+
 
         if(!connected)
         {

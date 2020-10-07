@@ -5,94 +5,9 @@
 #include <ophidian/parser/GuideWriter.h>
 #include <ophidian/parser/DefWriter.h>
 #include <ophidian/routing/Engine.h>
+#include <ophidian/routing/RoutabilityCheck.h>
 #include "run_ilp.h"
 
-bool check_connectivity(const ophidian::design::Design & design, const std::vector<ophidian::circuit::Net>& nets){
-    log() << "Checking for disconnected nets..." << std::endl;
-    bool is_nets_open = false;
-
-    namespace bgi = boost::geometry::index;
-    using box_scalar_type       = ophidian::geometry::Box<double>;
-    using rtree_node_type       = std::pair<box_scalar_type, ophidian::routing::GlobalRouting::gr_segment_type>;
-    using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
-    std::unordered_map<int, rtree_type> rtree_layers;
-
-    for (auto segment_it = design.global_routing().begin_segment(); segment_it != design.global_routing().end_segment(); segment_it++) {
-        auto segment = *segment_it;
-
-        auto gcell_start = design.global_routing().gcell_start(segment);
-        auto gcell_end = design.global_routing().gcell_end(segment);
-
-        auto gcell_start_box = design.global_routing().gcell_graph()->box(gcell_start);
-        auto gcell_end_box = design.global_routing().gcell_graph()->box(gcell_end);
-
-        auto gcell_start_scalar_box = box_scalar_type{{gcell_start_box.min_corner().x().value(), gcell_start_box.min_corner().y().value()}, {gcell_start_box.max_corner().x().value(), gcell_start_box.max_corner().y().value()}};
-        auto gcell_end_scalar_box = box_scalar_type{{gcell_end_box.min_corner().x().value(), gcell_end_box.min_corner().y().value()}, {gcell_end_box.max_corner().x().value(), gcell_end_box.max_corner().y().value()}};
-
-        auto layer_start = design.global_routing().gcell_graph()->layer_index(gcell_start);
-        auto layer_end = design.global_routing().gcell_graph()->layer_index(gcell_end);
-
-        auto node_start = rtree_node_type{gcell_start_scalar_box, segment};
-        auto node_end = rtree_node_type{gcell_end_scalar_box, segment};
-
-        rtree_layers[layer_start].insert(node_start);
-        rtree_layers[layer_end].insert(node_end);
-    }
-
-    for (auto net : nets) {
-        auto net_name = design.netlist().name(net);
-        ophidian::routing::GlobalRouting::gcell_container_type pin_gcells = {};
-        auto pins_connected = true;
-        for (auto pin : design.netlist().pins(net)) {
-            auto pin_name = design.netlist().name(pin);
-            auto pin_owner = design.netlist().cell(pin);
-            //auto location = (pin_owner != ophidian::circuit::CellInstance()) ? design.placement().location(pin_owner) : design.placement().location(pin);
-            auto location = design.placement().location(pin);
-            auto box = ophidian::routing::GCellGraph::box_type{location, location};
-            auto pin_geometry = design.placement().geometry(pin);
-            auto layer_name = pin_geometry.front().second;
-            auto pin_layer = design.routing_library().find_layer_instance(layer_name);
-            auto layer_index = design.routing_library().layerIndex(pin_layer);
-
-            // log() << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
-
-            design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
-
-            for (auto pin_box : pin_geometry) {
-                auto box_layer_name = pin_box.second;
-                auto box_layer = design.routing_library().find_layer_instance(box_layer_name);
-                auto box_layer_index = design.routing_library().layerIndex(box_layer);
-
-                auto pin_box_scalar = box_scalar_type{{pin_box.first.min_corner().x().value(), pin_box.first.min_corner().y().value()}, {pin_box.first.max_corner().x().value(), pin_box.first.max_corner().y().value()}};
-
-                std::vector<rtree_node_type> intersecting_nodes;
-                rtree_layers[box_layer_index].query(boost::geometry::index::intersects(pin_box_scalar), std::back_inserter(intersecting_nodes));
-
-                pins_connected &= !intersecting_nodes.empty();
-            }
-        }
-        if(false){ //debug code
-            for(auto gcell : pin_gcells)
-            {
-                auto box = design.global_routing().gcell_graph()->box(gcell);
-                auto layer = design.global_routing().gcell_graph()->layer_index(gcell);
-                auto layer_i = design.routing_library().layer_from_index(layer);
-                auto layer_str = design.routing_library().name(layer_i);
-                std::cout << box.min_corner().x().value() << " " << box.min_corner().y().value() << " " << box.max_corner().x().value() << " " << box.max_corner().y().value() << " " << layer_str << std::endl;
-            }
-        }
-
-        auto connected = design.global_routing().is_connected(net, pin_gcells, net_name) && pins_connected;
-        
-        if(!connected)
-        {
-            log() << "net " << net_name << " disconnected with " << design.netlist().pins(net).size() << " pins" << std::endl;
-            is_nets_open = true;
-        }
-    }
-    if (is_nets_open) printlog("Open nets detected!"); else printlog("All nets connected!");
-    return is_nets_open;
-}
 
 TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 
@@ -191,7 +106,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        if(check_connectivity(design, nets)){
+        if(ophidian::routing::check_connectivity(design, nets)){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
         }
 
@@ -306,8 +221,8 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         // "ispd19_test9"
     };
 
-    //std::string benchmarks_path = "./input_files/ispd19";
-    std::string benchmarks_path = "./input_files/circuits";
+    std::string benchmarks_path = "./input_files/ispd19";
+    // std::string benchmarks_path = "./input_files/circuits";
 
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
@@ -316,9 +231,9 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
          std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-         std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        //  std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
-        // std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
+        std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
 
 
 
@@ -332,16 +247,18 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
-        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net2958");
-        nets.push_back(net_to_debug);*/
+        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        // /*
+        std::vector<ophidian::circuit::Net> nets;
+        auto net_to_debug = design.netlist().find_net("net1078");
+        nets.push_back(net_to_debug);
+        // */
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
         log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
 
-        check_connectivity(design, nets);
+        ophidian::routing::check_connectivity(design, nets);
         /*for(auto net : nets){
             auto connected = design.global_routing().is_connected(net);
             if(connected == false)

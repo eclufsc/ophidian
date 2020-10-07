@@ -357,7 +357,8 @@ namespace ophidian::routing
         return is_overflow;
     }
 
-    bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells, std::string net_name) const
+    // bool GlobalRouting::is_connected(const net_type & net, const gcell_container_type & pin_gcells, std::string net_name) const
+    bool GlobalRouting::is_connected(const net_type & net) const
     {
         namespace bgi = boost::geometry::index;
         using point_scalar_type     = ophidian::geometry::Point<double>;
@@ -457,34 +458,53 @@ namespace ophidian::routing
         return lemon::connected(net_graph);
     }
 
-    bool GlobalRouting::is_connected(const net_type & net){
-        auto net_graph = graph_type{};
-        std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
+    // bool GlobalRouting::is_connected(const net_type & net){
+    //     namespace bgi = boost::geometry::index;
+    //     using box_scalar_type       = ophidian::geometry::Box<double>;
+    //     using rtree_node_type       = std::pair<box_scalar_type, ophidian::routing::GlobalRouting::gr_segment_type>;
+    //     using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
 
-        for (auto segment : m_net_to_gr_segment.parts(net)) {
-            auto gcell_start = m_gr_segment_gcell_start[segment]; 
-            auto gcell_end = m_gr_segment_gcell_end[segment];
-            auto start_node = node_type{};
-            auto end_node = node_type{};
-            if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
-                start_node = net_graph.addNode();
-                gcell_to_node[gcell_start] = start_node;
-            } else {
-                start_node = gcell_to_node[gcell_start];
-            }
-            if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
-                end_node = net_graph.addNode();
-                gcell_to_node[gcell_end] = end_node;
-            } else {
-                end_node = gcell_to_node[gcell_end];
-            }
-            net_graph.addEdge(start_node, end_node);
-        }
+    //     auto net_graph = graph_type{};
+    //     std::unordered_map<gcell_type, node_type, entity_system::EntityBaseHash> gcell_to_node;
 
-        return lemon::connected(net_graph);
-    }
+    //     std::unordered_map<int, rtree_type> rtree_layers;
 
-    bool GlobalRouting::is_connected(const net_container_type & nets){
+    //     for (auto segment : m_net_to_gr_segment.parts(net)) {
+    //         auto segment_box = box(segment); 
+    //         auto segment_min_corner = segment_box.min_corner();
+    //         auto segment_max_corner = segment_box.max_corner();
+    //         auto segment_scalar_box = box_scalar_type{{segment_min_corner.x().value(), segment_min_corner.y().value()}, {segment_max_corner.x().value(), segment_max_corner.y().value()}};
+            
+
+
+    //         auto gcell_start = m_gr_segment_gcell_start[segment];
+    //         auto start_layer = m_gcell_graph->layer_index(gcell_start);
+    //         auto gcell_end = m_gr_segment_gcell_end[segment];
+    //         auto end_layer = m_gcell_graph->layer_index(gcell_end);
+    //         auto start_node = node_type{};
+    //         auto end_node = node_type{};
+    //         if (gcell_to_node.find(gcell_start) == gcell_to_node.end()) {
+    //             start_node = net_graph.addNode();
+    //             gcell_to_node[gcell_start] = start_node;
+    //         } else {
+    //             start_node = gcell_to_node[gcell_start];
+    //         }
+    //         if (gcell_to_node.find(gcell_end) == gcell_to_node.end()) {
+    //             end_node = net_graph.addNode();
+    //             gcell_to_node[gcell_end] = end_node;
+    //         } else {
+    //             end_node = gcell_to_node[gcell_end];
+    //         }
+    //         net_graph.addEdge(start_node, end_node);
+
+    //         //find neighbors
+            
+    //     }
+
+    //     return lemon::connected(net_graph);
+    // }
+
+    bool GlobalRouting::is_connected(const net_container_type & nets) const {
         bool connected = true;
         for(auto net : nets){
             connected = is_connected(net);
