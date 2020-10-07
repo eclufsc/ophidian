@@ -106,7 +106,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        if(ophidian::routing::check_connectivity(design, nets)){
+        if(check_connectivity(design, nets)){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
         }
 
@@ -214,6 +214,7 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
 
 
         "ispd19_test1",
+        //"ispd19_test3",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -247,12 +248,10 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
-        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        // /*
-        std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net1078");
-        nets.push_back(net_to_debug);
-        // */
+        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        /*std::vector<ophidian::circuit::Net> nets;
+        auto net_to_debug = design.netlist().find_net("net3134");
+        nets.push_back(net_to_debug);*/
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
