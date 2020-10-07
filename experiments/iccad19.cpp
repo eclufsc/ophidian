@@ -106,7 +106,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        if(check_connectivity(design, nets)){
+        if(ophidian::routing::check_connectivity(design, nets)){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
         }
 
@@ -148,6 +148,8 @@ void draw_gcell_svg_2(ophidian::design::Design & design, std::string net_name){
 
     //layer index
     std::unordered_map<int, std::string> layer2color = {
+        {-1,"#D3D3D3"},//Light Gray
+
         {1,"#0000ff"},//blue
         {2,"#ff0000"},//red
         {3,"#00d000"},//green
@@ -180,6 +182,31 @@ void draw_gcell_svg_2(ophidian::design::Design & design, std::string net_name){
             if(net_name != "" && netlist.name(*net_it) != net_name)
                 continue;
 
+            for (auto pin : design.netlist().pins(*net_it)) {
+                auto pin_geometry = design.placement().geometry(pin);
+                auto layer_name = pin_geometry.front().second;
+                auto pin_layer = design.routing_library().find_layer_instance(layer_name);
+                auto layer_index = design.routing_library().layerIndex(pin_layer);
+
+                for (auto pin_box : pin_geometry) {
+                    auto box_layer_name = pin_box.second;
+                    auto box_layer = design.routing_library().find_layer_instance(box_layer_name);
+                    auto box_layer_index = design.routing_library().layerIndex(box_layer);
+
+                    auto box = pin_box.first;
+                    auto width = box.max_corner().x() - box.min_corner().x();
+                    auto height = box.max_corner().y() - box.min_corner().y();
+
+                    out_svg<<"<rect\n";
+                    // "#D3D3D3" -> //Light Gray
+                    out_svg<<"style=\"fill:"<< "#D3D3D3" <<";fill-opacity:0.5;\"\n";
+                    out_svg<<"width=\""<<units::unit_cast<double>(width) / 1000<<"\"\n";
+                    out_svg<<"height=\""<<units::unit_cast<double>(height) / 1000<<"\"\n";
+                    out_svg<<"x=\""<<units::unit_cast<double>(box.min_corner().x()) / 1000<<"\"\n";
+                    out_svg<<"y=\""<<units::unit_cast<double>(-box.max_corner().y()) / 1000<<"\" />\n";//svg files use y axis flipped
+                }
+            }
+
             for(auto gcell : global_routing.gcells(*net_it))
             {
                 if(gcell_graph_ptr->layer_index(gcell) != layer_color.first)
@@ -209,11 +236,11 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
     std::vector<std::string> circuit_names = {
         // "ispd18_sample3",
         // "ispd19_sample4",
-        // "ispd19_test4",
+        "ispd19_test4",
         // "ispd19_test5",
 
 
-        "ispd19_test1",
+        // "ispd19_test1",
         //"ispd19_test3",
         // "ispd18_test8",
         // "ispd18_test10",
@@ -248,10 +275,15 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
-        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net3134");
-        nets.push_back(net_to_debug);*/
+        
+        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        std::vector<ophidian::circuit::Net> nets;
+        auto net_to_debug = design.netlist().find_net("h5/n_78097");
+        nets.push_back(net_to_debug);
+
+        auto segments = design.global_routing().segments(net_to_debug);
+        auto size = segments.size();
+        log() << "Initial size = " << size << std::endl;
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
@@ -267,6 +299,8 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
                 draw_gcell_svg_2(design, net_name);
             }
         }*/
+
+        draw_gcell_svg_2(design, "h5/n_78097");
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
