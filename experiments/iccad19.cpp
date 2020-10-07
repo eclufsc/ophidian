@@ -54,10 +54,11 @@ bool check_connectivity(const ophidian::design::Design & design, const std::vect
             auto pin_layer = design.routing_library().find_layer_instance(layer_name);
             auto layer_index = design.routing_library().layerIndex(pin_layer);
 
-            // log() << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
+            //log() << "pin " << pin_name << " layer " << layer_name << " index " << layer_index << std::endl;
 
             design.global_routing().gcell_graph()->intersect(pin_gcells, box, layer_index-1);
 
+            auto pin_connected = false;
             for (auto pin_box : pin_geometry) {
                 auto box_layer_name = pin_box.second;
                 auto box_layer = design.routing_library().find_layer_instance(box_layer_name);
@@ -68,8 +69,11 @@ bool check_connectivity(const ophidian::design::Design & design, const std::vect
                 std::vector<rtree_node_type> intersecting_nodes;
                 rtree_layers[box_layer_index].query(boost::geometry::index::intersects(pin_box_scalar), std::back_inserter(intersecting_nodes));
 
-                pins_connected &= !intersecting_nodes.empty();
+                pin_connected |= !intersecting_nodes.empty();
+
+                //log() << "intersecting nodes " << intersecting_nodes.size() << " pins connected " << pin_connected << std::endl;
             }
+            pins_connected &= pin_connected;
         }
         if(false){ //debug code
             for(auto gcell : pin_gcells)
@@ -299,6 +303,7 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
 
 
         "ispd19_test1",
+        //"ispd19_test3",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -334,7 +339,7 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
 
         std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
         /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net2958");
+        auto net_to_debug = design.netlist().find_net("net3134");
         nets.push_back(net_to_debug);*/
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
