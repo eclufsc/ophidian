@@ -77,11 +77,16 @@ namespace ophidian::placement::factory
                         library.geometry(stdPin).push_back(std::make_pair(box, layer_name));
                     }
 
-                    double center_of_mass_x = sum_x.value() / cont;
+                    /*double center_of_mass_x = sum_x.value() / cont;
                     double center_of_mass_y = sum_y.value() / cont;
                     library.offset(stdPin) = Library::offset_type{ 
                         geometry::CellGeometry::unit_type(center_of_mass_x), 
                         geometry::CellGeometry::unit_type(center_of_mass_y) 
+                    };*/
+
+                    library.offset(stdPin) = Library::offset_type{
+                        geometry::CellGeometry::unit_type{port.second[0].min_corner().x()},
+                        geometry::CellGeometry::unit_type{port.second[0].min_corner().y()}
                     };
                 }
             }

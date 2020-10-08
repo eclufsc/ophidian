@@ -172,12 +172,15 @@ namespace ophidian::routing
         net_points.reserve(netlist.pins(m_net).size());
         for(auto pin : net_pins)
         {
-            auto pin_location = placement.location(pin);
+            //auto pin_location = placement.location(pin);
+            auto pin_location = placement.geometry(pin).front().first.min_corner();
             auto point = std::make_pair(std::round(pin_location.x().value()), std::round(pin_location.y().value()));
             net_points.push_back(pin_location);
             auto pin_name = netlist.name(pin);
             // pins_map[pin_location] = pin_name;
             pins_map[point].push_back(pin);
+
+            //log() << "pin location for flute " << pin_location.x().value() << "," << pin_location.y().value() << std::endl;
         }
         auto & flute = interconnection::Flute::instance();
         auto tree = flute.create(net_points);
@@ -236,9 +239,11 @@ namespace ophidian::routing
         auto& placement = m_design.placement();
 
         auto pin_1 = *netlist.pins(m_net).begin();
-        auto p1_l = placement.location(pin_1);
+        //auto p1_l = placement.location(pin_1);
+        auto p1_l = placement.geometry(pin_1).front().first.min_corner();
         auto pin_2 = *std::next(netlist.pins(m_net).begin());
-        auto p2_l = placement.location(pin_2);
+        //auto p2_l = placement.location(pin_2);
+        auto p2_l = placement.geometry(pin_2).front().first.min_corner();
 
         if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
         {
@@ -552,6 +557,8 @@ namespace ophidian::routing
         std::vector<gcell_type> path;
         auto s_node = m_gcell_graph->graph_node(m_node_map[s].mapped_gcell);
         auto s_pos = m_gcell_graph->position(s_node);
+            
+        //log() << "s_pos " << s_pos.get<0>() << "," << s_pos.get<1>() << "," << s_pos.get<2>() << std::endl;
 
         auto gcell = m_node_map[g].mapped_gcell;
         auto g_node = m_gcell_graph->graph_node(gcell);
@@ -560,6 +567,7 @@ namespace ophidian::routing
         bool non_stop = true;
         while(non_stop)
         {
+            //log() << "g_pos " << g_pos.get<0>() << "," << g_pos.get<1>() << "," << g_pos.get<2>() << std::endl;
             non_stop = (s_pos.get<0>() != g_pos.get<0>() || s_pos.get<1>() != g_pos.get<1>() || s_pos.get<2>() != g_pos.get<2>());
             path.push_back(gcell);
             if(non_stop == false)
@@ -592,6 +600,13 @@ namespace ophidian::routing
                 break;
             }
         }
+
+        //log() << "gcells " << gcells.size() << std::endl;
+        if (gcells.size() == 1) {
+            auto gcell = m_node_map[s].mapped_gcell;
+            m_routing_segments.push_back({gcell, gcell});
+        }
+
         //discover the direction of the segments
         std::vector<SegmentDirection> directions;
         directions.reserve(gcells.size());
@@ -604,8 +619,11 @@ namespace ophidian::routing
             direction = (current_pos.get<0>() - previous_pos.get<0>() != 0) ? SegmentDirection::X : direction;
             direction = (current_pos.get<1>() - previous_pos.get<1>() != 0) ? SegmentDirection::Y : direction;
             direction = (current_pos.get<2>() - previous_pos.get<2>() != 0) ? SegmentDirection::Z : direction;
-            directions.push_back(direction);
+            directions.push_back(direction);            
             previous_gcell = current_gcell;
+
+            //log() << "current pos " << current_pos.get<0>() << "," << current_pos.get<1>() << "," << current_pos.get<2>() << std::endl;
+            //log() << "previous pos " << previous_pos.get<0>() << "," << previous_pos.get<1>() << "," << previous_pos.get<2>() << std::endl;
         }
 
         //find routing segments
@@ -684,6 +702,8 @@ namespace ophidian::routing
             auto max_y = std::max(start_pos.y(), end_pos.y());
 
             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
+
+            //log() << "wire box " << min_x << "," << min_y << "->" << max_x << "," << max_y << std::endl;
 
             segments.push_back(AStarSegment(wire_box, start_layer, end_layer, m_net));
         }

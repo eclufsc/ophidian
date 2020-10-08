@@ -132,6 +132,7 @@ void Engine::run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & ne
     for(auto net : nets){
         auto astar_result = run_astar_on_net(net);
         auto net_name = m_design.netlist().name(net);
+        //log() << net_name << std::endl;
         if(astar_result.m_is_valid == false){
             std::cout << "A* FAIL IN NET " << m_design.netlist().name(net) << std::endl;
         }
@@ -795,6 +796,8 @@ void Engine::update_astar_on_global_routing(AstarResultV2& astar_result){
     // std::cout << "astar_wl size: " << astar_segments.size() << std::endl;
     int init_wl  = get_wire_length_segments(initial_segments);
     int astar_wl = get_wire_length_segments(astar_segments);
+
+    //log() << "init wl " << init_wl << " astar wl " << astar_wl << " result " << result << std::endl;
 
     // if(initial_segments.size() == 0){
     //     // case that not exist initial solution
