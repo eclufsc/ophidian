@@ -254,10 +254,15 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
-        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net3153");
-        nets.push_back(net_to_debug);*/
+        
+        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        std::vector<ophidian::circuit::Net> nets;
+        auto net_to_debug = design.netlist().find_net("h5/n_78097");
+        nets.push_back(net_to_debug);
+
+        auto segments = design.global_routing().segments(net_to_debug);
+        auto size = segments.size();
+        log() << "Initial size = " << size << std::endl;
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
@@ -273,6 +278,8 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
                 draw_gcell_svg_2(design, net_name);
             }
         }*/
+
+        draw_gcell_svg_2(design, "h5/n_78097");
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
