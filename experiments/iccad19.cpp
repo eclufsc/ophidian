@@ -85,8 +85,8 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         // "ispd19_sample4",
 
         "ispd19_test1",
-        "ispd19_test4",
-        "ispd19_test5",
+        //"ispd19_test4",
+        //"ispd19_test5",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",

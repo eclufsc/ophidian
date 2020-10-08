@@ -52,7 +52,7 @@ bool ophidian::routing::pins_are_connected(const ophidian::design::Design & desi
         auto gcell_start_box = global_routing.gcell_graph()->box(gcell_start);
         auto gcell_end_box = global_routing.gcell_graph()->box(gcell_end);
         
-        if(layer_start = layer_end){
+        if(layer_start == layer_end){
             //segment
             std::vector<double> x_cords {gcell_start_box.min_corner().x().value(), gcell_start_box.max_corner().x().value(), gcell_end_box.min_corner().x().value(), gcell_end_box.max_corner().x().value()};
             std::vector<double> y_cords {gcell_start_box.min_corner().y().value(), gcell_start_box.max_corner().y().value(), gcell_end_box.min_corner().y().value(), gcell_end_box.max_corner().y().value()};
