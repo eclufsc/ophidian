@@ -24,6 +24,8 @@ namespace ophidian::placement::factory
     {
         for(const auto& macro : lef.macros())
         {
+            //std::cout << macro.name() << std::endl;
+
             auto stdCell = stdCells.find_cell(macro.name());
 
             auto pmin = geometry::CellGeometry::point_type{
@@ -42,6 +44,8 @@ namespace ophidian::placement::factory
 
             for(const auto& pin : macro.pins())
             {
+                //std::cout << pin.name() << std::endl;
+
                 auto stdPin = stdCells.find_pin(macro.name() + ":" + pin.name());
 
                 library.geometry(stdPin) = Library::std_pin_geometry_type();
@@ -75,6 +79,8 @@ namespace ophidian::placement::factory
                         geometry::CellGeometry::box_type box{min_corner, max_corner};
 
                         library.geometry(stdPin).push_back(std::make_pair(box, layer_name));
+
+                        //std::cout << "box " << min_x.value() << "," << min_y.value() << "->" << max_x.value() << "," << max_y.value() << std::endl;
                     }
 
                     /*double center_of_mass_x = sum_x.value() / cont;

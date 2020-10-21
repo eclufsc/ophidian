@@ -728,6 +728,7 @@ TEST_CASE("write csv of initial routing", "[iccad20]") {
 TEST_CASE("evaluate cugr solution", "[iccad19]") {
     std::vector<std::string> circuit_names = {
         "ispd19_test1",
+        //"ispd19_test3",
         //"ispd19_test4",
         //"ispd19_test5",
     };

@@ -85,8 +85,9 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         // "ispd19_sample4",
 
         "ispd19_test1",
-        //"ispd19_test4",
-        //"ispd19_test5",
+        "ispd19_test3",
+        "ispd19_test4",
+        "ispd19_test5",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
@@ -123,17 +124,17 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         UCal::Engine engine(design);
         std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
         /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net1144");
+        auto net_to_debug = design.netlist().find_net("net3499");
         nets.push_back(net_to_debug);*/
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
         log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
         log() << "A* for generate the initial solution" << std::endl;
         //clear the possible initial solution
-        /*for (auto net : nets) {
+        for (auto net : nets) {
             design.global_routing().unroute(net);
         }
-        log() << "Cleaned wirelength = " << design.global_routing().wirelength(nets) << std::endl;*/
+        log() << "Cleaned wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
 
         auto & netlist = design.netlist();
@@ -192,7 +193,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         }
         output_file.close();
 
-        //draw_gcell_svg_2(design, "net1144");
+        draw_gcell_svg_2(design, "net1408");
 
         //ILP lower panels with movement 
 

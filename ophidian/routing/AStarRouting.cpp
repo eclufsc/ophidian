@@ -101,21 +101,21 @@ namespace ophidian::routing
                 return false;
 
             if(flute_graph == false) {
-                //log() << "failed flute graph" << std::endl;
+                log() << "failed flute graph" << std::endl;
                 return false;
             }
             bool working_correct = node_layer_assignment();
             if(working_correct == false)
             {
                 clear_router_members();
-                //log() << "failed node layer assignment" << std::endl;
+                log() << "failed node layer assignment" << std::endl;
                 return false;
             }
             working_correct = route_flute_segments(area);
             if(working_correct == false)
             {
                 clear_router_members();
-                //log() << "failed route flute segments" << std::endl;
+                log() << "failed route flute segments" << std::endl;
                 return false;
             }
             bfs_backtrack();
@@ -123,14 +123,14 @@ namespace ophidian::routing
             if(working_correct == false)
             {
                 clear_router_members();
-                //log() << "failed connect pins to min layer" << std::endl;
+                log() << "failed connect pins to min layer" << std::endl;
                 return false;
             }
             working_correct = connect_floating_pins();
             if(working_correct == false)
             {
                 clear_router_members();
-                //log() << "failed connect floating pins" << std::endl;
+                log() << "failed connect floating pins" << std::endl;
                 return false;
             }
         }
@@ -140,7 +140,7 @@ namespace ophidian::routing
             if(working_correct == false)
             {
                 clear_router_members();
-                //log() << "failed trivial routing" << std::endl;
+                log() << "failed trivial routing" << std::endl;
                 return false;
             }
         }
@@ -186,12 +186,12 @@ namespace ophidian::routing
         auto tree = flute.create(net_points);
 
         auto steiner_tree_length = tree->length().value();
-        if(steiner_tree_length == 0)
+        /*if(steiner_tree_length == 0)
         {
             if (AStarDebug) std::cout<<"WARNING: same gcell"<<std::endl;
             if (AStarDebug) std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
-        }
+        }*/
 
         //Create FluteGraph
         for(auto tree_segment_it = tree->segments().first; tree_segment_it != tree->segments().second; ++tree_segment_it)
@@ -245,12 +245,12 @@ namespace ophidian::routing
         //auto p2_l = placement.location(pin_2);
         auto p2_l = placement.geometry(pin_2).front().first.min_corner();
 
-        if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
+        /*if(p1_l.x() == p2_l.x() && p1_l.y() == p2_l.y())
         {
             if (AStarDebug) std::cout<<"WARNING: same gcell"<<std::endl;
             if (AStarDebug) std::cout<<"BUG in function: bool all_pins_same_collumn()"<<std::endl;
             return false;
-        }
+        }*/
 
         auto node1 = m_graph.addNode();
         m_node_map[node1] = FluteNode{p1_l, netlist.name(pin_1)};
@@ -321,6 +321,7 @@ namespace ophidian::routing
                 {
                     queue.push(opposite_node);
                     bool exist_path = a_star(current_node, opposite_node, area);
+                    //std::cout << "exist path " << exist_path << std::endl;
                     if(exist_path == false)
                         return false;
                 }
@@ -347,6 +348,7 @@ namespace ophidian::routing
         while(open_nodes.empty() == false)
         {
             number_of_visited_nodes++;
+            //std::cout << "number of visited nodes " << number_of_visited_nodes << std::endl;
             current_node = open_nodes.front();
             if(goal_reached(current_node, m_node_map[goal].mapped_gcell, goal_is_steiner))
             {
@@ -355,10 +357,11 @@ namespace ophidian::routing
             }
             open_nodes.pop_front();
 
-            if (number_of_visited_nodes >= 5000) {
+            /*if (number_of_visited_nodes >= 5000) {
+                std::cout << "visited more than 5k nodes" << std::endl;
                 target_found = false;
                 break;
-            }
+            }*/
             
             if (visited_nodes[current_node]) {
                 continue;
@@ -703,7 +706,7 @@ namespace ophidian::routing
 
             auto wire_box = box_type{{min_x, min_y}, {max_x, max_y}};
 
-            //log() << "wire box " << min_x << "," << min_y << "->" << max_x << "," << max_y << std::endl;
+            //log() << "wire box " << min_x.value() << "," << min_y.value() << "->" << max_x.value() << "," << max_y.value() << std::endl;
 
             segments.push_back(AStarSegment(wire_box, start_layer, end_layer, m_net));
         }

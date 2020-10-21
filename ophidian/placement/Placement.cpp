@@ -81,6 +81,8 @@ namespace ophidian::placement
         using Point = ophidian::geometry::Point<double>;
         using Box = ophidian::geometry::Box<double>;
 
+        //std::cout << "geometry of pin " << m_netlist.name(pin) << std::endl;
+
         if (m_netlist.is_pad(pin)) {
             auto pad = m_netlist.pad(pin);
             return geometry(pad);
@@ -98,11 +100,16 @@ namespace ophidian::placement
         auto translated_boxes = geometry::CellGeometry{};
         translated_boxes.reserve(stdPinGeometry.size());
 
+        //std::cout << "cell location " << cell_location.x().value() << "," << cell_location.y().value() << std::endl;
+        //std::cout << "cell dimensions " << cell_width.value() << "," << cell_height.value() << std::endl;
+
         for(auto & geometry : stdPinGeometry)
         {
             point_type min_corner;
             point_type max_corner;
             auto& box = geometry.first;
+
+            //std::cout << "pin box " << box.min_corner().x().value() << "," << box.min_corner().y().value() << "->" << box.max_corner().x().value() << "," << box.max_corner().y().value() << std::endl;
 
             switch (orientation(cell)){
                 case orientation_type::N:
@@ -145,11 +152,23 @@ namespace ophidian::placement
                         cell_location.y() + cell_height - box.min_corner().y()
                     };
                     break;
+                case orientation_type::W: // needs to fix this to use correct orientation
+                    min_corner = point_type{
+                        box.min_corner().x() + cell_location.x(),
+                        box.min_corner().y() + cell_location.y()
+                    };
+                    max_corner = point_type{
+                        box.max_corner().x() + cell_location.x(),
+                        box.max_corner().y() + cell_location.y()
+                    };
+                    break;
             }
             geometry::CellGeometry::box_type new_box (
                 min_corner, max_corner
             );
             translated_boxes.push_back(std::make_pair(new_box, geometry.second));
+            
+            //std::cout << "translated pin box " << new_box.min_corner().x().value() << "," << new_box.min_corner().y().value() << "->" << new_box.max_corner().x().value() << "," << new_box.max_corner().y().value() << std::endl;
         }
         return translated_boxes;
     }
