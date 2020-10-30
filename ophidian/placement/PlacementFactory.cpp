@@ -71,19 +71,79 @@ namespace ophidian::placement::factory
             auto pad_instance = netlist.add_pad(pin_instance);
 
             auto pad_position = pad.position();
+            auto pad_orientation = pad.orientation();
 
             for(auto layer_map : pad.layers())
             {
                 auto layer_name = layer_map.first;
                 for(auto rect : layer_map.second)
                 {
-                    auto min_x = std::min( rect.min_corner().x(), rect.max_corner().x());
-                    auto min_y = std::min( rect.min_corner().y(), rect.max_corner().y());
-                    auto max_x = std::max( rect.min_corner().x(), rect.max_corner().x());
-                    auto max_y = std::max( rect.min_corner().y(), rect.max_corner().y());
+                    // auto min_x = std::min( rect.min_corner().x(), rect.max_corner().x());
+                    // auto min_y = std::min( rect.min_corner().y(), rect.max_corner().y());
+                    // auto max_x = std::max( rect.min_corner().x(), rect.max_corner().x());
+                    // auto max_y = std::max( rect.min_corner().y(), rect.max_corner().y());
 
-                    auto min_corner = Placement::pad_geometry_type::point_type{ pad_position.x() + min_x, pad_position.y() + min_y };
-                    auto max_corner = Placement::pad_geometry_type::point_type{ pad_position.x() + max_x, pad_position.y() + max_y };
+                    Placement::pad_geometry_type::point_type min_corner;
+                    Placement::pad_geometry_type::point_type max_corner;
+
+                    switch (pad_orientation){
+                        case ophidian::parser::Pad::orientation_type::N:
+                            min_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.min_corner().x(),
+                                pad_position.y() + rect.min_corner().y() 
+                            };
+                            max_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.max_corner().x(), 
+                                pad_position.y() + rect.max_corner().y()
+                            };
+                            break;
+                        case ophidian::parser::Pad::orientation_type::W:
+                            min_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() - rect.max_corner().y(), 
+                                pad_position.y() + rect.min_corner().x() 
+                            };
+                            max_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() - rect.min_corner().y(), 
+                                pad_position.y() + rect.max_corner().x()
+                            };
+                            break;
+                        case ophidian::parser::Pad::orientation_type::S:
+                            min_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.min_corner().x(), 
+                                pad_position.y() - rect.max_corner().y()
+                            };
+                            max_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.max_corner().x(),
+                                pad_position.y() + rect.min_corner().y()
+                            };
+                            break;
+                        case ophidian::parser::Pad::orientation_type::E:
+                            min_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.max_corner().y(),
+                                pad_position.y() + rect.min_corner().x() 
+                            };
+                            max_corner = Placement::pad_geometry_type::point_type{ 
+                                pad_position.x() + rect.min_corner().y(),
+                                pad_position.y() + rect.max_corner().x()
+                            };
+                            break;
+                        case ophidian::parser::Pad::orientation_type::FN: //TODO
+                            min_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            max_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            break;
+                        case ophidian::parser::Pad::orientation_type::FW: //TODO
+                            min_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            max_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            break;
+                        case ophidian::parser::Pad::orientation_type::FS: //TODO
+                            min_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            max_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            break;
+                        case ophidian::parser::Pad::orientation_type::FE: //TODO
+                            min_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            max_corner = Placement::pad_geometry_type::point_type{Placement::unit_type{0}, Placement::unit_type{0}};
+                            break;
+                    }
                     Placement::pad_geometry_type::box_type box{min_corner, max_corner};
 
                     placement.add_geometry(pad_instance, box, layer_name);
