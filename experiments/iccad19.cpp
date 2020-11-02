@@ -81,18 +81,26 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        // "ispd18_sample3",
-        // "ispd19_sample4",
+        /*"ispd18_test1",
+        "ispd18_test2",
+        "ispd18_test3",
+        "ispd18_test4",
+        "ispd18_test5",
+        "ispd18_test6",
+        "ispd18_test7",
+        "ispd18_test8",
+        "ispd18_test9",*/
 
-        "ispd19_test1",
+        /*"ispd19_test1",
+        "ispd19_test2",
         "ispd19_test3",
         "ispd19_test4",
-        "ispd19_test5",
-        // "ispd18_test8",
-        // "ispd18_test10",
-        // "ispd19_test7",
-        // "ispd19_test8",
-        // "ispd19_test9"
+        "ispd19_test5",*/
+        "ispd19_test6",
+        "ispd19_test7",
+        "ispd19_test8",
+        "ispd19_test9",
+        "ispd19_test10",
     };
 
     // std::string benchmarks_path = "./input_files/ispd19";
@@ -105,7 +113,8 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
          std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        //std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        std::string guide_file = benchmarks_path + "/cugr_nopatch_ispd19/" + circuit_name + "/" + circuit_name + ".cugr.nopatch.output.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
 
         ophidian::parser::Def def;
@@ -124,23 +133,24 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         UCal::Engine engine(design);
         std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
         /*std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("net3499");
+        auto net_to_debug = design.netlist().find_net("FE_OFN12703_n_142878");
         nets.push_back(net_to_debug);*/
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
         log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
         log() << "A* for generate the initial solution" << std::endl;
         //clear the possible initial solution
-        for (auto net : nets) {
+        /*for (auto net : nets) {
             design.global_routing().unroute(net);
         }
-        log() << "Cleaned wirelength = " << design.global_routing().wirelength(nets) << std::endl;
+        log() << "Cleaned wirelength = " << design.global_routing().wirelength(nets) << std::endl;*/
 
 
         auto & netlist = design.netlist();
         auto & placement = design.placement();
         std::vector<std::pair<ophidian::circuit::Net, double>> nets_bounding_box;
         for(auto net : nets){
+            auto net_name = design.netlist().name(net);
 
             double min_x = std::numeric_limits<double>::max();
             double min_y = std::numeric_limits<double>::max();
@@ -157,12 +167,17 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 
             auto bounding_box = (max_x - min_x) + (max_y - min_y);
             nets_bounding_box.push_back(std::make_pair(net, bounding_box));
+
+            //std::cout << "net " << net_name << " bounding box " << bounding_box << std::endl;
         }
         std::sort(nets_bounding_box.begin(), nets_bounding_box.end(), [](std::pair<ophidian::circuit::Net, double> cost_a, std::pair<ophidian::circuit::Net, double> cost_b) {return cost_a.second < cost_b.second;});
         std::vector<ophidian::circuit::Net> ordered_nets;
         for(auto pair : nets_bounding_box)
         {
-            ordered_nets.push_back(pair.first);
+            auto hpwl = pair.second;
+            if (hpwl <= 1e5) {
+                ordered_nets.push_back(pair.first);
+            }
         }
         
         auto start_time = std::chrono::steady_clock::now();
@@ -178,9 +193,9 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        if(ophidian::routing::check_connectivity(design, nets)){
+        /*if(ophidian::routing::check_connectivity(design, nets)){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
-        }
+        }*/
 
         std::ofstream output_file;
         output_file.open(circuit_name + ".csv", std::ios::out|std::ios::trunc);
@@ -193,7 +208,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         }
         output_file.close();
 
-        draw_gcell_svg_2(design, "net1408");
+        //draw_gcell_svg_2(design, "net1408");
 
         //ILP lower panels with movement 
 

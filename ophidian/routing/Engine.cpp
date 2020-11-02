@@ -128,11 +128,20 @@ Json Engine::run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>
 // }
 
 void Engine::run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & nets){
+    auto timer = ophidian::util::timer();
+
     // std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
+    unsigned count = 0;
+    unsigned total_count = nets.size();
     for(auto net : nets){
-        auto astar_result = run_astar_on_net(net);
         auto net_name = m_design.netlist().name(net);
-        //log() << net_name << std::endl;
+
+        timer.start();
+        auto astar_result = run_astar_on_net(net);
+        auto runtime = timer.elapsed();
+        //std::cout << "net " << net_name << " runtime " << runtime << std::endl;
+        //log() << count << " out of " << total_count << std::endl;
+        count++;
         if(astar_result.m_is_valid == false){
             std::cout << "A* FAIL IN NET " << m_design.netlist().name(net) << std::endl;
         }

@@ -358,7 +358,7 @@ namespace ophidian::routing
             open_nodes.pop_front();
 
             /*if (number_of_visited_nodes >= 5000) {
-                std::cout << "visited more than 5k nodes" << std::endl;
+                //std::cout << "visited more than 5k nodes" << std::endl;
                 target_found = false;
                 break;
             }*/
