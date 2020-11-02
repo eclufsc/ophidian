@@ -110,7 +110,6 @@ namespace ophidian::placement
             auto& box = geometry.first;
 
             //std::cout << "pin box " << box.min_corner().x().value() << "," << box.min_corner().y().value() << "->" << box.max_corner().x().value() << "," << box.max_corner().y().value() << std::endl;
-
             switch (orientation(cell)){
                 case orientation_type::N:
                     min_corner = point_type{
@@ -152,14 +151,45 @@ namespace ophidian::placement
                         cell_location.y() + cell_height - box.min_corner().y()
                     };
                     break;
-                case orientation_type::W: // needs to fix this to use correct orientation
+                case orientation_type::W: // R90
                     min_corner = point_type{
-                        box.min_corner().x() + cell_location.x(),
-                        box.min_corner().y() + cell_location.y()
+                        cell_location.x() + cell_height - box.max_corner().y(),
+                        cell_location.y() + box.min_corner().x()
                     };
                     max_corner = point_type{
-                        box.max_corner().x() + cell_location.x(),
-                        box.max_corner().y() + cell_location.y()
+                        cell_location.x() + cell_height - box.min_corner().y(),
+                        cell_location.y() + box.max_corner().x()
+                    };
+                    break;
+                
+                case orientation_type::FW: // MX90
+                    min_corner = point_type{
+                        cell_location.x() + box.min_corner().y(),
+                        cell_location.y() + box.min_corner().x()
+                    };
+                    max_corner = point_type{
+                        cell_location.x() + box.max_corner().y(),
+                        cell_location.y() + box.max_corner().x()
+                    };
+                    break;
+                case orientation_type::E: // R270
+                    min_corner = point_type{
+                        cell_location.x() + box.min_corner().y(),
+                        cell_location.y() + cell_width - box.max_corner().x()
+                    };
+                    max_corner = point_type{
+                        cell_location.x() + box.max_corner().y(),
+                        cell_location.y() + cell_width - box.min_corner().x()
+                    };
+                    break;
+                case orientation_type::FE: // MY90
+                    min_corner = point_type{
+                        cell_location.x() + cell_height - box.max_corner().y(),
+                        cell_location.y() + cell_width - box.max_corner().x()
+                    };
+                    max_corner = point_type{
+                        cell_location.x() + cell_height - box.min_corner().y(),
+                        cell_location.y() + cell_width - box.min_corner().x()
                     };
                     break;
             }

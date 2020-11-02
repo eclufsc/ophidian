@@ -54,6 +54,26 @@ void draw_gcell_svg_2(ophidian::design::Design & design, std::string net_name){
             if(net_name != "" && netlist.name(*net_it) != net_name)
                 continue;
 
+            for(auto pin : netlist.pins(*net_it))
+            {
+                for(auto geometry : design.placement().geometry(pin))
+                {
+                    auto layer = routing_library.find_layer_instance(geometry.second);
+                    if(routing_library.layerIndex(layer) != layer_color.first)
+                        continue;
+                    auto box = geometry.first;
+                    auto width = box.max_corner().x() - box.min_corner().x();
+                    auto height = box.max_corner().y() - box.min_corner().y();
+
+                    out_svg<<"<rect\n";
+                    out_svg<<"style=\"fill:"<< "#C0C0C0" <<";fill-opacity:0.5;\"\n"; // #C0C0C0 -> HTML Silver
+                    out_svg<<"width=\""<<units::unit_cast<double>(width) / 1000<<"\"\n";
+                    out_svg<<"height=\""<<units::unit_cast<double>(height) / 1000<<"\"\n";
+                    out_svg<<"x=\""<<units::unit_cast<double>(box.min_corner().x()) / 1000<<"\"\n";
+                    out_svg<<"y=\""<<units::unit_cast<double>(-box.max_corner().y()) / 1000<<"\" />\n";//svg files use y axis flipped
+                }
+            }
+
             for(auto gcell : global_routing.gcells(*net_it))
             {
                 if(gcell_graph_ptr->layer_index(gcell) != layer_color.first)
@@ -235,16 +255,19 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         // "ispd19_test5",
 
 
-        "ispd19_test1",
-        //"ispd19_test3",
+        // "ispd19_test1",
+        // "ispd19_test3",
         // "ispd18_test8",
         // "ispd18_test10",
         // "ispd19_test7",
         // "ispd19_test8",
         // "ispd19_test9"
+        "ispd19_test2",
+        // "ispd19_test4",
+        // "ispd19_test5",
     };
 
-    //std::string benchmarks_path = "./input_files/ispd19";
+    // std::string benchmarks_path = "./input_files/ispd19";
      std::string benchmarks_path = "./input_files/circuits";
 
     for (auto circuit_name : circuit_names) {
@@ -252,11 +275,12 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
 
          std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
          std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        //  std::string guide_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.guide";
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-          std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
-        //std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
 
 
 
@@ -270,15 +294,26 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
-        
-        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        std::vector<ophidian::circuit::Net> nets;
-        auto net_to_debug = design.netlist().find_net("h5/n_78097");
-        nets.push_back(net_to_debug);
 
-        auto segments = design.global_routing().segments(net_to_debug);
-        auto size = segments.size();
-        log() << "Initial size = " << size << std::endl;
+        // auto cell = design.netlist().find_cell_instance("inst8268");
+        // auto pins = design.netlist().pins(cell);
+        // auto ori = design.placement().orientation(cell);
+
+        // for(auto pin : pins)
+        // {
+        //     auto geometry =  design.placement().geometry(pin);
+        // }
+
+        
+        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        // std::vector<ophidian::circuit::Net> nets;
+        // auto net_to_debug = design.netlist().find_net("a_5_2_6");
+        // nets.push_back(net_to_debug);
+        // draw_gcell_svg_2(design, "a_5_2_6");
+
+        // auto segments = design.global_routing().segments(net_to_debug);
+        // auto size = segments.size();
+        // log() << "Initial size = " << size << std::endl;
         
         log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
@@ -295,7 +330,6 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
             }
         }*/
 
-        draw_gcell_svg_2(design, "h5/n_78097");
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }

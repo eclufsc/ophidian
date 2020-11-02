@@ -5,7 +5,7 @@ bool ophidian::routing::check_connectivity(const ophidian::design::Design & desi
     using namespace ophidian::util;
     log() << "Checking for disconnected nets..." << std::endl;
     bool is_nets_open = false;
-
+    int count = 0;
     for (auto net : nets) {
         auto net_pins = design.netlist().pins(net);
         if (net_pins.size() < 2) {
@@ -24,10 +24,11 @@ bool ophidian::routing::check_connectivity(const ophidian::design::Design & desi
         if(!connected)
         {
             log() << "net " << net_name << " disconnected with " << design.netlist().pins(net).size() << " pins" << std::endl;
+            count ++;
             is_nets_open = true;
         }
     }
-    if (is_nets_open) printlog("Open nets detected!"); else printlog("All nets connected!");
+    if (is_nets_open) printflog("Open nets detected! %d nets are open!\n", count); else printlog("All nets connected!");
     return is_nets_open;
 }
 
