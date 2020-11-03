@@ -101,7 +101,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        /*"ispd18_test1",
+        "ispd18_test1",
         "ispd18_test2",
         "ispd18_test3",
         "ispd18_test4",
@@ -109,13 +109,13 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         "ispd18_test6",
         "ispd18_test7",
         "ispd18_test8",
-        "ispd18_test9",*/
+        "ispd18_test9",
 
-        /*"ispd19_test1",
+        "ispd19_test1",
         "ispd19_test2",
         "ispd19_test3",
         "ispd19_test4",
-        "ispd19_test5",*/
+        "ispd19_test5",
         "ispd19_test6",
         "ispd19_test7",
         "ispd19_test8",
@@ -134,7 +134,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
         //std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
-        std::string guide_file = benchmarks_path + "/cugr_nopatch_ispd19/" + circuit_name + "/" + circuit_name + ".cugr.nopatch.output.guide";
+        std::string guide_file = benchmarks_path + "/cugr_nopatch/" + circuit_name + "/" + circuit_name + ".cugr.nopatch.output.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
 
         ophidian::parser::Def def;
@@ -213,9 +213,9 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        /*if(ophidian::routing::check_connectivity(design, nets)){
+        if(ophidian::routing::check_connectivity(design, nets)){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
-        }*/
+        }
 
         std::ofstream output_file;
         output_file.open(circuit_name + ".csv", std::ios::out|std::ios::trunc);
