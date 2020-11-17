@@ -7,12 +7,17 @@ bool ophidian::routing::check_connectivity(const ophidian::design::Design & desi
     bool is_nets_open = false;
     int count = 0;
     for (auto net : nets) {
+
+        // uncomment to discart Pin1 Nets (large number of pins)
+        // auto net_name = design.netlist().name(net);
+        // if(net_name == "pin1")
+            // continue;
+
         auto net_pins = design.netlist().pins(net);
         if (net_pins.size() < 2) {
             continue;
         }
 
-        auto net_name = design.netlist().name(net);
 
         auto segments_connected = segments_are_connected(design, net);
         auto pins_connected = pins_are_connected(design, net);       

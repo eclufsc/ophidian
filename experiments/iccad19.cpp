@@ -101,23 +101,24 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        "ispd18_test1",
-        "ispd18_test2",
-        "ispd18_test3",
-        "ispd18_test4",
-        "ispd18_test5",
-        "ispd18_test6",
-        "ispd18_test7",
-        "ispd18_test8",
-        "ispd18_test9",
+        // "ispd18_test1",
+        // "ispd18_test2",
+        // "ispd18_test3",
+        // "ispd18_test4",
+        // "ispd18_test5",
+        // "ispd18_test6",
+        // "ispd18_test7",
+        // "ispd18_test8",
+        // "ispd18_test9",
+        // "ispd18_test10",
 
-        "ispd19_test1",
-        "ispd19_test2",
-        "ispd19_test3",
-        "ispd19_test4",
-        "ispd19_test5",
-        "ispd19_test6",
-        "ispd19_test7",
+        // "ispd19_test1",
+        // "ispd19_test2",
+        // "ispd19_test3",
+        // "ispd19_test4",
+        // "ispd19_test5",
+        // "ispd19_test6",
+        // "ispd19_test7",
         "ispd19_test8",
         "ispd19_test9",
         "ispd19_test10",
@@ -133,8 +134,8 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
          std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
         //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
         //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-        //std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
-        std::string guide_file = benchmarks_path + "/cugr_nopatch/" + circuit_name + "/" + circuit_name + ".cugr.nopatch.output.guide";
+        std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.nopatch.guide";
+        // std::string guide_file = benchmarks_path + "/cugr_nopatch/" + circuit_name + "/" + circuit_name + ".cugr.nopatch.output.guide";
         // std::string guide_file = "./" + circuit_name + "_astar.guide";
 
         ophidian::parser::Def def;
@@ -195,7 +196,11 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         for(auto pair : nets_bounding_box)
         {
             auto hpwl = pair.second;
-            if (hpwl <= 1e5) {
+            auto connected = design.global_routing().is_connected(pair.first);
+            if (hpwl <= 1e5 || connected == false) {
+                auto net_name = design.netlist().name(pair.first);
+                if(net_name == "pin1")
+                    continue;
                 ordered_nets.push_back(pair.first);
             }
         }
@@ -213,7 +218,7 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
         log() << "Number of vias = " << design.global_routing().number_of_vias(nets) << std::endl;
 
         // check_connectivity(design, nets);
-        if(ophidian::routing::check_connectivity(design, nets)){
+        if(ophidian::routing::check_connectivity(design, nets) == false){
             ophidian::parser::write_guide(design, circuit_name + "_astar.guide");
         }
 
@@ -227,6 +232,15 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
             output_file << net_name << "," << wl << "," << vias << std::endl;
         }
         output_file.close();
+
+
+        std::ofstream results_file;
+        results_file.open("results.csv", std::ios::out|std::ios::app);
+        // results_file << "circuit,wirelength,vias" << std::endl;
+        auto wl = design.global_routing().wirelength(nets);
+        auto vias = design.global_routing().number_of_vias(nets);
+        results_file << circuit_name << "," << wl << "," << vias << std::endl;
+        results_file.close();
 
         //draw_gcell_svg_2(design, "net1408");
 
@@ -245,42 +259,117 @@ TEST_CASE("run ILP for iccad19 benchmarks", "[DATE21]") {
 }
 
 
-TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
+TEST_CASE("run iccad20 solution in ispd 18 and 19 benchmarks", "[iccad20_sol_on_ispd]") {
 
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        // "ispd18_sample3",
-        // "ispd19_sample4",
-        // "ispd19_test4",
-        // "ispd19_test5",
-
+        // "ispd18_test1",
+        // "ispd18_test2",
+        // "ispd18_test3",
+        // "ispd18_test4",
+        // "ispd18_test5",
+        // "ispd18_test6",
+        // "ispd18_test7",
+        // "ispd18_test8",
+        // "ispd18_test9",
+        // "ispd18_test10",
 
         // "ispd19_test1",
+        // "ispd19_test2",
         // "ispd19_test3",
-        // "ispd18_test8",
-        // "ispd18_test10",
-        // "ispd19_test7",
-        // "ispd19_test8",
-        // "ispd19_test9"
-        "ispd19_test2",
         // "ispd19_test4",
         // "ispd19_test5",
+        // "ispd19_test6",
+        // "ispd19_test7",
+        "ispd19_test8",
+        // "ispd19_test9",
+        // "ispd19_test10",
     };
 
-    // std::string benchmarks_path = "./input_files/ispd19";
-     std::string benchmarks_path = "./input_files/circuits";
+    std::string benchmarks_path = "./input_files/circuits";
 
     for (auto circuit_name : circuit_names) {
         std::cout << "running circuit " << circuit_name << std::endl;
 
-         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
-         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        //  std::string guide_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.guide";
-        //std::string def_file =   benchmarks_path + "/" + circuit_name + ".input.def";
-        //std::string lef_file =   benchmarks_path + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
-        // std::string guide_file = "./" + circuit_name + "_astar.guide";
-        // std::string guide_file = "./" + circuit_name + ".solution_cugr.guide";
+        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+        std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
+
+        ophidian::parser::Def def;
+        ophidian::parser::Lef lef;
+        ophidian::parser::Guide guide;
+        def = ophidian::parser::Def{def_file};
+        lef = ophidian::parser::Lef{lef_file};
+        guide = ophidian::parser::Guide{guide_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design(design, def, lef, guide);
+
+        UCal::Engine engine(design);
+
+        
+        std::vector<ophidian::circuit::Net> nets;
+        nets.reserve(design.netlist().size_net());
+
+        for(auto net_it = design.netlist().begin_net(); net_it != design.netlist().end_net(); ++net_it){
+            if(design.netlist().name(*net_it) == "pin1"){
+                printlog("removing net pin1");
+                continue;
+            }
+            nets.push_back(*net_it);
+        }
+    
+
+        std::ofstream csv_file("wirelength_cugr_nopatch_connected.csv", std::ofstream::app);
+        auto wirelength = design.global_routing().wirelength(nets);
+        auto vias = design.global_routing().number_of_vias(nets);
+        csv_file << circuit_name << "," << wirelength << "," << vias << std::endl;
+
+        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
+    }
+}
+
+
+TEST_CASE("connecting all nets from cugr nopatch benchmarks", "[cugr]") {
+
+    //iccad 2019 benchmarks
+    std::vector<std::string> circuit_names = {
+        // "ispd18_test1",
+        // "ispd18_test2",
+        // "ispd18_test3",
+        // "ispd18_test4",
+        // "ispd18_test5",
+        // "ispd18_test6",
+        // "ispd18_test7",
+        // "ispd18_test8",
+        // "ispd18_test9",
+        // "ispd18_test10",
+
+        // "ispd19_test1",
+        // "ispd19_test2",
+        // "ispd19_test3",
+        // "ispd19_test4",
+        // "ispd19_test5",
+        // "ispd19_test6",
+        // "ispd19_test7",
+        "ispd19_test8",
+        "ispd19_test9",
+        "ispd19_test10",
+    };
+
+    // std::string benchmarks_path = "./input_files/ispd19";
+    std::string benchmarks_path = "./input_files/circuits";
+
+    for (auto circuit_name : circuit_names) {
+        std::cout << "running circuit " << circuit_name << std::endl;
+
+        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution/" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/" + circuit_name + ".solution_cugr.guide";
+
 
 
 
@@ -295,43 +384,58 @@ TEST_CASE("run iccad19 benchmarks", "[connectivity]") {
         ophidian::design::factory::make_design(design, def, lef, guide);
 
 
-        // auto cell = design.netlist().find_cell_instance("inst8268");
-        // auto pins = design.netlist().pins(cell);
-        // auto ori = design.placement().orientation(cell);
+        log() << "A* wirelength = " << design.global_routing().wirelength(nets) << std::endl;
+        log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
 
-        // for(auto pin : pins)
-        // {
-        //     auto geometry =  design.placement().geometry(pin);
-        // }
-
+        // UCal::Engine engine(design);
         
-        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
-        // std::vector<ophidian::circuit::Net> nets;
+        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        // std::vector<ophidian::circuit::Net> open_nets;
         // auto net_to_debug = design.netlist().find_net("a_5_2_6");
         // nets.push_back(net_to_debug);
         // draw_gcell_svg_2(design, "a_5_2_6");
 
-        // auto segments = design.global_routing().segments(net_to_debug);
-        // auto size = segments.size();
-        // log() << "Initial size = " << size << std::endl;
+        // log() << "cheking conectivety"  << std::endl;
+        // for(auto net : nets){
+        //     auto connected = design.global_routing().is_connected(net);
+        //     if(connected == false)
+        //     {
+        //         auto net_name = design.netlist().name(net);
+        //         log() << net_name << " is not connected" << std::endl;
+        //         open_nets.push_back(net);
+        //     }
+        // }
         
-        log() << "Initial wirelength = " << design.global_routing().wirelength(nets) << std::endl;
 
-        log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
+        // trie to resolve unconnected nets
+        // if(open_nets.size() > 0){
+        //     log() << "runing A*"  << std::endl;
+        //     engine.run_astar_on_circuit( open_nets );
+        // }
+        // bool changed = false;
+        // log() << "cheking conectivety after A*"  << std::endl;
+        // for(auto net : open_nets){
+        //     auto connected = design.global_routing().is_connected(net);
+        //     if(connected == false)
+        //     {
+        //         auto net_name = design.netlist().name(net);
+        //         log() << "WARNING : " << net_name << " still not connected" << std::endl;
+        //     }else{
+        //         changed |= true;
+        //     }
+        // }
 
-        ophidian::routing::check_connectivity(design, nets);
-        /*for(auto net : nets){
-            auto connected = design.global_routing().is_connected(net);
-            if(connected == false)
-            {
-                auto net_name = design.netlist().name(net);
-                log() << net_name << " is not connected" << std::endl;
-                draw_gcell_svg_2(design, net_name);
-            }
-        }*/
+        //rwite a new guide
+        // if(changed){
+        //     log() << "writing guide"  << std::endl;
+        //     ophidian::parser::write_guide(design, circuit_name + ".solution_cugr_ophidian.guide");
+        // }
 
+        // std::ofstream csv_file("wirelength.csv", std::ofstream::app);
+        // auto wirelength = design.global_routing().wirelength(nets);
+        // auto vias = design.global_routing().number_of_vias(nets);
+        // csv_file << circuit_name << "," << wirelength << "," << vias << std::endl;
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl;    
     }
 }
-

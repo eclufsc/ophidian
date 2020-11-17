@@ -138,9 +138,9 @@ void Engine::run_astar_on_circuit(const std::vector<ophidian::circuit::Net> & ne
 
         timer.start();
         auto astar_result = run_astar_on_net(net);
-        auto runtime = timer.elapsed();
-        //std::cout << "net " << net_name << " runtime " << runtime << std::endl;
-        //log() << count << " out of " << total_count << std::endl;
+        // auto runtime = timer.elapsed();
+        // std::cout << "net " << net_name << " runtime " << runtime << std::endl;
+        // log() << count << " out of " << total_count << std::endl;
         count++;
         if(astar_result.m_is_valid == false){
             std::cout << "A* FAIL IN NET " << m_design.netlist().name(net) << std::endl;
