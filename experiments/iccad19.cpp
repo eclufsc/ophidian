@@ -384,16 +384,17 @@ TEST_CASE("connecting all nets from cugr nopatch benchmarks", "[cugr]") {
         ophidian::design::factory::make_design(design, def, lef, guide);
 
 
-        log() << "A* wirelength = " << design.global_routing().wirelength(nets) << std::endl;
-        log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
 
         // UCal::Engine engine(design);
         
-        // std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
+        std::vector<ophidian::circuit::Net> nets(design.netlist().begin_net(), design.netlist().end_net());
         // std::vector<ophidian::circuit::Net> open_nets;
         // auto net_to_debug = design.netlist().find_net("a_5_2_6");
         // nets.push_back(net_to_debug);
         // draw_gcell_svg_2(design, "a_5_2_6");
+
+        log() << "A* wirelength = " << design.global_routing().wirelength(nets) << std::endl;
+        log() << "Total number of vias = "<< design.global_routing().number_of_vias(nets) << std::endl;
 
         // log() << "cheking conectivety"  << std::endl;
         // for(auto net : nets){

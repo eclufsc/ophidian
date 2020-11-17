@@ -8,8 +8,8 @@ bool ophidian::routing::check_connectivity(const ophidian::design::Design & desi
     int count = 0;
     for (auto net : nets) {
 
+        auto net_name = design.netlist().name(net);
         // uncomment to discart Pin1 Nets (large number of pins)
-        // auto net_name = design.netlist().name(net);
         // if(net_name == "pin1")
             // continue;
 
@@ -28,6 +28,7 @@ bool ophidian::routing::check_connectivity(const ophidian::design::Design & desi
 
         if(!connected)
         {
+
             log() << "net " << net_name << " disconnected with " << design.netlist().pins(net).size() << " pins" << std::endl;
             count ++;
             is_nets_open = true;
