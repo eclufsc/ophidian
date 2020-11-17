@@ -705,7 +705,7 @@ int run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_n
     }*/
 
     // UCal::MCFRouting mcf_routing(design,circuit_name);
-    movement_file.open("movement_report.txt");
+    // movement_file.open("movement_report.txt");
 
     UCal::TimerProfiler total_timer;
 
@@ -768,11 +768,12 @@ int run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_n
 
     }//end if 
 
-    movement_file.close();
+    // movement_file.close();
     
         
     ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
 
+    printlog("number of movements = "+movements.size());
     iccad_output_writer.write_ICCAD_2020_output(output, movements);
 
     auto wirelength = design.global_routing().wirelength(nets);
@@ -781,6 +782,7 @@ int run_mcf_for_circuit(ophidian::design::Design & design, std::string circuit_n
 
     total_timer.stop();
     
+    report_json["number_of_movements"] = movements.size();
     report_json["new_wire_length"] = wirelength;
     report_json["new_num_vias"] = vias;
     report_json["total_time"] = total_timer.userTime();
@@ -1043,12 +1045,12 @@ int main(int argc, char** argv) {
     std::cout << "Total run_time in: " << duration_s << " seconds | or | " << duration_ms << " milliseconds" << std::endl;
     
     //Write the csv file
-    auto csv_file = "exp" + std::to_string(experiment) + "_initial_results.csv";
-    write_csv_header(csv_file);
-    write_csv(design, circuit_name, csv_file, duration_s, number_of_movements);
+    // auto csv_file = "exp" + std::to_string(experiment) + "_initial_results.csv";
+    // write_csv_header(csv_file);
+    // write_csv(design, circuit_name, csv_file, duration_s, number_of_movements);
 
-    ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
-    iccad_output_writer.write_ICCAD_2020_output(output, movements);
+    // ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
+    // iccad_output_writer.write_ICCAD_2020_output(output, movements);
 
     return 0;
 }

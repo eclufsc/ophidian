@@ -11,6 +11,7 @@ namespace ophidian::parser
         auto & netlist = m_design.netlist();
         auto & global_routing = m_design.global_routing();
         std::ofstream out_file(out_file_name, std::ofstream::out);
+        int size =  movements.size();
         out_file << "NumMovedCellInst " << movements.size() << std::endl;
         for (auto move : movements) {
             int x = move.second.x().value() / 10 +1;

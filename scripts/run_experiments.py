@@ -55,42 +55,25 @@ def run_experiments(experiment,exp_name,iccad_2020_benchmark_list):
         print("Could not make the ",dir_name," file exist")
 
     for benchmark in iccad_2020_benchmark_list:  
-            # get in file
-            try:
-                src_dir = "../build/experiments/"+benchmark+".txt"
-                # target_dir = "/" + dir_name +"/"+ benchmark+"_out.txt"
-                # print(target_dir)
-                shutil.copy(src_dir, benchmark+".txt")
-            except:
-                print("not move the out file ",benchmark)
+        # get in file
+        # try:
+        #     src_dir = "../build/experiments/input_files/iccad2020/cases/"+benchmark+".txt"
+        #     # target_dir = "/" + dir_name +"/"+ benchmark+"_out.txt"
+        #     # print(target_dir)
+        #     shutil.copy(src_dir, benchmark+".txt")
+        # except:
+        #     print("not move the input file ",benchmark)
+        
+        # move reports to target folder 
+        for extension in ["_out.txt", ".json", "_log.txt", "_report.json"]:
 
+            src_dir = "../build/experiments/"
+            target_dir = "./"+ exp_name +"/"
 
             # get out file
             try:
-                src_dir = "../build/experiments/"+benchmark+"_out.txt"
-                # target_dir = "/" + dir_name +"/"+ benchmark+"_out.txt"
-                # print(target_dir)
-                shutil.move(src_dir, benchmark+"_out.txt")
+                file_name = benchmark + extension
+                shutil.move(src_dir + file_name, target_dir + file_name)
             except:
-                print("not move the out file ",benchmark)
+                print("not move the " + extension + " file ",benchmark)
             
-
-            # get report files 
-            try:
-                src_dir = "../build/experiments/"+benchmark+"_report.json"
-                # target_dir = "/" + dir_name +"/"+ benchmark+"_report.json"
-                # print(target_dir)
-                shutil.move(src_dir,benchmark+"_report.json")
-            except:
-                print("not move the report file ",benchmark)
-
-            # move reports to target folder 
-            try:
-                target_dir = dir_name + "/" + benchmark+".txt"
-                shutil.move(benchmark+".txt",target_dir)
-                target_dir = dir_name + "/" + benchmark+"_out.txt"
-                shutil.move(benchmark+"_out.txt",target_dir)
-                target_dir = dir_name + "/" + benchmark+"_report.json"
-                shutil.move(benchmark+"_report.json",target_dir)
-            except:
-                print("Could not move the correct folder")
