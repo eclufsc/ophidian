@@ -34,11 +34,16 @@ namespace UCal{
             using design_type               = ophidian::design::Design;
             using net_type                  = ophidian::circuit::Net;
             using point_type                = ophidian::util::LocationDbu;
+            using cell_type                 = ophidian::circuit::CellInstance;
             using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
             using AStarSegment = ophidian::routing::AStarSegment;
+
+            using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
+
+
             Engine(design_type & design);
             ~Engine();
-            Json run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements,std::chrono::steady_clock::time_point start_time);
+            Json run(movement_container_type & movements,std::chrono::steady_clock::time_point start_time);
             // void run_date21(std::chrono::steady_clock::time_point start_time);
             std::set<std::string>& get_nets_in_panels(){return m_nets_inside_panels;}
             int get_wire_length_segments(const std::vector<AStarSegment> & segments);
@@ -54,9 +59,9 @@ namespace UCal{
             void update_astar_on_global_routing(AstarResultV2& astar_result);
             void loadParams();
             void update_global_routing();
-            void run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-            void run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-            void run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+            void run_ilp_on_panels_parallel(movement_container_type & movements);
+            void run_ilp_on_panel(unsigned int panel_id,movement_container_type & movements);
+            void run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_set,movement_container_type & movements);
             
 
 

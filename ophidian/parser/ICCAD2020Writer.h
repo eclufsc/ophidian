@@ -30,10 +30,11 @@ namespace ophidian::parser
         using design_type   = ophidian::design::Design;
         using point_type    = ophidian::util::LocationDbu;
         using cell_type     = ophidian::circuit::CellInstance;
+        using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
 
         ICCAD2020Writer(design_type & design, std::string circuit_name);
 
-        void write_ICCAD_2020_output(const std::string out_file_name, const std::vector<std::pair<cell_type, point_type>> & movements = {});
+        void write_ICCAD_2020_output(const std::string out_file_name, const movement_container_type & movements = {});
 
     private:
         design_type & m_design;

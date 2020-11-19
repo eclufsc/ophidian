@@ -119,6 +119,8 @@ namespace ophidian::routing {
 
             using layer_type                = Library::layer_type;
             using layer_direction_type      = Direction;
+
+            using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
             
             struct segment{
                 point_type start;
@@ -130,8 +132,8 @@ namespace ophidian::routing {
 
             ILPRouting(design_type & design, std::string circuit_name);
 
-            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true, bool move_cells = true, bool initial_routing_only = true);
-            ILPResult route_nets_v2(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing = true);
+            std::pair<bool, Statistics> route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, movement_container_type & movements, bool initial_routing = true, bool move_cells = true, bool initial_routing_only = true);
+            ILPResult route_nets_v2(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, movement_container_type & movements, bool initial_routing = true);
 
             void add_extra_demand(const cell_container_type & cells);
 
@@ -181,7 +183,7 @@ namespace ophidian::routing {
 	        void write_segments(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets);
             ILPResult write_segments_v2(const std::vector<net_type> & nets, const solver_type& solver, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets);
 
-            void save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements);
+            void save_movements(const solver_type& solver, movement_container_type & movements);
 
     	    void save_result(const solver_type& solver);
 

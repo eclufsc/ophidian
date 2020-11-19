@@ -8,6 +8,8 @@
 
 using namespace ophidian::util;
 
+using movement_container_type = std::unordered_map< ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type, ophidian::entity_system::EntityBaseHash>; 
+
 
 TEST_CASE("iccad20 AStarRouting on all nets and colapsing nets", "[astar_colapse_nets]")
 {
@@ -78,7 +80,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and colapsing nets", "[astar_colapse
         log() << "% Reduction = " << std::to_string(reduction * 100) << " %" << std::endl;
 
 
-        std::vector<std::pair<cell_type, point_type>>  movements;
+        movement_container_type  movements;
 
         AstarColapseNet astar_colapse_net(design);
         astar_colapse_net.colapse_nets(nets, movements);

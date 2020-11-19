@@ -7,7 +7,7 @@ namespace ophidian::parser
     {
     }
 
-    void ICCAD2020Writer::write_ICCAD_2020_output(const std::string out_file_name, const std::vector<std::pair<cell_type, point_type>> & movements){
+    void ICCAD2020Writer::write_ICCAD_2020_output(const std::string out_file_name, const movement_container_type & movements){
         auto & netlist = m_design.netlist();
         auto & global_routing = m_design.global_routing();
         std::ofstream out_file(out_file_name, std::ofstream::out);

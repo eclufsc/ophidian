@@ -1,14 +1,15 @@
 {
-	"exp2" : 
+	"exp5" : 
 	    {
-                "construct_net_boxes_rtree"        : "true",
+                "construct_net_boxes_rtree" : "true",
                 "cluster_based_on_panel" : "true",
                 "run_ilp_on_panels_parallel_loop" : "false",
                 "run_astar_on_panels_parallel_loop" : "true", 
                 "run_astar_on_panels_parallel_section" : "false",
                 "run_astar_on_panels_sequential" : "false",
                 "cell_movement_serial": "true",
-                "cell_movement_time_out": "false",
-                "move_cell_multi": "false"
+                "cell_movement_time_out": "true",
+                "move_cell_multi": "true",
+                "multiple_cell_movement" : "false"
             }
 }

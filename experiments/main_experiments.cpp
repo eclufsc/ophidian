@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
         
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        std::unordered_map< ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type, ophidian::entity_system::EntityBaseHash> movements;
         run_ilp_for_circuit(design, circuit_name, movements, has_initial_routing);
 
         //replace the cells

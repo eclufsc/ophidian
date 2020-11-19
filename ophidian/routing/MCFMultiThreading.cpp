@@ -33,7 +33,7 @@ MCFMultiThreading::~MCFMultiThreading(){
     // abortAndJoin();
 }//end MCFMultiThreading destructor
 
-void MCFMultiThreading::run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run(movement_container_type & movements){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     //std::vector<std::pair<ophidian::routing::ILPRoung<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
     auto start_time = std::chrono::steady_clock::now();
@@ -310,7 +310,7 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
         // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2003")};
         // std::vector<ophidian::circuit::Net> nets = {design.netlist().find_net("N2116")};
 
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        movement_container_type movements;
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "routing nets" << std::endl;
         ophidian::routing::ILPRouting<IloBoolVar> ilpRouting(m_design, "case");
         /*auto result = ilpRouting.route_nets(nets_local, {}, fixed_nets, routed_nets, unrouted_nets, movements);
@@ -328,7 +328,7 @@ void MCFMultiThreading::cluster_based_on_nets_box(){
 }//end cluster_based_on_nets_box
 
 
-void MCFMultiThreading::write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::write_nets(movement_container_type & movements){
         
         ophidian::parser::ICCAD2020Writer iccad_output_writer(m_design, "case");
         if(DEBUG_MCF_MLT_NETS_ROWS) std::cout << "number of movement: " << movements.size() << std::endl;
@@ -781,7 +781,7 @@ void MCFMultiThreading::report(){
 
 }//end report function
 
-void MCFMultiThreading::run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run_ilp_on_panels(movement_container_type & movements){
     int num_panels = m_index_to_panel.size();
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
@@ -910,7 +910,7 @@ void MCFMultiThreading::reportPanelIds(){
     }
 }//end reportPAnelIds
 
-void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){  
+void MCFMultiThreading::run_ilp_on_panels_parallel(movement_container_type & movements){  
     m_total_panel_nets = 0;
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
@@ -950,7 +950,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
             //std::cout << "id: " << id << std::endl;
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
 
             #pragma omp critical
@@ -961,7 +961,8 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
@@ -972,7 +973,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
         #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
             
             #pragma omp critical
@@ -983,7 +984,8 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
@@ -1004,7 +1006,7 @@ void MCFMultiThreading::run_ilp_on_panels_parallel(std::vector<std::pair<ophidia
 }//end run_ilp_on_panels_parallel
 
 
-void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){  
+void MCFMultiThreading::run_ilp_on_panels_sequential(movement_container_type & movements){  
     m_total_panel_nets = 0;
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
@@ -1031,7 +1033,7 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
             //std::cout << "id: " << id << std::endl;
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
 
             for (auto movement : local_movements) {
@@ -1041,7 +1043,8 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
@@ -1051,7 +1054,7 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
         // odd panels
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
             
             for (auto movement : local_movements) {
@@ -1061,7 +1064,8 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
@@ -1080,7 +1084,7 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
     std::cout << "total nets targeted by panel: " << m_total_panel_nets << "out of " << nets.size() << std::endl;
 }//end run_ilp_on_panels_sequential
 
-void MCFMultiThreading::run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run_ilp_on_panel(unsigned int panel_id,movement_container_type & movements){
     int num_panels = m_index_to_panel.size();
     
     //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
@@ -1198,7 +1202,7 @@ void MCFMultiThreading::run_ilp_on_panel(unsigned int panel_id,std::vector<std::
     }//end loop iteration
 }//end run_ilp_on_panel
 
-void MCFMultiThreading::run_astar_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run_astar_on_panels_parallel(movement_container_type & movements){
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
     std::vector<ophidian::circuit::Net> astar_nets;
@@ -1328,7 +1332,7 @@ void MCFMultiThreading::update_global_routing(){
     m_ilp_results.clear();
 }//end update_global_routing
 
-void MCFMultiThreading::run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_name_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_name_set,movement_container_type & movements){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;
@@ -1440,7 +1444,7 @@ void MCFMultiThreading::data_analysis(std::string file_name_data){
 
 }//end data_analysis
 
-void MCFMultiThreading::run_astar_on_panels_parallel_v2(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void MCFMultiThreading::run_astar_on_panels_parallel_v2(movement_container_type & movements){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     ophidian::routing::AStarRouting astar_routing{m_design};
     for(auto net : nets){
@@ -1902,7 +1906,7 @@ void MCFMultiThreading::run_compute_cell_move_costs_on_panel(unsigned int panel_
 
 }//end run_compute_cell_move_costs_on_panel
 
-void MCFMultiThreading::move_cells_parallel(std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements){
+void MCFMultiThreading::move_cells_parallel(movement_container_type & movements){
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
     std::vector<ophidian::circuit::Net> astar_nets;
@@ -1948,7 +1952,7 @@ void MCFMultiThreading::move_cells_parallel(std::vector<std::pair<ophidian::circ
     
 }//end move_cells_parallel
 
-void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements){
+void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id,movement_container_type & movements){
     auto cells_panel = m_panel_index_to_local_cells_dict[panel_id];
     
     auto& global_routing = m_design.global_routing();
@@ -2062,7 +2066,8 @@ void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id,std::vector
         if(moved)
         {
             auto location = m_design.placement().location(cell);
-            movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            // movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            movements[cell] = m_design.placement().location(cell);
         }
      
         
@@ -2071,7 +2076,7 @@ void MCFMultiThreading::run_move_cell_on_panel(unsigned int panel_id,std::vector
 }//end run_move_cell_on_panel
 
 void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements){
+                                    movement_container_type & movements){
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
     using net_type = ophidian::circuit::Net;
@@ -2436,7 +2441,8 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
         {
             auto location = m_design.placement().location(cell);
             moved_cells++;            
-            movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            // movements.push_back(std::make_pair(cell, m_design.placement().location(cell)));
+            movements[cell] = m_design.placement().location(cell);
             //std::cout << "moved to " << location.x().value() << "," << location.y().value() << std::endl;
             //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
 
@@ -2450,8 +2456,7 @@ void MCFMultiThreading::move_cells_parallel_v2(std::vector<std::pair<ophidian::c
 
 }//end move_cells_parallel_v2
 
-void MCFMultiThreading::move_cells_parallel_v3(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements){
+void MCFMultiThreading::move_cells_parallel_v3(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells, movement_container_type & movements){
     using unit_type = ophidian::util::database_unit_t;
     using point_type = ophidian::util::LocationDbu;
     using net_type = ophidian::circuit::Net;

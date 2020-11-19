@@ -5,6 +5,9 @@
 #include <ophidian/parser/ICCAD2020.h>
 #include <ophidian/routing/ILPRouting.h>
 
+using movement_container_type = std::unordered_map<ophidian::circuit::CellInstance, ophidian::util::LocationDbu, ophidian::entity_system::EntityBaseHash>; 
+
+
 TEST_CASE("Test for iccad2020 ilp routing.", "[routing][globalRouting][ilp]")
 {
     ophidian::parser::ICCAD2020 sample{"input_files/iccad2020/cases/case1.txt"};
@@ -24,7 +27,7 @@ TEST_CASE("Test for iccad2020 ilp routing.", "[routing][globalRouting][ilp]")
     std::vector<ophidian::circuit::Net> routed_nets;
     std::vector<ophidian::circuit::Net> unrouted_nets;
     
-    std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements; 
+    movement_container_type movements; 
     std::cout << "routing nets" << std::endl;
     auto result = ilpRouting.route_nets(nets, cells, area, fixed_nets, routed_nets, unrouted_nets, movements);
     std::cout << "result " << result.first << std::endl;

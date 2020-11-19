@@ -34,9 +34,12 @@ class AstarColapseNet{
         using cell_set_type             = std::unordered_set<cell_type, ophidian::entity_system::EntityBaseHash>;
         using net_set_type              = std::unordered_set<net_type, ophidian::entity_system::EntityBaseHash>;
 
+        using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
+
+
         AstarColapseNet(design_type & design);
 
-        void colapse_nets(net_container_type & nets, std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
+        void colapse_nets(net_container_type & nets, movement_container_type & movements);
     private:
 
         design_type & m_design;
@@ -52,11 +55,11 @@ class AstarColapseNet{
 
         void save_initial_state(
                 const ophidian::circuit::Net & net,
-                std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & initial_cells_location,
+                movement_container_type & initial_cells_location,
                 std::vector<ophidian::routing::AStarSegment> & initial_segments);
         
         void restore_initial_status(
-                const std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & initial_cells_location,
+                const movement_container_type & initial_cells_location,
                 const std::vector<ophidian::routing::AStarSegment> & initial_segments);
 
         /*
@@ -64,7 +67,7 @@ class AstarColapseNet{
         return 0  -> net not moved
         return -1 -> net not moved because movement is not efficient
         */
-        int move_net(ophidian::circuit::Net & net, std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
+        int move_net(ophidian::circuit::Net & net, movement_container_type & movements);
 };
 
 

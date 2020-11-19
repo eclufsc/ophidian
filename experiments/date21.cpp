@@ -10,7 +10,10 @@
 using namespace ophidian::util;
 using point_type = ophidian::util::LocationDbu;
 using cell_type = ophidian::circuit::Netlist::cell_instance_type;
-using movements_type = std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>>;
+// using movements_type = std::vector<std::pair<ophidian::circuit::Netlist::cell_instance_type, ophidian::util::LocationDbu>>;
+using movements_type = std::unordered_map< ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type, ophidian::entity_system::EntityBaseHash>; 
+
+
 
 bool fileExists(std::string fileName)
 {

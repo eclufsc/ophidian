@@ -23,7 +23,7 @@ namespace ophidian::routing {
     }
 
     template <typename var_type>
-    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing, bool move_cells, bool initial_routing_only)
+    std::pair<bool, typename ILPRouting<var_type>::Statistics> ILPRouting<var_type>::route_nets(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, movement_container_type & movements, bool initial_routing, bool move_cells, bool initial_routing_only)
     {
         m_initial_routing_only = initial_routing_only;
 
@@ -139,7 +139,7 @@ namespace ophidian::routing {
      }
 
     template <typename var_type>
-    ILPResult ILPRouting<var_type>::route_nets_v2(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, std::vector<std::pair<cell_type, point_type>> & movements, bool initial_routing)
+    ILPResult ILPRouting<var_type>::route_nets_v2(const std::vector<net_type> & nets, const std::vector<cell_type> & cells, box_type & area, const std::vector<net_type> & fixed_nets, std::vector<net_type> & routed_nets, std::vector<net_type> & unrouted_nets, movement_container_type & movements, bool initial_routing)
     {
         if(STATUS) printlog("init function route_nets");
         ILPRouting<var_type>::Statistics statistic;
@@ -2249,7 +2249,7 @@ namespace ophidian::routing {
     }//end write_segment_v2
 
     template <typename var_type>
-    void ILPRouting<var_type>::save_movements(const solver_type& solver, std::vector<std::pair<cell_type, point_type>> & movements) {
+    void ILPRouting<var_type>::save_movements(const solver_type& solver, movement_container_type & movements) {
         int initial_candidate = 0;
         int two_pin = 0;
         int center_of_mass = 0;
@@ -2266,7 +2266,8 @@ namespace ophidian::routing {
                     auto candidate = m_name_to_position_candidate[name];
                     auto cell = m_position_candidate_cell[candidate];
                     auto position = m_position_candidate_position[candidate];
-                    movements.push_back(std::make_pair(cell, position));
+                    // movements.push_back(std::make_pair(cell, position));
+                    movements[cell] = position;
                     //m_design.placement().place(cell, position);
                     auto type = m_position_candidate_origin[candidate];
                     switch (type)

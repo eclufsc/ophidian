@@ -70,7 +70,7 @@ AstarColapseNet::AstarColapseNet(design_type & design) :
 
 using namespace ophidian::util;
 
-void AstarColapseNet::colapse_nets(net_container_type & nets, std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements){
+void AstarColapseNet::colapse_nets(net_container_type & nets, movement_container_type & movements){
 
     int moved_nets = 0;
     int not_moved_nets = 0;
@@ -105,13 +105,14 @@ void AstarColapseNet::colapse_nets(net_container_type & nets, std::vector<std::p
 
 void AstarColapseNet::save_initial_state(
     const ophidian::circuit::Net & net,
-    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & initial_cells_location,
+    movement_container_type & initial_cells_location,
     std::vector<ophidian::routing::AStarSegment> & initial_segments)
 {
     for(auto cell : m_net_cells[net])
     {
         auto position = m_placement.location(cell);
-        initial_cells_location.push_back(std::make_pair(cell, position));
+        // initial_cells_location.push_back(std::make_pair(cell, position));
+        initial_cells_location[cell] = position;
     }
     for(auto segment : m_global_routing.segments(net))
     {
@@ -120,7 +121,7 @@ void AstarColapseNet::save_initial_state(
 }
 
 void AstarColapseNet::restore_initial_status(
-    const std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & initial_cells_location,
+    const movement_container_type & initial_cells_location,
     const std::vector<ophidian::routing::AStarSegment> & initial_segments)
 {
     for(auto pair : initial_cells_location)
@@ -139,7 +140,7 @@ return 1  -> net moved
 return 0  -> net not moved
 return -1 -> net not moved because movement is not efficient
 */
-int AstarColapseNet::move_net(ophidian::circuit::Net & net, std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements)
+int AstarColapseNet::move_net(ophidian::circuit::Net & net, movement_container_type & movements)
 {
     if(m_net_neighbors[net].empty())
     {
@@ -151,7 +152,7 @@ int AstarColapseNet::move_net(ophidian::circuit::Net & net, std::vector<std::pai
     scalar_type initial_wirelength = 0;
     initial_wirelength += m_global_routing.wirelength(net);
     // unroute nets
-    std::vector<std::pair<cell_type, point_type>> initial_cells_location;
+    movement_container_type initial_cells_location;
     std::vector<a_star_segment_type> initial_segments;
     save_initial_state(net, initial_cells_location, initial_segments);
     m_global_routing.unroute(net);
@@ -253,7 +254,8 @@ int AstarColapseNet::move_net(ophidian::circuit::Net & net, std::vector<std::pai
 
         for(auto cell : m_net_cells[net])
         {  
-            movements.push_back(std::make_pair(cell, m_placement.location(cell)));
+            // movements.push_back(std::make_pair(cell, m_placement.location(cell)));
+            movements[cell] = m_placement.location(cell);
         }
     }else{
         //restore initial status and return false

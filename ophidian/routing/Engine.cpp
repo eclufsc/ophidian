@@ -32,7 +32,7 @@ Engine::~Engine(){
 }//end Engine destructor
 
 
-Json Engine::run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements,std::chrono::steady_clock::time_point start_time){
+Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::time_point start_time){
     log() << "A* routing only" << std::endl;
 
     loadParams();
@@ -899,7 +899,7 @@ void Engine::loadParams(){
 
 }//end method 
 
-void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){  
+void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){  
     m_total_panel_nets = 0;
     auto number_of_levels = m_panel_level.size();
     if(DEBUG_PANEL_PARALLEL) std::cout << "num parallel levels: " << number_of_levels <<std::endl;
@@ -939,7 +939,7 @@ void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing:
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
             //std::cout << "id: " << id << std::endl;
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
 
             #pragma omp critical
@@ -950,7 +950,8 @@ void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing:
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"even threads: " << omp_get_num_threads() << std::endl;
@@ -961,7 +962,7 @@ void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing:
         #pragma omp parallel for num_threads(8)
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
-            std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> local_movements;
+            movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
             
             #pragma omp critical
@@ -972,7 +973,8 @@ void Engine::run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing:
                 auto target_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(movement.second, 0);
                 m_design.global_routing().move_cell(source_gcell, target_gcell, movement.first, m_design.netlist(), m_design.placement(), m_design.routing_constraints(), m_design.standard_cells());
                 //m_design.global_routing().update_blockage_demand(m_design.netlist(), m_design.placement(), movement.first, false);
-                movements.push_back(movement);
+                // movements.push_back(movement);
+                movements[movement.first] = movement.second;
             } 
 
             //std::cout <<"odd threads: " << omp_get_num_threads() << std::endl;
@@ -1015,7 +1017,7 @@ void Engine::update_global_routing(){
     m_ilp_results.clear();
 }//end update_global_routing
 
-void Engine::run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void Engine::run_ilp_on_panel(unsigned int panel_id,movement_container_type & movements){
     int num_panels = m_index_to_panel.size();
     
     //std::vector<ophidian::circuit::CellInstance> cells(m_design.netlist().begin_cell_instance(), m_design.netlist().end_cell_instance());
@@ -1134,7 +1136,7 @@ void Engine::run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidi
 }//end run_ilp_on_panel
 
 
-void Engine::run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_name_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements){
+void Engine::run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_name_set,movement_container_type & movements){
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
     std::vector<ophidian::circuit::Net> fixed_nets;
     std::vector<ophidian::circuit::Net> routed_nets;

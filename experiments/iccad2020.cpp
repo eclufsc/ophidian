@@ -14,6 +14,7 @@
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 using namespace ophidian::util;
 
+using movement_container_type = std::unordered_map< ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type, ophidian::entity_system::EntityBaseHash>; 
 
 
 //Time in seconds
@@ -279,7 +280,7 @@ TEST_CASE("run ILP for iccad20 benchmarks", "[iccad20]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        movement_container_type movements;
         run_ilp_for_circuit(design, circuit_name, movements);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         
@@ -322,7 +323,7 @@ TEST_CASE("run ILP for iccad20 benchmarks 2", "[iccad20]") {
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        movement_container_type movements;
         run_ilp_for_circuit(design, circuit_name, movements);
         // auto is_connected = design.global_routing().is_connected() ? "grafo conexo" : "grafo desconexo!";
         
@@ -395,7 +396,7 @@ TEST_CASE("run ILP with panelling for iccad20 benchmarks", "[iccad20_LP_ILP]") {
             auto net_wirelength = design.global_routing().wirelength(net);
             nets_initial_wirelength[net] = net_wirelength; 
         }
-        std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements;
+        movement_container_type movements;
         run_ilp_for_circuit(design, circuit_name, movements);
 
         ophidian::parser::ICCAD2020Writer iccad_output_writer(design, circuit_name);
@@ -645,7 +646,7 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
 
         printlog("Initing movements ...");
         auto moved_cells = 0;
-        std::vector<std::pair<cell_type, point_type>>  movements;
+        movement_container_type movements;
 
         bool at_least_one_cell_moved = true;
         while(at_least_one_cell_moved)
@@ -662,7 +663,8 @@ TEST_CASE("iccad20 AStarRouting on all nets and moving cells", "[astar_moving_ce
                 if(moved)
                 {
                     moved_cells++;
-                    movements.push_back(std::make_pair(cell, placement.location(cell)));
+                    // movements.push_back(std::make_pair(cell, placement.location(cell)));
+                    movements[cell] = placement.location(cell);
                     //std::cout<<"# of moved cells: "<<moved_cells<<std::endl;
                 }
                 if(moved_cells == design.routing_constraints().max_cell_movement())

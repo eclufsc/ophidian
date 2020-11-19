@@ -77,28 +77,30 @@ class MCFMultiThreading{
     using point_type                = ophidian::util::LocationDbu;
     using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
     using AStarSegment = ophidian::routing::AStarSegment;
+    using cell_type                 = ophidian::circuit::CellInstance;
+    using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
     
      MCFMultiThreading(design_type & design);
     ~MCFMultiThreading();
-    void run(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+    void run(movement_container_type & movements);
     // private: 
         void construct_net_boxes_rtree(const std::vector<net_type> &nets);
         void cluster_based_on_nets_box();
         
-        void write_nets(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+        void write_nets(movement_container_type & movements);
         void cluster_based_on_panel();
         //vertical and horizontal paneling
         void cluster_based_on_panel_v2();
-        void run_ilp_on_panels(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-        void run_ilp_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-        void run_ilp_on_panels_sequential(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-        void run_astar_on_panels_parallel(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-        void run_astar_on_panels_parallel_v2(std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
-        void run_ilp_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+        void run_ilp_on_panels(movement_container_type & movements);
+        void run_ilp_on_panels_parallel(movement_container_type & movements);
+        void run_ilp_on_panels_sequential(movement_container_type & movements);
+        void run_astar_on_panels_parallel(movement_container_type & movements);
+        void run_astar_on_panels_parallel_v2(movement_container_type & movements);
+        void run_ilp_on_panel(unsigned int panel_id,movement_container_type & movements);
         
         void run_astar_on_panel(unsigned int panel_id);
         void update_global_routing();
-        void run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_set,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> & movements);
+        void run_ilp(ophidian::placement::Placement::box_type panel_region,std::set<std::string> nets_set,movement_container_type & movements);
         AstarResult run_astar_on_net(net_type& net);
         void update_astar_on_global_routing(AstarResult& astar_result);
         void data_analysis(std::string file_name);
@@ -114,18 +116,18 @@ class MCFMultiThreading{
         void move_cells_for_until_x_minutes(ophidian::design::Design & design,
                                     int time_limit,
                                     std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements,
+                                    movement_container_type & movements,
                                     ophidian::routing::AStarRouting & astar_routing);
         MoveCellResult move_cell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, ophidian::routing::AStarRouting & astar_routing);                                    
         void calculate_median_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, std::vector<gcell_type> & target_gcells);
         
         MoveCellResult test_target_gcell(ophidian::design::Design & design, ophidian::circuit::CellInstance & cell, gcell_type & initial_gcell, gcell_type & target_gcell, ophidian::routing::AStarRouting & astar_routing);
-        void move_cells_parallel(std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
-        void run_move_cell_on_panel(unsigned int panel_id,std::vector<std::pair<ophidian::routing::ILPRouting<IloBoolVar>::cell_type, ophidian::routing::ILPRouting<IloBoolVar>::point_type>> movements);
+        void move_cells_parallel(movement_container_type & movements);
+        void run_move_cell_on_panel(unsigned int panel_id,movement_container_type & movements);
         void move_cells_parallel_v2(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
+                                    movement_container_type & movements);
         void move_cells_parallel_v3(std::vector<std::pair<ophidian::circuit::CellInstance, double>> & cells,
-                                    std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> & movements);
+                                    movement_container_type & movements);
 
         design_type&    m_design;
 
