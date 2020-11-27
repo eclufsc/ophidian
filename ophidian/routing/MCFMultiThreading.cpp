@@ -1070,9 +1070,9 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
         m_design.placement().reset_rtree();
         update_global_routing();
         // break;
-        if(level == 5){
+        /*if(level == 5){
             break;
-        }
+        }*/
         
     }//end for 
 
