@@ -127,9 +127,6 @@ find_package(flute REQUIRED)
 # Find Verilog-parser
 find_package(verilogparser REQUIRED)
 
-# Find CPLEX
-find_package(CPLEX REQUIRED)
-
 # Find GUI Dependencies
 IF(OPHIDIAN_GUI)
     # Find SFML
