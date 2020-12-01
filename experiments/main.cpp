@@ -957,16 +957,16 @@ int main(int argc, char** argv) {
     ophidian::design::factory::make_design_iccad2020(design, iccad_2020);
     
     //run_for_circuit(design, circuit_name, output);
-    /*time_begin = std::chrono::high_resolution_clock::now();
+    time_begin = std::chrono::high_resolution_clock::now();
     auto number_of_movements = run_mcf_for_circuit(design,circuit_name, output);
-    time_end = std::chrono::high_resolution_clock::now();*/
+    time_end = std::chrono::high_resolution_clock::now();
 
     std::vector<std::pair<ophidian::circuit::CellInstance, ophidian::util::LocationDbu>> movements;
     //ophidian::routing::AStarRouting astar_routing{design};
-    auto engine = UCal::Engine(design);
-    std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells;
-    auto number_of_movements = 0;
-    auto moved_new_cells = true;
+    //auto engine = UCal::Engine(design);
+    //std::vector<std::pair<ophidian::circuit::CellInstance, double>> cells;
+    //auto number_of_movements = 0;
+    //auto moved_new_cells = true;
     
     // "exp1" --> "Astar_without_paneling_and_without_movements"
     // "exp2" --> "Astar_with_paneling_and_without_movements"
@@ -977,7 +977,7 @@ int main(int argc, char** argv) {
     // "exp6" --> "ILP_with_movements_Astar_with_movements"
     // "exp7" --> "ILP_with_movements_Astar_with_movements_parallel"
 
-    switch (experiment)
+    /*switch (experiment)
     {
     case 1:
         time_begin = std::chrono::high_resolution_clock::now();
@@ -1023,7 +1023,7 @@ int main(int argc, char** argv) {
                 design.placement().fixLocation(cell);
             }
             cells = compute_cell_move_costs_descending_order(design);
-            //move_cells_for_until_x_minutes(design, 1000000, cells, movements, engine.astar_routing());
+            move_cells_for_until_x_minutes(design, 1000000, cells, movements, engine.astar_routing());
             time_end = std::chrono::high_resolution_clock::now();
             moved_new_cells = (number_of_movements == movements.size());
             number_of_movements = movements.size();
@@ -1036,7 +1036,7 @@ int main(int argc, char** argv) {
         run_mcf_for_circuit(design,circuit_name, output);
         time_end = std::chrono::high_resolution_clock::now();
         break;
-    }
+    }*/
 
     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_begin).count();
     auto duration_s = std::chrono::duration_cast<std::chrono::seconds>(time_end-time_begin).count();
