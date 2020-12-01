@@ -459,7 +459,7 @@ void Engine::run_astar_on_panels_sequential(int time_limit){
     std::vector<ophidian::circuit::Net> astar_nets;
     for(auto panel_level: m_panel_level){
         auto level = panel_level.first;
-        //if(level <= 5) continue;
+        if(level <= 5) continue;
         auto & ids = panel_level.second;
         std::vector<unsigned int> even_ids;
         std::vector<unsigned int> odd_ids;

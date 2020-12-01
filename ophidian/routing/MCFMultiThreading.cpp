@@ -622,7 +622,7 @@ void MCFMultiThreading::cluster_based_on_panel_v2(){
     number_of_panels = (layout_width/panel_base)+1;
     count = 1;
     while(number_of_panels >= 1){
-        //if(panel_level==6) break;
+        if(panel_level==6) break;
         if(DEBUG_PANEL) std::cout << "level: " << count << std::endl;
         auto panel_size = panel_base * count;
         number_of_panels = ceil(layout_height/panel_size);
@@ -1070,9 +1070,9 @@ void MCFMultiThreading::run_ilp_on_panels_sequential(std::vector<std::pair<ophid
         m_design.placement().reset_rtree();
         update_global_routing();
         // break;
-        /*if(level == 5){
+        if(level == 5){
             break;
-        }*/
+        }
         
     }//end for 
 
