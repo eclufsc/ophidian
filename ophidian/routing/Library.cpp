@@ -365,6 +365,17 @@ bool Library::isFirstRightBelowSecond(const Library::layer_type& first, const Li
         return false;
 }
 
+const std::set<int> Library::index(const std::set<std::string> & layer_names) const
+{
+    std::set<int> indexes;
+    for(auto name : layer_names)
+    {
+        auto layer = find_layer_instance(name);
+        indexes.insert(index(layer));
+    }
+    return indexes;
+}
+
 Library::layer_type Library::highest_layer() const
 {
     return this->mHighest_layer;

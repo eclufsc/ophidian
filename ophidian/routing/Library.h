@@ -163,6 +163,8 @@ namespace ophidian::routing
         //! returns true if the second layer is above the first
         bool isFirstRightBelowSecond(const layer_type& first, const layer_type& second) const;
 
+        const std::set<int> index(const std::set<std::string> & layer_names) const;
+
         via_type find_via_instance(const std::string& viaName) const;
         std::string& name(const via_type& via);
         const std::string& name(const via_type& via) const;

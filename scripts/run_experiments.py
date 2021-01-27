@@ -45,6 +45,7 @@ def run_experiments(experiment,exp_name,iccad_2020_benchmark_list):
             benchmark_output = benchmark+"_out.txt"
             benchmark_log = benchmark+"_log.txt"
             cmd = "./run.sh "+ benchmark_input + " "+ benchmark_output + " " + benchmark_log
+    if False:
             os.system(cmd)
     # 
     try:

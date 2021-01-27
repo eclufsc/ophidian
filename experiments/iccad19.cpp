@@ -8,6 +8,8 @@
 #include <ophidian/routing/RoutabilityCheck.h>
 #include "run_ilp.h"
 
+using movement_container_type = std::unordered_map< ophidian::circuit::CellInstance, ophidian::util::LocationDbu, ophidian::entity_system::EntityBaseHash>;
+
 //if not specified the net name, it draws the whole circuit ((not recommended)
 void draw_gcell_svg_2(ophidian::design::Design & design, std::string net_name){
     auto& netlist = design.netlist();
@@ -263,7 +265,7 @@ TEST_CASE("run iccad20 solution in ispd 18 and 19 benchmarks", "[iccad20_sol_on_
 
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        // "ispd18_test1",
+        "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
         // "ispd18_test4",
@@ -281,7 +283,7 @@ TEST_CASE("run iccad20 solution in ispd 18 and 19 benchmarks", "[iccad20_sol_on_
         // "ispd19_test5",
         // "ispd19_test6",
         // "ispd19_test7",
-        "ispd19_test8",
+        // "ispd19_test8",
         // "ispd19_test9",
         // "ispd19_test10",
     };
@@ -293,9 +295,8 @@ TEST_CASE("run iccad20 solution in ispd 18 and 19 benchmarks", "[iccad20_sol_on_
 
         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
-        std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
-
+        std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
         ophidian::parser::Def def;
         ophidian::parser::Lef lef;
         ophidian::parser::Guide guide;
@@ -324,7 +325,12 @@ TEST_CASE("run iccad20 solution in ispd 18 and 19 benchmarks", "[iccad20_sol_on_
         std::ofstream csv_file("wirelength_cugr_nopatch_connected.csv", std::ofstream::app);
         auto wirelength = design.global_routing().wirelength(nets);
         auto vias = design.global_routing().number_of_vias(nets);
-        csv_file << circuit_name << "," << wirelength << "," << vias << std::endl;
+
+        auto start_time = std::chrono::steady_clock::now();
+        movement_container_type movements;
+        auto report_json = engine.run(movements,start_time);
+
+        // csv_file << circuit_name << "," << wirelength << "," << vias << std::endl;
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
     }

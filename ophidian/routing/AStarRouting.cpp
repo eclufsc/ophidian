@@ -811,7 +811,13 @@ namespace ophidian::routing
         auto gcell_graph_ptr = m_design.global_routing().gcell_graph();
 
         auto pin_ref = *netlist.pins(m_net).begin();
-        auto ref_loc = placement.location(pin_ref);
+        // auto ref_loc = placement.location(pin_ref);
+        //ISVLSI
+        auto pin_loc = placement.location(pin_ref);
+        auto layer_indexes = m_design.routing_library().index(m_design.placement().geometry(pin_ref).layers_names());
+        auto gcell = m_design.global_routing().gcell_graph()->nearest_gcell(pin_loc, *layer_indexes.begin());
+        auto ref_loc = m_design.global_routing().gcell_graph()->center_of_box(gcell);
+
 
         int min_layer_index = std::numeric_limits<int>::max();
         int max_layer_index = routing_library.layerIndex(m_min_layer);
@@ -841,10 +847,20 @@ namespace ophidian::routing
         auto& netlist = m_design.netlist();
         auto& placement = m_design.placement();
         auto pin_ref = *netlist.pins(m_net).begin();
-        auto ref_loc = placement.location(pin_ref);
+        // auto ref_loc = placement.location(pin_ref);
+        //ISVLSI
+        auto pin_loc = placement.location(pin_ref);
+        auto layer_indexes = m_design.routing_library().index(m_design.placement().geometry(pin_ref).layers_names());
+        auto gcell = m_design.global_routing().gcell_graph()->nearest_gcell(pin_loc, *layer_indexes.begin());
+        auto ref_loc = m_design.global_routing().gcell_graph()->center_of_box(gcell);
         for(auto pin : netlist.pins(m_net))
         {
-            auto pin_loc = placement.location(pin);
+            //ISVLSI
+            auto pin_loc_placement = placement.location(pin);
+            auto layer_indexes = m_design.routing_library().index(m_design.placement().geometry(pin).layers_names());
+            auto gcell = m_design.global_routing().gcell_graph()->nearest_gcell(pin_loc_placement, *layer_indexes.begin());
+            auto pin_loc = m_design.global_routing().gcell_graph()->center_of_box(gcell);
+
             if(ref_loc.x() != pin_loc.x() || ref_loc.y() != pin_loc.y())
                 return false;
         }

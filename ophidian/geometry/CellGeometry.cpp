@@ -22,11 +22,23 @@ namespace ophidian::geometry
 {
     CellGeometry::CellGeometry(const CellGeometry::geometry_container_type& geometries):
         m_geometries{geometries}
-    {}
+    {
+        for(auto geometry : geometries)
+        {
+            auto layer_name = geometry.second;
+            m_layer_names.insert(layer_name);
+        }
+    }
 
     CellGeometry::CellGeometry(CellGeometry::geometry_container_type&& geometries):
         m_geometries{std::move(geometries)}
-    {}
+    {
+        for(auto geometry : geometries)
+        {
+            auto layer_name = geometry.second;
+            m_layer_names.insert(layer_name);
+        }
+    }
 
     // Element access
     CellGeometry::geometry_type& CellGeometry::front()
@@ -88,6 +100,11 @@ namespace ophidian::geometry
         return max_y - min_y;
     }
 
+    CellGeometry::layer_name_container_type CellGeometry::layers_names() const
+    {
+        return m_layer_names;
+    }
+
     // Iterators
     CellGeometry::geometry_container_type::iterator CellGeometry::begin()
     {
@@ -124,11 +141,15 @@ namespace ophidian::geometry
     // Modifiers
     void CellGeometry::push_back(const CellGeometry::geometry_type & geometry)
     {
+        auto layer_name = geometry.second;
+        m_layer_names.insert(layer_name);
         m_geometries.push_back(geometry);
     }
 
     void CellGeometry::push_back(CellGeometry::geometry_type && geometry)
     {
+        auto layer_name = geometry.second;
+        m_layer_names.insert(layer_name);
         m_geometries.push_back(std::move(geometry));
     }
 

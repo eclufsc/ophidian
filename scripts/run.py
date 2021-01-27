@@ -1,10 +1,5 @@
 from run_experiments import *
 
-
-
-
-
-
 # iccad_2020_benchmark_list = ["case1","case2"]
 
 iccad_2020_benchmark_list = ["case3","case4"]
@@ -22,13 +17,8 @@ with open("experiments.json") as outfile:
         exp_name = exp
         run_experiments(experiments[exp],exp_name,iccad_2020_benchmark_list)
         
-   
 
-
-
-
-
-# 
+#
 
         
 

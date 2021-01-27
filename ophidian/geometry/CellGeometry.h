@@ -24,6 +24,7 @@
 #include <ophidian/util/Units.h>
 #include "Models.h"
 #include <map>
+#include <set>
 
 namespace ophidian::geometry
 {
@@ -37,6 +38,7 @@ namespace ophidian::geometry
         using box_type                = Box<unit_type>;
         using geometry_type           = std::pair<box_type, layer_name_type>;
         using geometry_container_type = std::vector<geometry_type>;
+        using layer_name_container_type = std::set<layer_name_type>;
 
         // Constructors
         CellGeometry() = default;
@@ -60,6 +62,7 @@ namespace ophidian::geometry
         point_type center() const;
         unit_type width() const;
         unit_type height() const;
+        layer_name_container_type layers_names() const;
 
         // Iterators
         geometry_container_type::iterator begin();
@@ -109,6 +112,7 @@ namespace ophidian::geometry
 
     private:
         geometry_container_type m_geometries;
+        layer_name_container_type m_layer_names;
     };
 
     CellGeometry translate(const CellGeometry& geometry, Point<CellGeometry::unit_type> translation_point) noexcept;

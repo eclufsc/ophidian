@@ -37,7 +37,6 @@ namespace UCal{
             using cell_type                 = ophidian::circuit::CellInstance;
             using gcell_type = ophidian::routing::GlobalRouting::gcell_type;
             using AStarSegment = ophidian::routing::AStarSegment;
-
             using movement_container_type = std::unordered_map< cell_type, point_type, ophidian::entity_system::EntityBaseHash>; 
 
 
