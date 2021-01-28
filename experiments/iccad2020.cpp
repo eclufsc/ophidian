@@ -705,7 +705,8 @@ TEST_CASE("write csv of initial routing", "[iccad20]") {
 
      std::string benchmarks_path = "./input_files/iccad2020/cases/";
     auto csv_file = "initial_results.csv";
-    write_csv_header(csv_file);
+    
+    (csv_file);
     for (auto circuit_name : circuit_names) {
         log() << "running circuit " << circuit_name << std::endl;
 

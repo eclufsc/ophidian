@@ -224,10 +224,11 @@ void write_csv(ophidian::design::Design & design, std::string csv_file_name, std
 
 }
 
-TEST_CASE("ILSVLSI paper first code", "[ILSVLSI]")
+TEST_CASE("ILSVLSI paper all cells to median code", "[ILSVLSI]")
 {
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
+
         "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
@@ -280,6 +281,67 @@ TEST_CASE("ILSVLSI paper first code", "[ILSVLSI]")
         auto csv_file_name = circuit_name + "_movements_to_median.csv";
         write_csv_header(csv_file_name);
         write_csv(design, csv_file_name, possible_movements);
+
+        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
+    }
+}
+
+TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
+{
+    //iccad 2019 benchmarks
+    std::vector<std::string> circuit_names = {
+        "ispd19_sample4",
+        // "ispd18_test1",
+        // "ispd18_test2",
+        // "ispd18_test3",
+        // "ispd18_test4",
+        // "ispd18_test5",
+        // "ispd18_test6",
+        // "ispd18_test7",
+        // "ispd18_test8",
+        // "ispd18_test9",
+        // "ispd18_test10",
+
+        // "ispd19_test1",
+        // "ispd19_test2",
+        // "ispd19_test3",
+        // "ispd19_test4",
+        // "ispd19_test5",
+        // "ispd19_test6",
+        // "ispd19_test7",
+        // "ispd19_test8",
+        // "ispd19_test9",
+        // "ispd19_test10",
+    };
+
+    std::string benchmarks_path = "./input_files/circuits";
+
+    for (auto circuit_name : circuit_names) {
+        std::cout << "running circuit " << circuit_name << std::endl;
+
+        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
+        ophidian::parser::Def def;
+        ophidian::parser::Lef lef;
+        ophidian::parser::Guide guide;
+        def = ophidian::parser::Def{def_file};
+        lef = ophidian::parser::Lef{lef_file};
+        guide = ophidian::parser::Guide{guide_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design(design, def, lef, guide);
+
+        UCal::Engine engine(design);
+        auto start_time = std::chrono::steady_clock::now();
+        movement_container_type movements;
+        auto report_json = engine.run(movements,start_time);
+
+
+        // auto csv_file_name = circuit_name + "_movements_to_median.csv";
+        // write_csv_header(csv_file_name);
+        // write_csv(design, csv_file_name, possible_movements);
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
     }

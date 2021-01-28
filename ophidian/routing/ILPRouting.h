@@ -197,6 +197,10 @@ namespace ophidian::routing {
 
             point_type convert_to_design(point_type & point) const;
 
+
+            point_type gcell_location(const pin_type & pin) const;
+            point_type gcell_location(const cell_type & cell) const;
+
             design_type&    m_design;
             std::string     m_circuit_name;
             environment_type m_env;

@@ -12,7 +12,7 @@ namespace UCal{
 
 #define max_time_to_run 25
 
-#define DEBUG_PANEL false
+#define DEBUG_PANEL true
 #define DEBUG_SECTION false
 #define DEBUG_PANEL_PARALLEL false
 #define num_nets_to_route 10000
@@ -934,7 +934,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
         }//end for 
         // omp_set_num_threads(8);
         // //even panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8) //ilsvlsi
         for(int i = 0; i < even_ids.size(); i++){
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
@@ -942,7 +942,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
             movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
 
-            #pragma omp critical
+            // #pragma omp critical //ilsvlsi
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
@@ -959,13 +959,13 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
         update_global_routing();
 
         // odd panels
-        #pragma omp parallel for num_threads(8)
+        // #pragma omp parallel for num_threads(8) //ilsvlsi
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
             movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
             
-            #pragma omp critical
+            // #pragma omp critical //ilsvlsi
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);

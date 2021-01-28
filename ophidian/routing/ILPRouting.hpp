@@ -5,10 +5,10 @@
 #include <boost/lexical_cast.hpp>
 #include <ophidian/util/log.h>
 
-#ifndef STATUS
-#define STATUS false
-#define DEBUG false
-#define WRITE_MODEL false
+#ifndef STATUS 
+#define STATUS true
+#define DEBUG true
+#define WRITE_MODEL true
 #endif
 
 using namespace ophidian::util;
@@ -374,7 +374,8 @@ namespace ophidian::routing {
         for (auto cell_it = m_design.netlist().begin_cell_instance(); cell_it != m_design.netlist().end_cell_instance(); cell_it++) {
             auto cell = *cell_it;
               
-            auto location = m_design.placement().location(cell);
+            // auto location = m_design.placement().location(cell);
+            auto location = gcell_location(cell);
             auto std_cell = m_design.netlist().std_cell(cell);
 
             auto cell_name = m_design.netlist().name(cell);
@@ -695,7 +696,8 @@ namespace ophidian::routing {
             for(auto net_pin : netlist.pins(net)){
                 if(net_pin == pin)
                     continue;
-                auto location = placement.location(net_pin);               
+                // auto location = placement.location(net_pin);
+                auto location = gcell_location(net_pin);               
                 positions.push_back(location);
 
                 //std::cout << "pin location " << location.x().value() << ", " << location.y().value() << std::endl;
@@ -715,7 +717,8 @@ namespace ophidian::routing {
         
         auto nearst_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(center_mass, 0);
 
-        auto cell_location = placement.location(cell);
+        // auto cell_location = placement.location(cell);
+        auto cell_location = gcell_location(cell);
         auto actual_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
 
         if(actual_gcell != nearst_gcell){
@@ -748,7 +751,8 @@ namespace ophidian::routing {
             for(auto net_pin : netlist.pins(net)){
                 if(net_pin == pin)
                     continue;
-                auto location = placement.location(net_pin);
+                // auto location = placement.location(net_pin);
+                auto location = gcell_location(net_pin);
                 x_min = std::min(x_min, location.x().value());
                 y_min = std::min(y_min, location.y().value());
                 x_max = std::max(x_max, location.x().value());
@@ -775,7 +779,8 @@ namespace ophidian::routing {
         
         auto nearest_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(median_point, 0);
 
-        auto cell_location = placement.location(cell);
+        // auto cell_location = placement.location(cell);
+        auto cell_location = gcell_location(cell);
         auto current_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_location, 0);
 
         if(current_gcell != nearest_gcell){
@@ -803,12 +808,14 @@ namespace ophidian::routing {
         std::vector<net_type> nets_of_cell_a;
         if(netlist.is_pad(pin_a)){
             cell_a_name = netlist.name(pin_a);
-            cell_a_pos = placement.location(pin_a);
+            // cell_a_pos = placement.location(pin_a);
+            cell_a_pos = gcell_location(pin_a);
             cell_a_fixed = true;
         }else{
             cell_a = netlist.cell(pin_a);
             cell_a_name = netlist.name(cell_a);
-            cell_a_pos = placement.location(cell_a);
+            // cell_a_pos = placement.location(cell_a);
+            cell_a_pos = gcell_location(cell_a);
             cell_a_fixed = placement.isFixed(cell_a);
             for(auto pin : netlist.pins(cell_a)){
                 auto net = netlist.net(pin);
@@ -824,12 +831,14 @@ namespace ophidian::routing {
         std::vector<net_type> nets_of_cell_b;
         if(netlist.is_pad(pin_b)){
             cell_b_name = netlist.name(pin_b);
-            cell_b_pos = placement.location(pin_b);
+            // cell_b_pos = placement.location(pin_b);
+            cell_b_pos = gcell_location(pin_b);
             cell_b_fixed = true;
         }else{
             cell_b = netlist.cell(pin_b);
             cell_b_name = netlist.name(cell_b);
-            cell_b_pos = placement.location(cell_b);
+            // cell_b_pos = placement.location(cell_b);
+            cell_b_pos = gcell_location(cell_b);
             cell_b_fixed = placement.isFixed(cell_b);
             for(auto pin : netlist.pins(cell_b)){
                 auto net = netlist.net(pin);
@@ -947,10 +956,12 @@ namespace ophidian::routing {
         for(auto pin : net_pins)
         {
             auto pin_name = netlist.name(pin);
-            auto pin_location = placement.location(pin);
+            // auto pin_location = placement.location(pin);
+            auto pin_location = gcell_location(pin);
             auto pin_cell = netlist.cell(pin);
             if (pin_cell != cell_type{} && pin_cell == moved_cell) {
-                auto original_cell_location = m_design.placement().location(pin_cell);
+                // auto original_cell_location = m_design.placement().location(pin_cell);
+                auto original_cell_location = gcell_location(pin_cell);
                 auto moved_cell_location = m_position_candidate_position[pos_candidate];                
                 auto translation = point_type{moved_cell_location.x() - original_cell_location.x(), moved_cell_location.y() - original_cell_location.y()};
                 pin_location = point_type{pin_location.x() + translation.x(), pin_location.y() + translation.y()};
@@ -1499,6 +1510,7 @@ namespace ophidian::routing {
         IloObjective obj = IloMinimize(m_env);
         unsigned candidate_count = 0;
         IloExpr expr(m_env);
+        std::cout << "num route candidates : " << m_route_candidate.size();
         for(auto candidate : m_route_candidate)
         {
             gcell_container_type intersecting_gcells;
@@ -2346,7 +2358,8 @@ namespace ophidian::routing {
             m_position_candidate_cell[initial_candidate] = cell;
             m_name_to_position_candidate[initial_variable_name] = initial_candidate;
             m_position_candidate_variables[initial_candidate] = initial_variable;
-            m_position_candidate_position[initial_candidate] = m_design.placement().location(cell);
+            // m_position_candidate_position[initial_candidate] = m_design.placement().location(cell);
+            m_position_candidate_position[initial_candidate] = gcell_location(cell);
             m_position_candidate_origin[initial_candidate] = candidate_origin_type::INITIAL;
             m_cell_initial_candidate[cell] = initial_candidate;
         }
@@ -2369,4 +2382,27 @@ namespace ophidian::routing {
         auto constraint = model.add(candicates <= IloExpr(m_env, max_movemnts));
         constraint.setName(constraint_name.c_str());
     }
+
+    template <typename var_type>
+    typename ILPRouting<var_type>::point_type ILPRouting<var_type>::gcell_location(const pin_type & pin) const
+    {
+        auto pin_loc = m_design.placement().location(pin);
+        auto layer_indexes = m_design.routing_library().index(m_design.placement().geometry(pin).layers_names());
+        //TODO: consider all gcells of the pin
+        auto gcell = m_design.global_routing().gcell_graph()->nearest_gcell(pin_loc, *layer_indexes.begin());
+        auto loc = m_design.global_routing().gcell_graph()->center_of_box(gcell);
+        return loc;
+    }
+
+    template <typename var_type>
+    typename ILPRouting<var_type>::point_type ILPRouting<var_type>::gcell_location(const cell_type & cell) const
+    {
+        auto cell_loc = m_design.placement().location(cell);
+        auto layer_indexes = m_design.routing_library().index(m_design.placement().geometry(cell).layers_names());
+        //TODO: consider all gcells of the pin
+        auto gcell = m_design.global_routing().gcell_graph()->nearest_gcell(cell_loc, *layer_indexes.begin());
+        auto loc = m_design.global_routing().gcell_graph()->center_of_box(gcell);
+        return loc;
+    }
+
 }
