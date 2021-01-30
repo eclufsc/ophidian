@@ -30,7 +30,7 @@ namespace ophidian::routing::factory
         using point_type            = ophidian::geometry::Point<unity_type>;
         using box_type              = geometry::Box<unity_type>;
         using rtree_node_type       = std::pair<box_scalar_type, GlobalRouting::gr_segment_type>;
-        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16> >;
+        using rtree_type            = boost::geometry::index::rtree<rtree_node_type, boost::geometry::index::rstar<16>>;
         std::map<GlobalRouting::scalar_type, rtree_type> rtree_layers;
 
         if( def.gcell_x_axis().size() != 0 && def.gcell_y_axis().size() != 0)

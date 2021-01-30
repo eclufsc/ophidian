@@ -65,6 +65,8 @@ namespace ophidian::parser
         // Class member functions
         void read_file(const std::string& guide_file);
 
+        void read_comercial_file(const std::string &guide_file);
+
         const size_t size() const noexcept;
 
         const net_container_type& nets() const noexcept;

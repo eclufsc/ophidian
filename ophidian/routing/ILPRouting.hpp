@@ -6,9 +6,9 @@
 #include <ophidian/util/log.h>
 
 #ifndef STATUS 
-#define STATUS true
-#define DEBUG true
-#define WRITE_MODEL true
+#define STATUS false
+#define DEBUG false
+#define WRITE_MODEL false
 #endif
 
 using namespace ophidian::util;
@@ -1883,7 +1883,7 @@ namespace ophidian::routing {
         auto & routing_constraints = m_design.routing_constraints();
         // same grid extra demand rules
         if (DEBUG) std::cout << "extra demand rules" << std::endl;
-
+        /*
         for (auto same_grid_it = routing_constraints.begin_same_grid(); same_grid_it != routing_constraints.end_same_grid(); same_grid_it++) {
             auto key = same_grid_it->first;
             //auto demand = same_grid_it->second;
@@ -2085,23 +2085,19 @@ namespace ophidian::routing {
                 }
             }
         }
+        */
 
         //for(auto gcell_it = gcell_graph->begin_gcell(); gcell_it != gcell_graph->end_gcell(); gcell_it++){
             //auto gcell = *gcell_it;
         for (auto & gcell : gcells) {
             auto node = gcell_graph->graph_node(gcell);
             auto location = gcell_graph->position(node);
-
             auto & gcell_constraint = gcells_constraints[gcell];
-            
             auto gcell_layer_index = gcell_graph->layer_index(gcell);
-
             auto gcell_box = gcell_graph->box(gcell);
-                
             auto x = gcell_box.min_corner().x().value();
             auto y = gcell_box.min_corner().y().value();
             auto z = gcell_layer_index;
-
                 
             auto capacity = gcell_graph->capacity(gcell);
             auto fixed_demand = m_gcells_demand[gcell];
@@ -2109,17 +2105,16 @@ namespace ophidian::routing {
             if (capacity - fixed_demand >= max_demand) {
                 free_gcells++;
             }
-            
             //TIAGO
-             if(gcells_constraints_bool[gcell] )
+            if(gcells_constraints_bool[gcell] )
             //if(gcells_constraints_bool[gcell] && capacity - fixed_demand < max_demand)
             {
                 auto constraint_name = std::to_string(location.get<1>()) + "_" + std::to_string(location.get<0>()) + "_" + std::to_string(location.get<2>()) ;
                 auto demand = m_gcells_demand[gcell];
                 auto extra_demand = m_gcells_extra_demand[gcell];
-                //std::cout << "constraint " << constraint_name << " " << capacity << " " << demand << " " << extra_demand << std::endl;
+                // std::cout << "constraint " << constraint_name << " " << capacity << " " << demand << " " << extra_demand << std::endl;
                 auto constraint = model.add(gcell_constraint <= capacity - demand - extra_demand);
-                constraint.setName(constraint_name.c_str());                
+                constraint.setName(constraint_name.c_str());
             }
         }
 

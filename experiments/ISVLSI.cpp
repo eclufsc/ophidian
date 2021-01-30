@@ -206,14 +206,13 @@ bool fileExists(std::string fileName)
     return infile.good();
 }
 
-void write_csv_header(std::string csv_file_name) {
+
+void write_csv(ophidian::design::Design & design, std::string csv_file_name, std::set<mevement> & possible_movements) {
     if(!fileExists(csv_file_name)){
         std::ofstream csv_file(csv_file_name, std::ofstream::out);
         csv_file << "cell,position_dbu_x,position_dbu_y,improvement" << std::endl;
     }
-}
 
-void write_csv(ophidian::design::Design & design, std::string csv_file_name, std::set<mevement> & possible_movements) {
     std::ofstream csv_file(csv_file_name, std::ofstream::app);
 
     for(auto mv : possible_movements)
@@ -222,6 +221,22 @@ void write_csv(ophidian::design::Design & design, std::string csv_file_name, std
         csv_file << cell_name << "," <<  mv.position.x().value() << "," << mv.position.y().value() << "," << mv.improvement << std::endl;
     }
 
+}
+
+
+void write_csv(ophidian::design::Design & design, std::string csv_file_name, movement_container_type & movements) {
+    if(!fileExists(csv_file_name)){
+        std::ofstream csv_file(csv_file_name, std::ofstream::out);
+        csv_file << "cell,position_dbu_x,position_dbu_y" << std::endl;
+    }
+
+    std::ofstream csv_file(csv_file_name, std::ofstream::app);
+
+    for(auto mv : movements)
+    {
+        auto cell_name = design.netlist().name(mv.first);
+        csv_file << cell_name << "," <<  mv.second.x().value() << "," << mv.second.y().value() << std::endl;
+    }
 }
 
 TEST_CASE("ILSVLSI paper all cells to median code", "[ILSVLSI]")
@@ -290,8 +305,8 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
 {
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        "ispd19_sample4",
-        // "ispd18_test1",
+        // "ispd19_sample4"
+        "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
         // "ispd18_test4",
@@ -301,7 +316,6 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         // "ispd18_test8",
         // "ispd18_test9",
         // "ispd18_test10",
-
         // "ispd19_test1",
         // "ispd19_test2",
         // "ispd19_test3",
@@ -321,7 +335,8 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
 
         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
         std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+        std::string guide_file = benchmarks_path + "/cadence_solution/" + circuit_name + ".guide";
+        // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
         // std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
         ophidian::parser::Def def;
         ophidian::parser::Lef lef;
@@ -333,18 +348,66 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
+        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
+        auto initial_wrl = design.global_routing().wirelength(nets) ;
+        std::cout << "Initial wirelength " << initial_wrl << std::endl;
+
         UCal::Engine engine(design);
         auto start_time = std::chrono::steady_clock::now();
         movement_container_type movements;
         auto report_json = engine.run(movements,start_time);
 
+        std::cout << "Number of movements : " << movements.size() << std::endl;
 
-        // auto csv_file_name = circuit_name + "_movements_to_median.csv";
-        // write_csv_header(csv_file_name);
-        // write_csv(design, csv_file_name, possible_movements);
+        std::cout << "Design connected? " << design.global_routing().is_connected(nets) << std::endl;
+
+        auto end_wrl = design.global_routing().wirelength(nets);
+        std::cout <<"Initial wrl " << initial_wrl << "\n"
+                << "Final wrl " << end_wrl << "\n"
+                << "Improve " << initial_wrl - end_wrl << "\n"
+                << "reduction " << (1 - end_wrl/initial_wrl)*100 << "%" << std::endl;
+
+        auto csv_file_name = circuit_name + "_movements_ILP_to_median_comercial.csv";
+        write_csv(design, csv_file_name, movements);
 
         std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
     }
 }
+
+TEST_CASE("ILSVLSI paper guide", "[TEST_GUIDE]")
+{
+    //iccad 2019 benchmarks
+    std::vector<std::string> circuit_names = {
+        "ispd18_test1",
+    };
+
+    std::string benchmarks_path = "./input_files/circuits";
+
+    for (auto circuit_name : circuit_names) {
+        std::cout << "running circuit " << circuit_name << std::endl;
+
+        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+        std::string guide_file = benchmarks_path + "/cadence_solution/" + circuit_name + "_mod.guide";
+        ophidian::parser::Def def;
+        ophidian::parser::Lef lef;
+        ophidian::parser::Guide guide;
+        def = ophidian::parser::Def{def_file};
+        lef = ophidian::parser::Lef{lef_file};
+        guide = ophidian::parser::Guide{guide_file};
+
+        auto design = ophidian::design::Design();
+        ophidian::design::factory::make_design(design, def, lef, guide);
+
+        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
+        auto initial_wrl = design.global_routing().wirelength(nets) ;
+        std::cout << "Initial wirelength " << initial_wrl << std::endl;
+
+        std::cout << "Design connected? " << design.global_routing().is_connected(nets) << std::endl;
+
+        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
+    }
+}
+
 
 }//end namespace

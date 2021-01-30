@@ -526,8 +526,8 @@ namespace ophidian::routing
         placement.place(cell, target_location);
         //add blockage demand
         update_blockage_demand(netlist, placement, cell, false);
-        incremental_update_extra_demand(source, netlist, placement, routing_constraints, std_cells);
-        incremental_update_extra_demand(target, netlist, placement, routing_constraints, std_cells);
+        // incremental_update_extra_demand(source, netlist, placement, routing_constraints, std_cells); //ILSVLSI
+        // incremental_update_extra_demand(target, netlist, placement, routing_constraints, std_cells); //ILSVLSI
         auto overflow = overflow_movement(target);
         return overflow;
     }
@@ -616,6 +616,8 @@ namespace ophidian::routing
         for(auto layer_it = m_library.begin_layer(); layer_it != m_library.end_layer(); layer_it++)
         {
             auto layer_index = m_library.layerIndex(*layer_it);
+            if(layer_index < 0) // CUT layers have index equal -1
+                continue;
             auto affected_node = m_gcell_graph->node(gcell_position.get<0>(), gcell_position.get<1>(), layer_index-1);
             auto affected_gcell = m_gcell_graph->gcell(affected_node);
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include "TimerProfiler.h"
+#include <cmath> 
 
 namespace UCal{
 
@@ -219,12 +220,18 @@ void Engine::construct_net_boxes_rtree(const std::vector<net_type> &nets){
 
 
 void Engine::cluster_based_on_panel(){
-    auto chip_upper_right_corner = m_design.floorplan().chip_upper_right_corner();
+    auto & floorplan = m_design.floorplan();
+    auto chip_origin = floorplan.chip_origin();
+    auto chip_upper_right_corner = floorplan.chip_upper_right_corner();
+
     // The window is 10Gcellx width of layout
-    int panel_base = 100;
+    auto row = *floorplan.range_row().begin();
+    auto row_height = floorplan.upper_right_corner(row).y().value() - floorplan.origin(row).y().value();
+    // int panel_base = 100;
+    int panel_base = 5*row_height;
     
-    int layout_width = chip_upper_right_corner.x().value();
-    int layout_height = chip_upper_right_corner.y().value();
+    int layout_width = chip_upper_right_corner.x().value() - chip_origin.x().value();
+    int layout_height = chip_upper_right_corner.y().value() - chip_origin.y().value();
 
     int panel_min_x = 1;
     int panel_min_y = 1;
@@ -238,9 +245,11 @@ void Engine::cluster_based_on_panel(){
     int total_panels = 0;
     unsigned int panel_level = 0;
 
+    int levels = std::ceil(log2(number_of_panels)) +1;
+
     // horizontal 
     while(number_of_panels >= 1){
-        if(panel_level==3) break;
+        if(panel_level==levels) break;
         if(DEBUG_PANEL) std::cout << "level: " << count << std::endl;
         auto panel_size = panel_base * count;
         number_of_panels = ceil(layout_height/panel_size);
@@ -249,10 +258,17 @@ void Engine::cluster_based_on_panel(){
         std::vector<unsigned int> panel_ids;
         for (int panel_iterator = 0; panel_iterator <= number_of_panels ; panel_iterator++){
             // compute panel corner 
-            panel_min_x = 0;//i*window_size;
-            panel_min_y = panel_iterator*panel_size;
-            panel_max_x = layout_width;
-            panel_max_y = panel_min_y + panel_size;
+            // panel_min_x = 0;//i*window_size;
+            // panel_min_y = panel_iterator*panel_size;
+            // panel_max_x = layout_width;
+            // panel_max_y = panel_min_y + panel_size;
+
+            panel_min_x = chip_origin.x().value();
+            panel_min_y = panel_iterator*panel_size + chip_origin.y().value();
+            panel_max_x = layout_width + chip_origin.x().value();;
+            panel_max_y = panel_min_y + panel_size + chip_origin.y().value();
+
+
             Box2DWrapper panel_box_current(panel_min_x,panel_min_y,panel_max_x,panel_max_y);
             unsigned int panel_index = total_panels;
             total_panels++;
@@ -347,7 +363,7 @@ void Engine::cluster_based_on_panel(){
     number_of_panels = (layout_width/panel_base)+1;
     count = 1;
     while(number_of_panels >= 1){
-        if(panel_level==6) break;
+        if(panel_level==levels) break;
         if(DEBUG_PANEL) std::cout << "level: " << count << std::endl;
         auto panel_size = panel_base * count;
         number_of_panels = ceil(layout_height/panel_size);
@@ -361,6 +377,21 @@ void Engine::cluster_based_on_panel(){
             panel_min_y = 0;//;
             panel_max_x = panel_min_x + panel_size;
             panel_max_y = layout_height;//;
+
+
+                        // compute panel corner 
+            // panel_min_x = 0;//i*window_size;
+            // panel_min_y = panel_iterator*panel_size;
+            // panel_max_x = layout_width;
+            // panel_max_y = panel_min_y + panel_size;
+
+            panel_min_x = chip_origin.x().value();
+            panel_min_y = panel_iterator*panel_size + chip_origin.y().value();
+            panel_max_x = layout_width + chip_origin.x().value();;
+            panel_max_y = panel_min_y + panel_size + chip_origin.y().value();
+
+
+
             Box2DWrapper panel_box_current(panel_min_x,panel_min_y,panel_max_x,panel_max_y);
             unsigned int panel_index = total_panels;
             total_panels++;
@@ -942,7 +973,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
             movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
 
-            // #pragma omp critical //ilsvlsi
+            #pragma omp critical //ilsvlsi
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
@@ -965,7 +996,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
             movement_container_type local_movements;
             run_ilp_on_panel(id,local_movements);
             
-            // #pragma omp critical //ilsvlsi
+            #pragma omp critical //ilsvlsi
             for (auto movement : local_movements) {
                 auto source_location = m_design.placement().location(movement.first);
                 auto source_gcell = m_design.global_routing().gcell_graph()->nearest_gcell(source_location, 0);
@@ -1171,8 +1202,9 @@ void Engine::run_ilp(ophidian::placement::Placement::box_type panel_region,std::
     // auto result = ilpRouting.route_nets(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
     auto ilp_result = ilpRouting.route_nets_v2(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
     // int s = ilp_result.m_routed_nets.size();
-    #pragma omp critical
-    m_ilp_results.push_back(ilp_result);
+    
+    // #pragma omp critical //ILSVLSI
+    // m_ilp_results.push_back(ilp_result);
     
 
 
