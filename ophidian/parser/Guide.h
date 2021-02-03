@@ -60,7 +60,7 @@ namespace ophidian::parser
         // Class constructors
         Guide() = default;
 
-        Guide(const std::string& guide_file);
+        Guide(const std::string& guide_file, bool comercia_guide = false);
 
         // Class member functions
         void read_file(const std::string& guide_file);

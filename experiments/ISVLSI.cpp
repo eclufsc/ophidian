@@ -343,26 +343,31 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         ophidian::parser::Guide guide;
         def = ophidian::parser::Def{def_file};
         lef = ophidian::parser::Lef{lef_file};
-        guide = ophidian::parser::Guide{guide_file};
+        guide = ophidian::parser::Guide{guide_file, true};
 
         auto design = ophidian::design::Design();
         ophidian::design::factory::make_design(design, def, lef, guide);
 
         std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
         auto initial_wrl = design.global_routing().wirelength(nets) ;
-        std::cout << "Initial wirelength " << initial_wrl << std::endl;
+        log() << "Initial wirelength " << initial_wrl << std::endl;
 
         UCal::Engine engine(design);
-        auto start_time = std::chrono::steady_clock::now();
         movement_container_type movements;
+        auto start_time = std::chrono::steady_clock::now();
         auto report_json = engine.run(movements,start_time);
+        auto end_time = std::chrono::steady_clock::now();
+        std::chrono::duration<double> diff = end_time-start_time;
 
-        std::cout << "Number of movements : " << movements.size() << std::endl;
+        log() << "Technique time : " << diff << " sec" << std::endl;
+        log() << "Technique time : " << diff/60 << " min" << std::endl;
 
-        std::cout << "Design connected? " << design.global_routing().is_connected(nets) << std::endl;
+        log() << "Number of movements : " << movements.size() << std::endl;
+
+        log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
 
         auto end_wrl = design.global_routing().wirelength(nets);
-        std::cout <<"Initial wrl " << initial_wrl << "\n"
+        log() <<"Initial wrl " << initial_wrl << "\n"
                 << "Final wrl " << end_wrl << "\n"
                 << "Improve " << initial_wrl - end_wrl << "\n"
                 << "reduction " << (1 - end_wrl/initial_wrl)*100 << "%" << std::endl;
@@ -370,44 +375,11 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         auto csv_file_name = circuit_name + "_movements_ILP_to_median_comercial.csv";
         write_csv(design, csv_file_name, movements);
 
-        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
+        log() << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
     }
 }
 
-TEST_CASE("ILSVLSI paper guide", "[TEST_GUIDE]")
-{
-    //iccad 2019 benchmarks
-    std::vector<std::string> circuit_names = {
-        "ispd18_test1",
-    };
 
-    std::string benchmarks_path = "./input_files/circuits";
-
-    for (auto circuit_name : circuit_names) {
-        std::cout << "running circuit " << circuit_name << std::endl;
-
-        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
-        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + "/cadence_solution/" + circuit_name + "_mod.guide";
-        ophidian::parser::Def def;
-        ophidian::parser::Lef lef;
-        ophidian::parser::Guide guide;
-        def = ophidian::parser::Def{def_file};
-        lef = ophidian::parser::Lef{lef_file};
-        guide = ophidian::parser::Guide{guide_file};
-
-        auto design = ophidian::design::Design();
-        ophidian::design::factory::make_design(design, def, lef, guide);
-
-        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
-        auto initial_wrl = design.global_routing().wirelength(nets) ;
-        std::cout << "Initial wirelength " << initial_wrl << std::endl;
-
-        std::cout << "Design connected? " << design.global_routing().is_connected(nets) << std::endl;
-
-        std::cout << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
-    }
-}
 
 
 }//end namespace

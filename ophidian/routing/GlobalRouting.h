@@ -130,7 +130,7 @@ namespace ophidian::routing
         entity_system::EntitySystem<gr_segment_type>::NotifierType * notifier(gr_segment_type) const;
         
         bool is_connected(const net_type & net) const;
-        bool is_connected(const net_container_type & nets) const;
+        bool is_connected(const GlobalRouting::netlist_type & netlist, const net_container_type & nets) const;
 
         // bool is_connected(const net_type & net, const gcell_container_type & pin_gcells, std::string net_name) const;
         /* Returns if there is overflow in any of the nets in nets_to_check. Overflowed nets are returned in ovfl_nets*/

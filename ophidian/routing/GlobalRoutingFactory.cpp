@@ -68,6 +68,7 @@ namespace ophidian::routing::factory
                 auto min_corner = point_scalar_type(region_box.min_corner().x().value(), region_box.min_corner().y().value());
                 auto max_corner = point_scalar_type(region_box.max_corner().x().value(), region_box.max_corner().y().value());
                 auto box = box_scalar_type(min_corner, max_corner);
+                std::cout<< "RTree index " << index << " size " << rtree_layers.at(index).size() << std::endl;
                 rtree_layers.at(index).insert(std::make_pair(box, segment));
             }
 

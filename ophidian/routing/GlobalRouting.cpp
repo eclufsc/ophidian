@@ -504,12 +504,16 @@ namespace ophidian::routing
     //     return lemon::connected(net_graph);
     // }
 
-    bool GlobalRouting::is_connected(const net_container_type & nets) const {
+    bool GlobalRouting::is_connected(const GlobalRouting::netlist_type & netlist, const net_container_type & nets) const {
         bool connected = true;
         for(auto net : nets){
             connected = is_connected(net);
             if(connected == false)
-                break;
+            {
+                auto net_name = netlist.name(net);
+                std::cout << "Net " << net_name << " is disconected" << std::endl;
+                // break;
+            }
         }
         return connected;
     }

@@ -9,10 +9,13 @@
 namespace ophidian::parser
 {
 
-Guide::Guide(const std::string &guide_file)
+Guide::Guide(const std::string &guide_file, bool comercia_guide)
 {
-    // read_file(guide_file);
-    read_comercial_file(guide_file);
+    if(comercia_guide){
+        read_comercial_file(guide_file);
+    }else{
+        read_file(guide_file);
+    }
 }
 
 void Guide::read_file(const std::string &guide_file)
@@ -138,10 +141,16 @@ void Guide::read_comercial_file(const std::string &guide_file)
                 {
                     throw exceptions::GuideFileSyntaxError();
                 }
-                int x1 = static_cast<int>(boost::lexical_cast<double>(words[1])*2000);
-                int y1 = static_cast<int>(boost::lexical_cast<double>(words[2])*2000);
-                int x2 = static_cast<int>(boost::lexical_cast<double>(words[3])*2000);
-                int y2 = static_cast<int>(boost::lexical_cast<double>(words[4])*2000);
+                int xo1 = static_cast<int>(boost::lexical_cast<double>(words[1])*2000);
+                int yo1 = static_cast<int>(boost::lexical_cast<double>(words[2])*2000);
+                int xo2 = static_cast<int>(boost::lexical_cast<double>(words[3])*2000);
+                int yo2 = static_cast<int>(boost::lexical_cast<double>(words[4])*2000);
+
+                int x1 = std::min(xo1, xo2);
+                int y1 = std::min(yo1, yo2);
+                int x2 = std::max(xo1, xo2);
+                int y2 = std::max(yo1, yo2);
+
                 auto origin = Guide::database_unit_point_type(Guide::database_unit_type(x1), Guide::database_unit_type(y1));
                 auto upperRight = Guide::database_unit_point_type(Guide::database_unit_type(x2), Guide::database_unit_type(y2));
                 auto region = Guide::Region(origin, upperRight, "Metal"+words[8]);
