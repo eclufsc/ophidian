@@ -305,8 +305,8 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
 {
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        // "ispd19_sample4"
-        "ispd18_test1",
+        "ispd19_sample4"
+        // "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
         // "ispd18_test4",
@@ -354,15 +354,37 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
 
         UCal::Engine engine(design);
         movement_container_type movements;
-        auto start_time = std::chrono::steady_clock::now();
-        auto report_json = engine.run(movements,start_time);
-        auto end_time = std::chrono::steady_clock::now();
-        std::chrono::duration<double> diff = end_time-start_time;
+        
+        if(!fileExists("iterations_log.csv")){
+            std::ofstream iter_log_file("iterations_log.csv", std::ofstream::out);
+            iter_log_file << "iter,time,num_mov" << std::endl;
+        }
+        std::ofstream iter_log_file("iterations_log.csv", std::ofstream::app);
+        
+        int num_mov = movements.size();
+        for (int i = 0; i < 5; i++)
+        {
+            log() << "Initing ILP iteration : " << i << std::endl;
+            auto start_time = std::chrono::steady_clock::now();
+            auto report_json = engine.run(movements,start_time);
+            auto end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end_time-start_time;
 
-        log() << "Technique time : " << diff << " sec" << std::endl;
-        log() << "Technique time : " << diff/60 << " min" << std::endl;
+            log() << "Technique time : " << diff.count() << " sec" << std::endl;
+            log() << "Technique time : " << (diff.count()/60) << " min" << std::endl;
+            int number_movements = movements.size() - num_mov;
+            log() << "Number of movements : " << number_movements << std::endl;
+            log() << "TOTAL of movements : " << movements.size() << std::endl;
 
-        log() << "Number of movements : " << movements.size() << std::endl;
+            iter_log_file << i << "," << diff.count() << "," << number_movements <<std::endl;
+
+            for(auto mov : movements)
+            {
+                auto cell = mov.first;
+                design.placement().fixLocation(cell);
+            }
+        }
+        iter_log_file.close();
 
         log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
 

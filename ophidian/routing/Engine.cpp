@@ -34,9 +34,10 @@ Engine::~Engine(){
 
 
 Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::time_point start_time){
-    log() << "A* routing only" << std::endl;
+    log() << "ILP with movements routing only" << std::endl;
+    // log() << "A* routing only" << std::endl;
 
-    loadParams();
+    // loadParams();
 
     UCal::TimerProfiler timer_construct_net_boxes_rtree;
     UCal::TimerProfiler timer_cluster_based_on_panel;
@@ -72,32 +73,32 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
     auto remaining_time = max_time_to_run - current_time;
     log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
 
-    if(m_global_params["run_ilp_on_panels_parallel"] == "true"){
+    // if(m_global_params["run_ilp_on_panels_parallel"] == "true"){
         std::cout << "ilp parallel\n";
         timer_run_ilp_on_panels_parallel_loop.start();
         m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
         run_ilp_on_panels_parallel(movements);
         timer_run_ilp_on_panels_parallel_loop.stop();
-    }
+    // }
     
-    if(m_global_params["run_astar_on_panels_parallel_loop"] == "true"){
-        std::cout << "loop\n";
-        timer_run_astar_on_panels_parallel_loop.start();
-        run_astar_on_panels_parallel_loop(remaining_time);
-        timer_run_astar_on_panels_parallel_loop.stop();
-    }
-    if(m_global_params["run_astar_on_panels_parallel_section"] == "true"){
-        std::cout << "section\n";
-        timer_run_astar_on_panels_parallel_section.start();
-        run_astar_on_panels_parallel_section(remaining_time);
-        timer_run_astar_on_panels_parallel_section.stop();
-    }
-    if(m_global_params["run_astar_on_panels_sequential"] == "true"){
-        std::cout << "sequential\n";
-        timer_run_astar_on_panels_sequential.start();
-        run_astar_on_panels_sequential(remaining_time);
-        timer_run_astar_on_panels_sequential.stop();
-    }
+    // if(m_global_params["run_astar_on_panels_parallel_loop"] == "true"){
+    //     std::cout << "loop\n";
+    //     timer_run_astar_on_panels_parallel_loop.start();
+    //     run_astar_on_panels_parallel_loop(remaining_time);
+    //     timer_run_astar_on_panels_parallel_loop.stop();
+    // }
+    // if(m_global_params["run_astar_on_panels_parallel_section"] == "true"){
+    //     std::cout << "section\n";
+    //     timer_run_astar_on_panels_parallel_section.start();
+    //     run_astar_on_panels_parallel_section(remaining_time);
+    //     timer_run_astar_on_panels_parallel_section.stop();
+    // }
+    // if(m_global_params["run_astar_on_panels_sequential"] == "true"){
+    //     std::cout << "sequential\n";
+    //     timer_run_astar_on_panels_sequential.start();
+    //     run_astar_on_panels_sequential(remaining_time);
+    //     timer_run_astar_on_panels_sequential.stop();
+    // }
 
     m_timer_report_json["construct_net_boxes_rtree"] = timer_construct_net_boxes_rtree.userTime();
     m_timer_report_json["cluster_based_on_panel"] = timer_cluster_based_on_panel.userTime();
@@ -228,7 +229,7 @@ void Engine::cluster_based_on_panel(){
     auto row = *floorplan.range_row().begin();
     auto row_height = floorplan.upper_right_corner(row).y().value() - floorplan.origin(row).y().value();
     // int panel_base = 100;
-    int panel_base = 5*row_height;
+    int panel_base = 10*row_height;
     
     int layout_width = chip_upper_right_corner.x().value() - chip_origin.x().value();
     int layout_height = chip_upper_right_corner.y().value() - chip_origin.y().value();
@@ -965,7 +966,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
         }//end for 
         // omp_set_num_threads(8);
         // //even panels
-        // #pragma omp parallel for num_threads(8) //ilsvlsi
+        #pragma omp parallel for num_threads(8) //ilsvlsi
         for(int i = 0; i < even_ids.size(); i++){
             auto id = even_ids[i];
             // printf("Number of threads: %d",  omp_get_num_threads());
@@ -990,7 +991,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
         update_global_routing();
 
         // odd panels
-        // #pragma omp parallel for num_threads(8) //ilsvlsi
+        #pragma omp parallel for num_threads(8) //ilsvlsi
         for(int i = 0; i < odd_ids.size(); i++){
             auto id = odd_ids[i];
             movement_container_type local_movements;
@@ -1203,8 +1204,8 @@ void Engine::run_ilp(ophidian::placement::Placement::box_type panel_region,std::
     auto ilp_result = ilpRouting.route_nets_v2(nets_local, local_cells, panel_region, fixed_nets, routed_nets, unrouted_nets, movements);
     // int s = ilp_result.m_routed_nets.size();
     
-    // #pragma omp critical //ILSVLSI
-    // m_ilp_results.push_back(ilp_result);
+    #pragma omp critical //ILSVLSI
+    m_ilp_results.push_back(ilp_result);
     
 
 
