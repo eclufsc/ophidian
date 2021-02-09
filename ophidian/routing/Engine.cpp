@@ -11,9 +11,9 @@
 
 namespace UCal{
 
-#define max_time_to_run 25
+#define max_time_to_run 100000
 
-#define DEBUG_PANEL true
+#define DEBUG_PANEL false
 #define DEBUG_SECTION false
 #define DEBUG_PANEL_PARALLEL false
 #define num_nets_to_route 10000
@@ -51,7 +51,7 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
     m_design.placement().reset_rtree();
 
     // if(m_global_params["construct_net_boxes_rtree"] == "true"){
-        std::cout << "construct_net_boxes_rtree\n";
+        log() << "construct_net_boxes_rtree\n";
         timer_construct_net_boxes_rtree.start();
         construct_net_boxes_rtree(nets);
         timer_construct_net_boxes_rtree.stop();
@@ -59,7 +59,7 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
         
 
     // if(m_global_params["cluster_based_on_panel"] == "true"){
-        std::cout << "cluster_based_on_panel\n";
+        log() << "cluster_based_on_panel\n";
         timer_cluster_based_on_panel.start();
         cluster_based_on_panel();
         timer_cluster_based_on_panel.stop();
@@ -67,14 +67,14 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
 
 
 
-    auto end_time = std::chrono::steady_clock::now();
-    std::chrono::duration<double> diff = end_time-start_time;
-    auto current_time = diff.count() / 60.0;
-    auto remaining_time = max_time_to_run - current_time;
-    log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
+    // auto end_time = std::chrono::steady_clock::now();
+    // std::chrono::duration<double> diff = end_time-start_time;
+    // auto current_time = diff.count() / 60.0;
+    // auto remaining_time = max_time_to_run - current_time;
+    // log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
 
     // if(m_global_params["run_ilp_on_panels_parallel"] == "true"){
-        std::cout << "ilp parallel\n";
+        log() << "ilp parallel\n";
         timer_run_ilp_on_panels_parallel_loop.start();
         m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
         run_ilp_on_panels_parallel(movements);
@@ -1023,7 +1023,7 @@ void Engine::run_ilp_on_panels_parallel(movement_container_type & movements){
 
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
 
-    std::cout << "total nets targeted by panel: " << m_total_panel_nets << "out of " << nets.size() << std::endl;
+    // std::cout << "total nets targeted by panel: " << m_total_panel_nets << "out of " << nets.size() << std::endl;
 }//end run_ilp_on_panels_parallel
 
 

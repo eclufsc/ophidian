@@ -29,4 +29,5 @@ using movement_container_type = std::unordered_map< ophidian::routing::ILPRoutin
     void ILP_with_movements_Astar_with_movements(ophidian::design::Design & design, std::string circuit_name, std::string output, movement_container_type & movements);
     void ILP_with_movements_Astar_with_movements_parallel(ophidian::design::Design & design, std::string circuit_name, std::string output, movement_container_type & movements, UCal::Engine & engine);
 
+    void draw_gcell_svg(ophidian::design::Design & design, std::string net_name);
 #endif

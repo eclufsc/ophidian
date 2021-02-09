@@ -1510,7 +1510,7 @@ namespace ophidian::routing {
         IloObjective obj = IloMinimize(m_env);
         unsigned candidate_count = 0;
         IloExpr expr(m_env);
-        std::cout << "num route candidates : " << m_route_candidate.size();
+        // std::cout << "num route candidates : " << m_route_candidate.size();
         for(auto candidate : m_route_candidate)
         {
             gcell_container_type intersecting_gcells;

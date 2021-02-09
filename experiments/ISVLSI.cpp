@@ -10,7 +10,6 @@
 #include <chrono>
 #include "run_ilp.h"
 #include "date21.h"
-
 // std::chrono::time_point<std::chrono::steady_clock> start_time;
 using namespace ophidian::util;
 
@@ -305,17 +304,17 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
 {
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
-        "ispd19_sample4"
-        // "ispd18_test1",
-        // "ispd18_test2",
-        // "ispd18_test3",
-        // "ispd18_test4",
-        // "ispd18_test5",
-        // "ispd18_test6",
-        // "ispd18_test7",
-        // "ispd18_test8",
-        // "ispd18_test9",
-        // "ispd18_test10",
+        // "ispd19_sample4"
+        "ispd18_test1",
+        "ispd18_test2",
+        "ispd18_test3",
+        "ispd18_test4",
+        "ispd18_test5",
+        "ispd18_test6",
+        "ispd18_test7",
+        "ispd18_test8",
+        "ispd18_test9",
+        "ispd18_test10",
         // "ispd19_test1",
         // "ispd19_test2",
         // "ispd19_test3",
@@ -331,6 +330,9 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
     std::string benchmarks_path = "./input_files/circuits";
 
     for (auto circuit_name : circuit_names) {
+        int iterations = 1;
+        std::string log_filename = circuit_name + "_" + std::to_string(iterations) + "_iterations_log.csv";
+
         std::cout << "running circuit " << circuit_name << std::endl;
 
         std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
@@ -351,50 +353,70 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
         auto initial_wrl = design.global_routing().wirelength(nets) ;
         log() << "Initial wirelength " << initial_wrl << std::endl;
+        log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
 
         UCal::Engine engine(design);
         movement_container_type movements;
         
-        if(!fileExists("iterations_log.csv")){
-            std::ofstream iter_log_file("iterations_log.csv", std::ofstream::out);
-            iter_log_file << "iter,time,num_mov" << std::endl;
+       
+        if(!fileExists(log_filename)){
+            std::ofstream iter_log_file(log_filename, std::ofstream::out);
+            iter_log_file << "iter,acum_time,acum_mov,time,num_mov,wirelength,reduction" << std::endl;
         }
-        std::ofstream iter_log_file("iterations_log.csv", std::ofstream::app);
+        std::ofstream iter_log_file(log_filename, std::ofstream::app);
         
+        auto start_time = std::chrono::steady_clock::now();
+
         int num_mov = movements.size();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < iterations; i++)
         {
             log() << "Initing ILP iteration : " << i << std::endl;
-            auto start_time = std::chrono::steady_clock::now();
-            auto report_json = engine.run(movements,start_time);
-            auto end_time = std::chrono::steady_clock::now();
-            std::chrono::duration<double> diff = end_time-start_time;
+            auto iteration_start_time = std::chrono::steady_clock::now();
+            auto report_json = engine.run(movements,iteration_start_time);
+            auto current_time = std::chrono::steady_clock::now();
 
-            log() << "Technique time : " << diff.count() << " sec" << std::endl;
-            log() << "Technique time : " << (diff.count()/60) << " min" << std::endl;
+            std::chrono::duration<double> iteration_time = current_time-iteration_start_time;
+            std::chrono::duration<double> technique_time = current_time-start_time;
+
             int number_movements = movements.size() - num_mov;
+            num_mov = movements.size();
+
+            log() << "Iteration time : " << iteration_time.count() << " sec | " << (iteration_time.count()/60) << " min" << std::endl;
             log() << "Number of movements : " << number_movements << std::endl;
+            log() << "Technique time : " << technique_time.count() << " sec | " << (technique_time.count()/60) << " min" << std::endl;
             log() << "TOTAL of movements : " << movements.size() << std::endl;
 
-            iter_log_file << i << "," << diff.count() << "," << number_movements <<std::endl;
+            auto wrl = design.global_routing().wirelength(nets);
+            auto reduction = (1.0 - wrl/(double)initial_wrl)*100.0;
+            log() << "reduction " <<  reduction << " %" << std::endl;
 
+            //  iter_log_file << "iter,acum_time,acum_mov,time,num_mov" << std::endl;
+            iter_log_file << i << "," <<
+                            technique_time.count() << "," << 
+                            num_mov << "," << 
+                            iteration_time.count() << "," << 
+                            number_movements << "," << 
+                            wrl << "," << 
+                            reduction << std::endl;
+            /*
             for(auto mov : movements)
             {
                 auto cell = mov.first;
                 design.placement().fixLocation(cell);
             }
+            */
         }
         iter_log_file.close();
 
         log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
 
         auto end_wrl = design.global_routing().wirelength(nets);
-        log() <<"Initial wrl " << initial_wrl << "\n"
-                << "Final wrl " << end_wrl << "\n"
-                << "Improve " << initial_wrl - end_wrl << "\n"
-                << "reduction " << (1 - end_wrl/initial_wrl)*100 << "%" << std::endl;
+        log() <<"Initial wrl " << initial_wrl << std::endl;
+        log() << "Final wrl " << end_wrl << std::endl;
+        log() << "Improve " << initial_wrl - end_wrl << std::endl;
+        log() << "reduction " << (1.0 - end_wrl/(double)initial_wrl)*100.0 << " %" << std::endl;
 
-        auto csv_file_name = circuit_name + "_movements_ILP_to_median_comercial.csv";
+        auto csv_file_name = circuit_name + "_" + std::to_string(iterations) + "_iterations_movements_ILP_to_median_comercial.csv";
         write_csv(design, csv_file_name, movements);
 
         log() << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
