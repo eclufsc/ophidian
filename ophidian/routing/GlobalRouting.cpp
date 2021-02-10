@@ -510,9 +510,9 @@ namespace ophidian::routing
             connected = is_connected(net);
             if(connected == false)
             {
-                auto net_name = netlist.name(net);
-                std::cout << "Net " << net_name << " is disconected" << std::endl;
-                // break;
+                // auto net_name = netlist.name(net);
+                // std::cout << "Net " << net_name << " is disconected" << std::endl;
+                break;
             }
         }
         return connected;
