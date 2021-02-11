@@ -306,26 +306,26 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
         // "ispd19_sample4"
-        "ispd18_test1",
-        "ispd18_test2",
-        "ispd18_test3",
-        "ispd18_test4",
-        "ispd18_test5",
-        "ispd18_test6",
-        "ispd18_test7",
-        "ispd18_test8",
-        "ispd18_test9",
-        "ispd18_test10",
-        // "ispd19_test1",
-        // "ispd19_test2",
-        // "ispd19_test3",
-        // "ispd19_test4",
-        // "ispd19_test5",
-        // "ispd19_test6",
-        // "ispd19_test7",
-        // "ispd19_test8",
-        // "ispd19_test9",
-        // "ispd19_test10",
+        // "ispd18_test1",
+        // "ispd18_test2",
+        // "ispd18_test3",
+        // "ispd18_test4",
+        // "ispd18_test5",
+        // "ispd18_test6",
+        // "ispd18_test7",
+        // "ispd18_test8",
+        // "ispd18_test9",
+        // "ispd18_test10",
+        "ispd19_test1",
+        "ispd19_test2",
+        "ispd19_test3",
+        "ispd19_test4",
+        "ispd19_test5",
+        "ispd19_test6",
+        "ispd19_test7",
+        "ispd19_test8",
+        "ispd19_test9",
+        "ispd19_test10",
     };
 
     std::string benchmarks_path = "./input_files/circuits";
@@ -415,16 +415,16 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
             auto via_reduction = (1.0 - vias/(double)initial_vias);
             log() << "Via reduction " <<  via_reduction << " %" << std::endl;
 
-            auto percentage_cell_moved = number_movements/(double)number_of_cells;
+            auto percentage_cell_moved = num_mov/(double)number_of_cells;
 
             //  iter_log_file << "iter,acum_time,acum_mov,time,num_mov" << std::endl;
             // iter_log_file << "Circuit,nets,std,Iteration,movements,total_movements,cells_moved,wrl_baseline,wrl_optimized,wrl_reduction,via_baseline,via_optimized,via_reduction,runtime,acumulated" << std::endl;
             iter_log_file << circuit_name << "," << 
                             number_of_nets << "," << 
                             number_of_cells << "," << 
-                            i << "," <<
-                            num_mov << "," << 
+                            (i+1) << "," <<
                             number_movements << "," << 
+                            num_mov << "," << 
                             percentage_cell_moved << "," << 
                             initial_wrl << "," << 
                             wrl << "," << 
