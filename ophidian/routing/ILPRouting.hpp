@@ -6,7 +6,7 @@
 #include <ophidian/util/log.h>
 
 #ifndef STATUS 
-#define STATUS false
+#define STATUS true
 #define DEBUG false
 #define WRITE_MODEL false
 #endif

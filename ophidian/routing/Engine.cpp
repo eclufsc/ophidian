@@ -34,7 +34,7 @@ Engine::~Engine(){
 
 
 Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::time_point start_time){
-    log() << "ILP with movements routing only" << std::endl;
+    log() << "ILP with movements initing technique" << std::endl;
     // log() << "A* routing only" << std::endl;
 
     // loadParams();
@@ -49,6 +49,8 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
     std::vector<ophidian::circuit::Net> nets(m_design.netlist().begin_net(), m_design.netlist().end_net());
   
     m_design.placement().reset_rtree();
+
+    auto panel_start_time = std::chrono::steady_clock::now();
 
     // if(m_global_params["construct_net_boxes_rtree"] == "true"){
         log() << "construct_net_boxes_rtree\n";
@@ -65,7 +67,9 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
         timer_cluster_based_on_panel.stop();
     // }//end if 
 
-
+    auto panel_end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> time_parser = panel_end_time-panel_start_time;
+    log() << "TIME CREATE PANELS : " << time_parser.count() << std::endl;
 
     // auto end_time = std::chrono::steady_clock::now();
     // std::chrono::duration<double> diff = end_time-start_time;
@@ -74,10 +78,11 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
     // log() << "current time " << current_time << " remaining time " << remaining_time << std::endl;
 
     // if(m_global_params["run_ilp_on_panels_parallel"] == "true"){
-        log() << "ilp parallel\n";
         timer_run_ilp_on_panels_parallel_loop.start();
         m_design.global_routing().set_gcell_cell_instances(m_design.netlist(), m_design.placement());
+        log() << "ilp parallel\n";
         run_ilp_on_panels_parallel(movements);
+        log() << "end ilp parallel\n";
         timer_run_ilp_on_panels_parallel_loop.stop();
     // }
     
@@ -107,11 +112,11 @@ Json Engine::run(movement_container_type & movements,std::chrono::steady_clock::
     m_timer_report_json["run_astar_on_panels_parallel_section"] = timer_run_astar_on_panels_parallel_section.userTime();
     m_timer_report_json["run_astar_on_panels_sequential"] = timer_run_astar_on_panels_sequential.userTime();
     
-
+    log() << "ILP with movements end technique" << std::endl;
     return m_timer_report_json;
     // // write prettified JSON to another file
     // std::string jsonFileNamestr = m_timer_report_json["file_name_report"];
-    // // std::ifstream jsonFile(jsonFileNamestr, std::ifstream::binary);
+    // std::ifstream jsonFile(jsonFileNamestr, std::ifstream::binary);
     // std::ofstream write_report_file(jsonFileNamestr);
     // write_report_file << std::setw(4) << m_timer_report_json << std::endl;   
 

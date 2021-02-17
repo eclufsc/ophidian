@@ -306,7 +306,7 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
     //iccad 2019 benchmarks
     std::vector<std::string> circuit_names = {
         // "ispd19_sample4"
-        // "ispd18_test1",
+        "ispd18_test1",
         // "ispd18_test2",
         // "ispd18_test3",
         // "ispd18_test4",
@@ -315,158 +315,170 @@ TEST_CASE("ILSVLSI paper ILP in all circuit", "[ILSVLSI_ILP]")
         // "ispd18_test7",
         // "ispd18_test8",
         // "ispd18_test9",
-        // "ispd18_test10",
-        "ispd19_test1",
-        "ispd19_test2",
-        "ispd19_test3",
-        "ispd19_test4",
-        "ispd19_test5",
-        "ispd19_test6",
-        "ispd19_test7",
-        "ispd19_test8",
-        "ispd19_test9",
-        "ispd19_test10",
+    };
+
+     std::vector<std::string> guide_extensions = {
+         "",
+        // ".0.95.default",
+        // ".1.default"
     };
 
     std::string benchmarks_path = "./input_files/circuits";
+    
+    for (auto guide_extension : guide_extensions) {
+        for (auto circuit_name : circuit_names) {
+            int iterations = 1;
+            std::string log_filename = circuit_name + guide_extension+ "_iterations_log.csv";
 
-    for (auto circuit_name : circuit_names) {
-        int iterations = 50;
-        std::string log_filename = circuit_name + "_" + std::to_string(iterations) + "_iterations_log.csv";
+            std::cout << "running circuit " << circuit_name << std::endl;
 
-        std::cout << "running circuit " << circuit_name << std::endl;
+            std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
+            std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
+            
+            // std::string def_file =   benchmarks_path + "/guides/" + circuit_name + "/" + circuit_name + guide_extension + ".def";
+            // std::string guide_file = benchmarks_path + "/guides/" + circuit_name + "/" + circuit_name + guide_extension + ".guide";
+            std::string guide_file = benchmarks_path + "/cadence_solution/" + circuit_name + ".guide";
 
-        std::string def_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.def";
-        std::string lef_file =   benchmarks_path + "/" + circuit_name + "/" + circuit_name + ".input.lef";
-        std::string guide_file = benchmarks_path + "/cadence_solution/" + circuit_name + ".guide";
-        // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
-        // std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
-        ophidian::parser::Def def;
-        ophidian::parser::Lef lef;
-        ophidian::parser::Guide guide;
-        def = ophidian::parser::Def{def_file};
-        lef = ophidian::parser::Lef{lef_file};
-        guide = ophidian::parser::Guide{guide_file, true};
+            // std::string guide_file = benchmarks_path + "/cu_gr_solution_tiago/guides/" + circuit_name + ".solution_cugr.guide";
+            // std::string guide_file = benchmarks_path + "/cu_gr_solution_nopatch_connected/" + circuit_name + ".solution_cugr_ophidian.guide";
+            auto start_time_parser  = std::chrono::steady_clock::now();
+            ophidian::parser::Def def;
+            ophidian::parser::Lef lef;
+            ophidian::parser::Guide guide;
+            def = ophidian::parser::Def{def_file};
+            lef = ophidian::parser::Lef{lef_file};
+            guide = ophidian::parser::Guide{guide_file, true};
 
-        auto design = ophidian::design::Design();
-        ophidian::design::factory::make_design(design, def, lef, guide);
+            auto design = ophidian::design::Design();
+            ophidian::design::factory::make_design(design, def, lef, guide);
 
-        //ispd19_sample4
-        // auto net_2037 = design.netlist().find_net("n_2037");
-        // draw_gcell_svg(design, "n_2037");
-        // auto wrl = design.global_routing().wirelength(net_2037);
-        // auto vias = design.global_routing().number_of_vias(net_2037);
-        // log() << "wirelength : " << wrl << " vias : " << vias << std::endl;
+            auto end_time_parser  = std::chrono::steady_clock::now();
+            std::chrono::duration<double> time_parser = end_time_parser-start_time_parser;
+            log() << "TIME PARSER : " << time_parser.count() << std::endl;
+
+            //ispd19_sample4
+            // auto net_2037 = design.netlist().find_net("n_2037");
+            // draw_gcell_svg(design, "n_2037");
+            // auto wrl = design.global_routing().wirelength(net_2037);
+            // auto vias = design.global_routing().number_of_vias(net_2037);
+            // log() << "wirelength : " << wrl << " vias : " << vias << std::endl;
 
 
-        std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
-        auto initial_wrl = design.global_routing().wirelength(nets) ;
-        log() << "Initial wirelength " << initial_wrl << std::endl;
-        auto initial_vias = design.global_routing().number_of_vias(nets);
-        log() << "Initial Vias " << initial_vias << std::endl;
-        log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
+            std::vector<ophidian::circuit::Net> nets{design.netlist().begin_net(), design.netlist().end_net()};
+            auto initial_wrl = design.global_routing().wirelength(nets) ;
+            log() << "Initial wirelength " << initial_wrl << std::endl;
+            auto initial_vias = design.global_routing().number_of_vias(nets);
+            log() << "Initial Vias " << initial_vias << std::endl;
+            log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
 
-        auto number_of_nets = nets.size();
-        auto number_of_cells = design.netlist().size_cell_instance();
+            auto number_of_nets = nets.size();
+            auto number_of_cells = design.netlist().size_cell_instance();
+            
+
+            UCal::Engine engine(design);
+            movement_container_type movements;
+            
         
+            if(!fileExists(log_filename)){
+                std::ofstream iter_log_file(log_filename, std::ofstream::out);
+                // iter_log_file << "iter,acum_time,acum_mov,time,num_mov,wirelength,reduction" << std::endl;
 
-        UCal::Engine engine(design);
-        movement_container_type movements;
-        
-       
-        if(!fileExists(log_filename)){
-            std::ofstream iter_log_file(log_filename, std::ofstream::out);
-            // iter_log_file << "iter,acum_time,acum_mov,time,num_mov,wirelength,reduction" << std::endl;
+                iter_log_file << "Circuit,nets,std,Iteration,movements,total_movements,cells_moved,wrl_baseline,wrl_optimized,wrl_reduction,via_baseline,via_optimized,via_reduction,runtime,acumulated" << std::endl;
 
-            iter_log_file << "Circuit,nets,std,Iteration,movements,total_movements,cells_moved,wrl_baseline,wrl_optimized,wrl_reduction,via_baseline,via_optimized,via_reduction,runtime,acumulated" << std::endl;
+                // Circuit	# nets	# std	Iterations	# movements	total movements	% cells moved	baseline	optimized	reduction %	baseline	optimized	reduction %	runtime	acumulated
+            }
+            std::ofstream iter_log_file(log_filename, std::ofstream::app);
+            
+           auto start_time  = std::chrono::steady_clock::now();
 
-            // Circuit	# nets	# std	Iterations	# movements	total movements	% cells moved	baseline	optimized	reduction %	baseline	optimized	reduction %	runtime	acumulated
-        }
-        std::ofstream iter_log_file(log_filename, std::ofstream::app);
-        
-        auto start_time = std::chrono::steady_clock::now();
+            int num_mov = movements.size();
 
-        int num_mov = movements.size();
-
-        auto last_reduction = 0.0;
-        for (int i = 0; i < iterations; i++)
-        {
-            log() << "Initing ILP iteration : " << i << std::endl;
-            auto iteration_start_time = std::chrono::steady_clock::now();
-            auto report_json = engine.run(movements,iteration_start_time);
-            auto current_time = std::chrono::steady_clock::now();
-
-            std::chrono::duration<double> iteration_time = current_time-iteration_start_time;
-            std::chrono::duration<double> technique_time = current_time-start_time;
-
-            int number_movements = movements.size() - num_mov;
-            num_mov = movements.size();
-
-            log() << "Iteration time : " << iteration_time.count() << " sec | " << (iteration_time.count()/60) << " min" << std::endl;
-            log() << "Number of movements : " << number_movements << std::endl;
-            log() << "Technique time : " << technique_time.count() << " sec | " << (technique_time.count()/60) << " min" << std::endl;
-            log() << "TOTAL of movements : " << movements.size() << std::endl;
-
-            auto wrl = design.global_routing().wirelength(nets);
-            auto wrl_reduction = (1.0 - wrl/(double)initial_wrl);
-            log() << "reduction " <<  wrl_reduction << " %" << std::endl;
-
-            auto vias = design.global_routing().number_of_vias(nets);
-            auto via_reduction = (1.0 - vias/(double)initial_vias);
-            log() << "Via reduction " <<  via_reduction << " %" << std::endl;
-
-            auto percentage_cell_moved = num_mov/(double)number_of_cells;
-
-            //  iter_log_file << "iter,acum_time,acum_mov,time,num_mov" << std::endl;
-            // iter_log_file << "Circuit,nets,std,Iteration,movements,total_movements,cells_moved,wrl_baseline,wrl_optimized,wrl_reduction,via_baseline,via_optimized,via_reduction,runtime,acumulated" << std::endl;
-            iter_log_file << circuit_name << "," << 
-                            number_of_nets << "," << 
-                            number_of_cells << "," << 
-                            (i+1) << "," <<
-                            number_movements << "," << 
-                            num_mov << "," << 
-                            percentage_cell_moved << "," << 
-                            initial_wrl << "," << 
-                            wrl << "," << 
-                            wrl_reduction << "," << 
-                            initial_vias << "," <<
-                            vias << "," <<
-                            via_reduction << "," <<
-                            iteration_time.count() << "," << 
-                            technique_time.count() << std::endl;
-            /*
-            for(auto mov : movements)
+            auto last_reduction = 0.0;
+            for (int i = 0; i < iterations; i++)
             {
-                auto cell = mov.first;
-                design.placement().fixLocation(cell);
-            }
-            */
+                log() << "Initing ILP iteration : " << i << std::endl;
+                auto iteration_start_time = std::chrono::steady_clock::now();
+                auto report_json = engine.run(movements,iteration_start_time);
+                auto current_time = std::chrono::steady_clock::now();
 
-            //stop criteria
-            double diff = wrl_reduction - last_reduction;
-            last_reduction = wrl_reduction;
-            if(diff <= 0.0001){
-                log() << "Stoping by stop criteria!" << std::endl;
-                break;
+                std::chrono::duration<double> iteration_time = current_time-iteration_start_time;
+                std::chrono::duration<double> technique_time = current_time-start_time;
+
+                int number_movements = movements.size() - num_mov;
+                num_mov = movements.size();
+
+                log() << "Iteration time : " << iteration_time.count() << " sec | " << (iteration_time.count()/60) << " min" << std::endl;
+                log() << "Number of movements : " << number_movements << std::endl;
+                log() << "Technique time : " << technique_time.count() << " sec | " << (technique_time.count()/60) << " min" << std::endl;
+                log() << "TOTAL of movements : " << movements.size() << std::endl;
+
+                auto wrl = design.global_routing().wirelength(nets);
+                auto wrl_reduction = (1.0 - wrl/(double)initial_wrl);
+                log() << "reduction " <<  wrl_reduction << " %" << std::endl;
+
+                auto vias = design.global_routing().number_of_vias(nets);
+                auto via_reduction = (1.0 - vias/(double)initial_vias);
+                log() << "Via reduction " <<  via_reduction << " %" << std::endl;
+
+                auto percentage_cell_moved = num_mov/(double)number_of_cells;
+
+                //  iter_log_file << "iter,acum_time,acum_mov,time,num_mov" << std::endl;
+                // iter_log_file << "Circuit,nets,std,Iteration,movements,total_movements,cells_moved,wrl_baseline,wrl_optimized,wrl_reduction,via_baseline,via_optimized,via_reduction,runtime,acumulated" << std::endl;
+                iter_log_file << circuit_name << "," << 
+                                number_of_nets << "," << 
+                                number_of_cells << "," << 
+                                (i+1) << "," <<
+                                number_movements << "," << 
+                                num_mov << "," << 
+                                percentage_cell_moved << "," << 
+                                initial_wrl << "," << 
+                                wrl << "," << 
+                                wrl_reduction << "," << 
+                                initial_vias << "," <<
+                                vias << "," <<
+                                via_reduction << "," <<
+                                iteration_time.count() << "," << 
+                                technique_time.count() << std::endl;
+                /*
+                for(auto mov : movements)
+                {
+                    auto cell = mov.first;
+                    design.placement().fixLocation(cell);
+                }
+                */
+
+                //stop criteria
+                double diff = wrl_reduction - last_reduction;
+                last_reduction = wrl_reduction;
+                if(diff <= 0.0001){
+                    log() << "Stoping by stop criteria!" << std::endl;
+                    break;
+                }
             }
+            iter_log_file.close();
+
+            // log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
+
+            // auto end_wrl = design.global_routing().wirelength(nets);
+            // log() <<"Initial wrl " << initial_wrl << std::endl;
+            // log() << "Final wrl " << end_wrl << std::endl;
+            // log() << "Improve " << initial_wrl - end_wrl << std::endl;
+            // log() << "reduction " << (1.0 - end_wrl/(double)initial_wrl)*100.0 << " %" << std::endl;
+
+            // std::string log_filename = circuit_name + guide_extension+ "_iterations_log.csv";
+            // auto csv_file_name = circuit_name + guide_extension + "_iterations_movements_.csv";
+            // write_csv(design, csv_file_name, movements);
+
+
+            auto start_time_output  = std::chrono::steady_clock::now();
+            auto guide_file_name = circuit_name + guide_extension + "_iterations.guide";
+            ophidian::parser::write_guide(design, guide_file_name);
+            auto end_time_output  = std::chrono::steady_clock::now();
+            std::chrono::duration<double> time_output = end_time_output-start_time_output;
+            log() << "TIME WRITE OUTPUT : " << time_output.count() << std::endl;
+
+            log() << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
         }
-        iter_log_file.close();
-
-        log() << "Design connected? " << design.global_routing().is_connected(design.netlist(), nets) << std::endl;
-
-        auto end_wrl = design.global_routing().wirelength(nets);
-        log() <<"Initial wrl " << initial_wrl << std::endl;
-        log() << "Final wrl " << end_wrl << std::endl;
-        log() << "Improve " << initial_wrl - end_wrl << std::endl;
-        log() << "reduction " << (1.0 - end_wrl/(double)initial_wrl)*100.0 << " %" << std::endl;
-
-        auto csv_file_name = circuit_name + "_" + std::to_string(iterations) + "_iterations_movements_ILP_to_median_comercial.csv";
-        write_csv(design, csv_file_name, movements);
-
-        auto guide_file_name = circuit_name + "_iterations.guide";
-        ophidian::parser::write_guide(design, guide_file_name);
-
-        log() << "Memory usage in peak= " << ophidian::util::mem_use::get_peak() << " MB" << std::endl << std::endl;    
     }
 }
 
